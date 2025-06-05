@@ -27,19 +27,49 @@ export default function Auth() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
+      console.log('[AUTH PAGE] Starting Google login process');
       const result = await loginWithGoogle();
+      
       if (result?.user) {
+        console.log('[AUTH PAGE] Google login successful, user:', result.user.email);
+        
         toast({
           title: "Welcome to VeeFore!",
           description: "Successfully signed in to your galactic command center.",
         });
-        // Small delay to ensure auth state is properly updated
-        setTimeout(() => {
-          setLocation('/dashboard');
-        }, 100);
+        
+        // Wait for auth state to propagate before redirecting
+        console.log('[AUTH PAGE] Waiting for auth state to update...');
+        
+        // Check for auth state every 100ms, up to 3 seconds
+        let attempts = 0;
+        const maxAttempts = 30;
+        
+        const checkAuthAndRedirect = () => {
+          attempts++;
+          const token = localStorage.getItem('veefore_auth_token');
+          
+          console.log(`[AUTH PAGE] Check attempt ${attempts}, token exists:`, !!token);
+          
+          if (token || attempts >= maxAttempts) {
+            console.log('[AUTH PAGE] Redirecting to dashboard');
+            setLocation('/dashboard');
+          } else {
+            setTimeout(checkAuthAndRedirect, 100);
+          }
+        };
+        
+        checkAuthAndRedirect();
+      } else {
+        console.log('[AUTH PAGE] Google login failed - no user returned');
+        toast({
+          title: "Login Failed",
+          description: "Google login did not return user information",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('[AUTH PAGE] Login error:', error);
       toast({
         title: "Login Failed",
         description: error.message || "Failed to sign in with Google",

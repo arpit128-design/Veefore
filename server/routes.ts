@@ -75,6 +75,55 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   };
 
+  // Get current user
+  app.get('/api/user', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      console.log(`[USER API] Returning user data for: ${user.id} (${user.email})`);
+      res.json(user);
+    } catch (error: any) {
+      console.error('[USER API] Error fetching user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create new user
+  app.post('/api/user', async (req: Request, res: Response) => {
+    try {
+      const { firebaseUid, email, username, displayName, avatar } = req.body;
+      
+      console.log('[USER API] Creating new user:', { firebaseUid, email, username });
+      
+      if (!firebaseUid || !email) {
+        return res.status(400).json({ error: 'Firebase UID and email are required' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByFirebaseUid(firebaseUid);
+      if (existingUser) {
+        console.log('[USER API] User already exists:', existingUser.id);
+        return res.json(existingUser);
+      }
+
+      const userData = {
+        firebaseUid,
+        email,
+        username: username || email.split('@')[0],
+        displayName: displayName || null,
+        avatar: avatar || null,
+        referredBy: null
+      };
+
+      const newUser = await storage.createUser(userData);
+      console.log('[USER API] New user created:', newUser.id);
+      
+      res.json(newUser);
+    } catch (error: any) {
+      console.error('[USER API] Error creating user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Content creation and publishing
   app.post('/api/content', requireAuth, async (req: any, res: Response) => {
     try {

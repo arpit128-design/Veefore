@@ -47,30 +47,56 @@ export function useAuth() {
           
           // Check if user exists in our database
           try {
+            console.log('[AUTH] Checking user in database with token:', idToken.substring(0, 20) + '...');
             const response = await fetch('/api/user', {
               headers: {
-                'Authorization': `Bearer ${idToken}`
+                'Authorization': `Bearer ${idToken}`,
+                'Content-Type': 'application/json'
               }
             });
             
+            console.log('[AUTH] User check response status:', response.status);
+            
             if (response.ok) {
               const userData = await response.json();
+              console.log('[AUTH] User found in database:', userData.username);
               setUser(userData);
             } else if (response.status === 404) {
               // User doesn't exist, create them
-              const newUserResponse = await apiRequest('POST', '/api/user', {
-                firebaseUid: firebaseUser.uid,
-                email: firebaseUser.email!,
-                username: firebaseUser.displayName || firebaseUser.email!.split('@')[0],
-                displayName: firebaseUser.displayName,
-                avatar: firebaseUser.photoURL
-              });
-              
-              const newUserData = await newUserResponse.json();
-              setUser(newUserData);
+              console.log('[AUTH] User not found, creating new user');
+              try {
+                const createUserResponse = await fetch('/api/user', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    firebaseUid: firebaseUser.uid,
+                    email: firebaseUser.email!,
+                    username: firebaseUser.displayName || firebaseUser.email!.split('@')[0],
+                    displayName: firebaseUser.displayName,
+                    avatar: firebaseUser.photoURL
+                  })
+                });
+                
+                if (createUserResponse.ok) {
+                  const newUserData = await createUserResponse.json();
+                  console.log('[AUTH] New user created:', newUserData.username);
+                  setUser(newUserData);
+                } else {
+                  const errorData = await createUserResponse.json();
+                  console.error('[AUTH] Failed to create user:', errorData);
+                }
+              } catch (createError) {
+                console.error('[AUTH] Error creating user:', createError);
+              }
+            } else {
+              const errorData = await response.text();
+              console.error('[AUTH] User sync failed with status:', response.status, errorData);
             }
           } catch (error) {
-            console.error('Failed to sync user:', error);
+            console.error('[AUTH] Failed to sync user:', error);
           }
         } catch (error) {
           console.error('Failed to get Firebase token:', error);

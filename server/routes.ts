@@ -638,19 +638,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect('/dashboard?error=missing_code_or_state');
       }
 
-      // State contains the workspace ID
+      // State contains the workspace ID (can be ObjectId string or number)
       const workspaceId = state as string;
       console.log(`[INSTAGRAM CALLBACK] Received state (workspace ID): ${workspaceId}`);
       
-      // Parse workspace ID more carefully
-      const workspaceIdNum = parseInt(workspaceId, 10);
-      if (isNaN(workspaceIdNum)) {
-        console.log(`[INSTAGRAM CALLBACK] Invalid workspace ID: ${workspaceId}`);
-        return res.redirect('/dashboard?error=invalid_workspace_id');
-      }
-      
-      console.log(`[INSTAGRAM CALLBACK] Parsed workspace ID: ${workspaceIdNum}`);
-      const workspace = await storage.getWorkspace(workspaceIdNum);
+      // Handle both ObjectId strings and numeric IDs
+      const workspace = await storage.getWorkspace(workspaceId);
       
       if (!workspace) {
         return res.redirect('/dashboard?error=invalid_workspace');

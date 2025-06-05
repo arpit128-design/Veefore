@@ -127,22 +127,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userData = insertUserSchema.parse(req.body);
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByFirebaseUid(userData.firebaseUid);
+      // Check if user already exists by Firebase UID
+      let existingUser = await storage.getUserByFirebaseUid(userData.firebaseUid);
       if (existingUser) {
         return res.json(existingUser);
       }
       
-      const user = await storage.createUser(userData);
+      // Also check by email to prevent duplicates
+      if (userData.email) {
+        existingUser = await storage.getUserByEmail(userData.email);
+        if (existingUser) {
+          return res.json(existingUser);
+        }
+      }
+      
+      let user;
+      try {
+        user = await storage.createUser(userData);
+      } catch (createError: any) {
+        // If user creation fails due to duplicate key, try to find existing user
+        if (createError.message && createError.message.includes('E11000')) {
+          console.log('User already exists, attempting to retrieve...');
+          user = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
+                 await storage.getUserByEmail(userData.email!);
+          if (user) {
+            return res.json(user);
+          }
+        }
+        throw createError;
+      }
       
       // Create default workspace with proper validation
-      const workspaceData = insertWorkspaceSchema.parse({
-        userId: user.id,
-        name: "Main Brand",
-        description: "Your primary workspace for content creation",
-        isDefault: true
-      });
-      await storage.createWorkspace(workspaceData);
+      try {
+        const workspaceData = insertWorkspaceSchema.parse({
+          userId: user.id,
+          name: "Main Brand",
+          description: "Your primary workspace for content creation",
+          isDefault: true
+        });
+        await storage.createWorkspace(workspaceData);
+      } catch (workspaceError) {
+        console.warn('Failed to create default workspace:', workspaceError);
+        // Continue even if workspace creation fails
+      }
       
       // Handle referral if provided
       if (userData.referredBy) {
@@ -167,7 +194,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      console.error('User creation error:', error);
+      
+      // Handle MongoDB duplicate key errors gracefully
+      if (error.message && error.message.includes('E11000')) {
+        // Try one more time to find the user
+        try {
+          const existingUser = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
+                             await storage.getUserByEmail(userData.email!);
+          if (existingUser) {
+            return res.json(existingUser);
+          }
+        } catch (retrieveError) {
+          console.error('Failed to retrieve existing user:', retrieveError);
+        }
+        res.status(409).json({ error: 'User already exists but could not be retrieved' });
+      } else {
+        res.status(400).json({ error: error.message });
+      }
     }
   });
 

@@ -573,16 +573,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       console.log('[CAPTION GENERATION] Generating caption for:', { title, description, type, platform });
 
-      // Generate caption using Google Gemini API
-      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_API_KEY, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Create an engaging ${platform} ${type} caption for: "${contentTopic}"
+      let caption = '';
+      let hashtags = '';
+
+      // Try Google Gemini API first if available
+      if (process.env.GOOGLE_API_KEY) {
+        try {
+          const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_API_KEY, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `Create an engaging ${platform} ${type} caption for: "${contentTopic}"
 ${additionalContext}
 
 Requirements:
@@ -597,44 +602,76 @@ Requirements:
 Format the response as:
 Caption: [your engaging caption here]
 Hashtags: [relevant hashtags separated by spaces]`
-            }]
-          }]
-        })
-      });
+                }]
+              }]
+            })
+          });
 
-      if (!response.ok) {
-        throw new Error(`Google API error: ${response.status}`);
-      }
+          if (response.ok) {
+            const data = await response.json();
+            const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-      const data = await response.json();
-      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            // Parse the generated content using simple string methods
+            const lines = generatedText.split('\n');
+            let inCaption = false;
+            let inHashtags = false;
 
-      // Parse the generated content using simple string methods
-      const lines = generatedText.split('\n');
-      let caption = '';
-      let hashtags = '';
-      let inCaption = false;
-      let inHashtags = false;
+            for (const line of lines) {
+              if (line.toLowerCase().includes('caption:')) {
+                inCaption = true;
+                inHashtags = false;
+                caption += line.replace(/caption:\s*/i, '').trim() + '\n';
+              } else if (line.toLowerCase().includes('hashtags:')) {
+                inHashtags = true;
+                inCaption = false;
+                hashtags += line.replace(/hashtags:\s*/i, '').trim();
+              } else if (inCaption && !line.toLowerCase().includes('hashtag')) {
+                caption += line.trim() + '\n';
+              } else if (inHashtags) {
+                hashtags += ' ' + line.trim();
+              }
+            }
 
-      for (const line of lines) {
-        if (line.toLowerCase().includes('caption:')) {
-          inCaption = true;
-          inHashtags = false;
-          caption += line.replace(/caption:\s*/i, '').trim() + '\n';
-        } else if (line.toLowerCase().includes('hashtags:')) {
-          inHashtags = true;
-          inCaption = false;
-          hashtags += line.replace(/hashtags:\s*/i, '').trim();
-        } else if (inCaption && !line.toLowerCase().includes('hashtag')) {
-          caption += line.trim() + '\n';
-        } else if (inHashtags) {
-          hashtags += ' ' + line.trim();
+            // Fallback if parsing fails
+            if (!caption && !hashtags) {
+              caption = generatedText.trim();
+            }
+          } else {
+            throw new Error(`Google API error: ${response.status}`);
+          }
+        } catch (error) {
+          console.log('[CAPTION GENERATION] Google API failed, using template fallback:', error);
+          // Fall through to template generation
         }
       }
 
-      // Fallback if parsing fails
-      if (!caption && !hashtags) {
-        caption = generatedText.trim();
+      // Template-based fallback caption generation
+      if (!caption) {
+        const captionTemplates = {
+          instagram: {
+            post: [
+              `✨ ${contentTopic} ✨\n\nReady to dive into something amazing? This is exactly what you've been looking for! 💫\n\nWhat do you think? Drop a comment below! 👇`,
+              `${contentTopic} hits different! 🔥\n\nSeriously, this is the kind of content that makes your day better. Who else agrees?\n\nTag someone who needs to see this! 🙌`,
+              `POV: You discover ${contentTopic} 🤩\n\nThis is your sign to try something new today! Life's too short for boring content.\n\nSave this post for later! 📌`,
+              `${contentTopic} just landed on your feed ✨\n\nSometimes the best discoveries happen when you least expect them. This is one of those moments!\n\nShare your thoughts below! 💭`
+            ]
+          }
+        };
+
+        const hashtagSets = {
+          instagram: [
+            '#viral #explore #trending #fyp #instagood',
+            '#content #creative #inspiration #lifestyle #daily',
+            '#amazing #discover #share #love #follow',
+            '#new #fresh #exciting #fun #awesome'
+          ]
+        };
+
+        const templates = captionTemplates[platform]?.[type] || captionTemplates.instagram.post;
+        const hashtagOptions = hashtagSets[platform] || hashtagSets.instagram;
+
+        caption = templates[Math.floor(Math.random() * templates.length)];
+        hashtags = hashtagOptions[Math.floor(Math.random() * hashtagOptions.length)];
       }
 
       console.log('[CAPTION GENERATION] Caption generated successfully');

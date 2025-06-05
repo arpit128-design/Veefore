@@ -317,6 +317,22 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  private convertSocialAccount(mongoAccount: any): SocialAccount {
+    return {
+      id: mongoAccount._id.toString(),
+      workspaceId: mongoAccount.workspaceId,
+      platform: mongoAccount.platform,
+      username: mongoAccount.username,
+      accountId: mongoAccount.accountId || null,
+      accessToken: mongoAccount.accessToken || null,
+      refreshToken: mongoAccount.refreshToken || null,
+      expiresAt: mongoAccount.expiresAt || null,
+      isActive: mongoAccount.isActive !== false,
+      createdAt: mongoAccount.createdAt || new Date(),
+      updatedAt: mongoAccount.updatedAt || new Date()
+    };
+  }
+
   private generateReferralCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
@@ -334,7 +350,9 @@ export class MongoStorage implements IStorage {
   }
 
   async getSocialAccountsByWorkspace(workspaceId: number): Promise<SocialAccount[]> {
-    return [];
+    await this.connect();
+    const accounts = await SocialAccountModel.find({ workspaceId });
+    return accounts.map(account => this.convertSocialAccount(account));
   }
 
   async getSocialAccountByPlatform(workspaceId: number, platform: string): Promise<SocialAccount | undefined> {

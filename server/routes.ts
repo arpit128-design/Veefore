@@ -495,6 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               comments: totalComments,
               shares: 0,
               followers: profile.followers_count || 0,
+              follower_count: profile.followers_count || 0,
               engagement: totalLikes + totalComments,
               reach: totalReach,
               impressions: totalImpressions
@@ -571,7 +572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         acc[a.platform].views += metrics?.views || metrics?.impressions || 0;
         acc[a.platform].engagement += (metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
-        acc[a.platform].followers += metrics?.followers || 0;
+        acc[a.platform].followers += metrics?.followers || metrics?.follower_count || 0;
         acc[a.platform].posts += 1;
         return acc;
       }, {} as any);

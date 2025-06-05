@@ -270,7 +270,17 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         publishNow = false
       } = req.body;
 
+      console.log('[CONTENT API] Request body validation:', { 
+        workspaceId: workspaceId, 
+        workspaceIdType: typeof workspaceId,
+        title: title,
+        titleType: typeof title,
+        hasWorkspaceId: !!workspaceId,
+        hasTitle: !!title
+      });
+
       if (!workspaceId || !title) {
+        console.log('[CONTENT API] Validation failed - missing required fields');
         return res.status(400).json({ error: 'Workspace ID and title are required' });
       }
 

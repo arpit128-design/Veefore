@@ -86,8 +86,6 @@ export default function Integrations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
-  const [manualToken, setManualToken] = useState("");
-  const [isManualDialogOpen, setIsManualDialogOpen] = useState(false);
 
   // Fetch connected social accounts
   const { data: socialAccounts, isLoading } = useQuery({
@@ -265,32 +263,7 @@ export default function Integrations() {
     }
   });
 
-  // Manual Instagram token connection mutation
-  const manualConnectMutation = useMutation({
-    mutationFn: async (token: string) => {
-      const response = await apiRequest('POST', '/api/instagram/manual-connect', {
-        workspaceId: currentWorkspace?.id,
-        accessToken: token
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
-      setIsManualDialogOpen(false);
-      setManualToken("");
-      toast({
-        title: "Instagram Connected",
-        description: "Instagram account connected successfully using manual token.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Connection Failed",
-        description: error.message || "Failed to connect using manual token",
-        variant: "destructive",
-      });
-    }
-  });
+
 
   const getConnectedAccount = (platform: string): SocialAccount | undefined => {
     return Array.isArray(socialAccounts) ? socialAccounts.find((account: SocialAccount) => account.platform === platform) : undefined;
@@ -483,50 +456,7 @@ export default function Integrations() {
         })}
       </div>
 
-      {/* Manual Instagram Connection */}
-      <Card className="border-asteroid-gray/20 bg-space-black/50 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Instagram className="w-5 h-5 text-pink-500" />
-            Manual Instagram Connection
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-asteroid-silver text-sm">
-            If OAuth connection fails, you can connect Instagram directly using your access token.
-          </p>
-          <div className="space-y-3">
-            <Label htmlFor="manual-token" className="text-white">
-              Instagram Access Token
-            </Label>
-            <Input
-              id="manual-token"
-              type="password"
-              placeholder="Enter your Instagram Business API access token"
-              value={manualToken}
-              onChange={(e) => setManualToken(e.target.value)}
-              className="bg-space-black/50 border-asteroid-gray/20 text-white"
-            />
-            <Button 
-              onClick={() => manualConnectMutation.mutate(manualToken)}
-              disabled={!manualToken || manualConnectMutation.isPending}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-            >
-              {manualConnectMutation.isPending ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  <Instagram className="w-4 h-4 mr-2" />
-                  Connect Instagram
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Integration Guide */}
       <Card className="border-asteroid-gray/20 bg-space-black/50 backdrop-blur-sm">

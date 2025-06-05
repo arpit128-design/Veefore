@@ -711,8 +711,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Exchange code for short-lived token
       console.log(`[INSTAGRAM CALLBACK] Attempting to exchange code: ${code}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
-      const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
-      console.log(`[INSTAGRAM CALLBACK] Exchanged code for token successfully:`, tokenData);
+      
+      try {
+        const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
+        console.log(`[INSTAGRAM CALLBACK] Token exchange successful:`, tokenData);
+      } catch (tokenError: any) {
+        console.error(`[INSTAGRAM CALLBACK] Token exchange failed:`, tokenError.message);
+        return res.redirect(`/dashboard?error=${encodeURIComponent(`Token exchange failed: ${tokenError.message}`)}`);
+      }
       
       // Get long-lived token
       const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);

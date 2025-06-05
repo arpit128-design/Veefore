@@ -46,7 +46,7 @@ export class InstagramAPI {
       ...(state && { state })
     });
 
-    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
+    return `https://api.instagram.com/oauth/authorize?${params.toString()}`;
   }
 
   // Exchange authorization code for access token (Instagram Business Login API)
@@ -54,6 +54,11 @@ export class InstagramAPI {
     access_token: string;
     user_id?: string;
   }> {
+    console.log(`[INSTAGRAM API] Token exchange started`);
+    console.log(`[INSTAGRAM API] Code: ${code}`);
+    console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
+    console.log(`[INSTAGRAM API] App ID: ${process.env.INSTAGRAM_APP_ID}`);
+    
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       client_secret: process.env.INSTAGRAM_APP_SECRET!,
@@ -62,13 +67,24 @@ export class InstagramAPI {
       code
     });
 
-    const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
+    try {
+      console.log(`[INSTAGRAM API] Making POST request to: https://api.instagram.com/oauth/access_token`);
+      console.log(`[INSTAGRAM API] Request body:`, params.toString());
+      
+      const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
 
-    return response.data;
+      console.log(`[INSTAGRAM API] Token exchange successful:`, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM API] Token exchange failed:`, error.response?.data || error.message);
+      console.error(`[INSTAGRAM API] Response status:`, error.response?.status);
+      console.error(`[INSTAGRAM API] Response headers:`, error.response?.headers);
+      throw new Error(`Instagram token exchange failed: ${error.response?.data?.error_message || error.message}`);
+    }
   }
 
   // Get long-lived access token (Instagram Graph API)

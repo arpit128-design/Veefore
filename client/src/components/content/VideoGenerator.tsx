@@ -129,17 +129,17 @@ export function VideoGenerator() {
                 placeholder="Enter video title..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="glassmorphism"
+                className="glassmorphism bg-space-navy/50 text-white border-electric-cyan/30 focus:border-electric-cyan focus:ring-electric-cyan focus:ring-1"
               />
             </div>
 
             <div>
               <Label htmlFor="platform-select">Target Platform</Label>
               <Select value={platform} onValueChange={setPlatform}>
-                <SelectTrigger className="glassmorphism">
+                <SelectTrigger className="glassmorphism bg-space-navy/50 text-white border-electric-cyan/30 focus:border-electric-cyan focus:ring-electric-cyan focus:ring-1">
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-cosmic-blue border-electric-cyan/30">
                   <SelectItem value="youtube">YouTube</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
                   <SelectItem value="tiktok">TikTok</SelectItem>
@@ -155,8 +155,9 @@ export function VideoGenerator() {
                 placeholder="Describe the video you want to create..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="glassmorphism resize-none"
+                className="glassmorphism resize-none bg-space-navy/50 text-white border-electric-cyan/30 focus:border-electric-cyan focus:ring-electric-cyan focus:ring-1"
                 rows={4}
+                autoFocus
               />
             </div>
 

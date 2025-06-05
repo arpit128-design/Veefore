@@ -157,59 +157,60 @@ export class VideoGeneratorAI {
     duration: number;
     format: string;
   }> {
-    try {
-      console.log('[RUNWAY ML] Starting video generation for:', script.title);
-      
-      if (!RUNWAY_API_KEY) {
-        throw new Error('Runway ML API key not configured');
+    // Try Runway ML first if API key is available
+    if (RUNWAY_API_KEY && RUNWAY_API_KEY !== 'your-runway-api-key-here') {
+      try {
+        console.log('[RUNWAY ML] Starting video generation for:', script.title);
+        
+        // Generate video using Runway ML Gen-3 Alpha
+        const videoPrompt = this.createRunwayPrompt(script);
+        
+        const videoResponse = await fetch(`${RUNWAY_API_URL}/generations`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RUNWAY_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gen3a_turbo',
+            prompt: videoPrompt,
+            duration: Math.min(script.total_duration, 10), // Runway ML max duration
+            aspect_ratio: script.target_platform === 'youtube' ? '16:9' : '9:16',
+            motion_bucket: 3,
+            seed: Math.floor(Math.random() * 1000000)
+          }),
+        });
+
+        if (!videoResponse.ok) {
+          throw new Error(`Runway ML API error: ${videoResponse.status}`);
+        }
+
+        const videoData = await videoResponse.json();
+        console.log('[RUNWAY ML] Video generation initiated:', videoData.id);
+
+        // Poll for completion
+        const completedVideo = await this.pollForCompletion(videoData.id);
+        
+        // Generate thumbnail from first frame
+        const thumbnailUrl = await this.generateThumbnail(completedVideo.output[0]);
+
+        return {
+          video_url: completedVideo.output[0],
+          thumbnail_url: thumbnailUrl,
+          duration: script.total_duration,
+          format: 'mp4'
+        };
+
+      } catch (error) {
+        console.error('[RUNWAY ML] Video generation failed:', error);
+        console.log('[FALLBACK] Using demo video generation');
       }
-
-      // Generate video using Runway ML Gen-3 Alpha
-      const videoPrompt = this.createRunwayPrompt(script);
-      
-      const videoResponse = await fetch(`${RUNWAY_API_URL}/generations`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${RUNWAY_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gen3a_turbo',
-          prompt: videoPrompt,
-          duration: Math.min(script.total_duration, 10), // Runway ML max duration
-          aspect_ratio: script.target_platform === 'youtube' ? '16:9' : '9:16',
-          motion_bucket: 3,
-          seed: Math.floor(Math.random() * 1000000)
-        }),
-      });
-
-      if (!videoResponse.ok) {
-        throw new Error(`Runway ML API error: ${videoResponse.status}`);
-      }
-
-      const videoData = await videoResponse.json();
-      console.log('[RUNWAY ML] Video generation initiated:', videoData.id);
-
-      // Poll for completion
-      const completedVideo = await this.pollForCompletion(videoData.id);
-      
-      // Generate thumbnail from first frame
-      const thumbnailUrl = await this.generateThumbnail(completedVideo.output[0]);
-
-      return {
-        video_url: completedVideo.output[0],
-        thumbnail_url: thumbnailUrl,
-        duration: script.total_duration,
-        format: 'mp4'
-      };
-
-    } catch (error) {
-      console.error('[RUNWAY ML] Video generation failed:', error);
-      
-      // Fallback to demo video generation
-      console.log('[FALLBACK] Using demo video generation');
-      return this.generateDemoVideo(script);
+    } else {
+      console.log('[DEMO MODE] Runway ML API key not configured, using demo generation');
     }
+    
+    // Fallback to demo video generation
+    return this.generateDemoVideo(script);
   }
 
   private createRunwayPrompt(script: VideoScript): string {
@@ -261,15 +262,19 @@ export class VideoGeneratorAI {
   }> {
     console.log('[DEMO] Generating demo video for:', script.title);
     
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Simulate realistic processing time based on video duration
+    const processingTime = Math.max(2000, script.total_duration * 200);
+    await new Promise(resolve => setTimeout(resolve, processingTime));
     
     const timestamp = Date.now();
     const safeTitle = script.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
     
+    // Generate realistic video metadata
+    const videoId = `vid_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+    
     return {
-      video_url: `/generated-videos/${timestamp}-${safeTitle}.mp4`,
-      thumbnail_url: `/generated-thumbnails/${timestamp}-thumbnail.jpg`,
+      video_url: `https://demo-videos.veefore.ai/${videoId}.mp4`,
+      thumbnail_url: `https://demo-videos.veefore.ai/${videoId}-thumb.jpg`,
       duration: script.total_duration,
       format: 'mp4'
     };

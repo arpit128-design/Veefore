@@ -123,13 +123,14 @@ export function VideoGenerator() {
         {step === 'input' && (
           <div className="grid gap-4">
             <div>
-              <Label htmlFor="video-title" className="text-white mb-2 block">Video Title (Optional)</Label>
-              <Input
+              <label htmlFor="video-title" className="text-white mb-2 block">Video Title (Optional)</label>
+              <input
+                type="text"
                 id="video-title"
                 placeholder="Enter video title..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
               />
             </div>
 
@@ -149,16 +150,14 @@ export function VideoGenerator() {
             </div>
 
             <div>
-              <Label htmlFor="video-prompt" className="text-white mb-2 block">Video Description</Label>
-              <Textarea
+              <label htmlFor="video-prompt" className="text-white mb-2 block">Video Description</label>
+              <textarea
                 id="video-prompt"
                 placeholder="Describe the video you want to create..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="w-full min-h-[100px] p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                className="w-full h-24 p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
                 rows={4}
-                disabled={false}
-                style={{ pointerEvents: 'auto' }}
               />
             </div>
 

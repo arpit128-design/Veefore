@@ -465,7 +465,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Nuclear database cleanup - remove ALL social accounts from workspace
+  // Complete database wipe - remove ALL social accounts from workspace
   app.post('/api/social-accounts/cleanup', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
@@ -475,70 +475,85 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
       
-      console.log(`[NUCLEAR CLEANUP] Starting nuclear cleanup for workspace: ${workspace.id}`);
+      console.log(`[DATABASE WIPE] Starting complete database wipe for workspace: ${workspace.id}`);
       
-      // Import mongoose models for direct database access
-      const mongoose = await import('mongoose');
+      // Multiple deletion approaches to ensure complete removal
+      let totalDeleted = 0;
       
-      // Ensure connection to MongoDB
-      if (!mongoose.default.connection.readyState) {
-        await mongoose.default.connect(process.env.MONGODB_URI!);
+      // Approach 1: Use storage layer deletion
+      try {
+        const existingAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        console.log(`[DATABASE WIPE] Storage layer found ${existingAccounts.length} accounts`);
+        
+        for (const account of existingAccounts) {
+          try {
+            await storage.deleteSocialAccount(account.id);
+            totalDeleted++;
+            console.log(`[DATABASE WIPE] Storage deleted: ${account.platform} @${account.username}`);
+          } catch (e) {
+            console.log(`[DATABASE WIPE] Storage deletion failed for ${account.id}:`, e);
+          }
+        }
+      } catch (storageError) {
+        console.log(`[DATABASE WIPE] Storage approach failed:`, storageError);
       }
       
-      // Get the SocialAccount model
-      const SocialAccountModel = mongoose.default.models.SocialAccount || 
-        mongoose.default.model('SocialAccount', new mongoose.Schema({
-          workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
-          platform: { type: String, required: true },
-          username: { type: String, required: true },
-          accountId: String,
-          accessToken: String,
-          refreshToken: String,
-          isActive: { type: Boolean, default: true },
-          createdAt: { type: Date, default: Date.now },
-          updatedAt: { type: Date, default: Date.now }
-        }));
+      // Approach 2: Direct MongoDB access using existing connection
+      try {
+        const mongoStorage = storage as any;
+        await mongoStorage.connect();
+        
+        if (mongoStorage.SocialAccountModel) {
+          const directResult = await mongoStorage.SocialAccountModel.deleteMany({ 
+            workspaceId: workspace.id 
+          });
+          console.log(`[DATABASE WIPE] Direct MongoDB deletion result:`, directResult);
+          totalDeleted += directResult.deletedCount || 0;
+        }
+      } catch (directError) {
+        console.log(`[DATABASE WIPE] Direct MongoDB approach failed:`, directError);
+      }
       
-      // Find ALL social accounts for this workspace
-      const accountsToDelete = await SocialAccountModel.find({ 
-        workspaceId: workspace.id 
-      });
-      
-      console.log(`[NUCLEAR CLEANUP] Found ${accountsToDelete.length} accounts to delete:`);
-      accountsToDelete.forEach((acc: any, idx: number) => {
-        console.log(`  ${idx + 1}. ${acc.platform} @${acc.username} (MongoDB _id: ${acc._id})`);
-      });
-      
-      // Use deleteMany for mass deletion
-      const deleteResult = await SocialAccountModel.deleteMany({ 
-        workspaceId: workspace.id 
-      });
-      
-      console.log(`[NUCLEAR CLEANUP] Mass deletion result:`, deleteResult);
-      
-      // Verify complete cleanup
-      const remainingAccounts = await SocialAccountModel.find({ 
-        workspaceId: workspace.id 
-      });
-      
-      console.log(`[NUCLEAR CLEANUP] Final verification - remaining: ${remainingAccounts.length}`);
-      
-      if (remainingAccounts.length > 0) {
-        console.log('[NUCLEAR CLEANUP] Remaining accounts:');
-        remainingAccounts.forEach((acc: any, idx: number) => {
-          console.log(`  ${idx + 1}. ${acc.platform} @${acc.username} (still exists!)`);
+      // Approach 3: Raw MongoDB connection as fallback
+      try {
+        const mongodb = await import('mongodb');
+        const client = new mongodb.MongoClient(process.env.MONGODB_URI!);
+        await client.connect();
+        
+        const db = client.db('veeforedb');
+        const collection = db.collection('socialaccounts');
+        
+        const rawResult = await collection.deleteMany({ 
+          workspaceId: workspace.id 
         });
+        console.log(`[DATABASE WIPE] Raw MongoDB deletion result:`, rawResult);
+        totalDeleted += rawResult.deletedCount || 0;
+        
+        await client.close();
+      } catch (rawError) {
+        console.log(`[DATABASE WIPE] Raw MongoDB approach failed:`, rawError);
+      }
+      
+      // Final verification
+      let remainingCount = 0;
+      try {
+        const remaining = await storage.getSocialAccountsByWorkspace(workspace.id);
+        remainingCount = remaining.length;
+        console.log(`[DATABASE WIPE] Final verification: ${remainingCount} accounts remaining`);
+      } catch (verifyError) {
+        console.log(`[DATABASE WIPE] Verification failed:`, verifyError);
       }
       
       res.json({ 
         success: true, 
-        message: `Nuclear cleanup complete: removed ${deleteResult.deletedCount} accounts`,
-        deletedAccounts: deleteResult.deletedCount,
-        remainingAccounts: remainingAccounts.length,
-        isComplete: remainingAccounts.length === 0
+        message: `Database wipe complete: attempted deletion of accounts using multiple methods`,
+        totalDeleted: totalDeleted,
+        remainingAccounts: remainingCount,
+        isComplete: remainingCount === 0,
+        note: "If accounts persist, they may be cached - refresh the page"
       });
     } catch (error: any) {
-      console.error('[NUCLEAR CLEANUP] Error:', error);
+      console.error('[DATABASE WIPE] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

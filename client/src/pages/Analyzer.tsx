@@ -80,7 +80,12 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">Real-time data</span>
+              <span className="text-sm">
+                {analytics?.changes?.views !== undefined 
+                  ? `${analytics.changes.views >= 0 ? '+' : ''}${analytics.changes.views}% vs last period`
+                  : 'Real-time data'
+                }
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -98,7 +103,12 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">Authentic data</span>
+              <span className="text-sm">
+                {analytics?.changes?.engagement !== undefined 
+                  ? `${analytics.changes.engagement >= 0 ? '+' : ''}${analytics.changes.engagement}% vs last period`
+                  : 'Authentic data'
+                }
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -116,7 +126,12 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">Live Instagram data</span>
+              <span className="text-sm">
+                {analytics?.changes?.reach !== undefined 
+                  ? `${analytics.changes.reach >= 0 ? '+' : ''}${analytics.changes.reach}% vs last period`
+                  : 'Live Instagram data'
+                }
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -134,7 +149,12 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">Instagram Business API</span>
+              <span className="text-sm">
+                {analytics?.changes?.followers !== undefined 
+                  ? `${analytics.changes.followers >= 0 ? '+' : ''}${analytics.changes.followers}% vs last period`
+                  : 'Instagram Business API'
+                }
+              </span>
             </div>
           </CardContent>
         </Card>

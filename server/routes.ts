@@ -118,12 +118,44 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             console.log(`[INSTAGRAM BUSINESS API] Account insights not available:`, insightsError);
           }
           
+          // Get historical data for percentage calculations
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          const historicalAnalytics = await storage.getAnalytics(defaultWorkspace.id, 'instagram', 7);
+          
+          // Calculate percentage changes
+          const calculateChange = (current: number, previous: number): number => {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return Math.round(((current - previous) / previous) * 100);
+          };
+          
+          let changes = {
+            views: 0,
+            engagement: 0,
+            reach: 0,
+            followers: 0
+          };
+          
+          if (historicalAnalytics.length > 1) {
+            const previous = historicalAnalytics[historicalAnalytics.length - 2];
+            const prevMetrics = previous.metrics as any;
+            
+            changes = {
+              views: calculateChange(totalViews, prevMetrics.views || 0),
+              engagement: calculateChange(totalEngagement, prevMetrics.engagement || 0),
+              reach: calculateChange(totalReach, prevMetrics.reach || 0),
+              followers: calculateChange(userProfile.followers_count, prevMetrics.followers || 0)
+            };
+          }
+
           const liveData = {
             totalViews: totalViews,
             engagement: totalEngagement,
             totalFollowers: userProfile.followers_count,
             newFollowers: userProfile.followers_count,
             contentScore: 85,
+            changes: changes,
             platforms: [{
               platform: 'instagram',
               views: totalViews,

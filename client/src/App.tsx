@@ -64,10 +64,13 @@ function Router() {
 
   if (!user) {
     return (
-      <Switch>
-        <Route path="/auth" component={Auth} />
-        <Route component={() => <Redirect to="/auth" />} />
-      </Switch>
+      <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
+        <SpaceBackground />
+        <Switch>
+          <Route path="/auth" component={Auth} />
+          <Route component={() => <Redirect to="/auth" />} />
+        </Switch>
+      </div>
     );
   }
 

@@ -33,7 +33,10 @@ export default function Auth() {
           title: "Welcome to VeeFore!",
           description: "Successfully signed in to your galactic command center.",
         });
-        setLocation('/dashboard');
+        // Small delay to ensure auth state is properly updated
+        setTimeout(() => {
+          setLocation('/dashboard');
+        }, 100);
       }
     } catch (error: any) {
       console.error('Login error:', error);

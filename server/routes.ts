@@ -456,6 +456,190 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Instagram Publishing API
+  app.post('/api/publish-instagram', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[INSTAGRAM PUBLISH] Starting Instagram publishing for user:', req.user.id);
+      
+      const { title, description, mediaUrl, type = 'post' } = req.body;
+      
+      if (!title || !mediaUrl) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Title and media URL are required for Instagram publishing' 
+        });
+      }
+
+      // Get user's Instagram access token from social accounts
+      const workspace = await storage.getDefaultWorkspace(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'No workspace found' 
+        });
+      }
+
+      const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        return res.status(401).json({ 
+          success: false, 
+          error: 'Instagram account not connected. Please connect your Instagram account first.' 
+        });
+      }
+
+      console.log('[INSTAGRAM PUBLISH] Publishing content:', { title, type });
+
+      // Create Instagram media container
+      const createMediaResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image_url: mediaUrl,
+          caption: `${title}\n\n${description || ''}`,
+          access_token: instagramAccount.accessToken
+        })
+      });
+
+      if (!createMediaResponse.ok) {
+        const errorData = await createMediaResponse.json();
+        throw new Error(`Instagram API error: ${errorData.error?.message || 'Failed to create media container'}`);
+      }
+
+      const mediaData = await createMediaResponse.json();
+      const creationId = mediaData.id;
+
+      // Publish the media container
+      const publishResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media_publish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          creation_id: creationId,
+          access_token: instagramAccount.accessToken
+        })
+      });
+
+      if (!publishResponse.ok) {
+        const errorData = await publishResponse.json();
+        throw new Error(`Instagram publish error: ${errorData.error?.message || 'Failed to publish media'}`);
+      }
+
+      const publishData = await publishResponse.json();
+      console.log('[INSTAGRAM PUBLISH] Content published successfully:', publishData.id);
+
+      // Store the published content in database
+      const contentData = {
+        workspaceId: workspace.id,
+        title,
+        description: description || '',
+        type,
+        platform: 'instagram',
+        contentData: {
+          mediaUrl,
+          instagramPostId: publishData.id,
+          publishedAt: new Date().toISOString()
+        }
+      };
+
+      await storage.createContent(contentData);
+
+      res.json({
+        success: true,
+        instagramPostId: publishData.id,
+        message: 'Content successfully published to Instagram'
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM PUBLISH] Error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to publish to Instagram: ' + error.message 
+      });
+    }
+  });
+
+  // Instagram Account Connection
+  app.post('/api/connect-instagram', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { accessToken, accountId } = req.body;
+      
+      if (!accessToken || !accountId) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Access token and account ID are required' 
+        });
+      }
+
+      const workspace = await storage.getDefaultWorkspace(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'No workspace found' 
+        });
+      }
+
+      // Verify the access token with Instagram API
+      const verifyResponse = await fetch(`https://graph.instagram.com/v18.0/${accountId}?fields=id,username,account_type&access_token=${accessToken}`);
+      
+      if (!verifyResponse.ok) {
+        return res.status(401).json({ 
+          success: false, 
+          error: 'Invalid Instagram access token' 
+        });
+      }
+
+      const accountData = await verifyResponse.json();
+
+      // Check if Instagram account already exists
+      const existingAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+      
+      if (existingAccount) {
+        // Update existing account
+        await storage.updateSocialAccount(existingAccount.id, {
+          accessToken,
+          accountId,
+          username: accountData.username,
+          accountData: {
+            accountType: accountData.account_type,
+            connectedAt: new Date().toISOString()
+          }
+        });
+      } else {
+        // Create new account
+        await storage.createSocialAccount({
+          workspaceId: workspace.id,
+          platform: 'instagram',
+          accountId,
+          username: accountData.username,
+          accessToken,
+          accountData: {
+            accountType: accountData.account_type,
+            connectedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Instagram account connected successfully',
+        accountData: {
+          username: accountData.username,
+          accountType: accountData.account_type
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM CONNECT] Error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to connect Instagram account: ' + error.message 
+      });
+    }
+  });
+
   // Return the app instead of creating a new server
   return app as any;
 }

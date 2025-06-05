@@ -311,7 +311,7 @@ export default function Scheduler() {
     }
 
     const contentData = {
-      workspaceId: parseInt(currentWorkspace.id),
+      workspaceId: currentWorkspace.id,
       title: scheduleForm.title.trim(),
       description: scheduleForm.description?.trim() || '',
       type: scheduleForm.type,

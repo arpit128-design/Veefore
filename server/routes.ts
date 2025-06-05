@@ -278,7 +278,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       // Create content in database
       const content = await storage.createContent({
-        workspaceId: parseInt(workspaceId),
+        workspaceId: typeof workspaceId === 'string' ? workspaceId : parseInt(workspaceId),
         title,
         description: description || null,
         type,

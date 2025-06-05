@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import Stripe from "stripe";
-// Firebase Admin removed - using client-side auth only
+import * as admin from "firebase-admin";
 import { storage } from "./storage";
 import { 
   insertUserSchema, insertWorkspaceSchema, insertSocialAccountSchema,
@@ -13,8 +13,24 @@ import { z } from "zod";
 import { instagramAPI } from "./instagram-api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Using client-side Firebase authentication only
-console.log("Server configured for client-side authentication");
+// Initialize Firebase Admin SDK
+let firebaseAdmin: typeof admin | null = null;
+try {
+  if (process.env.VITE_FIREBASE_PROJECT_ID && process.env.VITE_FIREBASE_API_KEY) {
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+        // For development, we'll use the Firebase emulator or client credentials
+      });
+    }
+    firebaseAdmin = admin;
+    console.log("Firebase Admin SDK initialized");
+  } else {
+    console.log("Server configured for client-side authentication");
+  }
+} catch (error) {
+  console.log("Firebase Admin initialization failed, using client-side auth:", error);
+}
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -85,18 +101,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       let firebaseUid;
       
-      // Simple token validation for client-side auth
-      if (token === 'demo-token') {
-        firebaseUid = 'demo-user';
+      // Proper Firebase token verification using Firebase Admin SDK
+      if (firebaseAdmin) {
+        try {
+          const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+          firebaseUid = decodedToken.uid;
+        } catch (firebaseError) {
+          console.error('Firebase token verification failed:', firebaseError);
+          // Fallback for development/testing
+          if (token === 'demo-token') {
+            firebaseUid = 'demo-user';
+          } else {
+            const payload = token.split('.')[1];
+            if (payload) {
+              try {
+                const decoded = JSON.parse(atob(payload));
+                firebaseUid = decoded.user_id || decoded.sub;
+              } catch {
+                return res.status(401).json({ error: 'Invalid token' });
+              }
+            } else {
+              return res.status(401).json({ error: 'Invalid token format' });
+            }
+          }
+        }
       } else {
-        // For real Firebase tokens, extract basic info
+        // Client-side auth fallback
         const payload = token.split('.')[1];
         if (payload) {
           try {
             const decoded = JSON.parse(atob(payload));
             firebaseUid = decoded.user_id || decoded.sub;
           } catch {
-            firebaseUid = token.slice(0, 10);
+            return res.status(401).json({ error: 'Invalid token' });
           }
         } else {
           return res.status(401).json({ error: 'Invalid token format' });

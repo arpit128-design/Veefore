@@ -16,7 +16,17 @@ export async function apiRequest(
   
   console.log(`[CLIENT DEBUG] ${method} ${url} - Token:`, token ? 'Present' : 'Missing');
   
-  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  const headers: Record<string, string> = {};
+  let body: string | FormData | undefined;
+
+  if (data instanceof FormData) {
+    // Don't set Content-Type for FormData, let browser set it with boundary
+    body = data;
+  } else if (data) {
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify(data);
+  }
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   } else {
@@ -28,7 +38,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    body,
     credentials: "include",
   });
 

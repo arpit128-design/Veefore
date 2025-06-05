@@ -130,19 +130,16 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await apiRequest('/api/upload', {
-          method: 'POST',
-          body: formData,
-          headers: {} // Let browser set Content-Type for FormData
-        });
+        const response = await apiRequest('POST', '/api/upload', formData);
+        const result = await response.json();
         
-        if (response.success) {
+        if (result.success) {
           // Update form content data with the uploaded file URL
           setForm(prev => ({
             ...prev,
             contentData: {
               ...prev.contentData,
-              mediaUrl: response.fileUrl
+              mediaUrl: result.fileUrl
             }
           }));
           

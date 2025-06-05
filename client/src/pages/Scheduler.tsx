@@ -159,13 +159,36 @@ export default function Scheduler() {
     deleteContentMutation.mutate(contentId);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedFile(file);
-      // Create object URL for preview
-      const objectUrl = URL.createObjectURL(file);
-      setScheduleForm(prev => ({ ...prev, mediaUrl: objectUrl }));
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await apiRequest('POST', '/api/upload', formData);
+        const result = await response.json();
+        
+        if (result.success) {
+          setScheduleForm(prev => ({ ...prev, mediaUrl: result.fileUrl }));
+          toast({
+            title: "File uploaded successfully",
+            description: `${file.name} is ready for Instagram publishing`
+          });
+        }
+      } catch (error) {
+        console.error('File upload error:', error);
+        toast({
+          title: "Upload failed",
+          description: `Failed to upload ${file.name}`,
+          variant: "destructive"
+        });
+        // Fallback to object URL for preview only
+        const objectUrl = URL.createObjectURL(file);
+        setScheduleForm(prev => ({ ...prev, mediaUrl: objectUrl }));
+      }
     }
   };
 

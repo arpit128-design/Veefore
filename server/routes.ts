@@ -566,16 +566,12 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     try {
       console.log('[CAPTION GENERATION] Starting caption generation for user:', req.user.id);
       
-      const { title, type = 'post', platform = 'instagram' } = req.body;
+      const { title, description, type = 'post', platform = 'instagram' } = req.body;
       
-      if (!title) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Title is required for caption generation' 
-        });
-      }
+      const contentTopic = title || description || 'social media content';
+      const additionalContext = description ? `Additional context: ${description}` : '';
 
-      console.log('[CAPTION GENERATION] Generating caption for:', { title, type, platform });
+      console.log('[CAPTION GENERATION] Generating caption for:', { title, description, type, platform });
 
       // Generate caption using Google Gemini API
       const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_API_KEY, {
@@ -586,7 +582,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Create an engaging ${platform} ${type} caption for: "${title}"
+              text: `Create an engaging ${platform} ${type} caption for: "${contentTopic}"
+${additionalContext}
 
 Requirements:
 - Write a compelling caption that hooks the audience
@@ -595,6 +592,7 @@ Requirements:
 - Keep it conversational and authentic
 - Maximum 150 words for the caption text
 - Add line breaks for better readability
+- Make it engaging and shareable
 
 Format the response as:
 Caption: [your engaging caption here]
@@ -611,21 +609,42 @@ Hashtags: [relevant hashtags separated by spaces]`
       const data = await response.json();
       const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-      // Parse the generated content
-      const captionMatch = generatedText.match(/Caption:\s*(.*?)(?=Hashtags:|$)/s);
-      const hashtagsMatch = generatedText.match(/Hashtags:\s*(.*?)$/s);
+      // Parse the generated content using simple string methods
+      const lines = generatedText.split('\n');
+      let caption = '';
+      let hashtags = '';
+      let inCaption = false;
+      let inHashtags = false;
 
-      const caption = captionMatch ? captionMatch[1].trim() : generatedText.trim();
-      const hashtags = hashtagsMatch ? hashtagsMatch[1].trim() : '';
+      for (const line of lines) {
+        if (line.toLowerCase().includes('caption:')) {
+          inCaption = true;
+          inHashtags = false;
+          caption += line.replace(/caption:\s*/i, '').trim() + '\n';
+        } else if (line.toLowerCase().includes('hashtags:')) {
+          inHashtags = true;
+          inCaption = false;
+          hashtags += line.replace(/hashtags:\s*/i, '').trim();
+        } else if (inCaption && !line.toLowerCase().includes('hashtag')) {
+          caption += line.trim() + '\n';
+        } else if (inHashtags) {
+          hashtags += ' ' + line.trim();
+        }
+      }
+
+      // Fallback if parsing fails
+      if (!caption && !hashtags) {
+        caption = generatedText.trim();
+      }
 
       console.log('[CAPTION GENERATION] Caption generated successfully');
 
       res.json({
         success: true,
-        caption: caption,
-        hashtags: hashtags,
+        caption: caption.trim(),
+        hashtags: hashtags.trim(),
         metadata: {
-          title,
+          title: contentTopic,
           type,
           platform,
           generatedAt: new Date().toISOString()

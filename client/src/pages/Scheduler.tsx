@@ -211,22 +211,17 @@ export default function Scheduler() {
   };
 
   const generateAICaption = async () => {
-    if (!scheduleForm.title.trim()) {
-      toast({
-        title: "Missing title",
-        description: "Please enter a post title first to generate AI caption.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    const title = scheduleForm.title.trim() || "social media post";
+    const description = scheduleForm.description.trim() || scheduleForm.aiPrompt.trim() || "";
+    
     try {
       const response = await apiRequest('POST', '/api/generate-caption', {
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          title: scheduleForm.title,
+          title: title,
+          description: description,
           type: scheduleForm.type,
           platform: scheduleForm.platform
         })

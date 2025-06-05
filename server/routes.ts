@@ -254,6 +254,92 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Video generation endpoint
+  app.post('/api/content/generate-video', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { description, platform = 'youtube', title, workspaceId } = req.body;
+
+      if (!description?.trim()) {
+        return res.status(400).json({ error: 'Video description is required' });
+      }
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      console.log('[VIDEO API] Generating video from description:', description);
+
+      // Generate script and video using AI
+      const result = await videoGeneratorAI.createVideoFromDescription(
+        description.trim(),
+        platform,
+        title?.trim()
+      );
+
+      // Save content to storage
+      const content = await storage.createContent({
+        workspaceId: parseInt(workspaceId),
+        type: 'video',
+        title: result.script.title,
+        content: JSON.stringify({
+          description,
+          script: result.script,
+          video: result.video
+        }),
+        platform,
+        status: 'ready',
+        scheduledFor: null
+      });
+
+      console.log('[VIDEO API] Video generated successfully:', content.id);
+
+      res.json({
+        success: true,
+        content: content,
+        script: result.script,
+        video: result.video
+      });
+
+    } catch (error: any) {
+      console.error('[VIDEO API] Error generating video:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate video',
+        details: error.message 
+      });
+    }
+  });
+
+  // Script generation only endpoint
+  app.post('/api/content/generate-script', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { description, platform = 'youtube', title } = req.body;
+
+      if (!description?.trim()) {
+        return res.status(400).json({ error: 'Video description is required' });
+      }
+
+      console.log('[SCRIPT API] Generating script for description:', description);
+
+      const script = await videoGeneratorAI.generateVideoScript(
+        description.trim(),
+        platform,
+        title?.trim()
+      );
+
+      res.json({
+        success: true,
+        script: script
+      });
+
+    } catch (error: any) {
+      console.error('[SCRIPT API] Error generating script:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate script',
+        details: error.message 
+      });
+    }
+  });
+
   // Return the app instead of creating a new server
   return app as any;
 }

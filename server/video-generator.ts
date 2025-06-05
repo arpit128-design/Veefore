@@ -123,7 +123,7 @@ export class VideoGeneratorAI {
   }
 
   private generateColorScheme(theme: string): string[] {
-    const schemes = {
+    const schemes: Record<string, string[]> = {
       'Modern Tech': ['#00D4FF', '#7B2CBF', '#E2E8F0'],
       'Natural': ['#22C55E', '#84CC16', '#F0FDF4'],
       'Corporate': ['#3B82F6', '#1E40AF', '#F8FAFC'],
@@ -142,7 +142,7 @@ export class VideoGeneratorAI {
   }
 
   private generateCTA(platform: string, description: string): string {
-    const ctas = {
+    const ctas: Record<string, string> = {
       youtube: 'Subscribe for more content like this!',
       instagram: 'Follow for daily updates!',
       tiktok: 'Follow for more viral content!',

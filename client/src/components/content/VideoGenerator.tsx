@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
-import { Video, Zap } from "lucide-react";
+import { Video, Zap, FileText, Play, ArrowLeft, Download, CheckCircle } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function VideoGenerator() {
@@ -20,99 +20,259 @@ export function VideoGenerator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const generateMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/content/generate', data),
-    onSuccess: (response) => {
+  const [generatedScript, setGeneratedScript] = useState<any>(null);
+  const [generatedVideo, setGeneratedVideo] = useState<any>(null);
+  const [step, setStep] = useState('input'); // 'input', 'script', 'video'
+
+  const scriptMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('POST', '/api/content/generate-script', data),
+    onSuccess: (response: any) => {
+      setGeneratedScript(response.script);
+      setStep('script');
+      toast({
+        title: "Script Generated!",
+        description: "Your AI-generated video script is ready for review.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Script Generation Failed",
+        description: error.message || "Failed to generate video script",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const videoMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('POST', '/api/content/generate-video', data),
+    onSuccess: (response: any) => {
+      setGeneratedVideo(response.video);
+      setStep('video');
       toast({
         title: "Video Generated Successfully!",
         description: "Your AI-powered video is ready for review.",
       });
       queryClient.invalidateQueries({ queryKey: ['content'] });
-      // Reset form
-      setPrompt("");
-      setTitle("");
-      setPlatform("");
     },
     onError: (error: any) => {
       toast({
-        title: "Generation Failed",
+        title: "Video Generation Failed", 
         description: error.message || "Failed to generate video content",
         variant: "destructive",
       });
     }
   });
 
-  const handleGenerate = () => {
+  const handleGenerateScript = () => {
     if (!prompt.trim()) {
       toast({
-        title: "Prompt Required",
+        title: "Description Required",
         description: "Please enter a description for your video",
         variant: "destructive",
       });
       return;
     }
 
-    generateMutation.mutate({
-      type: 'video',
-      prompt: prompt.trim(),
-      title: title.trim() || `Generated Video - ${new Date().toLocaleDateString()}`,
-      workspaceId: currentWorkspace?.id,
-      platform
+    scriptMutation.mutate({
+      description: prompt.trim(),
+      platform: platform || 'youtube',
+      title: title.trim()
     });
+  };
+
+  const handleGenerateVideo = () => {
+    if (!generatedScript) {
+      toast({
+        title: "Script Required",
+        description: "Please generate a script first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    videoMutation.mutate({
+      description: prompt.trim(),
+      platform: platform || 'youtube',
+      title: title.trim() || generatedScript.title,
+      workspaceId: currentWorkspace?.id
+    });
+  };
+
+  const handleReset = () => {
+    setStep('input');
+    setGeneratedScript(null);
+    setGeneratedVideo(null);
+    setPrompt("");
+    setTitle("");
+    setPlatform("");
   };
 
   return (
     <Card className="content-card holographic">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-electric-cyan to-nebula-purple flex items-center justify-center">
-            <Video className="h-6 w-6 text-white" />
-          </div>
+        <CardTitle className="flex items-center gap-2 text-stellar-gold">
+          <Video className="w-5 h-5" />
           <div>
-            <h3 className="text-xl font-orbitron font-semibold">Video Generator</h3>
+            <div>AI Video Generator</div>
             <p className="text-asteroid-silver text-sm">Create engaging videos with AI-powered scenes and effects</p>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="video-title">Video Title</Label>
-            <Input
-              id="video-title"
-              placeholder="Enter video title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="glassmorphism"
-            />
-          </div>
+        {/* Step 1: Input */}
+        {step === 'input' && (
+          <div className="grid gap-4">
+            <div>
+              <Label htmlFor="video-title">Video Title (Optional)</Label>
+              <Input
+                id="video-title"
+                placeholder="Enter video title..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="glassmorphism"
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="platform-select">Target Platform</Label>
-            <Select value={platform} onValueChange={setPlatform}>
-              <SelectTrigger className="glassmorphism">
-                <SelectValue placeholder="Select platform" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="youtube">YouTube</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
-                <SelectItem value="tiktok">TikTok</SelectItem>
-                <SelectItem value="twitter">X (Twitter)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label htmlFor="platform-select">Target Platform</Label>
+              <Select value={platform} onValueChange={setPlatform}>
+                <SelectTrigger className="glassmorphism">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  <SelectItem value="twitter">X (Twitter)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label htmlFor="video-prompt">Video Description</Label>
-            <Textarea
-              id="video-prompt"
-              placeholder="Describe the video you want to create... (e.g., 'A motivational fitness video showing morning workout routine with upbeat music')"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="min-h-32 glassmorphism"
-            />
+            <div>
+              <Label htmlFor="video-prompt">Video Description</Label>
+              <Textarea
+                id="video-prompt"
+                placeholder="Describe the video you want to create..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="glassmorphism resize-none"
+                rows={4}
+              />
+            </div>
+
+            <div className="text-center">
+              <Button 
+                onClick={handleGenerateScript}
+                disabled={scriptMutation.isPending || !prompt.trim()}
+                className="cosmic-btn w-full"
+              >
+                {scriptMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="w-4 h-4 mr-2" />
+                    Generating Script...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Generate Script
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Step 2: Script Review */}
+        {step === 'script' && generatedScript && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-stellar-gold flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Generated Script
+              </h3>
+              <Button variant="outline" onClick={handleReset} size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Edit Description
+              </Button>
+            </div>
+            
+            <div className="glassmorphism p-4 rounded-lg space-y-3">
+              <h4 className="font-medium text-stellar-gold">{generatedScript.title}</h4>
+              <div className="text-sm text-asteroid-silver">
+                <p><strong>Platform:</strong> {generatedScript.target_platform}</p>
+                <p><strong>Duration:</strong> {generatedScript.total_duration} seconds</p>
+                <p><strong>Theme:</strong> {generatedScript.theme}</p>
+              </div>
+              
+              <div className="space-y-2">
+                <h5 className="font-medium text-white">Scenes:</h5>
+                {generatedScript.scenes?.map((scene: any, index: number) => (
+                  <div key={scene.id} className="border-l-2 border-cosmic-purple pl-3 text-sm">
+                    <p className="text-stellar-gold">Scene {index + 1} ({scene.duration}s)</p>
+                    <p className="text-white">{scene.description}</p>
+                    <p className="text-asteroid-silver text-xs">{scene.visuals}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleGenerateVideo}
+                disabled={videoMutation.isPending}
+                className="cosmic-btn flex-1"
+              >
+                {videoMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="w-4 h-4 mr-2" />
+                    Creating Video...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Create Video
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Video Result */}
+        {step === 'video' && generatedVideo && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-stellar-gold flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Video Generated Successfully!
+              </h3>
+              <Button variant="outline" onClick={handleReset} size="sm">
+                Create New Video
+              </Button>
+            </div>
+            
+            <div className="glassmorphism p-4 rounded-lg space-y-3">
+              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                <div className="text-center text-asteroid-silver">
+                  <Video className="w-16 h-16 mx-auto mb-2" />
+                  <p>Video Preview</p>
+                  <p className="text-sm">{generatedVideo.duration}s • {generatedVideo.format}</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button className="cosmic-btn flex-1">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Video
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <Play className="w-4 h-4 mr-2" />
+                  Preview
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between p-4 rounded-lg bg-cosmic-blue border border-electric-cyan/30">
           <div>
@@ -120,28 +280,12 @@ export function VideoGenerator() {
             <div className="text-sm text-asteroid-silver">25 credits per video</div>
           </div>
           <div className="text-right">
-            <div className="font-medium text-asteroid-silver">Estimated Time</div>
-            <div className="text-sm text-solar-gold">2-3 minutes</div>
+            <div className="text-lg font-bold text-stellar-gold">
+              {step === 'input' ? '25' : step === 'script' ? '15' : '0'} Credits
+            </div>
+            <div className="text-xs text-asteroid-silver">remaining for video</div>
           </div>
         </div>
-
-        <Button
-          onClick={handleGenerate}
-          disabled={generateMutation.isPending || !prompt.trim()}
-          className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:opacity-90 transition-opacity"
-        >
-          {generateMutation.isPending ? (
-            <>
-              <LoadingSpinner className="w-4 h-4 mr-2" />
-              Generating Video...
-            </>
-          ) : (
-            <>
-              <Zap className="w-4 h-4 mr-2" />
-              Generate Video
-            </>
-          )}
-        </Button>
       </CardContent>
     </Card>
   );

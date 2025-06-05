@@ -368,26 +368,28 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Save to database
       const existingAccount = await storage.getSocialAccountByPlatform(workspaceId, 'instagram');
       
+      console.log(`[INSTAGRAM CALLBACK] Saving Instagram account: @${profile.username} (ID: ${profile.id})`);
+      
       if (existingAccount) {
         await storage.updateSocialAccount(existingAccount.id, {
           accessToken: longLivedToken.access_token,
           refreshToken: null,
           expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
           accountId: profile.id,
-          username: profile.username,
-          metadata: { profile }
+          username: profile.username
         });
+        console.log(`[INSTAGRAM CALLBACK] Updated existing account: @${profile.username}`);
       } else {
-        await storage.createSocialAccount({
+        const newAccount = await storage.createSocialAccount({
           workspaceId,
           platform: 'instagram',
           accountId: profile.id,
           username: profile.username,
           accessToken: longLivedToken.access_token,
           refreshToken: null,
-          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
-          metadata: { profile }
+          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000)
         });
+        console.log(`[INSTAGRAM CALLBACK] Created new account: @${profile.username} (DB ID: ${newAccount.id})`);
       }
       
       res.redirect(`https://${req.get('host')}/integrations?success=instagram_connected`);
@@ -562,40 +564,75 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Dashboard analytics
+  // Dashboard analytics - fetch real Instagram data
   app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspace = await storage.getDefaultWorkspace(user.id);
       
       if (!workspace) {
-        return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'instagram' });
+        return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
       }
+
+      // Get connected Instagram account
+      const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
       
-      const analytics = await storage.getAnalytics(workspace.id, undefined, 30);
-      
-      // Calculate metrics
-      const totalPosts = analytics.length;
-      const totalReach = analytics.reduce((sum, a: any) => sum + (a.metrics?.reach || 0), 0);
-      const totalEngagement = analytics.reduce((sum, a: any) => sum + (a.metrics?.engagement || 0), 0);
-      const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
-      
-      // Find top platform
-      const platformCounts = analytics.reduce((acc: any, a: any) => {
-        acc[a.platform] = (acc[a.platform] || 0) + 1;
-        return acc;
-      }, {});
-      
-      const topPlatform = Object.keys(platformCounts).length > 0 
-        ? Object.keys(platformCounts).reduce((a, b) => platformCounts[a] > platformCounts[b] ? a : b)
-        : 'instagram';
-      
-      res.json({
-        totalPosts,
-        totalReach,
-        engagementRate: Math.round(engagementRate * 100) / 100,
-        topPlatform
-      });
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        return res.json({ 
+          totalPosts: 0, 
+          totalReach: 0, 
+          engagementRate: 0, 
+          topPlatform: 'none',
+          message: 'No Instagram account connected'
+        });
+      }
+
+      try {
+        console.log(`[DASHBOARD] Fetching real Instagram data for @${instagramAccount.username}`);
+        
+        // Import Instagram API
+        const { instagramAPI } = await import('./instagram-api');
+        
+        // Get user media and insights
+        const [media, insights] = await Promise.all([
+          instagramAPI.getUserMedia(instagramAccount.accessToken, 25),
+          instagramAPI.getAccountInsights(instagramAccount.accessToken, 'day')
+        ]);
+
+        console.log(`[DASHBOARD] Retrieved ${media.length} posts and insights for @${instagramAccount.username}`);
+
+        // Calculate real metrics from Instagram data
+        const totalPosts = media.length;
+        const totalReach = insights.reach || 0;
+        const totalLikes = media.reduce((sum, post) => sum + (post.like_count || 0), 0);
+        const totalComments = media.reduce((sum, post) => sum + (post.comments_count || 0), 0);
+        const totalEngagement = totalLikes + totalComments;
+        const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
+
+        res.json({
+          totalPosts,
+          totalReach,
+          engagementRate: Math.round(engagementRate * 10) / 10,
+          topPlatform: 'instagram',
+          followers: insights.follower_count || 0,
+          impressions: insights.impressions || 0,
+          accountUsername: instagramAccount.username
+        });
+
+      } catch (instagramError: any) {
+        console.error(`[DASHBOARD] Instagram API error for @${instagramAccount.username}:`, instagramError);
+        
+        // Return minimal data if Instagram API fails
+        res.json({
+          totalPosts: 0,
+          totalReach: 0,
+          engagementRate: 0,
+          topPlatform: 'instagram',
+          error: 'Instagram API error - check credentials',
+          accountUsername: instagramAccount.username
+        });
+      }
+
     } catch (error: any) {
       console.error('[DASHBOARD ANALYTICS] Error:', error);
       res.status(500).json({ error: error.message });

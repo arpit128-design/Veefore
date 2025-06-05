@@ -588,19 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Social platform OAuth routes
-  app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
-    try {
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
-      const state = String(req.user.id); // Convert user ID to string for state parameter
-      const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
-      
-      res.json({ authUrl });
-    } catch (error: any) {
-      console.error('Instagram auth error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // Social platform OAuth routes (Instagram auth moved to separate section below)
 
   app.get("/api/twitter/auth", requireAuth, async (req: any, res) => {
     try {

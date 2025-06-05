@@ -10,6 +10,8 @@ import {
   insertSuggestionSchema, insertCreditTransactionSchema, insertReferralSchema
 } from "@shared/schema";
 import { z } from "zod";
+import { instagramAPI } from "./instagram-api";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Using client-side Firebase authentication only
 console.log("Server configured for client-side authentication");
@@ -63,7 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Middleware for authentication - simplified for demo
+  // Middleware for authentication with user lookup
   const requireAuth = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -73,36 +75,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const token = authHeader.substring(7);
     
     try {
+      let firebaseUid;
+      
       // Simple token validation for client-side auth
       if (token === 'demo-token') {
-        req.user = { 
-          firebaseUid: 'demo-user',
-          email: 'demo@veefore.com',
-          name: 'Demo User'
-        };
+        firebaseUid = 'demo-user';
       } else {
         // For real Firebase tokens, extract basic info
-        // In production, you would verify the token with Firebase
         const payload = token.split('.')[1];
         if (payload) {
           try {
             const decoded = JSON.parse(atob(payload));
-            req.user = {
-              firebaseUid: decoded.user_id || decoded.sub,
-              email: decoded.email,
-              name: decoded.name || decoded.display_name
-            };
+            firebaseUid = decoded.user_id || decoded.sub;
           } catch {
-            req.user = { 
-              firebaseUid: token.slice(0, 10),
-              email: 'user@veefore.com',
-              name: 'VeeFore User'
-            };
+            firebaseUid = token.slice(0, 10);
           }
         } else {
           return res.status(401).json({ error: 'Invalid token format' });
         }
       }
+
+      // Look up user in database
+      const user = await storage.getUserByFirebaseUid(firebaseUid);
+      if (!user) {
+        return res.status(401).json({ error: 'User not found' });
+      }
+
+      req.user = user;
       next();
     } catch (error) {
       console.error('Token verification failed:', error);
@@ -117,6 +116,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
+      // Attach user to request for other endpoints
+      req.user = user;
       res.json(user);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -455,6 +456,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Instagram OAuth routes
+  app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
+    try {
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      const state = req.user.id.toString(); // Use user ID as state for security
+      const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
+      
+      res.json({ authUrl });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/instagram/callback", async (req, res) => {
+    try {
+      const { code, state, error } = req.query;
+      
+      if (error) {
+        return res.redirect(`/dashboard?error=${encodeURIComponent(error as string)}`);
+      }
+
+      if (!code || !state) {
+        return res.redirect('/dashboard?error=missing_code_or_state');
+      }
+
+      const userId = parseInt(state as string);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.redirect('/dashboard?error=invalid_user');
+      }
+
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      
+      // Exchange code for short-lived token
+      const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
+      
+      // Get long-lived token
+      const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);
+      
+      // Get user profile
+      const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
+      
+      // Get user workspaces
+      const workspaces = await storage.getWorkspacesByUserId(userId);
+      let defaultWorkspace;
+      
+      if (workspaces.length === 0) {
+        defaultWorkspace = await storage.createWorkspace({
+          userId,
+          name: "My VeeFore Workspace",
+          description: "Default workspace for content creation"
+        });
+      } else {
+        defaultWorkspace = workspaces[0];
+      }
+
+      // Store Instagram account
+      await storage.createSocialAccount({
+        workspaceId: defaultWorkspace.id,
+        platform: "instagram",
+        accountId: profile.id,
+        username: profile.username,
+        accessToken: longLivedToken.access_token,
+        refreshToken: null,
+        expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
+        isActive: true
+      });
+
+      // Fetch and store initial analytics data
+      try {
+        const insights = await instagramAPI.getAccountInsights(longLivedToken.access_token);
+        const media = await instagramAPI.getUserMedia(longLivedToken.access_token, 10);
+        
+        // Store account insights
+        await storage.createAnalytics({
+          workspaceId: defaultWorkspace.id,
+          platform: "instagram",
+          metrics: {
+            views: insights.impressions,
+            likes: 0,
+            comments: 0,
+            shares: 0,
+            followers: insights.follower_count,
+            impressions: insights.impressions,
+            reach: insights.reach,
+            profile_views: insights.profile_views
+          }
+        });
+
+        // Store media insights
+        for (const item of media.slice(0, 5)) {
+          try {
+            const mediaInsights = await instagramAPI.getMediaInsights(item.id, longLivedToken.access_token);
+            await storage.createAnalytics({
+              workspaceId: defaultWorkspace.id,
+              platform: "instagram",
+              postId: item.id,
+              metrics: {
+                views: mediaInsights.impressions || 0,
+                likes: mediaInsights.likes || 0,
+                comments: mediaInsights.comments || 0,
+                shares: mediaInsights.shares || 0,
+                saves: mediaInsights.saves || 0,
+                impressions: mediaInsights.impressions || 0,
+                reach: mediaInsights.reach || 0
+              }
+            });
+          } catch (mediaError) {
+            console.error(`Error fetching insights for media ${item.id}:`, mediaError);
+          }
+        }
+      } catch (analyticsError) {
+        console.error('Error fetching Instagram analytics:', analyticsError);
+      }
+
+      res.redirect('/dashboard?success=instagram_connected');
+    } catch (error: any) {
+      console.error('Instagram callback error:', error);
+      res.redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
     }
   });
 

@@ -457,7 +457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts
-      const connectedAccounts = await storage.getSocialAccountsByWorkspace(Number(defaultWorkspace.id));
+      const connectedAccounts = await storage.getSocialAccountsByWorkspace(defaultWorkspace.id);
       const instagramAccount = connectedAccounts.find(acc => acc.platform === 'instagram');
       
       // Fetch real Instagram analytics if we have an access token
@@ -474,7 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('[INSTAGRAM INTEGRATION] Profile fetched:', profile.username, 'ID:', profile.id);
           
           // Check if Instagram account exists for this workspace, if not create it
-          let existingAccount = await storage.getSocialAccountByPlatform(Number(defaultWorkspace.id), 'instagram');
+          let existingAccount = await storage.getSocialAccountByPlatform(defaultWorkspace.id, 'instagram');
           console.log('[INSTAGRAM INTEGRATION] Existing account check:', existingAccount ? 'Found' : 'Not found');
           
           if (!existingAccount) {
@@ -536,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Refresh analytics data
-          analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
+          analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
         } catch (error) {
           console.error('Instagram API fetch failed:', error);
         }
@@ -547,7 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Store fresh analytics data
           await storage.createAnalytics({
-            workspaceId: Number(defaultWorkspace.id),
+            workspaceId: defaultWorkspace.id,
             platform: 'instagram',
             metrics: {
               ...insights,
@@ -558,7 +558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Refresh analytics data
-          analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
+          analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
         } catch (error) {
           console.log('Instagram API fetch failed, using stored data:', error);
         }
@@ -690,14 +690,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[INSTAGRAM DIRECT] Connected account: ${profile.username}`);
       
       // Check if account already exists
-      const existingAccount = await storage.getSocialAccountByPlatform(Number(defaultWorkspace.id), "instagram");
+      const existingAccount = await storage.getSocialAccountByPlatform(defaultWorkspace.id, "instagram");
       if (existingAccount) {
         return res.json({ success: true, account: existingAccount, message: "Instagram account already connected" });
       }
       
       // Store Instagram account
       const socialAccount = await storage.createSocialAccount({
-        workspaceId: Number(defaultWorkspace.id),
+        workspaceId: defaultWorkspace.id,
         platform: "instagram",
         accountId: profile.id,
         username: profile.username,
@@ -712,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const media = await instagramAPI.getUserMedia(process.env.INSTAGRAM_ACCESS_TOKEN, 10);
         
         await storage.createAnalytics({
-          workspaceId: Number(defaultWorkspace.id),
+          workspaceId: defaultWorkspace.id,
           platform: "instagram",
           metrics: {
             views: insights.impressions,

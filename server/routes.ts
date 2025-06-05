@@ -315,9 +315,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                 'Authorization': req.headers.authorization || ''
               },
               body: JSON.stringify({
+                title: title,
+                description: description,
                 mediaUrl: contentData.mediaUrl,
-                caption: description,
-                workspaceId
+                type: type || 'post'
               })
             });
 
@@ -338,7 +339,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                 publishResult
               });
             } else {
-              console.log('[CONTENT API] Instagram publishing failed, content saved as scheduled');
+              const errorText = await publishResponse.text();
+              console.log('[CONTENT API] Instagram publishing failed:', errorText);
+              
+              return res.json({
+                success: true,
+                content,
+                published: false,
+                message: publishNow ? 'Content saved. Instagram publishing requires account connection.' : 'Content scheduled successfully',
+                publishingError: 'Instagram account connection required'
+              });
             }
           }
         } catch (error) {

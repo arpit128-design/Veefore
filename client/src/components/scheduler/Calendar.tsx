@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { apiRequest } from "@/lib/queryClient";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 interface CalendarDay {
@@ -22,7 +23,10 @@ export function Calendar() {
 
   const { data: scheduledContent } = useQuery({
     queryKey: ['scheduled-content', currentWorkspace?.id, currentDate.getFullYear(), currentDate.getMonth()],
-    queryFn: () => fetch(`/api/content?workspaceId=${currentWorkspace?.id}&status=scheduled`).then(res => res.json()),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/content?workspaceId=${currentWorkspace?.id}&status=scheduled`);
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
 
@@ -57,11 +61,11 @@ export function Calendar() {
       const isToday = fullDate.toDateString() === today.toDateString();
       
       // Filter scheduled content for this date
-      const dayContent = scheduledContent?.filter((content: any) => {
+      const dayContent = Array.isArray(scheduledContent) ? scheduledContent.filter((content: any) => {
         if (!content.scheduledAt) return false;
         const contentDate = new Date(content.scheduledAt);
         return contentDate.toDateString() === fullDate.toDateString();
-      }) || [];
+      }) : [];
 
       days.push({
         date,

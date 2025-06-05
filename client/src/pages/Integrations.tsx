@@ -87,7 +87,10 @@ export default function Integrations() {
   // Fetch connected social accounts
   const { data: socialAccounts, isLoading } = useQuery({
     queryKey: ['social-accounts', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/social-accounts?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
 

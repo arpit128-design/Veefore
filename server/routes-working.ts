@@ -257,6 +257,5 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  const http = await import('http');
-  return http.createServer(app);
+  return require('http').createServer(app);
 }

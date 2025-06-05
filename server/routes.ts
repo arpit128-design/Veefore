@@ -561,6 +561,86 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // AI Caption and Hashtag Generation
+  app.post('/api/generate-caption', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[CAPTION GENERATION] Starting caption generation for user:', req.user.id);
+      
+      const { title, type = 'post', platform = 'instagram' } = req.body;
+      
+      if (!title) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Title is required for caption generation' 
+        });
+      }
+
+      console.log('[CAPTION GENERATION] Generating caption for:', { title, type, platform });
+
+      // Generate caption using Google Gemini API
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GOOGLE_API_KEY, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Create an engaging ${platform} ${type} caption for: "${title}"
+
+Requirements:
+- Write a compelling caption that hooks the audience
+- Match the tone for ${platform} platform
+- Include 3-5 relevant hashtags at the end
+- Keep it conversational and authentic
+- Maximum 150 words for the caption text
+- Add line breaks for better readability
+
+Format the response as:
+Caption: [your engaging caption here]
+Hashtags: [relevant hashtags separated by spaces]`
+            }]
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Google API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Parse the generated content
+      const captionMatch = generatedText.match(/Caption:\s*(.*?)(?=Hashtags:|$)/s);
+      const hashtagsMatch = generatedText.match(/Hashtags:\s*(.*?)$/s);
+
+      const caption = captionMatch ? captionMatch[1].trim() : generatedText.trim();
+      const hashtags = hashtagsMatch ? hashtagsMatch[1].trim() : '';
+
+      console.log('[CAPTION GENERATION] Caption generated successfully');
+
+      res.json({
+        success: true,
+        caption: caption,
+        hashtags: hashtags,
+        metadata: {
+          title,
+          type,
+          platform,
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[CAPTION GENERATION] Error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to generate caption: ' + error.message 
+      });
+    }
+  });
+
   // Instagram Account Connection
   app.post('/api/connect-instagram', requireAuth, async (req: any, res: Response) => {
     try {

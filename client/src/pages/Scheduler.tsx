@@ -182,7 +182,10 @@ export default function Scheduler() {
     setIsGeneratingAI(true);
     try {
       const response = await apiRequest('POST', '/api/generate-image', {
-        body: JSON.stringify({ prompt: scheduleForm.aiPrompt })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt: scheduleForm.aiPrompt.trim() })
       });
       const result = await response.json();
       
@@ -193,9 +196,10 @@ export default function Scheduler() {
           description: "Your AI-generated image is ready for scheduling."
         });
       } else {
-        throw new Error("Failed to generate image");
+        throw new Error(result.error || "Failed to generate image");
       }
     } catch (error) {
+      console.error('AI generation error:', error);
       toast({
         title: "Generation failed",
         description: "Unable to generate AI content. Please try again or upload your own image.",
@@ -203,6 +207,51 @@ export default function Scheduler() {
       });
     } finally {
       setIsGeneratingAI(false);
+    }
+  };
+
+  const generateAICaption = async () => {
+    if (!scheduleForm.title.trim()) {
+      toast({
+        title: "Missing title",
+        description: "Please enter a post title first to generate AI caption.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const response = await apiRequest('POST', '/api/generate-caption', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          title: scheduleForm.title,
+          type: scheduleForm.type,
+          platform: scheduleForm.platform
+        })
+      });
+      const result = await response.json();
+      
+      if (result.success && result.caption) {
+        setScheduleForm(prev => ({ 
+          ...prev, 
+          description: result.caption + (result.hashtags ? '\n\n' + result.hashtags : '')
+        }));
+        toast({
+          title: "AI caption generated",
+          description: "Caption and hashtags have been generated for your post."
+        });
+      } else {
+        throw new Error(result.error || "Failed to generate caption");
+      }
+    } catch (error) {
+      console.error('Caption generation error:', error);
+      toast({
+        title: "Generation failed",
+        description: "Unable to generate AI caption. Please write your own caption.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -536,12 +585,24 @@ export default function Scheduler() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-asteroid-silver">Description</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="description" className="text-asteroid-silver">Caption & Description</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={generateAICaption}
+                    className="text-electric-cyan hover:text-white"
+                  >
+                    <Zap className="w-4 h-4 mr-1" />
+                    AI Generate
+                  </Button>
+                </div>
                 <Textarea
                   id="description"
                   value={scheduleForm.description}
                   onChange={(e) => setScheduleForm(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Write your content description or caption..."
+                  placeholder="Write your content description or caption... (or use AI Generate)"
                   className="glassmorphism min-h-[100px]"
                 />
               </div>

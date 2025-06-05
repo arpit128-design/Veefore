@@ -703,13 +703,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect('/dashboard?error=invalid_workspace');
       }
 
-      // Use same redirect URI format as authorization request
-      const protocol = req.get('x-forwarded-proto') || req.protocol;
-      const host = req.get('host');
-      const redirectUri = `${protocol}://${host}/api/instagram/callback`;
+      // Force HTTPS for redirect URI
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       console.log(`[INSTAGRAM CALLBACK] Processing callback with workspace ID: ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
-      console.log(`[INSTAGRAM CALLBACK] Protocol: ${protocol}, Host: ${host}`);
       
       // Exchange code for short-lived token
       console.log(`[INSTAGRAM CALLBACK] Attempting to exchange code: ${code}`);
@@ -895,13 +892,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         defaultWorkspace = workspaces[0];
       }
       
-      // Use consistent redirect URI format
-      const protocol = req.get('x-forwarded-proto') || req.protocol;
-      const host = req.get('host');
-      const redirectUri = `${protocol}://${host}/api/instagram/callback`;
+      // Force HTTPS for Instagram OAuth redirect URI
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       console.log(`[INSTAGRAM AUTH] Generated redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] Request protocol: ${req.protocol}`);
-      console.log(`[INSTAGRAM AUTH] X-Forwarded-Proto: ${req.get('x-forwarded-proto')}`);
       console.log(`[INSTAGRAM AUTH] Request host: ${req.get('host')}`);
       
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, defaultWorkspace.id.toString());

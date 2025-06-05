@@ -107,26 +107,36 @@ export default function Integrations() {
       let token = localStorage.getItem('veefore_auth_token');
       console.log(`[CONNECT DEBUG] Token from localStorage:`, token ? `Present (${token.substring(0, 20)}...)` : 'Missing');
       
-      // Always try to get a fresh token from Firebase if user exists
+      // Handle demo mode vs real Firebase user
       if (user) {
-        console.log(`[CONNECT DEBUG] User exists, attempting to get fresh Firebase token`);
-        try {
-          // Import Firebase auth dynamically
-          const { auth } = await import('@/lib/firebase');
-          console.log(`[CONNECT DEBUG] Firebase auth current user:`, auth.currentUser ? 'Present' : 'Missing');
-          
-          if (auth.currentUser) {
-            const freshToken = await auth.currentUser.getIdToken(true); // Force refresh
-            if (freshToken) {
-              token = freshToken;
-              localStorage.setItem('veefore_auth_token', token);
-              console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase (${token.substring(0, 20)}...)`);
+        console.log(`[CONNECT DEBUG] User exists, checking if demo mode or real Firebase user`);
+        
+        // Check if this is demo mode
+        if (user.firebaseUid === 'demo-user') {
+          console.log(`[CONNECT DEBUG] Demo mode detected, using demo token`);
+          token = 'demo-token';
+          localStorage.setItem('veefore_auth_token', token);
+        } else {
+          // Real Firebase user - get fresh token
+          console.log(`[CONNECT DEBUG] Real Firebase user, attempting to get fresh token`);
+          try {
+            // Import Firebase auth dynamically
+            const { auth } = await import('@/lib/firebase');
+            console.log(`[CONNECT DEBUG] Firebase auth current user:`, auth.currentUser ? 'Present' : 'Missing');
+            
+            if (auth.currentUser) {
+              const freshToken = await auth.currentUser.getIdToken(true); // Force refresh
+              if (freshToken) {
+                token = freshToken;
+                localStorage.setItem('veefore_auth_token', token);
+                console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase (${token.substring(0, 20)}...)`);
+              }
+            } else {
+              console.log(`[CONNECT DEBUG] No current Firebase user found`);
             }
-          } else {
-            console.log(`[CONNECT DEBUG] No current Firebase user found`);
+          } catch (error) {
+            console.error(`[CONNECT ERROR] Failed to get fresh token:`, error);
           }
-        } catch (error) {
-          console.error(`[CONNECT ERROR] Failed to get fresh token:`, error);
         }
       } else {
         console.log(`[CONNECT DEBUG] No user in auth context`);

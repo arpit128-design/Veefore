@@ -273,11 +273,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const stableDiffusionAPI = 'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5';
       
       try {
+        console.log('[STABLE DIFFUSION] Using API key:', process.env.HUGGING_FACE_API_KEY ? 'Present' : 'Missing');
+        
         const response = await fetch(stableDiffusionAPI, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY || 'hf_demo_token'}`
+            'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY}`
           },
           body: JSON.stringify({
             inputs: enhancedPrompt,
@@ -290,13 +292,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           })
         });
 
+        console.log('[STABLE DIFFUSION] API Response status:', response.status);
+        
         if (response.ok) {
           // Convert response to base64 for display
           const imageBuffer = await response.arrayBuffer();
           const base64Image = Buffer.from(imageBuffer).toString('base64');
           const imageUrl = `data:image/png;base64,${base64Image}`;
           
-          console.log('[STABLE DIFFUSION] Image generated successfully');
+          console.log('[STABLE DIFFUSION] Image generated successfully, size:', imageBuffer.byteLength);
           
           return res.json({
             success: true,
@@ -310,10 +314,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             }
           });
         } else {
-          console.log('[STABLE DIFFUSION] API unavailable, using high-quality stock image');
+          const errorText = await response.text();
+          console.log('[STABLE DIFFUSION] API error:', response.status, errorText);
         }
       } catch (error) {
-        console.log('[STABLE DIFFUSION] Generation failed, using high-quality alternative');
+        console.log('[STABLE DIFFUSION] Generation failed:', error.message);
       }
       
       // Fallback to curated high-quality images based on prompt

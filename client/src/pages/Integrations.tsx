@@ -263,7 +263,27 @@ export default function Integrations() {
     }
   });
 
-
+  // Direct Instagram connection mutation (uses existing token)
+  const directConnectMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/instagram/connect-direct');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      toast({
+        title: "Instagram Connected",
+        description: "Instagram account connected successfully using existing token.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Failed to connect Instagram account",
+        variant: "destructive",
+      });
+    }
+  });
 
   const getConnectedAccount = (platform: string): SocialAccount | undefined => {
     return Array.isArray(socialAccounts) ? socialAccounts.find((account: SocialAccount) => account.platform === platform) : undefined;
@@ -408,23 +428,39 @@ export default function Integrations() {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   {!isConnected ? (
-                    <Button 
-                      onClick={() => connectMutation.mutate(platform)}
-                      disabled={connectingPlatform === platform}
-                      className="flex-1 bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-electric-cyan/80 hover:to-nebula-purple/80"
-                    >
-                      {connectingPlatform === platform ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Connecting...
-                        </>
-                      ) : (
-                        <>
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Connect
-                        </>
+                    <>
+                      <Button 
+                        onClick={() => connectMutation.mutate(platform)}
+                        disabled={connectingPlatform === platform}
+                        className="flex-1 bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-electric-cyan/80 hover:to-nebula-purple/80"
+                      >
+                        {connectingPlatform === platform ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                            Connecting...
+                          </>
+                        ) : (
+                          <>
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Connect
+                          </>
+                        )}
+                      </Button>
+                      {platform === 'instagram' && (
+                        <Button 
+                          onClick={() => directConnectMutation.mutate()}
+                          disabled={directConnectMutation.isPending}
+                          variant="outline"
+                          className="border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-white"
+                        >
+                          {directConnectMutation.isPending ? (
+                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            'Quick Connect'
+                          )}
+                        </Button>
                       )}
-                    </Button>
+                    </>
                   ) : (
                     <>
                       {isExpired && (

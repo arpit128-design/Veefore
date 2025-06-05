@@ -443,22 +443,42 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
       
-      // Get all Instagram accounts for this workspace
-      const instagramAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      const instagramAccountsToDelete = instagramAccounts.filter(account => account.platform === 'instagram');
+      console.log(`[CLEANUP] Starting cleanup for workspace: ${workspace.id}`);
       
-      console.log(`[CLEANUP] Found ${instagramAccountsToDelete.length} Instagram accounts to clean up for workspace ${workspace.id}`);
+      // Get ALL social accounts for this workspace
+      const allAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      console.log(`[CLEANUP] Found ${allAccounts.length} total accounts in workspace`);
       
-      // Delete all Instagram accounts
-      for (const account of instagramAccountsToDelete) {
-        console.log(`[CLEANUP] Removing Instagram account: @${account.username} (${account.accountId})`);
-        await storage.deleteSocialAccount(account.id);
+      // Filter accounts to delete (all Instagram accounts or accounts with wrong username)
+      const accountsToDelete = allAccounts.filter(account => 
+        account.platform === 'instagram' || 
+        account.username === 'rahulc1020' ||
+        account.accountId === '9505923456179711'
+      );
+      
+      console.log(`[CLEANUP] Accounts to delete:`, accountsToDelete.map(a => `${a.platform}:@${a.username} (ID:${a.id})`));
+      
+      // Delete all targeted accounts
+      let deletedCount = 0;
+      for (const account of accountsToDelete) {
+        try {
+          console.log(`[CLEANUP] Deleting account: ${account.platform} @${account.username} (ID: ${account.id})`);
+          await storage.deleteSocialAccount(account.id);
+          deletedCount++;
+        } catch (deleteError) {
+          console.error(`[CLEANUP] Failed to delete account ${account.id}:`, deleteError);
+        }
       }
+      
+      // Verify cleanup by checking remaining accounts
+      const remainingAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      console.log(`[CLEANUP] Remaining accounts after cleanup:`, remainingAccounts.length);
       
       res.json({ 
         success: true, 
-        message: `Cleaned up ${instagramAccountsToDelete.length} Instagram accounts`,
-        deletedAccounts: instagramAccountsToDelete.length 
+        message: `Cleaned up ${deletedCount} accounts`,
+        deletedAccounts: deletedCount,
+        remainingAccounts: remainingAccounts.length
       });
     } catch (error: any) {
       console.error('[CLEANUP] Error:', error);

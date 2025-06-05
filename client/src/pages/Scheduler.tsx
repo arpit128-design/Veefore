@@ -556,7 +556,7 @@ export default function Scheduler() {
           </DialogHeader>
 
           {!isBulkMode ? (
-            <form onSubmit={(e) => handleScheduleSubmit(false, e)} className="space-y-6">
+            <div className="space-y-6">
               {/* Content Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -851,14 +851,15 @@ export default function Scheduler() {
                   {createContentMutation.isPending ? "Publishing..." : "Post Now"}
                 </Button>
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={(e) => handleScheduleSubmit(false, e)}
                   disabled={createContentMutation.isPending}
                   className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
                 >
                   {createContentMutation.isPending ? "Scheduling..." : "Schedule Content"}
                 </Button>
               </div>
-            </form>
+            </div>
           ) : (
             <div className="space-y-6">
               <div className="text-center py-8">

@@ -4,8 +4,18 @@ import { setupVite, serveStatic, log } from "./vite";
 import { MongoStorage } from "./mongodb-storage";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+// Debug middleware for request body
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/content') && req.method === 'POST') {
+    console.log('[BODY DEBUG] Raw body:', req.body);
+    console.log('[BODY DEBUG] Content-Type:', req.headers['content-type']);
+    console.log('[BODY DEBUG] Content-Length:', req.headers['content-length']);
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

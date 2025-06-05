@@ -120,6 +120,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             
             if (instagramAccount && instagramAccount.accessToken) {
               try {
+                console.log('[INSTAGRAM DEBUG] Current connected account details:', {
+                  accountId: instagramAccount.accountId,
+                  username: instagramAccount.username,
+                  platform: instagramAccount.platform,
+                  workspaceId: instagramAccount.workspaceId
+                });
                 console.log('[INSTAGRAM API] Attempting to publish with media URL:', contentData.mediaUrl);
                 
                 if (contentData.mediaUrl.startsWith('blob:')) {

@@ -255,6 +255,124 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Content Creation and Scheduling
+  app.post('/api/content', requireAuth, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { 
+        workspaceId, 
+        title, 
+        description, 
+        type, 
+        platform, 
+        scheduledAt, 
+        contentData,
+        publishNow = false
+      } = req.body;
+
+      if (!workspaceId || !title) {
+        return res.status(400).json({ error: 'Workspace ID and title are required' });
+      }
+
+      console.log('[CONTENT API] Creating content:', { workspaceId, title, type, platform, scheduledAt, publishNow });
+
+      // Create content in database
+      const content = await storage.createContent({
+        workspaceId: parseInt(workspaceId),
+        title,
+        description: description || null,
+        type,
+        platform: platform || 'instagram',
+        contentData: contentData || null,
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        creditsUsed: 1
+      });
+
+      // If publishNow is true or scheduled for immediate posting, publish to platform
+      if (publishNow || (scheduledAt && new Date(scheduledAt).getTime() - Date.now() < 300000)) {
+        try {
+          if (platform === 'instagram' && contentData?.mediaUrl) {
+            console.log('[CONTENT API] Publishing to Instagram immediately');
+            
+            const publishResponse = await fetch(`${req.protocol}://${req.get('host')}/api/publish-instagram`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.authorization || ''
+              },
+              body: JSON.stringify({
+                mediaUrl: contentData.mediaUrl,
+                caption: description,
+                workspaceId
+              })
+            });
+
+            if (publishResponse.ok) {
+              const publishResult = await publishResponse.json();
+              console.log('[CONTENT API] Published to Instagram successfully');
+              
+              // Update content status
+              await storage.updateContent(content.id, {
+                status: 'published',
+                publishedAt: new Date()
+              });
+
+              return res.json({
+                success: true,
+                content,
+                published: true,
+                publishResult
+              });
+            } else {
+              console.log('[CONTENT API] Instagram publishing failed, content saved as scheduled');
+            }
+          }
+        } catch (error) {
+          console.log('[CONTENT API] Publishing failed:', error);
+          // Continue with scheduled content creation
+        }
+      }
+
+      console.log('[CONTENT API] Content created successfully:', content.id);
+
+      res.json({
+        success: true,
+        content,
+        published: false
+      });
+
+    } catch (error: any) {
+      console.error('[CONTENT API] Error creating content:', error);
+      res.status(500).json({ 
+        error: 'Failed to create content',
+        details: error.message 
+      });
+    }
+  });
+
+  // Get Content
+  app.get('/api/content', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId, status } = req.query;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      let content;
+      if (status === 'scheduled') {
+        content = await storage.getScheduledContent(parseInt(workspaceId));
+      } else {
+        content = await storage.getContentByWorkspace(parseInt(workspaceId), 50);
+      }
+
+      res.json(content);
+    } catch (error: any) {
+      console.error('[CONTENT API] Error fetching content:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Stable Diffusion Image Generation
   app.post('/api/generate-image', requireAuth, async (req: any, res: Response) => {
     try {

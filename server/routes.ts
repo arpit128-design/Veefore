@@ -326,6 +326,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         title?.trim()
       );
 
+      console.log('[SCRIPT API] Generated script data:', JSON.stringify(script, null, 2));
+
       res.json({
         success: true,
         script: script

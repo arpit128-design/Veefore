@@ -37,7 +37,10 @@ function VideoGenerator() {
   const queryClient = useQueryClient();
 
   const scriptMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/content/generate-script', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/content/generate-script', data);
+      return response.json();
+    },
     onSuccess: (response: any) => {
       console.log('[SCRIPT] Response received:', response);
       setGeneratedScript(response.script);
@@ -58,8 +61,12 @@ function VideoGenerator() {
   });
 
   const videoMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/content/generate-video', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/content/generate-video', data);
+      return response.json();
+    },
     onSuccess: (response: any) => {
+      console.log('[VIDEO] Response received:', response);
       setGeneratedVideo(response.video);
       setStep('video');
       toast({

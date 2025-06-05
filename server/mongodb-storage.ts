@@ -425,7 +425,27 @@ export class MongoStorage implements IStorage {
   }
 
   async getAnalytics(workspaceId: number, platform?: string, days?: number): Promise<Analytics[]> {
-    return [];
+    await this.connect();
+    
+    // Build query filter
+    const filter: any = { workspaceId: workspaceId.toString() };
+    
+    if (platform) {
+      filter.platform = platform;
+    }
+    
+    if (days) {
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - days);
+      filter.date = { $gte: daysAgo };
+    }
+    
+    console.log('[MONGO DEBUG] Querying analytics with filter:', filter);
+    
+    const analyticsData = await AnalyticsModel.find(filter).sort({ date: -1 });
+    console.log('[MONGO DEBUG] Found analytics records:', analyticsData.length);
+    
+    return analyticsData.map(doc => this.convertAnalytics(doc));
   }
 
   async createAnalytics(analytics: InsertAnalytics): Promise<Analytics> {

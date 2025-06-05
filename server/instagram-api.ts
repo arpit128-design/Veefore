@@ -54,13 +54,15 @@ export class InstagramAPI {
     access_token: string;
     user_id: string;
   }> {
-    const response = await axios.post('https://api.instagram.com/oauth/access_token', {
+    const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       client_secret: process.env.INSTAGRAM_APP_SECRET!,
       grant_type: 'authorization_code',
       redirect_uri: redirectUri,
       code
-    }, {
+    });
+
+    const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }

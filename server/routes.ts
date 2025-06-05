@@ -8,7 +8,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
-export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
+export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Middleware for authentication
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -324,6 +324,14 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               
               if (instagramAccount && instagramAccount.accessToken) {
                 try {
+                  console.log('[INSTAGRAM API] Attempting to publish with media URL:', contentData.mediaUrl);
+                  
+                  // Check if media URL is a blob - can't be used with Instagram API
+                  if (contentData.mediaUrl.startsWith('blob:')) {
+                    console.log('[INSTAGRAM API] Blob URL detected - cannot publish to Instagram');
+                    throw new Error('Blob URLs cannot be published to Instagram. Please upload an image file.');
+                  }
+                  
                   // Create Instagram media container
                   const createMediaResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media`, {
                     method: 'POST',
@@ -337,42 +345,55 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                     })
                   });
 
-                  if (createMediaResponse.ok) {
-                    const mediaData = await createMediaResponse.json();
-                    
-                    // Publish the media container
-                    const publishResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media_publish`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        creation_id: mediaData.id,
-                        access_token: instagramAccount.accessToken
-                      })
-                    });
-
-                    if (publishResponse.ok) {
-                      const publishData = await publishResponse.json();
-                      console.log('[CONTENT API] Published to Instagram successfully:', publishData.id);
-                      
-                      // Update content status
-                      await storage.updateContent(content.id, {
-                        status: 'published',
-                        publishedAt: new Date()
-                      });
-
-                      return res.json({
-                        success: true,
-                        content,
-                        published: true,
-                        instagramPostId: publishData.id,
-                        message: 'Content published to Instagram successfully'
-                      });
-                    }
+                  console.log('[INSTAGRAM API] Create media response status:', createMediaResponse.status);
+                  
+                  if (!createMediaResponse.ok) {
+                    const errorData = await createMediaResponse.json();
+                    console.log('[INSTAGRAM API] Create media error:', errorData);
+                    throw new Error(`Instagram API error: ${errorData.error?.message || 'Failed to create media container'}`);
                   }
-                } catch (instagramError) {
-                  console.log('[CONTENT API] Instagram API error:', instagramError);
+
+                  const mediaData = await createMediaResponse.json();
+                  console.log('[INSTAGRAM API] Media container created:', mediaData.id);
+                  
+                  // Publish the media container
+                  const publishResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media_publish`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      creation_id: mediaData.id,
+                      access_token: instagramAccount.accessToken
+                    })
+                  });
+
+                  console.log('[INSTAGRAM API] Publish response status:', publishResponse.status);
+
+                  if (!publishResponse.ok) {
+                    const errorData = await publishResponse.json();
+                    console.log('[INSTAGRAM API] Publish error:', errorData);
+                    throw new Error(`Instagram publish error: ${errorData.error?.message || 'Failed to publish'}`);
+                  }
+
+                  const publishData = await publishResponse.json();
+                  console.log('[CONTENT API] Published to Instagram successfully:', publishData.id);
+                  
+                  // Update content status
+                  await storage.updateContent(content.id, {
+                    status: 'published',
+                    publishedAt: new Date()
+                  });
+
+                  return res.json({
+                    success: true,
+                    content,
+                    published: true,
+                    instagramPostId: publishData.id,
+                    message: 'Content published to Instagram successfully'
+                  });
+                } catch (instagramError: any) {
+                  console.log('[CONTENT API] Instagram API error:', instagramError.message);
                 }
               }
             }
@@ -950,6 +971,28 @@ Hashtags: [relevant hashtags separated by spaces]`
         success: false, 
         error: 'Failed to connect Instagram account: ' + error.message 
       });
+    }
+  });
+
+  // File upload endpoint
+  app.post('/api/upload', requireAuth, upload?.single('file'), (req: any, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      
+      res.json({
+        success: true,
+        fileUrl: fileUrl,
+        filename: req.file.filename,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      });
+    } catch (error) {
+      console.error('[UPLOAD] Error:', error);
+      res.status(500).json({ error: 'File upload failed' });
     }
   });
 

@@ -119,7 +119,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           }
           
           const liveData = {
-            totalViews: totalViews || (accountInsights?.impressions || 0),
+            totalViews: totalViews,
             engagement: totalEngagement,
             totalFollowers: userProfile.followers_count,
             newFollowers: userProfile.followers_count,

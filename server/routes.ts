@@ -415,10 +415,53 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
     try {
       const accountId = parseInt(req.params.id);
+      console.log(`[DISCONNECT ACCOUNT] Attempting to disconnect account ID: ${accountId}`);
+      
+      // Get account details before deletion for logging
+      const account = await storage.getSocialAccount(accountId);
+      if (account) {
+        console.log(`[DISCONNECT ACCOUNT] Disconnecting ${account.platform} account: @${account.username} (${account.accountId})`);
+      }
+      
       await storage.deleteSocialAccount(accountId);
-      res.json({ success: true });
+      console.log(`[DISCONNECT ACCOUNT] Successfully disconnected account ID: ${accountId}`);
+      
+      res.json({ success: true, message: 'Account disconnected successfully' });
     } catch (error: any) {
       console.error('[DISCONNECT ACCOUNT] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Clear old Instagram accounts for current user (cleanup endpoint)
+  app.post('/api/social-accounts/cleanup', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+      
+      // Get all Instagram accounts for this workspace
+      const instagramAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      const instagramAccountsToDelete = instagramAccounts.filter(account => account.platform === 'instagram');
+      
+      console.log(`[CLEANUP] Found ${instagramAccountsToDelete.length} Instagram accounts to clean up for workspace ${workspace.id}`);
+      
+      // Delete all Instagram accounts
+      for (const account of instagramAccountsToDelete) {
+        console.log(`[CLEANUP] Removing Instagram account: @${account.username} (${account.accountId})`);
+        await storage.deleteSocialAccount(account.id);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Cleaned up ${instagramAccountsToDelete.length} Instagram accounts`,
+        deletedAccounts: instagramAccountsToDelete.length 
+      });
+    } catch (error: any) {
+      console.error('[CLEANUP] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

@@ -23,7 +23,8 @@ import {
   AlertCircle,
   Settings,
   Unlink,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from "lucide-react";
 
 interface SocialAccount {
@@ -285,6 +286,28 @@ export default function Integrations() {
     }
   });
 
+  // Cleanup old accounts mutation
+  const cleanupMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/social-accounts/cleanup');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      toast({
+        title: "Cleanup Complete",
+        description: `Removed ${data.deletedAccounts} old Instagram accounts.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cleanup Failed",
+        description: error.message || "Failed to cleanup old accounts",
+        variant: "destructive",
+      });
+    }
+  });
+
   const getConnectedAccount = (platform: string): SocialAccount | undefined => {
     return Array.isArray(socialAccounts) ? socialAccounts.find((account: SocialAccount) => account.platform === platform) : undefined;
   };
@@ -316,11 +339,32 @@ export default function Integrations() {
             Connect your social media accounts to automate content creation and analytics
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Settings className="text-asteroid-silver" />
-          <span className="text-sm text-asteroid-silver">
-            {socialAccounts?.length || 0} platforms connected
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Settings className="text-asteroid-silver" />
+            <span className="text-sm text-asteroid-silver">
+              {socialAccounts?.length || 0} platforms connected
+            </span>
+          </div>
+          <Button
+            onClick={() => cleanupMutation.mutate()}
+            disabled={cleanupMutation.isPending}
+            variant="outline"
+            size="sm"
+            className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+          >
+            {cleanupMutation.isPending ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Cleaning...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear Old Accounts
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

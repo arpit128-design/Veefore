@@ -104,7 +104,7 @@ export default function Auth() {
               <Button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:opacity-90 transition-opacity h-12"
+                className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:opacity-90 transition-opacity h-12 mb-3"
               >
                 {loading ? (
                   <>
@@ -117,6 +117,19 @@ export default function Auth() {
                     Continue with Google
                   </>
                 )}
+              </Button>
+
+              {/* Demo Mode Button */}
+              <Button
+                onClick={() => {
+                  localStorage.setItem('veefore_demo_mode', 'true');
+                  window.location.reload();
+                }}
+                variant="outline"
+                className="w-full border-solar-gold text-solar-gold hover:bg-solar-gold hover:text-space-navy transition-all h-12"
+              >
+                <i className="fas fa-rocket text-lg mr-3"></i>
+                Explore Demo Mode
               </Button>
 
               {/* Features Preview */}

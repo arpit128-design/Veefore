@@ -62,18 +62,16 @@ function Router() {
     );
   }
 
-  return (
-    <Switch>
-      {!user ? (
-        <>
-          <Route path="/auth" component={Auth} />
-          <Route component={() => <Redirect to="/auth" />} />
-        </>
-      ) : (
-        <Route component={AuthenticatedApp} />
-      )}
-    </Switch>
-  );
+  if (!user) {
+    return (
+      <Switch>
+        <Route path="/auth" component={Auth} />
+        <Route component={() => <Redirect to="/auth" />} />
+      </Switch>
+    );
+  }
+
+  return <AuthenticatedApp />;
 }
 
 function App() {

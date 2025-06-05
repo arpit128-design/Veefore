@@ -25,6 +25,36 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for demo mode in localStorage
+    const demoMode = localStorage.getItem('veefore_demo_mode');
+    
+    if (demoMode === 'true') {
+      // Create demo user
+      const demoUser: User = {
+        id: 1,
+        firebaseUid: 'demo-user',
+        email: 'demo@veefore.com',
+        username: 'DemoCommander',
+        displayName: 'Demo Commander',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
+        credits: 2500,
+        plan: 'Pro',
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        referralCode: 'DEMO123',
+        totalReferrals: 47,
+        totalEarned: 1250,
+        referredBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      setUser(demoUser);
+      setToken('demo-token');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setFirebaseUser(firebaseUser);
       

@@ -32,7 +32,15 @@ if (!GEMINI_API_KEY) {
 
 // Social media API setup
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN || "";
+const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID || "";
+const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET || "";
 const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN || "";
+
+console.log('Instagram API credentials loaded:', {
+  hasAccessToken: !!INSTAGRAM_ACCESS_TOKEN,
+  hasAppId: !!INSTAGRAM_APP_ID,
+  hasAppSecret: !!INSTAGRAM_APP_SECRET
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -406,15 +414,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analytics = [];
       } else {
         defaultWorkspace = workspaces[0];
-        analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
+        analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts
       const connectedAccounts = await storage.getSocialAccountsByWorkspace(Number(defaultWorkspace.id));
       const instagramAccount = connectedAccounts.find(acc => acc.platform === 'instagram');
       
-      // Fetch real Instagram analytics if account is connected
-      if (instagramAccount && instagramAccount.accessToken) {
+      // Fetch real Instagram analytics if we have an access token
+      if (INSTAGRAM_ACCESS_TOKEN) {
+        try {
+          console.log('Fetching Instagram analytics with provided access token...');
+          
+          // Fetch user profile
+          const profileResponse = await fetch(`https://graph.instagram.com/me?fields=id,username,account_type,media_count,followers_count&access_token=${INSTAGRAM_ACCESS_TOKEN}`);
+          if (!profileResponse.ok) {
+            throw new Error(`Instagram API error: ${profileResponse.status}`);
+          }
+          const profile = await profileResponse.json();
+          
+          // Fetch media insights
+          const mediaResponse = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,timestamp,like_count,comments_count,impressions,reach&access_token=${INSTAGRAM_ACCESS_TOKEN}&limit=10`);
+          if (!mediaResponse.ok) {
+            throw new Error(`Instagram Media API error: ${mediaResponse.status}`);
+          }
+          const mediaData = await mediaResponse.json();
+          
+          // Calculate total metrics from recent posts
+          const totalLikes = mediaData.data?.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0) || 0;
+          const totalComments = mediaData.data?.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0) || 0;
+          const totalImpressions = mediaData.data?.reduce((sum: number, post: any) => sum + (post.impressions || 0), 0) || 0;
+          const totalReach = mediaData.data?.reduce((sum: number, post: any) => sum + (post.reach || 0), 0) || 0;
+          
+          // Store fresh analytics data
+          await storage.createAnalytics({
+            workspaceId: Number(defaultWorkspace.id),
+            platform: 'instagram',
+            metrics: {
+              profile_views: totalImpressions,
+              follower_count: profile.followers_count || 0,
+              media_count: profile.media_count || 0,
+              likes: totalLikes,
+              comments: totalComments,
+              impressions: totalImpressions,
+              reach: totalReach,
+              engagement: totalLikes + totalComments,
+              views: totalImpressions
+            }
+          });
+          
+          console.log('Successfully fetched and stored Instagram analytics:', {
+            followers: profile.followers_count,
+            mediaCount: profile.media_count,
+            totalEngagement: totalLikes + totalComments,
+            totalImpressions
+          });
+          
+          // Refresh analytics data
+          analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
+        } catch (error) {
+          console.error('Instagram API fetch failed:', error);
+        }
+      } else if (instagramAccount && instagramAccount.accessToken) {
         try {
           const profile = await instagramAPI.getUserProfile(instagramAccount.accessToken);
           const insights = await instagramAPI.getAccountInsights(instagramAccount.accessToken);

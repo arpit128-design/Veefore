@@ -384,6 +384,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard analytics summary endpoint
+  app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      
+      let analytics: any[] = [];
+      let defaultWorkspace;
+
+      if (workspaces.length === 0) {
+        // Create default workspace for new users
+        defaultWorkspace = await storage.createWorkspace({
+          userId: user.id,
+          name: "My VeeFore Workspace",
+          description: "Default workspace for content creation"
+        });
+        
+        // Return empty analytics for new workspace until social accounts are connected
+        analytics = [];
+      } else {
+        defaultWorkspace = workspaces[0];
+        analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
+      }
+      
+      // Calculate aggregated metrics from JSON structure
+      const totalViews = analytics.reduce((sum, a) => {
+        const metrics = a.metrics as any;
+        return sum + (metrics?.views || metrics?.impressions || 0);
+      }, 0);
+      
+      const totalEngagement = analytics.reduce((sum, a) => {
+        const metrics = a.metrics as any;
+        return sum + (metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
+      }, 0);
+      
+      const totalFollowers = analytics.reduce((sum, a) => {
+        const metrics = a.metrics as any;
+        return sum + (metrics?.followers || 0);
+      }, 0);
+      
+      // Calculate content score based on engagement rate
+      const contentScore = totalViews > 0 ? Math.round((totalEngagement / totalViews) * 100) : 0;
+
+      // Group analytics by platform
+      const platformAnalytics = analytics.reduce((acc, a) => {
+        const metrics = a.metrics as any;
+        if (!acc[a.platform]) {
+          acc[a.platform] = {
+            platform: a.platform,
+            views: 0,
+            engagement: 0,
+            followers: 0,
+            posts: 0
+          };
+        }
+        acc[a.platform].views += metrics?.views || metrics?.impressions || 0;
+        acc[a.platform].engagement += (metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
+        acc[a.platform].followers += metrics?.followers || 0;
+        acc[a.platform].posts += 1;
+        return acc;
+      }, {} as any);
+
+      res.json({
+        totalViews,
+        engagement: totalEngagement,
+        newFollowers: totalFollowers,
+        contentScore,
+        platforms: Object.values(platformAnalytics)
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/analytics/fetch", requireAuth, async (req, res) => {
     try {
       const { workspaceId, platform } = req.body;

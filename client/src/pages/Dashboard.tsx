@@ -5,9 +5,16 @@ import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, Heart, Users, TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { user } = useAuth();
+
+  // Fetch real analytics data
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['/api/dashboard/analytics'],
+    enabled: !!user
+  });
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour12: false,
@@ -15,6 +22,34 @@ export default function Dashboard() {
     hour: '2-digit',
     minute: '2-digit'
   });
+
+  // Format numbers for display
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  const formatPercentage = (num: number) => `${num}%`;
+
+  // Show loading state
+  if (analyticsLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  const analytics = analyticsData || {
+    totalViews: 0,
+    engagement: 0,
+    newFollowers: 0,
+    contentScore: 0,
+    platforms: []
+  };
 
   return (
     <div className="space-y-8">
@@ -38,29 +73,29 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Views"
-          value="2.4M"
-          change={{ value: "+12.5% from last week", isPositive: true }}
+          value={formatNumber(analytics.totalViews)}
+          change={{ value: analytics.totalViews > 0 ? "Active data" : "No data yet", isPositive: analytics.totalViews > 0 }}
           icon={<Eye className="text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
         />
         <StatsCard
           title="Engagement"
-          value="156K"
-          change={{ value: "+8.3% from last week", isPositive: true }}
+          value={formatNumber(analytics.engagement)}
+          change={{ value: analytics.engagement > 0 ? "Active data" : "No data yet", isPositive: analytics.engagement > 0 }}
           icon={<Heart className="text-xl" />}
           gradient="from-solar-gold to-red-500"
         />
         <StatsCard
           title="New Followers"
-          value="1,247"
-          change={{ value: "+15.7% from last week", isPositive: true }}
+          value={formatNumber(analytics.newFollowers)}
+          change={{ value: analytics.newFollowers > 0 ? "Active data" : "No data yet", isPositive: analytics.newFollowers > 0 }}
           icon={<Users className="text-xl" />}
           gradient="from-nebula-purple to-pink-500"
         />
         <StatsCard
           title="Content Score"
-          value="94%"
-          change={{ value: "+5.1% from last week", isPositive: true }}
+          value={formatPercentage(analytics.contentScore)}
+          change={{ value: analytics.contentScore > 0 ? "Active data" : "No data yet", isPositive: analytics.contentScore > 0 }}
           icon={<TrendingUp className="text-xl" />}
           gradient="from-green-400 to-blue-500"
         />

@@ -626,37 +626,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Manual Instagram token connection endpoint
-  app.post("/api/instagram/manual-connect", requireAuth, async (req: any, res) => {
+  // Direct Instagram connection using existing token
+  app.post("/api/instagram/connect-direct", requireAuth, async (req: any, res) => {
     try {
-      const { workspaceId, accessToken } = req.body;
+      const user = req.user;
+      const userId = typeof user.id === 'string' ? user.id : Number(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(userId);
       
-      if (!workspaceId || !accessToken) {
-        return res.status(400).json({ error: 'Missing workspace ID or access token' });
+      let defaultWorkspace;
+      if (workspaces.length === 0) {
+        defaultWorkspace = await storage.createWorkspace({
+          userId: userId,
+          name: "My VeeFore Workspace",
+          description: "Default workspace for content creation"
+        });
+      } else {
+        defaultWorkspace = workspaces[0];
+      }
+
+      // Use the existing Instagram access token from environment
+      if (!process.env.INSTAGRAM_ACCESS_TOKEN) {
+        return res.status(400).json({ error: 'Instagram access token not configured' });
       }
 
       // Validate token by getting user profile
-      const profile = await instagramAPI.getUserProfile(accessToken);
-      console.log(`[INSTAGRAM MANUAL] Connected account: ${profile.username}`);
+      const profile = await instagramAPI.getUserProfile(process.env.INSTAGRAM_ACCESS_TOKEN);
+      console.log(`[INSTAGRAM DIRECT] Connected account: ${profile.username}`);
+      
+      // Check if account already exists
+      const existingAccount = await storage.getSocialAccountByPlatform(Number(defaultWorkspace.id), "instagram");
+      if (existingAccount) {
+        return res.json({ success: true, account: existingAccount, message: "Instagram account already connected" });
+      }
       
       // Store Instagram account
       const socialAccount = await storage.createSocialAccount({
-        workspaceId: Number(workspaceId),
+        workspaceId: Number(defaultWorkspace.id),
         platform: "instagram",
         accountId: profile.id,
         username: profile.username,
-        accessToken: accessToken,
+        accessToken: process.env.INSTAGRAM_ACCESS_TOKEN,
         refreshToken: null,
         expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
       });
 
       // Fetch and store analytics
       try {
-        const insights = await instagramAPI.getAccountInsights(accessToken);
-        const media = await instagramAPI.getUserMedia(accessToken, 10);
+        const insights = await instagramAPI.getAccountInsights(process.env.INSTAGRAM_ACCESS_TOKEN);
+        const media = await instagramAPI.getUserMedia(process.env.INSTAGRAM_ACCESS_TOKEN, 10);
         
         await storage.createAnalytics({
-          workspaceId: Number(workspaceId),
+          workspaceId: Number(defaultWorkspace.id),
           platform: "instagram",
           metrics: {
             views: insights.impressions,
@@ -675,7 +695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, account: socialAccount });
     } catch (error: any) {
-      console.error('Instagram manual connect error:', error);
+      console.error('Instagram direct connect error:', error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -899,13 +919,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const protocol = host?.includes('localhost') ? 'http' : 'https';
       const redirectUri = `${protocol}://${host}/api/instagram/callback`;
       
+      console.log(`[INSTAGRAM AUTH] ===========================================`);
+      console.log(`[INSTAGRAM AUTH] Starting Instagram OAuth flow`);
       console.log(`[INSTAGRAM AUTH] Generated redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] Request protocol: ${req.protocol}`);
       console.log(`[INSTAGRAM AUTH] Request host: ${host}`);
       console.log(`[INSTAGRAM AUTH] Workspace ID: ${defaultWorkspace.id}`);
+      console.log(`[INSTAGRAM AUTH] App ID: ${process.env.INSTAGRAM_APP_ID}`);
+      console.log(`[INSTAGRAM AUTH] ===========================================`);
+      
+      // Verify Instagram app credentials
+      if (!process.env.INSTAGRAM_APP_ID || !process.env.INSTAGRAM_APP_SECRET) {
+        return res.status(500).json({ 
+          error: 'Instagram app credentials not configured. Please provide INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET.' 
+        });
+      }
       
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, defaultWorkspace.id.toString());
-      console.log(`[INSTAGRAM AUTH] Generated auth URL: ${authUrl}`);
+      console.log(`[INSTAGRAM AUTH] Final auth URL: ${authUrl}`);
       res.json({ authUrl });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

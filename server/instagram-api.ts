@@ -38,15 +38,23 @@ export class InstagramAPI {
 
   // Generate Instagram Business Login OAuth URL (Direct Instagram API)
   generateAuthUrl(redirectUri: string, state?: string): string {
+    // Ensure redirect URI is properly encoded
+    const encodedRedirectUri = encodeURIComponent(redirectUri);
+    
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
-      redirect_uri: redirectUri,
+      redirect_uri: redirectUri, // Don't double encode
       scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
       response_type: 'code',
       ...(state && { state })
     });
 
-    return `https://api.instagram.com/oauth/authorize?${params.toString()}`;
+    const authUrl = `https://api.instagram.com/oauth/authorize?${params.toString()}`;
+    console.log(`[INSTAGRAM API] Generated auth URL: ${authUrl}`);
+    console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
+    console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
+    
+    return authUrl;
   }
 
   // Exchange authorization code for access token (Instagram Business Login API)

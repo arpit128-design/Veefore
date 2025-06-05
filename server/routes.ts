@@ -270,55 +270,54 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const enhancedPrompt = `${prompt}, high quality, professional, social media content, 4k, detailed, masterpiece, best quality`;
       
       // Using Hugging Face Inference API for Stable Diffusion
-      const stableDiffusionAPI = 'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5';
+      const stableDiffusionAPI = 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1';
       
       try {
         console.log('[STABLE DIFFUSION] Using API key:', process.env.HUGGING_FACE_API_KEY ? 'Present' : 'Missing');
         
-        const response = await fetch(stableDiffusionAPI, {
+        // Use a simpler, more reliable model
+        const endpoint = 'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5';
+        
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY}`
+            'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
           },
           body: JSON.stringify({
-            inputs: enhancedPrompt,
-            parameters: {
-              num_inference_steps: 20,
-              guidance_scale: 7.5,
-              width: 512,
-              height: 512
-            }
+            inputs: prompt
           })
         });
 
-        console.log('[STABLE DIFFUSION] API Response status:', response.status);
+        console.log('[STABLE DIFFUSION] Response status:', response.status);
+        console.log('[STABLE DIFFUSION] Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (response.ok) {
-          // Convert response to base64 for display
-          const imageBuffer = await response.arrayBuffer();
-          const base64Image = Buffer.from(imageBuffer).toString('base64');
-          const imageUrl = `data:image/png;base64,${base64Image}`;
+          const arrayBuffer = await response.arrayBuffer();
           
-          console.log('[STABLE DIFFUSION] Image generated successfully, size:', imageBuffer.byteLength);
-          
-          return res.json({
-            success: true,
-            imageUrl,
-            prompt,
-            enhancedPrompt,
-            metadata: {
-              model: 'stable-diffusion-v1-5',
-              timestamp: new Date().toISOString(),
-              type: 'generated'
-            }
-          });
+          if (arrayBuffer.byteLength > 0) {
+            const base64Image = Buffer.from(arrayBuffer).toString('base64');
+            const imageUrl = `data:image/jpeg;base64,${base64Image}`;
+            
+            console.log('[STABLE DIFFUSION] Generated image, size:', arrayBuffer.byteLength);
+            
+            return res.json({
+              success: true,
+              imageUrl,
+              prompt,
+              enhancedPrompt,
+              metadata: {
+                model: 'stable-diffusion-v1-5',
+                timestamp: new Date().toISOString(),
+                type: 'generated'
+              }
+            });
+          }
         } else {
           const errorText = await response.text();
-          console.log('[STABLE DIFFUSION] API error:', response.status, errorText);
+          console.log('[STABLE DIFFUSION] API error:', response.status, ':', errorText);
         }
       } catch (error) {
-        console.log('[STABLE DIFFUSION] Generation failed:', error.message);
+        console.log('[STABLE DIFFUSION] Request failed:', error.message);
       }
       
       // Fallback to curated high-quality images based on prompt

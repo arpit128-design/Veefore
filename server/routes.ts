@@ -472,86 +472,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize cache immediately
   initializeCache();
 
-  // Dashboard analytics summary endpoint
+  // Dashboard analytics summary endpoint with real-time Instagram data
   app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
-      // Handle both string and number user IDs from MongoDB
       const userId = typeof user.id === 'string' ? user.id : Number(user.id);
       const workspaces = await storage.getWorkspacesByUserId(userId);
       
-      let analytics: any[] = [];
       let defaultWorkspace;
-
       if (workspaces.length === 0) {
-        // Create default workspace for new users
         defaultWorkspace = await storage.createWorkspace({
           userId: userId,
           name: "My VeeFore Workspace",
           description: "Default workspace for content creation"
         });
-        
-        // Return empty analytics for new workspace until social accounts are connected
-        analytics = [];
       } else {
         defaultWorkspace = workspaces[0];
-        analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
       }
 
-      // Check for recent cached data to serve immediately
-      const now = Date.now();
-      if (cachedInstagramData && (now - lastCacheUpdate) < CACHE_DURATION) {
-        res.setHeader('Cache-Control', 'public, max-age=30');
-        return res.json(cachedInstagramData);
+      // Always fetch fresh Instagram data for real-time updates
+      if (INSTAGRAM_ACCESS_TOKEN) {
+        console.log(`[LIVE UPDATE] Fetching current Instagram metrics`);
+        
+        try {
+          // Fetch current Instagram profile data
+          const userProfile = await instagramAPI.getUserProfile(INSTAGRAM_ACCESS_TOKEN);
+          const userMedia = await instagramAPI.getUserMedia(INSTAGRAM_ACCESS_TOKEN, 25);
+          
+          // Calculate real-time engagement
+          const totalEngagement = userMedia.reduce((sum, media) => {
+            const likes = media.like_count || 0;
+            const comments = media.comments_count || 0;
+            return sum + likes + comments;
+          }, 0);
+          
+          const liveData = {
+            totalViews: 0,
+            engagement: totalEngagement,
+            totalFollowers: userProfile.followers_count,
+            newFollowers: userProfile.followers_count,
+            contentScore: 85,
+            platforms: [{
+              platform: 'instagram',
+              views: 0,
+              engagement: totalEngagement,
+              followers: userProfile.followers_count,
+              posts: userMedia.length
+            }]
+          };
+          
+          console.log(`[LIVE UPDATE] Current Instagram: ${userProfile.followers_count} followers, ${totalEngagement} engagement`);
+          
+          // Store fresh data for persistence
+          await storage.createAnalytics({
+            workspaceId: defaultWorkspace.id,
+            platform: 'instagram',
+            date: new Date(),
+            metrics: {
+              followers: userProfile.followers_count,
+              follower_count: userProfile.followers_count,
+              engagement: totalEngagement,
+              likes: totalEngagement,
+              views: 0,
+              impressions: 0,
+              comments: 0,
+              shares: 0,
+              reach: 0
+            }
+          });
+          
+          res.setHeader('Cache-Control', 'no-cache'); // No cache for real-time data
+          return res.json(liveData);
+          
+        } catch (error) {
+          console.log(`[LIVE UPDATE] Instagram API error:`, error);
+        }
       }
-
-      // If no cache and we have database data, return it immediately
+      
+      // Fallback to latest database data if API unavailable
+      const analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 1);
       if (analytics.length > 0) {
         const latestRecord = analytics[0];
         const latestMetrics = latestRecord?.metrics as any;
         
-        const immediateData = {
-          totalViews: latestMetrics?.views || latestMetrics?.impressions || 0,
+        const fallbackData = {
+          totalViews: latestMetrics?.views || 0,
           engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
           totalFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
           newFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
           contentScore: 85,
           platforms: [{
             platform: latestRecord.platform,
-            views: latestMetrics?.views || latestMetrics?.impressions || 0,
+            views: latestMetrics?.views || 0,
             engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
             followers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
-            posts: analytics.filter(a => a.platform === latestRecord.platform).length
+            posts: 1
           }]
         };
         
-        // Cache and return immediately
-        cachedInstagramData = immediateData;
-        lastCacheUpdate = now;
-        res.setHeader('Cache-Control', 'public, max-age=30');
-        return res.json(immediateData);
+        return res.json(fallbackData);
       }
       
-      // Try to fetch fresh Instagram data if we have connected accounts
-      const connectedAccounts = await storage.getSocialAccountsByWorkspace(defaultWorkspace.id);
-      const instagramAccount = connectedAccounts.find(acc => acc.platform === 'instagram');
-      
-      // Fetch real Instagram analytics if we have an access token
-      if (INSTAGRAM_ACCESS_TOKEN) {
-        try {
-          console.log('[INSTAGRAM INTEGRATION] Starting Instagram data fetch for workspace:', defaultWorkspace.id);
-          
-          // Fetch user profile
-          const profileResponse = await fetch(`https://graph.instagram.com/me?fields=id,username,account_type,media_count,followers_count&access_token=${INSTAGRAM_ACCESS_TOKEN}`);
-          if (!profileResponse.ok) {
-            throw new Error(`Instagram API error: ${profileResponse.status}`);
-          }
-          const profile = await profileResponse.json();
-          console.log('[INSTAGRAM INTEGRATION] Profile fetched:', profile.username, 'ID:', profile.id);
-          
-          // Check if Instagram account exists for this workspace, if not create it
-          let existingAccount = await storage.getSocialAccountByPlatform(defaultWorkspace.id, 'instagram');
-          console.log('[INSTAGRAM INTEGRATION] Existing account check:', existingAccount ? 'Found' : 'Not found');
+      // Empty state for new accounts
+      res.json({
+        totalViews: 0,
+        engagement: 0,
+        totalFollowers: 0,
+        newFollowers: 0,
+        contentScore: 85,
+        platforms: []
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
           
           if (!existingAccount) {
             console.log('[INSTAGRAM INTEGRATION] Creating Instagram social account for workspace:', defaultWorkspace.id);

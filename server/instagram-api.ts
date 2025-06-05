@@ -38,80 +38,59 @@ export class InstagramAPI {
 
   // Generate Instagram Business Login OAuth URL (Direct Instagram API)
   generateAuthUrl(redirectUri: string, state?: string): string {
-    // Try Instagram Basic Display API first (more common for basic integrations)
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'user_profile,user_media',
+      scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
       response_type: 'code',
       ...(state && { state })
     });
 
     const authUrl = `https://api.instagram.com/oauth/authorize?${params.toString()}`;
-    console.log(`[INSTAGRAM API] Generated Basic Display auth URL: ${authUrl}`);
+    console.log(`[INSTAGRAM API] Generated Business API auth URL: ${authUrl}`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
     
     return authUrl;
   }
 
-  // Exchange authorization code for access token (Instagram Basic Display API)
+  // Exchange authorization code for access token (Instagram Business API)
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<{
     access_token: string;
     user_id?: string;
   }> {
-    console.log(`[INSTAGRAM API] Basic Display token exchange started`);
+    console.log(`[INSTAGRAM API] Business API token exchange started`);
     console.log(`[INSTAGRAM API] Code: ${code}`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] App ID: ${process.env.INSTAGRAM_APP_ID}`);
     
-    const formData = new FormData();
-    formData.append('client_id', process.env.INSTAGRAM_APP_ID!);
-    formData.append('client_secret', process.env.INSTAGRAM_APP_SECRET!);
-    formData.append('grant_type', 'authorization_code');
-    formData.append('redirect_uri', redirectUri);
-    formData.append('code', code);
+    const params = new URLSearchParams({
+      client_id: process.env.INSTAGRAM_APP_ID!,
+      client_secret: process.env.INSTAGRAM_APP_SECRET!,
+      grant_type: 'authorization_code',
+      redirect_uri: redirectUri,
+      code
+    });
 
     try {
       console.log(`[INSTAGRAM API] Making POST request to: https://api.instagram.com/oauth/access_token`);
-      console.log(`[INSTAGRAM API] Using Basic Display API format`);
+      console.log(`[INSTAGRAM API] Request params:`, params.toString());
       
-      const response = await axios.post('https://api.instagram.com/oauth/access_token', formData, {
+      const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
 
-      console.log(`[INSTAGRAM API] Basic Display token exchange successful:`, response.data);
+      console.log(`[INSTAGRAM API] Business API token exchange successful:`, response.data);
       return response.data;
     } catch (error: any) {
-      console.error(`[INSTAGRAM API] Basic Display token exchange failed:`, error.response?.data || error.message);
+      console.error(`[INSTAGRAM API] Business API token exchange failed:`, error.response?.data || error.message);
       console.error(`[INSTAGRAM API] Response status:`, error.response?.status);
       console.error(`[INSTAGRAM API] Response headers:`, error.response?.headers);
+      console.error(`[INSTAGRAM API] Full error response:`, JSON.stringify(error.response?.data, null, 2));
       
-      // If Basic Display fails, try Business API format as fallback
-      console.log(`[INSTAGRAM API] Trying Business API fallback...`);
-      try {
-        const params = new URLSearchParams({
-          client_id: process.env.INSTAGRAM_APP_ID!,
-          client_secret: process.env.INSTAGRAM_APP_SECRET!,
-          grant_type: 'authorization_code',
-          redirect_uri: redirectUri,
-          code
-        });
-
-        const fallbackResponse = await axios.post('https://api.instagram.com/oauth/access_token', params, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
-
-        console.log(`[INSTAGRAM API] Business API fallback successful:`, fallbackResponse.data);
-        return fallbackResponse.data;
-      } catch (fallbackError: any) {
-        console.error(`[INSTAGRAM API] Both API formats failed:`, fallbackError.response?.data || fallbackError.message);
-        throw new Error(`Instagram token exchange failed: ${error.response?.data?.error_message || error.message}`);
-      }
+      throw new Error(`Instagram token exchange failed: ${error.response?.data?.error_message || error.response?.data?.error?.message || error.message}`);
     }
   }
 

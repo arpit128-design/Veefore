@@ -119,6 +119,11 @@ export default function Auth() {
                 )}
               </Button>
 
+              {/* Firebase Configuration Help */}
+              <div className="text-xs text-asteroid-silver text-center mb-2">
+                Having login issues? Your Firebase project may need configuration.
+              </div>
+
               {/* Demo Mode Button */}
               <Button
                 onClick={() => {

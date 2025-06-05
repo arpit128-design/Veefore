@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 const WorkspaceSchema = new mongoose.Schema({
-  userId: { type: Number, required: true },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
   name: { type: String, required: true },
   description: String,
   avatar: String,
@@ -41,7 +41,7 @@ const WorkspaceSchema = new mongoose.Schema({
 });
 
 const SocialAccountSchema = new mongoose.Schema({
-  workspaceId: { type: Number, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   platform: { type: String, required: true },
   username: { type: String, required: true },
   accountId: String,
@@ -53,7 +53,7 @@ const SocialAccountSchema = new mongoose.Schema({
 });
 
 const ContentSchema = new mongoose.Schema({
-  workspaceId: { type: Number, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
   platform: { type: String, required: true },
@@ -67,7 +67,7 @@ const ContentSchema = new mongoose.Schema({
 });
 
 const AnalyticsSchema = new mongoose.Schema({
-  workspaceId: { type: Number, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   platform: { type: String, required: true },
   date: { type: Date, required: true },
   views: { type: Number, default: 0 },
@@ -81,7 +81,7 @@ const AnalyticsSchema = new mongoose.Schema({
 });
 
 const AutomationRuleSchema = new mongoose.Schema({
-  workspaceId: { type: Number, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   name: { type: String, required: true },
   trigger: { type: String, required: true },
   action: { type: String, required: true },

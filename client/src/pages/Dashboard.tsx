@@ -111,8 +111,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Views"
-          value={formatNumber(analytics.totalViews)}
-          change={{ value: analytics.totalViews > 0 ? "Active data" : "No data yet", isPositive: analytics.totalViews > 0 }}
+          value={analytics.platforms.length > 0 ? formatNumber(analytics.platforms[0].impressions || 0) : "0"}
+          change={{ value: analytics.platforms.length > 0 && analytics.platforms[0].impressions > 0 ? "Active data" : "Limited access", isPositive: analytics.platforms.length > 0 }}
           icon={<Eye className="text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
         />
@@ -141,16 +141,75 @@ export default function Dashboard() {
 
       {/* Platform Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <PlatformAnalytics
-          platform="instagram"
-          icon={<i className="fab fa-instagram" />}
-          color="text-pink-500"
-        />
-        <PlatformAnalytics
-          platform="twitter"
-          icon={<i className="fab fa-x-twitter" />}
-          color="text-white"
-        />
+        {/* Instagram Analytics - Live Data */}
+        <div className="content-card holographic">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <i className="fab fa-instagram text-2xl text-pink-500" />
+                <h3 className="text-xl font-orbitron font-semibold">Instagram Analytics</h3>
+              </div>
+              <div className="w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Followers</span>
+                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.followers || analytics.newFollowers || 0}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Avg. Engagement</span>
+                <span className="text-xl font-bold text-green-400">{analytics.engagement || 0}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Impressions</span>
+                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.impressions || 0}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Reach (7d)</span>
+                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.reach || 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Twitter Analytics */}
+        <div className="content-card holographic">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <i className="fab fa-x-twitter text-2xl text-white" />
+                <h3 className="text-xl font-orbitron font-semibold">Twitter Analytics</h3>
+              </div>
+              <div className="w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Followers</span>
+                <span className="text-xl font-bold text-white">0</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Avg. Engagement</span>
+                <span className="text-xl font-bold text-green-400">0%</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Impressions</span>
+                <span className="text-xl font-bold text-white">0</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Reach (7d)</span>
+                <span className="text-xl font-bold text-white">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* AI Content Studio Quick Access */}

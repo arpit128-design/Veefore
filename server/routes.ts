@@ -123,10 +123,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Look up user in database
+      console.log(`[AUTH DEBUG] Looking up user with Firebase UID: ${firebaseUid}`);
       const user = await storage.getUserByFirebaseUid(firebaseUid);
       if (!user) {
+        console.error(`[AUTH ERROR] User not found in database for Firebase UID: ${firebaseUid}`);
         return res.status(401).json({ error: 'User not found' });
       }
+      console.log(`[AUTH DEBUG] User found: ${user.id} (${user.email})`);
 
       req.user = user;
       next();

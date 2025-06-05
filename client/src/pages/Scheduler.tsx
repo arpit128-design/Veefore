@@ -262,13 +262,24 @@ export default function Scheduler() {
     }
   };
 
-  const handleScheduleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleScheduleSubmit = async (publishNow = false, e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     
-    if (!currentWorkspace?.id || !scheduleForm.title || !scheduleForm.scheduledDate) {
+    if (!currentWorkspace?.id || !scheduleForm.title.trim()) {
       toast({
         title: "Missing information",
-        description: "Please fill in all required fields.",
+        description: publishNow ? "Please enter a title for your post." : "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!publishNow && (!scheduleForm.scheduledDate || !scheduleForm.scheduledTime)) {
+      toast({
+        title: "Missing schedule information",
+        description: "Please select a date and time for scheduling.",
         variant: "destructive"
       });
       return;
@@ -283,40 +294,39 @@ export default function Scheduler() {
       return;
     }
 
-    const scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
-    const now = new Date();
+    let scheduledDateTime = new Date();
+    
+    if (!publishNow) {
+      scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
+      const now = new Date();
+
+      if (scheduledDateTime < now) {
+        toast({
+          title: "Invalid date",
+          description: "Please select a future date and time.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
 
     const contentData = {
       workspaceId: currentWorkspace.id,
-      title: scheduleForm.title,
-      description: scheduleForm.description,
+      title: scheduleForm.title.trim(),
+      description: scheduleForm.description?.trim() || '',
       type: scheduleForm.type,
       platform: scheduleForm.platform,
-      scheduledAt: scheduledDateTime.toISOString(),
+      scheduledAt: publishNow ? new Date().toISOString() : scheduledDateTime.toISOString(),
+      publishNow: publishNow,
       contentData: {
         mediaUrl: scheduleForm.mediaUrl,
-        caption: scheduleForm.description,
+        caption: scheduleForm.description?.trim() || '',
         isAIGenerated: scheduleForm.useAIGenerated,
         aiPrompt: scheduleForm.aiPrompt
       }
     };
 
-    // If scheduled for immediate posting (within 5 minutes), publish now
-    if (scheduledDateTime.getTime() - now.getTime() < 300000 && scheduleForm.platform === 'instagram') {
-      try {
-        await publishToInstagram(contentData);
-        toast({
-          title: "Posted to Instagram",
-          description: "Your content has been published to Instagram successfully."
-        });
-      } catch (error) {
-        toast({
-          title: "Publishing failed",
-          description: "Content saved as scheduled. Instagram publishing requires authentication setup.",
-          variant: "destructive"
-        });
-      }
-    }
+    console.log('[CLIENT] Submitting content data:', contentData);
 
     createContentMutation.mutate(contentData);
   };
@@ -546,7 +556,7 @@ export default function Scheduler() {
           </DialogHeader>
 
           {!isBulkMode ? (
-            <form onSubmit={handleScheduleSubmit} className="space-y-6">
+            <form onSubmit={(e) => handleScheduleSubmit(false, e)} className="space-y-6">
               {/* Content Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">

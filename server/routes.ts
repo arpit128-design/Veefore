@@ -414,26 +414,58 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Disconnect social account
   app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
     try {
-      const accountId = parseInt(req.params.id);
+      const { user } = req;
+      const accountId = req.params.id;
       console.log(`[DISCONNECT ACCOUNT] Attempting to disconnect account ID: ${accountId}`);
       
-      // Get account details before deletion for logging
-      const account = await storage.getSocialAccount(accountId);
-      if (account) {
-        console.log(`[DISCONNECT ACCOUNT] Disconnecting ${account.platform} account: @${account.username} (${account.accountId})`);
+      // Verify user has access to workspace
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
       }
       
-      await storage.deleteSocialAccount(accountId);
-      console.log(`[DISCONNECT ACCOUNT] Successfully disconnected account ID: ${accountId}`);
+      // Get account details before deletion for logging - handle MongoDB ObjectId
+      let account;
+      try {
+        // Try as string first (MongoDB ObjectId)
+        account = await storage.getSocialAccount(accountId);
+      } catch (castError) {
+        console.log(`[DISCONNECT ACCOUNT] MongoDB cast error, trying numeric ID:`, castError.message);
+        // Try as number if string fails
+        const numericId = parseInt(accountId);
+        if (!isNaN(numericId)) {
+          account = await storage.getSocialAccount(numericId);
+        }
+      }
       
-      res.json({ success: true, message: 'Account disconnected successfully' });
+      if (account) {
+        console.log(`[DISCONNECT ACCOUNT] Disconnecting ${account.platform} account: @${account.username} (${account.accountId})`);
+        
+        // Verify account belongs to user's workspace
+        if (account.workspaceId !== workspace.id) {
+          return res.status(403).json({ error: 'Access denied to this account' });
+        }
+        
+        await storage.deleteSocialAccount(account.id);
+        console.log(`[DISCONNECT ACCOUNT] Successfully disconnected ${account.platform} account`);
+        
+        res.json({ 
+          success: true, 
+          message: `Successfully disconnected ${account.platform} account`,
+          platform: account.platform,
+          username: account.username
+        });
+      } else {
+        console.log(`[DISCONNECT ACCOUNT] Account not found: ${accountId}`);
+        res.status(404).json({ error: 'Account not found' });
+      }
     } catch (error: any) {
       console.error('[DISCONNECT ACCOUNT] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Clear old Instagram accounts for current user (cleanup endpoint)
+  // Clear ALL social accounts for current user (complete reset)
   app.post('/api/social-accounts/cleanup', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
@@ -443,45 +475,42 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
       
-      console.log(`[CLEANUP] Starting cleanup for workspace: ${workspace.id}`);
+      console.log(`[TOTAL CLEANUP] Starting complete cleanup for workspace: ${workspace.id}`);
       
       // Get ALL social accounts for this workspace
       const allAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      console.log(`[CLEANUP] Found ${allAccounts.length} total accounts in workspace`);
+      console.log(`[TOTAL CLEANUP] Found ${allAccounts.length} total accounts to DELETE ALL`);
       
-      // Filter accounts to delete (all Instagram accounts or accounts with wrong username)
-      const accountsToDelete = allAccounts.filter(account => 
-        account.platform === 'instagram' || 
-        account.username === 'rahulc1020' ||
-        account.accountId === '9505923456179711'
-      );
-      
-      console.log(`[CLEANUP] Accounts to delete:`, accountsToDelete.map(a => `${a.platform}:@${a.username} (ID:${a.id})`));
-      
-      // Delete all targeted accounts
+      // Delete EVERY single social account in this workspace
       let deletedCount = 0;
-      for (const account of accountsToDelete) {
+      for (const account of allAccounts) {
         try {
-          console.log(`[CLEANUP] Deleting account: ${account.platform} @${account.username} (ID: ${account.id})`);
+          console.log(`[TOTAL CLEANUP] Deleting: ${account.platform} @${account.username} (ID: ${account.id})`);
           await storage.deleteSocialAccount(account.id);
           deletedCount++;
         } catch (deleteError) {
-          console.error(`[CLEANUP] Failed to delete account ${account.id}:`, deleteError);
+          console.error(`[TOTAL CLEANUP] Failed to delete account ${account.id}:`, deleteError);
         }
       }
       
-      // Verify cleanup by checking remaining accounts
+      // Verify complete cleanup
       const remainingAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      console.log(`[CLEANUP] Remaining accounts after cleanup:`, remainingAccounts.length);
+      console.log(`[TOTAL CLEANUP] Final check - remaining accounts:`, remainingAccounts.length);
+      
+      if (remainingAccounts.length > 0) {
+        console.log(`[TOTAL CLEANUP] WARNING: ${remainingAccounts.length} accounts still remain after cleanup`);
+        console.log(`[TOTAL CLEANUP] Remaining accounts:`, remainingAccounts.map(a => `${a.platform}:@${a.username}`));
+      }
       
       res.json({ 
         success: true, 
-        message: `Cleaned up ${deletedCount} accounts`,
+        message: `Complete workspace reset: deleted ${deletedCount} accounts`,
         deletedAccounts: deletedCount,
-        remainingAccounts: remainingAccounts.length
+        remainingAccounts: remainingAccounts.length,
+        isComplete: remainingAccounts.length === 0
       });
     } catch (error: any) {
-      console.error('[CLEANUP] Error:', error);
+      console.error('[TOTAL CLEANUP] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

@@ -99,8 +99,25 @@ export default function Integrations() {
     mutationFn: async (platform: string) => {
       console.log(`[CONNECT DEBUG] Attempting to connect ${platform}`);
       
-      // Get fresh token
-      const token = localStorage.getItem('veefore_auth_token');
+      // Get fresh token from Firebase auth or localStorage
+      let token = localStorage.getItem('veefore_auth_token');
+      
+      // If we have a Firebase user, get a fresh token
+      if (user && !token) {
+        console.log(`[CONNECT DEBUG] No token in localStorage, attempting to get fresh Firebase token`);
+        try {
+          // Import Firebase auth dynamically
+          const { auth } = await import('@/lib/firebase');
+          if (auth.currentUser) {
+            token = await auth.currentUser.getIdToken(true); // Force refresh
+            localStorage.setItem('veefore_auth_token', token);
+            console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase`);
+          }
+        } catch (error) {
+          console.error(`[CONNECT ERROR] Failed to get fresh token:`, error);
+        }
+      }
+      
       console.log(`[CONNECT DEBUG] Current auth token:`, token ? 'Present' : 'Missing');
       
       if (!token) {

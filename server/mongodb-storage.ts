@@ -303,18 +303,13 @@ export class MongoStorage implements IStorage {
   }
 
   private convertAnalytics(mongoAnalytics: any): Analytics {
+    const metrics = mongoAnalytics.metrics || {};
     return {
       id: mongoAnalytics._id.toString(),
       workspaceId: mongoAnalytics.workspaceId,
       platform: mongoAnalytics.platform,
       date: mongoAnalytics.date,
-      views: mongoAnalytics.views || 0,
-      likes: mongoAnalytics.likes || 0,
-      comments: mongoAnalytics.comments || 0,
-      shares: mongoAnalytics.shares || 0,
-      followers: mongoAnalytics.followers || 0,
-      engagement: mongoAnalytics.engagement || 0,
-      reach: mongoAnalytics.reach || 0,
+      metrics: metrics,
       createdAt: mongoAnalytics.createdAt || new Date()
     };
   }

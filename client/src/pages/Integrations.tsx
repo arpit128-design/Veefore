@@ -98,16 +98,44 @@ export default function Integrations() {
   const connectMutation = useMutation({
     mutationFn: async (platform: string) => {
       console.log(`[CONNECT DEBUG] Attempting to connect ${platform}`);
-      console.log(`[CONNECT DEBUG] Current auth token:`, localStorage.getItem('veefore_auth_token') ? 'Present' : 'Missing');
       
-      const response = await apiRequest('GET', `/api/${platform}/auth`);
-      const data = await response.json();
+      // Get fresh token
+      const token = localStorage.getItem('veefore_auth_token');
+      console.log(`[CONNECT DEBUG] Current auth token:`, token ? 'Present' : 'Missing');
       
-      if (data.authUrl) {
-        console.log(`[CONNECT DEBUG] Redirecting to:`, data.authUrl);
-        window.location.href = data.authUrl;
-      } else {
-        throw new Error('Failed to get authorization URL');
+      if (!token) {
+        throw new Error('Authentication token not found. Please refresh the page and try again.');
+      }
+      
+      console.log(`[CONNECT DEBUG] Making authenticated request to /api/${platform}/auth`);
+      
+      try {
+        // Make direct authenticated fetch to ensure proper headers
+        const response = await fetch(`/api/${platform}/auth`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.authUrl) {
+          console.log(`[CONNECT DEBUG] Redirecting to:`, data.authUrl);
+          window.location.href = data.authUrl;
+        } else {
+          throw new Error('Failed to get authorization URL');
+        }
+      } catch (error) {
+        console.error(`[CONNECT ERROR] Request failed:`, error);
+        throw error;
       }
     },
     onMutate: (platform) => {

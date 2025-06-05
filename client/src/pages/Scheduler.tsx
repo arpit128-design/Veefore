@@ -24,6 +24,9 @@ interface ScheduleForm {
   platform: string;
   scheduledDate: string;
   scheduledTime: string;
+  mediaUrl: string;
+  useAIGenerated: boolean;
+  aiPrompt: string;
 }
 
 export default function Scheduler() {
@@ -38,8 +41,13 @@ export default function Scheduler() {
     type: "post",
     platform: "instagram",
     scheduledDate: "",
-    scheduledTime: "09:00"
+    scheduledTime: "09:00",
+    mediaUrl: "",
+    useAIGenerated: false,
+    aiPrompt: ""
   });
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -123,8 +131,12 @@ export default function Scheduler() {
       type: "post",
       platform: "instagram",
       scheduledDate: "",
-      scheduledTime: "09:00"
+      scheduledTime: "09:00",
+      mediaUrl: "",
+      useAIGenerated: false,
+      aiPrompt: ""
     });
+    setUploadedFile(null);
   };
 
   const handleScheduleContent = (date?: Date) => {
@@ -147,7 +159,66 @@ export default function Scheduler() {
     deleteContentMutation.mutate(contentId);
   };
 
-  const handleScheduleSubmit = (e: React.FormEvent) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      // Create object URL for preview
+      const objectUrl = URL.createObjectURL(file);
+      setScheduleForm(prev => ({ ...prev, mediaUrl: objectUrl }));
+    }
+  };
+
+  const generateAIContent = async () => {
+    if (!scheduleForm.aiPrompt.trim()) {
+      toast({
+        title: "Missing prompt",
+        description: "Please enter a description for AI image generation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    try {
+      const response = await apiRequest('POST', '/api/generate-image', {
+        body: JSON.stringify({ prompt: scheduleForm.aiPrompt })
+      });
+      const result = await response.json();
+      
+      if (result.success && result.imageUrl) {
+        setScheduleForm(prev => ({ ...prev, mediaUrl: result.imageUrl }));
+        toast({
+          title: "AI content generated",
+          description: "Your AI-generated image is ready for scheduling."
+        });
+      } else {
+        throw new Error("Failed to generate image");
+      }
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Unable to generate AI content. Please try again or upload your own image.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  const publishToInstagram = async (contentData: any) => {
+    try {
+      const response = await apiRequest('POST', '/api/publish-instagram', {
+        body: JSON.stringify(contentData)
+      });
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      throw new Error("Failed to publish to Instagram");
+    }
+  };
+
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!currentWorkspace?.id || !scheduleForm.title || !scheduleForm.scheduledDate) {
@@ -159,7 +230,17 @@ export default function Scheduler() {
       return;
     }
 
+    if (!scheduleForm.mediaUrl && scheduleForm.platform === 'instagram') {
+      toast({
+        title: "Media required",
+        description: "Instagram posts require an image or video. Please upload media or generate AI content.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
+    const now = new Date();
 
     const contentData = {
       workspaceId: currentWorkspace.id,
@@ -168,8 +249,30 @@ export default function Scheduler() {
       type: scheduleForm.type,
       platform: scheduleForm.platform,
       scheduledAt: scheduledDateTime.toISOString(),
-      contentData: {}
+      contentData: {
+        mediaUrl: scheduleForm.mediaUrl,
+        caption: scheduleForm.description,
+        isAIGenerated: scheduleForm.useAIGenerated,
+        aiPrompt: scheduleForm.aiPrompt
+      }
     };
+
+    // If scheduled for immediate posting (within 5 minutes), publish now
+    if (scheduledDateTime.getTime() - now.getTime() < 300000 && scheduleForm.platform === 'instagram') {
+      try {
+        await publishToInstagram(contentData);
+        toast({
+          title: "Posted to Instagram",
+          description: "Your content has been published to Instagram successfully."
+        });
+      } catch (error) {
+        toast({
+          title: "Publishing failed",
+          description: "Content saved as scheduled. Instagram publishing requires authentication setup.",
+          variant: "destructive"
+        });
+      }
+    }
 
     createContentMutation.mutate(contentData);
   };
@@ -391,7 +494,7 @@ export default function Scheduler() {
 
       {/* Schedule Dialog */}
       <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
-        <DialogContent className="max-w-2xl glassmorphism border-electric-cyan/20">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glassmorphism border-electric-cyan/20">
           <DialogHeader>
             <DialogTitle className="text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
               {isBulkMode ? "Bulk Content Scheduler" : "Schedule New Content"}
@@ -465,6 +568,130 @@ export default function Scheduler() {
                     </Button>
                   ))}
                 </div>
+              </div>
+
+              {/* Media Upload Section */}
+              <div className="space-y-4">
+                <Label className="text-asteroid-silver">Media Content</Label>
+                
+                {/* Toggle between Upload and AI Generate */}
+                <div className="flex items-center space-x-4">
+                  <Button
+                    type="button"
+                    variant={!scheduleForm.useAIGenerated ? "default" : "outline"}
+                    onClick={() => setScheduleForm(prev => ({ ...prev, useAIGenerated: false }))}
+                    className="glassmorphism"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Media
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={scheduleForm.useAIGenerated ? "default" : "outline"}
+                    onClick={() => setScheduleForm(prev => ({ ...prev, useAIGenerated: true }))}
+                    className="glassmorphism"
+                  >
+                    <Image className="w-4 h-4 mr-2" />
+                    AI Generate
+                  </Button>
+                </div>
+
+                {!scheduleForm.useAIGenerated ? (
+                  // File Upload Section
+                  <div className="border-2 border-dashed border-electric-cyan/20 rounded-lg p-6 glassmorphism">
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 text-asteroid-silver mx-auto mb-2" />
+                      <p className="text-asteroid-silver text-sm mb-2">Upload images or videos for your post</p>
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="media-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="glassmorphism"
+                        onClick={() => document.getElementById('media-upload')?.click()}
+                      >
+                        Choose File
+                      </Button>
+                    </div>
+                    
+                    {scheduleForm.mediaUrl && (
+                      <div className="mt-4">
+                        <div className="relative w-full h-48 rounded-lg overflow-hidden bg-cosmic-blue">
+                          <img 
+                            src={scheduleForm.mediaUrl} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setScheduleForm(prev => ({ ...prev, mediaUrl: "" }));
+                              setUploadedFile(null);
+                            }}
+                            className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {uploadedFile && (
+                          <p className="text-xs text-asteroid-silver mt-2">{uploadedFile.name}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // AI Generation Section
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-asteroid-silver">AI Image Prompt</Label>
+                      <Textarea
+                        value={scheduleForm.aiPrompt}
+                        onChange={(e) => setScheduleForm(prev => ({ ...prev, aiPrompt: e.target.value }))}
+                        placeholder="Describe the image you want to generate (e.g., 'A modern office workspace with plants')"
+                        className="glassmorphism"
+                      />
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      onClick={generateAIContent}
+                      disabled={isGeneratingAI || !scheduleForm.aiPrompt.trim()}
+                      className="bg-gradient-to-r from-nebula-purple to-electric-cyan hover:opacity-90"
+                    >
+                      {isGeneratingAI ? "Generating..." : "Generate AI Image"}
+                    </Button>
+
+                    {scheduleForm.mediaUrl && (
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden bg-cosmic-blue">
+                        <img 
+                          src={scheduleForm.mediaUrl} 
+                          alt="AI Generated" 
+                          className="w-full h-full object-cover"
+                        />
+                        <Badge className="absolute top-2 left-2 bg-nebula-purple">
+                          AI Generated
+                        </Badge>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setScheduleForm(prev => ({ ...prev, mediaUrl: "" }))}
+                          className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Scheduling */}

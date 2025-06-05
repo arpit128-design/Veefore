@@ -181,8 +181,14 @@ export default function Integrations() {
         } else {
           throw new Error('Failed to get authorization URL');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`[CONNECT ERROR] Request failed:`, error);
+        
+        // Handle demo mode authentication requirement
+        if (error.message.includes('requires real authentication')) {
+          throw new Error('Instagram integration requires real authentication. Please log out and log in with your Google account to connect your Instagram Business account.');
+        }
+        
         throw error;
       }
     },

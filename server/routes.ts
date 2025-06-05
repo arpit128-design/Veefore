@@ -124,7 +124,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Look up user in database
       console.log(`[AUTH DEBUG] Looking up user with Firebase UID: ${firebaseUid}`);
-      const user = await storage.getUserByFirebaseUid(firebaseUid);
+      let user = await storage.getUserByFirebaseUid(firebaseUid);
+      
+      // Handle demo mode - create demo user if it doesn't exist
+      if (!user && firebaseUid === 'demo-user') {
+        console.log(`[AUTH DEBUG] Demo mode detected, creating demo user record`);
+        const demoUser = {
+          firebaseUid: 'demo-user',
+          email: 'demo@veefore.com',
+          username: 'DemoCommander',
+          displayName: 'Demo Commander',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face'
+        };
+        user = await storage.createUser(demoUser);
+        console.log(`[AUTH DEBUG] Demo user created: ${user.id}`);
+      }
+      
       if (!user) {
         console.error(`[AUTH ERROR] User not found in database for Firebase UID: ${firebaseUid}`);
         return res.status(401).json({ error: 'User not found' });
@@ -799,6 +814,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
+      
+      // Handle demo mode
+      if (user.firebaseUid === 'demo-user') {
+        return res.status(400).json({ 
+          error: 'Instagram integration requires real authentication. Please log in with your Google account to connect your Instagram Business account and access authentic analytics data.',
+          requiresRealAuth: true 
+        });
+      }
+      
       const userId = typeof user.id === 'string' ? user.id : Number(user.id);
       const workspaces = await storage.getWorkspacesByUserId(userId);
       

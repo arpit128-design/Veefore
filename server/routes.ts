@@ -838,7 +838,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      console.log(`[INSTAGRAM AUTH] Generated redirect URI: ${redirectUri}`);
+      console.log(`[INSTAGRAM AUTH] Request protocol: ${req.protocol}`);
+      console.log(`[INSTAGRAM AUTH] Request host: ${req.get('host')}`);
+      
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, defaultWorkspace.id.toString());
+      console.log(`[INSTAGRAM AUTH] Generated auth URL: ${authUrl}`);
       res.json({ authUrl });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

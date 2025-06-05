@@ -626,6 +626,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manual Instagram token connection endpoint
+  app.post("/api/instagram/manual-connect", requireAuth, async (req: any, res) => {
+    try {
+      const { workspaceId, accessToken } = req.body;
+      
+      if (!workspaceId || !accessToken) {
+        return res.status(400).json({ error: 'Missing workspace ID or access token' });
+      }
+
+      // Validate token by getting user profile
+      const profile = await instagramAPI.getUserProfile(accessToken);
+      console.log(`[INSTAGRAM MANUAL] Connected account: ${profile.username}`);
+      
+      // Store Instagram account
+      const socialAccount = await storage.createSocialAccount({
+        workspaceId: Number(workspaceId),
+        platform: "instagram",
+        accountId: profile.id,
+        username: profile.username,
+        accessToken: accessToken,
+        refreshToken: null,
+        expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
+      });
+
+      // Fetch and store analytics
+      try {
+        const insights = await instagramAPI.getAccountInsights(accessToken);
+        const media = await instagramAPI.getUserMedia(accessToken, 10);
+        
+        await storage.createAnalytics({
+          workspaceId: Number(workspaceId),
+          platform: "instagram",
+          metrics: {
+            views: insights.impressions,
+            likes: 0,
+            comments: 0,
+            shares: 0,
+            followers: insights.follower_count,
+            impressions: insights.impressions,
+            reach: insights.reach,
+            profile_views: insights.profile_views
+          }
+        });
+      } catch (analyticsError) {
+        console.error('Error fetching Instagram analytics:', analyticsError);
+      }
+
+      res.json({ success: true, account: socialAccount });
+    } catch (error: any) {
+      console.error('Instagram manual connect error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/instagram/callback", async (req, res) => {
     try {
       const { code, state, error } = req.query;

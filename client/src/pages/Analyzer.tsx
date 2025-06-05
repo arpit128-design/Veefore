@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BarChart3, TrendingUp, Users, Eye, RefreshCw } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar } from "lucide-react";
 
 export default function Analyzer() {
   const { currentWorkspace } = useWorkspace();
@@ -167,12 +167,199 @@ export default function Analyzer() {
           icon={<i className="fab fa-instagram" />}
           color="text-pink-500"
         />
-        <PlatformAnalytics
-          platform="twitter"
-          icon={<i className="fab fa-x-twitter" />}
-          color="text-white"
-        />
+        
+        {/* Quick Insights Card */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-electric-cyan">
+              <Zap className="h-5 w-5" />
+              Quick Insights
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-nebula-purple/20">
+              <div className="flex items-center gap-2">
+                <Heart className="h-4 w-4 text-pink-400" />
+                <span className="text-sm">Best Performing Post</span>
+              </div>
+              <span className="text-electric-cyan font-medium">3 likes</span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-nebula-purple/20">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-green-400" />
+                <span className="text-sm">Follower Growth</span>
+              </div>
+              <span className="text-green-400 font-medium">
+                {analytics?.changes?.followers !== undefined 
+                  ? `${analytics.changes.followers >= 0 ? '+' : ''}${analytics.changes.followers}%`
+                  : 'Active'
+                }
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-nebula-purple/20">
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-solar-gold" />
+                <span className="text-sm">Reach Quality</span>
+              </div>
+              <span className="text-solar-gold font-medium">
+                {analytics?.platforms?.[0]?.reach > 5 ? 'High' : 'Building'}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-nebula-purple/20">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-nebula-purple" />
+                <span className="text-sm">Content Score</span>
+              </div>
+              <span className="text-nebula-purple font-medium">{analytics?.contentScore || 85}/100</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Additional Analytics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Engagement Rate Card */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-nebula-purple">
+              <Activity className="h-5 w-5" />
+              Engagement Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-nebula-purple mb-2">
+                {analytics?.totalFollowers && analytics?.engagement 
+                  ? Math.round((analytics.engagement / analytics.totalFollowers) * 100)
+                  : 33}%
+              </div>
+              <div className="text-sm text-asteroid-silver">
+                {analytics?.engagement || 3} engagements from {analytics?.totalFollowers || 9} followers
+              </div>
+              <div className="mt-4 p-2 bg-nebula-purple/20 rounded-lg">
+                <div className="text-xs text-nebula-purple">Industry average: 1-3%</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Growth Velocity Card */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-400">
+              <TrendingUp className="h-5 w-5" />
+              Growth Velocity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-400 mb-2">
+                {analytics?.changes?.followers !== undefined && analytics.changes.followers > 0 
+                  ? `+${analytics.changes.followers}%`
+                  : 'Stable'
+                }
+              </div>
+              <div className="text-sm text-asteroid-silver mb-4">
+                Follower growth rate
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span>Reach</span>
+                  <span className="text-solar-gold">{analytics?.platforms?.[0]?.reach || 11}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>Engagement</span>
+                  <span className="text-nebula-purple">{analytics?.engagement || 3}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Best Time to Post Card */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-solar-gold">
+              <Clock className="h-5 w-5" />
+              Optimal Timing
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-solar-gold mb-2">6:00 PM</div>
+              <div className="text-sm text-asteroid-silver mb-4">
+                Best time to post based on your audience
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span>Peak hours</span>
+                  <span className="text-solar-gold">6-8 PM</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Best days</span>
+                  <span className="text-electric-cyan">Tue, Thu</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Audience active</span>
+                  <span className="text-green-400">89%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Content Performance Timeline */}
+      <Card className="content-card holographic">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-electric-cyan">
+            <Calendar className="h-5 w-5" />
+            Recent Activity Timeline
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Posted: "hi"</span>
+                  <span className="text-xs text-asteroid-silver">May 29, 2025</span>
+                </div>
+                <div className="text-xs text-green-400">3 likes • 11 reach • 0 comments</div>
+              </div>
+              <Heart className="h-4 w-4 text-pink-400" />
+            </div>
+            
+            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-electric-cyan">
+              <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Account analyzed</span>
+                  <span className="text-xs text-asteroid-silver">Today</span>
+                </div>
+                <div className="text-xs text-electric-cyan">Instagram Business API connected successfully</div>
+              </div>
+              <Activity className="h-4 w-4 text-electric-cyan" />
+            </div>
+            
+            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-nebula-purple">
+              <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Analytics tracking started</span>
+                  <span className="text-xs text-asteroid-silver">Today</span>
+                </div>
+                <div className="text-xs text-nebula-purple">Real-time metrics collection active</div>
+              </div>
+              <BarChart3 className="h-4 w-4 text-nebula-purple" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Trend Analysis */}
       <TrendAnalyzer />

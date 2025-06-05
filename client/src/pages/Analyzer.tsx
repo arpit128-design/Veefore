@@ -13,8 +13,8 @@ export default function Analyzer() {
   const [timeRange, setTimeRange] = useState("30");
 
   const { data: analytics, refetch, isLoading } = useQuery({
-    queryKey: ['analytics', currentWorkspace?.id, timeRange],
-    queryFn: () => fetch(`/api/analytics?workspaceId=${currentWorkspace?.id}&days=${timeRange}`).then(res => res.json()),
+    queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
+    queryFn: () => fetch(`/api/dashboard/analytics`).then(res => res.json()),
     enabled: !!currentWorkspace?.id
   });
 
@@ -57,8 +57,8 @@ export default function Analyzer() {
                 <Eye className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-electric-cyan">2.4M</div>
-                <div className="text-sm text-asteroid-silver">Total Impressions</div>
+                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews || 0}</div>
+                <div className="text-sm text-asteroid-silver">Total Views</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-green-400">
@@ -75,8 +75,8 @@ export default function Analyzer() {
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-nebula-purple">8.7%</div>
-                <div className="text-sm text-asteroid-silver">Avg Engagement Rate</div>
+                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement || 0}</div>
+                <div className="text-sm text-asteroid-silver">Total Engagement</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-green-400">
@@ -93,7 +93,7 @@ export default function Analyzer() {
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-solar-gold">156K</div>
+                <div className="text-2xl font-bold text-solar-gold">{analytics?.platforms?.[0]?.reach || 0}</div>
                 <div className="text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
@@ -111,8 +111,8 @@ export default function Analyzer() {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-400">+24.5%</div>
-                <div className="text-sm text-asteroid-silver">Growth Rate</div>
+                <div className="text-2xl font-bold text-green-400">{analytics?.totalFollowers || analytics?.newFollowers || 0}</div>
+                <div className="text-sm text-asteroid-silver">Total Followers</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-green-400">

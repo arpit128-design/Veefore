@@ -15,8 +15,8 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
   const { currentWorkspace } = useWorkspace();
 
   const { data: analytics, refetch, isLoading } = useQuery({
-    queryKey: ['analytics', currentWorkspace?.id, platform],
-    queryFn: () => fetch(`/api/analytics?workspaceId=${currentWorkspace?.id}&platform=${platform}`).then(res => res.json()),
+    queryKey: ['dashboard-analytics', currentWorkspace?.id, platform],
+    queryFn: () => fetch(`/api/dashboard/analytics`).then(res => res.json()),
     enabled: !!currentWorkspace?.id
   });
 
@@ -30,10 +30,11 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  const latestData = analytics?.[0]?.metrics || {};
+  const platformData = analytics?.platforms?.find(p => p.platform === platform) || {};
   
   const getMetricValue = (key: string, fallback: string = '0') => {
-    return latestData[key]?.toLocaleString() || fallback;
+    const value = platformData[key] || analytics?.[key] || 0;
+    return value.toString();
   };
 
   return (

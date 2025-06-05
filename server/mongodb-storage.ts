@@ -358,15 +358,42 @@ export class MongoStorage implements IStorage {
   }
 
   async getSocialAccountByPlatform(workspaceId: number, platform: string): Promise<SocialAccount | undefined> {
-    return undefined;
+    await this.connect();
+    const account = await SocialAccountModel.findOne({ workspaceId, platform });
+    return account ? this.convertSocialAccount(account) : undefined;
   }
 
   async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
-    throw new Error('Not implemented');
+    await this.connect();
+    
+    const socialAccountData = {
+      ...account,
+      id: Date.now(),
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const newAccount = new SocialAccountModel(socialAccountData);
+    await newAccount.save();
+    
+    return this.convertSocialAccount(newAccount);
   }
 
   async updateSocialAccount(id: number, updates: Partial<SocialAccount>): Promise<SocialAccount> {
-    throw new Error('Not implemented');
+    await this.connect();
+    
+    const updatedAccount = await SocialAccountModel.findOneAndUpdate(
+      { id },
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!updatedAccount) {
+      throw new Error('Social account not found');
+    }
+    
+    return this.convertSocialAccount(updatedAccount);
   }
 
   async deleteSocialAccount(id: number): Promise<void> {

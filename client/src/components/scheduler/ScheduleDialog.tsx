@@ -122,8 +122,45 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
     createContentMutation.mutate(contentData);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    
+    for (const file of files) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await apiRequest('/api/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {} // Let browser set Content-Type for FormData
+        });
+        
+        if (response.success) {
+          // Update form content data with the uploaded file URL
+          setForm(prev => ({
+            ...prev,
+            contentData: {
+              ...prev.contentData,
+              mediaUrl: response.fileUrl
+            }
+          }));
+          
+          toast({
+            title: "File uploaded successfully",
+            description: `${file.name} is ready for Instagram publishing`
+          });
+        }
+      } catch (error) {
+        console.error('File upload error:', error);
+        toast({
+          title: "Upload failed",
+          description: `Failed to upload ${file.name}`,
+          variant: "destructive"
+        });
+      }
+    }
+    
     setUploadedFiles(prev => [...prev, ...files]);
   };
 

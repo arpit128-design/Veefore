@@ -463,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch real Instagram analytics if we have an access token
       if (INSTAGRAM_ACCESS_TOKEN) {
         try {
-          console.log('Fetching Instagram analytics with provided access token...');
+          console.log('[INSTAGRAM INTEGRATION] Starting Instagram data fetch for workspace:', defaultWorkspace.id);
           
           // Fetch user profile
           const profileResponse = await fetch(`https://graph.instagram.com/me?fields=id,username,account_type,media_count,followers_count&access_token=${INSTAGRAM_ACCESS_TOKEN}`);
@@ -471,20 +471,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             throw new Error(`Instagram API error: ${profileResponse.status}`);
           }
           const profile = await profileResponse.json();
+          console.log('[INSTAGRAM INTEGRATION] Profile fetched:', profile.username, 'ID:', profile.id);
           
           // Check if Instagram account exists for this workspace, if not create it
           let existingAccount = await storage.getSocialAccountByPlatform(Number(defaultWorkspace.id), 'instagram');
+          console.log('[INSTAGRAM INTEGRATION] Existing account check:', existingAccount ? 'Found' : 'Not found');
+          
           if (!existingAccount) {
-            console.log('Creating Instagram social account for workspace:', defaultWorkspace.id);
-            await storage.createSocialAccount({
-              workspaceId: defaultWorkspace.id,
-              platform: "instagram",
-              accountId: profile.id,
-              username: profile.username,
-              accessToken: INSTAGRAM_ACCESS_TOKEN,
-              refreshToken: null,
-              expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // 60 days
-            });
+            console.log('[INSTAGRAM INTEGRATION] Creating Instagram social account for workspace:', defaultWorkspace.id);
+            try {
+              const newAccount = await storage.createSocialAccount({
+                workspaceId: defaultWorkspace.id,
+                platform: "instagram",
+                accountId: profile.id,
+                username: profile.username,
+                accessToken: INSTAGRAM_ACCESS_TOKEN,
+                refreshToken: null,
+                expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // 60 days
+              });
+              console.log('[INSTAGRAM INTEGRATION] Successfully created social account:', newAccount.id);
+            } catch (createError) {
+              console.error('[INSTAGRAM INTEGRATION] Failed to create social account:', createError);
+            }
+          } else {
+            console.log('[INSTAGRAM INTEGRATION] Using existing account:', existingAccount.username);
           }
           
           // Fetch media insights
@@ -592,6 +602,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return acc;
       }, {} as any);
 
+      // Debug logging for analytics calculation
+      console.log('[ANALYTICS DEBUG] Analytics data:', analytics.length, 'records');
+      console.log('[ANALYTICS DEBUG] Calculated totals:', {
+        totalViews,
+        totalEngagement,
+        totalFollowers,
+        contentScore
+      });
+
+      res.setHeader('Cache-Control', 'no-cache');
       res.json({
         totalViews,
         engagement: totalEngagement,

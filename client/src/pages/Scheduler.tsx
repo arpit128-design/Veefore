@@ -1,23 +1,45 @@
 import { Calendar } from "@/components/scheduler/Calendar";
 import { AutomationRules } from "@/components/scheduler/AutomationRules";
 import { OptimalTimes } from "@/components/scheduler/OptimalTimes";
-import { ScheduleDialog } from "@/components/scheduler/ScheduleDialog";
-import { BulkScheduler } from "@/components/scheduler/BulkScheduler";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload } from "lucide-react";
+import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2 } from "lucide-react";
 import { useState } from "react";
+
+interface ScheduleForm {
+  title: string;
+  description: string;
+  type: string;
+  platform: string;
+  scheduledDate: string;
+  scheduledTime: string;
+}
 
 export default function Scheduler() {
   const { currentWorkspace } = useWorkspace();
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState("calendar");
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState<ScheduleForm>({
+    title: "",
+    description: "",
+    type: "post",
+    platform: "instagram",
+    scheduledDate: "",
+    scheduledTime: "09:00"
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -48,6 +70,31 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id
   });
 
+  const createContentMutation = useMutation({
+    mutationFn: async (contentData: any) => {
+      const response = await apiRequest('POST', '/api/content', {
+        body: JSON.stringify(contentData)
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      toast({
+        title: "Content scheduled",
+        description: "Your content has been scheduled successfully."
+      });
+      setIsScheduleDialogOpen(false);
+      resetScheduleForm();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to schedule content. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const deleteContentMutation = useMutation({
     mutationFn: async (contentId: number) => {
       const response = await apiRequest('DELETE', `/api/content/${contentId}`);
@@ -69,13 +116,88 @@ export default function Scheduler() {
     }
   });
 
+  const resetScheduleForm = () => {
+    setScheduleForm({
+      title: "",
+      description: "",
+      type: "post",
+      platform: "instagram",
+      scheduledDate: "",
+      scheduledTime: "09:00"
+    });
+  };
+
   const handleScheduleContent = (date?: Date) => {
     setSelectedDate(date || null);
+    if (date) {
+      setScheduleForm(prev => ({
+        ...prev,
+        scheduledDate: date.toISOString().split('T')[0]
+      }));
+    }
+    setIsScheduleDialogOpen(true);
+  };
+
+  const handleBulkUpload = () => {
+    setIsBulkMode(true);
     setIsScheduleDialogOpen(true);
   };
 
   const handleDeleteContent = (contentId: number) => {
     deleteContentMutation.mutate(contentId);
+  };
+
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!currentWorkspace?.id || !scheduleForm.title || !scheduleForm.scheduledDate) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
+
+    const contentData = {
+      workspaceId: currentWorkspace.id,
+      title: scheduleForm.title,
+      description: scheduleForm.description,
+      type: scheduleForm.type,
+      platform: scheduleForm.platform,
+      scheduledAt: scheduledDateTime.toISOString(),
+      contentData: {}
+    };
+
+    createContentMutation.mutate(contentData);
+  };
+
+  const getContentTypeIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video className="h-4 w-4" />;
+      case 'reel': return <Video className="h-4 w-4" />;
+      case 'post': return <Image className="h-4 w-4" />;
+      case 'story': return <Image className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  const getOptimalTimes = () => {
+    const platform = scheduleForm.platform;
+    switch (platform) {
+      case 'instagram':
+        return ['09:00', '11:00', '13:00', '17:00', '19:00', '21:00'];
+      case 'twitter':
+        return ['08:00', '12:00', '15:00', '17:00', '20:00'];
+      case 'facebook':
+        return ['09:00', '13:00', '15:00', '19:00', '21:00'];
+      case 'linkedin':
+        return ['08:00', '10:00', '12:00', '14:00', '17:00'];
+      default:
+        return ['09:00', '12:00', '15:00', '18:00', '21:00'];
+    }
   };
 
   const getSchedulingStats = () => {
@@ -125,7 +247,7 @@ export default function Scheduler() {
         <div className="flex items-center space-x-4">
           <Button 
             variant="outline" 
-            onClick={() => handleScheduleContent()}
+            onClick={handleBulkUpload}
             className="glassmorphism"
           >
             <Upload className="w-4 h-4 mr-2" />
@@ -268,12 +390,197 @@ export default function Scheduler() {
       </Tabs>
 
       {/* Schedule Dialog */}
-      <ScheduleDialog
-        isOpen={isScheduleDialogOpen}
-        onClose={() => setIsScheduleDialogOpen(false)}
-        selectedDate={selectedDate}
-        workspaceId={currentWorkspace?.id}
-      />
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent className="max-w-2xl glassmorphism border-electric-cyan/20">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
+              {isBulkMode ? "Bulk Content Scheduler" : "Schedule New Content"}
+            </DialogTitle>
+          </DialogHeader>
+
+          {!isBulkMode ? (
+            <form onSubmit={handleScheduleSubmit} className="space-y-6">
+              {/* Content Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-asteroid-silver">Title *</Label>
+                  <Input
+                    id="title"
+                    value={scheduleForm.title}
+                    onChange={(e) => setScheduleForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Enter content title..."
+                    className="glassmorphism"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="platform" className="text-asteroid-silver">Platform *</Label>
+                  <Select value={scheduleForm.platform} onValueChange={(value) => setScheduleForm(prev => ({ ...prev, platform: value }))}>
+                    <SelectTrigger className="glassmorphism">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="instagram">Instagram</SelectItem>
+                      <SelectItem value="facebook">Facebook</SelectItem>
+                      <SelectItem value="twitter">Twitter</SelectItem>
+                      <SelectItem value="linkedin">LinkedIn</SelectItem>
+                      <SelectItem value="youtube">YouTube</SelectItem>
+                      <SelectItem value="tiktok">TikTok</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-asteroid-silver">Description</Label>
+                <Textarea
+                  id="description"
+                  value={scheduleForm.description}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Write your content description or caption..."
+                  className="glassmorphism min-h-[100px]"
+                />
+              </div>
+
+              {/* Content Type */}
+              <div className="space-y-2">
+                <Label className="text-asteroid-silver">Content Type</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { value: 'post', label: 'Post' },
+                    { value: 'story', label: 'Story' },
+                    { value: 'reel', label: 'Reel' },
+                    { value: 'video', label: 'Video' }
+                  ].map((type) => (
+                    <Button
+                      key={type.value}
+                      type="button"
+                      variant={scheduleForm.type === type.value ? "default" : "outline"}
+                      className={`glassmorphism ${scheduleForm.type === type.value ? 'bg-electric-cyan' : ''}`}
+                      onClick={() => setScheduleForm(prev => ({ ...prev, type: type.value }))}
+                    >
+                      {getContentTypeIcon(type.value)}
+                      <span className="ml-2">{type.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Scheduling */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-asteroid-silver">Schedule Date *</Label>
+                  <Input
+                    type="date"
+                    value={scheduleForm.scheduledDate}
+                    onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                    className="glassmorphism"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-asteroid-silver">Time *</Label>
+                  <Select value={scheduleForm.scheduledTime} onValueChange={(value) => setScheduleForm(prev => ({ ...prev, scheduledTime: value }))}>
+                    <SelectTrigger className="glassmorphism">
+                      <Clock className="mr-2 h-4 w-4" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getOptimalTimes().map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time} <Badge variant="secondary" className="ml-2">Optimal</Badge>
+                        </SelectItem>
+                      ))}
+                      {/* Additional times */}
+                      {Array.from({ length: 24 }, (_, i) => {
+                        const time = `${i.toString().padStart(2, '0')}:00`;
+                        if (!getOptimalTimes().includes(time)) {
+                          return (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                          );
+                        }
+                        return null;
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Optimal Times Suggestion */}
+              {scheduleForm.platform && (
+                <Card className="content-card holographic">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-electric-cyan">
+                        Optimal posting times for {scheduleForm.platform}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {getOptimalTimes().map((time) => (
+                        <Badge
+                          key={time}
+                          variant={scheduleForm.scheduledTime === time ? "default" : "secondary"}
+                          className="cursor-pointer"
+                          onClick={() => setScheduleForm(prev => ({ ...prev, scheduledTime: time }))}
+                        >
+                          {time}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end space-x-4 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsScheduleDialogOpen(false);
+                    setIsBulkMode(false);
+                    resetScheduleForm();
+                  }}
+                  className="glassmorphism"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createContentMutation.isPending}
+                  className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
+                >
+                  {createContentMutation.isPending ? "Scheduling..." : "Schedule Content"}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center py-8">
+                <Upload className="h-16 w-16 text-asteroid-silver mx-auto mb-4" />
+                <p className="text-asteroid-silver text-lg">Bulk Upload Feature</p>
+                <p className="text-asteroid-silver/60 text-sm">Upload CSV files or create multiple posts at once</p>
+                <Button
+                  className="mt-4 bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
+                  onClick={() => {
+                    setIsBulkMode(false);
+                    toast({
+                      title: "Feature Coming Soon",
+                      description: "Bulk upload functionality will be available in the next update."
+                    });
+                  }}
+                >
+                  Continue with Single Post
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

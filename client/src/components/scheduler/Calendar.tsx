@@ -207,6 +207,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
           {calendarDays.map((day, index) => (
             <div
               key={index}
+              onClick={() => day.isCurrentMonth && onScheduleContent?.(day.fullDate)}
               className={`aspect-square p-2 border border-space-gray hover:border-electric-cyan transition-colors cursor-pointer rounded-lg ${
                 day.isToday 
                   ? 'border-electric-cyan bg-electric-cyan/10' 

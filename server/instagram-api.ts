@@ -36,12 +36,12 @@ export class InstagramAPI {
   
   constructor() {}
 
-  // Generate Instagram OAuth URL
+  // Generate Instagram Business OAuth URL
   generateAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
+      scope: 'user_profile,user_media',
       response_type: 'code',
       ...(state && { state })
     });
@@ -49,10 +49,10 @@ export class InstagramAPI {
     return `https://api.instagram.com/oauth/authorize?${params.toString()}`;
   }
 
-  // Exchange authorization code for access token
+  // Exchange authorization code for access token (Instagram Business API)
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<{
     access_token: string;
-    user_id: string;
+    user_id?: string;
   }> {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,

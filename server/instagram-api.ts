@@ -44,12 +44,12 @@ export class InstagramAPI {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri, // Don't double encode
-      scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
+      scope: 'instagram_basic,instagram_content_publish,pages_show_list,business_management',
       response_type: 'code',
       ...(state && { state })
     });
 
-    const authUrl = `https://api.instagram.com/oauth/authorize?${params.toString()}`;
+    const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`;
     console.log(`[INSTAGRAM API] Generated auth URL: ${authUrl}`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
@@ -76,10 +76,11 @@ export class InstagramAPI {
     });
 
     try {
-      console.log(`[INSTAGRAM API] Making POST request to: https://api.instagram.com/oauth/access_token`);
+      // Use Facebook Graph API for Instagram Business Login
+      console.log(`[INSTAGRAM API] Making POST request to: https://graph.facebook.com/v18.0/oauth/access_token`);
       console.log(`[INSTAGRAM API] Request body:`, params.toString());
       
-      const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
+      const response = await axios.post('https://graph.facebook.com/v18.0/oauth/access_token', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }

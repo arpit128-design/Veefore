@@ -135,12 +135,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const user = await storage.createUser(userData);
       
-      // Create default workspace
-      await storage.createWorkspace({
+      // Create default workspace with proper validation
+      const workspaceData = insertWorkspaceSchema.parse({
         userId: user.id,
         name: "Main Brand",
+        description: "Your primary workspace for content creation",
         isDefault: true
       });
+      await storage.createWorkspace(workspaceData);
       
       // Handle referral if provided
       if (userData.referredBy) {

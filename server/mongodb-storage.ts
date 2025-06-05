@@ -424,8 +424,35 @@ export class MongoStorage implements IStorage {
     return this.convertSocialAccount(updatedAccount);
   }
 
-  async deleteSocialAccount(id: number): Promise<void> {
-    // Implementation needed
+  async deleteSocialAccount(id: number | string): Promise<void> {
+    await this.connect();
+    
+    console.log(`[MONGODB DELETE] Attempting to delete social account with ID: ${id} (type: ${typeof id})`);
+    
+    // Try deleting by MongoDB _id first (ObjectId format)
+    let deleteResult;
+    try {
+      deleteResult = await SocialAccountModel.deleteOne({ _id: id });
+      console.log(`[MONGODB DELETE] Delete by _id result:`, deleteResult);
+    } catch (objectIdError) {
+      console.log(`[MONGODB DELETE] ObjectId deletion failed, trying by 'id' field:`, objectIdError.message);
+      
+      // If ObjectId fails, try deleting by the 'id' field
+      try {
+        deleteResult = await SocialAccountModel.deleteOne({ id: id });
+        console.log(`[MONGODB DELETE] Delete by id field result:`, deleteResult);
+      } catch (idError) {
+        console.error(`[MONGODB DELETE] Both deletion methods failed:`, idError);
+        throw new Error(`Failed to delete social account with id ${id}`);
+      }
+    }
+    
+    if (deleteResult.deletedCount === 0) {
+      console.log(`[MONGODB DELETE] No account found with ID: ${id}`);
+      throw new Error(`Social account with id ${id} not found`);
+    }
+    
+    console.log(`[MONGODB DELETE] Successfully deleted ${deleteResult.deletedCount} social account(s)`);
   }
 
   async getContent(id: number): Promise<Content | undefined> {

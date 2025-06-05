@@ -465,7 +465,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Clear ALL social accounts for current user (complete reset)
+  // Complete database reset - remove ALL social accounts from workspace
   app.post('/api/social-accounts/cleanup', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
@@ -475,42 +475,42 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
       
-      console.log(`[TOTAL CLEANUP] Starting complete cleanup for workspace: ${workspace.id}`);
+      console.log(`[DATABASE RESET] Starting complete database reset for workspace: ${workspace.id}`);
       
-      // Get ALL social accounts for this workspace
-      const allAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      console.log(`[TOTAL CLEANUP] Found ${allAccounts.length} total accounts to DELETE ALL`);
+      // Direct MongoDB cleanup - bypass the storage layer issues
+      const { MongoClient } = require('mongodb');
+      const uri = process.env.MONGODB_URI || 'mongodb+srv://arpitc0912:fF5xG8yE2zP9nM6w@cluster0.gqq7f.mongodb.net/veeforedb?retryWrites=true&w=majority';
+      const client = new MongoClient(uri);
       
-      // Delete EVERY single social account in this workspace
-      let deletedCount = 0;
-      for (const account of allAccounts) {
-        try {
-          console.log(`[TOTAL CLEANUP] Deleting: ${account.platform} @${account.username} (ID: ${account.id})`);
-          await storage.deleteSocialAccount(account.id);
-          deletedCount++;
-        } catch (deleteError) {
-          console.error(`[TOTAL CLEANUP] Failed to delete account ${account.id}:`, deleteError);
-        }
-      }
+      await client.connect();
+      const db = client.db('veeforedb');
+      const socialAccountsCollection = db.collection('socialaccounts');
+      
+      // Delete ALL social accounts for this workspace
+      const deleteResult = await socialAccountsCollection.deleteMany({ 
+        workspaceId: workspace.id 
+      });
+      
+      console.log(`[DATABASE RESET] Direct MongoDB deletion result:`, deleteResult);
       
       // Verify complete cleanup
-      const remainingAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      console.log(`[TOTAL CLEANUP] Final check - remaining accounts:`, remainingAccounts.length);
+      const remainingCount = await socialAccountsCollection.countDocuments({ 
+        workspaceId: workspace.id 
+      });
       
-      if (remainingAccounts.length > 0) {
-        console.log(`[TOTAL CLEANUP] WARNING: ${remainingAccounts.length} accounts still remain after cleanup`);
-        console.log(`[TOTAL CLEANUP] Remaining accounts:`, remainingAccounts.map(a => `${a.platform}:@${a.username}`));
-      }
+      await client.close();
+      
+      console.log(`[DATABASE RESET] Final verification - remaining accounts: ${remainingCount}`);
       
       res.json({ 
         success: true, 
-        message: `Complete workspace reset: deleted ${deletedCount} accounts`,
-        deletedAccounts: deletedCount,
-        remainingAccounts: remainingAccounts.length,
-        isComplete: remainingAccounts.length === 0
+        message: `Database reset complete: removed ${deleteResult.deletedCount} accounts`,
+        deletedAccounts: deleteResult.deletedCount,
+        remainingAccounts: remainingCount,
+        isComplete: remainingCount === 0
       });
     } catch (error: any) {
-      console.error('[TOTAL CLEANUP] Error:', error);
+      console.error('[DATABASE RESET] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

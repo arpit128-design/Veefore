@@ -655,8 +655,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
       // Exchange code for short-lived token
+      console.log(`[INSTAGRAM CALLBACK] Attempting to exchange code: ${code}`);
+      console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
-      console.log(`[INSTAGRAM CALLBACK] Exchanged code for token successfully`);
+      console.log(`[INSTAGRAM CALLBACK] Exchanged code for token successfully:`, tokenData);
       
       // Get long-lived token
       const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);

@@ -87,8 +87,24 @@ export async function loginWithGoogle() {
   }
 }
 
-export function logout() {
-  return signOut(auth);
+export async function logout() {
+  try {
+    // Clear demo mode from localStorage
+    localStorage.removeItem('veefore_demo_mode');
+    
+    // If Firebase auth is available, sign out
+    if (auth) {
+      await signOut(auth);
+    }
+    
+    // Force reload to reset application state
+    window.location.reload();
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Even if Firebase logout fails, clear local state
+    localStorage.removeItem('veefore_demo_mode');
+    window.location.reload();
+  }
 }
 
 export { onAuthStateChanged };

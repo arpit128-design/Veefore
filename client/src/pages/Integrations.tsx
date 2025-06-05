@@ -97,10 +97,14 @@ export default function Integrations() {
   // Connect social account mutation
   const connectMutation = useMutation({
     mutationFn: async (platform: string) => {
+      console.log(`[CONNECT DEBUG] Attempting to connect ${platform}`);
+      console.log(`[CONNECT DEBUG] Current auth token:`, localStorage.getItem('veefore_auth_token') ? 'Present' : 'Missing');
+      
       const response = await apiRequest('GET', `/api/${platform}/auth`);
       const data = await response.json();
       
       if (data.authUrl) {
+        console.log(`[CONNECT DEBUG] Redirecting to:`, data.authUrl);
         window.location.href = data.authUrl;
       } else {
         throw new Error('Failed to get authorization URL');

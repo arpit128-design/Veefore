@@ -12,8 +12,10 @@ export default function Dashboard() {
 
   // Fetch real analytics data
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['/api/dashboard/analytics'],
-    enabled: !!user
+    queryKey: ['/api/dashboard/analytics', Date.now()], // Force fresh data
+    enabled: !!user,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0 // Don't cache
   });
 
   const currentTime = new Date().toLocaleTimeString('en-US', {

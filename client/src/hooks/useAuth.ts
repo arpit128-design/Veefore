@@ -25,39 +25,9 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for demo mode in localStorage
-    const demoMode = localStorage.getItem('veefore_demo_mode');
-    
-    if (demoMode === 'true') {
-      // Create demo user
-      const demoUser: User = {
-        id: 1,
-        firebaseUid: 'demo-user',
-        email: 'demo@veefore.com',
-        username: 'DemoCommander',
-        displayName: 'Demo Commander',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
-        credits: 2500,
-        plan: 'Pro',
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        referralCode: 'DEMO123',
-        totalReferrals: 47,
-        totalEarned: 1250,
-        referredBy: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      setUser(demoUser);
-      setToken('demo-token');
-      setLoading(false);
-      return;
-    }
-
     // Check if Firebase auth is available
     if (!auth) {
-      console.warn('Firebase auth not available, using demo mode');
+      console.warn('Firebase auth not available');
       setLoading(false);
       return;
     }
@@ -67,6 +37,9 @@ export function useAuth() {
       
       if (firebaseUser) {
         try {
+          // Clear any demo mode when real user is authenticated
+          localStorage.removeItem('veefore_demo_mode');
+          
           // Get Firebase ID token
           const idToken = await firebaseUser.getIdToken();
           setToken(idToken);
@@ -102,8 +75,33 @@ export function useAuth() {
           console.error('Failed to get Firebase token:', error);
         }
       } else {
-        setUser(null);
-        setToken(null);
+        // Only fall back to demo mode if explicitly requested
+        const demoMode = localStorage.getItem('veefore_demo_mode');
+        if (demoMode === 'true') {
+          const demoUser: User = {
+            id: 1,
+            firebaseUid: 'demo-user',
+            email: 'demo@veefore.com',
+            username: 'DemoCommander',
+            displayName: 'Demo Commander',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face',
+            credits: 2500,
+            plan: 'Pro',
+            stripeCustomerId: null,
+            stripeSubscriptionId: null,
+            referralCode: 'DEMO123',
+            totalReferrals: 47,
+            totalEarned: 1250,
+            referredBy: null,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          setUser(demoUser);
+          setToken('demo-token');
+        } else {
+          setUser(null);
+          setToken(null);
+        }
       }
       
       setLoading(false);

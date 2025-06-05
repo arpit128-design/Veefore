@@ -16,7 +16,11 @@ interface CalendarDay {
   scheduledContent: any[];
 }
 
-export function Calendar() {
+interface CalendarProps {
+  onScheduleContent?: (date?: Date) => void;
+}
+
+export function Calendar({ onScheduleContent }: CalendarProps) {
   const { currentWorkspace } = useWorkspace();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
@@ -181,6 +185,7 @@ export function Calendar() {
             </Button>
             <Button
               size="sm"
+              onClick={() => onScheduleContent?.()}
               className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
             >
               <Plus className="w-4 h-4 mr-2" />

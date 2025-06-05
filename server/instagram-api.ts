@@ -110,41 +110,83 @@ export class InstagramAPI {
     return response.data;
   }
 
-  // Get user profile information
+  // Get user profile information with Business API
   async getUserProfile(accessToken: string): Promise<InstagramUser> {
-    const fields = 'id,username,account_type,media_count,followers_count';
-    const response = await axios.get(`${this.baseUrl}/me`, {
-      params: {
-        fields,
-        access_token: accessToken
-      }
-    });
-
-    return response.data;
-  }
-
-  // Get user media
-  async getUserMedia(accessToken: string, limit = 25): Promise<InstagramMedia[]> {
-    const fields = 'id,media_type,media_url,permalink,timestamp,caption';
-    const response = await axios.get(`${this.baseUrl}/me/media`, {
-      params: {
-        fields,
-        limit,
-        access_token: accessToken
-      }
-    });
-
-    return response.data.data || [];
-  }
-
-  // Get media insights
-  async getMediaInsights(mediaId: string, accessToken: string): Promise<any> {
-    const metrics = 'impressions,reach,likes,comments,shares,saves';
-    
     try {
+      const fields = 'id,username,account_type,media_count,followers_count,name,biography,profile_picture_url,website';
+      const response = await axios.get(`${this.baseUrl}/me`, {
+        params: {
+          fields,
+          access_token: accessToken
+        }
+      });
+
+      console.log(`[INSTAGRAM BUSINESS API] User profile:`, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM BUSINESS API] Profile error:`, error.response?.data || error.message);
+      throw new Error('Failed to fetch Instagram Business profile');
+    }
+  }
+
+  // Get user media with Business API insights
+  async getUserMedia(accessToken: string, limit = 25): Promise<InstagramMedia[]> {
+    try {
+      const fields = 'id,media_type,media_url,permalink,timestamp,caption,like_count,comments_count';
+      const response = await axios.get(`${this.baseUrl}/me/media`, {
+        params: {
+          fields,
+          limit,
+          access_token: accessToken
+        }
+      });
+
+      console.log(`[INSTAGRAM BUSINESS API] Media response:`, response.data);
+      
+      // Fetch insights for each media item
+      const mediaWithInsights = await Promise.all(
+        (response.data.data || []).map(async (media: any) => {
+          try {
+            const insights = await this.getMediaInsights(media.id, accessToken);
+            return {
+              ...media,
+              impressions: insights.impressions || 0,
+              reach: insights.reach || 0,
+              engagement: (insights.likes || 0) + (insights.comments || 0),
+              views: insights.video_views || 0
+            };
+          } catch (error) {
+            console.log(`[INSTAGRAM BUSINESS API] Could not fetch insights for media ${media.id}`);
+            return {
+              ...media,
+              impressions: 0,
+              reach: 0,
+              engagement: (media.like_count || 0) + (media.comments_count || 0),
+              views: 0
+            };
+          }
+        })
+      );
+
+      return mediaWithInsights;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM BUSINESS API] Media error:`, error.response?.data || error.message);
+      return [];
+    }
+  }
+
+  // Get media insights with Business API
+  async getMediaInsights(mediaId: string, accessToken: string): Promise<any> {
+    try {
+      // For video content, include video-specific metrics
+      const videoMetrics = 'video_views,reach,impressions,likes,comments,shares,saves';
+      const photoMetrics = 'reach,impressions,likes,comments,shares,saves';
+      
+      console.log(`[INSTAGRAM BUSINESS API] Fetching insights for media: ${mediaId}`);
+      
       const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
         params: {
-          metric: metrics,
+          metric: videoMetrics, // Try video metrics first, fallback if needed
           access_token: accessToken
         }
       });
@@ -155,10 +197,30 @@ export class InstagramAPI {
         insights[insight.name] = insight.values[0]?.value || 0;
       });
 
+      console.log(`[INSTAGRAM BUSINESS API] Media insights for ${mediaId}:`, insights);
       return insights;
-    } catch (error) {
-      console.error('Error fetching media insights:', error);
-      return {};
+    } catch (error: any) {
+      console.log(`[INSTAGRAM BUSINESS API] Media insights error for ${mediaId}:`, error.response?.data || error.message);
+      
+      // Try photo metrics if video metrics failed
+      try {
+        const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
+          params: {
+            metric: 'reach,impressions,likes,comments,shares,saves',
+            access_token: accessToken
+          }
+        });
+
+        const insights: any = {};
+        response.data.data.forEach((insight: any) => {
+          insights[insight.name] = insight.values[0]?.value || 0;
+        });
+
+        return insights;
+      } catch (fallbackError) {
+        console.log(`[INSTAGRAM BUSINESS API] Fallback insights also failed for ${mediaId}`);
+        return {};
+      }
     }
   }
 

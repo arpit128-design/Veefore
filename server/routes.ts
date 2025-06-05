@@ -394,6 +394,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   });
                 } catch (instagramError: any) {
                   console.log('[CONTENT API] Instagram API error:', instagramError.message);
+                  // Return error response for Instagram publishing failure
+                  return res.json({
+                    success: true,
+                    content,
+                    published: false,
+                    message: 'Content saved but Instagram publishing failed',
+                    publishingError: instagramError.message
+                  });
                 }
               }
             }

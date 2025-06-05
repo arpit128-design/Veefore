@@ -310,8 +310,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             
             // Direct Instagram publishing instead of internal API call
             const workspace = await storage.getDefaultWorkspace(user.id);
+            console.log('[INSTAGRAM DEBUG] Workspace found:', workspace?.id);
+            
             if (workspace) {
               const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+              console.log('[INSTAGRAM DEBUG] Instagram account:', {
+                found: !!instagramAccount,
+                hasAccessToken: !!instagramAccount?.accessToken,
+                accountId: instagramAccount?.accountId,
+                platform: instagramAccount?.platform
+              });
               
               if (instagramAccount && instagramAccount.accessToken) {
                 try {

@@ -16,7 +16,24 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
 
   const { data: analytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, platform],
-    queryFn: () => fetch(`/api/dashboard/analytics`).then(res => res.json()),
+    queryFn: async () => {
+      const token = localStorage.getItem('veefore_auth_token');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/dashboard/analytics', {
+        headers,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
 
@@ -30,7 +47,7 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  const platformData = analytics?.platforms?.find(p => p.platform === platform) || {};
+  const platformData = analytics?.platforms?.find((p: any) => p.platform === platform) || {};
   
   const getMetricValue = (key: string, fallback: string = '0') => {
     const value = platformData[key] || analytics?.[key] || 0;

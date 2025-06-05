@@ -14,7 +14,24 @@ export default function Analyzer() {
 
   const { data: analytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
-    queryFn: () => fetch(`/api/dashboard/analytics`).then(res => res.json()),
+    queryFn: async () => {
+      const token = localStorage.getItem('veefore_auth_token');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/dashboard/analytics', {
+        headers,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
 

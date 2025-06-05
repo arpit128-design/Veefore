@@ -79,7 +79,7 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
           </div>
           <div className="flex justify-between items-center">
             <span className="text-asteroid-silver">Avg. Engagement</span>
-            <span className="font-mono text-lg text-green-400">{getMetricValue('engagement_rate', '0%')}</span>
+            <span className="font-mono text-lg text-green-400">{getMetricValue('engagement', '0')}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-asteroid-silver">Impressions</span>

@@ -80,7 +80,7 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">+12.5% vs last period</span>
+              <span className="text-sm">Real-time data</span>
             </div>
           </CardContent>
         </Card>
@@ -98,7 +98,7 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">+2.1% vs last period</span>
+              <span className="text-sm">Authentic data</span>
             </div>
           </CardContent>
         </Card>
@@ -116,7 +116,7 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">+8.3% vs last period</span>
+              <span className="text-sm">Live Instagram data</span>
             </div>
           </CardContent>
         </Card>
@@ -134,7 +134,7 @@ export default function Analyzer() {
             </div>
             <div className="flex items-center space-x-2 text-green-400">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">+5.2% vs last period</span>
+              <span className="text-sm">Instagram Business API</span>
             </div>
           </CardContent>
         </Card>

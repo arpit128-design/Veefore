@@ -55,6 +55,13 @@ export function useAuth() {
       return;
     }
 
+    // Check if Firebase auth is available
+    if (!auth) {
+      console.warn('Firebase auth not available, using demo mode');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setFirebaseUser(firebaseUser);
       

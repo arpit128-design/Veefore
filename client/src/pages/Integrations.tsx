@@ -172,7 +172,7 @@ export default function Integrations() {
   });
 
   const getConnectedAccount = (platform: string): SocialAccount | undefined => {
-    return socialAccounts?.find((account: SocialAccount) => account.platform === platform);
+    return Array.isArray(socialAccounts) ? socialAccounts.find((account: SocialAccount) => account.platform === platform) : undefined;
   };
 
   const isTokenExpired = (account: SocialAccount): boolean => {

@@ -326,10 +326,11 @@ export class MongoStorage implements IStorage {
     return result;
   }
 
-  // Placeholder implementations for other methods (to be implemented)
+  // Social account operations
   async getSocialAccount(id: number): Promise<SocialAccount | undefined> {
-    // Implementation needed
-    return undefined;
+    await this.connect();
+    const account = await SocialAccountModel.findById(id);
+    return account ? this.convertSocialAccount(account) : undefined;
   }
 
   async getSocialAccountsByWorkspace(workspaceId: number): Promise<SocialAccount[]> {

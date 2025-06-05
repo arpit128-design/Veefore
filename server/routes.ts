@@ -755,6 +755,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Social accounts endpoint
+  app.get("/api/social-accounts", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const userId = typeof user.id === 'string' ? user.id : Number(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(userId);
+      
+      if (workspaces.length === 0) {
+        return res.json([]);
+      }
+      
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(Number(workspaces[0].id));
+      res.json(socialAccounts);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Instagram OAuth initiation
+  app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
+      const userId = typeof user.id === 'string' ? user.id : Number(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(userId);
+      
+      let defaultWorkspace;
+      if (workspaces.length === 0) {
+        defaultWorkspace = await storage.createWorkspace({
+          userId: userId,
+          name: "My VeeFore Workspace",
+          description: "Default workspace for content creation"
+        });
+      } else {
+        defaultWorkspace = workspaces[0];
+      }
+      
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      const authUrl = instagramAPI.generateAuthUrl(redirectUri, defaultWorkspace.id.toString());
+      res.json({ authUrl });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Suggestions routes
   app.get("/api/suggestions", requireAuth, async (req, res) => {
     try {

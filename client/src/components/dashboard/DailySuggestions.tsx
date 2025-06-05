@@ -52,7 +52,7 @@ export function DailySuggestions() {
   ];
 
   const getSuggestionByType = (type: string) => {
-    return suggestions?.find((s: any) => s.type === type);
+    return Array.isArray(suggestions) ? suggestions.find((s: any) => s.type === type) : null;
   };
 
   return (

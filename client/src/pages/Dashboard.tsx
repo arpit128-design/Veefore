@@ -49,12 +49,16 @@ export default function Dashboard() {
   console.log('[DASHBOARD DEBUG] Analytics data received:', analyticsData);
   
   const analytics = {
-    totalViews: analyticsData?.totalViews || 0,
-    engagement: analyticsData?.engagement || 0,
-    newFollowers: analyticsData?.totalFollowers || 0,
-    contentScore: analyticsData?.contentScore || 85,
-    platforms: analyticsData?.platforms || []
+    totalViews: (analyticsData as any)?.totalViews || 0,
+    engagement: (analyticsData as any)?.engagement || 0,
+    newFollowers: (analyticsData as any)?.totalFollowers || 0,
+    contentScore: (analyticsData as any)?.contentScore || 85,
+    platforms: (analyticsData as any)?.platforms || []
   };
+  
+  console.log('[DASHBOARD DEBUG] Mapped analytics:', analytics);
+  console.log('[DASHBOARD DEBUG] Formatted engagement:', formatNumber(analytics.engagement));
+  console.log('[DASHBOARD DEBUG] Formatted followers:', formatNumber(analytics.newFollowers));
 
   return (
     <div className="space-y-8">

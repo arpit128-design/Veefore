@@ -62,6 +62,7 @@ export default function Dashboard() {
   // Map API response to dashboard data structure
   console.log('[DASHBOARD DEBUG] Analytics data received:', analyticsData);
   
+  // Handle null/undefined data gracefully and provide fallback
   const analytics = {
     totalViews: (analyticsData as any)?.totalViews || 0,
     engagement: (analyticsData as any)?.engagement || 0,
@@ -69,6 +70,9 @@ export default function Dashboard() {
     contentScore: (analyticsData as any)?.contentScore || 85,
     platforms: (analyticsData as any)?.platforms || []
   };
+  
+  // Show loading message when data is null/empty
+  const isDataEmpty = !analyticsData || (analytics.engagement === 0 && analytics.newFollowers === 0 && analytics.platforms.length === 0);
   
   console.log('[DASHBOARD DEBUG] Mapped analytics:', analytics);
   console.log('[DASHBOARD DEBUG] Formatted engagement:', formatNumber(analytics.engagement));

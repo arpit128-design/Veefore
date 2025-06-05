@@ -236,7 +236,18 @@ export class MongoStorage implements IStorage {
 
   async getDefaultWorkspace(userId: number | string): Promise<Workspace | undefined> {
     await this.connect();
-    const workspace = await WorkspaceModel.findOne({ userId, isDefault: true });
+    console.log('[MONGODB DEBUG] Looking for workspace with userId:', userId, typeof userId);
+    
+    // Try to find default workspace first
+    let workspace = await WorkspaceModel.findOne({ userId, isDefault: true });
+    console.log('[MONGODB DEBUG] Default workspace found:', !!workspace);
+    
+    // If no default workspace, get the first workspace for this user
+    if (!workspace) {
+      workspace = await WorkspaceModel.findOne({ userId });
+      console.log('[MONGODB DEBUG] Any workspace found:', !!workspace);
+    }
+    
     return workspace ? this.convertWorkspace(workspace) : undefined;
   }
 

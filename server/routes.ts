@@ -389,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(Number(user.id));
       
       let analytics: any[] = [];
       let defaultWorkspace;
@@ -397,7 +397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (workspaces.length === 0) {
         // Create default workspace for new users
         defaultWorkspace = await storage.createWorkspace({
-          userId: user.id,
+          userId: Number(user.id),
           name: "My VeeFore Workspace",
           description: "Default workspace for content creation"
         });
@@ -410,7 +410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts
-      const connectedAccounts = await storage.getSocialAccountsByWorkspace(defaultWorkspace.id);
+      const connectedAccounts = await storage.getSocialAccountsByWorkspace(Number(defaultWorkspace.id));
       const instagramAccount = connectedAccounts.find(acc => acc.platform === 'instagram');
       
       // Fetch real Instagram analytics if account is connected
@@ -421,7 +421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Store fresh analytics data
           await storage.createAnalytics({
-            workspaceId: defaultWorkspace.id,
+            workspaceId: Number(defaultWorkspace.id),
             platform: 'instagram',
             metrics: {
               ...insights,
@@ -432,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Refresh analytics data
-          analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
+          analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
         } catch (error) {
           console.log('Instagram API fetch failed, using stored data:', error);
         }
@@ -750,6 +750,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(rule);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Social accounts management routes
+  app.get("/api/social-accounts", requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.query;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId is required' });
+      }
+      
+      const accounts = await storage.getSocialAccountsByWorkspace(Number(workspaceId));
+      res.json(accounts);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/social-accounts/:id", requireAuth, async (req, res) => {
+    try {
+      const accountId = Number(req.params.id);
+      await storage.deleteSocialAccount(accountId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/social-accounts/:id", requireAuth, async (req, res) => {
+    try {
+      const accountId = Number(req.params.id);
+      const updates = req.body;
+      const updatedAccount = await storage.updateSocialAccount(accountId, updates);
+      res.json(updatedAccount);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/social-accounts/:id/refresh", requireAuth, async (req, res) => {
+    try {
+      const accountId = Number(req.params.id);
+      const account = await storage.getSocialAccount(accountId);
+      
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+
+      if (account.platform === 'instagram' && account.refreshToken) {
+        try {
+          const refreshResult = await instagramAPI.refreshAccessToken(account.refreshToken);
+          
+          const updatedAccount = await storage.updateSocialAccount(accountId, {
+            accessToken: refreshResult.access_token,
+            expiresAt: new Date(Date.now() + refreshResult.expires_in * 1000)
+          });
+          
+          res.json(updatedAccount);
+        } catch (error) {
+          res.status(400).json({ error: 'Failed to refresh Instagram token' });
+        }
+      } else {
+        res.status(400).json({ error: 'Token refresh not supported for this platform' });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

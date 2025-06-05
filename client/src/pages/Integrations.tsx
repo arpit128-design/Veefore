@@ -1,0 +1,415 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Instagram, 
+  Twitter, 
+  Linkedin, 
+  Youtube, 
+  Facebook,
+  ExternalLink,
+  CheckCircle,
+  AlertCircle,
+  Settings,
+  Unlink,
+  RefreshCw
+} from "lucide-react";
+
+interface SocialAccount {
+  id: number;
+  platform: string;
+  username: string;
+  accountId: string;
+  accessToken: string;
+  isActive: boolean;
+  expiresAt?: Date;
+  lastSync?: Date;
+}
+
+const platformConfig = {
+  instagram: {
+    name: "Instagram Business",
+    icon: Instagram,
+    color: "text-pink-500",
+    bgColor: "bg-gradient-to-r from-purple-500 to-pink-500",
+    description: "Connect your Instagram Business account to manage posts and analyze performance",
+    features: ["Post scheduling", "Analytics", "Story management", "Hashtag suggestions"]
+  },
+  twitter: {
+    name: "Twitter/X",
+    icon: Twitter,
+    color: "text-blue-400",
+    bgColor: "bg-gradient-to-r from-blue-400 to-blue-600",
+    description: "Connect your Twitter account for automated posting and engagement tracking",
+    features: ["Tweet scheduling", "Thread creation", "Analytics", "Trend analysis"]
+  },
+  linkedin: {
+    name: "LinkedIn",
+    icon: Linkedin,
+    color: "text-blue-600",
+    bgColor: "bg-gradient-to-r from-blue-600 to-blue-800",
+    description: "Professional networking and content sharing for business growth",
+    features: ["Professional posts", "Article publishing", "Network analytics", "Lead generation"]
+  },
+  youtube: {
+    name: "YouTube",
+    icon: Youtube,
+    color: "text-red-500",
+    bgColor: "bg-gradient-to-r from-red-500 to-red-700",
+    description: "Upload and manage video content with automated optimization",
+    features: ["Video uploads", "Thumbnail generation", "Description optimization", "Analytics"]
+  },
+  facebook: {
+    name: "Facebook Pages",
+    icon: Facebook,
+    color: "text-blue-500",
+    bgColor: "bg-gradient-to-r from-blue-500 to-blue-700",
+    description: "Manage Facebook business pages and advertising campaigns",
+    features: ["Page management", "Ad campaigns", "Audience insights", "Event promotion"]
+  }
+};
+
+export default function Integrations() {
+  const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
+
+  // Fetch connected social accounts
+  const { data: socialAccounts, isLoading } = useQuery({
+    queryKey: ['social-accounts', currentWorkspace?.id],
+    queryFn: () => fetch(`/api/social-accounts?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
+    enabled: !!currentWorkspace?.id
+  });
+
+  // Connect social account mutation
+  const connectMutation = useMutation({
+    mutationFn: async (platform: string) => {
+      const response = await apiRequest('GET', `/api/${platform}/auth`);
+      const data = await response.json();
+      
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error('Failed to get authorization URL');
+      }
+    },
+    onMutate: (platform) => {
+      setConnectingPlatform(platform);
+    },
+    onError: (error: any) => {
+      setConnectingPlatform(null);
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Failed to connect account",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Disconnect social account mutation
+  const disconnectMutation = useMutation({
+    mutationFn: async (accountId: number) => {
+      const response = await apiRequest('DELETE', `/api/social-accounts/${accountId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      toast({
+        title: "Account Disconnected",
+        description: "Social media account has been successfully disconnected.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Disconnection Failed",
+        description: error.message || "Failed to disconnect account",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Toggle account status mutation
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ accountId, isActive }: { accountId: number; isActive: boolean }) => {
+      const response = await apiRequest('PATCH', `/api/social-accounts/${accountId}`, { isActive });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+    }
+  });
+
+  // Refresh token mutation
+  const refreshTokenMutation = useMutation({
+    mutationFn: async (accountId: number) => {
+      const response = await apiRequest('POST', `/api/social-accounts/${accountId}/refresh`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      toast({
+        title: "Token Refreshed",
+        description: "Access token has been successfully refreshed.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Refresh Failed",
+        description: error.message || "Failed to refresh token",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const getConnectedAccount = (platform: string): SocialAccount | undefined => {
+    return socialAccounts?.find((account: SocialAccount) => account.platform === platform);
+  };
+
+  const isTokenExpired = (account: SocialAccount): boolean => {
+    if (!account.expiresAt) return false;
+    return new Date(account.expiresAt) < new Date();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-4xl font-orbitron font-bold neon-text text-electric-cyan mb-2">
+            Social Integrations
+          </h2>
+          <p className="text-asteroid-silver">
+            Connect your social media accounts to automate content creation and analytics
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Settings className="text-asteroid-silver" />
+          <span className="text-sm text-asteroid-silver">
+            {socialAccounts?.length || 0} platforms connected
+          </span>
+        </div>
+      </div>
+
+      {/* Connection Status Alert */}
+      {socialAccounts?.length === 0 && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Connect your first social media account to start using VeeFore's AI-powered content creation and analytics features.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Platform Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Object.entries(platformConfig).map(([platform, config]) => {
+          const connectedAccount = getConnectedAccount(platform);
+          const isConnected = !!connectedAccount;
+          const isExpired = connectedAccount ? isTokenExpired(connectedAccount) : false;
+          const IconComponent = config.icon;
+
+          return (
+            <Card key={platform} className="relative overflow-hidden border-asteroid-gray/20 bg-space-black/50 backdrop-blur-sm">
+              {/* Platform Header with Gradient */}
+              <div className={`h-2 ${config.bgColor}`} />
+              
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg bg-gradient-to-r ${config.bgColor} bg-opacity-10`}>
+                      <IconComponent className={`w-6 h-6 ${config.color}`} />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white text-lg">{config.name}</CardTitle>
+                      {isConnected && (
+                        <div className="flex items-center gap-2 mt-1">
+                          {isExpired ? (
+                            <Badge variant="destructive" className="text-xs">
+                              Token Expired
+                            </Badge>
+                          ) : (
+                            <Badge variant="default" className="text-xs bg-green-500/20 text-green-400">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Connected
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {isConnected && (
+                    <Switch
+                      checked={connectedAccount?.isActive}
+                      onCheckedChange={(checked) => 
+                        toggleStatusMutation.mutate({ 
+                          accountId: connectedAccount.id, 
+                          isActive: checked 
+                        })
+                      }
+                      disabled={isExpired}
+                    />
+                  )}
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <p className="text-asteroid-silver text-sm">
+                  {config.description}
+                </p>
+
+                {/* Features List */}
+                <div className="space-y-2">
+                  <h4 className="text-white font-medium text-sm">Features:</h4>
+                  <ul className="space-y-1">
+                    {config.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-xs text-asteroid-silver">
+                        <div className="w-1 h-1 bg-electric-cyan rounded-full" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Connected Account Info */}
+                {isConnected && (
+                  <div className="space-y-2 p-3 bg-space-black/30 rounded-lg border border-asteroid-gray/10">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-asteroid-silver">Account:</span>
+                      <span className="text-xs text-white font-mono">
+                        @{connectedAccount.username}
+                      </span>
+                    </div>
+                    {connectedAccount.lastSync && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-asteroid-silver">Last Sync:</span>
+                        <span className="text-xs text-asteroid-silver">
+                          {new Date(connectedAccount.lastSync).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  {!isConnected ? (
+                    <Button 
+                      onClick={() => connectMutation.mutate(platform)}
+                      disabled={connectingPlatform === platform}
+                      className="flex-1 bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-electric-cyan/80 hover:to-nebula-purple/80"
+                    >
+                      {connectingPlatform === platform ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Connect
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <>
+                      {isExpired && (
+                        <Button 
+                          onClick={() => refreshTokenMutation.mutate(connectedAccount.id)}
+                          disabled={refreshTokenMutation.isPending}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Refresh
+                        </Button>
+                      )}
+                      <Button 
+                        onClick={() => disconnectMutation.mutate(connectedAccount.id)}
+                        disabled={disconnectMutation.isPending}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        <Unlink className="w-4 h-4 mr-2" />
+                        Disconnect
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Integration Guide */}
+      <Card className="border-asteroid-gray/20 bg-space-black/50 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Settings className="w-5 h-5 text-electric-cyan" />
+            Integration Guide
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h4 className="text-white font-medium">Getting Started</h4>
+              <ul className="space-y-2 text-sm text-asteroid-silver">
+                <li className="flex items-start gap-2">
+                  <span className="text-electric-cyan mt-1">1.</span>
+                  Click "Connect" on your preferred social media platform
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-electric-cyan mt-1">2.</span>
+                  Authorize VeeFore to access your account
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-electric-cyan mt-1">3.</span>
+                  Start creating and scheduling content automatically
+                </li>
+              </ul>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="text-white font-medium">Security & Privacy</h4>
+              <ul className="space-y-2 text-sm text-asteroid-silver">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
+                  All connections use secure OAuth protocols
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
+                  We never store your passwords
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
+                  You can revoke access anytime
+                </li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

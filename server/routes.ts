@@ -488,7 +488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Instagram OAuth routes
+  // Social platform OAuth routes
   app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
     try {
       const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
@@ -496,6 +496,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
       
       res.json({ authUrl });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/twitter/auth", requireAuth, async (req: any, res) => {
+    try {
+      // Twitter OAuth implementation placeholder - requires Twitter API v2 credentials
+      res.status(501).json({ error: 'Twitter OAuth integration requires API credentials. Please provide TWITTER_CLIENT_ID and TWITTER_CLIENT_SECRET.' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/linkedin/auth", requireAuth, async (req: any, res) => {
+    try {
+      // LinkedIn OAuth implementation placeholder - requires LinkedIn API credentials
+      res.status(501).json({ error: 'LinkedIn OAuth integration requires API credentials. Please provide LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET.' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/youtube/auth", requireAuth, async (req: any, res) => {
+    try {
+      // YouTube OAuth implementation placeholder - requires Google API credentials
+      res.status(501).json({ error: 'YouTube OAuth integration requires Google API credentials. Please provide GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/facebook/auth", requireAuth, async (req: any, res) => {
+    try {
+      // Facebook OAuth implementation placeholder - requires Facebook API credentials
+      res.status(501).json({ error: 'Facebook OAuth integration requires Facebook API credentials. Please provide FACEBOOK_APP_ID and FACEBOOK_APP_SECRET.' });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

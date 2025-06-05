@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Rocket, Brain, Calendar, BarChart3, Sparkles, 
-  Globe, Share2, Settings 
+  Globe, Share2, Settings, Link as LinkIcon
 } from "lucide-react";
 
 const navigationItems = [
@@ -12,6 +12,7 @@ const navigationItems = [
   { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
   { href: "/suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
+  { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },
   { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
   { href: "/settings", icon: Settings, label: "Settings", color: "text-asteroid-silver" },
 ];

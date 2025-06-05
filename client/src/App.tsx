@@ -15,6 +15,7 @@ import Scheduler from "@/pages/Scheduler";
 import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
 import Workspaces from "@/pages/Workspaces";
+import Integrations from "@/pages/Integrations";
 import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Auth from "@/pages/Auth";
@@ -37,6 +38,7 @@ function AuthenticatedApp() {
             <Route path="/analyzer" component={Analyzer} />
             <Route path="/suggestions" component={Suggestions} />
             <Route path="/workspaces" component={Workspaces} />
+            <Route path="/integrations" component={Integrations} />
             <Route path="/referrals" component={Referrals} />
             <Route path="/settings" component={Settings} />
             <Route path="/subscribe" component={Subscribe} />

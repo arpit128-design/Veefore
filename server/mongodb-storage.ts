@@ -474,7 +474,14 @@ export class MongoStorage implements IStorage {
   }
 
   async updateContent(id: number, updates: Partial<Content>): Promise<Content> {
-    throw new Error('Not implemented');
+    await this.connect();
+    const content = await ContentModel.findOneAndUpdate(
+      { _id: id },
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!content) throw new Error('Content not found');
+    return this.convertContent(content);
   }
 
   async deleteContent(id: number): Promise<void> {

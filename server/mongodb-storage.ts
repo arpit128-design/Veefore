@@ -219,7 +219,7 @@ export class MongoStorage implements IStorage {
   // Workspace operations
   async getWorkspace(id: number): Promise<Workspace | undefined> {
     await this.connect();
-    const workspace = await WorkspaceModel.findById(id);
+    const workspace = await WorkspaceModel.findOne({ _id: id });
     return workspace ? this.convertWorkspace(workspace) : undefined;
   }
 

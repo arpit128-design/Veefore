@@ -70,6 +70,7 @@ const AnalyticsSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   platform: { type: String, required: true },
   date: { type: Date, required: true },
+  metrics: { type: mongoose.Schema.Types.Mixed, default: {} },
   views: { type: Number, default: 0 },
   likes: { type: Number, default: 0 },
   comments: { type: Number, default: 0 },
@@ -454,7 +455,7 @@ export class MongoStorage implements IStorage {
       createdAt: new Date()
     });
     await analyticsDoc.save();
-    console.log('[STORAGE DEBUG] Saved analytics doc metrics:', JSON.stringify(analyticsDoc.metrics, null, 2));
+    console.log('[STORAGE DEBUG] Saved analytics doc metrics:', JSON.stringify((analyticsDoc as any).metrics, null, 2));
     return this.convertAnalytics(analyticsDoc);
   }
 

@@ -141,20 +141,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Handle username uniqueness by adding timestamp suffix if needed
+      let finalUserData = { ...userData };
       let user;
+      
       try {
-        user = await storage.createUser(userData);
+        user = await storage.createUser(finalUserData);
       } catch (createError: any) {
-        // If user creation fails due to duplicate key, try to find existing user
+        // If user creation fails due to duplicate key, handle appropriately
         if (createError.message && createError.message.includes('E11000')) {
           console.log('User already exists, attempting to retrieve...');
-          user = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
-                 await storage.getUserByEmail(userData.email!);
-          if (user) {
-            return res.json(user);
+          
+          // Check if it's a username duplicate
+          if (createError.message.includes('username_1')) {
+            // Generate unique username
+            const timestamp = Date.now();
+            const baseUsername = userData.username.replace(/[^a-zA-Z0-9]/g, '');
+            finalUserData.username = `${baseUsername}_${timestamp}`;
+            
+            try {
+              user = await storage.createUser(finalUserData);
+            } catch (retryError: any) {
+              // If still fails, try to find existing user
+              user = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
+                     await storage.getUserByEmail(userData.email!);
+              if (user) {
+                return res.json(user);
+              }
+              throw retryError;
+            }
+          } else {
+            // For other duplicates, try to find existing user
+            user = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
+                   await storage.getUserByEmail(userData.email!);
+            if (user) {
+              return res.json(user);
+            }
+            throw createError;
           }
+        } else {
+          throw createError;
         }
-        throw createError;
       }
       
       // Create default workspace with proper validation
@@ -200,8 +227,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.message && error.message.includes('E11000')) {
         // Try one more time to find the user
         try {
-          const existingUser = await storage.getUserByFirebaseUid(userData.firebaseUid) || 
-                             await storage.getUserByEmail(userData.email!);
+          const requestBody = req.body;
+          const existingUser = await storage.getUserByFirebaseUid(requestBody.firebaseUid) || 
+                             await storage.getUserByEmail(requestBody.email);
           if (existingUser) {
             return res.json(existingUser);
           }

@@ -36,20 +36,20 @@ export class InstagramAPI {
   
   constructor() {}
 
-  // Generate Instagram Business OAuth URL
+  // Generate Instagram Business OAuth URL (through Facebook Login)
   generateAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'user_profile,user_media',
+      scope: 'instagram_basic,instagram_manage_insights,pages_show_list,pages_read_engagement',
       response_type: 'code',
       ...(state && { state })
     });
 
-    return `https://api.instagram.com/oauth/authorize?${params.toString()}`;
+    return `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`;
   }
 
-  // Exchange authorization code for access token (Instagram Business API)
+  // Exchange authorization code for access token (Facebook Graph API for Instagram Business)
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<{
     access_token: string;
     user_id?: string;
@@ -62,7 +62,7 @@ export class InstagramAPI {
       code
     });
 
-    const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
+    const response = await axios.post('https://graph.facebook.com/v18.0/oauth/access_token', params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }

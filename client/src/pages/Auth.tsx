@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SpaceBackground } from "@/components/layout/SpaceBackground";
-import { loginWithGoogle, handleRedirect } from "@/lib/firebase";
+import { loginWithGoogle } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -22,9 +22,12 @@ export default function Auth() {
     if (ref) {
       setReferralCode(ref);
     }
+  }, []);
 
-    // Handle redirect result from Google auth
-    handleRedirect().then((result) => {
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const result = await loginWithGoogle();
       if (result?.user) {
         toast({
           title: "Welcome to VeeFore!",
@@ -32,27 +35,14 @@ export default function Auth() {
         });
         setLocation('/dashboard');
       }
-    }).catch((error) => {
-      if (error.message) {
-        toast({
-          title: "Authentication Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    });
-  }, [setLocation, toast]);
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      await loginWithGoogle();
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Login Failed",
         description: error.message || "Failed to sign in with Google",
         variant: "destructive",
       });
+    } finally {
       setLoading(false);
     }
   };

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import Stripe from "stripe";
+import * as admin from "firebase-admin";
 import { storage } from "./storage";
 import { 
   insertUserSchema, insertWorkspaceSchema, insertSocialAccountSchema,
@@ -10,12 +11,25 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 
+// Initialize Firebase Admin - simplified for demo
+let firebaseAdmin: any = null;
+try {
+  if (!admin.apps.length && process.env.VITE_FIREBASE_PROJECT_ID) {
+    firebaseAdmin = admin.initializeApp({
+      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+    });
+    console.log("Firebase Admin initialized successfully");
+  }
+} catch (error) {
+  console.warn("Firebase Admin initialization failed, using simplified auth:", error);
+}
+
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2024-06-20",
 });
 
 // Google Gemini API setup
@@ -59,17 +73,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Middleware for authentication (simplified for demo)
-  const requireAuth = (req: any, res: any, next: any) => {
+  // Middleware for authentication
+  const requireAuth = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
-    // In real implementation, verify Firebase token here
     const token = authHeader.substring(7);
-    req.user = { firebaseUid: token, id: 1 }; // Mock user for demo
-    next();
+    
+    try {
+      // Verify Firebase token
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      req.user = { 
+        firebaseUid: decodedToken.uid,
+        email: decodedToken.email,
+        name: decodedToken.name 
+      };
+      next();
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return res.status(401).json({ error: 'Invalid token' });
+    }
   };
 
   // User routes

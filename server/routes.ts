@@ -14,7 +14,7 @@ import { z } from "zod";
 // Initialize Firebase Admin with service account
 let firebaseAdmin: any = null;
 try {
-  if (admin.apps.length === 0) {
+  if (!admin.apps || admin.apps.length === 0) {
     // Try to initialize with service account credentials
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);

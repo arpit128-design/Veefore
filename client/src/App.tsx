@@ -20,6 +20,8 @@ import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
@@ -42,6 +44,8 @@ function AuthenticatedApp() {
             <Route path="/referrals" component={Referrals} />
             <Route path="/settings" component={Settings} />
             <Route path="/subscribe" component={Subscribe} />
+            <Route path="/privacy-policy" component={PrivacyPolicy} />
+            <Route path="/terms-of-service" component={TermsOfService} />
             <Route component={NotFound} />
           </Switch>
         </main>
@@ -70,6 +74,8 @@ function Router() {
         <SpaceBackground />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/privacy-policy" component={PrivacyPolicy} />
+          <Route path="/terms-of-service" component={TermsOfService} />
           <Route component={() => <Redirect to="/auth" />} />
         </Switch>
       </div>

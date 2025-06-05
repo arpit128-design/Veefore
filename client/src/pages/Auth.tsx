@@ -168,9 +168,9 @@ export default function Auth() {
               {/* Terms */}
               <p className="text-xs text-asteroid-silver text-center">
                 By signing in, you agree to our{" "}
-                <a href="#" className="text-electric-cyan hover:underline">Terms of Service</a>{" "}
+                <a href="/terms-of-service" className="text-electric-cyan hover:underline">Terms of Service</a>{" "}
                 and{" "}
-                <a href="#" className="text-electric-cyan hover:underline">Privacy Policy</a>
+                <a href="/privacy-policy" className="text-electric-cyan hover:underline">Privacy Policy</a>
               </p>
             </CardContent>
           </Card>

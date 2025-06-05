@@ -510,23 +510,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const totalImpressions = mediaData.data?.reduce((sum: number, post: any) => sum + (post.impressions || 0), 0) || 0;
           const totalReach = mediaData.data?.reduce((sum: number, post: any) => sum + (post.reach || 0), 0) || 0;
           
-          // Store fresh analytics data with correct schema format
-          await storage.createAnalytics({
-            workspaceId: defaultWorkspace.id,
-            platform: 'instagram',
-            metrics: {
-              views: totalImpressions,
-              likes: totalLikes,
-              comments: totalComments,
-              shares: 0,
-              followers: profile.followers_count || 0,
-              follower_count: profile.followers_count || 0,
-              engagement: totalLikes + totalComments,
-              reach: totalReach,
-              impressions: totalImpressions
-            },
-            date: new Date()
-          });
+              // Check if we already have recent data (within last hour) before storing
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+          const hasRecentData = analytics.some(a => 
+            a.platform === 'instagram' && 
+            a.date && new Date(a.date) > oneHourAgo
+          );
+          
+          if (!hasRecentData) {
+            await storage.createAnalytics({
+              workspaceId: defaultWorkspace.id,
+              platform: 'instagram',
+              metrics: {
+                views: totalImpressions,
+                likes: totalLikes,
+                comments: totalComments,
+                shares: 0,
+                followers: profile.followers_count || 0,
+                follower_count: profile.followers_count || 0,
+                engagement: totalLikes + totalComments,
+                reach: totalReach,
+                impressions: totalImpressions
+              },
+              date: new Date()
+            });
+          }
           
           console.log('Successfully fetched and stored Instagram analytics:', {
             followers: profile.followers_count,
@@ -539,28 +547,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
         } catch (error) {
           console.error('Instagram API fetch failed:', error);
-        }
-      } else if (instagramAccount && instagramAccount.accessToken) {
-        try {
-          const profile = await instagramAPI.getUserProfile(instagramAccount.accessToken);
-          const insights = await instagramAPI.getAccountInsights(instagramAccount.accessToken);
-          
-          // Store fresh analytics data
-          await storage.createAnalytics({
-            workspaceId: defaultWorkspace.id,
-            platform: 'instagram',
-            metrics: {
-              ...insights,
-              profile_views: insights.profile_views,
-              follower_count: insights.follower_count,
-              media_count: profile.media_count
-            }
-          });
-          
-          // Refresh analytics data
-          analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
-        } catch (error) {
-          console.log('Instagram API fetch failed, using stored data:', error);
         }
       }
       

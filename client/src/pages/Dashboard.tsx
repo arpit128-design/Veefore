@@ -51,7 +51,7 @@ export default function Dashboard() {
   const analytics = {
     totalViews: (analyticsData as any)?.totalViews || 0,
     engagement: (analyticsData as any)?.engagement || 0,
-    newFollowers: (analyticsData as any)?.newFollowers || 0,
+    newFollowers: (analyticsData as any)?.totalFollowers || (analyticsData as any)?.newFollowers || 0,
     contentScore: (analyticsData as any)?.contentScore || 85,
     platforms: (analyticsData as any)?.platforms || []
   };

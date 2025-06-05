@@ -97,34 +97,50 @@ export default function Integrations() {
   // Connect social account mutation
   const connectMutation = useMutation({
     mutationFn: async (platform: string) => {
+      console.log(`[CONNECT DEBUG] ===========================================`);
       console.log(`[CONNECT DEBUG] Attempting to connect ${platform}`);
+      console.log(`[CONNECT DEBUG] User state:`, user ? 'Present' : 'Missing');
+      console.log(`[CONNECT DEBUG] User ID:`, user?.id);
+      console.log(`[CONNECT DEBUG] Firebase UID:`, user?.firebaseUid);
       
       // Get fresh token from Firebase auth or localStorage
       let token = localStorage.getItem('veefore_auth_token');
+      console.log(`[CONNECT DEBUG] Token from localStorage:`, token ? `Present (${token.substring(0, 20)}...)` : 'Missing');
       
-      // If we have a Firebase user, get a fresh token
-      if (user && !token) {
-        console.log(`[CONNECT DEBUG] No token in localStorage, attempting to get fresh Firebase token`);
+      // Always try to get a fresh token from Firebase if user exists
+      if (user) {
+        console.log(`[CONNECT DEBUG] User exists, attempting to get fresh Firebase token`);
         try {
           // Import Firebase auth dynamically
           const { auth } = await import('@/lib/firebase');
+          console.log(`[CONNECT DEBUG] Firebase auth current user:`, auth.currentUser ? 'Present' : 'Missing');
+          
           if (auth.currentUser) {
-            token = await auth.currentUser.getIdToken(true); // Force refresh
-            localStorage.setItem('veefore_auth_token', token);
-            console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase`);
+            const freshToken = await auth.currentUser.getIdToken(true); // Force refresh
+            if (freshToken) {
+              token = freshToken;
+              localStorage.setItem('veefore_auth_token', token);
+              console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase (${token.substring(0, 20)}...)`);
+            }
+          } else {
+            console.log(`[CONNECT DEBUG] No current Firebase user found`);
           }
         } catch (error) {
           console.error(`[CONNECT ERROR] Failed to get fresh token:`, error);
         }
+      } else {
+        console.log(`[CONNECT DEBUG] No user in auth context`);
       }
       
-      console.log(`[CONNECT DEBUG] Current auth token:`, token ? 'Present' : 'Missing');
+      console.log(`[CONNECT DEBUG] Final token state:`, token ? `Present (${token.substring(0, 20)}...)` : 'Missing');
       
       if (!token) {
+        console.error(`[CONNECT ERROR] No authentication token available after all attempts`);
         throw new Error('Authentication token not found. Please refresh the page and try again.');
       }
       
       console.log(`[CONNECT DEBUG] Making authenticated request to /api/${platform}/auth`);
+      console.log(`[CONNECT DEBUG] Request headers will include: Authorization: Bearer ${token.substring(0, 20)}...`);
       
       try {
         // Make direct authenticated fetch to ensure proper headers
@@ -137,12 +153,17 @@ export default function Integrations() {
           credentials: 'include'
         });
         
+        console.log(`[CONNECT DEBUG] Response status:`, response.status);
+        console.log(`[CONNECT DEBUG] Response ok:`, response.ok);
+        
         if (!response.ok) {
           const errorText = await response.text();
+          console.error(`[CONNECT ERROR] Response error:`, errorText);
           throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
         
         const data = await response.json();
+        console.log(`[CONNECT DEBUG] Response data:`, data);
         
         if (data.authUrl) {
           console.log(`[CONNECT DEBUG] Redirecting to:`, data.authUrl);

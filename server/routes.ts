@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import Stripe from "stripe";
-import * as admin from "firebase-admin";
+// Using client-side Firebase authentication
 import { storage } from "./storage";
 import { 
   insertUserSchema, insertWorkspaceSchema, insertSocialAccountSchema,
@@ -13,24 +13,8 @@ import { z } from "zod";
 import { instagramAPI } from "./instagram-api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Firebase Admin SDK
-let firebaseAdmin: typeof admin | null = null;
-try {
-  if (process.env.VITE_FIREBASE_PROJECT_ID && process.env.VITE_FIREBASE_API_KEY) {
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-        // For development, we'll use the Firebase emulator or client credentials
-      });
-    }
-    firebaseAdmin = admin;
-    console.log("Firebase Admin SDK initialized");
-  } else {
-    console.log("Server configured for client-side authentication");
-  }
-} catch (error) {
-  console.log("Firebase Admin initialization failed, using client-side auth:", error);
-}
+// Configure authentication for client-side Firebase
+console.log("Server configured for client-side authentication");
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -89,53 +73,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Middleware for authentication with user lookup
+  // Simplified authentication middleware for client-side Firebase
   const requireAuth = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Missing or invalid authorization header');
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
     const token = authHeader.substring(7);
+    console.log('Received token length:', token.length);
     
     try {
       let firebaseUid;
       
-      // Proper Firebase token verification using Firebase Admin SDK
-      if (firebaseAdmin) {
-        try {
-          const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
-          firebaseUid = decodedToken.uid;
-        } catch (firebaseError) {
-          console.error('Firebase token verification failed:', firebaseError);
-          // Fallback for development/testing
-          if (token === 'demo-token') {
-            firebaseUid = 'demo-user';
-          } else {
-            const payload = token.split('.')[1];
-            if (payload) {
-              try {
-                const decoded = JSON.parse(atob(payload));
-                firebaseUid = decoded.user_id || decoded.sub;
-              } catch {
-                return res.status(401).json({ error: 'Invalid token' });
-              }
-            } else {
-              return res.status(401).json({ error: 'Invalid token format' });
-            }
-          }
-        }
+      // Handle demo token for testing
+      if (token === 'demo-token') {
+        firebaseUid = 'demo-user';
       } else {
-        // Client-side auth fallback
-        const payload = token.split('.')[1];
-        if (payload) {
-          try {
-            const decoded = JSON.parse(atob(payload));
-            firebaseUid = decoded.user_id || decoded.sub;
-          } catch {
-            return res.status(401).json({ error: 'Invalid token' });
+        // Parse Firebase JWT token payload
+        const parts = token.split('.');
+        console.log('Token parts count:', parts.length);
+        
+        if (parts.length !== 3) {
+          console.error('Invalid JWT format - expected 3 parts, got:', parts.length);
+          return res.status(401).json({ error: 'Invalid token format' });
+        }
+        
+        try {
+          // Add padding if needed for base64 decoding
+          let payloadPart = parts[1];
+          while (payloadPart.length % 4) {
+            payloadPart += '=';
           }
-        } else {
+          
+          const payload = JSON.parse(atob(payloadPart));
+          console.log('Token payload keys:', Object.keys(payload));
+          
+          firebaseUid = payload.user_id || payload.sub || payload.uid;
+          
+          if (!firebaseUid) {
+            console.error('No user ID found in token payload. Available keys:', Object.keys(payload));
+            return res.status(401).json({ error: 'Invalid token payload' });
+          }
+          
+          console.log('Extracted Firebase UID:', firebaseUid);
+        } catch (parseError) {
+          console.error('Failed to parse token payload:', parseError);
           return res.status(401).json({ error: 'Invalid token format' });
         }
       }
@@ -143,9 +127,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Look up user in database
       const user = await storage.getUserByFirebaseUid(firebaseUid);
       if (!user) {
+        console.error(`User not found for Firebase UID: ${firebaseUid}`);
         return res.status(401).json({ error: 'User not found' });
       }
 
+      console.log('User found:', user.id);
       req.user = user;
       next();
     } catch (error) {

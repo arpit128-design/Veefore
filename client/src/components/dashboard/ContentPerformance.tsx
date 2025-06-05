@@ -72,7 +72,7 @@ export function ContentPerformance() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {content?.slice(0, 8).map((item: any) => {
+          {Array.isArray(content) ? content.slice(0, 8).map((item: any) => {
             const IconComponent = getIconForType(item.type);
             const gradient = getGradientForType(item.type);
             
@@ -106,7 +106,11 @@ export function ContentPerformance() {
                 </div>
               </div>
             );
-          })}
+          }) : (
+            <div className="col-span-full text-center text-cosmic-gray py-8">
+              No content available
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

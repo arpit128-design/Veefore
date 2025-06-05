@@ -308,48 +308,74 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           if (platform === 'instagram' && contentData?.mediaUrl) {
             console.log('[CONTENT API] Publishing to Instagram immediately');
             
-            const publishResponse = await fetch(`${req.protocol}://${req.get('host')}/api/publish-instagram`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': req.headers.authorization || ''
-              },
-              body: JSON.stringify({
-                title: title,
-                description: description,
-                mediaUrl: contentData.mediaUrl,
-                type: type || 'post'
-              })
-            });
-
-            if (publishResponse.ok) {
-              const publishResult = await publishResponse.json();
-              console.log('[CONTENT API] Published to Instagram successfully');
+            // Direct Instagram publishing instead of internal API call
+            const workspace = await storage.getDefaultWorkspace(user.id);
+            if (workspace) {
+              const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
               
-              // Update content status
-              await storage.updateContent(content.id, {
-                status: 'published',
-                publishedAt: new Date()
-              });
+              if (instagramAccount && instagramAccount.accessToken) {
+                try {
+                  // Create Instagram media container
+                  const createMediaResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      image_url: contentData.mediaUrl,
+                      caption: `${title}\n\n${description || ''}`,
+                      access_token: instagramAccount.accessToken
+                    })
+                  });
 
-              return res.json({
-                success: true,
-                content,
-                published: true,
-                publishResult
-              });
-            } else {
-              const errorText = await publishResponse.text();
-              console.log('[CONTENT API] Instagram publishing failed:', errorText);
-              
-              return res.json({
-                success: true,
-                content,
-                published: false,
-                message: publishNow ? 'Content saved. Instagram publishing requires account connection.' : 'Content scheduled successfully',
-                publishingError: 'Instagram account connection required'
-              });
+                  if (createMediaResponse.ok) {
+                    const mediaData = await createMediaResponse.json();
+                    
+                    // Publish the media container
+                    const publishResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media_publish`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        creation_id: mediaData.id,
+                        access_token: instagramAccount.accessToken
+                      })
+                    });
+
+                    if (publishResponse.ok) {
+                      const publishData = await publishResponse.json();
+                      console.log('[CONTENT API] Published to Instagram successfully:', publishData.id);
+                      
+                      // Update content status
+                      await storage.updateContent(content.id, {
+                        status: 'published',
+                        publishedAt: new Date()
+                      });
+
+                      return res.json({
+                        success: true,
+                        content,
+                        published: true,
+                        instagramPostId: publishData.id,
+                        message: 'Content published to Instagram successfully'
+                      });
+                    }
+                  }
+                } catch (instagramError) {
+                  console.log('[CONTENT API] Instagram API error:', instagramError);
+                }
+              }
             }
+            
+            console.log('[CONTENT API] Instagram publishing failed - account not connected or invalid');
+            return res.json({
+              success: true,
+              content,
+              published: false,
+              message: publishNow ? 'Content saved. Instagram publishing requires account connection.' : 'Content scheduled successfully',
+              publishingError: 'Instagram account connection required'
+            });
           }
         } catch (error) {
           console.log('[CONTENT API] Publishing failed:', error);

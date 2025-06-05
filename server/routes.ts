@@ -453,7 +453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analytics = [];
       } else {
         defaultWorkspace = workspaces[0];
-        analytics = await storage.getAnalytics(Number(defaultWorkspace.id), undefined, 30);
+        analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts

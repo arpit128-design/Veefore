@@ -424,11 +424,14 @@ export class MongoStorage implements IStorage {
     // Implementation needed
   }
 
-  async getAnalytics(workspaceId: number, platform?: string, days?: number): Promise<Analytics[]> {
+  async getAnalytics(workspaceId: number | string, platform?: string, days?: number): Promise<Analytics[]> {
     await this.connect();
     
+    // Handle both string and number workspace IDs
+    const workspaceIdStr = typeof workspaceId === 'string' ? workspaceId : workspaceId.toString();
+    
     // Build query filter
-    const filter: any = { workspaceId: workspaceId.toString() };
+    const filter: any = { workspaceId: workspaceIdStr };
     
     if (platform) {
       filter.platform = platform;

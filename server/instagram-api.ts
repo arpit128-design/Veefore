@@ -36,20 +36,20 @@ export class InstagramAPI {
   
   constructor() {}
 
-  // Generate Instagram Business OAuth URL (through Facebook Login)
+  // Generate Instagram Business Login OAuth URL (Direct Instagram API)
   generateAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'instagram_basic,instagram_manage_insights,pages_show_list,pages_read_engagement',
+      scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
       response_type: 'code',
       ...(state && { state })
     });
 
-    return `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`;
+    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
   }
 
-  // Exchange authorization code for access token (Facebook Graph API for Instagram Business)
+  // Exchange authorization code for access token (Instagram Business Login API)
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<{
     access_token: string;
     user_id?: string;
@@ -62,7 +62,7 @@ export class InstagramAPI {
       code
     });
 
-    const response = await axios.post('https://graph.facebook.com/v18.0/oauth/access_token', params, {
+    const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
@@ -71,7 +71,7 @@ export class InstagramAPI {
     return response.data;
   }
 
-  // Get long-lived access token
+  // Get long-lived access token (Instagram Graph API)
   async getLongLivedToken(shortLivedToken: string): Promise<{
     access_token: string;
     token_type: string;
@@ -83,7 +83,7 @@ export class InstagramAPI {
       access_token: shortLivedToken
     });
 
-    const response = await axios.get(`${this.baseUrl}/access_token?${params.toString()}`);
+    const response = await axios.get(`https://graph.instagram.com/access_token?${params.toString()}`);
     return response.data;
   }
 

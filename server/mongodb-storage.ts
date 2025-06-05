@@ -92,7 +92,7 @@ const AutomationRuleSchema = new mongoose.Schema({
 });
 
 const SuggestionSchema = new mongoose.Schema({
-  workspaceId: { type: Number, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   type: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
@@ -104,7 +104,7 @@ const SuggestionSchema = new mongoose.Schema({
 });
 
 const CreditTransactionSchema = new mongoose.Schema({
-  userId: { type: Number, required: true },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
   amount: { type: Number, required: true },
   type: { type: String, required: true },
   description: { type: String, required: true },
@@ -300,6 +300,23 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  private convertAnalytics(mongoAnalytics: any): Analytics {
+    return {
+      id: mongoAnalytics._id.toString(),
+      workspaceId: mongoAnalytics.workspaceId,
+      platform: mongoAnalytics.platform,
+      date: mongoAnalytics.date,
+      views: mongoAnalytics.views || 0,
+      likes: mongoAnalytics.likes || 0,
+      comments: mongoAnalytics.comments || 0,
+      shares: mongoAnalytics.shares || 0,
+      followers: mongoAnalytics.followers || 0,
+      engagement: mongoAnalytics.engagement || 0,
+      reach: mongoAnalytics.reach || 0,
+      createdAt: mongoAnalytics.createdAt || new Date()
+    };
+  }
+
   private generateReferralCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
@@ -364,7 +381,13 @@ export class MongoStorage implements IStorage {
   }
 
   async createAnalytics(analytics: InsertAnalytics): Promise<Analytics> {
-    throw new Error('Not implemented');
+    await this.connect();
+    const analyticsDoc = new AnalyticsModel({
+      ...analytics,
+      createdAt: new Date()
+    });
+    await analyticsDoc.save();
+    return this.convertAnalytics(analyticsDoc);
   }
 
   async getLatestAnalytics(workspaceId: number, platform: string): Promise<Analytics | undefined> {

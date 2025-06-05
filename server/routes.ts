@@ -450,19 +450,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Store fresh analytics data
           await storage.createAnalytics({
-            workspaceId: Number(defaultWorkspace.id),
+            workspaceId: defaultWorkspace.id,
             platform: 'instagram',
-            metrics: {
-              profile_views: totalImpressions,
-              follower_count: profile.followers_count || 0,
-              media_count: profile.media_count || 0,
-              likes: totalLikes,
-              comments: totalComments,
-              impressions: totalImpressions,
-              reach: totalReach,
-              engagement: totalLikes + totalComments,
-              views: totalImpressions
-            }
+            date: new Date(),
+            views: totalImpressions,
+            likes: totalLikes,
+            comments: totalComments,
+            shares: 0,
+            followers: profile.followers_count || 0,
+            engagement: totalLikes + totalComments,
+            reach: totalReach
           });
           
           console.log('Successfully fetched and stored Instagram analytics:', {

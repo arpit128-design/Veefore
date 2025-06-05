@@ -430,10 +430,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cache for Instagram data to serve immediately
+  // Persistent cache for Instagram data to serve immediately
   let cachedInstagramData: any = null;
   let lastCacheUpdate = 0;
   const CACHE_DURATION = 30000; // 30 seconds
+  
+  // Initialize cache with existing data on server start
+  const initializeCache = async () => {
+    try {
+      // Get any user's latest analytics to populate initial cache
+      const allWorkspaces = await storage.getWorkspacesByUserId('6841a7d5d70118ce230574f8');
+      if (allWorkspaces.length > 0) {
+        const analytics = await storage.getAnalytics(allWorkspaces[0].id, undefined, 1);
+        if (analytics.length > 0) {
+          const latestRecord = analytics[0];
+          const latestMetrics = latestRecord?.metrics as any;
+          
+          cachedInstagramData = {
+            totalViews: latestMetrics?.views || latestMetrics?.impressions || 0,
+            engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
+            totalFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+            newFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+            contentScore: 85,
+            platforms: [{
+              platform: latestRecord.platform,
+              views: latestMetrics?.views || latestMetrics?.impressions || 0,
+              engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
+              followers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+              posts: analytics.length
+            }]
+          };
+          lastCacheUpdate = Date.now();
+          console.log(`[CACHE INIT] Initialized cache with: followers=${cachedInstagramData.totalFollowers}, engagement=${cachedInstagramData.engagement}`);
+        }
+      }
+    } catch (error) {
+      console.log(`[CACHE INIT] Cache initialization failed:`, error);
+    }
+  };
+  
+  // Initialize cache immediately
+  initializeCache();
 
   // Dashboard analytics summary endpoint
   app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {

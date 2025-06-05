@@ -37,8 +37,19 @@ export default function Dashboard() {
 
   const formatPercentage = (num: number) => `${num}%`;
 
-  // Show loading state only for initial load
+  // Show loading spinner only on true initial load
   if (analyticsLoading && !analyticsData) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard if we don't have data yet
+  if (!analyticsData) {
     return (
       <div className="space-y-8">
         <div className="flex items-center justify-center min-h-[400px]">

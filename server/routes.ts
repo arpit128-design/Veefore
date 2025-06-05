@@ -638,37 +638,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect('/dashboard?error=missing_code_or_state');
       }
 
-      const userId = parseInt(state as string);
-      const user = await storage.getUser(userId);
+      // State contains the workspace ID
+      const workspaceId = state as string;
+      const workspace = await storage.getWorkspace(Number(workspaceId));
       
-      if (!user) {
-        return res.redirect('/dashboard?error=invalid_user');
+      if (!workspace) {
+        return res.redirect('/dashboard?error=invalid_workspace');
       }
 
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      // Force HTTPS for redirect URI
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      console.log(`[INSTAGRAM CALLBACK] Processing callback with workspace ID: ${workspaceId}`);
+      console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
       // Exchange code for short-lived token
       const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
+      console.log(`[INSTAGRAM CALLBACK] Exchanged code for token successfully`);
       
       // Get long-lived token
       const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);
+      console.log(`[INSTAGRAM CALLBACK] Got long-lived token successfully`);
       
       // Get user profile
       const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
+      console.log(`[INSTAGRAM CALLBACK] Got user profile: ${profile.username}`);
       
-      // Get user workspaces
-      const workspaces = await storage.getWorkspacesByUserId(userId);
-      let defaultWorkspace;
-      
-      if (workspaces.length === 0) {
-        defaultWorkspace = await storage.createWorkspace({
-          userId,
-          name: "My VeeFore Workspace",
-          description: "Default workspace for content creation"
-        });
-      } else {
-        defaultWorkspace = workspaces[0];
-      }
+      const defaultWorkspace = workspace;
 
       // Store Instagram account
       await storage.createSocialAccount({

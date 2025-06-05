@@ -23,7 +23,7 @@ export interface IStorage {
 
   // Workspace operations
   getWorkspace(id: number): Promise<Workspace | undefined>;
-  getWorkspacesByUserId(userId: number): Promise<Workspace[]>;
+  getWorkspacesByUserId(userId: number | string): Promise<Workspace[]>;
   getDefaultWorkspace(userId: number): Promise<Workspace | undefined>;
   createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
   updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace>;

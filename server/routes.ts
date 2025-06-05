@@ -397,7 +397,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {
     try {
       const user = req.user;
-      const workspaces = await storage.getWorkspacesByUserId(Number(user.id));
+      // Handle both string and number user IDs from MongoDB
+      const userId = typeof user.id === 'string' ? user.id : Number(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(userId);
       
       let analytics: any[] = [];
       let defaultWorkspace;
@@ -405,7 +407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (workspaces.length === 0) {
         // Create default workspace for new users
         defaultWorkspace = await storage.createWorkspace({
-          userId: Number(user.id),
+          userId: userId,
           name: "My VeeFore Workspace",
           description: "Default workspace for content creation"
         });
@@ -553,11 +555,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/instagram/auth", requireAuth, async (req: any, res) => {
     try {
       const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
-      const state = req.user.id.toString(); // Use user ID as state for security
+      const state = String(req.user.id); // Convert user ID to string for state parameter
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
       
       res.json({ authUrl });
     } catch (error: any) {
+      console.error('Instagram auth error:', error);
       res.status(500).json({ error: error.message });
     }
   });

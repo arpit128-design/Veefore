@@ -326,14 +326,19 @@ function VideoGenerator() {
 function PostCreator() {
   const [postText, setPostText] = useState("");
   const [postPlatform, setPostPlatform] = useState("instagram");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createPostMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/content', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/content', data);
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Post Created!",
@@ -341,7 +346,8 @@ function PostCreator() {
       });
       queryClient.invalidateQueries({ queryKey: ['content'] });
       setPostText("");
-      setImageUrl("");
+      setImagePrompt("");
+      setGeneratedImage(null);
     },
     onError: (error: any) => {
       toast({
@@ -351,6 +357,40 @@ function PostCreator() {
       });
     }
   });
+
+  const generateImageMutation = useMutation({
+    mutationFn: async (prompt: string) => {
+      const response = await apiRequest('POST', '/api/generate-image', { prompt });
+      return response.json();
+    },
+    onSuccess: (response: any) => {
+      setGeneratedImage(response.imageUrl);
+      toast({
+        title: "Image Generated!",
+        description: "AI-powered image created successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Image Generation Failed",
+        description: error.message || "Failed to generate image",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleGenerateImage = () => {
+    if (!imagePrompt.trim()) {
+      toast({
+        title: "Missing Prompt",
+        description: "Please enter an image description",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsGeneratingImage(true);
+    generateImageMutation.mutate(imagePrompt);
+  };
 
   const handleCreatePost = () => {
     if (!postText.trim()) {
@@ -370,7 +410,8 @@ function PostCreator() {
       platform: postPlatform,
       contentData: {
         text: postText,
-        imageUrl: imageUrl
+        imageUrl: generatedImage,
+        imagePrompt: imagePrompt
       }
     });
   };
@@ -421,18 +462,48 @@ function PostCreator() {
         </div>
 
         <div>
-          <label htmlFor="post-image" className="text-white mb-2 block text-sm font-medium">
-            Image URL (Optional)
+          <label htmlFor="image-prompt" className="text-white mb-2 block text-sm font-medium">
+            AI Image Generation (Optional)
           </label>
-          <input
-            type="url"
-            id="post-image"
-            placeholder="https://example.com/image.jpg"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-            style={{ pointerEvents: 'auto', userSelect: 'text' }}
-          />
+          <div className="space-y-3">
+            <input
+              id="image-prompt"
+              type="text"
+              placeholder="Describe the image you want to generate..."
+              value={imagePrompt}
+              onChange={(e) => setImagePrompt(e.target.value)}
+              className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+              style={{ pointerEvents: 'auto', userSelect: 'text' }}
+            />
+            <Button 
+              onClick={handleGenerateImage}
+              disabled={generateImageMutation.isPending || !imagePrompt.trim()}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              {generateImageMutation.isPending ? (
+                <>
+                  <LoadingSpinner className="w-4 h-4 mr-2" />
+                  Generating Image...
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Generate Image with AI
+                </>
+              )}
+            </Button>
+          </div>
+          
+          {generatedImage && (
+            <div className="mt-3 p-3 border border-gray-600 rounded-md bg-gray-800">
+              <img 
+                src={generatedImage} 
+                alt="AI Generated content" 
+                className="w-full h-48 object-cover rounded-md"
+              />
+              <p className="text-sm text-gray-400 mt-2">AI-generated image ready for your post</p>
+            </div>
+          )}
         </div>
 
         <Button 

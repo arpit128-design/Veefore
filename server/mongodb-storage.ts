@@ -199,8 +199,8 @@ export class MongoStorage implements IStorage {
 
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
     await this.connect();
-    const user = await UserModel.findByIdAndUpdate(
-      id,
+    const user = await UserModel.findOneAndUpdate(
+      { _id: id },
       { ...updates, updatedAt: new Date() },
       { new: true }
     );
@@ -248,8 +248,8 @@ export class MongoStorage implements IStorage {
 
   async updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace> {
     await this.connect();
-    const workspace = await WorkspaceModel.findByIdAndUpdate(
-      id,
+    const workspace = await WorkspaceModel.findOneAndUpdate(
+      { _id: id },
       { ...updates, updatedAt: new Date() },
       { new: true }
     );
@@ -259,7 +259,7 @@ export class MongoStorage implements IStorage {
 
   async deleteWorkspace(id: number): Promise<void> {
     await this.connect();
-    await WorkspaceModel.findByIdAndDelete(id);
+    await WorkspaceModel.findOneAndDelete({ _id: id });
   }
 
   // Helper methods for data conversion
@@ -345,7 +345,7 @@ export class MongoStorage implements IStorage {
   // Social account operations
   async getSocialAccount(id: number): Promise<SocialAccount | undefined> {
     await this.connect();
-    const account = await SocialAccountModel.findById(id);
+    const account = await SocialAccountModel.findOne({ _id: id });
     return account ? this.convertSocialAccount(account) : undefined;
   }
 

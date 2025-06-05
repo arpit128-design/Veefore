@@ -14,10 +14,16 @@ export async function apiRequest(
 ): Promise<Response> {
   const token = localStorage.getItem('veefore_auth_token');
   
+  console.log(`[CLIENT DEBUG] ${method} ${url} - Token:`, token ? 'Present' : 'Missing');
+  
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  } else {
+    console.warn(`[CLIENT WARNING] No auth token found for ${method} ${url}`);
   }
+
+  console.log(`[CLIENT DEBUG] Request headers:`, Object.keys(headers));
 
   const res = await fetch(url, {
     method,

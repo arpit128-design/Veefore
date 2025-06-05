@@ -75,9 +75,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Simplified authentication middleware for client-side Firebase
   const requireAuth = async (req: any, res: any, next: any) => {
+    console.log(`[AUTH DEBUG] ${req.method} ${req.path} - Headers:`, {
+      authorization: req.headers.authorization ? 'Present' : 'Missing',
+      userAgent: req.headers['user-agent'],
+      referer: req.headers.referer
+    });
+    
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Missing or invalid authorization header');
+      console.error(`[AUTH ERROR] Missing or invalid authorization header for ${req.path}`);
+      console.error('Available headers:', Object.keys(req.headers));
       return res.status(401).json({ error: 'Unauthorized' });
     }
     

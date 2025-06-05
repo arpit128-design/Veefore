@@ -461,11 +461,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
       }
 
-      // Serve cached data immediately if available and fresh
+      // Check for recent cached data to serve immediately
       const now = Date.now();
       if (cachedInstagramData && (now - lastCacheUpdate) < CACHE_DURATION) {
         res.setHeader('Cache-Control', 'public, max-age=30');
         return res.json(cachedInstagramData);
+      }
+
+      // If no cache and we have database data, return it immediately
+      if (analytics.length > 0) {
+        const latestRecord = analytics[0];
+        const latestMetrics = latestRecord?.metrics as any;
+        
+        const immediateData = {
+          totalViews: latestMetrics?.views || latestMetrics?.impressions || 0,
+          engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
+          totalFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+          newFollowers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+          contentScore: 85,
+          platforms: [{
+            platform: latestRecord.platform,
+            views: latestMetrics?.views || latestMetrics?.impressions || 0,
+            engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
+            followers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+            posts: analytics.filter(a => a.platform === latestRecord.platform).length
+          }]
+        };
+        
+        // Cache and return immediately
+        cachedInstagramData = immediateData;
+        lastCacheUpdate = now;
+        res.setHeader('Cache-Control', 'public, max-age=30');
+        return res.json(immediateData);
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts
@@ -599,7 +626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Cache the response data
-      const responseData = {
+      const finalResponseData = {
         totalViews,
         engagement: totalEngagement,
         totalFollowers,
@@ -608,11 +635,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         platforms: Object.values(platformAnalytics)
       };
       
-      cachedInstagramData = responseData;
+      cachedInstagramData = finalResponseData;
       lastCacheUpdate = now;
 
       res.setHeader('Cache-Control', 'public, max-age=30');
-      res.json(responseData);
+      res.json(finalResponseData);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

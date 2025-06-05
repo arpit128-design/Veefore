@@ -564,43 +564,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Calculate aggregated metrics from JSON structure
-      const totalViews = analytics.reduce((sum, a) => {
-        const metrics = a.metrics as any;
-        return sum + (metrics?.views || metrics?.impressions || metrics?.profile_views || 0);
-      }, 0);
+      // Get current metrics from latest record instead of cumulative totals
+      const latestRecord = analytics.length > 0 ? analytics[0] : null;
+      const latestMetrics = latestRecord?.metrics as any;
       
-      const totalEngagement = analytics.reduce((sum, a) => {
-        const metrics = a.metrics as any;
-        return sum + (metrics?.engagement || metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
-      }, 0);
-      
-      const totalFollowers = analytics.reduce((sum, a) => {
-        const metrics = a.metrics as any;
-        return sum + (metrics?.followers || metrics?.follower_count || 0);
-      }, 0);
+      const totalViews = latestMetrics?.views || latestMetrics?.impressions || latestMetrics?.profile_views || 0;
+      const totalEngagement = latestMetrics?.engagement || latestMetrics?.likes || 0;
+      const totalFollowers = latestMetrics?.followers || latestMetrics?.follower_count || 0;
       
       // Calculate content score based on engagement rate
       const contentScore = totalViews > 0 ? Math.round((totalEngagement / totalViews) * 100) : 85;
 
-      // Group analytics by platform
-      const platformAnalytics = analytics.reduce((acc, a) => {
-        const metrics = a.metrics as any;
-        if (!acc[a.platform]) {
-          acc[a.platform] = {
-            platform: a.platform,
-            views: 0,
-            engagement: 0,
-            followers: 0,
-            posts: 0
-          };
-        }
-        acc[a.platform].views += metrics?.views || metrics?.impressions || 0;
-        acc[a.platform].engagement += (metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
-        acc[a.platform].followers += metrics?.followers || metrics?.follower_count || 0;
-        acc[a.platform].posts += 1;
-        return acc;
-      }, {} as any);
+      // Get current platform metrics from latest record
+      const platformAnalytics: any = {};
+      if (latestRecord) {
+        platformAnalytics[latestRecord.platform] = {
+          platform: latestRecord.platform,
+          views: latestMetrics?.views || latestMetrics?.impressions || 0,
+          engagement: latestMetrics?.engagement || latestMetrics?.likes || 0,
+          followers: latestMetrics?.followers || latestMetrics?.follower_count || 0,
+          posts: analytics.filter(a => a.platform === latestRecord.platform).length
+        };
+      }
 
       // Debug logging for analytics calculation
       console.log('[ANALYTICS DEBUG] Analytics data:', analytics.length, 'records');
@@ -619,6 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         totalViews,
         engagement: totalEngagement,
+        totalFollowers,
         newFollowers: totalFollowers,
         contentScore,
         platforms: Object.values(platformAnalytics)

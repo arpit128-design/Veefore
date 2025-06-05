@@ -4,6 +4,7 @@ import { instagramAPI } from "./instagram-api";
 import { videoGeneratorAI } from "./video-generator";
 import { Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -264,8 +265,6 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
 
       // Using Google Gemini for image generation
-      const { GoogleGenerativeAI } = require('@google/generative-ai');
-      
       if (!process.env.GOOGLE_API_KEY) {
         return res.status(500).json({ 
           error: 'Google API key not configured',

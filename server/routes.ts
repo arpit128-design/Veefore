@@ -259,6 +259,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   app.post('/api/content', requireAuth, async (req: any, res: Response) => {
     try {
       const user = req.user;
+      
+      // Handle nested body structure from Express
+      const requestBody = req.body.body ? JSON.parse(req.body.body) : req.body;
+      
       const { 
         workspaceId, 
         title, 
@@ -268,7 +272,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         scheduledAt, 
         contentData,
         publishNow = false
-      } = req.body;
+      } = requestBody;
 
       console.log('[CONTENT API] Request body validation:', { 
         workspaceId: workspaceId, 

@@ -39,6 +39,7 @@ function VideoGenerator() {
   const scriptMutation = useMutation({
     mutationFn: (data: any) => apiRequest('POST', '/api/content/generate-script', data),
     onSuccess: (response: any) => {
+      console.log('[SCRIPT] Response received:', response);
       setGeneratedScript(response.script);
       setStep('script');
       toast({
@@ -47,6 +48,7 @@ function VideoGenerator() {
       });
     },
     onError: (error: any) => {
+      console.error('[SCRIPT] Error:', error);
       toast({
         title: "Script Generation Failed",
         description: error.message || "Failed to generate video script",

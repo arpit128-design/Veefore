@@ -12,10 +12,10 @@ export default function Dashboard() {
 
   // Fetch real analytics data
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['/api/dashboard/analytics', Date.now()], // Force fresh data
+    queryKey: ['/api/dashboard/analytics'],
     enabled: !!user,
-    staleTime: 0, // Always fetch fresh data
-    cacheTime: 0 // Don't cache
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchInterval: 10000 // Refetch every 10 seconds
   });
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
@@ -45,19 +45,15 @@ export default function Dashboard() {
     );
   }
 
-  // Provide default values for analytics with proper typing
-  const analytics: {
-    totalViews: number;
-    engagement: number;
-    newFollowers: number;
-    contentScore: number;
-    platforms: any[];
-  } = analyticsData || {
-    totalViews: 0,
-    engagement: 0,
-    newFollowers: 0,
-    contentScore: 85,
-    platforms: []
+  // Map API response to dashboard data structure
+  console.log('[DASHBOARD DEBUG] Analytics data received:', analyticsData);
+  
+  const analytics = {
+    totalViews: analyticsData?.totalViews || 0,
+    engagement: analyticsData?.engagement || 0,
+    newFollowers: analyticsData?.totalFollowers || 0,
+    contentScore: analyticsData?.contentScore || 85,
+    platforms: analyticsData?.platforms || []
   };
 
   return (

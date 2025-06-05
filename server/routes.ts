@@ -11,17 +11,31 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 
-// Initialize Firebase Admin - simplified for demo
+// Initialize Firebase Admin with service account
 let firebaseAdmin: any = null;
 try {
-  if (!admin.apps.length && process.env.VITE_FIREBASE_PROJECT_ID) {
-    firebaseAdmin = admin.initializeApp({
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    });
-    console.log("Firebase Admin initialized successfully");
+  if (admin.apps.length === 0) {
+    // Try to initialize with service account credentials
+    if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      firebaseAdmin = admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+      });
+      console.log("Firebase Admin initialized with service account");
+    } else if (process.env.VITE_FIREBASE_PROJECT_ID) {
+      // Fallback initialization for development
+      firebaseAdmin = admin.initializeApp({
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+      });
+      console.log("Firebase Admin initialized without service account (development mode)");
+    }
+  } else {
+    firebaseAdmin = admin.apps[0];
+    console.log("Using existing Firebase Admin app");
   }
 } catch (error) {
-  console.warn("Firebase Admin initialization failed, using simplified auth:", error);
+  console.warn("Firebase Admin initialization failed, using token-based auth:", error);
 }
 
 // Initialize Stripe

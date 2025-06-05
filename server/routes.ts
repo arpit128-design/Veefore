@@ -82,7 +82,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const token = authHeader.substring(7);
-    console.log('Received token length:', token.length);
     
     try {
       let firebaseUid;
@@ -93,10 +92,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         // Parse Firebase JWT token payload
         const parts = token.split('.');
-        console.log('Token parts count:', parts.length);
         
         if (parts.length !== 3) {
-          console.error('Invalid JWT format - expected 3 parts, got:', parts.length);
           return res.status(401).json({ error: 'Invalid token format' });
         }
         
@@ -108,18 +105,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           const payload = JSON.parse(atob(payloadPart));
-          console.log('Token payload keys:', Object.keys(payload));
-          
           firebaseUid = payload.user_id || payload.sub || payload.uid;
           
           if (!firebaseUid) {
-            console.error('No user ID found in token payload. Available keys:', Object.keys(payload));
             return res.status(401).json({ error: 'Invalid token payload' });
           }
-          
-          console.log('Extracted Firebase UID:', firebaseUid);
         } catch (parseError) {
-          console.error('Failed to parse token payload:', parseError);
           return res.status(401).json({ error: 'Invalid token format' });
         }
       }
@@ -127,11 +118,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Look up user in database
       const user = await storage.getUserByFirebaseUid(firebaseUid);
       if (!user) {
-        console.error(`User not found for Firebase UID: ${firebaseUid}`);
         return res.status(401).json({ error: 'User not found' });
       }
 
-      console.log('User found:', user.id);
       req.user = user;
       next();
     } catch (error) {

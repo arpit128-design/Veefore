@@ -175,37 +175,23 @@ export class InstagramAPI {
     }
   }
 
-  // Get media insights with Business API - using supported metrics
+  // Get media insights with correct metrics for media type
   async getMediaInsights(mediaId: string, accessToken: string): Promise<any> {
-    try {
-      // Use only supported Business API metrics based on media type
-      const supportedMetrics = 'impressions,reach,likes,comments,shares,saved';
-      
-      console.log(`[INSTAGRAM BUSINESS API] Fetching insights for media: ${mediaId}`);
-      
-      const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
-        params: {
-          metric: supportedMetrics,
-          access_token: accessToken
-        }
-      });
+    // Different metrics available for different media types
+    const metricSets = [
+      'reach,likes,comments,shares,saved', // For images - no impressions
+      'reach,likes,comments', // Minimal for images
+      'likes,comments', // Very basic metrics
+      'reach' // Single metric
+    ];
 
-      // Transform insights data into a more usable format
-      const insights: any = {};
-      response.data.data.forEach((insight: any) => {
-        insights[insight.name] = insight.values[0]?.value || 0;
-      });
-
-      console.log(`[INSTAGRAM BUSINESS API] Media insights for ${mediaId}:`, insights);
-      return insights;
-    } catch (error: any) {
-      console.log(`[INSTAGRAM BUSINESS API] Media insights error for ${mediaId}:`, error.response?.data || error.message);
-      
-      // Try minimal metrics if full set failed
+    for (const metrics of metricSets) {
       try {
+        console.log(`[INSTAGRAM BUSINESS API] Trying media insights for ${mediaId} with: ${metrics}`);
+        
         const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
           params: {
-            metric: 'impressions,reach',
+            metric: metrics,
             access_token: accessToken
           }
         });
@@ -215,56 +201,80 @@ export class InstagramAPI {
           insights[insight.name] = insight.values[0]?.value || 0;
         });
 
-        console.log(`[INSTAGRAM BUSINESS API] Minimal insights for ${mediaId}:`, insights);
+        console.log(`[INSTAGRAM BUSINESS API] Media insights success for ${mediaId}:`, insights);
         return insights;
-      } catch (fallbackError) {
-        console.log(`[INSTAGRAM BUSINESS API] All insights failed for ${mediaId}`);
-        return {};
+      } catch (error: any) {
+        console.log(`[INSTAGRAM BUSINESS API] Metrics '${metrics}' failed for ${mediaId}:`, error.response?.data?.error?.message || error.message);
+        continue;
       }
     }
+
+    console.log(`[INSTAGRAM BUSINESS API] All insights failed for ${mediaId}`);
+    return {};
   }
 
-  // Get account insights
+  // Get account insights using correct Instagram Business API format
   async getAccountInsights(accessToken: string, period = 'day', since?: string, until?: string): Promise<InstagramInsights> {
-    const metrics = 'impressions,reach,profile_views,website_clicks,follower_count';
-    const params: any = {
-      metric: metrics,
-      period,
-      access_token: accessToken
-    };
+    // Try different metric combinations since some may not be available
+    const metricAttempts = [
+      ['impressions', 'reach', 'profile_views'],
+      ['impressions', 'reach'],
+      ['profile_views'],
+      ['reach']
+    ];
 
-    if (since) params.since = since;
-    if (until) params.until = until;
+    for (const metrics of metricAttempts) {
+      try {
+        console.log(`[INSTAGRAM BUSINESS API] Attempting account insights with: ${metrics.join(',')}`);
+        
+        const params: any = {
+          metric: metrics.join(','),
+          period,
+          access_token: accessToken
+        };
 
-    try {
-      const response = await axios.get(`${this.baseUrl}/me/insights`, { params });
+        // Add date range if provided
+        if (since) params.since = since;
+        if (until) params.until = until;
 
-      // Transform insights data
-      const insights: any = {
-        impressions: 0,
-        reach: 0,
-        profile_views: 0,
-        website_clicks: 0,
-        follower_count: 0
-      };
+        const response = await axios.get(`${this.baseUrl}/me/insights`, { params });
+        
+        console.log(`[INSTAGRAM BUSINESS API] Account insights success with ${metrics.join(',')}:`, response.data);
 
-      response.data.data.forEach((insight: any) => {
-        if (insight.values && insight.values.length > 0) {
-          insights[insight.name] = insight.values[insight.values.length - 1]?.value || 0;
+        // Transform insights data
+        const insights: any = {
+          impressions: 0,
+          reach: 0,
+          profile_views: 0,
+          website_clicks: 0,
+          follower_count: 0
+        };
+
+        if (response.data.data) {
+          response.data.data.forEach((insight: any) => {
+            if (insight.values && insight.values.length > 0) {
+              const value = insight.values[insight.values.length - 1]?.value || 0;
+              insights[insight.name] = value;
+              console.log(`[INSTAGRAM BUSINESS API] ${insight.name}: ${value}`);
+            }
+          });
         }
-      });
 
-      return insights;
-    } catch (error) {
-      console.error('Error fetching account insights:', error);
-      return {
-        impressions: 0,
-        reach: 0,
-        profile_views: 0,
-        website_clicks: 0,
-        follower_count: 0
-      };
+        return insights;
+      } catch (error: any) {
+        console.log(`[INSTAGRAM BUSINESS API] Metrics ${metrics.join(',')} failed:`, error.response?.data?.error?.message || error.message);
+        continue;
+      }
     }
+
+    console.log(`[INSTAGRAM BUSINESS API] All account insights attempts failed`);
+    return {
+      impressions: 0,
+      reach: 0,
+      profile_views: 0,
+      website_clicks: 0,
+      follower_count: 0
+    };
   }
 
   // Refresh access token

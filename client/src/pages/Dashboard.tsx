@@ -111,8 +111,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Views"
-          value={analytics.platforms.length > 0 ? formatNumber(analytics.platforms[0].impressions || 0) : "0"}
-          change={{ value: analytics.platforms.length > 0 && analytics.platforms[0].impressions > 0 ? "Active data" : "Limited access", isPositive: analytics.platforms.length > 0 }}
+          value={formatNumber(analytics.totalViews)}
+          change={{ value: analytics.totalViews > 0 ? "Active data" : "Building insights", isPositive: analytics.totalViews >= 0 }}
           icon={<Eye className="text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
         />

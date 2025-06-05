@@ -10,12 +10,15 @@ import { useQuery } from "@tanstack/react-query";
 export default function Dashboard() {
   const { user } = useAuth();
 
-  // Fetch real analytics data
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+  // Fetch real analytics data with better caching
+  const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
     enabled: !!user,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchInterval: 10000 // Refetch every 10 seconds
+    staleTime: 30000, // Data is fresh for 30 seconds
+    gcTime: 300000, // Keep in cache for 5 minutes (TanStack Query v5)
+    refetchInterval: 30000, // Refetch every 30 seconds
+    retry: 2,
+    retryDelay: 1000
   });
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
@@ -34,12 +37,23 @@ export default function Dashboard() {
 
   const formatPercentage = (num: number) => `${num}%`;
 
-  // Show loading state
-  if (analyticsLoading) {
+  // Show loading state only for initial load
+  if (analyticsLoading && !analyticsData) {
     return (
       <div className="space-y-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
+        </div>
+      </div>
+    );
+  }
+  
+  // Use previous data if available while new data loads
+  if (!analyticsData && analyticsLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-asteroid-silver">Loading your Instagram metrics...</div>
         </div>
       </div>
     );

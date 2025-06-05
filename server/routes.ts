@@ -430,6 +430,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cache for Instagram data to serve immediately
+  let cachedInstagramData: any = null;
+  let lastCacheUpdate = 0;
+  const CACHE_DURATION = 30000; // 30 seconds
+
   // Dashboard analytics summary endpoint
   app.get("/api/dashboard/analytics", requireAuth, async (req: any, res) => {
     try {
@@ -454,6 +459,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         defaultWorkspace = workspaces[0];
         analytics = await storage.getAnalytics(defaultWorkspace.id, undefined, 30);
+      }
+
+      // Serve cached data immediately if available and fresh
+      const now = Date.now();
+      if (cachedInstagramData && (now - lastCacheUpdate) < CACHE_DURATION) {
+        res.setHeader('Cache-Control', 'public, max-age=30');
+        return res.json(cachedInstagramData);
       }
       
       // Try to fetch fresh Instagram data if we have connected accounts
@@ -586,15 +598,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentScore
       });
 
-      res.setHeader('Cache-Control', 'no-cache');
-      res.json({
+      // Cache the response data
+      const responseData = {
         totalViews,
         engagement: totalEngagement,
         totalFollowers,
         newFollowers: totalFollowers,
         contentScore,
         platforms: Object.values(platformAnalytics)
-      });
+      };
+      
+      cachedInstagramData = responseData;
+      lastCacheUpdate = now;
+
+      res.setHeader('Cache-Control', 'public, max-age=30');
+      res.json(responseData);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

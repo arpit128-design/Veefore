@@ -29,13 +29,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const firebaseUid = token.split('_')[0];
-      console.log(`[AUTH DEBUG] Looking up user with Firebase UID: ${firebaseUid}`);
+      // Extract Firebase UID from JWT token payload
+      let firebaseUid;
+      try {
+        // Decode JWT token (base64 decode the payload part)
+        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+        firebaseUid = payload.user_id || payload.sub;
+        console.log(`[AUTH DEBUG] Extracted Firebase UID: ${firebaseUid} from JWT token`);
+      } catch (error) {
+        console.log(`[AUTH ERROR] Failed to decode JWT token:`, error);
+        return res.status(401).json({ error: 'Invalid token format' });
+      }
       
-      const user = await storage.getUserByFirebaseUid(firebaseUid);
+      let user = await storage.getUserByFirebaseUid(firebaseUid);
       if (!user) {
-        console.log(`[AUTH ERROR] User not found for Firebase UID: ${firebaseUid}`);
-        return res.status(401).json({ error: 'User not found' });
+        console.log(`[AUTH DEBUG] Creating new user for Firebase UID: ${firebaseUid}`);
+        // Create new user from JWT payload
+        try {
+          const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          user = await storage.createUser({
+            firebaseUid: firebaseUid,
+            email: payload.email,
+            username: payload.email.split('@')[0],
+            displayName: payload.name || null,
+            avatar: payload.picture || null,
+            credits: 50, // Initial credits
+            plan: 'free'
+          });
+          console.log(`[AUTH DEBUG] Created new user: ${user.id} (${user.email})`);
+        } catch (createError) {
+          console.log(`[AUTH ERROR] Failed to create user:`, createError);
+          return res.status(500).json({ error: 'Failed to create user account' });
+        }
       }
 
       console.log(`[AUTH DEBUG] User found: ${user.id} (${user.email})`);

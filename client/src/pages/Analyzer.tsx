@@ -167,6 +167,79 @@ export default function Analyzer() {
         color="text-pink-500"
       />
 
+      {/* YouTube Analytics - Second Section */}
+      <Card className="content-card holographic">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-500">
+            <Play className="h-5 w-5" />
+            YouTube Analytics
+            <RefreshCw className="h-4 w-4 ml-auto cursor-pointer hover:text-red-400" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Subscribers</div>
+              <div className="text-2xl font-bold text-red-500">0</div>
+              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Views</div>
+              <div className="text-2xl font-bold text-red-500">0</div>
+              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Watch Time (hrs)</div>
+              <div className="text-2xl font-bold text-red-500">0</div>
+              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Engagement</div>
+              <div className="text-2xl font-bold text-red-500">0</div>
+              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+            </div>
+          </div>
+          
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
+              <div className="flex items-center gap-2">
+                <ThumbsUp className="h-4 w-4 text-red-400" />
+                <span className="text-sm">Avg. Likes</span>
+              </div>
+              <span className="text-red-400 font-medium">Connect YouTube</span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-red-400" />
+                <span className="text-sm">Comments</span>
+              </div>
+              <span className="text-red-400 font-medium">Connect YouTube</span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
+              <div className="flex items-center gap-2">
+                <Share2 className="h-4 w-4 text-red-400" />
+                <span className="text-sm">Shares</span>
+              </div>
+              <span className="text-red-400 font-medium">Connect YouTube</span>
+            </div>
+          </div>
+          
+          <div className="mt-6 p-4 bg-red-500/10 rounded-lg border border-red-500/30">
+            <div className="text-center">
+              <div className="text-sm text-red-400 mb-2">YouTube API Not Connected</div>
+              <div className="text-xs text-asteroid-silver">
+                Connect your YouTube account to view authentic analytics data including subscribers, views, watch time, and engagement metrics.
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Additional Analytics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Engagement Rate Card */}
@@ -309,78 +382,7 @@ export default function Analyzer() {
         </CardContent>
       </Card>
 
-      {/* YouTube Analytics */}
-      <Card className="content-card holographic">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-500">
-            <Play className="h-5 w-5" />
-            YouTube Analytics
-            <RefreshCw className="h-4 w-4 ml-auto cursor-pointer hover:text-red-400" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Subscribers</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Views</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Watch Time (hrs)</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Engagement</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
-            </div>
-          </div>
-          
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
-              <div className="flex items-center gap-2">
-                <ThumbsUp className="h-4 w-4 text-red-400" />
-                <span className="text-sm">Avg. Likes</span>
-              </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-red-400" />
-                <span className="text-sm">Comments</span>
-              </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
-              <div className="flex items-center gap-2">
-                <Share2 className="h-4 w-4 text-red-400" />
-                <span className="text-sm">Shares</span>
-              </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
-            </div>
-          </div>
-          
-          <div className="mt-6 p-4 bg-red-500/10 rounded-lg border border-red-500/30">
-            <div className="text-center">
-              <div className="text-sm text-red-400 mb-2">YouTube API Not Connected</div>
-              <div className="text-xs text-asteroid-silver">
-                Connect your YouTube account to view authentic analytics data including subscribers, views, watch time, and engagement metrics.
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Trend Analysis */}
       <TrendAnalyzer />

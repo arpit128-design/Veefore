@@ -1,6 +1,7 @@
 import { Express, Request, Response, NextFunction } from "express";
 import { IStorage } from "./storage";
 import { instagramAPI } from "./instagram-api";
+import { videoGeneratorAI } from "./video-generator";
 import { Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 

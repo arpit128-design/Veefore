@@ -160,31 +160,12 @@ export default function Analyzer() {
         </Card>
       </div>
 
-      {/* Platform Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <PlatformAnalytics
-          platform="instagram"
-          icon={<i className="fab fa-instagram" />}
-          color="text-pink-500"
-        />
-        
-        {/* Placeholder for future platform */}
-        <Card className="content-card holographic opacity-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-asteroid-silver">
-              <Eye className="h-5 w-5" />
-              Additional Platform
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <div className="text-sm text-asteroid-silver">
-                Connect more social media platforms to see comprehensive analytics
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Instagram Analytics - Top Section */}
+      <PlatformAnalytics
+        platform="instagram"
+        icon={<i className="fab fa-instagram" />}
+        color="text-pink-500"
+      />
 
       {/* Additional Analytics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

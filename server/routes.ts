@@ -472,6 +472,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           const profile = await profileResponse.json();
           
+          // Check if Instagram account exists for this workspace, if not create it
+          let existingAccount = await storage.getSocialAccountByPlatform(Number(defaultWorkspace.id), 'instagram');
+          if (!existingAccount) {
+            console.log('Creating Instagram social account for workspace:', defaultWorkspace.id);
+            await storage.createSocialAccount({
+              workspaceId: defaultWorkspace.id,
+              platform: "instagram",
+              accountId: profile.id,
+              username: profile.username,
+              accessToken: INSTAGRAM_ACCESS_TOKEN,
+              refreshToken: null,
+              expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // 60 days
+            });
+          }
+          
           // Fetch media insights
           const mediaResponse = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,timestamp,like_count,comments_count,impressions,reach&access_token=${INSTAGRAM_ACCESS_TOKEN}&limit=10`);
           if (!mediaResponse.ok) {

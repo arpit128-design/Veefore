@@ -322,8 +322,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
 
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      // Force HTTPS for Instagram redirect URI (required by Instagram API)
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       const state = `${workspace.id}`;
+      
+      console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
+      console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
       
       const { instagramAPI } = await import('./instagram-api');
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
@@ -340,15 +344,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const { code, state, error } = req.query;
       
       if (error) {
-        return res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=${error}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=${error}`);
       }
       
       if (!code || !state) {
-        return res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=missing_code_or_state`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
       }
 
       const workspaceId = parseInt(state as string);
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       
       const { instagramAPI } = await import('./instagram-api');
       
@@ -386,10 +390,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         });
       }
       
-      res.redirect(`${req.protocol}://${req.get('host')}/integrations?success=instagram_connected`);
+      res.redirect(`https://${req.get('host')}/integrations?success=instagram_connected`);
     } catch (error: any) {
       console.error('[INSTAGRAM CALLBACK] Error:', error);
-      res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=${encodeURIComponent(error.message)}`);
+      res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error.message)}`);
     }
   });
 

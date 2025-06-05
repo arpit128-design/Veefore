@@ -54,14 +54,16 @@ const SocialAccountSchema = new mongoose.Schema({
 
 const ContentSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  type: { type: String, required: true },
   title: { type: String, required: true },
-  content: { type: String, required: true },
-  platform: { type: String, required: true },
+  description: String,
+  contentData: { type: mongoose.Schema.Types.Mixed, default: {} },
+  platform: String,
   status: { type: String, default: 'draft' },
   scheduledAt: Date,
   publishedAt: Date,
-  mediaUrls: [String],
-  hashtags: [String],
+  creditsUsed: { type: Number, default: 0 },
+  prompt: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -315,6 +317,25 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  private convertContent(mongoContent: any): Content {
+    return {
+      id: mongoContent._id.toString(),
+      workspaceId: mongoContent.workspaceId,
+      type: mongoContent.type,
+      title: mongoContent.title,
+      description: mongoContent.description || null,
+      contentData: mongoContent.contentData || null,
+      platform: mongoContent.platform || null,
+      status: mongoContent.status || 'draft',
+      scheduledAt: mongoContent.scheduledAt || null,
+      publishedAt: mongoContent.publishedAt || null,
+      creditsUsed: mongoContent.creditsUsed || null,
+      prompt: mongoContent.prompt || null,
+      createdAt: mongoContent.createdAt,
+      updatedAt: mongoContent.updatedAt
+    };
+  }
+
   private convertSocialAccount(mongoAccount: any): SocialAccount {
     return {
       id: mongoAccount._id.toString(),
@@ -397,11 +418,22 @@ export class MongoStorage implements IStorage {
   }
 
   async getContent(id: number): Promise<Content | undefined> {
-    return undefined;
+    await this.connect();
+    const content = await ContentModel.findById(id);
+    return content ? this.convertContent(content) : undefined;
   }
 
   async getContentByWorkspace(workspaceId: number, limit?: number): Promise<Content[]> {
-    return [];
+    await this.connect();
+    const query = ContentModel.find({ workspaceId: workspaceId.toString() })
+      .sort({ createdAt: -1 });
+    
+    if (limit) {
+      query.limit(limit);
+    }
+    
+    const contents = await query.exec();
+    return contents.map(content => this.convertContent(content));
   }
 
   async getScheduledContent(workspaceId: number): Promise<Content[]> {
@@ -409,7 +441,25 @@ export class MongoStorage implements IStorage {
   }
 
   async createContent(content: InsertContent): Promise<Content> {
-    throw new Error('Not implemented');
+    await this.connect();
+    
+    const contentData = {
+      workspaceId: content.workspaceId.toString(),
+      type: content.type,
+      title: content.title,
+      description: content.description,
+      contentData: content.contentData || {},
+      platform: content.platform,
+      status: 'ready',
+      scheduledAt: content.scheduledAt,
+      creditsUsed: content.creditsUsed || 0,
+      prompt: content.prompt
+    };
+
+    const contentDoc = new ContentModel(contentData);
+    const saved = await contentDoc.save();
+    
+    return this.convertContent(saved);
   }
 
   async updateContent(id: number, updates: Partial<Content>): Promise<Content> {

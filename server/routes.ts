@@ -572,7 +572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const totalEngagement = analytics.reduce((sum, a) => {
         const metrics = a.metrics as any;
-        return sum + (metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
+        return sum + (metrics?.engagement || metrics?.likes || 0) + (metrics?.comments || 0) + (metrics?.shares || 0);
       }, 0);
       
       const totalFollowers = analytics.reduce((sum, a) => {
@@ -604,6 +604,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Debug logging for analytics calculation
       console.log('[ANALYTICS DEBUG] Analytics data:', analytics.length, 'records');
+      if (analytics.length > 0) {
+        console.log('[ANALYTICS DEBUG] Sample record metrics:', JSON.stringify(analytics[0].metrics, null, 2));
+        console.log('[ANALYTICS DEBUG] Last 3 records metrics:', analytics.slice(-3).map(a => a.metrics));
+      }
       console.log('[ANALYTICS DEBUG] Calculated totals:', {
         totalViews,
         totalEngagement,

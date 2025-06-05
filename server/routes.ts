@@ -312,6 +312,169 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Instagram API routes
+  app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      const state = `${workspace.id}`;
+      
+      const { instagramAPI } = await import('./instagram-api');
+      const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
+      
+      res.json({ authUrl });
+    } catch (error: any) {
+      console.error('[INSTAGRAM AUTH] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/instagram/callback', async (req: Request, res: Response) => {
+    try {
+      const { code, state, error } = req.query;
+      
+      if (error) {
+        return res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=${error}`);
+      }
+      
+      if (!code || !state) {
+        return res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=missing_code_or_state`);
+      }
+
+      const workspaceId = parseInt(state as string);
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      
+      const { instagramAPI } = await import('./instagram-api');
+      
+      // Exchange code for token
+      const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
+      
+      // Get long-lived token
+      const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);
+      
+      // Get user profile
+      const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
+      
+      // Save to database
+      const existingAccount = await storage.getSocialAccountByPlatform(workspaceId, 'instagram');
+      
+      if (existingAccount) {
+        await storage.updateSocialAccount(existingAccount.id, {
+          accessToken: longLivedToken.access_token,
+          refreshToken: null,
+          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
+          accountId: profile.id,
+          username: profile.username,
+          metadata: { profile }
+        });
+      } else {
+        await storage.createSocialAccount({
+          workspaceId,
+          platform: 'instagram',
+          accountId: profile.id,
+          username: profile.username,
+          accessToken: longLivedToken.access_token,
+          refreshToken: null,
+          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
+          metadata: { profile }
+        });
+      }
+      
+      res.redirect(`${req.protocol}://${req.get('host')}/integrations?success=instagram_connected`);
+    } catch (error: any) {
+      console.error('[INSTAGRAM CALLBACK] Error:', error);
+      res.redirect(`${req.protocol}://${req.get('host')}/integrations?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
+  // Get social accounts
+  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.json([]);
+      }
+      
+      const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      res.json(accounts);
+    } catch (error: any) {
+      console.error('[SOCIAL ACCOUNTS] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Disconnect social account
+  app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const accountId = parseInt(req.params.id);
+      await storage.deleteSocialAccount(accountId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[DISCONNECT ACCOUNT] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Dashboard analytics
+  app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'instagram' });
+      }
+      
+      const analytics = await storage.getAnalytics(workspace.id, undefined, 30);
+      
+      // Calculate metrics
+      const totalPosts = analytics.length;
+      const totalReach = analytics.reduce((sum, a: any) => sum + (a.metrics?.reach || 0), 0);
+      const totalEngagement = analytics.reduce((sum, a: any) => sum + (a.metrics?.engagement || 0), 0);
+      const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
+      
+      // Find top platform
+      const platformCounts = analytics.reduce((acc: any, a: any) => {
+        acc[a.platform] = (acc[a.platform] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const topPlatform = Object.keys(platformCounts).length > 0 
+        ? Object.keys(platformCounts).reduce((a, b) => platformCounts[a] > platformCounts[b] ? a : b)
+        : 'instagram';
+      
+      res.json({
+        totalPosts,
+        totalReach,
+        engagementRate: Math.round(engagementRate * 100) / 100,
+        topPlatform
+      });
+    } catch (error: any) {
+      console.error('[DASHBOARD ANALYTICS] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get workspaces
+  app.get('/api/workspaces', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      res.json(workspaces);
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const http = await import('http');
   return http.createServer(app);
 }

@@ -234,7 +234,7 @@ export class MongoStorage implements IStorage {
     return workspaces.map(this.convertWorkspace);
   }
 
-  async getDefaultWorkspace(userId: number): Promise<Workspace | undefined> {
+  async getDefaultWorkspace(userId: number | string): Promise<Workspace | undefined> {
     await this.connect();
     const workspace = await WorkspaceModel.findOne({ userId, isDefault: true });
     return workspace ? this.convertWorkspace(workspace) : undefined;

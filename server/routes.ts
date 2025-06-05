@@ -311,6 +311,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             // Direct Instagram publishing instead of internal API call
             const workspace = await storage.getDefaultWorkspace(user.id);
             console.log('[INSTAGRAM DEBUG] Workspace found:', workspace?.id);
+            console.log('[INSTAGRAM DEBUG] User ID:', user.id, typeof user.id);
             
             if (workspace) {
               const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
@@ -949,6 +950,35 @@ Hashtags: [relevant hashtags separated by spaces]`
         success: false, 
         error: 'Failed to connect Instagram account: ' + error.message 
       });
+    }
+  });
+
+  // Debug endpoint to check social accounts
+  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.json({ accounts: [], message: 'No workspace found' });
+      }
+      
+      const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      
+      res.json({
+        accounts: accounts.map(acc => ({
+          id: acc.id,
+          platform: acc.platform,
+          username: acc.username,
+          hasAccessToken: !!acc.accessToken,
+          accountId: acc.accountId,
+          isActive: acc.isActive
+        })),
+        workspaceId: workspace.id
+      });
+    } catch (error) {
+      console.error('[SOCIAL ACCOUNTS] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch social accounts' });
     }
   });
 

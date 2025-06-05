@@ -448,11 +448,13 @@ export class MongoStorage implements IStorage {
 
   async createAnalytics(analytics: InsertAnalytics): Promise<Analytics> {
     await this.connect();
+    console.log('[STORAGE DEBUG] Creating analytics with data:', JSON.stringify(analytics, null, 2));
     const analyticsDoc = new AnalyticsModel({
       ...analytics,
       createdAt: new Date()
     });
     await analyticsDoc.save();
+    console.log('[STORAGE DEBUG] Saved analytics doc metrics:', JSON.stringify(analyticsDoc.metrics, null, 2));
     return this.convertAnalytics(analyticsDoc);
   }
 

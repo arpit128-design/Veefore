@@ -448,18 +448,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const totalImpressions = mediaData.data?.reduce((sum: number, post: any) => sum + (post.impressions || 0), 0) || 0;
           const totalReach = mediaData.data?.reduce((sum: number, post: any) => sum + (post.reach || 0), 0) || 0;
           
-          // Store fresh analytics data
+          // Store fresh analytics data with correct schema format
           await storage.createAnalytics({
             workspaceId: defaultWorkspace.id,
             platform: 'instagram',
-            date: new Date(),
-            views: totalImpressions,
-            likes: totalLikes,
-            comments: totalComments,
-            shares: 0,
-            followers: profile.followers_count || 0,
-            engagement: totalLikes + totalComments,
-            reach: totalReach
+            metrics: {
+              views: totalImpressions,
+              likes: totalLikes,
+              comments: totalComments,
+              shares: 0,
+              followers: profile.followers_count || 0,
+              engagement: totalLikes + totalComments,
+              reach: totalReach,
+              impressions: totalImpressions
+            },
+            date: new Date()
           });
           
           console.log('Successfully fetched and stored Instagram analytics:', {

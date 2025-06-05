@@ -169,6 +169,11 @@ export default function Dashboard() {
               </div>
               
               <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Total Likes</span>
+                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.likes || analytics.engagement || 0}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Reach (7d)</span>
                 <span className="text-xl font-bold text-white">{analytics.platforms[0]?.reach || 0}</span>
               </div>

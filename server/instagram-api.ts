@@ -175,18 +175,17 @@ export class InstagramAPI {
     }
   }
 
-  // Get media insights with Business API
+  // Get media insights with Business API - using supported metrics
   async getMediaInsights(mediaId: string, accessToken: string): Promise<any> {
     try {
-      // For video content, include video-specific metrics
-      const videoMetrics = 'video_views,reach,impressions,likes,comments,shares,saves';
-      const photoMetrics = 'reach,impressions,likes,comments,shares,saves';
+      // Use only supported Business API metrics based on media type
+      const supportedMetrics = 'impressions,reach,likes,comments,shares,saved';
       
       console.log(`[INSTAGRAM BUSINESS API] Fetching insights for media: ${mediaId}`);
       
       const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
         params: {
-          metric: videoMetrics, // Try video metrics first, fallback if needed
+          metric: supportedMetrics,
           access_token: accessToken
         }
       });
@@ -202,11 +201,11 @@ export class InstagramAPI {
     } catch (error: any) {
       console.log(`[INSTAGRAM BUSINESS API] Media insights error for ${mediaId}:`, error.response?.data || error.message);
       
-      // Try photo metrics if video metrics failed
+      // Try minimal metrics if full set failed
       try {
         const response = await axios.get(`${this.baseUrl}/${mediaId}/insights`, {
           params: {
-            metric: 'reach,impressions,likes,comments,shares,saves',
+            metric: 'impressions,reach',
             access_token: accessToken
           }
         });
@@ -216,9 +215,10 @@ export class InstagramAPI {
           insights[insight.name] = insight.values[0]?.value || 0;
         });
 
+        console.log(`[INSTAGRAM BUSINESS API] Minimal insights for ${mediaId}:`, insights);
         return insights;
       } catch (fallbackError) {
-        console.log(`[INSTAGRAM BUSINESS API] Fallback insights also failed for ${mediaId}`);
+        console.log(`[INSTAGRAM BUSINESS API] All insights failed for ${mediaId}`);
         return {};
       }
     }

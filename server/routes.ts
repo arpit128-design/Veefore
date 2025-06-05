@@ -98,28 +98,44 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           const userProfile = await instagramAPI.getUserProfile(INSTAGRAM_ACCESS_TOKEN);
           const userMedia = await instagramAPI.getUserMedia(INSTAGRAM_ACCESS_TOKEN, 25);
           
+          // Calculate comprehensive metrics from Business API
+          const totalViews = userMedia.reduce((sum, media) => sum + (media.views || 0), 0);
+          const totalImpressions = userMedia.reduce((sum, media) => sum + (media.impressions || 0), 0);
+          const totalReach = userMedia.reduce((sum, media) => sum + (media.reach || 0), 0);
           const totalEngagement = userMedia.reduce((sum, media) => {
             const likes = media.like_count || 0;
             const comments = media.comments_count || 0;
-            return sum + likes + comments;
+            const engagement = media.engagement || 0;
+            return sum + Math.max(likes + comments, engagement);
           }, 0);
           
+          // Fetch account-level insights for additional metrics
+          let accountInsights = null;
+          try {
+            accountInsights = await instagramAPI.getAccountInsights(INSTAGRAM_ACCESS_TOKEN, 'day');
+            console.log(`[INSTAGRAM BUSINESS API] Account insights:`, accountInsights);
+          } catch (insightsError) {
+            console.log(`[INSTAGRAM BUSINESS API] Account insights not available:`, insightsError);
+          }
+          
           const liveData = {
-            totalViews: 0,
+            totalViews: totalViews || (accountInsights?.impressions || 0),
             engagement: totalEngagement,
             totalFollowers: userProfile.followers_count,
             newFollowers: userProfile.followers_count,
             contentScore: 85,
             platforms: [{
               platform: 'instagram',
-              views: 0,
+              views: totalViews,
               engagement: totalEngagement,
               followers: userProfile.followers_count,
-              posts: userMedia.length
+              posts: userMedia.length,
+              impressions: totalImpressions,
+              reach: totalReach
             }]
           };
           
-          console.log(`[LIVE UPDATE] Current Instagram: ${userProfile.followers_count} followers, ${totalEngagement} engagement`);
+          console.log(`[INSTAGRAM BUSINESS API] Analytics: ${userProfile.followers_count} followers, ${totalEngagement} engagement, ${totalViews} views, ${totalImpressions} impressions`);
           
           await storage.createAnalytics({
             workspaceId: defaultWorkspace.id,
@@ -130,11 +146,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               follower_count: userProfile.followers_count,
               engagement: totalEngagement,
               likes: totalEngagement,
-              views: 0,
-              impressions: 0,
+              views: totalViews,
+              impressions: totalImpressions,
               comments: 0,
               shares: 0,
-              reach: 0
+              reach: totalReach
             }
           });
           

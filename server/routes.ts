@@ -703,8 +703,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect('/dashboard?error=invalid_workspace');
       }
 
-      // Force HTTPS for redirect URI
-      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      // Use consistent redirect URI (same logic as auth endpoint)
+      const host = req.get('host');
+      const protocol = host?.includes('localhost') ? 'http' : 'https';
+      const redirectUri = `${protocol}://${host}/api/instagram/callback`;
       console.log(`[INSTAGRAM CALLBACK] Processing callback with workspace ID: ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
@@ -892,11 +894,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         defaultWorkspace = workspaces[0];
       }
       
-      // Force HTTPS for Instagram OAuth redirect URI
-      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      // Use consistent redirect URI for Instagram OAuth
+      const host = req.get('host');
+      const protocol = host?.includes('localhost') ? 'http' : 'https';
+      const redirectUri = `${protocol}://${host}/api/instagram/callback`;
+      
       console.log(`[INSTAGRAM AUTH] Generated redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] Request protocol: ${req.protocol}`);
-      console.log(`[INSTAGRAM AUTH] Request host: ${req.get('host')}`);
+      console.log(`[INSTAGRAM AUTH] Request host: ${host}`);
+      console.log(`[INSTAGRAM AUTH] Workspace ID: ${defaultWorkspace.id}`);
       
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, defaultWorkspace.id.toString());
       console.log(`[INSTAGRAM AUTH] Generated auth URL: ${authUrl}`);

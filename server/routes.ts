@@ -825,7 +825,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         defaultWorkspace = workspaces[0];
       }
       
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/instagram/callback`;
+      // Force HTTPS for Instagram OAuth redirect URI
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       console.log(`[INSTAGRAM AUTH] Generated redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] Request protocol: ${req.protocol}`);
       console.log(`[INSTAGRAM AUTH] Request host: ${req.get('host')}`);

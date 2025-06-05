@@ -1,0 +1,230 @@
+import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  firebaseUid: text("firebase_uid").notNull().unique(),
+  email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
+  displayName: text("display_name"),
+  avatar: text("avatar"),
+  credits: integer("credits").default(50),
+  plan: text("plan").default("free"), // free, pro, agency, enterprise
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  referralCode: text("referral_code").unique(),
+  referredBy: text("referred_by"),
+  totalReferrals: integer("total_referrals").default(0),
+  totalEarned: integer("total_earned").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const workspaces = pgTable("workspaces", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  avatar: text("avatar"),
+  theme: text("theme").default("default"),
+  aiPersonality: text("ai_personality"),
+  credits: integer("credits").default(0),
+  isDefault: boolean("is_default").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const socialAccounts = pgTable("social_accounts", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  platform: text("platform").notNull(), // instagram, twitter, youtube, tiktok
+  accountId: text("account_id").notNull(),
+  username: text("username").notNull(),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token"),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const content = pgTable("content", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  type: text("type").notNull(), // video, reel, post, caption, thumbnail
+  title: text("title").notNull(),
+  description: text("description"),
+  contentData: json("content_data"), // Generated content, URLs, etc.
+  prompt: text("prompt"),
+  platform: text("platform"),
+  status: text("status").default("draft"), // draft, ready, published, scheduled
+  creditsUsed: integer("credits_used").default(0),
+  scheduledAt: timestamp("scheduled_at"),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const analytics = pgTable("analytics", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  contentId: integer("content_id").references(() => content.id),
+  platform: text("platform").notNull(),
+  postId: text("post_id"),
+  metrics: json("metrics"), // views, likes, comments, shares, etc.
+  date: timestamp("date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const automationRules = pgTable("automation_rules", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  trigger: json("trigger"), // Trigger conditions
+  action: json("action"), // Action to perform
+  isActive: boolean("is_active").default(true),
+  lastRun: timestamp("last_run"),
+  nextRun: timestamp("next_run"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const suggestions = pgTable("suggestions", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  type: text("type").notNull(), // trending, audio, hashtag, content
+  data: json("data"), // Suggestion content
+  confidence: integer("confidence").default(0), // 0-100
+  isUsed: boolean("is_used").default(false),
+  validUntil: timestamp("valid_until"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const creditTransactions = pgTable("credit_transactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id),
+  type: text("type").notNull(), // purchase, earned, used, refund
+  amount: integer("amount").notNull(),
+  description: text("description"),
+  referenceId: text("reference_id"), // Stripe payment intent, content ID, etc.
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referrerId: integer("referrer_id").references(() => users.id).notNull(),
+  referredId: integer("referred_id").references(() => users.id).notNull(),
+  status: text("status").default("pending"), // pending, confirmed, rewarded
+  rewardAmount: integer("reward_amount").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  confirmedAt: timestamp("confirmed_at")
+});
+
+// Insert schemas
+export const insertUserSchema = createInsertSchema(users).pick({
+  firebaseUid: true,
+  email: true,
+  username: true,
+  displayName: true,
+  avatar: true,
+  referredBy: true
+});
+
+export const insertWorkspaceSchema = createInsertSchema(workspaces).pick({
+  userId: true,
+  name: true,
+  description: true,
+  avatar: true,
+  theme: true,
+  aiPersonality: true,
+  isDefault: true
+});
+
+export const insertSocialAccountSchema = createInsertSchema(socialAccounts).pick({
+  workspaceId: true,
+  platform: true,
+  accountId: true,
+  username: true,
+  accessToken: true,
+  refreshToken: true,
+  expiresAt: true
+});
+
+export const insertContentSchema = createInsertSchema(content).pick({
+  workspaceId: true,
+  type: true,
+  title: true,
+  description: true,
+  contentData: true,
+  prompt: true,
+  platform: true,
+  creditsUsed: true,
+  scheduledAt: true
+});
+
+export const insertAutomationRuleSchema = createInsertSchema(automationRules).pick({
+  workspaceId: true,
+  name: true,
+  description: true,
+  trigger: true,
+  action: true,
+  isActive: true,
+  nextRun: true
+});
+
+export const insertAnalyticsSchema = createInsertSchema(analytics).pick({
+  workspaceId: true,
+  contentId: true,
+  platform: true,
+  postId: true,
+  metrics: true,
+  date: true
+});
+
+export const insertSuggestionSchema = createInsertSchema(suggestions).pick({
+  workspaceId: true,
+  type: true,
+  data: true,
+  confidence: true,
+  validUntil: true
+});
+
+export const insertCreditTransactionSchema = createInsertSchema(creditTransactions).pick({
+  userId: true,
+  workspaceId: true,
+  type: true,
+  amount: true,
+  description: true,
+  referenceId: true
+});
+
+export const insertReferralSchema = createInsertSchema(referrals).pick({
+  referrerId: true,
+  referredId: true,
+  rewardAmount: true
+});
+
+// Select types
+export type User = typeof users.$inferSelect;
+export type Workspace = typeof workspaces.$inferSelect;
+export type SocialAccount = typeof socialAccounts.$inferSelect;
+export type Content = typeof content.$inferSelect;
+export type Analytics = typeof analytics.$inferSelect;
+export type AutomationRule = typeof automationRules.$inferSelect;
+export type Suggestion = typeof suggestions.$inferSelect;
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type Referral = typeof referrals.$inferSelect;
+
+// Insert types
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
+export type InsertSocialAccount = z.infer<typeof insertSocialAccountSchema>;
+export type InsertContent = z.infer<typeof insertContentSchema>;
+export type InsertAutomationRule = z.infer<typeof insertAutomationRuleSchema>;
+export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+export type InsertSuggestion = z.infer<typeof insertSuggestionSchema>;
+export type InsertCreditTransaction = z.infer<typeof insertCreditTransactionSchema>;
+export type InsertReferral = z.infer<typeof insertReferralSchema>;

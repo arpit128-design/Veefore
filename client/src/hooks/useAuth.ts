@@ -43,6 +43,7 @@ export function useAuth() {
           // Get Firebase ID token
           const idToken = await firebaseUser.getIdToken();
           setToken(idToken);
+          localStorage.setItem('veefore_auth_token', idToken);
           
           // Check if user exists in our database
           try {

@@ -281,14 +281,14 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         workspaceId: parseInt(workspaceId),
         type: 'video',
         title: result.script.title,
-        content: JSON.stringify({
-          description,
+        description: description,
+        contentData: {
           script: result.script,
           video: result.video
-        }),
+        },
         platform,
         status: 'ready',
-        scheduledFor: null
+        scheduledAt: null
       });
 
       console.log('[VIDEO API] Video generated successfully:', content.id);

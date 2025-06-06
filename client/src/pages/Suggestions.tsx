@@ -33,9 +33,14 @@ export default function Suggestions() {
   const suggestions = Array.isArray(suggestionsResponse) ? suggestionsResponse : [];
 
   const generateSuggestionsMutation = useMutation({
-    mutationFn: () => apiRequest('POST', '/api/suggestions/generate', {
-      workspaceId: currentWorkspace?.id
-    }),
+    mutationFn: () => {
+      if (!currentWorkspace?.id) {
+        throw new Error('No workspace selected');
+      }
+      return apiRequest('POST', '/api/suggestions/generate', {
+        workspaceId: currentWorkspace.id
+      });
+    },
     onSuccess: () => {
       toast({
         title: "AI Suggestions Generated!",
@@ -89,7 +94,7 @@ export default function Suggestions() {
           </div>
           <Button
             onClick={() => generateSuggestionsMutation.mutate()}
-            disabled={generateSuggestionsMutation.isPending}
+            disabled={generateSuggestionsMutation.isPending || !currentWorkspace?.id}
             className="bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90 w-full sm:w-auto"
           >
             {generateSuggestionsMutation.isPending ? (

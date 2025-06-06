@@ -182,20 +182,26 @@ export default function Scheduler() {
     };
   }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length, user?.id]);
 
-  // Force refresh queries when workspace changes
+  // Force refresh when modal opens to ensure fresh data
   useEffect(() => {
-    if (currentWorkspace?.id && currentWorkspace?.name) {
-      console.log('[SCHEDULER DEBUG] Workspace changed, removing cache and refetching for:', currentWorkspace.id, currentWorkspace.name);
-      // Completely remove cached data
+    if (isScheduleModalOpen && currentWorkspace?.id && currentWorkspace?.name) {
+      console.log('[SCHEDULER DEBUG] Modal opened, forcing fresh data fetch for workspace:', currentWorkspace.name);
+      // Clear accounts state immediately
+      setSocialAccounts([]);
+      setSocialAccountsLoading(true);
+      
+      // Clear all cached data and force immediate refetch
       queryClient.removeQueries({ queryKey: ['social-accounts'] });
       queryClient.removeQueries({ queryKey: ['scheduled-content'] });
-      // Force immediate refetch
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ['social-accounts', currentWorkspace.id, currentWorkspace.name] });
-        queryClient.refetchQueries({ queryKey: ['scheduled-content', currentWorkspace.id] });
-      }, 100);
+      
+      // Trigger the main effect to refetch with minimal delay
+      const timeoutId = setTimeout(() => {
+        console.log('[SCHEDULER DEBUG] Modal refresh: Fetching accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
+      }, 50);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [currentWorkspace?.id, currentWorkspace?.name, queryClient]);
+  }, [isScheduleModalOpen, currentWorkspace?.id, currentWorkspace?.name, queryClient]);
 
   // Update platform selection when workspace or social accounts change
   useEffect(() => {

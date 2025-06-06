@@ -44,34 +44,15 @@ export default function Dashboard() {
 
   const formatPercentage = (num: number) => `${num}%`;
 
-  // Show loading spinner only on true initial load
+  // Show loading spinner only on initial load without any data
   if (analyticsLoading && !analyticsData) {
     return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render dashboard if we don't have data yet
-  if (!analyticsData) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full" />
-        </div>
-      </div>
-    );
-  }
-  
-  // Use previous data if available while new data loads
-  if (!analyticsData && analyticsLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-asteroid-silver">Loading your Instagram metrics...</div>
+      <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden">
+        <div className="flex items-center justify-center min-h-[300px] md:min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="text-asteroid-silver text-sm">Loading your Instagram metrics...</div>
+          </div>
         </div>
       </div>
     );

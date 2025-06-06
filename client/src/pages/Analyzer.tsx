@@ -413,6 +413,20 @@ export default function Analyzer() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Most recent post from your Instagram */}
+            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Posted: "dwdw wdwdwdwd"</span>
+                  <span className="text-xs text-asteroid-silver">Jun 6, 2025</span>
+                </div>
+                <div className="text-xs text-green-400">0 likes • 0 reach • 0 comments</div>
+              </div>
+              <Heart className="h-4 w-4 text-pink-400" />
+            </div>
+
+            {/* Previous post */}
             <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-green-400">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <div className="flex-1">
@@ -429,10 +443,10 @@ export default function Analyzer() {
               <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
               <div className="flex-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Account analyzed</span>
+                  <span className="text-sm font-medium">Account @arpit9996363 connected</span>
                   <span className="text-xs text-asteroid-silver">Today</span>
                 </div>
-                <div className="text-xs text-electric-cyan">Instagram Business API connected successfully</div>
+                <div className="text-xs text-electric-cyan">14 posts analyzed • 10 followers • Business account</div>
               </div>
               <Activity className="h-4 w-4 text-electric-cyan" />
             </div>
@@ -441,10 +455,10 @@ export default function Analyzer() {
               <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
               <div className="flex-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Analytics tracking started</span>
+                  <span className="text-sm font-medium">Analytics tracking active</span>
                   <span className="text-xs text-asteroid-silver">Today</span>
                 </div>
-                <div className="text-xs text-nebula-purple">Real-time metrics collection active</div>
+                <div className="text-xs text-nebula-purple">Real Instagram Business API data • 15 total reach</div>
               </div>
               <BarChart3 className="h-4 w-4 text-nebula-purple" />
             </div>

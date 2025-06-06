@@ -57,11 +57,23 @@ export default function Workspaces() {
       setNewWorkspace({ name: "", description: "", theme: "default" });
     },
     onError: (error: any) => {
-      toast({
-        title: "Creation Failed",
-        description: error.message || "Failed to create workspace",
-        variant: "destructive",
-      });
+      console.log('Workspace creation error:', error);
+      
+      // Handle plan restriction errors
+      if (error?.response?.status === 403) {
+        const errorData = error.response.data;
+        toast({
+          title: "Plan Limit Reached",
+          description: errorData.upgradeMessage || errorData.error || "You've reached your workspace limit for your current plan",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Creation Failed",
+          description: error.message || "Failed to create workspace",
+          variant: "destructive",
+        });
+      }
     }
   });
 

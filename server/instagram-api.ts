@@ -626,7 +626,7 @@ export class InstagramAPI {
                   console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
                   
                   const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
-                  return await this.publishVideo(accessToken, compressedUrl, caption, true);
+                  return await this.publishVideoWithCompression(accessToken, compressedUrl, caption, true);
                 }
               } catch (compressionError: any) {
                 console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);

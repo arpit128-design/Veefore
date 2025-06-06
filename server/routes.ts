@@ -571,8 +571,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           } else {
             console.error(`[POST NOW] Unsupported platform: ${content.platform}`);
             await storage.updateContent(id, { 
-              status: 'failed',
-              errorMessage: `Unsupported platform: ${content.platform}`
+              status: 'failed'
             });
           }
           

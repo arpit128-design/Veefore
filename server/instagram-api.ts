@@ -411,10 +411,47 @@ export class InstagramAPI {
       console.log(`[INSTAGRAM PUBLISH] Reel published successfully:`, publishResponse.data);
       return publishResponse.data;
     } catch (error: any) {
-      console.error(`[INSTAGRAM PUBLISH] Reel publish failed, trying regular video:`, error.response?.data || error.message);
+      console.error(`[INSTAGRAM PUBLISH] Reel publish failed:`, error.response?.data || error.message);
+      
+      // Check if this is a video processing failure that could be resolved with compression
+      const isProcessingError = error.response?.data?.error?.message?.includes('processing failed') ||
+                               error.response?.data?.error?.message?.includes('Media ID is not available') ||
+                               error.response?.data?.error?.message?.includes('video could not be processed');
+      
+      if (isProcessingError && !isRetryWithCompression) {
+        console.log(`[INSTAGRAM PUBLISH] Detected video processing failure - attempting intelligent compression`);
+        
+        // Check if this is a local file we can compress
+        const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+        if (isLocalFile) {
+          const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+          
+          if (fs.existsSync(localPath)) {
+            console.log(`[INSTAGRAM PUBLISH] Activating intelligent video compression for reel`);
+            
+            try {
+              const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                quality: 'high',
+                targetSizeMB: 45,
+                maintainAspectRatio: true
+              });
+              
+              if (compressionResult.success && compressionResult.outputPath) {
+                console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                
+                const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                return this.publishReel(accessToken, compressedUrl, caption, true);
+              }
+            } catch (compressionError: any) {
+              console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);
+            }
+          }
+        }
+      }
+      
       // Fall back to regular video post if Reels fail
       try {
-        return await this.publishVideo(accessToken, videoUrl, caption);
+        return await this.publishVideo(accessToken, videoUrl, caption, isRetryWithCompression);
       } catch (fallbackError: any) {
         throw new Error(`Instagram publish failed: ${error.response?.data?.error?.message || error.message}`);
       }
@@ -548,8 +585,8 @@ export class InstagramAPI {
       const maxAttempts = 120; // 10 minutes for large video files (54MB+)
 
       while (!containerReady && attempts < maxAttempts) {
-        // Progressive wait times: 3s for first 20 attempts, then 5s
-        const waitTime = attempts < 20 ? 3000 : 5000;
+        // Much longer wait times to avoid rate limiting: 30s initially, then 60s
+        const waitTime = attempts < 5 ? 30000 : 60000;
         await new Promise(resolve => setTimeout(resolve, waitTime));
         
         try {
@@ -570,11 +607,10 @@ export class InstagramAPI {
         } catch (statusError: any) {
           console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);
           
-          // Handle rate limiting with exponential backoff
+          // Handle rate limiting - STOP making calls when rate limited
           if (statusError.response?.data?.error?.code === 4 && statusError.response?.data?.error?.error_subcode === 1349210) {
-            console.log(`[INSTAGRAM PUBLISH] Rate limit detected, waiting before retry...`);
-            await new Promise(resolve => setTimeout(resolve, Math.min(30000, 5000 * Math.pow(2, Math.floor(attempts / 10)))));
-            continue; // Skip to next iteration
+            console.log(`[INSTAGRAM PUBLISH] Rate limit hit - stopping API calls to prevent further rate limit exhaustion`);
+            throw new Error('Instagram API rate limit exceeded. Please wait 60 minutes before attempting to publish again. The issue is resolved by reducing API call frequency in the codebase.');
           }
           
           // Detect Instagram file processing failures and trigger intelligent compression

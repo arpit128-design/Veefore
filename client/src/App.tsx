@@ -32,9 +32,9 @@ function AuthenticatedApp() {
       <div className="min-h-screen bg-space-navy text-white overflow-x-hidden">
         <SpaceBackground />
         <Header />
-        <div className="flex pt-16 md:pt-20 min-h-screen pb-16 md:pb-0">
+        <div className="flex pt-16 md:pt-20 min-h-screen pb-20 md:pb-0">
           <Sidebar />
-          <main className="flex-1 ml-0 md:ml-64 p-4 md:p-8 relative z-10 transition-all duration-300">
+          <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
               <Route path="/dashboard" component={Dashboard} />

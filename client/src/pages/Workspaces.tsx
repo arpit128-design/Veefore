@@ -69,7 +69,14 @@ export default function Workspaces() {
   });
 
   const createWorkspaceMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/workspaces', data),
+    mutationFn: async (data: any) => {
+      try {
+        return await apiRequest('POST', '/api/workspaces', data);
+      } catch (error: any) {
+        // Re-throw with proper error data for handling in onError
+        throw error;
+      }
+    },
     onSuccess: () => {
       toast({
         title: "Workspace Created!",
@@ -79,7 +86,7 @@ export default function Workspaces() {
       setIsCreateOpen(false);
       setNewWorkspace({ name: "", description: "", theme: "default" });
     },
-    onError: (error: any) => {
+    onError: async (error: any) => {
       console.log('Workspace creation error:', error);
       
       // Handle plan restriction errors with upgrade modal
@@ -95,19 +102,25 @@ export default function Workspaces() {
           if (statusIndex !== -1) {
             const jsonStr = error.message.substring(statusIndex + 4).trim();
             errorData = JSON.parse(jsonStr);
+            console.log('Parsed error data:', errorData);
           }
         } catch (e) {
-          console.log('Could not parse error data:', e);
+          console.log('Could not parse error data, trying alternative method:', e);
+          // If parsing fails, show upgrade modal anyway for 403 errors
+          errorData = {
+            upgradeMessage: "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
+            currentPlan: user?.plan || 'Free'
+          };
         }
         
         setUpgradeModal({
           isOpen: true,
           feature: 'workspace_creation',
-          currentPlan: user?.plan || 'Free',
+          currentPlan: errorData.currentPlan || user?.plan || 'Free',
           upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
           limitReached: {
-            current: workspaces?.length || 0,
-            max: user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10,
+            current: errorData.currentWorkspaces || workspaces?.length || 0,
+            max: errorData.maxWorkspaces || (user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10),
             type: 'workspaces'
           }
         });

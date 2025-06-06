@@ -47,11 +47,28 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  const platformData = analytics?.platforms?.find((p: any) => p.platform === platform) || {};
-  
+  // Map Instagram data directly from analytics response
   const getMetricValue = (key: string, fallback: string = '0') => {
-    const value = platformData[key] || analytics?.[key] || 0;
-    return value.toString();
+    if (!analytics) return fallback;
+    
+    switch (key) {
+      case 'followers':
+        return (analytics.followers || 0).toString();
+      case 'engagement':
+        return (analytics.engagementRate || 0).toString();
+      case 'reach':
+        return (analytics.totalReach || 0).toString();
+      case 'impressions':
+        return (analytics.impressions || 0).toString();
+      case 'totalLikes':
+        return (analytics.totalLikes || 0).toString();
+      case 'totalComments':
+        return (analytics.totalComments || 0).toString();
+      case 'totalPosts':
+        return (analytics.totalPosts || 0).toString();
+      default:
+        return fallback;
+    }
   };
 
   return (
@@ -96,23 +113,23 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-pink-500/20">
             <div className="flex items-center gap-2">
-              <span className="text-sm">Avg. Likes</span>
+              <span className="text-sm">Total Likes</span>
             </div>
-            <span className="text-pink-400 font-medium">{getMetricValue('engagement', '0')}</span>
+            <span className="text-pink-400 font-medium">{getMetricValue('totalLikes', '0')}</span>
           </div>
           
           <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-pink-500/20">
             <div className="flex items-center gap-2">
               <span className="text-sm">Comments</span>
             </div>
-            <span className="text-pink-400 font-medium">0</span>
+            <span className="text-pink-400 font-medium">{getMetricValue('totalComments', '0')}</span>
           </div>
           
           <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-pink-500/20">
             <div className="flex items-center gap-2">
               <span className="text-sm">Posts</span>
             </div>
-            <span className="text-pink-400 font-medium">{platformData.posts || 1}</span>
+            <span className="text-pink-400 font-medium">{getMetricValue('totalPosts', '1')}</span>
           </div>
         </div>
         

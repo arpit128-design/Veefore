@@ -12,7 +12,7 @@ export default function Analyzer() {
   const { currentWorkspace } = useWorkspace();
   const [timeRange, setTimeRange] = useState("30");
 
-  const { data: analytics, refetch, isLoading } = useQuery({
+  const { data: rawAnalytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
     queryFn: async () => {
       const token = localStorage.getItem('veefore_auth_token');
@@ -34,6 +34,19 @@ export default function Analyzer() {
     },
     enabled: !!currentWorkspace?.id
   });
+
+  // Map raw Instagram data to analyzer format
+  const analytics = rawAnalytics ? {
+    totalViews: rawAnalytics.totalReach || 0,
+    engagement: rawAnalytics.engagementRate || 0,
+    totalReach: rawAnalytics.totalReach || 0,
+    followers: rawAnalytics.followers || 0,
+    impressions: rawAnalytics.impressions || 0,
+    totalLikes: rawAnalytics.totalLikes || 0,
+    totalComments: rawAnalytics.totalComments || 0,
+    totalPosts: rawAnalytics.totalPosts || 0,
+    accountUsername: rawAnalytics.accountUsername
+  } : null;
 
   return (
     <div className="space-y-8">

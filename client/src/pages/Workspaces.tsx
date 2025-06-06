@@ -5,13 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Globe, Settings, Star, Users } from "lucide-react";
+import { Plus, Globe, Settings, Star, Users, Edit3, Trash2, AlertTriangle, StarOff } from "lucide-react";
 import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
 import PlanUpgradeModal from "@/components/subscription/PlanUpgradeModal";
 
@@ -38,6 +41,16 @@ export default function Workspaces() {
     currentPlan: '',
     upgradeMessage: '',
     limitReached: null as any
+  });
+
+  // Workspace management state
+  const [isManageOpen, setIsManageOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingWorkspace, setEditingWorkspace] = useState<any>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    theme: "default"
   });
 
   // Fetch workspace-specific social accounts for activity
@@ -95,6 +108,65 @@ export default function Workspaces() {
     }
   });
 
+  // Update workspace mutation
+  const updateWorkspaceMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => apiRequest('PUT', `/api/workspaces/${id}`, data),
+    onSuccess: () => {
+      toast({
+        title: "Workspace Updated!",
+        description: "Your workspace settings have been saved.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      setIsEditOpen(false);
+      setEditingWorkspace(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update workspace",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete workspace mutation
+  const deleteWorkspaceMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('DELETE', `/api/workspaces/${id}`),
+    onSuccess: () => {
+      toast({
+        title: "Workspace Deleted",
+        description: "The workspace has been permanently removed.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete workspace",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Set as default workspace mutation
+  const setDefaultMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('PUT', `/api/workspaces/${id}/default`),
+    onSuccess: () => {
+      toast({
+        title: "Default Workspace Set",
+        description: "This workspace is now your default.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to set default workspace",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleCreateWorkspace = () => {
     if (!newWorkspace.name.trim()) {
       toast({
@@ -106,6 +178,51 @@ export default function Workspaces() {
     }
 
     createWorkspaceMutation.mutate(newWorkspace);
+  };
+
+  const handleEditWorkspace = (workspace: any) => {
+    setEditingWorkspace(workspace);
+    setEditForm({
+      name: workspace.name,
+      description: workspace.description || "",
+      theme: workspace.theme || "default"
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateWorkspace = () => {
+    if (!editingWorkspace || !editForm.name.trim()) {
+      toast({
+        title: "Name Required",
+        description: "Please enter a workspace name",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    updateWorkspaceMutation.mutate({
+      id: editingWorkspace.id,
+      data: editForm
+    });
+  };
+
+  const handleDeleteWorkspace = (workspace: any) => {
+    if (workspace.isDefault) {
+      toast({
+        title: "Cannot Delete",
+        description: "Default workspace cannot be deleted",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    deleteWorkspaceMutation.mutate(workspace.id);
+  };
+
+  const handleSetDefault = (workspace: any) => {
+    if (!workspace.isDefault) {
+      setDefaultMutation.mutate(workspace.id);
+    }
   };
 
   return (
@@ -204,10 +321,103 @@ export default function Workspaces() {
                 <span className="text-asteroid-silver">Credits:</span>
                 <span className="text-solar-gold font-mono">{currentWorkspace.credits}</span>
               </div>
-              <Button variant="outline" size="sm" className="glassmorphism">
-                <Settings className="w-4 h-4 mr-2" />
-                Manage
-              </Button>
+              <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="glassmorphism">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Manage
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="glassmorphism border-electric-cyan/30 max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-orbitron text-electric-cyan">
+                      Workspace Management
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    {workspaces.map((workspace) => (
+                      <div key={workspace.id} className="p-4 rounded-lg border border-cosmic-blue/50 bg-cosmic-void/20">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 workspace-planet rounded-full animate-glow"></div>
+                            <div>
+                              <div className="font-medium text-white">{workspace.name}</div>
+                              <div className="text-sm text-asteroid-silver">
+                                {workspace.description || "No description"}
+                              </div>
+                              <div className="flex items-center space-x-2 mt-1">
+                                {workspace.isDefault && (
+                                  <Badge className="bg-solar-gold/20 text-solar-gold text-xs">
+                                    <Star className="w-2 h-2 mr-1" />
+                                    Default
+                                  </Badge>
+                                )}
+                                {currentWorkspace?.id === workspace.id && (
+                                  <Badge className="bg-electric-cyan/20 text-electric-cyan text-xs">
+                                    Active
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditWorkspace(workspace)}
+                              className="glassmorphism"
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            {!workspace.isDefault && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSetDefault(workspace)}
+                                disabled={setDefaultMutation.isPending}
+                                className="glassmorphism"
+                              >
+                                <Star className="w-3 h-3" />
+                              </Button>
+                            )}
+                            {!workspace.isDefault && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="glassmorphism text-red-400 hover:text-red-300"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="glassmorphism border-red-500/30">
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-red-400">Delete Workspace</AlertDialogTitle>
+                                    <AlertDialogDescription className="text-asteroid-silver">
+                                      Are you sure you want to delete "{workspace.name}"? This action cannot be undone and will permanently remove all associated content and data.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel className="glassmorphism">Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteWorkspace(workspace)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                      disabled={deleteWorkspaceMutation.isPending}
+                                    >
+                                      {deleteWorkspaceMutation.isPending ? "Deleting..." : "Delete"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardContent>
         </Card>

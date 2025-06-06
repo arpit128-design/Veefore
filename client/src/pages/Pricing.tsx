@@ -65,18 +65,21 @@ export default function Pricing() {
   const createOrderMutation = useMutation({
     mutationFn: async ({ planId, type, packageId, addonId }: any) => {
       if (type === 'subscription') {
-        return apiRequest(`/api/subscription/create-order`, {
+        return apiRequest('/api/subscription/create-order', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ planId })
         });
       } else if (type === 'credits') {
-        return apiRequest(`/api/credits/create-order`, {
+        return apiRequest('/api/credits/create-order', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ packageId })
         });
       } else if (type === 'addon') {
-        return apiRequest(`/api/addons/create-order`, {
+        return apiRequest('/api/addons/create-order', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ addonId })
         });
       }

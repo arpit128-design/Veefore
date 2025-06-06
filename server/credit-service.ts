@@ -1,47 +1,31 @@
-import { eq, and, desc, sql } from 'drizzle-orm';
-import { db } from './db';
-import { users, creditTransactions, subscriptions } from '@shared/schema';
+import { storage } from './storage';
 import { CREDIT_COSTS, REFERRAL_REWARDS } from './pricing-config';
 
 export class CreditService {
   
   // Get user's current credit balance
-  async getUserCredits(userId: number): Promise<number> {
-    const user = await db.select({ credits: users.credits }).from(users).where(eq(users.id, userId)).limit(1);
-    return user[0]?.credits || 0;
+  async getUserCredits(userId: number | string): Promise<number> {
+    const user = await storage.getUser(Number(userId));
+    return user?.credits || 0;
   }
 
   // Get user's subscription and credit details
-  async getUserCreditInfo(userId: number) {
-    const user = await db.select({
-      credits: users.credits,
-      plan: users.plan
-    }).from(users).where(eq(users.id, userId)).limit(1);
-
-    if (!user[0]) {
+  async getUserCreditInfo(userId: number | string) {
+    const user = await storage.getUser(Number(userId));
+    if (!user) {
       throw new Error('User not found');
     }
 
     // Get current subscription
-    const subscription = await db.select()
-      .from(subscriptions)
-      .where(and(
-        eq(subscriptions.userId, userId),
-        eq(subscriptions.status, 'active')
-      ))
-      .limit(1);
+    const subscription = await storage.getSubscription(Number(userId));
 
     // Get recent credit transactions
-    const recentTransactions = await db.select()
-      .from(creditTransactions)
-      .where(eq(creditTransactions.userId, userId))
-      .orderBy(desc(creditTransactions.createdAt))
-      .limit(10);
+    const recentTransactions = await storage.getCreditTransactions(Number(userId), 10);
 
     return {
-      currentCredits: user[0].credits,
-      plan: user[0].plan,
-      subscription: subscription[0] || null,
+      currentCredits: user.credits,
+      plan: user.plan,
+      subscription: subscription || null,
       recentTransactions
     };
   }
@@ -66,31 +50,27 @@ export class CreditService {
       throw new Error(`Unknown feature type: ${featureType}`);
     }
 
-    const totalCost = Math.ceil(creditCost * quantity); // Round up for fractional costs
+    const totalCost = Math.ceil(creditCost * quantity);
     const userCredits = await this.getUserCredits(userId);
 
     if (userCredits < totalCost) {
-      return false; // Insufficient credits
+      return false;
     }
 
-    // Deduct credits and log transaction
-    await db.transaction(async (tx) => {
-      // Update user credits
-      await tx.update(users)
-        .set({ 
-          credits: sql`${users.credits} - ${totalCost}`,
-          updatedAt: new Date()
-        })
-        .where(eq(users.id, userId));
+    // Update user credits and log transaction
+    const user = await storage.getUser(userId);
+    if (!user) return false;
 
-      // Log credit transaction
-      await tx.insert(creditTransactions).values({
-        userId,
-        type: 'used',
-        amount: -totalCost,
-        description: description || `${featureType} usage (${quantity}x)`,
-        referenceId: `${featureType}_${Date.now()}`
-      });
+    const newCredits = user.credits - totalCost;
+    await storage.updateUserCredits(userId, newCredits);
+
+    // Create credit transaction record
+    await storage.createCreditTransaction({
+      userId,
+      type: 'used',
+      amount: -totalCost,
+      description: description || `${featureType} usage (${quantity}x)`,
+      referenceId: `${featureType}_${Date.now()}`
     });
 
     return true;
@@ -98,44 +78,34 @@ export class CreditService {
 
   // Add credits to user account
   async addCredits(userId: number, amount: number, type: 'purchase' | 'earned' | 'refund' | 'bonus', description: string, referenceId?: string): Promise<void> {
-    await db.transaction(async (tx) => {
-      // Update user credits
-      await tx.update(users)
-        .set({ 
-          credits: sql`${users.credits} + ${amount}`,
-          updatedAt: new Date()
-        })
-        .where(eq(users.id, userId));
+    const user = await storage.getUser(userId);
+    if (!user) throw new Error('User not found');
 
-      // Log credit transaction
-      await tx.insert(creditTransactions).values({
-        userId,
-        type,
-        amount,
-        description,
-        referenceId
-      });
+    const newCredits = user.credits + amount;
+    await storage.updateUserCredits(userId, newCredits);
+
+    // Create credit transaction record
+    await storage.createCreditTransaction({
+      userId,
+      type,
+      amount,
+      description,
+      referenceId
     });
   }
 
   // Reset monthly credits based on subscription
   async resetMonthlyCredits(userId: number): Promise<void> {
-    const subscription = await db.select()
-      .from(subscriptions)
-      .where(and(
-        eq(subscriptions.userId, userId),
-        eq(subscriptions.status, 'active')
-      ))
-      .limit(1);
+    const subscription = await storage.getSubscription(userId);
 
-    if (!subscription[0]) {
+    if (!subscription) {
       // Free plan gets 60 credits
       await this.addCredits(userId, 60, 'earned', 'Monthly free credits reset', 'monthly_reset');
       return;
     }
 
-    const monthlyCredits = subscription[0].monthlyCredits;
-    await this.addCredits(userId, monthlyCredits, 'earned', `Monthly ${subscription[0].plan} credits reset`, 'monthly_reset');
+    const monthlyCredits = subscription.monthlyCredits || 60;
+    await this.addCredits(userId, monthlyCredits, 'earned', `Monthly ${subscription.plan} credits reset`, 'monthly_reset');
   }
 
   // Handle referral rewards
@@ -154,45 +124,34 @@ export class CreditService {
 
   // Get credit transaction history
   async getCreditHistory(userId: number, limit: number = 50) {
-    return await db.select()
-      .from(creditTransactions)
-      .where(eq(creditTransactions.userId, userId))
-      .orderBy(desc(creditTransactions.createdAt))
-      .limit(limit);
+    return await storage.getCreditTransactions(userId, limit);
   }
 
   // Calculate credit rollover (unused credits from previous month)
   async calculateCreditRollover(userId: number): Promise<number> {
-    // Get last month's credit reset
-    const lastReset = await db.select()
-      .from(creditTransactions)
-      .where(and(
-        eq(creditTransactions.userId, userId),
-        eq(creditTransactions.type, 'earned'),
-        sql`${creditTransactions.description} LIKE '%Monthly%reset%'`
-      ))
-      .orderBy(desc(creditTransactions.createdAt))
-      .limit(2);
+    // Get last month's credit reset transactions
+    const transactions = await storage.getCreditTransactions(userId, 50);
+    const resets = transactions.filter(t => 
+      t.type === 'earned' && 
+      t.description?.includes('Monthly') && 
+      t.description?.includes('reset')
+    );
 
-    if (lastReset.length < 2) return 0;
+    if (resets.length < 2) return 0;
 
     // Calculate credits used between the two resets
-    const startDate = lastReset[1].createdAt;
-    const endDate = lastReset[0].createdAt;
+    const lastReset = resets[0];
+    const previousReset = resets[1];
+    
+    const usedTransactions = transactions.filter(t => 
+      t.type === 'used' && 
+      t.createdAt && previousReset.createdAt && lastReset.createdAt &&
+      t.createdAt >= previousReset.createdAt && 
+      t.createdAt <= lastReset.createdAt
+    );
 
-    const creditsUsed = await db.select({
-      total: sql`SUM(ABS(${creditTransactions.amount}))`
-    })
-    .from(creditTransactions)
-    .where(and(
-      eq(creditTransactions.userId, userId),
-      eq(creditTransactions.type, 'used'),
-      sql`${creditTransactions.createdAt} >= ${startDate}`,
-      sql`${creditTransactions.createdAt} <= ${endDate}`
-    ));
-
-    const monthlyAllocation = lastReset[1].amount;
-    const usedAmount = Number(creditsUsed[0]?.total || 0);
+    const usedAmount = usedTransactions.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
+    const monthlyAllocation = previousReset.amount || 0;
     const rollover = Math.max(0, monthlyAllocation - usedAmount);
 
     // Max rollover is 30 days worth (same as monthly allocation)

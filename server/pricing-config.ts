@@ -3,81 +3,86 @@ export const SUBSCRIPTION_PLANS = {
   free: {
     id: 'free',
     name: 'Free Forever',
+    description: 'Perfect for getting started with social media management',
     price: 0,
     currency: 'INR',
     interval: 'month',
     credits: 60,
-    features: {
-      workspaces: 1,
-      socialAccountsPerPlatform: 1,
-      basicScheduling: true,
-      limitedAnalytics: true,
-      chromeExtensionLimited: true,
-      watermarkedContent: true,
-      calendarView: 7, // days
-    }
+    features: [
+      '1 Workspace',
+      '1 Social Account per Platform',
+      'Basic Scheduling',
+      'Limited Analytics',
+      'Chrome Extension (Limited)',
+      'Watermarked Content',
+      '7-day Calendar View'
+    ]
   },
-  'creator-pro': {
-    id: 'creator-pro',
+  creator: {
+    id: 'creator',
     name: 'Creator Pro',
-    price: 39900, // ₹399 in paise
+    description: 'Perfect for content creators and influencers',
+    price: 399,
     currency: 'INR',
     interval: 'month',
     credits: 200,
-    features: {
-      workspaces: 3,
-      socialAccountsPerPlatform: 3,
-      advancedScheduling: true,
-      fullAnalytics: true,
-      chromeExtensionFull: true,
-      noWatermarks: true,
-      calendarView: 30, // days
-      brandVoiceTrainer: true,
-      abTesting: true,
-      priorityPublishing: true,
-      viralContentAdapter: true,
-      trendExplorer: true,
-    }
+    popular: true,
+    features: [
+      '3 Workspaces',
+      '3 Social Accounts per Platform',
+      'Advanced Scheduling',
+      'Full Analytics',
+      'Chrome Extension (Full)',
+      'No Watermarks',
+      '30-day Calendar View',
+      'Brand Voice Trainer',
+      'A/B Testing',
+      'Priority Publishing',
+      'Viral Content Adapter',
+      'Trend Explorer'
+    ]
   },
-  'agency-suite': {
-    id: 'agency-suite',
+  pro: {
+    id: 'pro',
     name: 'Agency Suite',
-    price: 89900, // ₹899 in paise
+    description: 'Designed for agencies and teams',
+    price: 899,
     currency: 'INR',
     interval: 'month',
     credits: 750,
-    features: {
-      workspaces: 'unlimited',
-      socialAccountsPerPlatform: 'unlimited',
-      teamCollaboration: true,
-      roleBasedAccess: true,
-      whiteLabel: true,
-      autoPilotScheduling: true,
-      aiCommentReplier: true,
-      dmAgent: true,
-      unifiedInbox: true,
-      weeklyReports: true,
-      trendForecast: true,
-      apiAccess: true,
-    }
+    features: [
+      'Unlimited Workspaces',
+      'Unlimited Social Accounts',
+      'Team Collaboration',
+      'Role-based Access',
+      'White Label',
+      'Auto Pilot Scheduling',
+      'AI Comment Replier',
+      'DM Agent',
+      'Unified Inbox',
+      'Weekly Reports',
+      'Trend Forecast',
+      'API Access'
+    ]
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
+    description: 'Custom solutions for large organizations',
     price: 'custom',
     currency: 'INR',
     interval: 'month',
     credits: 5000,
-    features: {
-      dedicatedSupport: true,
-      customIntegrations: true,
-      bulkGeneration: true,
-      privateAI: true,
-      advancedAnalytics: true,
-      soc2Compliance: true,
-      sla: true,
-      customCredits: true,
-    }
+    features: [
+      'Dedicated Support',
+      'Custom Integrations',
+      'Bulk Generation',
+      'Private AI',
+      'Advanced Analytics',
+      'SOC2 Compliance',
+      'SLA',
+      'Custom Credits'
+    ]
   }
 };
 
@@ -85,30 +90,36 @@ export const CREDIT_PACKAGES = [
   {
     id: 'credits-50',
     name: '50 Credits',
-    credits: 50,
-    price: 5000, // ₹50 in paise
-    bonusPercentage: 0,
+    baseCredits: 50,
+    bonusCredits: 0,
+    totalCredits: 50,
+    price: 50,
   },
   {
     id: 'credits-150',
     name: '150 Credits',
-    credits: 150,
-    price: 15000, // ₹150 in paise
-    bonusPercentage: 0,
+    baseCredits: 150,
+    bonusCredits: 0,
+    totalCredits: 150,
+    price: 150,
   },
   {
     id: 'credits-500',
     name: '500 Credits + Bonus',
-    credits: 500,
-    price: 50000, // ₹500 in paise
-    bonusPercentage: 10, // 10% bonus = 50 extra credits
+    baseCredits: 500,
+    bonusCredits: 50,
+    totalCredits: 550,
+    price: 500,
+    savings: '10%',
   },
   {
     id: 'credits-2000',
     name: '2000 Credits + Bonus',
-    credits: 2000,
-    price: 200000, // ₹2000 in paise
-    bonusPercentage: 10, // 10% bonus = 200 extra credits
+    baseCredits: 2000,
+    bonusCredits: 200,
+    totalCredits: 2200,
+    price: 2000,
+    savings: '10%',
   }
 ];
 
@@ -208,11 +219,10 @@ export function calculateCreditPackageTotal(packageId: string) {
   const pkg = getCreditPackageById(packageId);
   if (!pkg) return null;
   
-  const bonusCredits = Math.floor(pkg.credits * (pkg.bonusPercentage / 100));
   return {
-    baseCredits: pkg.credits,
-    bonusCredits,
-    totalCredits: pkg.credits + bonusCredits,
+    baseCredits: pkg.baseCredits,
+    bonusCredits: pkg.bonusCredits,
+    totalCredits: pkg.totalCredits,
     price: pkg.price,
   };
 }

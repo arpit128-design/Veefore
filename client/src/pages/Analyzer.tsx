@@ -3,28 +3,25 @@ import { PlatformAnalytics } from "@/components/dashboard/PlatformAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
+import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { BarChart3, TrendingUp, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 
 export default function Analyzer() {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
+  const { token } = useAuth();
   const [timeRange, setTimeRange] = useState("30");
 
   // Fetch real-time analytics data
   const { data: realtimeAnalytics, refetch: refetchRealtime, isLoading: realtimeLoading } = useQuery({
     queryKey: ['analytics-realtime', currentWorkspace?.id, timeRange],
     queryFn: async () => {
-      const token = localStorage.getItem('veefore_auth_token');
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch('/api/analytics/realtime', {
-        headers,
-        credentials: 'include'
+      const response = await fetch(`/api/analytics/realtime?workspaceId=${currentWorkspace?.id}&days=${timeRange}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       if (!response.ok) {
@@ -33,7 +30,7 @@ export default function Analyzer() {
       
       return response.json();
     },
-    enabled: !!currentWorkspace?.id,
+    enabled: !!currentWorkspace?.id && !!token,
     refetchInterval: 30000, // Refresh every 30 seconds for real-time updates
     staleTime: 25000 // Consider data stale after 25 seconds
   });
@@ -42,15 +39,10 @@ export default function Analyzer() {
   const { data: rawAnalytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
     queryFn: async () => {
-      const token = localStorage.getItem('veefore_auth_token');
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch('/api/dashboard/analytics', {
-        headers,
-        credentials: 'include'
+      const response = await fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       if (!response.ok) {
@@ -59,7 +51,7 @@ export default function Analyzer() {
       
       return response.json();
     },
-    enabled: !!currentWorkspace?.id && !realtimeAnalytics
+    enabled: !!currentWorkspace?.id && !!token && !realtimeAnalytics
   });
 
   // Use real-time analytics if available, fallback to dashboard analytics

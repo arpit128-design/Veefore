@@ -78,7 +78,7 @@ export default function Scheduler() {
       const response = await apiRequest('GET', `/api/content?workspaceId=${currentWorkspace?.id}&status=scheduled`);
       return response.json();
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
   const { data: socialAccounts = [] } = useQuery({
@@ -90,7 +90,7 @@ export default function Scheduler() {
       console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts);
       return accounts;
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
   // Update platform selection when workspace or social accounts change

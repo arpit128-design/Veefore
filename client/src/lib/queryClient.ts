@@ -47,6 +47,8 @@ export async function apiRequest(
     credentials: "include",
   });
 
+  console.log('[API REQUEST] Response status:', res.status, 'OK:', res.ok);
+  
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     console.log('[API REQUEST] Error response text:', text);

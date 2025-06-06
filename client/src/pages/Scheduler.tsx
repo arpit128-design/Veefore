@@ -119,14 +119,42 @@ export default function Scheduler() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
       toast({
-        title: "Content deleted",
-        description: "Scheduled content has been removed successfully."
+        title: "Content cancelled",
+        description: "Scheduled content has been cancelled successfully."
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete scheduled content.",
+        description: "Failed to cancel scheduled content.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Update scheduled content mutation
+  const updateContentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const scheduledAt = new Date(`${data.scheduledDate}T${data.scheduledTime}`).toISOString();
+      const response = await apiRequest('PUT', `/api/content/${data.id}`, {
+        title: data.title,
+        description: data.description,
+        scheduledAt
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      setEditDialog(false);
+      toast({
+        title: "Content updated",
+        description: "Scheduled content has been updated successfully."
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update scheduled content",
         variant: "destructive"
       });
     }
@@ -504,8 +532,9 @@ export default function Scheduler() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 glassmorphism">
+        <TabsList className="grid w-full grid-cols-5 glassmorphism">
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled Content</TabsTrigger>
           <TabsTrigger value="list">List View</TabsTrigger>
           <TabsTrigger value="automation">Automation</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -513,6 +542,109 @@ export default function Scheduler() {
 
         <TabsContent value="calendar" className="space-y-6">
           <Calendar onScheduleContent={handleScheduleContent} />
+        </TabsContent>
+
+        <TabsContent value="scheduled" className="space-y-6">
+          <Card className="content-card holographic">
+            <CardHeader>
+              <CardTitle className="text-xl font-orbitron font-semibold neon-text text-electric-cyan">
+                Scheduled Content Management
+              </CardTitle>
+              <p className="text-asteroid-silver">
+                Manage your scheduled posts - edit timing or cancel as needed
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {scheduledContent.length === 0 ? (
+                <div className="text-center py-12">
+                  <CalendarIcon className="h-12 w-12 mx-auto text-asteroid-silver mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">No Scheduled Content</h3>
+                  <p className="text-asteroid-silver">
+                    You don't have any content scheduled for publishing yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {scheduledContent.map((content: any) => {
+                    const scheduledDate = new Date(content.scheduledAt);
+                    const timeUntil = getTimeUntilScheduled(content.scheduledAt);
+                    
+                    return (
+                      <Card key={content.id} className="content-card glassmorphism hover:border-electric-cyan/50 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                {getContentIcon(content.type)}
+                                <h3 className="font-semibold text-white">{content.title}</h3>
+                                <Badge className={`${getStatusColor(content.status)} text-white`}>
+                                  {content.status}
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  {content.platform}
+                                </Badge>
+                              </div>
+                              
+                              {content.description && (
+                                <p className="text-asteroid-silver mb-3 text-sm">
+                                  {content.description}
+                                </p>
+                              )}
+                              
+                              <div className="flex items-center gap-4 text-sm text-asteroid-silver">
+                                <div className="flex items-center gap-1">
+                                  <CalendarIcon className="h-4 w-4" />
+                                  {scheduledDate.toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <AlertCircle className="h-4 w-4" />
+                                  {timeUntil}
+                                </div>
+                              </div>
+                              
+                              {content.contentData?.mediaUrl && (
+                                <div className="mt-3">
+                                  <img 
+                                    src={content.contentData.mediaUrl} 
+                                    alt="Content preview" 
+                                    className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center gap-2 ml-4">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEdit(content)}
+                                className="glassmorphism"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDelete(content.id)}
+                                className="glassmorphism text-red-400 hover:text-red-300"
+                                disabled={deleteContentMutation.isPending}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="list" className="space-y-6">

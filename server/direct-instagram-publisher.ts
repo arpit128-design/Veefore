@@ -82,7 +82,60 @@ export class DirectInstagramPublisher {
       };
       
     } catch (error: any) {
-      console.error(`[DIRECT PUBLISH] Failed:`, error.response?.data || error.message);
+      console.error(`[DIRECT PUBLISH] Initial publish failed:`, error.response?.data || error.message);
+      
+      // If not already compressed and the error suggests file issues, try compression
+      if (!hasCompressed && error.response?.data?.error?.message?.includes('processing')) {
+        console.log(`[DIRECT PUBLISH] Retrying with compression after processing failure`);
+        
+        try {
+          const originalPath = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http')
+            ? path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl)
+            : null;
+            
+          if (originalPath && fs.existsSync(originalPath)) {
+            const compressionResult = await FastVideoCompressor.compressVideoForInstagram(originalPath);
+            
+            if (compressionResult.success && compressionResult.outputPath) {
+              const compressedPath = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+              const compressedUrl = compressedPath.startsWith('/') ? compressedPath : '/' + compressedPath;
+              const fullCompressedUrl = `${baseUrl}${compressedUrl}`;
+              
+              console.log(`[DIRECT PUBLISH] Publishing compressed video: ${fullCompressedUrl}`);
+              
+              // Create container with compressed video
+              const compressedContainerResponse = await axios.post(`https://graph.instagram.com/me/media`, {
+                video_url: fullCompressedUrl,
+                caption: caption,
+                media_type: 'REELS',
+                access_token: accessToken
+              });
+              
+              const compressedContainerId = compressedContainerResponse.data.id;
+              console.log(`[DIRECT PUBLISH] Compressed container created: ${compressedContainerId}`);
+              
+              // Wait for processing
+              await new Promise(resolve => setTimeout(resolve, 15000));
+              
+              // Publish compressed container
+              const compressedPublishResponse = await axios.post(`https://graph.instagram.com/me/media_publish`, {
+                creation_id: compressedContainerId,
+                access_token: accessToken
+              });
+              
+              console.log(`[DIRECT PUBLISH] Successfully published compressed video: ${compressedPublishResponse.data.id}`);
+              
+              return {
+                id: compressedPublishResponse.data.id,
+                permalink: `https://www.instagram.com/p/${compressedPublishResponse.data.id}`
+              };
+            }
+          }
+        } catch (compressionError: any) {
+          console.error(`[DIRECT PUBLISH] Compression retry failed:`, compressionError.response?.data || compressionError.message);
+        }
+      }
+      
       throw new Error(`Instagram publish failed: ${error.response?.data?.error?.message || error.message}`);
     }
   }

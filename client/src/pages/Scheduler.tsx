@@ -102,9 +102,15 @@ export default function Scheduler() {
   // Force refresh queries when workspace changes
   useEffect(() => {
     if (currentWorkspace?.id && currentWorkspace?.name) {
-      console.log('[SCHEDULER DEBUG] Workspace changed, invalidating queries for:', currentWorkspace.id, currentWorkspace.name);
-      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      console.log('[SCHEDULER DEBUG] Workspace changed, removing cache and refetching for:', currentWorkspace.id, currentWorkspace.name);
+      // Completely remove cached data
+      queryClient.removeQueries({ queryKey: ['social-accounts'] });
+      queryClient.removeQueries({ queryKey: ['scheduled-content'] });
+      // Force immediate refetch
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['social-accounts', currentWorkspace.id, currentWorkspace.name] });
+        queryClient.refetchQueries({ queryKey: ['scheduled-content', currentWorkspace.id] });
+      }, 100);
     }
   }, [currentWorkspace?.id, currentWorkspace?.name, queryClient]);
 

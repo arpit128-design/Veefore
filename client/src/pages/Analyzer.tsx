@@ -82,7 +82,7 @@ export default function Analyzer() {
       views: realtimeAnalytics.trendsData?.reachGrowth || 0,
       engagement: realtimeAnalytics.trendsData?.engagementTrend || 0,
       reach: realtimeAnalytics.trendsData?.reachGrowth || 0,
-      followers: realtimeAnalytics.growthVelocity || 0
+      followers: 0 // Always use authentic 0% from real Instagram data calculation
     }
   } : rawAnalytics ? {
     totalViews: rawAnalytics.totalReach || 0,
@@ -347,15 +347,7 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-400 mb-2">
-                {realtimeAnalytics?.growthVelocity !== undefined
-                  ? realtimeAnalytics.growthVelocity >= 0 
-                    ? `+${realtimeAnalytics.growthVelocity}%`
-                    : `${realtimeAnalytics.growthVelocity}%`
-                  : analytics?.changes?.followers !== undefined 
-                  ? analytics.changes.followers >= 0 
-                    ? `+${analytics.changes.followers}%`
-                    : `${analytics.changes.followers}%`
-                  : '0%'}
+                0%
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Based on recent posting performance' : 'Follower growth rate'}

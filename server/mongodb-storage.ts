@@ -496,7 +496,7 @@ export class MongoStorage implements IStorage {
       description: content.description,
       contentData: content.contentData || {},
       platform: content.platform,
-      status: 'ready',
+      status: content.scheduledAt ? 'scheduled' : 'ready',
       scheduledAt: content.scheduledAt,
       creditsUsed: content.creditsUsed || 0,
       prompt: content.prompt

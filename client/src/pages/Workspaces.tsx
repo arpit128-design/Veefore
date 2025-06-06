@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Globe, Settings, Star, Users, Edit3, Trash2, AlertTriangle, StarOff } from "lucide-react";
 import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
-import PlanUpgradeModal from "@/components/subscription/PlanUpgradeModal";
+import SimplePlanUpgradeModal from "@/components/subscription/SimplePlanUpgradeModal";
 
 
 
@@ -705,7 +705,7 @@ export default function Workspaces() {
       </Dialog>
 
       {/* Plan Upgrade Modal */}
-      <PlanUpgradeModal
+      <SimplePlanUpgradeModal
         isOpen={upgradeModal.isOpen}
         onClose={closeUpgradeModal}
         feature={upgradeModal.feature}

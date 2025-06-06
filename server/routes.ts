@@ -629,10 +629,22 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       } else {
         // Fallback to default workspace if no workspaceId provided
         workspace = await storage.getDefaultWorkspace(user.id);
+        
+        // If no default workspace exists, create one automatically
+        if (!workspace) {
+          console.log('[INSTAGRAM AUTH] No workspace found, creating default workspace for user:', user.id);
+          workspace = await storage.createWorkspace({
+            userId: user.id,
+            name: 'My VeeFore Workspace',
+            description: 'Default workspace for social media management'
+          });
+          console.log('[INSTAGRAM AUTH] Created default workspace:', workspace.id, workspace.name);
+        }
       }
       
       if (!workspace) {
-        return res.status(400).json({ error: 'No workspace found' });
+        console.error('[INSTAGRAM AUTH] Failed to get or create workspace for user:', user.id);
+        return res.status(400).json({ error: 'Unable to access or create workspace' });
       }
       
       console.log('[INSTAGRAM AUTH] Using workspace:', workspace.id, workspace.name);

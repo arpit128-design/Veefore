@@ -329,12 +329,33 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         });
       }
 
+      // Diagnostic information for debugging redirect URI issues
+      const currentDomain = req.get('host');
+      const requiredRedirectUri = `https://${currentDomain}/api/instagram/callback`;
+      
+      console.log(`[INSTAGRAM AUTH] Current domain: ${currentDomain}`);
+      console.log(`[INSTAGRAM AUTH] Required redirect URI: ${requiredRedirectUri}`);
+      console.log(`[INSTAGRAM AUTH] App ID: ${process.env.INSTAGRAM_APP_ID}`);
+      console.log(`[INSTAGRAM AUTH] CRITICAL: Ensure your Instagram app has this exact redirect URI configured`);
+      
+      // Validate domain format
+      if (!currentDomain || !currentDomain.includes('replit.dev')) {
+        console.warn(`[INSTAGRAM AUTH] Warning: Domain format may not be supported by Instagram: ${currentDomain}`);
+      }
+
       // Force HTTPS for Instagram redirect URI (required by Instagram API)
       const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
-      const state = `${workspace.id}`;
+      const stateData = {
+        workspaceId: workspace.id,
+        userId: user.id,
+        timestamp: Date.now()
+      };
+      const state = JSON.stringify(stateData);
       
-      console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
-      console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
+      console.log(`[INSTAGRAM AUTH] Starting OAuth flow for user ${user.id}`);
+      console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
+      console.log(`[INSTAGRAM AUTH] App ID: ${process.env.INSTAGRAM_APP_ID}`);
+      console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
       const { instagramAPI } = await import('./instagram-api');
       const authUrl = instagramAPI.generateAuthUrl(redirectUri, state);
@@ -350,59 +371,96 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       const { code, state, error } = req.query;
       
+      console.log(`[INSTAGRAM CALLBACK] Received callback:`, {
+        code: code ? 'present' : 'missing',
+        state: state ? 'present' : 'missing',
+        error: error || 'none'
+      });
+      
       if (error) {
-        return res.redirect(`https://${req.get('host')}/integrations?error=${error}`);
+        console.error(`[INSTAGRAM CALLBACK] OAuth error: ${error}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error as string)}`);
       }
       
       if (!code || !state) {
+        console.error('[INSTAGRAM CALLBACK] Missing code or state parameter');
         return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
       }
 
-      const workspaceId = parseInt(state as string);
+      // Parse state parameter
+      let stateData;
+      try {
+        stateData = JSON.parse(state as string);
+        console.log(`[INSTAGRAM CALLBACK] Parsed state data:`, stateData);
+      } catch (e) {
+        // Fallback for old simple state format
+        stateData = { workspaceId: parseInt(state as string) };
+        console.log(`[INSTAGRAM CALLBACK] Using fallback state parsing:`, stateData);
+      }
+
+      const { workspaceId } = stateData;
       const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      
+      console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
+      console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
       const { instagramAPI } = await import('./instagram-api');
       
       // Exchange code for token
+      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for access token...`);
       const tokenData = await instagramAPI.exchangeCodeForToken(code as string, redirectUri);
+      console.log(`[INSTAGRAM CALLBACK] Token exchange successful`);
       
       // Get long-lived token
+      console.log(`[INSTAGRAM CALLBACK] Converting to long-lived token...`);
       const longLivedToken = await instagramAPI.getLongLivedToken(tokenData.access_token);
+      console.log(`[INSTAGRAM CALLBACK] Long-lived token obtained, expires in ${longLivedToken.expires_in} seconds`);
       
       // Get user profile
+      console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
       const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
+      console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
       
       // Save to database
       const existingAccount = await storage.getSocialAccountByPlatform(workspaceId, 'instagram');
       
-      console.log(`[INSTAGRAM CALLBACK] Saving Instagram account: @${profile.username} (ID: ${profile.id})`);
+      const accountData = {
+        accessToken: longLivedToken.access_token,
+        refreshToken: null,
+        expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
+        accountId: profile.id,
+        username: profile.username,
+        isActive: true
+      };
       
       if (existingAccount) {
-        await storage.updateSocialAccount(existingAccount.id, {
-          accessToken: longLivedToken.access_token,
-          refreshToken: null,
-          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000),
-          accountId: profile.id,
-          username: profile.username
-        });
+        await storage.updateSocialAccount(existingAccount.id, accountData);
         console.log(`[INSTAGRAM CALLBACK] Updated existing account: @${profile.username}`);
       } else {
         const newAccount = await storage.createSocialAccount({
           workspaceId,
           platform: 'instagram',
-          accountId: profile.id,
-          username: profile.username,
-          accessToken: longLivedToken.access_token,
-          refreshToken: null,
-          expiresAt: new Date(Date.now() + longLivedToken.expires_in * 1000)
+          ...accountData
         });
         console.log(`[INSTAGRAM CALLBACK] Created new account: @${profile.username} (DB ID: ${newAccount.id})`);
       }
       
-      res.redirect(`https://${req.get('host')}/integrations?success=instagram_connected`);
+      console.log(`[INSTAGRAM CALLBACK] Successfully connected Instagram account @${profile.username}`);
+      res.redirect(`https://${req.get('host')}/integrations?success=instagram_connected&username=${profile.username}`);
+      
     } catch (error: any) {
-      console.error('[INSTAGRAM CALLBACK] Error:', error);
-      res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error.message)}`);
+      console.error('[INSTAGRAM CALLBACK] Error details:', {
+        message: error.message,
+        stack: error.stack?.split('\n')[0],
+        response: error.response?.data
+      });
+      
+      let errorMessage = error.message;
+      if (error.response?.data) {
+        errorMessage = `Instagram API Error: ${JSON.stringify(error.response.data)}`;
+      }
+      
+      res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(errorMessage)}`);
     }
   });
 

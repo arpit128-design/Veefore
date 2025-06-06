@@ -113,18 +113,18 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-orbitron font-bold neon-text text-electric-cyan mb-2">
+          <h2 className="text-2xl md:text-4xl font-orbitron font-bold neon-text text-electric-cyan mb-2">
             Mission Control
           </h2>
-          <p className="text-asteroid-silver">
+          <p className="text-asteroid-silver text-sm md:text-base">
             Welcome back, <span className="text-solar-gold font-medium">{user?.displayName || user?.username}</span>
           </p>
         </div>
-        <div className="text-right">
-          <div className="text-sm text-asteroid-silver">Current Time</div>
-          <div className="text-xl font-mono text-electric-cyan">{currentTime} UTC</div>
+        <div className="text-left md:text-right">
+          <div className="text-xs md:text-sm text-asteroid-silver">Current Time</div>
+          <div className="text-lg md:text-xl font-mono text-electric-cyan">{currentTime} UTC</div>
         </div>
       </div>
 
@@ -161,16 +161,16 @@ export default function Dashboard() {
       </div>
 
       {/* Platform Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         {/* Instagram Analytics - Live Data */}
         <div className="content-card holographic">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <i className="fab fa-instagram text-2xl text-pink-500" />
-                <h3 className="text-xl font-orbitron font-semibold">Instagram Analytics</h3>
+          <div className="p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <i className="fab fa-instagram text-xl md:text-2xl text-pink-500" />
+                <h3 className="text-lg md:text-xl font-orbitron font-semibold">Instagram Analytics</h3>
               </div>
-              <div className="w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
             </div>
             
             <div className="space-y-4">

@@ -4,24 +4,40 @@ import { Badge } from "@/components/ui/badge";
 import { WorkspaceSwitcher } from "@/components/workspaces/WorkspaceSwitcher";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
-import { Bell, Satellite } from "lucide-react";
+import { Bell, Satellite, Menu, X } from "lucide-react";
+import { useState } from "react";
 
 export function Header() {
   const { user } = useAuth();
   const { credits } = useCredits();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glassmorphism">
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
         <div className="flex items-center justify-between">
           {/* Brand Logo */}
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-electric-cyan to-nebula-purple animate-pulse-glow"></div>
-            <h1 className="text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-electric-cyan to-nebula-purple animate-pulse-glow"></div>
+            <h1 className="text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
           </div>
           
-          {/* Workspace Switcher and Controls */}
-          <div className="flex items-center space-x-6">
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden glassmorphism"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5 text-electric-cyan" />
+            ) : (
+              <Menu className="h-5 w-5 text-electric-cyan" />
+            )}
+          </Button>
+          
+          {/* Desktop Controls */}
+          <div className="hidden md:flex items-center space-x-6">
             <WorkspaceSwitcher />
             
             {/* Credit Display */}
@@ -49,7 +65,43 @@ export function Header() {
               </AvatarFallback>
             </Avatar>
           </div>
+
+          {/* Mobile User Avatar */}
+          <Avatar className="w-8 h-8 md:hidden border-2 border-electric-cyan">
+            <AvatarImage src={user?.avatar || ""} alt={user?.username || ""} />
+            <AvatarFallback className="bg-gradient-to-r from-electric-cyan to-nebula-purple text-xs">
+              {user?.username?.charAt(0).toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-electric-cyan/20">
+            <div className="space-y-4 pt-4">
+              <WorkspaceSwitcher />
+              
+              {/* Credit Display */}
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-8 h-2 bg-space-gray rounded-full overflow-hidden">
+                  <div className="h-full energy-bar w-3/4"></div>
+                </div>
+                <span className="text-solar-gold font-mono">{credits.toLocaleString()}</span>
+                <span className="text-xs text-asteroid-silver">credits</span>
+              </div>
+              
+              {/* Notifications */}
+              <div className="flex justify-center">
+                <Button variant="ghost" size="icon" className="relative glassmorphism hover:bg-opacity-80">
+                  <Satellite className="h-5 w-5 text-electric-cyan" />
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-solar-gold text-xs p-0 flex items-center justify-center">
+                    3
+                  </Badge>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

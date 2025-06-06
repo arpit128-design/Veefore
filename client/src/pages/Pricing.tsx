@@ -92,41 +92,81 @@ export default function Pricing() {
   // Fetch user subscription
   const { data: userSubscription } = useQuery({
     queryKey: ['/api/subscription'],
-    queryFn: () => fetch('/api/subscription').then(res => res.json())
+    queryFn: () => apiRequest('GET', '/api/subscription'),
+    retry: false
   });
 
-  // Create order mutation
-  const createOrderMutation = useMutation({
-    mutationFn: async (data: { type: string; planId?: string; packageId?: string; addonId?: string }) => {
-      if (data.type === 'subscription') {
-        return apiRequest('/api/subscription/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planId: data.planId })
-        });
-      } else if (data.type === 'credits') {
-        return apiRequest('/api/credits/purchase', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ packageId: data.packageId })
-        });
-      } else if (data.type === 'addon') {
-        return apiRequest('/api/addons/purchase', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ addonId: data.addonId })
-        });
-      }
+  // Fetch subscription plans  
+  const { data: plansData } = useQuery({
+    queryKey: ['/api/subscription/plans'],
+    queryFn: () => apiRequest('GET', '/api/subscription/plans')
+  });
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  // Create subscription order mutation
+  const createSubscriptionMutation = useMutation({
+    mutationFn: async (planId: string) => {
+      return apiRequest('POST', '/api/subscription/create-order', { planId });
     },
     onSuccess: (data) => {
-      if (data?.paymentUrl) {
-        window.location.href = data.paymentUrl;
+      if (data && window.Razorpay) {
+        const options = {
+          key: data.key,
+          amount: data.amount,
+          currency: data.currency,
+          name: 'VeeFore',
+          description: 'Subscription Payment',
+          order_id: data.orderId,
+          handler: async (response: any) => {
+            try {
+              await apiRequest('POST', '/api/subscription/verify-payment', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              
+              toast({
+                title: "Payment Successful",
+                description: "Your subscription has been activated!",
+              });
+              
+              queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+            } catch (error) {
+              toast({
+                title: "Payment Verification Failed",
+                description: "Please contact support if payment was deducted.",
+                variant: "destructive",
+              });
+            }
+          },
+          prefill: {
+            name: userSubscription?.user?.displayName || '',
+            email: userSubscription?.user?.email || '',
+          },
+          theme: {
+            color: '#6366f1',
+          },
+        };
+        
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       } else {
         toast({
-          title: "Success",
-          description: "Your purchase was completed successfully!",
+          title: "Error",
+          description: "Failed to initialize payment. Please try again.",
+          variant: "destructive",
         });
-        queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
       }
     },
     onError: (error: any) => {
@@ -140,7 +180,8 @@ export default function Pricing() {
 
   // Handle plan selection
   const handlePlanSelect = (planId: string) => {
-    if (userSubscription?.plan === planId) return;
+    const currentPlan = userSubscription?.plan || 'free';
+    if (currentPlan === planId) return;
     
     if (planId === 'free') {
       toast({
@@ -150,17 +191,23 @@ export default function Pricing() {
       return;
     }
     
-    createOrderMutation.mutate({ type: 'subscription', planId });
+    createSubscriptionMutation.mutate(planId);
   };
 
   // Handle credit purchase
   const handleCreditPurchase = (packageId: string) => {
-    createOrderMutation.mutate({ type: 'credits', packageId });
+    toast({
+      title: "Coming Soon",
+      description: "Credit packages will be available soon!",
+    });
   };
 
   // Handle addon purchase
   const handleAddonPurchase = (addonId: string) => {
-    createOrderMutation.mutate({ type: 'addon', addonId });
+    toast({
+      title: "Coming Soon", 
+      description: "Add-ons will be available soon!",
+    });
   };
 
   const plans = pricingData?.plans || {};
@@ -559,7 +606,7 @@ export default function Pricing() {
                                       : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
                               }`}
                               onClick={() => handlePlanSelect(plan.id)}
-                              disabled={userSubscription?.plan === plan.id || createOrderMutation.isPending}
+                              disabled={userSubscription?.plan === plan.id || createSubscriptionMutation.isPending}
                             >
                               <span className="flex items-center justify-center gap-2">
                                 {userSubscription?.plan === plan.id 
@@ -625,9 +672,9 @@ export default function Pricing() {
                       <Button
                         className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold py-3"
                         onClick={() => handleCreditPurchase(pkg.id)}
-                        disabled={createOrderMutation.isPending}
+                        disabled={false}
                       >
-                        {createOrderMutation.isPending ? 'Processing...' : 'Buy Credits'}
+                        Buy Credits
                       </Button>
                     </CardFooter>
                   </Card>
@@ -669,9 +716,9 @@ export default function Pricing() {
                       <Button
                         className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3"
                         onClick={() => handleAddonPurchase(addon.id)}
-                        disabled={createOrderMutation.isPending}
+                        disabled={false}
                       >
-                        {createOrderMutation.isPending ? 'Processing...' : 'Add to Plan'}
+                        Add to Plan
                       </Button>
                     </CardFooter>
                   </Card>

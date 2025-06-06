@@ -188,6 +188,7 @@ export const CREDIT_COSTS = {
   'custom-gpt-task': 2, // base cost, can be 2-5 depending on complexity
   'hashtag-generation': 1,
   'caption-optimization': 1,
+  'ai_suggestions': 2, // AI-powered content and growth suggestions
   'content-analysis': 2,
   'engagement-prediction': 3,
   'competitor-analysis': 4,

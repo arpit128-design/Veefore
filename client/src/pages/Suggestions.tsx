@@ -6,17 +6,31 @@ import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Flame, Music, Hash, Clock, RefreshCw, Zap } from "lucide-react";
+import { auth } from "@/lib/firebase";
 
 export default function Suggestions() {
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: suggestions, refetch, isLoading } = useQuery({
+  const { data: suggestionsResponse, refetch, isLoading } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
+    queryFn: async () => {
+      const response = await fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+      }
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
+
+  // Ensure suggestions is always an array
+  const suggestions = Array.isArray(suggestionsResponse) ? suggestionsResponse : [];
 
   const generateSuggestionsMutation = useMutation({
     mutationFn: () => apiRequest('POST', '/api/suggestions/generate', {
@@ -39,7 +53,7 @@ export default function Suggestions() {
   });
 
   const getSuggestionsByType = (type: string) => {
-    return suggestions?.filter((s: any) => s.type === type) || [];
+    return suggestions.filter((s: any) => s.type === type);
   };
 
   const getSuggestionIcon = (type: string) => {

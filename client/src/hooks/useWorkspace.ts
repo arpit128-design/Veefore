@@ -89,13 +89,45 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     enabled: !!user?.id && !!token
   });
 
-  // Set default workspace when workspaces load
+  // Save current workspace to localStorage when it changes
   useEffect(() => {
-    if (workspaces.length > 0 && !currentWorkspace) {
-      const defaultWorkspace = workspaces.find((w: Workspace) => w.isDefault) || workspaces[0];
-      setCurrentWorkspace(defaultWorkspace);
+    if (currentWorkspace && user?.id) {
+      const storageKey = `veefore_current_workspace_${user.id}`;
+      localStorage.setItem(storageKey, JSON.stringify(currentWorkspace));
     }
-  }, [workspaces, currentWorkspace]);
+  }, [currentWorkspace, user?.id]);
+
+  // Restore workspace from localStorage or set default when workspaces load
+  useEffect(() => {
+    if (workspaces.length > 0 && !currentWorkspace && user?.id) {
+      const storageKey = `veefore_current_workspace_${user.id}`;
+      const savedWorkspace = localStorage.getItem(storageKey);
+      
+      let workspaceToSet: Workspace | null = null;
+      
+      if (savedWorkspace) {
+        try {
+          const parsedWorkspace = JSON.parse(savedWorkspace);
+          // Verify the saved workspace still exists in current workspaces
+          const foundWorkspace = workspaces.find((w: Workspace) => w.id === parsedWorkspace.id);
+          if (foundWorkspace) {
+            workspaceToSet = foundWorkspace;
+            console.log('[WORKSPACE PROVIDER] Restored workspace from localStorage:', foundWorkspace.name);
+          }
+        } catch (error) {
+          console.log('[WORKSPACE PROVIDER] Error parsing saved workspace:', error);
+        }
+      }
+      
+      // Fall back to default workspace if no saved workspace or it doesn't exist
+      if (!workspaceToSet) {
+        workspaceToSet = workspaces.find((w: Workspace) => w.isDefault) || workspaces[0];
+        console.log('[WORKSPACE PROVIDER] Using default workspace:', workspaceToSet.name);
+      }
+      
+      setCurrentWorkspace(workspaceToSet);
+    }
+  }, [workspaces, currentWorkspace, user?.id]);
 
   const switchWorkspace = async (workspace: Workspace) => {
     console.log('[WORKSPACE PROVIDER] Switching from', currentWorkspace?.name, 'to', workspace.name);

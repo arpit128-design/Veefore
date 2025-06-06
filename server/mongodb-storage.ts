@@ -485,7 +485,22 @@ export class MongoStorage implements IStorage {
       query.workspaceId = workspaceId.toString();
     }
     
+    console.log(`[MONGODB DEBUG] getScheduledContent query:`, query);
     const contents = await ContentModel.find(query).sort({ scheduledAt: 1 }).exec();
+    console.log(`[MONGODB DEBUG] Found ${contents.length} scheduled content items`);
+    
+    if (contents.length > 0) {
+      contents.forEach((content, index) => {
+        console.log(`[MONGODB DEBUG] Content ${index + 1}:`, {
+          id: content._id.toString(),
+          title: content.title,
+          workspaceId: content.workspaceId,
+          status: content.status,
+          scheduledAt: content.scheduledAt
+        });
+      });
+    }
+    
     return contents.map(content => this.convertContent(content));
   }
 

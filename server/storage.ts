@@ -40,7 +40,7 @@ export interface IStorage {
   // Content operations
   getContent(id: number): Promise<Content | undefined>;
   getContentByWorkspace(workspaceId: number, limit?: number): Promise<Content[]>;
-  getScheduledContent(workspaceId: number): Promise<Content[]>;
+  getScheduledContent(workspaceId?: number): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
   updateContent(id: number, updates: Partial<Content>): Promise<Content>;
   deleteContent(id: number): Promise<void>;
@@ -255,12 +255,17 @@ export class MemStorage implements IStorage {
     return workspaceContent.slice(0, limit);
   }
 
-  async getScheduledContent(workspaceId: number): Promise<Content[]> {
-    return Array.from(this.content.values()).filter(
-      content => content.workspaceId === workspaceId && 
-                 content.status === "scheduled" && 
-                 content.scheduledAt
-    ).sort((a, b) => (a.scheduledAt!.getTime() - b.scheduledAt!.getTime()));
+  async getScheduledContent(workspaceId?: number): Promise<Content[]> {
+    const allContent = Array.from(this.content.values()).filter(
+      content => content.status === "scheduled" && content.scheduledAt
+    );
+    
+    // If workspaceId is provided, filter by workspace
+    const filteredContent = workspaceId 
+      ? allContent.filter(content => content.workspaceId === workspaceId)
+      : allContent;
+    
+    return filteredContent.sort((a, b) => (a.scheduledAt!.getTime() - b.scheduledAt!.getTime()));
   }
 
   async createContent(insertContent: InsertContent): Promise<Content> {

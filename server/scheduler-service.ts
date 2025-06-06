@@ -72,7 +72,16 @@ export class SchedulerService {
   private async getAllScheduledContent(): Promise<any[]> {
     try {
       // Get scheduled content from the storage layer directly (no workspace filter)
-      return await this.storage.getScheduledContent();
+      const allScheduled = await this.storage.getScheduledContent();
+      console.log(`[SCHEDULER DEBUG] Raw scheduled content from storage:`, allScheduled.map(c => ({
+        id: c.id,
+        title: c.title,
+        workspaceId: c.workspaceId,
+        workspaceIdType: typeof c.workspaceId,
+        status: c.status,
+        scheduledAt: c.scheduledAt
+      })));
+      return allScheduled;
     } catch (error) {
       console.error('[SCHEDULER] Error getting all scheduled content:', error);
       return [];

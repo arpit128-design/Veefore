@@ -90,14 +90,23 @@ export default function Workspaces() {
       setNewWorkspace({ name: "", description: "", theme: "default" });
     },
     onError: async (error: any) => {
-      console.log('Workspace creation error:', error);
+      console.log('=== WORKSPACE CREATION ERROR DEBUG ===');
+      console.log('Raw error object:', error);
       console.log('Error message:', error?.message);
+      console.log('Error status:', error?.status);
+      console.log('Error code:', error?.code);
+      console.log('Error response:', error?.response);
       console.log('Error type:', typeof error);
+      console.log('Error keys:', Object.keys(error || {}));
+      console.log('=======================================');
       
       // Handle plan restriction errors with upgrade modal
       // Check if error message contains "403:" indicating plan limits OR if it's a 403 status
-      const is403Error = error?.message?.includes('403:') || error?.status === 403 || error?.message?.includes('plan allows');
-      console.log('Is 403 error:', is403Error);
+      const is403Error = error?.message?.includes('403:') || 
+                         error?.status === 403 || 
+                         error?.message?.includes('plan allows') ||
+                         error?.response?.status === 403;
+      console.log('Is 403 error check result:', is403Error);
       
       if (is403Error) {
         console.log('Processing 403 error for upgrade modal');

@@ -14,7 +14,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2 } from "lucide-react";
+import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2, Edit, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 interface ScheduleForm {
@@ -48,6 +48,14 @@ export default function Scheduler() {
   });
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [editDialog, setEditDialog] = useState(false);
+  const [editForm, setEditForm] = useState({
+    id: "",
+    title: "",
+    description: "",
+    scheduledDate: "",
+    scheduledTime: ""
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

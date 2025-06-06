@@ -519,8 +519,21 @@ export class MongoStorage implements IStorage {
     return this.convertContent(content);
   }
 
-  async deleteContent(id: number): Promise<void> {
-    // Implementation needed
+  async deleteContent(id: number | string): Promise<void> {
+    await this.connect();
+    
+    try {
+      const deleteResult = await ContentModel.deleteOne({ _id: id });
+      
+      if (deleteResult.deletedCount === 0) {
+        throw new Error(`Content with id ${id} not found`);
+      }
+      
+      console.log(`[MONGODB] Successfully deleted content: ${id}`);
+    } catch (error) {
+      console.error(`[MONGODB] Error deleting content ${id}:`, error);
+      throw error;
+    }
   }
 
   async getAnalytics(workspaceId: number | string, platform?: string, days?: number): Promise<Analytics[]> {

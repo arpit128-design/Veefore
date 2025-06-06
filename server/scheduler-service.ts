@@ -90,7 +90,8 @@ export class SchedulerService {
 
       // Get Instagram account for this workspace
       console.log(`[SCHEDULER] Looking for Instagram account for workspace: ${content.workspaceId} (type: ${typeof content.workspaceId})`);
-      const workspaceId = typeof content.workspaceId === 'string' ? parseInt(content.workspaceId) : content.workspaceId;
+      // Keep workspace ID as string for MongoDB ObjectId compatibility
+      const workspaceId = content.workspaceId.toString();
       const instagramAccount = await this.storage.getSocialAccountByPlatform(workspaceId, 'instagram');
       
       if (!instagramAccount || !instagramAccount.accessToken) {

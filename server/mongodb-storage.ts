@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import { IStorage } from "./storage";
 import {
   User, Workspace, SocialAccount, Content, Analytics, AutomationRule,
-  Suggestion, CreditTransaction, Referral,
+  Suggestion, CreditTransaction, Referral, Subscription, Payment, Addon,
   InsertUser, InsertWorkspace, InsertSocialAccount, InsertContent,
   InsertAutomationRule, InsertAnalytics, InsertSuggestion,
-  InsertCreditTransaction, InsertReferral
+  InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -127,6 +127,47 @@ const ReferralSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+const SubscriptionSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  plan: { type: String, required: true },
+  status: { type: String, required: true },
+  priceId: String,
+  subscriptionId: String,
+  currentPeriodStart: Date,
+  currentPeriodEnd: Date,
+  monthlyCredits: { type: Number, default: 0 },
+  extraCredits: { type: Number, default: 0 },
+  autoRenew: { type: Boolean, default: true },
+  canceledAt: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const PaymentSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'INR' },
+  status: { type: String, required: true },
+  razorpayOrderId: { type: String, required: true },
+  razorpayPaymentId: String,
+  razorpaySignature: String,
+  purpose: { type: String, required: true },
+  metadata: mongoose.Schema.Types.Mixed,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AddonSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  type: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  isActive: { type: Boolean, default: true },
+  expiresAt: Date,
+  metadata: mongoose.Schema.Types.Mixed,
+  createdAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
@@ -137,6 +178,9 @@ const AutomationRuleModel = mongoose.model('AutomationRule', AutomationRuleSchem
 const SuggestionModel = mongoose.model('Suggestion', SuggestionSchema);
 const CreditTransactionModel = mongoose.model('CreditTransaction', CreditTransactionSchema);
 const ReferralModel = mongoose.model('Referral', ReferralSchema);
+const SubscriptionModel = mongoose.model('Subscription', SubscriptionSchema);
+const PaymentModel = mongoose.model('Payment', PaymentSchema);
+const AddonModel = mongoose.model('Addon', AddonSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;
@@ -730,5 +774,109 @@ export class MongoStorage implements IStorage {
 
   async getLeaderboard(limit?: number): Promise<Array<User & { referralCount: number }>> {
     return [];
+  }
+
+  // Subscription operations
+  async getSubscription(userId: number): Promise<Subscription | undefined> {
+    await this.connect();
+    const subscription = await SubscriptionModel.findOne({ userId });
+    return subscription ? this.convertSubscription(subscription) : undefined;
+  }
+
+  async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
+    await this.connect();
+    const subscription = new SubscriptionModel(insertSubscription);
+    await subscription.save();
+    return this.convertSubscription(subscription);
+  }
+
+  async updateSubscriptionStatus(userId: number, status: string, canceledAt?: Date): Promise<Subscription> {
+    await this.connect();
+    const subscription = await SubscriptionModel.findOneAndUpdate(
+      { userId },
+      { status, canceledAt, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!subscription) throw new Error('Subscription not found');
+    return this.convertSubscription(subscription);
+  }
+
+  // Payment operations
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    await this.connect();
+    const payment = new PaymentModel(insertPayment);
+    await payment.save();
+    return this.convertPayment(payment);
+  }
+
+  async getPaymentsByUser(userId: number): Promise<Payment[]> {
+    await this.connect();
+    const payments = await PaymentModel.find({ userId }).sort({ createdAt: -1 });
+    return payments.map(payment => this.convertPayment(payment));
+  }
+
+  // Addon operations
+  async getUserAddons(userId: number): Promise<Addon[]> {
+    await this.connect();
+    const addons = await AddonModel.find({ userId, isActive: true });
+    return addons.map(addon => this.convertAddon(addon));
+  }
+
+  async createAddon(insertAddon: InsertAddon): Promise<Addon> {
+    await this.connect();
+    const addon = new AddonModel(insertAddon);
+    await addon.save();
+    return this.convertAddon(addon);
+  }
+
+  // Conversion methods for subscription system
+  private convertSubscription(doc: any): Subscription {
+    return {
+      id: doc._id?.toString() || doc.id,
+      userId: doc.userId,
+      plan: doc.plan,
+      status: doc.status,
+      priceId: doc.priceId || null,
+      subscriptionId: doc.subscriptionId || null,
+      currentPeriodStart: doc.currentPeriodStart || null,
+      currentPeriodEnd: doc.currentPeriodEnd || null,
+      monthlyCredits: doc.monthlyCredits || null,
+      extraCredits: doc.extraCredits || null,
+      autoRenew: doc.autoRenew || null,
+      canceledAt: doc.canceledAt || null,
+      createdAt: doc.createdAt || null,
+      updatedAt: doc.updatedAt || null
+    };
+  }
+
+  private convertPayment(doc: any): Payment {
+    return {
+      id: doc._id?.toString() || doc.id,
+      userId: doc.userId,
+      amount: doc.amount,
+      currency: doc.currency || null,
+      status: doc.status || null,
+      razorpayOrderId: doc.razorpayOrderId,
+      razorpayPaymentId: doc.razorpayPaymentId || null,
+      razorpaySignature: doc.razorpaySignature || null,
+      purpose: doc.purpose,
+      metadata: doc.metadata || null,
+      createdAt: doc.createdAt || null,
+      updatedAt: doc.updatedAt || null
+    };
+  }
+
+  private convertAddon(doc: any): Addon {
+    return {
+      id: doc._id?.toString() || doc.id,
+      userId: doc.userId,
+      type: doc.type,
+      name: doc.name,
+      price: doc.price,
+      isActive: doc.isActive || null,
+      expiresAt: doc.expiresAt || null,
+      metadata: doc.metadata || null,
+      createdAt: doc.createdAt || null
+    };
   }
 }

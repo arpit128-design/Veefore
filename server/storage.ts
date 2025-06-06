@@ -598,7 +598,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { DatabaseStorage } from './db-storage';
+import { MongoStorage } from './mongodb-storage';
 
-// Use PostgreSQL database if available, otherwise fallback to memory storage
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+// Use MongoDB Atlas if connection string is available, otherwise fallback to memory storage
+export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();

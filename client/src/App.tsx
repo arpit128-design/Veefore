@@ -21,6 +21,7 @@ import Workspaces from "@/pages/Workspaces";
 import Integrations from "@/pages/Integrations";
 import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
+import Pricing from "@/pages/Pricing";
 import Auth from "@/pages/Auth";
 import Onboarding from "@/pages/Onboarding";
 import Landing from "@/pages/Landing";

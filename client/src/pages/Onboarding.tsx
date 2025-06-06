@@ -888,50 +888,210 @@ export default function Onboarding() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-center space-y-8"
+      className="text-center space-y-12"
     >
-      <div className="space-y-4">
-        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-          <CheckCircle className="w-12 h-12 text-white" />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold text-gray-900">
-            You're All Set!
-          </h1>
-          <p className="text-xl text-gray-600">
-            Welcome to the future of social media management
-          </p>
+      {/* Hero Section */}
+      <div className="space-y-8">
+        <motion.div 
+          className="mx-auto w-32 h-32 bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 rounded-full flex items-center justify-center relative"
+          animate={{ 
+            boxShadow: [
+              "0 0 30px rgba(34, 197, 94, 0.4)",
+              "0 0 50px rgba(34, 197, 94, 0.6)",
+              "0 0 30px rgba(34, 197, 94, 0.4)"
+            ]
+          }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          <CheckCircle className="w-16 h-16 text-white" />
+          
+          {/* Animated rings */}
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-green-400/30"
+            animate={{ 
+              scale: [1, 1.4, 1],
+              opacity: [0.5, 0, 0.5]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-blue-400/30"
+            animate={{ 
+              scale: [1, 1.6, 1],
+              opacity: [0.3, 0, 0.3]
+            }}
+            transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+          />
+          
+          {/* Success particles */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+              style={{
+                top: `${20 + Math.random() * 60}%`,
+                left: `${20 + Math.random() * 60}%`,
+              }}
+              animate={{
+                y: [-10, -30, -10],
+                opacity: [0, 1, 0],
+                scale: [0, 1, 0]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.3,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </motion.div>
+        
+        <div className="space-y-4">
+          <motion.h1 
+            className="text-6xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent"
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Mission Accomplished!
+          </motion.h1>
+          <motion.p 
+            className="text-2xl text-white/90 font-medium"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            Welcome to the cosmic future of social media
+          </motion.p>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-          <h3 className="font-semibold text-lg mb-4">What's Next?</h3>
-          <div className="text-left space-y-3">
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-              <div>
-                <div className="font-medium">Create Your First Content</div>
-                <div className="text-sm text-gray-600">Use our AI-powered Content Studio to generate posts</div>
-              </div>
+      {/* Enhanced Features Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="max-w-4xl mx-auto"
+      >
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+          <CardContent className="p-10">
+            <motion.h3 
+              className="font-bold text-3xl mb-8 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              Your Journey Begins Now
+            </motion.h3>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Star,
+                  title: "AI Content Studio",
+                  description: "Generate stunning posts with cosmic AI power",
+                  gradient: "from-blue-500 to-purple-500",
+                  delay: 0.2
+                },
+                {
+                  icon: Calendar,
+                  title: "Smart Scheduling", 
+                  description: "Plan your content calendar for optimal engagement",
+                  gradient: "from-purple-500 to-pink-500",
+                  delay: 0.4
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Analytics Universe",
+                  description: "Monitor performance and grow your audience",
+                  gradient: "from-green-500 to-teal-500",
+                  delay: 0.6
+                }
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: item.delay }}
+                    className="text-center space-y-6 p-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-500 group"
+                    whileHover={{ scale: 1.05, y: -10 }}
+                  >
+                    <motion.div 
+                      className={`w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mx-auto relative`}
+                      animate={{ 
+                        boxShadow: [
+                          "0 0 20px rgba(255, 255, 255, 0.1)",
+                          "0 0 30px rgba(255, 255, 255, 0.2)",
+                          "0 0 20px rgba(255, 255, 255, 0.1)"
+                        ]
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, delay: index * 0.5 }}
+                    >
+                      <Icon className="w-10 h-10 text-white" />
+                      
+                      {/* Shimmer effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-2xl"
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                      />
+                    </motion.div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-bold text-xl text-white group-hover:text-green-300 transition-colors">
+                        {item.title}
+                      </h4>
+                      <p className="text-white/80 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                    
+                    <motion.div
+                      className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: item.delay + 0.5 }}
+                    >
+                      <CheckCircle className="w-5 h-5 text-white" />
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
             </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-              <div>
-                <div className="font-medium">Schedule Posts</div>
-                <div className="text-sm text-gray-600">Plan your content calendar for optimal engagement</div>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-              <div>
-                <div className="font-medium">Track Performance</div>
-                <div className="text-sm text-gray-600">Monitor your analytics and grow your audience</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Launch Button */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.2 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="max-w-md mx-auto"
+      >
+        <Button
+          onClick={() => setLocation('/dashboard')}
+          size="lg"
+          className="w-full bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 hover:from-green-700 hover:via-teal-700 hover:to-blue-700 text-white font-bold py-6 text-xl shadow-2xl shadow-green-500/25 relative overflow-hidden group"
+        >
+          {/* Animated background effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          
+          <span className="relative z-10 flex items-center justify-center space-x-3">
+            <Rocket className="w-6 h-6" />
+            <span>Launch into VeeFore Universe</span>
+            <Star className="w-6 h-6" />
+          </span>
+        </Button>
+      </motion.div>
     </motion.div>
   );
 

@@ -40,6 +40,8 @@ const WorkspaceSchema = new mongoose.Schema({
   theme: { type: String, default: 'space' },
   aiPersonality: { type: String, default: 'professional' },
   isDefault: { type: Boolean, default: false },
+  maxTeamMembers: { type: Number, default: 1 },
+  inviteCode: { type: String, unique: true, sparse: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -168,6 +170,31 @@ const AddonSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const WorkspaceMemberSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  role: { type: String, required: true, enum: ['owner', 'editor', 'viewer'] },
+  status: { type: String, default: 'active' },
+  permissions: { type: mongoose.Schema.Types.Mixed, default: {} },
+  invitedBy: { type: mongoose.Schema.Types.Mixed },
+  joinedAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const TeamInvitationSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  email: { type: String, required: true },
+  role: { type: String, required: true, enum: ['editor', 'viewer'] },
+  status: { type: String, default: 'pending' },
+  token: { type: String, required: true, unique: true },
+  expiresAt: { type: Date, required: true },
+  invitedBy: { type: mongoose.Schema.Types.Mixed, required: true },
+  permissions: { type: mongoose.Schema.Types.Mixed, default: {} },
+  acceptedAt: Date,
+  createdAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
@@ -181,6 +208,8 @@ const ReferralModel = mongoose.model('Referral', ReferralSchema);
 const SubscriptionModel = mongoose.model('Subscription', SubscriptionSchema);
 const PaymentModel = mongoose.model('Payment', PaymentSchema);
 const AddonModel = mongoose.model('Addon', AddonSchema);
+const WorkspaceMemberModel = mongoose.model('WorkspaceMember', WorkspaceMemberSchema);
+const TeamInvitationModel = mongoose.model('TeamInvitation', TeamInvitationSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;
@@ -419,6 +448,8 @@ export class MongoStorage implements IStorage {
       theme: mongoWorkspace.theme || 'space',
       aiPersonality: mongoWorkspace.aiPersonality || 'professional',
       isDefault: mongoWorkspace.isDefault || false,
+      maxTeamMembers: mongoWorkspace.maxTeamMembers || 1,
+      inviteCode: mongoWorkspace.inviteCode || null,
       createdAt: mongoWorkspace.createdAt,
       updatedAt: mongoWorkspace.updatedAt
     };

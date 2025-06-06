@@ -70,8 +70,8 @@ export class AnalyticsEngine {
       // Calculate growth velocity based on posting patterns
       const growthVelocity = await this.calculateGrowthVelocity(engagementData, accessToken);
       
-      // Analyze optimal posting times from user's historical data
-      const optimalTime = this.calculateOptimalTiming(engagementData);
+      // Analyze optimal posting times from user's historical data with actual timestamps
+      const optimalTime = await this.calculateOptimalTiming(engagementData, accessToken);
       
       // Calculate trend data
       const trendsData = this.calculateTrends(engagementData);
@@ -143,93 +143,163 @@ export class AnalyticsEngine {
     }
   }
 
-  private calculateOptimalTiming(engagementData: EngagementData[]): {
+  private async calculateOptimalTiming(engagementData: EngagementData[], accessToken: string): Promise<{
     hour: string;
     peakHours: string;
     bestDays: string[];
     audienceActive: number;
-  } {
-    if (engagementData.length === 0) {
+  }> {
+    try {
+      // Get authentic Instagram media data with timestamps
+      const mediaData = await instagramAPI.getUserMedia(accessToken, 25);
+      
+      if (mediaData.length === 0) {
+        console.log('[ANALYTICS ENGINE] No media data available for optimal timing');
+        return {
+          hour: "6:00 PM",
+          peakHours: "6-8 PM",
+          bestDays: ["Tue", "Thu"],
+          audienceActive: 50
+        };
+      }
+
+      // Combine Instagram timestamps with engagement data for authentic analysis
+      const timingData: { hour: number; day: number; engagement: number; reach: number; timestamp: string }[] = [];
+      
+      mediaData.forEach(media => {
+        const date = new Date(media.timestamp);
+        const hour = date.getHours();
+        const dayOfWeek = date.getDay();
+        
+        // Match with engagement data
+        const engagementInfo = engagementData.find(ed => ed.mediaId === media.id) || {
+          likes: 0, comments: 0, shares: 0, saves: 0, reach: 0
+        };
+        
+        const totalEngagement = engagementInfo.likes + engagementInfo.comments + engagementInfo.shares + engagementInfo.saves;
+        
+        timingData.push({
+          hour,
+          day: dayOfWeek,
+          engagement: totalEngagement,
+          reach: engagementInfo.reach,
+          timestamp: media.timestamp
+        });
+      });
+
+      if (timingData.length === 0) {
+        return {
+          hour: "6:00 PM",
+          peakHours: "6-8 PM",
+          bestDays: ["Tue", "Thu"],
+          audienceActive: 50
+        };
+      }
+
+      // Analyze posting patterns by hour
+      const hourlyStats = new Map<number, { totalEngagement: number; totalReach: number; postCount: number }>();
+      const dailyStats = new Map<number, { totalEngagement: number; totalReach: number; postCount: number }>();
+
+      timingData.forEach(entry => {
+        // Hourly analysis
+        const hourlyExisting = hourlyStats.get(entry.hour) || { totalEngagement: 0, totalReach: 0, postCount: 0 };
+        hourlyStats.set(entry.hour, {
+          totalEngagement: hourlyExisting.totalEngagement + entry.engagement,
+          totalReach: hourlyExisting.totalReach + entry.reach,
+          postCount: hourlyExisting.postCount + 1
+        });
+
+        // Daily analysis
+        const dailyExisting = dailyStats.get(entry.day) || { totalEngagement: 0, totalReach: 0, postCount: 0 };
+        dailyStats.set(entry.day, {
+          totalEngagement: dailyExisting.totalEngagement + entry.engagement,
+          totalReach: dailyExisting.totalReach + entry.reach,
+          postCount: dailyExisting.postCount + 1
+        });
+      });
+
+      // Find optimal hour based on authentic engagement rates
+      let bestHour = 18;
+      let bestEngagementRate = 0;
+
+      hourlyStats.forEach((stats, hour) => {
+        const engagementRate = stats.totalReach > 0 ? (stats.totalEngagement / stats.totalReach) * 100 : 0;
+        if (engagementRate > bestEngagementRate && stats.postCount > 0) {
+          bestEngagementRate = engagementRate;
+          bestHour = hour;
+        }
+      });
+
+      // Calculate peak hours from authentic data
+      const avgEngagementRate = Array.from(hourlyStats.values())
+        .filter(stats => stats.totalReach > 0)
+        .reduce((sum, stats) => sum + ((stats.totalEngagement / stats.totalReach) * 100), 0) / 
+        Array.from(hourlyStats.values()).filter(stats => stats.totalReach > 0).length;
+
+      const peakHours: number[] = [];
+      hourlyStats.forEach((stats, hour) => {
+        const engagementRate = stats.totalReach > 0 ? (stats.totalEngagement / stats.totalReach) * 100 : 0;
+        if (engagementRate > avgEngagementRate && stats.postCount > 0) {
+          peakHours.push(hour);
+        }
+      });
+
+      // Find best days from authentic performance data
+      const dayAbbrev = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      
+      const bestDaysData = Array.from(dailyStats.entries())
+        .map(([day, stats]) => ({
+          day,
+          engagementRate: stats.totalReach > 0 ? (stats.totalEngagement / stats.totalReach) * 100 : 0,
+          postCount: stats.postCount
+        }))
+        .filter(item => item.postCount > 0)
+        .sort((a, b) => b.engagementRate - a.engagementRate)
+        .slice(0, 2)
+        .map(item => dayAbbrev[item.day]);
+
+      // Calculate authentic audience activity from real data
+      const totalEngagement = timingData.reduce((sum, entry) => sum + entry.engagement, 0);
+      const totalReach = timingData.reduce((sum, entry) => sum + entry.reach, 0);
+      const audienceActive = totalReach > 0 ? Math.round((totalEngagement / totalReach) * 100) : 50;
+
+      // Format time display
+      const formatHour = (hour: number) => {
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        return `${displayHour}:00 ${period}`;
+      };
+
+      // Format peak hours range
+      const peakHoursRange = peakHours.length >= 2 ? 
+        `${Math.min(...peakHours)}-${Math.max(...peakHours)} ${peakHours[0] >= 12 ? 'PM' : 'AM'}` :
+        peakHours.length === 1 ?
+        formatHour(peakHours[0]) :
+        "6-8 PM";
+
+      console.log('[ANALYTICS ENGINE] Calculated authentic optimal timing from', timingData.length, 'Instagram posts:', {
+        bestHour: formatHour(bestHour),
+        peakHours: peakHoursRange,
+        bestDays: bestDaysData,
+        audienceActive
+      });
+
       return {
-        hour: '6:00 PM',
-        peakHours: '6-8 PM',
-        bestDays: ['Tue', 'Thu'],
-        audienceActive: 89
+        hour: formatHour(bestHour),
+        peakHours: peakHoursRange,
+        bestDays: bestDaysData.length > 0 ? bestDaysData : ["Tue", "Thu"],
+        audienceActive: Math.max(0, Math.min(100, audienceActive))
+      };
+
+    } catch (error) {
+      console.error('[ANALYTICS ENGINE] Error calculating optimal timing:', error);
+      return {
+        hour: "6:00 PM",
+        peakHours: "6-8 PM",
+        bestDays: ["Tue", "Thu"],
+        audienceActive: 50
       };
     }
-
-    // Analyze posting times and their engagement
-    const timingAnalysis: OptimalTimingData[] = [];
-    
-    engagementData.forEach(data => {
-      const date = new Date(data.timestamp);
-      const hour = date.getHours();
-      const dayOfWeek = date.getDay();
-      const engagement = data.likes + data.comments + data.shares + data.saves;
-      
-      timingAnalysis.push({
-        hour,
-        dayOfWeek,
-        avgEngagement: engagement,
-        postCount: 1
-      });
-    });
-
-    // Group by hour and calculate average engagement
-    const hourlyStats = new Map<number, { totalEngagement: number; postCount: number }>();
-    
-    timingAnalysis.forEach(analysis => {
-      const existing = hourlyStats.get(analysis.hour) || { totalEngagement: 0, postCount: 0 };
-      hourlyStats.set(analysis.hour, {
-        totalEngagement: existing.totalEngagement + analysis.avgEngagement,
-        postCount: existing.postCount + 1
-      });
-    });
-
-    // Find optimal hour
-    let bestHour = 18; // Default 6 PM
-    let maxAvgEngagement = 0;
-
-    hourlyStats.forEach((stats, hour) => {
-      const avgEngagement = stats.totalEngagement / stats.postCount;
-      if (avgEngagement > maxAvgEngagement) {
-        maxAvgEngagement = avgEngagement;
-        bestHour = hour;
-      }
-    });
-
-    // Analyze best days
-    const dayStats = new Map<number, { totalEngagement: number; postCount: number }>();
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    timingAnalysis.forEach(analysis => {
-      const existing = dayStats.get(analysis.dayOfWeek) || { totalEngagement: 0, postCount: 0 };
-      dayStats.set(analysis.dayOfWeek, {
-        totalEngagement: existing.totalEngagement + analysis.avgEngagement,
-        postCount: existing.postCount + 1
-      });
-    });
-
-    const bestDays: string[] = [];
-    dayStats.forEach((stats, day) => {
-      const avgEngagement = stats.totalEngagement / stats.postCount;
-      if (avgEngagement > maxAvgEngagement * 0.8) { // Within 80% of best performance
-        bestDays.push(dayNames[day]);
-      }
-    });
-
-    // Calculate audience activity percentage
-    const totalEngagement = engagementData.reduce((sum, data) => 
-      sum + data.likes + data.comments + data.shares + data.saves, 0);
-    const averageEngagement = totalEngagement / engagementData.length;
-    const audienceActive = Math.min(99, Math.max(50, Math.round(averageEngagement * 10)));
-
-    return {
-      hour: `${bestHour % 12 || 12}:00 ${bestHour >= 12 ? 'PM' : 'AM'}`,
-      peakHours: `${(bestHour-1) % 12 || 12}-${(bestHour+1) % 12 || 12} ${bestHour >= 12 ? 'PM' : 'AM'}`,
-      bestDays: bestDays.length > 0 ? bestDays.slice(0, 2) : ['Tue', 'Thu'],
-      audienceActive
-    };
   }
 
   private calculateTrends(engagementData: EngagementData[]): {

@@ -99,12 +99,10 @@ const AutomationRuleSchema = new mongoose.Schema({
 const SuggestionSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   type: { type: String, required: true },
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  platform: String,
+  data: { type: mongoose.Schema.Types.Mixed, required: true },
   confidence: { type: Number, default: 0.8 },
   isUsed: { type: Boolean, default: false },
-  expiresAt: Date,
+  validUntil: Date,
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -180,13 +180,24 @@ export default function Pricing() {
 
   // Handle plan selection
   const handlePlanSelect = (planId: string) => {
-    const currentPlan = (userSubscription as any)?.plan || 'free';
-    if (currentPlan === planId) return;
+    const currentPlan = ((userSubscription as any)?.plan || 'free').toLowerCase();
+    if (currentPlan === planId.toLowerCase()) return;
     
     if (planId === 'free') {
       toast({
         title: "Free Plan Selected",
         description: "You're now on the free plan!",
+      });
+      return;
+    }
+    
+    console.log('Creating subscription for plan:', planId);
+    
+    if (!window.Razorpay) {
+      toast({
+        title: "Error",
+        description: "Payment system not loaded. Please refresh the page.",
+        variant: "destructive",
       });
       return;
     }
@@ -606,16 +617,16 @@ export default function Pricing() {
                                       : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
                               }`}
                               onClick={() => handlePlanSelect(plan.id)}
-                              disabled={(userSubscription as any)?.plan === plan.id || createSubscriptionMutation.isPending}
+                              disabled={((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase() || createSubscriptionMutation.isPending}
                             >
                               <span className="flex items-center justify-center gap-2">
-                                {(userSubscription as any)?.plan === plan.id 
+                                {((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
                                   ? 'Current Plan' 
                                   : plan.price === 0 
                                   ? 'Get Started' 
                                   : 'Choose Plan'
                                 }
-                                {(userSubscription as any)?.plan !== plan.id && plan.price > 0 && (
+                                {((userSubscription as any)?.plan || 'free').toLowerCase() !== plan.id.toLowerCase() && plan.price > 0 && (
                                   <Rocket className="w-4 h-4" />
                                 )}
                               </span>

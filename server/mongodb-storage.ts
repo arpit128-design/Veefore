@@ -415,19 +415,48 @@ export class MongoStorage implements IStorage {
     return this.convertSocialAccount(newAccount);
   }
 
-  async updateSocialAccount(id: number, updates: Partial<SocialAccount>): Promise<SocialAccount> {
+  async updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount> {
     await this.connect();
     
-    const updatedAccount = await SocialAccountModel.findOneAndUpdate(
-      { id },
-      { ...updates, updatedAt: new Date() },
-      { new: true }
-    );
+    console.log(`[MONGODB DEBUG] Updating social account with ID: ${id} (type: ${typeof id})`);
+    console.log(`[MONGODB DEBUG] Updates:`, updates);
+    
+    // Try to find by MongoDB _id first (if it's a valid ObjectId)
+    let updatedAccount;
+    try {
+      if (mongoose.Types.ObjectId.isValid(id.toString())) {
+        console.log(`[MONGODB DEBUG] Attempting update by MongoDB _id: ${id}`);
+        updatedAccount = await SocialAccountModel.findByIdAndUpdate(
+          id.toString(),
+          { ...updates, updatedAt: new Date() },
+          { new: true }
+        );
+        console.log(`[MONGODB DEBUG] Update by _id result: ${updatedAccount ? 'Found' : 'Not found'}`);
+      }
+    } catch (error) {
+      console.log(`[MONGODB DEBUG] Failed to update by _id:`, error);
+    }
+    
+    // If not found by _id, try by our custom id field
+    if (!updatedAccount) {
+      console.log(`[MONGODB DEBUG] Attempting update by custom id field: ${id}`);
+      updatedAccount = await SocialAccountModel.findOneAndUpdate(
+        { id: id.toString() },
+        { ...updates, updatedAt: new Date() },
+        { new: true }
+      );
+      console.log(`[MONGODB DEBUG] Update by custom id result: ${updatedAccount ? 'Found' : 'Not found'}`);
+    }
     
     if (!updatedAccount) {
+      // Debug: let's see what accounts exist
+      const allAccounts = await SocialAccountModel.find({}).limit(5);
+      console.error(`[MONGODB DEBUG] Social account not found with ID: ${id}`);
+      console.error(`[MONGODB DEBUG] Available accounts:`, allAccounts.map(a => ({ _id: a._id, id: a.id, platform: a.platform })));
       throw new Error('Social account not found');
     }
     
+    console.log(`[MONGODB DEBUG] Successfully updated social account: ${updatedAccount._id}`);
     return this.convertSocialAccount(updatedAccount);
   }
 

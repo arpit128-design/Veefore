@@ -34,7 +34,7 @@ export interface IStorage {
   getSocialAccountsByWorkspace(workspaceId: number): Promise<SocialAccount[]>;
   getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined>;
   createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount>;
-  updateSocialAccount(id: number, updates: Partial<SocialAccount>): Promise<SocialAccount>;
+  updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount>;
   deleteSocialAccount(id: number): Promise<void>;
 
   // Content operations
@@ -229,12 +229,13 @@ export class MemStorage implements IStorage {
     return account;
   }
 
-  async updateSocialAccount(id: number, updates: Partial<SocialAccount>): Promise<SocialAccount> {
-    const account = this.socialAccounts.get(id);
+  async updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount> {
+    const numId = typeof id === 'string' ? parseInt(id) : id;
+    const account = this.socialAccounts.get(numId);
     if (!account) throw new Error("Social account not found");
     
     const updatedAccount = { ...account, ...updates, updatedAt: new Date() };
-    this.socialAccounts.set(id, updatedAccount);
+    this.socialAccounts.set(numId, updatedAccount);
     return updatedAccount;
   }
 

@@ -47,7 +47,9 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
+  // Clone the response so we can read it multiple times if needed
+  const clonedRes = res.clone();
+  await throwIfResNotOk(clonedRes);
   return res;
 }
 

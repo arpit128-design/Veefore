@@ -116,7 +116,8 @@ export default function Pricing() {
   // Create subscription order mutation
   const createSubscriptionMutation = useMutation({
     mutationFn: async (planId: string) => {
-      return apiRequest('POST', '/api/subscription/create-order', { planId });
+      const response = await apiRequest('POST', '/api/subscription/create-order', { planId });
+      return response.json();
     },
     onSuccess: (data: any) => {
       console.log('Razorpay order response:', data);

@@ -322,6 +322,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No workspace found' });
       }
 
+      // Check if Instagram credentials are properly configured
+      if (!process.env.INSTAGRAM_APP_ID || !process.env.INSTAGRAM_APP_SECRET) {
+        return res.status(400).json({ 
+          error: 'Instagram app credentials not configured. Please provide INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET.' 
+        });
+      }
+
       // Force HTTPS for Instagram redirect URI (required by Instagram API)
       const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
       const state = `${workspace.id}`;
@@ -396,6 +403,64 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error: any) {
       console.error('[INSTAGRAM CALLBACK] Error:', error);
       res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
+  // Manual Instagram account connection
+  app.post('/api/instagram/manual-connect', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { accessToken, username } = req.body;
+      
+      if (!accessToken || !username) {
+        return res.status(400).json({ error: 'Access token and username are required' });
+      }
+      
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      console.log(`[MANUAL CONNECT] Connecting Instagram account @${username}`);
+
+      // Test the access token by making a basic API call
+      try {
+        const { instagramAPI } = await import('./instagram-api');
+        const profile = await instagramAPI.getUserProfile(accessToken);
+        
+        console.log(`[MANUAL CONNECT] Token validated for @${profile.username}`);
+        
+        // Save to database
+        const existingAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+        
+        if (existingAccount) {
+          await storage.updateSocialAccount(existingAccount.id, {
+            accessToken,
+            username: profile.username,
+            accountId: profile.id
+          });
+          console.log(`[MANUAL CONNECT] Updated existing account: @${profile.username}`);
+        } else {
+          const newAccount = await storage.createSocialAccount({
+            workspaceId: workspace.id,
+            platform: 'instagram',
+            accountId: profile.id,
+            username: profile.username,
+            accessToken,
+            refreshToken: null,
+            expiresAt: null
+          });
+          console.log(`[MANUAL CONNECT] Created new account: @${profile.username} (DB ID: ${newAccount.id})`);
+        }
+
+        res.json({ success: true, username: profile.username, accountId: profile.id });
+      } catch (apiError: any) {
+        console.error(`[MANUAL CONNECT] Instagram API error:`, apiError);
+        res.status(400).json({ error: 'Invalid Instagram access token or API error' });
+      }
+    } catch (error: any) {
+      console.error('[MANUAL CONNECT] Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 

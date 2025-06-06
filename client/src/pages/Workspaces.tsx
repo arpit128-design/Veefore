@@ -80,7 +80,18 @@ export default function Workspaces() {
   });
 
   const createWorkspaceMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/workspaces', data),
+    mutationFn: async (data: any) => {
+      try {
+        console.log('=== MUTATION FUNCTION START ===');
+        const response = await apiRequest('POST', '/api/workspaces', data);
+        console.log('=== MUTATION SUCCESS ===');
+        return response.json();
+      } catch (error) {
+        console.log('=== MUTATION CAUGHT ERROR ===');
+        console.log('Error in mutationFn:', error);
+        throw error; // Re-throw to trigger onError
+      }
+    },
     onSuccess: () => {
       toast({
         title: "Workspace Created!",

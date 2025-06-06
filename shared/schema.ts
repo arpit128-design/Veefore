@@ -163,6 +163,8 @@ export const insertContentSchema = createInsertSchema(content).pick({
   platform: true,
   creditsUsed: true,
   scheduledAt: true
+}).extend({
+  workspaceId: z.union([z.number(), z.string()])
 });
 
 export const insertAutomationRuleSchema = createInsertSchema(automationRules).pick({

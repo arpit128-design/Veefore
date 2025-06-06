@@ -151,7 +151,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       // Create content in database
       const content = await storage.createContent({
-        workspaceId: parseInt(workspaceId),
+        workspaceId: workspaceId,
         title,
         description: description || null,
         type,

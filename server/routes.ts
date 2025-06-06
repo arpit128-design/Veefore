@@ -111,6 +111,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       const { user } = req;
       console.log(`[USER API] Returning user data for: ${user.id} (${user.email})`);
+      console.log(`[USER API] User isOnboarded: ${user.isOnboarded}, preferences:`, user.preferences ? 'Present' : 'Missing');
       res.json(user);
     } catch (error: any) {
       console.error('[USER API] Error fetching user:', error);

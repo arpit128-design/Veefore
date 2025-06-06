@@ -1155,6 +1155,30 @@ export class MongoStorage implements IStorage {
       }
     }
     
+    // If no members found, add the workspace owner as a member
+    if (result.length === 0) {
+      const workspace = await this.getWorkspace(workspaceId);
+      if (workspace) {
+        const owner = await this.getUser(workspace.userId);
+        if (owner) {
+          const ownerMember: WorkspaceMember & { user: User } = {
+            id: 1,
+            userId: typeof workspace.userId === 'string' ? parseInt(workspace.userId) : workspace.userId,
+            workspaceId: typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId,
+            role: 'Owner',
+            status: 'active',
+            permissions: null,
+            invitedBy: null,
+            joinedAt: workspace.createdAt,
+            createdAt: workspace.createdAt,
+            updatedAt: workspace.updatedAt,
+            user: owner
+          };
+          result.push(ownerMember);
+        }
+      }
+    }
+    
     return result;
   }
 
@@ -1259,13 +1283,13 @@ export class MongoStorage implements IStorage {
 
   private convertWorkspaceMember(doc: any): WorkspaceMember {
     return {
-      id: doc._id?.toString() || doc.id,
+      id: parseInt(doc._id?.toString() || doc.id),
       userId: parseInt(doc.userId),
       workspaceId: parseInt(doc.workspaceId),
       role: doc.role,
       status: doc.status || null,
       permissions: doc.permissions || null,
-      invitedBy: doc.invitedBy || null,
+      invitedBy: doc.invitedBy ? parseInt(doc.invitedBy) : null,
       joinedAt: doc.joinedAt || null,
       createdAt: doc.createdAt || null,
       updatedAt: doc.updatedAt || null

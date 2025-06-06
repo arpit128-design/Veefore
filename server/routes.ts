@@ -2238,7 +2238,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Get workspace members
   app.get('/api/workspaces/:workspaceId/members', requireAuth, addPlanContext, async (req: any, res: Response) => {
     try {
-      const workspaceId = parseInt(req.params.workspaceId);
+      const workspaceId = req.params.workspaceId;
       const userId = req.user.id;
 
       // Check if user has access to this workspace
@@ -2248,12 +2248,20 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
 
       // Check if user is owner or member of workspace
+      console.log('[TEAM] Checking workspace access for user:', userId, 'workspace:', workspaceId);
+      console.log('[TEAM] Workspace owner:', workspace.userId);
+      
       const member = await storage.getWorkspaceMember(workspaceId, userId);
+      console.log('[TEAM] Found member:', member ? 'Yes' : 'No');
+      
       if (workspace.userId !== userId && !member) {
         return res.status(403).json({ error: 'Access denied' });
       }
 
+      console.log('[TEAM] Getting workspace members for:', workspaceId);
       const members = await storage.getWorkspaceMembers(workspaceId);
+      console.log('[TEAM] Found members:', members.length);
+      
       res.json(members);
     } catch (error: any) {
       console.error('[TEAM] Get members error:', error);

@@ -84,20 +84,25 @@ export default function Scheduler() {
   const [socialAccounts, setSocialAccounts] = useState([]);
   const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
 
-  // Fetch social accounts when workspace changes
+  // Fetch social accounts when workspace changes - ensure proper workspace restoration
   useEffect(() => {
-    if (currentWorkspace?.id) {
+    // Only fetch after proper workspace restoration (avoid "My VeeFore Workspace" during restoration)
+    if (currentWorkspace?.id && workspaces.length > 0) {
       console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
       setSocialAccountsLoading(true);
       
       const fetchSocialAccounts = async () => {
         try {
-          // Add slight delay to ensure workspace context is stable
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Wait longer to ensure workspace restoration completes
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
-          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
+          // Get the current workspace ID again to ensure it's correct
+          const workspaceId = currentWorkspace.id;
+          console.log('[SCHEDULER DEBUG] Making API call with workspace ID:', workspaceId);
+          
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${workspaceId}`);
           const accounts = await response.json();
-          console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name);
+          console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name, 'ID:', workspaceId);
           setSocialAccounts(accounts);
         } catch (error) {
           console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
@@ -109,10 +114,10 @@ export default function Scheduler() {
       
       fetchSocialAccounts();
     } else {
-      // No workspace yet
+      // No workspace yet or workspaces still loading
       setSocialAccounts([]);
     }
-  }, [currentWorkspace?.id]);
+  }, [currentWorkspace?.id, workspaces.length]);
 
   // Force refresh queries when workspace changes
   useEffect(() => {

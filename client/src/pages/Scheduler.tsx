@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PublishingProgressTracker } from "@/components/PublishingProgressTracker";
 import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2, Edit, AlertCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ScheduleForm {
   title: string;
@@ -81,64 +81,86 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
-  // Add state to track when workspace restoration is complete
-  const [isWorkspaceStable, setIsWorkspaceStable] = useState(false);
+  // Simple manual state management for social accounts to avoid React Query race conditions
+  const [socialAccounts, setSocialAccounts] = useState([]);
+  const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
+  const workspaceRef = useRef(currentWorkspace);
   
-  // Monitor workspace stability to avoid race conditions
+  // Keep workspace ref updated
   useEffect(() => {
+    workspaceRef.current = currentWorkspace;
+  }, [currentWorkspace]);
+
+  // Fetch social accounts with proper timing control
+  useEffect(() => {
+    let isCancelled = false;
     let timeoutId: NodeJS.Timeout;
     
+    console.log('[SCHEDULER DEBUG] Workspace effect triggered:', {
+      currentId: currentWorkspace?.id,
+      currentName: currentWorkspace?.name,
+      workspacesCount: workspaces.length
+    });
+    
+    // Clear accounts during workspace changes
+    setSocialAccounts([]);
+    setSocialAccountsLoading(true);
+    
     if (currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
-      console.log('[SCHEDULER DEBUG] Workspace context changed:', {
-        id: currentWorkspace.id,
-        name: currentWorkspace.name,
-        workspacesCount: workspaces.length
-      });
-      
-      // Reset stability and wait for workspace to stabilize
-      setIsWorkspaceStable(false);
-      
-      // Wait longer to ensure workspace restoration is truly complete
-      timeoutId = setTimeout(() => {
-        console.log('[SCHEDULER DEBUG] Workspace considered stable:', currentWorkspace.name, currentWorkspace.id);
-        setIsWorkspaceStable(true);
-      }, 1000); // Increased delay for stability
+      // Wait for workspace restoration to stabilize
+      timeoutId = setTimeout(async () => {
+        if (isCancelled) return;
+        
+        // Use ref to get the most current workspace at execution time
+        const workspace = workspaceRef.current;
+        
+        console.log('[SCHEDULER DEBUG] About to fetch accounts with current workspace:', {
+          refId: workspace?.id,
+          refName: workspace?.name,
+          contextId: currentWorkspace?.id,
+          contextName: currentWorkspace?.name
+        });
+        
+        if (!workspace?.id || !workspace?.name) {
+          console.log('[SCHEDULER DEBUG] No valid workspace ref, skipping fetch');
+          setSocialAccountsLoading(false);
+          return;
+        }
+        
+        try {
+          console.log('[SCHEDULER DEBUG] Fetching accounts for workspace:', workspace.id, workspace.name);
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${workspace.id}`);
+          const accounts = await response.json();
+          
+          if (!isCancelled) {
+            console.log('[SCHEDULER DEBUG] Retrieved accounts:', accounts.length, 'for workspace:', workspace.name);
+            accounts.forEach((account: any, index: number) => {
+              console.log(`[SCHEDULER DEBUG]   ${index + 1}. @${account.username} (${account.platform})`);
+            });
+            setSocialAccounts(accounts);
+          }
+        } catch (error) {
+          console.error('[SCHEDULER DEBUG] Error fetching accounts:', error);
+          if (!isCancelled) {
+            setSocialAccounts([]);
+          }
+        } finally {
+          if (!isCancelled) {
+            setSocialAccountsLoading(false);
+          }
+        }
+      }, 1500); // Longer delay to ensure restoration completes
     } else {
-      setIsWorkspaceStable(false);
+      setSocialAccountsLoading(false);
     }
     
     return () => {
+      isCancelled = true;
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     };
   }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length]);
-
-  // Use React Query for social accounts with stability check
-  const { data: socialAccounts = [], isLoading: socialAccountsLoading } = useQuery({
-    queryKey: ['social-accounts', currentWorkspace?.id],
-    queryFn: async () => {
-      if (!currentWorkspace?.id) {
-        console.log('[SCHEDULER] No workspace context for social accounts fetch');
-        return [];
-      }
-      
-      console.log('[SCHEDULER DEBUG] Fetching social accounts for STABLE workspace:', currentWorkspace.id, currentWorkspace.name);
-      
-      const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
-      const accounts = await response.json();
-      
-      console.log('[SCHEDULER DEBUG] Retrieved accounts:', accounts.length, 'for workspace:', currentWorkspace.name);
-      accounts.forEach((account: any, index: number) => {
-        console.log(`[SCHEDULER DEBUG]   ${index + 1}. @${account.username} (${account.platform}) - WorkspaceId: ${account.workspaceId}`);
-      });
-      
-      return accounts;
-    },
-    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name && workspaces.length > 0 && isWorkspaceStable,
-    staleTime: 30000,
-    retry: false
-  });
 
   // Force refresh queries when workspace changes
   useEffect(() => {

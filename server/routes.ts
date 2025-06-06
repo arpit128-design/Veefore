@@ -621,7 +621,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
         
         // Verify user has access to the requested workspace
-        workspace = await storage.getWorkspaceById(workspaceObjectId);
+        workspace = await storage.getWorkspace(workspaceObjectId);
         if (!workspace || workspace.userId !== user.id) {
           console.log('[INSTAGRAM AUTH] Access denied to workspace:', workspaceId);
           return res.status(403).json({ error: 'Access denied to workspace' });
@@ -740,8 +740,19 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
       console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
       
-      // Save to database
-      const existingAccount = await storage.getSocialAccountByPlatform(workspaceId, 'instagram');
+      // Save to database - handle workspace ID conversion
+      console.log(`[INSTAGRAM CALLBACK] Looking for existing Instagram account in workspace: ${workspaceId}`);
+      
+      let existingAccount;
+      try {
+        // Try to find existing account with workspace-specific method
+        const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+        existingAccount = accounts.find(account => account.platform === 'instagram');
+        console.log(`[INSTAGRAM CALLBACK] Found ${accounts.length} accounts in workspace, existing Instagram: ${existingAccount ? 'Yes' : 'No'}`);
+      } catch (error) {
+        console.log(`[INSTAGRAM CALLBACK] Error looking up existing accounts:`, error);
+        existingAccount = null;
+      }
       
       const accountData = {
         accessToken: longLivedToken.access_token,
@@ -753,9 +764,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       };
       
       if (existingAccount) {
+        console.log(`[INSTAGRAM CALLBACK] Updating existing account ID: ${existingAccount.id}`);
         await storage.updateSocialAccount(existingAccount.id, accountData);
         console.log(`[INSTAGRAM CALLBACK] Updated existing account: @${profile.username}`);
       } else {
+        console.log(`[INSTAGRAM CALLBACK] Creating new Instagram account for workspace: ${workspaceId}`);
         const newAccount = await storage.createSocialAccount({
           workspaceId,
           platform: 'instagram',

@@ -367,7 +367,7 @@ export default function Workspaces() {
                               onClick={() => handleEditWorkspace(workspace)}
                               className="glassmorphism"
                             >
-                              <Edit className="w-3 h-3" />
+                              <Edit3 className="w-3 h-3" />
                             </Button>
                             {!workspace.isDefault && (
                               <Button
@@ -579,6 +579,69 @@ export default function Workspaces() {
         currentWorkspace={currentWorkspace}
         targetWorkspace={targetWorkspace}
       />
+
+      {/* Edit Workspace Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="glassmorphism border-electric-cyan/30">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-orbitron text-electric-cyan">
+              Edit Workspace
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-workspace-name">Workspace Name</Label>
+              <Input
+                id="edit-workspace-name"
+                placeholder="e.g., My Business Brand"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                className="glassmorphism"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-workspace-description">Description (Optional)</Label>
+              <Textarea
+                id="edit-workspace-description"
+                placeholder="Brief description of this workspace..."
+                value={editForm.description}
+                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                className="glassmorphism"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-workspace-theme">Theme</Label>
+              <Select value={editForm.theme} onValueChange={(value) => setEditForm({ ...editForm, theme: value })}>
+                <SelectTrigger className="glassmorphism">
+                  <SelectValue placeholder="Select a theme" />
+                </SelectTrigger>
+                <SelectContent className="glassmorphism">
+                  <SelectItem value="default">Default</SelectItem>
+                  <SelectItem value="cosmic">Cosmic Blue</SelectItem>
+                  <SelectItem value="nebula">Nebula Purple</SelectItem>
+                  <SelectItem value="solar">Solar Gold</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex space-x-3 pt-4">
+              <Button
+                onClick={handleUpdateWorkspace}
+                disabled={updateWorkspaceMutation.isPending}
+                className="flex-1 bg-gradient-to-r from-nebula-purple to-purple-600"
+              >
+                {updateWorkspaceMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditOpen(false)}
+                className="flex-1 glassmorphism"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Plan Upgrade Modal */}
       <PlanUpgradeModal

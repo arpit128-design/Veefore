@@ -115,6 +115,8 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<number, User> = new Map();
   private workspaces: Map<number, Workspace> = new Map();
+  private workspaceMembers: Map<string, WorkspaceMember> = new Map(); // key: `${workspaceId}-${userId}`
+  private teamInvitations: Map<number, TeamInvitation> = new Map();
   private socialAccounts: Map<number, SocialAccount> = new Map();
   private content: Map<number, Content> = new Map();
   private analytics: Map<number, Analytics> = new Map();
@@ -128,6 +130,8 @@ export class MemStorage implements IStorage {
   
   private currentUserId: number = 1;
   private currentWorkspaceId: number = 1;
+  private currentWorkspaceMemberId: number = 1;
+  private currentTeamInvitationId: number = 1;
   private currentSocialAccountId: number = 1;
   private currentContentId: number = 1;
   private currentAnalyticsId: number = 1;
@@ -261,6 +265,93 @@ export class MemStorage implements IStorage {
       targetWorkspace.isDefault = true;
       targetWorkspace.updatedAt = new Date();
     }
+  }
+
+  async getWorkspaceByInviteCode(inviteCode: string): Promise<Workspace | undefined> {
+    return Array.from(this.workspaces.values()).find(workspace => workspace.inviteCode === inviteCode);
+  }
+
+  // Team management operations
+  async getWorkspaceMember(workspaceId: number, userId: number): Promise<WorkspaceMember | undefined> {
+    return this.workspaceMembers.get(`${workspaceId}-${userId}`);
+  }
+
+  async getWorkspaceMembers(workspaceId: number): Promise<(WorkspaceMember & { user: User })[]> {
+    const members: (WorkspaceMember & { user: User })[] = [];
+    
+    for (const member of this.workspaceMembers.values()) {
+      if (member.workspaceId === workspaceId) {
+        const user = this.users.get(member.userId);
+        if (user) {
+          members.push({ ...member, user });
+        }
+      }
+    }
+    
+    return members;
+  }
+
+  async addWorkspaceMember(insertMember: InsertWorkspaceMember): Promise<WorkspaceMember> {
+    const id = this.currentWorkspaceMemberId++;
+    const member: WorkspaceMember = {
+      ...insertMember,
+      id,
+      invitedAt: new Date(),
+      joinedAt: new Date()
+    };
+    
+    this.workspaceMembers.set(`${member.workspaceId}-${member.userId}`, member);
+    return member;
+  }
+
+  async updateWorkspaceMember(workspaceId: number, userId: number, updates: Partial<WorkspaceMember>): Promise<WorkspaceMember> {
+    const member = this.workspaceMembers.get(`${workspaceId}-${userId}`);
+    if (!member) throw new Error("Workspace member not found");
+    
+    const updatedMember = { ...member, ...updates };
+    this.workspaceMembers.set(`${workspaceId}-${userId}`, updatedMember);
+    return updatedMember;
+  }
+
+  async removeWorkspaceMember(workspaceId: number, userId: number): Promise<void> {
+    this.workspaceMembers.delete(`${workspaceId}-${userId}`);
+  }
+
+  // Team invitation operations
+  async createTeamInvitation(insertInvitation: InsertTeamInvitation): Promise<TeamInvitation> {
+    const id = this.currentTeamInvitationId++;
+    const invitation: TeamInvitation = {
+      ...insertInvitation,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.teamInvitations.set(id, invitation);
+    return invitation;
+  }
+
+  async getTeamInvitation(id: number): Promise<TeamInvitation | undefined> {
+    return this.teamInvitations.get(id);
+  }
+
+  async getTeamInvitationByToken(token: string): Promise<TeamInvitation | undefined> {
+    return Array.from(this.teamInvitations.values()).find(invitation => invitation.token === token);
+  }
+
+  async getTeamInvitations(workspaceId: number, status?: string): Promise<TeamInvitation[]> {
+    return Array.from(this.teamInvitations.values()).filter(invitation => 
+      invitation.workspaceId === workspaceId && (!status || invitation.status === status)
+    );
+  }
+
+  async updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation> {
+    const invitation = this.teamInvitations.get(id);
+    if (!invitation) throw new Error("Team invitation not found");
+    
+    const updatedInvitation = { ...invitation, ...updates, updatedAt: new Date() };
+    this.teamInvitations.set(id, updatedInvitation);
+    return updatedInvitation;
   }
 
   // Social account operations

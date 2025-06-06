@@ -17,6 +17,7 @@ import {
   enrichResponseWithPlanInfo
 } from "./plan-enforcement-middleware";
 import { generateIntelligentSuggestions } from "./ai-suggestions-service";
+import { TeamService } from "./team-service";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 

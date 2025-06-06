@@ -1,69 +1,53 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
 import { 
   Rocket, 
   Instagram, 
-  Twitter, 
-  Youtube, 
-  TrendingUp,
+  CheckCircle, 
+  ArrowRight, 
+  ArrowLeft,
   Sparkles,
   Target,
-  Heart,
-  Camera,
-  Music,
-  Gamepad2,
-  Utensils,
-  Plane,
-  BookOpen,
-  Briefcase,
   Palette,
-  Code,
+  Building,
+  Camera,
+  Video,
+  FileText,
+  Users,
+  TrendingUp,
+  Heart,
+  Gamepad2,
+  Music,
+  Plane,
+  GraduationCap,
+  Utensils,
+  Shirt,
   Dumbbell,
+  Code,
   Car,
   Home,
   ShoppingCart,
   Baby,
-  PawPrint,
-  Users,
-  ArrowRight,
-  Check,
-  Star
+  PawPrint
 } from 'lucide-react';
 
-const steps = [
-  { id: 'welcome', title: 'Welcome to VeeFore', icon: Rocket },
-  { id: 'integrations', title: 'Connect Your Accounts', icon: Instagram },
-  { id: 'preferences', title: 'Tell Us About You', icon: Sparkles },
-  { id: 'complete', title: 'Ready to Launch', icon: Star }
-];
-
-const socialPlatforms = [
-  { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
-  { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'bg-blue-500', comingSoon: true },
-  { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'bg-red-500', comingSoon: true },
-];
-
 const niches = [
-  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Fashion, beauty, wellness' },
-  { id: 'photography', name: 'Photography', icon: Camera, description: 'Visual storytelling' },
-  { id: 'music', name: 'Music', icon: Music, description: 'Artists, producers, fans' },
-  { id: 'gaming', name: 'Gaming', icon: Gamepad2, description: 'Gaming content & reviews' },
-  { id: 'food', name: 'Food & Cooking', icon: Utensils, description: 'Recipes & culinary arts' },
+  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Daily life & personal stories' },
+  { id: 'fashion', name: 'Fashion', icon: Shirt, description: 'Style & trends' },
+  { id: 'beauty', name: 'Beauty', icon: Sparkles, description: 'Makeup & skincare' },
+  { id: 'food', name: 'Food', icon: Utensils, description: 'Recipes & dining' },
   { id: 'travel', name: 'Travel', icon: Plane, description: 'Adventures & destinations' },
-  { id: 'education', name: 'Education', icon: BookOpen, description: 'Learning & tutorials' },
-  { id: 'business', name: 'Business', icon: Briefcase, description: 'Entrepreneurship & tips' },
-  { id: 'art', name: 'Art & Design', icon: Palette, description: 'Creative expression' },
+  { id: 'business', name: 'Business', icon: TrendingUp, description: 'Entrepreneurship & tips' },
+  { id: 'education', name: 'Education', icon: GraduationCap, description: 'Learning & tutorials' },
+  { id: 'entertainment', name: 'Entertainment', icon: Gamepad2, description: 'Gaming & fun content' },
+  { id: 'music', name: 'Music', icon: Music, description: 'Songs & performances' },
   { id: 'tech', name: 'Technology', icon: Code, description: 'Tech reviews & tutorials' },
   { id: 'fitness', name: 'Fitness', icon: Dumbbell, description: 'Health & workouts' },
   { id: 'automotive', name: 'Automotive', icon: Car, description: 'Cars & motorsports' },
@@ -74,33 +58,31 @@ const niches = [
 ];
 
 const contentTypes = [
-  'Posts', 'Stories', 'Reels', 'IGTV', 'Carousel Posts', 'Live Videos', 'Tutorials', 'Behind-the-scenes'
+  { id: 'photos', name: 'Photos', icon: Camera, description: 'High-quality images' },
+  { id: 'videos', name: 'Videos', icon: Video, description: 'Short-form video content' },
+  { id: 'stories', name: 'Stories', icon: Users, description: 'Behind-the-scenes content' },
+  { id: 'captions', name: 'Captions', icon: FileText, description: 'Engaging text content' }
 ];
 
 const tones = [
-  { id: 'professional', name: 'Professional', description: 'Formal and business-focused' },
-  { id: 'casual', name: 'Casual', description: 'Relaxed and conversational' },
-  { id: 'humorous', name: 'Humorous', description: 'Funny and entertaining' },
-  { id: 'inspirational', name: 'Inspirational', description: 'Motivational and uplifting' },
-  { id: 'educational', name: 'Educational', description: 'Informative and teaching' },
-  { id: 'trendy', name: 'Trendy', description: 'Current and fashionable' }
+  { id: 'professional', name: 'Professional', description: 'Formal and business-oriented' },
+  { id: 'casual', name: 'Casual', description: 'Friendly and approachable' },
+  { id: 'humorous', name: 'Humorous', description: 'Fun and entertaining' },
+  { id: 'inspirational', name: 'Inspirational', description: 'Motivating and uplifting' },
+  { id: 'educational', name: 'Educational', description: 'Informative and teaching' }
 ];
 
 export default function Onboarding() {
-  const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
+  const [, setLocation] = useLocation();
   const [preferences, setPreferences] = useState({
-    businessName: '',
-    businessType: '',
-    targetAudience: '',
-    goals: '',
     selectedNiches: [] as string[],
     contentTypes: [] as string[],
     tone: '',
-    postingFrequency: 'daily',
-    languages: ['English'],
-    timezone: 'UTC'
+    businessName: '',
+    description: ''
   });
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -110,72 +92,58 @@ export default function Onboarding() {
     retry: false
   });
 
-  const { data: socialAccounts } = useQuery({
+  const { data: socialAccounts = [] } = useQuery({
     queryKey: ['/api/social-accounts'],
     enabled: currentStep === 1
   });
 
   useEffect(() => {
-    if (user?.isOnboarded) {
+    if (user && user.isOnboarded) {
       setLocation('/dashboard');
     }
   }, [user, setLocation]);
 
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/user/complete-onboarding', {
+      const response = await fetch('/api/user/complete-onboarding', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('firebase-token')}`
+        },
         body: JSON.stringify(data)
       });
+      if (!response.ok) {
+        throw new Error('Failed to complete onboarding');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       toast({
         title: 'Welcome to VeeFore!',
-        description: 'Your account is now set up and ready to use.'
+        description: 'Your onboarding is complete. Redirecting to dashboard...'
       });
-      setLocation('/dashboard');
+      setTimeout(() => setLocation('/dashboard'), 2000);
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
-        title: 'Setup Error',
-        description: error.message || 'Failed to complete onboarding',
+        title: 'Error',
+        description: 'Failed to complete onboarding. Please try again.',
         variant: 'destructive'
       });
     }
   });
 
-  const connectInstagram = () => {
-    window.location.href = '/api/instagram/auth';
-  };
-
-  const handleNicheToggle = (nicheId: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      selectedNiches: prev.selectedNiches.includes(nicheId)
-        ? prev.selectedNiches.filter(id => id !== nicheId)
-        : [...prev.selectedNiches, nicheId]
-    }));
-  };
-
-  const handleContentTypeToggle = (type: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      contentTypes: prev.contentTypes.includes(type)
-        ? prev.contentTypes.filter(t => t !== type)
-        : [...prev.contentTypes, type]
-    }));
-  };
-
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
-  const handlePrevious = () => {
+  const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -191,7 +159,7 @@ export default function Onboarding() {
   const canProceed = () => {
     switch (currentStep) {
       case 0: return true; // Welcome step
-      case 1: return socialAccounts && socialAccounts.length > 0; // Must connect at least one account
+      case 1: return Array.isArray(socialAccounts) && socialAccounts.length > 0; // Must connect at least one account
       case 2: return preferences.selectedNiches.length > 0 && preferences.tone && preferences.businessName; // Must fill preferences
       case 3: return true; // Complete step
       default: return false;
@@ -212,98 +180,115 @@ export default function Onboarding() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Welcome to VeeFore
           </h1>
-          <p className="text-xl text-gray-600 mt-4">
-            Your AI-powered social media management platform
+          <p className="text-xl text-gray-600 mt-2">
+            AI-Powered Social Media Management
           </p>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <Card className="p-6 text-center border-2 hover:border-blue-200 transition-colors">
-          <TrendingUp className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-          <h3 className="font-semibold text-lg mb-2">AI Content Creation</h3>
-          <p className="text-gray-600">Generate engaging content tailored to your audience</p>
+        <Card className="text-center">
+          <CardContent className="pt-6">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-6 h-6 text-blue-600" />
+            </div>
+            <h3 className="font-semibold mb-2">AI Content Creation</h3>
+            <p className="text-sm text-gray-600">
+              Generate engaging posts, captions, and media with AI
+            </p>
+          </CardContent>
         </Card>
-        <Card className="p-6 text-center border-2 hover:border-purple-200 transition-colors">
-          <Target className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-          <h3 className="font-semibold text-lg mb-2">Smart Scheduling</h3>
-          <p className="text-gray-600">Optimize posting times for maximum engagement</p>
+
+        <Card className="text-center">
+          <CardContent className="pt-6">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Target className="w-6 h-6 text-green-600" />
+            </div>
+            <h3 className="font-semibold mb-2">Smart Scheduling</h3>
+            <p className="text-sm text-gray-600">
+              Schedule posts at optimal times for maximum engagement
+            </p>
+          </CardContent>
         </Card>
-        <Card className="p-6 text-center border-2 hover:border-green-200 transition-colors">
-          <Sparkles className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h3 className="font-semibold text-lg mb-2">Analytics & Insights</h3>
-          <p className="text-gray-600">Track performance with real-time analytics</p>
+
+        <Card className="text-center">
+          <CardContent className="pt-6">
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <TrendingUp className="w-6 h-6 text-purple-600" />
+            </div>
+            <h3 className="font-semibold mb-2">Analytics & Insights</h3>
+            <p className="text-sm text-gray-600">
+              Track performance and optimize your strategy
+            </p>
+          </CardContent>
         </Card>
       </div>
 
-      <p className="text-gray-500">
-        Let's get you set up in just a few steps to unlock the full power of AI-driven social media management.
+      <p className="text-gray-600 max-w-2xl mx-auto">
+        Let's get you set up in just a few simple steps. We'll help you connect your social media accounts, 
+        set your preferences, and start creating amazing content with AI.
       </p>
     </motion.div>
   );
 
-  const renderIntegrationsStep = () => (
+  const renderSocialStep = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+      className="text-center space-y-8"
     >
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-4">Connect Your Social Media Accounts</h2>
-        <p className="text-gray-600 text-lg">
-          Connect your accounts to start managing your social media presence
-        </p>
+      <div className="space-y-4">
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full flex items-center justify-center">
+          <Instagram className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Connect Your Social Media
+          </h1>
+          <p className="text-lg text-gray-600">
+            Link your Instagram account to start creating amazing content
+          </p>
+        </div>
       </div>
 
-      <div className="grid gap-6 max-w-2xl mx-auto">
-        {socialPlatforms.map((platform) => (
-          <Card key={platform.id} className="overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full ${platform.color} flex items-center justify-center`}>
-                    <platform.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">{platform.name}</h3>
-                    <p className="text-gray-600">
-                      {platform.comingSoon ? 'Coming Soon' : 'Ready to connect'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  {socialAccounts?.find(acc => acc.platform === platform.id) ? (
-                    <div className="flex items-center space-x-2 text-green-600">
-                      <Check className="w-5 h-5" />
-                      <span className="font-medium">Connected</span>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={platform.id === 'instagram' ? connectInstagram : undefined}
-                      disabled={platform.comingSoon}
-                      variant={platform.comingSoon ? 'outline' : 'default'}
-                      className={platform.id === 'instagram' ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' : ''}
-                    >
-                      {platform.comingSoon ? 'Coming Soon' : 'Connect'}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {socialAccounts && socialAccounts.length > 0 && (
-        <div className="text-center">
-          <div className="inline-flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-            <Check className="w-5 h-5 text-green-600" />
-            <span className="text-green-700 font-medium">
-              Great! You've connected {socialAccounts.length} account{socialAccounts.length > 1 ? 's' : ''}
-            </span>
+      {Array.isArray(socialAccounts) && socialAccounts.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-center text-green-600 mb-2">
+            <CheckCircle className="w-6 h-6 mr-2" />
+            <span className="font-medium">Instagram Connected Successfully!</span>
           </div>
+          <p className="text-sm text-gray-600">
+            Account: @{socialAccounts[0]?.username}
+          </p>
         </div>
       )}
+
+      <Card className="max-w-md mx-auto">
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center space-x-3">
+                <Instagram className="w-6 h-6 text-pink-600" />
+                <div>
+                  <div className="font-medium">Instagram</div>
+                  <div className="text-sm text-gray-600">Connect your Instagram Business account</div>
+                </div>
+              </div>
+              <Button 
+                onClick={() => setLocation('/integrations')}
+                variant="outline"
+                size="sm"
+              >
+                Connect
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <p className="text-sm text-gray-600 max-w-md mx-auto">
+        You can connect additional platforms later in the Integrations section.
+      </p>
     </motion.div>
   );
 
@@ -313,23 +298,33 @@ export default function Onboarding() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
     >
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-4">Tell Us About Your Brand</h2>
-        <p className="text-gray-600 text-lg">
-          Help our AI understand your brand to create better content
-        </p>
+      <div className="text-center space-y-4">
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+          <Palette className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Personalize Your Experience
+          </h1>
+          <p className="text-lg text-gray-600">
+            Help us create better content by sharing your preferences
+          </p>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Business Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Business Information</CardTitle>
+            <CardTitle className="flex items-center space-x-2">
+              <Building className="w-5 h-5" />
+              <span>Business Information</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="businessName">Business/Brand Name</Label>
+                <Label htmlFor="businessName">Business/Brand Name *</Label>
                 <Input
                   id="businessName"
                   value={preferences.businessName}
@@ -338,34 +333,14 @@ export default function Onboarding() {
                 />
               </div>
               <div>
-                <Label htmlFor="businessType">Business Type</Label>
+                <Label htmlFor="description">Description</Label>
                 <Input
-                  id="businessType"
-                  value={preferences.businessType}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, businessType: e.target.value }))}
-                  placeholder="e.g., E-commerce, Service, Personal Brand"
+                  id="description"
+                  value={preferences.description}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Brief description of your business"
                 />
               </div>
-            </div>
-            <div>
-              <Label htmlFor="targetAudience">Target Audience</Label>
-              <Textarea
-                id="targetAudience"
-                value={preferences.targetAudience}
-                onChange={(e) => setPreferences(prev => ({ ...prev, targetAudience: e.target.value }))}
-                placeholder="Describe your target audience (age, interests, demographics)"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="goals">Business Goals</Label>
-              <Textarea
-                id="goals"
-                value={preferences.goals}
-                onChange={(e) => setPreferences(prev => ({ ...prev, goals: e.target.value }))}
-                placeholder="What are your main business goals? (brand awareness, sales, engagement, etc.)"
-                rows={3}
-              />
             </div>
           </CardContent>
         </Card>
@@ -373,76 +348,97 @@ export default function Onboarding() {
         {/* Niche Selection */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Niches & Industries</CardTitle>
+            <CardTitle>Select Your Niches *</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {niches.map((niche) => (
-                <div
-                  key={niche.id}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                    preferences.selectedNiches.includes(niche.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => handleNicheToggle(niche.id)}
-                >
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <niche.icon className="w-8 h-8 text-gray-600" />
-                    <div>
-                      <p className="font-medium text-sm">{niche.name}</p>
-                      <p className="text-xs text-gray-500">{niche.description}</p>
-                    </div>
+              {niches.map((niche) => {
+                const Icon = niche.icon;
+                const isSelected = preferences.selectedNiches.includes(niche.id);
+                return (
+                  <div
+                    key={niche.id}
+                    onClick={() => {
+                      setPreferences(prev => ({
+                        ...prev,
+                        selectedNiches: isSelected
+                          ? prev.selectedNiches.filter(id => id !== niche.id)
+                          : [...prev.selectedNiches, niche.id]
+                      }));
+                    }}
+                    className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mb-2 ${isSelected ? 'text-blue-600' : 'text-gray-600'}`} />
+                    <div className="text-sm font-medium">{niche.name}</div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
-        {/* Content Preferences */}
+        {/* Content Types */}
         <Card>
           <CardHeader>
-            <CardTitle>Content Preferences</CardTitle>
+            <CardTitle>Preferred Content Types</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <Label className="text-base font-medium">Content Types You Want to Create</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                {contentTypes.map((type) => (
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {contentTypes.map((type) => {
+                const Icon = type.icon;
+                const isSelected = preferences.contentTypes.includes(type.id);
+                return (
                   <div
-                    key={type}
-                    className={`p-3 border-2 rounded-lg cursor-pointer text-center transition-all ${
-                      preferences.contentTypes.includes(type)
-                        ? 'border-blue-500 bg-blue-50'
+                    key={type.id}
+                    onClick={() => {
+                      setPreferences(prev => ({
+                        ...prev,
+                        contentTypes: isSelected
+                          ? prev.contentTypes.filter(id => id !== type.id)
+                          : [...prev.contentTypes, type.id]
+                      }));
+                    }}
+                    className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                      isSelected 
+                        ? 'border-green-500 bg-green-50 text-green-700' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
-                    onClick={() => handleContentTypeToggle(type)}
                   >
-                    <span className="text-sm font-medium">{type}</span>
+                    <Icon className={`w-6 h-6 mb-2 ${isSelected ? 'text-green-600' : 'text-gray-600'}`} />
+                    <div className="font-medium">{type.name}</div>
+                    <div className="text-sm text-gray-600">{type.description}</div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </CardContent>
+        </Card>
 
-            <div>
-              <Label className="text-base font-medium">Brand Tone & Voice</Label>
-              <div className="grid md:grid-cols-2 gap-3 mt-3">
-                {tones.map((tone) => (
-                  <div
-                    key={tone.id}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      preferences.tone === tone.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => setPreferences(prev => ({ ...prev, tone: tone.id }))}
-                  >
-                    <h4 className="font-medium">{tone.name}</h4>
-                    <p className="text-sm text-gray-600">{tone.description}</p>
-                  </div>
-                ))}
-              </div>
+        {/* Brand Tone */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Brand Tone *</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {tones.map((tone) => (
+                <div
+                  key={tone.id}
+                  onClick={() => setPreferences(prev => ({ ...prev, tone: tone.id }))}
+                  className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                    preferences.tone === tone.id
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-medium">{tone.name}</div>
+                  <div className="text-sm text-gray-600">{tone.description}</div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -457,170 +453,129 @@ export default function Onboarding() {
       className="text-center space-y-8"
     >
       <div className="space-y-4">
-        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-          <Star className="w-12 h-12 text-white" />
+        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+          <CheckCircle className="w-12 h-12 text-white" />
         </div>
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-gray-900">
             You're All Set!
           </h1>
-          <p className="text-xl text-gray-600 mt-4">
-            Your VeeFore account is now configured and ready to use
+          <p className="text-xl text-gray-600">
+            Welcome to the future of social media management
           </p>
         </div>
       </div>
 
-      <Card className="max-w-2xl mx-auto">
-        <CardContent className="p-8">
-          <h3 className="text-xl font-semibold mb-6">Setup Summary</h3>
-          <div className="space-y-4 text-left">
-            <div className="flex items-center justify-between">
-              <span>Connected Accounts</span>
-              <Badge variant="outline">{socialAccounts?.length || 0} connected</Badge>
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+          <h3 className="font-semibold text-lg mb-4">What's Next?</h3>
+          <div className="text-left space-y-3">
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <div>
+                <div className="font-medium">Create Your First Content</div>
+                <div className="text-sm text-gray-600">Use our AI-powered Content Studio to generate posts</div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Selected Niches</span>
-              <Badge variant="outline">{preferences.selectedNiches.length} selected</Badge>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <div>
+                <div className="font-medium">Schedule Posts</div>
+                <div className="text-sm text-gray-600">Plan your content calendar for optimal engagement</div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Brand Tone</span>
-              <Badge variant="outline">{preferences.tone || 'Not set'}</Badge>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <div>
+                <div className="font-medium">Track Performance</div>
+                <div className="text-sm text-gray-600">Monitor your analytics and grow your audience</div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Content Types</span>
-              <Badge variant="outline">{preferences.contentTypes.length} selected</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-4">
-        <p className="text-gray-600">
-          Our AI is now learning about your brand and will help you create amazing content that resonates with your audience.
-        </p>
-        <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto text-sm">
-          <div className="flex items-center space-x-2 text-green-600">
-            <Check className="w-4 h-4" />
-            <span>AI personality configured</span>
-          </div>
-          <div className="flex items-center space-x-2 text-green-600">
-            <Check className="w-4 h-4" />
-            <span>Content preferences saved</span>
-          </div>
-          <div className="flex items-center space-x-2 text-green-600">
-            <Check className="w-4 h-4" />
-            <span>Ready to create content</span>
           </div>
         </div>
       </div>
     </motion.div>
   );
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0: return renderWelcomeStep();
-      case 1: return renderIntegrationsStep();
-      case 2: return renderPreferencesStep();
-      case 3: return renderCompleteStep();
-      default: return null;
-    }
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const steps = [
+    { title: 'Welcome', component: renderWelcomeStep },
+    { title: 'Connect Social', component: renderSocialStep },
+    { title: 'Preferences', component: renderPreferencesStep },
+    { title: 'Complete', component: renderCompleteStep }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Progress Header */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="flex items-center justify-between mb-8">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-full transition-all ${
+        {/* Progress Bar */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step, index) => (
+              <div key={index} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     index <= currentStep
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-400'
-                  }`}>
-                    {index < currentStep ? (
-                      <Check className="w-6 h-6" />
-                    ) : (
-                      <Icon className="w-6 h-6" />
-                    )}
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-24 h-1 mx-4 transition-all ${
-                      index < currentStep ? 'bg-blue-600' : 'bg-gray-200'
-                    }`} />
-                  )}
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {index + 1}
                 </div>
-              );
-            })}
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-16 md:w-24 h-1 mx-2 ${
+                      index < currentStep ? 'bg-blue-600' : 'bg-gray-200'
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
           <div className="text-center">
-            <h2 className="text-lg font-medium text-gray-600">
-              Step {currentStep + 1} of {steps.length}
-            </h2>
-            <h1 className="text-2xl font-bold text-gray-900 mt-1">
-              {steps[currentStep].title}
-            </h1>
+            <div className="text-sm text-gray-600">
+              Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+            </div>
           </div>
         </div>
 
         {/* Step Content */}
-        <div className="max-w-6xl mx-auto">
-          <AnimatePresence mode="wait">
-            {renderStepContent()}
-          </AnimatePresence>
+        <div className="max-w-5xl mx-auto">
+          {steps[currentStep].component()}
         </div>
 
         {/* Navigation */}
-        <div className="max-w-4xl mx-auto mt-12">
-          <div className="flex justify-between">
+        <div className="max-w-2xl mx-auto mt-12 flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 0}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back</span>
+          </Button>
+
+          {currentStep < 3 ? (
             <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
+              onClick={handleNext}
+              disabled={!canProceed()}
               className="flex items-center space-x-2"
             >
-              <span>Previous</span>
+              <span>Next</span>
+              <ArrowRight className="w-4 h-4" />
             </Button>
-            
-            <div className="flex space-x-4">
-              {currentStep === steps.length - 1 ? (
-                <Button
-                  onClick={handleComplete}
-                  disabled={completeOnboardingMutation.isPending}
-                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 flex items-center space-x-2"
-                >
-                  {completeOnboardingMutation.isPending ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : (
-                    <>
-                      <span>Complete Setup</span>
-                      <Star className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className="flex items-center space-x-2"
-                >
-                  <span>Next</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-          </div>
+          ) : (
+            <Button
+              onClick={handleComplete}
+              disabled={completeOnboardingMutation.isPending}
+              className="flex items-center space-x-2"
+            >
+              <span>
+                {completeOnboardingMutation.isPending ? 'Completing...' : 'Get Started'}
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

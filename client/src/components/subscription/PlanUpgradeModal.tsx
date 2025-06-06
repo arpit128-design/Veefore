@@ -250,8 +250,15 @@ export default function PlanUpgradeModal({
     delay: Math.random() * 2
   }));
 
+  // Debug logging for modal state
+  console.log('[UPGRADE MODAL] Component props:', { isOpen, feature, currentPlan, upgradeMessage, limitReached });
+  
+  // Force open for debugging if needed
+  const shouldShow = isOpen;
+  console.log('[UPGRADE MODAL] Should show:', shouldShow);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={shouldShow} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/50 backdrop-blur-xl relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 pointer-events-none">

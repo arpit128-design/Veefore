@@ -50,6 +50,11 @@ export default function Scheduler() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
+  const [publishingState, setPublishingState] = useState<{
+    isPublishing: boolean;
+    contentType?: string;
+    contentId?: string;
+  }>({ isPublishing: false });
   const [editForm, setEditForm] = useState({
     id: "",
     title: "",
@@ -89,21 +94,54 @@ export default function Scheduler() {
 
   const createContentMutation = useMutation({
     mutationFn: async (contentData: any) => {
+      // For immediate publishing, start progress tracking
+      if (contentData.publishNow) {
+        setPublishingState({
+          isPublishing: true,
+          contentType: contentData.type,
+          contentId: `temp_${Date.now()}`
+        });
+      }
+
       const response = await apiRequest('POST', '/api/content', {
         body: JSON.stringify(contentData)
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
-      toast({
-        title: "Content scheduled",
-        description: "Your content has been scheduled successfully."
-      });
-      setIsScheduleDialogOpen(false);
-      resetScheduleForm();
+      
+      if (variables.publishNow) {
+        // For immediate publishing, continue progress tracking for Instagram processing
+        setPublishingState(prev => ({
+          ...prev,
+          contentId: data.id
+        }));
+        
+        // Extended progress for video processing (2-3 minutes)
+        const processingTime = variables.type === 'reel' || variables.type === 'video' ? 150000 : 30000;
+        
+        setTimeout(() => {
+          setPublishingState({ isPublishing: false });
+          setIsScheduleDialogOpen(false);
+          resetScheduleForm();
+          toast({
+            title: "Content Published Successfully!",
+            description: `Your ${variables.type} has been published to Instagram.`
+          });
+        }, processingTime);
+      } else {
+        // For scheduled content
+        setIsScheduleDialogOpen(false);
+        resetScheduleForm();
+        toast({
+          title: "Content scheduled",
+          description: "Your content has been scheduled successfully."
+        });
+      }
     },
     onError: () => {
+      setPublishingState({ isPublishing: false });
       toast({
         title: "Error",
         description: "Failed to schedule content. Please try again.",
@@ -792,14 +830,16 @@ export default function Scheduler() {
           </DialogHeader>
 
           {/* Publishing Progress Tracker */}
-          {createContentMutation.isPending && (
+          {(createContentMutation.isPending || publishingState.isPublishing) && (
             <PublishingProgressTracker 
-              contentType={scheduleForm.type}
+              contentType={publishingState.contentType || scheduleForm.type}
               isPublishing={true}
+              contentId={publishingState.contentId}
               onComplete={() => {
+                setPublishingState({ isPublishing: false });
                 toast({
                   title: "Content Published Successfully!",
-                  description: `Your ${scheduleForm.type} has been published to Instagram.`
+                  description: `Your ${publishingState.contentType || scheduleForm.type} has been published to Instagram.`
                 });
               }}
             />

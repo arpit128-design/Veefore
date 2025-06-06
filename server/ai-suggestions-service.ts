@@ -156,7 +156,7 @@ Based on this data, provide suggestions in JSON format:
 
 Focus on data-driven insights and practical actions they can take immediately.`;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   
   const response = await model.generateContent(prompt);
   const responseText = response.response.text();

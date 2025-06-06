@@ -628,13 +628,13 @@ export default function Scheduler() {
                     const timeUntil = getTimeUntilScheduled(content.scheduledAt);
                     
                     return (
-                      <Card key={content.id} className="content-card glassmorphism hover:border-electric-cyan/50 transition-colors">
+                      <Card key={content.id} className="content-card glassmorphism hover:border-electric-cyan/50 hover:shadow-lg hover:shadow-electric-cyan/20 transition-all duration-300 cursor-pointer group">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-3">
                                 {getContentIcon(content.type)}
-                                <h3 className="font-semibold text-white">{content.title}</h3>
+                                <h3 className="font-semibold text-white group-hover:text-electric-cyan transition-colors">{content.title}</h3>
                                 <Badge className={`${getStatusColor(content.status)} text-white`}>
                                   {content.status}
                                 </Badge>
@@ -679,16 +679,22 @@ export default function Scheduler() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleEdit(content)}
-                                className="glassmorphism"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(content);
+                                }}
+                                className="glassmorphism hover:bg-electric-cyan/20 hover:border-electric-cyan transition-all opacity-0 group-hover:opacity-100"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleDelete(content.id)}
-                                className="glassmorphism text-red-400 hover:text-red-300"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(content.id);
+                                }}
+                                className="glassmorphism text-red-400 hover:text-red-300 hover:bg-red-500/20 hover:border-red-400 transition-all opacity-0 group-hover:opacity-100"
                                 disabled={deleteContentMutation.isPending}
                               >
                                 <Trash2 className="h-4 w-4" />

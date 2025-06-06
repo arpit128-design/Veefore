@@ -62,20 +62,25 @@ export default function Analyzer() {
     enabled: !!currentWorkspace?.id && !realtimeAnalytics
   });
 
-  // Calculate percentage changes based on current metrics
-  const calculatePercentageChange = (current: number, metric: string) => {
-    // Simulate historical comparison for demonstration
-    // In a real scenario, you'd compare with previous period data
-    const baselineMultipliers = {
-      totalViews: 0.85, // 15% increase
-      engagement: 0.75, // 25% increase  
-      totalReach: 0.90, // 10% increase
-      followers: 0.95   // 5% increase
-    };
+  // Calculate authentic percentage changes from real Instagram trends data
+  const calculateAuthenticPercentageChange = (metric: string) => {
+    if (!realtimeAnalytics?.trendsData) {
+      return 0; // Return neutral when no real data available
+    }
+
+    const trends = realtimeAnalytics.trendsData;
     
-    const baseline = current * (baselineMultipliers[metric] || 0.9);
-    const change = ((current - baseline) / baseline) * 100;
-    return Math.round(change * 10) / 10;
+    switch (metric) {
+      case 'totalViews':
+      case 'totalReach':
+        return trends.reachGrowth || 0;
+      case 'engagement':
+        return trends.engagementTrend || 0;
+      case 'followers':
+        return realtimeAnalytics.growthVelocity || 0;
+      default:
+        return trends.weeklyGrowth || 0;
+    }
   };
 
   // Use real-time analytics if available, fallback to dashboard analytics
@@ -95,10 +100,10 @@ export default function Analyzer() {
     totalPosts: rawAnalytics?.totalPosts || 0,
     accountUsername: rawAnalytics?.accountUsername,
     changes: {
-      views: realtimeAnalytics.trendsData?.reachGrowth || 0,
-      engagement: realtimeAnalytics.trendsData?.engagementTrend || 0,
-      reach: realtimeAnalytics.trendsData?.reachGrowth || 0,
-      followers: realtimeAnalytics.growthVelocity || 0
+      views: calculateAuthenticPercentageChange('totalViews'),
+      engagement: calculateAuthenticPercentageChange('engagement'),
+      reach: calculateAuthenticPercentageChange('totalReach'),
+      followers: calculateAuthenticPercentageChange('followers')
     }
   } : rawAnalytics ? {
     totalViews: rawAnalytics.totalReach || 0,
@@ -111,10 +116,10 @@ export default function Analyzer() {
     totalPosts: rawAnalytics.totalPosts || 0,
     accountUsername: rawAnalytics.accountUsername,
     changes: {
-      views: calculatePercentageChange(rawAnalytics.totalReach || 0, 'totalViews'),
-      engagement: calculatePercentageChange(rawAnalytics.engagementRate || 0, 'engagement'),
-      reach: calculatePercentageChange(rawAnalytics.totalReach || 0, 'totalReach'),
-      followers: calculatePercentageChange(rawAnalytics.followers || 0, 'followers')
+      views: calculateAuthenticPercentageChange('totalViews'),
+      engagement: calculateAuthenticPercentageChange('engagement'),
+      reach: calculateAuthenticPercentageChange('totalReach'),
+      followers: calculateAuthenticPercentageChange('followers')
     }
   } : null;
 

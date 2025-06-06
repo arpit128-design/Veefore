@@ -474,8 +474,16 @@ export class MongoStorage implements IStorage {
     return contents.map(content => this.convertContent(content));
   }
 
-  async getScheduledContent(workspaceId: number): Promise<Content[]> {
-    return [];
+  async getScheduledContent(workspaceId?: number): Promise<Content[]> {
+    await this.connect();
+    const query: any = { status: 'scheduled' };
+    
+    if (workspaceId) {
+      query.workspaceId = workspaceId.toString();
+    }
+    
+    const contents = await ContentModel.find(query).sort({ scheduledAt: 1 }).exec();
+    return contents.map(content => this.convertContent(content));
   }
 
   async createContent(content: InsertContent): Promise<Content> {

@@ -4,16 +4,23 @@ import { ContentStudio } from "@/components/dashboard/ContentStudio";
 import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { useAuth } from "@/hooks/useAuth";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { Eye, Heart, Users, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspaceContext();
 
-  // Fetch real analytics data with better caching
+  // Fetch real analytics data with better caching - filtered by workspace
   const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
-    queryKey: ['/api/dashboard/analytics'],
-    enabled: !!user,
+    queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
+    queryFn: () => fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      }
+    }).then(res => res.json()),
+    enabled: !!user && !!currentWorkspace,
     staleTime: 30000, // Data is fresh for 30 seconds
     gcTime: 300000, // Keep in cache for 5 minutes (TanStack Query v5)
     refetchInterval: 30000, // Refetch every 30 seconds

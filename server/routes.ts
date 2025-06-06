@@ -1020,15 +1020,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Dashboard analytics - fetch real Instagram data
+  // Dashboard analytics - fetch real Instagram data filtered by workspace
   app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const workspace = await storage.getDefaultWorkspace(user.id);
+      const workspaceId = req.query.workspaceId;
+      
+      let workspace;
+      if (workspaceId) {
+        // Get specific workspace
+        workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace || workspace.userId !== user.id) {
+          return res.status(403).json({ error: 'Workspace not found or access denied' });
+        }
+      } else {
+        // Fallback to default workspace
+        workspace = await storage.getDefaultWorkspace(user.id);
+      }
       
       if (!workspace) {
         return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
       }
+
+      console.log(`[DASHBOARD ANALYTICS] Fetching data for workspace: ${workspace.name} (${workspace.id})`);
 
       // Get connected Instagram account
       const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');

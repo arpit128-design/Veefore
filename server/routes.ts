@@ -980,6 +980,46 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Real-time analytics endpoint with authentic data calculation
+  app.get('/api/analytics/realtime', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      
+      if (!workspace) {
+        return res.status(404).json({ error: 'No workspace found' });
+      }
+
+      const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+      
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        return res.status(400).json({ 
+          error: 'Instagram account not connected',
+          message: 'Connect your Instagram account to view real-time analytics'
+        });
+      }
+
+      // Import analytics engine
+      const { AnalyticsEngine } = await import('./analytics-engine');
+      const analyticsEngine = new AnalyticsEngine(storage);
+
+      // Calculate real-time analytics from Instagram data
+      const realTimeAnalytics = await analyticsEngine.calculateRealTimeAnalytics(
+        instagramAccount.accessToken, 
+        workspace.id
+      );
+
+      res.json(realTimeAnalytics);
+
+    } catch (error: any) {
+      console.error('[REALTIME ANALYTICS] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to calculate real-time analytics',
+        details: error.message 
+      });
+    }
+  });
+
   // Dashboard analytics - fetch real Instagram data
   app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
     try {

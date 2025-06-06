@@ -12,6 +12,33 @@ export default function Analyzer() {
   const { currentWorkspace } = useWorkspace();
   const [timeRange, setTimeRange] = useState("30");
 
+  // Fetch real-time analytics data
+  const { data: realtimeAnalytics, refetch: refetchRealtime, isLoading: realtimeLoading } = useQuery({
+    queryKey: ['analytics-realtime', currentWorkspace?.id, timeRange],
+    queryFn: async () => {
+      const token = localStorage.getItem('veefore_auth_token');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/analytics/realtime', {
+        headers,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!currentWorkspace?.id,
+    refetchInterval: 30000, // Refresh every 30 seconds for real-time updates
+    staleTime: 25000 // Consider data stale after 25 seconds
+  });
+
+  // Fetch dashboard analytics as fallback
   const { data: rawAnalytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
     queryFn: async () => {
@@ -32,7 +59,7 @@ export default function Analyzer() {
       
       return response.json();
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id && !realtimeAnalytics
   });
 
   // Calculate percentage changes based on current metrics
@@ -51,8 +78,29 @@ export default function Analyzer() {
     return Math.round(change * 10) / 10;
   };
 
-  // Map raw Instagram data to analyzer format with percentage changes
-  const analytics = rawAnalytics ? {
+  // Use real-time analytics if available, fallback to dashboard analytics
+  const analytics = realtimeAnalytics ? {
+    engagementRate: realtimeAnalytics.engagementRate,
+    growthVelocity: realtimeAnalytics.growthVelocity,
+    optimalTime: realtimeAnalytics.optimalTime,
+    trendsData: realtimeAnalytics.trendsData,
+    // Map for backwards compatibility
+    totalViews: rawAnalytics?.totalReach || 0,
+    engagement: realtimeAnalytics.engagementRate,
+    totalReach: rawAnalytics?.totalReach || 0,
+    followers: rawAnalytics?.followers || 0,
+    impressions: rawAnalytics?.impressions || 0,
+    totalLikes: rawAnalytics?.totalLikes || 0,
+    totalComments: rawAnalytics?.totalComments || 0,
+    totalPosts: rawAnalytics?.totalPosts || 0,
+    accountUsername: rawAnalytics?.accountUsername,
+    changes: {
+      views: realtimeAnalytics.trendsData?.reachGrowth || 0,
+      engagement: realtimeAnalytics.trendsData?.engagementTrend || 0,
+      reach: realtimeAnalytics.trendsData?.reachGrowth || 0,
+      followers: realtimeAnalytics.growthVelocity || 0
+    }
+  } : rawAnalytics ? {
     totalViews: rawAnalytics.totalReach || 0,
     engagement: rawAnalytics.engagementRate || 0,
     totalReach: rawAnalytics.totalReach || 0,
@@ -288,12 +336,14 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-3xl font-bold text-nebula-purple mb-2">
-                {analytics?.totalFollowers && analytics?.engagement 
-                  ? Math.round((analytics.engagement / analytics.totalFollowers) * 100)
-                  : 33}%
+                {realtimeAnalytics?.engagementRate !== undefined 
+                  ? `${realtimeAnalytics.engagementRate}%`
+                  : analytics?.engagement 
+                  ? `${Math.round(analytics.engagement)}%`
+                  : 'Loading...'}
               </div>
               <div className="text-sm text-asteroid-silver">
-                {analytics?.engagement || 3} engagements from {analytics?.totalFollowers || 9} followers
+                {realtimeAnalytics ? 'Real-time engagement rate from Instagram data' : 'Calculated from your posts and reach'}
               </div>
               <div className="mt-4 p-2 bg-nebula-purple/20 rounded-lg">
                 <div className="text-xs text-nebula-purple">Industry average: 1-3%</div>
@@ -313,22 +363,25 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-400 mb-2">
-                {analytics?.changes?.followers !== undefined && analytics.changes.followers > 0 
+                {realtimeAnalytics?.growthVelocity !== undefined
+                  ? realtimeAnalytics.growthVelocity >= 0 
+                    ? `+${realtimeAnalytics.growthVelocity}%`
+                    : `${realtimeAnalytics.growthVelocity}%`
+                  : analytics?.changes?.followers !== undefined && analytics.changes.followers > 0 
                   ? `+${analytics.changes.followers}%`
-                  : 'Stable'
-                }
+                  : 'Calculating...'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
-                Follower growth rate
+                {realtimeAnalytics ? 'Based on recent posting performance' : 'Follower growth rate'}
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span>Reach</span>
-                  <span className="text-solar-gold">{analytics?.platforms?.[0]?.reach || 11}</span>
+                  <span className="text-solar-gold">{analytics?.totalReach || 0}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span>Engagement</span>
-                  <span className="text-nebula-purple">{analytics?.engagement || 3}</span>
+                  <span className="text-nebula-purple">{Math.round(analytics?.engagement || 0)}</span>
                 </div>
               </div>
             </div>
@@ -345,22 +398,26 @@ export default function Analyzer() {
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <div className="text-2xl font-bold text-solar-gold mb-2">6:00 PM</div>
+              <div className="text-2xl font-bold text-solar-gold mb-2">
+                {realtimeAnalytics?.optimalTime?.hour || '6:00 PM'}
+              </div>
               <div className="text-sm text-asteroid-silver mb-4">
-                Best time to post based on your audience
+                {realtimeAnalytics ? 'Analyzed from your posting history' : 'Best time to post based on your audience'}
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span>Peak hours</span>
-                  <span className="text-solar-gold">6-8 PM</span>
+                  <span className="text-solar-gold">{realtimeAnalytics?.optimalTime?.peakHours || '6-8 PM'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Best days</span>
-                  <span className="text-electric-cyan">Tue, Thu</span>
+                  <span className="text-electric-cyan">
+                    {realtimeAnalytics?.optimalTime?.bestDays?.join(', ') || 'Tue, Thu'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Audience active</span>
-                  <span className="text-green-400">89%</span>
+                  <span className="text-green-400">{realtimeAnalytics?.optimalTime?.audienceActive || 89}%</span>
                 </div>
               </div>
             </div>

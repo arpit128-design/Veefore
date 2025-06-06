@@ -666,11 +666,19 @@ export default function Scheduler() {
                               
                               {content.contentData?.mediaUrl && (
                                 <div className="mt-3">
-                                  <img 
-                                    src={content.contentData.mediaUrl} 
-                                    alt="Content preview" 
-                                    className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
-                                  />
+                                  {content.contentData.mediaUrl.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || content.type === 'video' || content.type === 'reel' ? (
+                                    <video 
+                                      src={content.contentData.mediaUrl} 
+                                      className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
+                                      muted
+                                    />
+                                  ) : (
+                                    <img 
+                                      src={content.contentData.mediaUrl} 
+                                      alt="Content preview" 
+                                      className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
+                                    />
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -916,11 +924,19 @@ export default function Scheduler() {
                     {scheduleForm.mediaUrl && (
                       <div className="mt-4">
                         <div className="relative w-full h-48 rounded-lg overflow-hidden bg-cosmic-blue">
-                          <img 
-                            src={scheduleForm.mediaUrl} 
-                            alt="Preview" 
-                            className="w-full h-full object-cover"
-                          />
+                          {uploadedFile && uploadedFile.type.startsWith('video/') ? (
+                            <video 
+                              src={scheduleForm.mediaUrl} 
+                              controls
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img 
+                              src={scheduleForm.mediaUrl} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                           <Button
                             type="button"
                             variant="ghost"
@@ -935,7 +951,9 @@ export default function Scheduler() {
                           </Button>
                         </div>
                         {uploadedFile && (
-                          <p className="text-xs text-asteroid-silver mt-2">{uploadedFile.name}</p>
+                          <p className="text-xs text-asteroid-silver mt-2">
+                            {uploadedFile.name} ({uploadedFile.type.startsWith('video/') ? 'Video' : 'Image'})
+                          </p>
                         )}
                       </div>
                     )}

@@ -191,32 +191,50 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
                 const caption = `${title}\n\n${description || ''}`;
 
+                // Auto-detect if media is video or image
+                const mediaUrl = contentData.mediaUrl;
+                const isVideo = mediaUrl.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || 
+                               mediaUrl.includes('video') || 
+                               type === 'reel' || 
+                               type === 'video';
+
                 // Determine media type and configure payload accordingly
                 switch (type) {
                   case 'story':
-                    // Note: Stories require special permissions and may not work with basic Instagram API access
-                    mediaPayload.image_url = contentData.mediaUrl;
-                    mediaPayload.media_type = 'STORIES';
+                    if (isVideo) {
+                      mediaPayload.video_url = mediaUrl;
+                      mediaPayload.media_type = 'STORIES';
+                    } else {
+                      mediaPayload.image_url = mediaUrl;
+                      mediaPayload.media_type = 'STORIES';
+                    }
                     console.log('[INSTAGRAM API] WARNING: Story publishing requires advanced Instagram API permissions');
                     break;
                   case 'reel':
-                    // Note: Reels require special permissions and may not work with basic Instagram API access
-                    mediaPayload.video_url = contentData.mediaUrl;
+                    mediaPayload.video_url = mediaUrl;
                     mediaPayload.caption = caption;
                     mediaPayload.media_type = 'REELS';
                     console.log('[INSTAGRAM API] WARNING: Reel publishing requires advanced Instagram API permissions');
                     break;
                   case 'video':
-                    mediaPayload.video_url = contentData.mediaUrl;
+                    mediaPayload.video_url = mediaUrl;
                     mediaPayload.caption = caption;
                     mediaPayload.media_type = 'VIDEO';
                     break;
                   case 'post':
                   default:
-                    mediaPayload.image_url = contentData.mediaUrl;
-                    mediaPayload.caption = caption;
+                    if (isVideo) {
+                      mediaPayload.video_url = mediaUrl;
+                      mediaPayload.caption = caption;
+                      mediaPayload.media_type = 'VIDEO';
+                    } else {
+                      mediaPayload.image_url = mediaUrl;
+                      mediaPayload.caption = caption;
+                    }
                     break;
                 }
+
+                console.log(`[INSTAGRAM API] Auto-detected media type: ${isVideo ? 'video' : 'image'} for ${type}`);
 
                 console.log(`[INSTAGRAM API] Creating ${type} media container with payload:`, { ...mediaPayload, access_token: '[HIDDEN]' });
 

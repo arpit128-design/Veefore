@@ -108,38 +108,53 @@ export class SchedulerService {
       // Publish to Instagram based on content type
       let publishResult;
       const caption = `${content.title}\n\n${content.description || ''}`;
+      const mediaUrl = content.contentData.mediaUrl;
       
-      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram`);
+      // Auto-detect if media is video or image
+      const isVideo = mediaUrl?.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || 
+                     mediaUrl?.includes('video') || 
+                     content.type === 'reel' || 
+                     content.type === 'video';
+      
+      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram (${isVideo ? 'video' : 'image'})`);
       
       switch (content.type) {
         case 'story':
           publishResult = await instagramAPI.publishStory(
             instagramAccount.accessToken,
-            content.contentData.mediaUrl,
-            false // Assuming image stories for now
+            mediaUrl,
+            isVideo
           );
           break;
         case 'reel':
           publishResult = await instagramAPI.publishReel(
             instagramAccount.accessToken,
-            content.contentData.mediaUrl,
+            mediaUrl,
             caption
           );
           break;
         case 'video':
           publishResult = await instagramAPI.publishVideo(
             instagramAccount.accessToken,
-            content.contentData.mediaUrl,
+            mediaUrl,
             caption
           );
           break;
         case 'post':
         default:
-          publishResult = await instagramAPI.publishPhoto(
-            instagramAccount.accessToken,
-            content.contentData.mediaUrl,
-            caption
-          );
+          if (isVideo) {
+            publishResult = await instagramAPI.publishVideo(
+              instagramAccount.accessToken,
+              mediaUrl,
+              caption
+            );
+          } else {
+            publishResult = await instagramAPI.publishPhoto(
+              instagramAccount.accessToken,
+              mediaUrl,
+              caption
+            );
+          }
           break;
       }
 

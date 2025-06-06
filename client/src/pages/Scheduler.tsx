@@ -135,7 +135,7 @@ export default function Scheduler() {
   // Update scheduled content mutation
   const updateContentMutation = useMutation({
     mutationFn: async (data: any) => {
-      const scheduledAt = new Date(`${data.scheduledDate}T${data.scheduledTime}`).toISOString();
+      const scheduledAt = new Date(`${data.scheduledDate}T${data.scheduledTime}:00.000Z`).toISOString();
       const response = await apiRequest('PUT', `/api/content/${data.id}`, {
         title: data.title,
         description: data.description,
@@ -228,7 +228,7 @@ export default function Scheduler() {
       title: content.title,
       description: content.description || "",
       scheduledDate: scheduled.toISOString().split('T')[0],
-      scheduledTime: scheduled.toTimeString().slice(0, 5)
+      scheduledTime: scheduled.toISOString().split('T')[1].slice(0, 5)
     });
     setEditDialog(true);
   };
@@ -413,7 +413,8 @@ export default function Scheduler() {
     let scheduledDateTime = new Date();
     
     if (!publishNow) {
-      scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
+      // Create date in UTC to avoid time zone conversion issues
+      scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}:00.000Z`);
       const now = new Date();
 
       if (scheduledDateTime < now) {

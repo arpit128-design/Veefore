@@ -122,7 +122,7 @@ export default function Workspaces() {
           };
         }
         
-        console.log('Setting upgrade modal with data:', {
+        const modalData = {
           isOpen: true,
           feature: 'workspace_creation',
           currentPlan: errorData.currentPlan || user?.plan || 'Free',
@@ -132,19 +132,15 @@ export default function Workspaces() {
             max: errorData.maxWorkspaces || (user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10),
             type: 'workspaces'
           }
-        });
+        };
         
-        setUpgradeModal({
-          isOpen: true,
-          feature: 'workspace_creation',
-          currentPlan: errorData.currentPlan || user?.plan || 'Free',
-          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
-          limitReached: {
-            current: errorData.currentWorkspaces || workspaces?.length || 0,
-            max: errorData.maxWorkspaces || (user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10),
-            type: 'workspaces'
-          }
-        });
+        console.log('Setting upgrade modal with data:', modalData);
+        
+        // Use setTimeout to ensure state update happens after current render cycle
+        setTimeout(() => {
+          setUpgradeModal(modalData);
+          console.log('Upgrade modal state set via setTimeout');
+        }, 100);
         
         console.log('Upgrade modal should now be open');
       } else {

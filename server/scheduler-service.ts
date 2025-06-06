@@ -30,11 +30,24 @@ export class SchedulerService {
 
   private async processScheduledContent() {
     try {
-      console.log('[SCHEDULER] Checking for scheduled content to publish');
+      const currentTime = new Date();
+      console.log(`[SCHEDULER] Checking for scheduled content to publish at ${currentTime.toISOString()}`);
       
       // Get all scheduled content that should be published now
-      const currentTime = new Date();
       const allScheduledContent = await this.getAllScheduledContent();
+      console.log(`[SCHEDULER] Found ${allScheduledContent.length} total scheduled items`);
+      
+      // Debug each item
+      allScheduledContent.forEach((content: any, index: number) => {
+        console.log(`[SCHEDULER] Item ${index + 1}:`, {
+          id: content.id,
+          title: content.title,
+          status: content.status,
+          scheduledAt: content.scheduledAt,
+          scheduledTime: content.scheduledAt ? new Date(content.scheduledAt).toISOString() : 'null',
+          shouldPublish: content.scheduledAt && content.status === 'scheduled' && new Date(content.scheduledAt) <= currentTime
+        });
+      });
       
       const contentToPublish = allScheduledContent.filter((content: any) => {
         if (!content.scheduledAt || content.status !== 'scheduled') {
@@ -46,7 +59,7 @@ export class SchedulerService {
         return scheduledTime <= currentTime;
       });
 
-      console.log(`[SCHEDULER] Found ${contentToPublish.length} items to publish`);
+      console.log(`[SCHEDULER] Found ${contentToPublish.length} items ready to publish`);
 
       for (const content of contentToPublish) {
         await this.publishScheduledContent(content);
@@ -76,7 +89,9 @@ export class SchedulerService {
       }
 
       // Get Instagram account for this workspace
-      const instagramAccount = await this.storage.getSocialAccountByPlatform(content.workspaceId, 'instagram');
+      console.log(`[SCHEDULER] Looking for Instagram account for workspace: ${content.workspaceId} (type: ${typeof content.workspaceId})`);
+      const workspaceId = typeof content.workspaceId === 'string' ? parseInt(content.workspaceId) : content.workspaceId;
+      const instagramAccount = await this.storage.getSocialAccountByPlatform(workspaceId, 'instagram');
       
       if (!instagramAccount || !instagramAccount.accessToken) {
         console.error(`[SCHEDULER] No Instagram account found for workspace ${content.workspaceId}`);

@@ -56,7 +56,7 @@ function analyzeAccountPerformance(socialAccounts: any[], analytics: any[], cont
   let accountType = 'personal';
   let hasRealData = false;
 
-  if (instagramAccount?.realDataSynced) {
+  if (instagramAccount && (instagramAccount.realDataSynced || instagramAccount.followersCount !== undefined)) {
     followersCount = instagramAccount.followersCount || 0;
     mediaCount = instagramAccount.mediaCount || 0;
     avgLikes = instagramAccount.avgLikes || 0;
@@ -64,7 +64,7 @@ function analyzeAccountPerformance(socialAccounts: any[], analytics: any[], cont
     engagementRate = instagramAccount.engagementRate || 0;
     accountType = instagramAccount.accountType || 'PERSONAL';
     hasRealData = true;
-    console.log(`[AI ANALYSIS] Using real Instagram data: ${followersCount} followers, ${mediaCount} posts, ${avgLikes} avg likes, ${avgComments} avg comments, ${(engagementRate/100).toFixed(2)}% engagement`);
+    console.log(`[AI ANALYSIS] Using real Instagram data: @${instagramAccount.username} - ${followersCount} followers, ${mediaCount} posts, ${avgLikes} avg likes, ${avgComments} avg comments, ${(engagementRate/100).toFixed(2)}% engagement`);
   } else {
     // Fallback to analytics table data
     followersCount = instagramAccount?.followersCount || 0;
@@ -228,11 +228,22 @@ Make suggestions highly specific and immediately actionable. Include current Ins
   responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
   try {
-    return JSON.parse(responseText);
+    // Try to extract JSON from the response if it's wrapped in text
+    let jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      responseText = jsonMatch[0];
+    }
+    
+    const parsed = JSON.parse(responseText);
+    console.log('[AI SUGGESTIONS] Successfully parsed AI response with', parsed.suggestions?.length || 0, 'suggestions');
+    return parsed;
   } catch (parseError) {
     console.error('[AI SUGGESTIONS] Failed to parse AI response:', parseError);
-    console.error('[AI SUGGESTIONS] Raw response:', responseText);
-    throw new Error('Invalid AI response format');
+    console.error('[AI SUGGESTIONS] Raw response length:', responseText.length);
+    console.error('[AI SUGGESTIONS] Raw response preview:', responseText.substring(0, 500));
+    
+    // Return a valid structure so fallback can be used
+    return { suggestions: [] };
   }
 }
 

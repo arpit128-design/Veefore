@@ -129,11 +129,21 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       const { user } = req;
       
-      console.log('[CONTENT API] Full request body:', JSON.stringify(req.body, null, 2));
-      console.log('[CONTENT API] Request body type:', typeof req.body);
-      console.log('[CONTENT API] Request body keys:', Object.keys(req.body || {}));
+      // Fix double-stringified body issue
+      let requestData = req.body;
+      if (requestData && typeof requestData === 'object' && requestData.body && typeof requestData.body === 'string') {
+        try {
+          requestData = JSON.parse(requestData.body);
+          console.log('[CONTENT API] Fixed double-stringified body');
+        } catch (parseError) {
+          console.error('[CONTENT API] Failed to parse nested body:', parseError);
+          return res.status(400).json({ error: 'Invalid request body format' });
+        }
+      }
       
-      const { workspaceId, title, description, type, platform, scheduledAt, publishNow, contentData } = req.body;
+      console.log('[CONTENT API] Parsed request data:', JSON.stringify(requestData, null, 2));
+      
+      const { workspaceId, title, description, type, platform, scheduledAt, publishNow, contentData } = requestData;
 
       console.log('[CONTENT API] Extracted values:', {
         workspaceId,
@@ -154,7 +164,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         console.log('[CONTENT API] Validation failed - missing required fields');
         return res.status(400).json({ 
           error: 'Workspace ID and title are required',
-          received: { workspaceId, title, bodyType: typeof req.body }
+          received: { workspaceId, title, bodyType: typeof requestData }
         });
       }
 

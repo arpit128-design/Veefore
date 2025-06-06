@@ -84,15 +84,16 @@ export default function Workspaces() {
       
       // Handle plan restriction errors with upgrade modal
       // Check if error message contains "403:" indicating plan limits
-      if (error?.message?.includes('403:') || error?.message?.includes('plan allows')) {
+      if (error?.message?.includes('403:')) {
         setIsCreateOpen(false); // Close the creation modal immediately
         
         // Parse the error message to extract the JSON response
-        let errorData = {};
+        let errorData: any = {};
         try {
-          const messageStart = error.message.indexOf('{');
-          if (messageStart !== -1) {
-            const jsonStr = error.message.substring(messageStart);
+          // Extract JSON from error message (format: "403: {json}")
+          const statusIndex = error.message.indexOf('403:');
+          if (statusIndex !== -1) {
+            const jsonStr = error.message.substring(statusIndex + 4).trim();
             errorData = JSON.parse(jsonStr);
           }
         } catch (e) {
@@ -103,10 +104,10 @@ export default function Workspaces() {
           isOpen: true,
           feature: 'workspace_creation',
           currentPlan: user?.plan || 'Free',
-          upgradeMessage: (errorData as any).upgradeMessage || "Upgrade your plan to create more workspaces",
+          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
           limitReached: {
             current: workspaces?.length || 0,
-            max: user?.plan === 'Free' ? 1 : 3,
+            max: user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10,
             type: 'workspaces'
           }
         });

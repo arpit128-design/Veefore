@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,9 @@ import {
   ArrowRight,
   Sparkles,
   Rocket,
-  Shield
+  Shield,
+  Compass,
+  Globe
 } from "lucide-react";
 
 interface PlanUpgradeModalProps {
@@ -145,6 +147,18 @@ export default function PlanUpgradeModal({
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>('creator');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState(0);
+
+  // Animation cycle for floating elements
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const interval = setInterval(() => {
+      setAnimationPhase(prev => (prev + 1) % 360);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   const { data: plans } = useQuery({
     queryKey: ['subscription', 'plans'],
@@ -227,18 +241,91 @@ export default function PlanUpgradeModal({
   const currentPlanData = PLAN_FEATURES[currentPlan.toLowerCase() as keyof typeof PLAN_FEATURES];
   const CurrentIcon = currentPlanData?.icon || Sparkles;
 
+  // Floating particles animation data
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 3 + 1,
+    delay: Math.random() * 2
+  }));
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/50 backdrop-blur-xl">
-        <DialogHeader className="text-center pb-6">
-          <div className="mx-auto mb-4 p-3 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/50 backdrop-blur-xl relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Floating Particles */}
+          {particles.map((particle) => (
+            <div
+              key={particle.id}
+              className="absolute rounded-full bg-gradient-to-r from-blue-400/30 to-purple-400/30"
+              style={{
+                left: `${particle.x}%`,
+                top: `${particle.y}%`,
+                width: `${particle.size}px`,
+                height: `${particle.size}px`,
+                animation: `float ${3 + particle.delay}s ease-in-out infinite`,
+                animationDelay: `${particle.delay}s`,
+                transform: `translateY(${Math.sin(animationPhase * 0.01 + particle.id) * 10}px) rotate(${animationPhase + particle.id * 30}deg)`,
+                transition: 'transform 0.05s ease-out'
+              }}
+            />
+          ))}
+          
+          {/* Orbital Rings */}
+          <div 
+            className="absolute top-1/2 left-1/2 w-96 h-96 border border-blue-500/10 rounded-full"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${animationPhase * 0.5}deg)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          />
+          <div 
+            className="absolute top-1/2 left-1/2 w-80 h-80 border border-purple-500/10 rounded-full"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${-animationPhase * 0.3}deg)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          />
+          
+          {/* Gradient Waves */}
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent"
+            style={{
+              transform: `translateX(${Math.sin(animationPhase * 0.02) * 50}px)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          />
+        </div>
+
+        <DialogHeader className="text-center pb-6 relative z-10">
+          <div 
+            className="mx-auto mb-4 p-3 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm"
+            style={{
+              transform: `scale(${1 + Math.sin(animationPhase * 0.03) * 0.1}) rotateY(${Math.sin(animationPhase * 0.02) * 15}deg)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          >
             <Shield className="w-8 h-8 text-orange-400" />
           </div>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-            Unlock More Power
+          <DialogTitle 
+            className="text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+            style={{
+              transform: `translateY(${Math.sin(animationPhase * 0.025) * 2}px)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          >
+            🚀 Unlock Cosmic Power
           </DialogTitle>
-          <p className="text-slate-400 text-lg">
-            You've reached the limit for your current plan
+          <p 
+            className="text-slate-400 text-lg"
+            style={{
+              transform: `translateY(${Math.sin(animationPhase * 0.025 + 1) * 2}px)`,
+              transition: 'transform 0.05s ease-out'
+            }}
+          >
+            You've reached the limits of your current galaxy
           </p>
         </DialogHeader>
 
@@ -281,11 +368,21 @@ export default function PlanUpgradeModal({
             return (
               <Card 
                 key={planKey}
-                className={`relative cursor-pointer transition-all duration-300 hover:scale-105 ${
+                className={`relative cursor-pointer transition-all duration-500 group perspective-1000 ${
                   isSelected 
                     ? `${plan.bgColor} border-2 ${plan.borderColor} shadow-xl shadow-purple-500/20` 
                     : 'bg-slate-800/50 border-slate-700/50 hover:border-slate-600/50'
                 }`}
+                style={{
+                  transform: isSelected 
+                    ? `scale(1.05) rotateY(${Math.sin(animationPhase * 0.02) * 5}deg) rotateX(${Math.cos(animationPhase * 0.015) * 3}deg)` 
+                    : 'scale(1) rotateY(0deg) rotateX(0deg)',
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.5s ease-out, box-shadow 0.3s ease-out',
+                  boxShadow: isSelected 
+                    ? `0 20px 40px rgba(139, 92, 246, 0.3), 0 0 20px ${plan.color.replace('text-', 'rgba(').replace('-', ', ').replace('400', '0.2)')}` 
+                    : '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
                 onClick={() => setSelectedPlan(planKey)}
               >
                 {isRecommended && (

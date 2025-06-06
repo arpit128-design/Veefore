@@ -645,9 +645,9 @@ export default function Onboarding() {
                 <p className="text-white/70">Select multiple niches that match your brand</p>
               </motion.div>
             </CardHeader>
-            <CardContent className="space-y-6 p-8">
+            <CardContent className="space-y-6 p-8 overflow-visible">
               {/* Dropdown Menu */}
-              <div className="relative">
+              <div className="relative z-50">
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -676,7 +676,7 @@ export default function Onboarding() {
                     pointerEvents: nicheDropdownOpen ? 'auto' : 'none'
                   }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
+                  className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
                 >
                     {/* Categories */}
                     {['Personal', 'Creative', 'Professional', 'Lifestyle', 'Commercial', 'Specialty', 'Entertainment'].map((category) => {

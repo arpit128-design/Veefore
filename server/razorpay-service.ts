@@ -16,14 +16,15 @@ export class RazorpayService {
   // Create order for subscription
   async createSubscriptionOrder(planId: string, userId: string) {
     const plan = SUBSCRIPTION_PLANS[planId as keyof typeof SUBSCRIPTION_PLANS];
-    if (!plan || plan.price === 'custom') {
+    if (!plan || plan.price === 'custom' || typeof plan.price !== 'number') {
       throw new Error('Invalid subscription plan');
     }
 
+    const planPrice = plan.price as number;
     const options = {
-      amount: plan.price * 100, // Convert to paise
+      amount: planPrice * 100, // Convert to paise
       currency: plan.currency,
-      receipt: `sub_${userId}_${Date.now()}`,
+      receipt: `sub_${userId.slice(-8)}_${Date.now().toString().slice(-8)}`,
       notes: {
         purpose: 'subscription',
         planId: plan.id,
@@ -55,7 +56,7 @@ export class RazorpayService {
     const options = {
       amount: packageInfo.price * 100, // Convert to paise
       currency: 'INR',
-      receipt: `credits_${userId}_${Date.now()}`,
+      receipt: `crd_${userId.slice(-8)}_${Date.now().toString().slice(-8)}`,
       notes: {
         purpose: 'credits',
         packageId,

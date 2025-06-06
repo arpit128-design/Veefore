@@ -83,15 +83,27 @@ export default function Workspaces() {
       console.log('Workspace creation error:', error);
       
       // Handle plan restriction errors with upgrade modal
-      if (error?.response?.status === 403) {
-        const errorData = error.response.data;
+      // Check if error message contains "403:" indicating plan limits
+      if (error?.message?.includes('403:') || error?.message?.includes('plan allows')) {
         setIsCreateOpen(false); // Close the creation modal immediately
+        
+        // Parse the error message to extract the JSON response
+        let errorData = {};
+        try {
+          const messageStart = error.message.indexOf('{');
+          if (messageStart !== -1) {
+            const jsonStr = error.message.substring(messageStart);
+            errorData = JSON.parse(jsonStr);
+          }
+        } catch (e) {
+          console.log('Could not parse error data:', e);
+        }
         
         setUpgradeModal({
           isOpen: true,
           feature: 'workspace_creation',
           currentPlan: user?.plan || 'Free',
-          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces",
+          upgradeMessage: (errorData as any).upgradeMessage || "Upgrade your plan to create more workspaces",
           limitReached: {
             current: workspaces?.length || 0,
             max: user?.plan === 'Free' ? 1 : 3,

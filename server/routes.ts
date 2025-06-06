@@ -60,6 +60,19 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           
           user = await storage.createUser(userData);
           console.log(`[AUTH DEBUG] Created new user: ${user.id}`);
+          
+          // Automatically create default workspace for new users
+          try {
+            const defaultWorkspace = await storage.createWorkspace({
+              userId: user.id,
+              name: 'My VeeFore Workspace',
+              description: 'Default workspace for social media management'
+            });
+            console.log(`[AUTH DEBUG] Created default workspace for new user: ${defaultWorkspace.id} (${defaultWorkspace.name})`);
+          } catch (workspaceError) {
+            console.error(`[AUTH ERROR] Failed to create default workspace for user ${user.id}:`, workspaceError);
+            // Continue even if workspace creation fails - user can create one later
+          }
         } catch (error) {
           console.log(`[AUTH ERROR] Failed to create user:`, error);
           return res.status(500).json({ error: 'Failed to create user account' });
@@ -67,6 +80,24 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
 
       console.log(`[AUTH DEBUG] User found: ${user.id} (${user.email})`);
+      
+      // Check if existing user has at least one workspace, create default if not
+      try {
+        const userWorkspaces = await storage.getWorkspacesByUser(user.id);
+        if (userWorkspaces.length === 0) {
+          console.log(`[AUTH DEBUG] User ${user.id} has no workspaces, creating default workspace`);
+          const defaultWorkspace = await storage.createWorkspace({
+            userId: user.id,
+            name: 'My VeeFore Workspace',
+            description: 'Default workspace for social media management'
+          });
+          console.log(`[AUTH DEBUG] Created default workspace for existing user: ${defaultWorkspace.id} (${defaultWorkspace.name})`);
+        }
+      } catch (workspaceError) {
+        console.error(`[AUTH ERROR] Failed to check/create workspace for user ${user.id}:`, workspaceError);
+        // Continue even if workspace check/creation fails
+      }
+      
       req.user = user;
       next();
     } catch (error) {

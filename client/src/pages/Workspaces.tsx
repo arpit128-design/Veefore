@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -17,7 +17,7 @@ import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwit
 
 
 export default function Workspaces() {
-  const { workspaces, currentWorkspace, isSwitching, switchWorkspace } = useWorkspace();
+  const { workspaces, currentWorkspace, isSwitching, switchWorkspace } = useWorkspaceContext();
   const [targetWorkspace, setTargetWorkspace] = useState<any>(null);
   const { token } = useAuth();
   const { toast } = useToast();
@@ -28,6 +28,21 @@ export default function Workspaces() {
     name: "",
     description: "",
     theme: "default"
+  });
+
+  // Fetch workspace-specific social accounts for activity
+  const { data: socialAccounts } = useQuery({
+    queryKey: ['social-accounts', currentWorkspace?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/social-accounts?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch social accounts');
+      return response.json();
+    },
+    enabled: !!currentWorkspace?.id && !!token
   });
 
   const createWorkspaceMutation = useMutation({
@@ -257,38 +272,35 @@ export default function Workspaces() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-pink-400">
-              <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Instagram @arpit9996363 connected</span>
-                  <span className="text-xs text-asteroid-silver">Today</span>
+            {socialAccounts && socialAccounts.length > 0 ? (
+              socialAccounts.map((account: any, index: number) => (
+                <div key={account._id} className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-pink-400">
+                  <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">
+                        {account.platform} @{account.username} connected
+                      </span>
+                      <span className="text-xs text-asteroid-silver">Today</span>
+                    </div>
+                    <div className="text-xs text-pink-400">
+                      {account.accountType} account verified
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs text-pink-400">Business account verified • 14 posts analyzed</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-green-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Content performance analyzed</span>
-                  <span className="text-xs text-asteroid-silver">Today</span>
+              ))
+            ) : (
+              <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-electric-cyan">
+                <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Workspace created</span>
+                    <span className="text-xs text-asteroid-silver">Today</span>
+                  </div>
+                  <div className="text-xs text-electric-cyan">Ready for social media integrations</div>
                 </div>
-                <div className="text-xs text-green-400">15 total reach • 3 total likes • 20% engagement rate</div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-3 bg-cosmic-void/30 rounded-lg border-l-4 border-electric-cyan">
-              <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Optimal timing calculated</span>
-                  <span className="text-xs text-asteroid-silver">Today</span>
-                </div>
-                <div className="text-xs text-electric-cyan">Best posting time: 6:00 PM • Peak days: Thu, Fri</div>
-              </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>

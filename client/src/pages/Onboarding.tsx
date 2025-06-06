@@ -111,12 +111,27 @@ export default function Onboarding() {
     enabled: currentStep === 1
   });
 
+  // Fetch workspaces to ensure we have a valid workspace ID
+  const { data: workspaces = [] } = useQuery({
+    queryKey: ['/api/workspaces'],
+    enabled: !!user
+  });
+
   // Instagram connection mutation using the same flow as integrations page
   const connectInstagramMutation = useMutation({
     mutationFn: async () => {
       console.log(`[ONBOARDING CONNECT] Attempting to connect Instagram`);
       console.log(`[ONBOARDING CONNECT] User state:`, user ? 'Present' : 'Missing');
-      console.log(`[ONBOARDING CONNECT] Workspace:`, currentWorkspace?.id);
+      console.log(`[ONBOARDING CONNECT] Current workspace:`, currentWorkspace?.id);
+      console.log(`[ONBOARDING CONNECT] Available workspaces:`, workspaces.length);
+      
+      // Use currentWorkspace if available, otherwise use first workspace
+      const workspaceId = currentWorkspace?.id || workspaces[0]?.id;
+      console.log(`[ONBOARDING CONNECT] Using workspace ID:`, workspaceId);
+      
+      if (!workspaceId) {
+        throw new Error('No workspace available. Please refresh the page and try again.');
+      }
       
       // Get fresh token from localStorage
       let token = localStorage.getItem('veefore_auth_token');
@@ -151,7 +166,7 @@ export default function Onboarding() {
       }
       
       // Make authenticated request to Instagram OAuth
-      const response = await fetch(`/api/instagram/auth?workspaceId=${currentWorkspace?.id}`, {
+      const response = await fetch(`/api/instagram/auth?workspaceId=${workspaceId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -188,10 +203,7 @@ export default function Onboarding() {
 
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/user/complete-onboarding', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
+      return apiRequest('/api/user/complete-onboarding', 'POST', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });

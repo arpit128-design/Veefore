@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 3D Perspective and Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
 :root {
   --background: 11 20% 8%; /* #0B1426 */
   --foreground: 0 0% 98%;

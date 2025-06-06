@@ -621,7 +621,35 @@ export class InstagramAPI {
       }
 
       if (!containerReady) {
-        throw new Error(`Instagram video processing failed. This appears to be due to Instagram's limitations with your ${Math.round(parseInt(videoUrl.split('-')[2]) / 1024 / 1024)}MB video file.\n\nInstagram API limitations:\n• Maximum recommended file size: 50MB\n• Your file appears to exceed processing limits\n• Current API permissions may not support large file processing\n\nSolutions:\n1. Compress video to under 50MB\n2. Convert to MP4 with H.264 codec\n3. Reduce video resolution or duration\n4. Use Instagram's recommended specifications\n\nWould you like me to implement automatic video compression, or do you have access to Instagram's advanced API permissions for large file processing?`);
+        if (!isRetryWithCompression) {
+          // Try compression as a last resort
+          const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+          if (isLocalFile) {
+            const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+            
+            if (fs.existsSync(localPath)) {
+              console.log(`[INSTAGRAM PUBLISH] Timeout reached - attempting emergency video compression as final attempt`);
+              
+              try {
+                const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                  quality: 'medium', // Use medium quality for emergency compression
+                  targetSizeMB: 40, // Even more aggressive target
+                  maintainAspectRatio: true
+                });
+                
+                if (compressionResult.success && compressionResult.outputPath) {
+                  console.log(`[INSTAGRAM PUBLISH] Emergency compression successful - retrying with compressed video`);
+                  const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                  return this.publishVideoWithCompression(accessToken, compressedUrl, caption, true);
+                }
+              } catch (compressionError: any) {
+                console.error(`[INSTAGRAM PUBLISH] Emergency compression failed:`, compressionError.message);
+              }
+            }
+          }
+        }
+        
+        throw new Error(`Instagram video processing failed after all attempts including intelligent compression. The video file could not be processed within Instagram's limitations.\n\nThis may be due to:\n• File format incompatibility\n• Video specifications exceeding Instagram's processing capacity\n• Network or API limitations\n\nThe intelligent compression system attempted to optimize your video but Instagram's servers could not complete processing. Please try:\n1. Converting to MP4 format with H.264 codec\n2. Reducing video duration or resolution manually\n3. Ensuring stable network connectivity\n4. Retrying after some time`);
       }
 
       // Step 3: Publish the video container

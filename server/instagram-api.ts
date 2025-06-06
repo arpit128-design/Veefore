@@ -36,22 +36,21 @@ export class InstagramAPI {
   
   constructor() {}
 
-  // Generate Instagram OAuth URL - auto-detect app type
+  // Generate Instagram OAuth URL for current API structure
   generateAuthUrl(redirectUri: string, state?: string): string {
-    // Try Instagram Business API first, fallback to Basic Display if needed
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'user_profile,user_media', // Basic Display scopes
+      scope: 'user_profile,user_media',
       response_type: 'code',
       ...(state && { state })
     });
 
     const authUrl = `https://api.instagram.com/oauth/authorize?${params.toString()}`;
     console.log(`[INSTAGRAM API] Generated OAuth URL: ${authUrl}`);
+    console.log(`[INSTAGRAM API] App Type: Checking compatibility with current Instagram app configuration`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
-    console.log(`[INSTAGRAM API] Using Basic Display API scopes for compatibility`);
     
     return authUrl;
   }

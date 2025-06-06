@@ -528,35 +528,41 @@ export default function Integrations() {
                               variant="outline"
                               className="border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-white"
                             >
-                              Manual Connect
+                              Alternative Connect
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="bg-space-black border-asteroid-gray/20">
+                          <DialogContent className="bg-space-black border-asteroid-gray/20 max-w-lg">
                             <DialogHeader>
-                              <DialogTitle className="text-white">Connect Instagram Manually</DialogTitle>
+                              <DialogTitle className="text-white">Connect Instagram Account</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4">
+                              <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                <p className="text-yellow-400 text-sm">
+                                  OAuth connection requires app configuration updates. Use this method to connect your Instagram account directly.
+                                </p>
+                              </div>
                               <div>
                                 <Label htmlFor="username" className="text-white">Instagram Username</Label>
                                 <Input
                                   id="username"
-                                  placeholder="Enter your Instagram username (e.g., arpit9996363)"
+                                  placeholder="arpit9996363"
                                   value={username}
                                   onChange={(e) => setUsername(e.target.value)}
                                   className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="token" className="text-white">Access Token</Label>
+                                <Label htmlFor="token" className="text-white">Instagram Access Token</Label>
                                 <Input
                                   id="token"
+                                  type="password"
                                   placeholder="Enter your Instagram access token"
                                   value={accessToken}
                                   onChange={(e) => setAccessToken(e.target.value)}
                                   className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
                                 />
                                 <p className="text-xs text-asteroid-gray mt-1">
-                                  Get your access token from Instagram Basic Display API or Graph API
+                                  Get your access token from Instagram Developer Console
                                 </p>
                               </div>
                               <Button

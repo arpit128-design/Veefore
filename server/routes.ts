@@ -329,18 +329,36 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         });
       }
 
-      // Diagnostic information for debugging redirect URI issues
+      // Comprehensive diagnostic information for Instagram app configuration
       const currentDomain = req.get('host');
       const requiredRedirectUri = `https://${currentDomain}/api/instagram/callback`;
       
+      console.log(`[INSTAGRAM AUTH] ================== DIAGNOSTIC INFO ==================`);
       console.log(`[INSTAGRAM AUTH] Current domain: ${currentDomain}`);
       console.log(`[INSTAGRAM AUTH] Required redirect URI: ${requiredRedirectUri}`);
       console.log(`[INSTAGRAM AUTH] App ID: ${process.env.INSTAGRAM_APP_ID}`);
-      console.log(`[INSTAGRAM AUTH] CRITICAL: Ensure your Instagram app has this exact redirect URI configured`);
+      console.log(`[INSTAGRAM AUTH] App Secret: ${process.env.INSTAGRAM_APP_SECRET ? 'Present' : 'Missing'}`);
+      console.log(`[INSTAGRAM AUTH] =====================================================`);
+      console.log(`[INSTAGRAM AUTH] TROUBLESHOOTING STEPS:`);
+      console.log(`[INSTAGRAM AUTH] 1. Verify Instagram app type (Basic Display vs Business)`);
+      console.log(`[INSTAGRAM AUTH] 2. Check redirect URI configuration in Instagram Developer Console`);
+      console.log(`[INSTAGRAM AUTH] 3. Ensure app is approved for production use`);
+      console.log(`[INSTAGRAM AUTH] 4. Verify domain is whitelisted in app settings`);
+      console.log(`[INSTAGRAM AUTH] =====================================================`);
       
-      // Validate domain format
+      // Return detailed error information to help with debugging
       if (!currentDomain || !currentDomain.includes('replit.dev')) {
-        console.warn(`[INSTAGRAM AUTH] Warning: Domain format may not be supported by Instagram: ${currentDomain}`);
+        const errorMsg = `Domain format incompatible with Instagram API: ${currentDomain}`;
+        console.error(`[INSTAGRAM AUTH] ${errorMsg}`);
+        return res.status(400).json({ 
+          error: errorMsg,
+          troubleshooting: {
+            currentDomain,
+            requiredRedirectUri,
+            appId: process.env.INSTAGRAM_APP_ID,
+            suggestion: "Verify app configuration in Instagram Developer Console"
+          }
+        });
       }
 
       // Force HTTPS for Instagram redirect URI (required by Instagram API)
@@ -371,7 +389,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       const { code, state, error, error_reason, error_description } = req.query;
       
-      console.log(`[INSTAGRAM CALLBACK] Received callback with all parameters:`, {
+      console.log(`[INSTAGRAM CALLBACK] ================== CALLBACK RECEIVED ==================`);
+      console.log(`[INSTAGRAM CALLBACK] Parameters:`, {
         code: code ? `present (${String(code).substring(0, 10)}...)` : 'missing',
         state: state ? 'present' : 'missing',
         error: error || 'none',
@@ -380,6 +399,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         fullUrl: req.url,
         host: req.get('host')
       });
+      console.log(`[INSTAGRAM CALLBACK] All query parameters:`, req.query);
+      console.log(`[INSTAGRAM CALLBACK] ============================================`);
       
       if (error) {
         console.error(`[INSTAGRAM CALLBACK] OAuth error: ${error}`);

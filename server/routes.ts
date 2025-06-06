@@ -605,11 +605,37 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const workspace = await storage.getDefaultWorkspace(user.id);
+      const workspaceId = req.query.workspaceId;
+      
+      console.log('[INSTAGRAM AUTH] Request for user:', user.id, 'workspaceId:', workspaceId);
+      
+      let workspace;
+      if (workspaceId) {
+        // Convert string workspace ID to ObjectId for MongoDB
+        let workspaceObjectId;
+        try {
+          workspaceObjectId = workspaceId.toString();
+        } catch (error) {
+          console.log('[INSTAGRAM AUTH] Invalid workspace ID format:', workspaceId);
+          return res.status(400).json({ error: 'Invalid workspace ID format' });
+        }
+        
+        // Verify user has access to the requested workspace
+        workspace = await storage.getWorkspaceById(workspaceObjectId);
+        if (!workspace || workspace.userId !== user.id) {
+          console.log('[INSTAGRAM AUTH] Access denied to workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      } else {
+        // Fallback to default workspace if no workspaceId provided
+        workspace = await storage.getDefaultWorkspace(user.id);
+      }
       
       if (!workspace) {
         return res.status(400).json({ error: 'No workspace found' });
       }
+      
+      console.log('[INSTAGRAM AUTH] Using workspace:', workspace.id, workspace.name);
 
       // Check if Instagram credentials are properly configured
       if (!process.env.INSTAGRAM_APP_ID || !process.env.INSTAGRAM_APP_SECRET) {

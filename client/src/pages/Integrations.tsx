@@ -161,7 +161,7 @@ export default function Integrations() {
       
       try {
         // Make direct authenticated fetch to ensure proper headers
-        const response = await fetch(`/api/${platform}/auth`, {
+        const response = await fetch(`/api/${platform}/auth?workspaceId=${currentWorkspace?.id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

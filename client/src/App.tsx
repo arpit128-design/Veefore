@@ -8,7 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/hooks/useWorkspace";
-import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
+import { GlobalWorkspaceSwitchingOverlay } from "@/components/workspaces/GlobalWorkspaceSwitchingOverlay";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
@@ -28,31 +28,34 @@ import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
   return (
-    <div className="min-h-screen bg-space-navy text-white overflow-x-hidden">
-      <SpaceBackground />
-      <Header />
-      <div className="flex pt-20 min-h-screen">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8 relative z-10">
-          <Switch>
-            <Route path="/" component={() => <Redirect to="/dashboard" />} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/content-studio" component={ContentStudio} />
-            <Route path="/scheduler" component={Scheduler} />
-            <Route path="/analyzer" component={Analyzer} />
-            <Route path="/suggestions" component={Suggestions} />
-            <Route path="/workspaces" component={Workspaces} />
-            <Route path="/integrations" component={Integrations} />
-            <Route path="/referrals" component={Referrals} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/subscribe" component={Subscribe} />
-            <Route path="/privacy-policy" component={PrivacyPolicy} />
-            <Route path="/terms-of-service" component={TermsOfService} />
-            <Route component={NotFound} />
-          </Switch>
-        </main>
+    <WorkspaceProvider>
+      <div className="min-h-screen bg-space-navy text-white overflow-x-hidden">
+        <SpaceBackground />
+        <Header />
+        <div className="flex pt-20 min-h-screen">
+          <Sidebar />
+          <main className="flex-1 ml-64 p-8 relative z-10">
+            <Switch>
+              <Route path="/" component={() => <Redirect to="/dashboard" />} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/content-studio" component={ContentStudio} />
+              <Route path="/scheduler" component={Scheduler} />
+              <Route path="/analyzer" component={Analyzer} />
+              <Route path="/suggestions" component={Suggestions} />
+              <Route path="/workspaces" component={Workspaces} />
+              <Route path="/integrations" component={Integrations} />
+              <Route path="/referrals" component={Referrals} />
+              <Route path="/settings" component={Settings} />
+              <Route path="/subscribe" component={Subscribe} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
+              <Route path="/terms-of-service" component={TermsOfService} />
+              <Route component={NotFound} />
+            </Switch>
+          </main>
+        </div>
+        <GlobalWorkspaceSwitchingOverlay />
       </div>
-    </div>
+    </WorkspaceProvider>
   );
 }
 

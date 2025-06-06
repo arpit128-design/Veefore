@@ -46,22 +46,14 @@ import {
 } from 'lucide-react';
 
 const niches = [
-  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Daily life & personal stories' },
+  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Daily life & wellness' },
   { id: 'fashion', name: 'Fashion', icon: Shirt, description: 'Style & trends' },
   { id: 'beauty', name: 'Beauty', icon: Sparkles, description: 'Makeup & skincare' },
   { id: 'food', name: 'Food', icon: Utensils, description: 'Recipes & dining' },
-  { id: 'travel', name: 'Travel', icon: Plane, description: 'Adventures & destinations' },
-  { id: 'business', name: 'Business', icon: TrendingUp, description: 'Entrepreneurship & tips' },
-  { id: 'education', name: 'Education', icon: GraduationCap, description: 'Learning & tutorials' },
-  { id: 'entertainment', name: 'Entertainment', icon: Gamepad2, description: 'Gaming & fun content' },
-  { id: 'music', name: 'Music', icon: Music, description: 'Songs & performances' },
-  { id: 'tech', name: 'Technology', icon: Code, description: 'Tech reviews & tutorials' },
+  { id: 'travel', name: 'Travel', icon: Plane, description: 'Adventures & places' },
+  { id: 'business', name: 'Business', icon: TrendingUp, description: 'Growth & strategy' },
   { id: 'fitness', name: 'Fitness', icon: Dumbbell, description: 'Health & workouts' },
-  { id: 'automotive', name: 'Automotive', icon: Car, description: 'Cars & motorsports' },
-  { id: 'home', name: 'Home & Garden', icon: Home, description: 'Interior design & DIY' },
-  { id: 'shopping', name: 'Shopping', icon: ShoppingCart, description: 'Product reviews & deals' },
-  { id: 'parenting', name: 'Parenting', icon: Baby, description: 'Family & childcare' },
-  { id: 'pets', name: 'Pets', icon: PawPrint, description: 'Pet care & training' },
+  { id: 'tech', name: 'Technology', icon: Code, description: 'Tech & innovation' },
 ];
 
 const contentTypes = [
@@ -503,54 +495,116 @@ export default function Onboarding() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+      className="space-y-12 relative z-10"
     >
-      <div className="text-center space-y-4">
-        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-          <Palette className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Personalize Your Experience
+      {/* Hero Section with 3D Icon */}
+      <div className="text-center space-y-8">
+        <motion.div
+          initial={{ scale: 0, rotateY: -180 }}
+          animate={{ scale: 1, rotateY: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="mx-auto relative"
+        >
+          <div className="w-32 h-32 mx-auto relative">
+            {/* Rotating Glow Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-1"
+            >
+              <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-white/30" />
+            </motion.div>
+            
+            {/* Main Icon Container */}
+            <motion.div
+              animate={{ 
+                y: [0, -15, 0],
+                rotateX: [0, 10, 0],
+                boxShadow: [
+                  "0 20px 40px rgba(147, 51, 234, 0.3)",
+                  "0 30px 60px rgba(236, 72, 153, 0.4)", 
+                  "0 20px 40px rgba(147, 51, 234, 0.3)"
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-2 bg-gradient-to-br from-purple-500 via-pink-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl"
+            >
+              <Palette className="w-16 h-16 text-white" />
+            </motion.div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
+            Your Preferences
           </h1>
-          <p className="text-lg text-gray-600">
-            Help us create better content by sharing your preferences
-          </p>
-        </div>
+          <motion.p 
+            className="text-xl md:text-2xl text-white/90 font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            Tell us about your brand to create amazing content
+          </motion.p>
+        </motion.div>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Business Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Building className="w-5 h-5" />
-              <span>Business Information</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="businessName">Business/Brand Name *</Label>
-                <Input
-                  id="businessName"
-                  value={preferences.businessName}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
-                  placeholder="Enter your business name"
-                />
+        {/* Enhanced Business Information */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+            <CardHeader className="text-center pb-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto">
+                  <Building className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Brand Identity
+                </CardTitle>
+              </motion.div>
+            </CardHeader>
+            <CardContent className="space-y-6 p-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="businessName" className="text-white/90 font-medium mb-2 block">
+                    Business/Brand Name *
+                  </Label>
+                  <Input
+                    id="businessName"
+                    value={preferences.businessName}
+                    onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
+                    placeholder="Enter your business name"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-white/90 font-medium mb-2 block">
+                    Brand Description
+                  </Label>
+                  <Input
+                    id="description"
+                    value={preferences.description}
+                    onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="What makes your brand unique?"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  value={preferences.description}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of your business"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Enhanced Niche Selection with 3D Effects */}
         <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
@@ -570,7 +624,7 @@ export default function Onboarding() {
             </motion.div>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {niches.map((niche, index) => {
                 const Icon = niche.icon;
                 const isSelected = preferences.selectedNiches.includes(niche.id);
@@ -740,30 +794,111 @@ export default function Onboarding() {
           </CardContent>
         </Card>
 
-        {/* Brand Tone */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Brand Tone *</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {tones.map((tone) => (
-                <div
-                  key={tone.id}
-                  onClick={() => setPreferences(prev => ({ ...prev, tone: tone.id }))}
-                  className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                    preferences.tone === tone.id
-                      ? 'border-purple-500 bg-purple-50 text-purple-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="font-medium">{tone.name}</div>
-                  <div className="text-sm text-gray-600">{tone.description}</div>
+        {/* Enhanced Brand Tone Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+            <CardHeader className="text-center pb-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto">
+                  <Zap className="w-6 h-6 text-white" />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
+                  Brand Personality
+                </CardTitle>
+                <p className="text-white/70">Choose the tone that represents your brand</p>
+              </motion.div>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tones.map((tone, index) => {
+                  const isSelected = preferences.tone === tone.id;
+                  const colors = [
+                    'from-blue-500 to-cyan-400',
+                    'from-purple-500 to-pink-400',
+                    'from-green-500 to-emerald-400',
+                    'from-orange-500 to-red-400',
+                    'from-indigo-500 to-purple-400'
+                  ];
+                  const colorClass = colors[index % colors.length];
+                  
+                  return (
+                    <motion.div
+                      key={tone.id}
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: index * 0.1, duration: 0.4 }}
+                      onClick={() => setPreferences(prev => ({ ...prev, tone: tone.id }))}
+                      whileHover={{ 
+                        scale: 1.02,
+                        boxShadow: "0 10px 25px rgba(255, 255, 255, 0.1)"
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`relative p-6 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
+                        isSelected 
+                          ? 'bg-white/20 backdrop-blur-md border-2 border-white/40 shadow-lg' 
+                          : 'bg-white/5 backdrop-blur-sm border border-white/20 hover:bg-white/10'
+                      }`}
+                    >
+                      {/* Background Glow Effect */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                      
+                      {/* Selection Ring */}
+                      {isSelected && (
+                        <motion.div
+                          className="absolute inset-0 rounded-xl border-2 border-white/40"
+                          animate={{ 
+                            boxShadow: [
+                              "0 0 15px rgba(255, 255, 255, 0.2)",
+                              "0 0 25px rgba(255, 255, 255, 0.4)",
+                              "0 0 15px rgba(255, 255, 255, 0.2)"
+                            ]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
+                      )}
+                      
+                      {/* Content */}
+                      <div className="relative z-10 text-center">
+                        <div className={`font-bold text-lg mb-2 ${isSelected ? 'text-white' : 'text-white/90'}`}>
+                          {tone.name}
+                        </div>
+                        <div className={`text-sm ${isSelected ? 'text-white/80' : 'text-white/60'}`}>
+                          {tone.description}
+                        </div>
+                      </div>
+                      
+                      {/* Selection Checkmark */}
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
+                        >
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </motion.div>
+                      )}
+                      
+                      {/* Shimmer Effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-xl"
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </motion.div>
   );

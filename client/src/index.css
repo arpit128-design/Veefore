@@ -229,6 +229,28 @@
 .animate-drift { animation: drift 20s ease-in-out infinite; }
 .animate-glow { animation: glow 3s ease-in-out infinite alternate; }
 
+/* Enhanced hover animations for scheduled content */
+.content-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 212, 255, 0.15), 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+.group:hover .opacity-0 {
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.glassmorphism {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Scrollbar styling for space theme */
 ::-webkit-scrollbar {
   width: 8px;

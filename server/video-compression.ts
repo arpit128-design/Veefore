@@ -40,12 +40,14 @@ export class VideoCompressor {
   ): Promise<CompressionResult> {
     try {
       const {
-        targetSizeMB = VideoCompressor.INSTAGRAM_MAX_SIZE_MB,
-        quality = 'high',
+        targetSizeMB = 25, // More aggressive target
+        quality = 'medium',
         maintainAspectRatio = true
       } = options;
 
       console.log(`[VIDEO COMPRESSION] Starting intelligent compression for Instagram compatibility`);
+      console.log(`[VIDEO COMPRESSION] Input file: ${inputPath}`);
+      console.log(`[VIDEO COMPRESSION] Target size: ${targetSizeMB}MB`);
       
       // Get original file size
       const stats = fs.statSync(inputPath);

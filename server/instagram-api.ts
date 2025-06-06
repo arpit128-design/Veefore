@@ -675,24 +675,42 @@ export class InstagramAPI {
                 const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
                 
                 if (fs.existsSync(localPath)) {
+                  console.log(`[INSTAGRAM PUBLISH] Attempting video compression for file: ${localPath}`);
+                  
                   try {
-                    // Import VideoCompressor
+                    // Import VideoCompressor dynamically
                     const { VideoCompressor } = await import('./video-compression');
                     
+                    console.log(`[INSTAGRAM PUBLISH] Starting compression process...`);
                     const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
-                      quality: 'high',
-                      targetSizeMB: 25,
+                      quality: 'medium', // Use medium quality for better compression
+                      targetSizeMB: 20,  // Target smaller size
                       maintainAspectRatio: true
                     });
                     
+                    console.log(`[INSTAGRAM PUBLISH] Compression result:`, {
+                      success: compressionResult.success,
+                      error: compressionResult.error,
+                      outputPath: compressionResult.outputPath
+                    });
+                    
                     if (compressionResult.success && compressionResult.outputPath) {
-                      console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                      const originalSizeMB = compressionResult.originalSize / 1024 / 1024;
+                      const compressedSizeMB = compressionResult.compressedSize! / 1024 / 1024;
+                      
+                      console.log(`[INSTAGRAM PUBLISH] Video compressed successfully: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`);
                       
                       const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
-                      return await this.publishVideo(accessToken, compressedUrl, caption, true);
+                      const finalUrl = compressedUrl.startsWith('/') ? compressedUrl : '/' + compressedUrl;
+                      
+                      console.log(`[INSTAGRAM PUBLISH] Retrying with compressed video: ${finalUrl}`);
+                      return await this.publishVideo(accessToken, finalUrl, caption, true);
+                    } else {
+                      console.error(`[INSTAGRAM PUBLISH] Compression failed:`, compressionResult.error);
                     }
                   } catch (compressionError: any) {
-                    console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);
+                    console.error(`[INSTAGRAM PUBLISH] Video compression error:`, compressionError.message);
+                    console.error(`[INSTAGRAM PUBLISH] Compression stack:`, compressionError.stack);
                   }
                 }
               }

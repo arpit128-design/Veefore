@@ -84,25 +84,20 @@ export default function Scheduler() {
   const [socialAccounts, setSocialAccounts] = useState([]);
   const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
 
-  // Manually fetch social accounts when workspace changes - wait for proper workspace restoration
+  // Fetch social accounts when workspace changes
   useEffect(() => {
-    // Only fetch if workspace has been properly restored and is not the default fallback
-    const isCorrectWorkspace = currentWorkspace?.id && currentWorkspace?.name && 
-                               currentWorkspace.name !== 'My VeeFore Workspace';
-    
-    if (isCorrectWorkspace) {
-      console.log('[SCHEDULER DEBUG] Fetching social accounts for RESTORED workspace:', currentWorkspace.id, currentWorkspace.name);
+    if (currentWorkspace?.id) {
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
       setSocialAccountsLoading(true);
       
-      // Add delay to ensure cache is cleared and workspace is fully restored
       const fetchSocialAccounts = async () => {
         try {
-          // Wait a moment for cache clearing to complete
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Add slight delay to ensure workspace context is stable
+          await new Promise(resolve => setTimeout(resolve, 100));
           
           const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
           const accounts = await response.json();
-          console.log('[SCHEDULER DEBUG] Retrieved social accounts for RESTORED workspace:', accounts);
+          console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name);
           setSocialAccounts(accounts);
         } catch (error) {
           console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
@@ -113,12 +108,11 @@ export default function Scheduler() {
       };
       
       fetchSocialAccounts();
-    } else if (currentWorkspace?.name === 'My VeeFore Workspace') {
-      // This is the default workspace loaded before restoration - clear accounts
-      console.log('[SCHEDULER DEBUG] Detected default workspace before restoration, clearing accounts');
+    } else {
+      // No workspace yet
       setSocialAccounts([]);
     }
-  }, [currentWorkspace?.id, currentWorkspace?.name]);
+  }, [currentWorkspace?.id]);
 
   // Force refresh queries when workspace changes
   useEffect(() => {

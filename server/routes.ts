@@ -219,14 +219,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   case 'video':
                     mediaPayload.video_url = mediaUrl;
                     mediaPayload.caption = caption;
-                    mediaPayload.media_type = 'VIDEO';
+                    mediaPayload.media_type = 'REELS';
                     break;
                   case 'post':
                   default:
                     if (isVideo) {
                       mediaPayload.video_url = mediaUrl;
                       mediaPayload.caption = caption;
-                      mediaPayload.media_type = 'VIDEO';
+                      mediaPayload.media_type = 'REELS';
                     } else {
                       mediaPayload.image_url = mediaUrl;
                       mediaPayload.caption = caption;

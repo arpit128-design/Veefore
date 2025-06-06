@@ -79,13 +79,13 @@ export default function Pricing() {
   // Fetch pricing data
   const { data: pricingData } = useQuery({
     queryKey: ['/api/pricing'],
-    queryFn: () => apiRequest('/api/pricing')
+    queryFn: () => fetch('/api/pricing').then(res => res.json())
   });
 
   // Fetch user subscription
   const { data: userSubscription } = useQuery({
     queryKey: ['/api/subscription'],
-    queryFn: () => apiRequest('/api/subscription')
+    queryFn: () => fetch('/api/subscription').then(res => res.json())
   });
 
   // Create order mutation
@@ -681,7 +681,8 @@ export default function Pricing() {
               ))}
             </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </motion.div>
 
         {/* FAQ Section */}
         <motion.div

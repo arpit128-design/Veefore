@@ -3,17 +3,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Play, Image, Video, Camera } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
+import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 
 export function ContentPerformance() {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
+  const { token } = useAuth();
   const [timeRange, setTimeRange] = useState("7");
 
   const { data: content } = useQuery({
     queryKey: ['content', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/content?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
-    enabled: !!currentWorkspace?.id
+    queryFn: () => fetch(`/api/content?workspaceId=${currentWorkspace?.id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then(res => res.json()),
+    enabled: !!currentWorkspace?.id && !!token
   });
 
   const getIconForType = (type: string) => {

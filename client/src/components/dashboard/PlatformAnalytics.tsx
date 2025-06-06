@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PlatformAnalyticsProps {
   platform: string;
@@ -12,20 +13,16 @@ interface PlatformAnalyticsProps {
 }
 
 export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsProps) {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
+  const { token } = useAuth();
 
   const { data: analytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, platform],
     queryFn: async () => {
-      const token = localStorage.getItem('veefore_auth_token');
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch('/api/dashboard/analytics', {
-        headers,
-        credentials: 'include'
+      const response = await fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       if (!response.ok) {
@@ -34,7 +31,7 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
       
       return response.json();
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id && !!token
   });
 
   const refreshMutation = useMutation({

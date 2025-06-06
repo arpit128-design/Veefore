@@ -81,7 +81,40 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
-  // Use React Query for social accounts with proper workspace dependency
+  // Add state to track when workspace restoration is complete
+  const [isWorkspaceStable, setIsWorkspaceStable] = useState(false);
+  
+  // Monitor workspace stability to avoid race conditions
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
+      console.log('[SCHEDULER DEBUG] Workspace context changed:', {
+        id: currentWorkspace.id,
+        name: currentWorkspace.name,
+        workspacesCount: workspaces.length
+      });
+      
+      // Reset stability and wait for workspace to stabilize
+      setIsWorkspaceStable(false);
+      
+      // Wait longer to ensure workspace restoration is truly complete
+      timeoutId = setTimeout(() => {
+        console.log('[SCHEDULER DEBUG] Workspace considered stable:', currentWorkspace.name, currentWorkspace.id);
+        setIsWorkspaceStable(true);
+      }, 1000); // Increased delay for stability
+    } else {
+      setIsWorkspaceStable(false);
+    }
+    
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length]);
+
+  // Use React Query for social accounts with stability check
   const { data: socialAccounts = [], isLoading: socialAccountsLoading } = useQuery({
     queryKey: ['social-accounts', currentWorkspace?.id],
     queryFn: async () => {
@@ -90,12 +123,7 @@ export default function Scheduler() {
         return [];
       }
       
-      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
-      console.log('[SCHEDULER DEBUG] Workspace context at fetch time:', {
-        id: currentWorkspace.id,
-        name: currentWorkspace.name,
-        workspacesCount: workspaces.length
-      });
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for STABLE workspace:', currentWorkspace.id, currentWorkspace.name);
       
       const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
       const accounts = await response.json();
@@ -107,8 +135,8 @@ export default function Scheduler() {
       
       return accounts;
     },
-    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name && workspaces.length > 0,
-    staleTime: 30000, // Cache for 30 seconds
+    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name && workspaces.length > 0 && isWorkspaceStable,
+    staleTime: 30000,
     retry: false
   });
 

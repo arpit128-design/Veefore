@@ -82,15 +82,21 @@ export default function Scheduler() {
   });
 
   const { data: socialAccounts = [] } = useQuery({
-    queryKey: ['social-accounts', currentWorkspace?.id],
+    queryKey: ['social-accounts', currentWorkspace?.id, currentWorkspace?.name],
     queryFn: async () => {
+      if (!currentWorkspace?.id || !currentWorkspace?.name) {
+        console.log('[SCHEDULER DEBUG] No workspace available');
+        return [];
+      }
       console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace?.id, currentWorkspace?.name);
       const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
       const accounts = await response.json();
       console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts);
       return accounts;
     },
-    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
+    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name,
+    staleTime: 0, // Force fresh data
+    refetchOnMount: true
   });
 
   // Force refresh queries when workspace changes

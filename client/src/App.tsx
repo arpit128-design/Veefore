@@ -1,4 +1,5 @@
-import { Switch, Route, Redirect } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -102,6 +103,20 @@ function Router() {
       </div>
     );
   }
+
+  // Redirect component for onboarded users who access onboarding page
+  const OnboardingRedirect = () => {
+    const [location] = useLocation();
+    
+    useEffect(() => {
+      if (location === '/onboarding') {
+        console.log('[ROUTER] Redirecting onboarded user from /onboarding to /dashboard');
+        window.location.href = '/dashboard';
+      }
+    }, [location]);
+
+    return <Redirect to="/dashboard" />;
+  };
 
   return <AuthenticatedApp />;
 }

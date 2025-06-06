@@ -47,15 +47,35 @@ export async function generateIntelligentSuggestions(
 function analyzeAccountPerformance(socialAccounts: any[], analytics: any[], content: any[]) {
   const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
   
-  // Calculate engagement metrics
+  // Use real Instagram data if available from sync
+  let followersCount = 0;
+  let mediaCount = 0;
+  let avgLikes = 0;
+  let avgComments = 0;
+  let engagementRate = 0;
+  let accountType = 'personal';
+  let hasRealData = false;
+
+  if (instagramAccount?.realDataSynced) {
+    followersCount = instagramAccount.followersCount || 0;
+    mediaCount = instagramAccount.mediaCount || 0;
+    avgLikes = instagramAccount.avgLikes || 0;
+    avgComments = instagramAccount.avgComments || 0;
+    engagementRate = instagramAccount.engagementRate || 0;
+    accountType = instagramAccount.accountType || 'PERSONAL';
+    hasRealData = true;
+    console.log(`[AI ANALYSIS] Using real Instagram data: ${followersCount} followers, ${mediaCount} posts, ${avgLikes} avg likes, ${avgComments} avg comments, ${(engagementRate/100).toFixed(2)}% engagement`);
+  } else {
+    // Fallback to analytics table data
+    followersCount = instagramAccount?.followersCount || 0;
+    mediaCount = instagramAccount?.mediaCount || analytics.length;
+    console.log(`[AI ANALYSIS] Using fallback data: ${followersCount} followers, ${mediaCount} posts from analytics`);
+  }
+  
+  // Calculate additional metrics from analytics table
   const totalReach = analytics.reduce((sum, a) => sum + (a.metrics?.reach || 0), 0);
   const totalLikes = analytics.reduce((sum, a) => sum + (a.metrics?.likes || 0), 0);
   const totalComments = analytics.reduce((sum, a) => sum + (a.metrics?.comments || 0), 0);
-  const avgEngagement = analytics.length > 0 ? (totalLikes + totalComments) / totalReach * 100 : 0;
-  
-  // Analyze posting patterns
-  const postTimes = analytics.map(a => new Date(a.date)).filter(d => d);
-  const postingFrequency = calculatePostingFrequency(postTimes);
   
   // Content type analysis
   const contentTypes = content.reduce((acc, c) => {
@@ -64,29 +84,36 @@ function analyzeAccountPerformance(socialAccounts: any[], analytics: any[], cont
     return acc;
   }, {});
   
-  // Performance trends
-  const performanceTrend = calculatePerformanceTrend(analytics);
-  
   return {
     accountInfo: {
       username: instagramAccount?.username || 'unknown',
-      accountType: instagramAccount?.accountType || 'personal',
-      followersCount: instagramAccount?.followersCount || 0,
-      mediaCount: instagramAccount?.mediaCount || 0
+      accountType: accountType.toLowerCase(),
+      followersCount,
+      mediaCount,
+      hasRealData
     },
     metrics: {
       totalReach,
-      totalLikes,
-      totalComments,
-      avgEngagement: Math.round(avgEngagement * 100) / 100,
-      postCount: analytics.length
+      totalLikes: hasRealData ? avgLikes * mediaCount : totalLikes,
+      totalComments: hasRealData ? avgComments * mediaCount : totalComments,
+      avgEngagement: hasRealData ? (engagementRate / 100) : 0,
+      engagementRate: hasRealData ? engagementRate : 0,
+      avgLikes,
+      avgComments,
+      postCount: mediaCount || analytics.length
     },
     patterns: {
-      postingFrequency,
+      postingFrequency: mediaCount > 1 ? 'regular' : 'starting',
       contentTypes,
-      performanceTrend
+      performanceTrend: hasRealData ? 'growing' : 'unknown'
     },
-    recentPerformance: analytics.slice(-5) // Last 5 posts
+    insights: {
+      hasContent: mediaCount > 0,
+      hasFollowers: followersCount > 0,
+      highEngagement: hasRealData && engagementRate > 300, // 3%+ is good
+      needsGrowth: followersCount < 100,
+      activeAccount: hasRealData
+    }
   };
 }
 
@@ -125,32 +152,48 @@ function calculatePerformanceTrend(analytics: any[]): 'improving' | 'declining' 
 }
 
 async function generateAISuggestions(accountAnalysis: any): Promise<any> {
-  const hasAccountData = accountAnalysis.accountInfo.username !== 'unknown' && accountAnalysis.accountInfo.followersCount > 0;
+  const hasRealData = accountAnalysis.accountInfo.hasRealData;
+  const hasContent = accountAnalysis.insights.hasContent;
+  const hasFollowers = accountAnalysis.insights.hasFollowers;
   
   let prompt;
   
-  if (hasAccountData) {
-    // Detailed analysis for connected accounts
-    prompt = `You are an expert Instagram growth strategist. Analyze this account data and provide 4-6 specific, actionable suggestions to improve engagement and growth.
+  if (hasRealData && hasContent) {
+    // Detailed analysis for connected accounts with real data
+    const engagementPercent = (accountAnalysis.metrics.engagementRate / 100).toFixed(2);
+    prompt = `You are an expert Instagram growth strategist. Analyze this REAL Instagram account data and provide 4-5 specific, actionable suggestions to improve engagement and growth.
 
-Account Analysis:
-- Username: ${accountAnalysis.accountInfo.username}
+REAL ACCOUNT DATA (from Instagram API):
+- Username: @${accountAnalysis.accountInfo.username}
+- Account Type: ${accountAnalysis.accountInfo.accountType.toUpperCase()}
+- Current Followers: ${accountAnalysis.accountInfo.followersCount}
+- Total Posts: ${accountAnalysis.accountInfo.mediaCount}
+- Average Likes per Post: ${accountAnalysis.metrics.avgLikes}
+- Average Comments per Post: ${accountAnalysis.metrics.avgComments}
+- Current Engagement Rate: ${engagementPercent}% (${accountAnalysis.insights.highEngagement ? 'EXCELLENT' : accountAnalysis.metrics.engagementRate > 100 ? 'GOOD' : 'NEEDS IMPROVEMENT'})
+
+ACCOUNT INSIGHTS:
+- Account Status: ${hasFollowers ? 'Growing account' : 'New account'} with ${hasContent ? 'active content' : 'limited content'}
+- Growth Potential: ${accountAnalysis.insights.needsGrowth ? 'High growth potential' : 'Established presence'}
+- Engagement Quality: ${accountAnalysis.insights.highEngagement ? 'Strong audience engagement' : 'Room for engagement improvement'}
+
+Based on this SPECIFIC REAL account performance data, provide targeted suggestions.`;
+  } else if (hasContent) {
+    // Account has posts but no real engagement data
+    prompt = `You are an expert Instagram growth strategist. This account has ${accountAnalysis.accountInfo.mediaCount} posts but limited performance data. Provide 4-5 specific suggestions to optimize their existing content and improve growth.
+
+Account Status:
+- Username: @${accountAnalysis.accountInfo.username}
+- Posts Created: ${accountAnalysis.accountInfo.mediaCount}
 - Account Type: ${accountAnalysis.accountInfo.accountType}
-- Followers: ${accountAnalysis.accountInfo.followersCount}
-- Posts: ${accountAnalysis.accountInfo.mediaCount}
-- Average Engagement Rate: ${accountAnalysis.metrics.avgEngagement}%
-- Total Reach: ${accountAnalysis.metrics.totalReach}
-- Posting Frequency: ${accountAnalysis.patterns.postingFrequency}
-- Performance Trend: ${accountAnalysis.patterns.performanceTrend}
-- Content Types: ${JSON.stringify(accountAnalysis.patterns.contentTypes)}
 
-Based on this specific account data, provide detailed suggestions.`;
+Focus on: Content optimization, engagement improvement, growth acceleration strategies.`;
   } else {
-    // Strategic guidance for new accounts or accounts without data
-    prompt = `You are an expert Instagram growth strategist. The user is setting up their Instagram strategy. Provide 4-6 specific, actionable suggestions for building a successful Instagram presence from the ground up.
+    // New account or no content yet
+    prompt = `You are an expert Instagram growth strategist. This is a new Instagram account (@${accountAnalysis.accountInfo.username || 'user'}) just starting out. Provide 4-5 specific, actionable suggestions for building a successful Instagram presence from the ground up.
 
-Current Status: New account or account not yet connected
-Focus on: Foundation building, content strategy, audience growth, engagement tactics
+Current Status: New account with no posts yet
+Focus on: Foundation building, first content strategy, audience growth, engagement tactics
 
 Provide suggestions that help establish a strong Instagram presence.`;
   }

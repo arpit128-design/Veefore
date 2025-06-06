@@ -89,6 +89,18 @@ function Router() {
     );
   }
 
+  // Check if user needs onboarding
+  if (user && !user.isOnboarded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden relative">
+        <Switch>
+          <Route path="/onboarding" component={Onboarding} />
+          <Route component={() => <Redirect to="/onboarding" />} />
+        </Switch>
+      </div>
+    );
+  }
+
   return <AuthenticatedApp />;
 }
 

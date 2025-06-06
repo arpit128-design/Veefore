@@ -507,32 +507,45 @@ export class InstagramAPI {
       const containerId = containerResponse.data.id;
       console.log(`[INSTAGRAM PUBLISH] Video container created: ${containerId}`);
 
-      // Step 2: Check container status (videos need processing time)
+      // Step 2: Check container status with extended timeout for large files
       let containerReady = false;
       let attempts = 0;
-      const maxAttempts = 10;
+      const maxAttempts = 120; // 10 minutes for large video files (54MB+)
 
       while (!containerReady && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+        // Progressive wait times: 3s for first 20 attempts, then 5s
+        const waitTime = attempts < 20 ? 3000 : 5000;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        const statusResponse = await axios.get(`${this.baseUrl}/${containerId}`, {
-          params: {
-            fields: 'status_code',
-            access_token: accessToken
-          }
-        });
+        try {
+          const statusResponse = await axios.get(`${this.baseUrl}/${containerId}`, {
+            params: {
+              fields: 'status_code',
+              access_token: accessToken
+            }
+          });
 
-        if (statusResponse.data.status_code === 'FINISHED') {
-          containerReady = true;
-        } else if (statusResponse.data.status_code === 'ERROR') {
-          throw new Error('Video processing failed');
+          console.log(`[INSTAGRAM PUBLISH] Video status check ${attempts + 1}:`, statusResponse.data.status_code);
+
+          if (statusResponse.data.status_code === 'FINISHED') {
+            containerReady = true;
+          } else if (statusResponse.data.status_code === 'ERROR') {
+            throw new Error('Video processing failed on Instagram servers');
+          }
+        } catch (statusError: any) {
+          console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);
+          
+          // Continue processing for large files even with some status errors
+          if (attempts > 15 && statusError.response?.status === 400) {
+            console.log(`[INSTAGRAM PUBLISH] Continuing despite status check error for large file...`);
+          }
         }
         
         attempts++;
       }
 
       if (!containerReady) {
-        throw new Error('Video processing timeout');
+        throw new Error('Video processing timeout - Instagram may still be processing your large video file. Please check your Instagram account in a few minutes.');
       }
 
       // Step 3: Publish the video container

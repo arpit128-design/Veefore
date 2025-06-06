@@ -1352,6 +1352,17 @@ export default function Scheduler() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Progress Tracker */}
+      {progressState.isVisible && (
+        <PublishingProgressTracker
+          contentType={scheduleForm.type}
+          isPublishing={progressState.status === 'uploading'}
+          isScheduled={false}
+          contentId={publishingState.contentId}
+          onComplete={() => setProgressState({ isVisible: false, status: 'idle', progress: 0, currentStep: '', timeRemaining: '' })}
+        />
+      )}
     </div>
   );
 }

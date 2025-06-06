@@ -394,16 +394,16 @@ export default function Pricing() {
                         className="relative h-full"
                       >
                         <Card className={`
-                          h-full relative overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 group-hover:shadow-xl
+                          h-full relative overflow-hidden border-2 backdrop-blur-md transition-all duration-500 hover:scale-105 group-hover:shadow-2xl
                           ${isPopular 
-                            ? 'border-amber-400/60 bg-white/95 shadow-amber-500/10' 
+                            ? 'border-amber-500/60 bg-gradient-to-br from-amber-900/30 via-orange-900/20 to-red-900/30 hover:border-amber-400/80 ring-4 ring-amber-400/20' 
                             : plan.id === 'free'
-                              ? 'border-gray-300/60 bg-white/90 hover:border-gray-400/80'
+                              ? 'border-slate-500/40 bg-gradient-to-br from-slate-800/40 via-slate-700/30 to-slate-800/40 hover:border-slate-400/60'
                               : plan.id === 'creator'
-                                ? 'border-blue-400/60 bg-white/90 hover:border-blue-500/80'
+                                ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/40 via-cyan-900/30 to-blue-900/40 hover:border-blue-400/70'
                                 : plan.id === 'pro'
-                                  ? 'border-purple-400/60 bg-white/90 hover:border-purple-500/80'
-                                  : 'border-indigo-400/60 bg-white/90 hover:border-indigo-500/80'
+                                  ? 'border-purple-500/50 bg-gradient-to-br from-purple-900/40 via-violet-900/30 to-purple-900/40 hover:border-purple-400/70'
+                                  : 'border-indigo-500/50 bg-gradient-to-br from-indigo-900/40 via-blue-900/30 to-indigo-900/40 hover:border-indigo-400/70'
                           }
                         `}>
                         
@@ -427,38 +427,29 @@ export default function Pricing() {
                           </motion.div>
                         )}
                         
-                        <CardHeader className="text-center pb-6 pt-8 relative z-10">
+                        <CardHeader className="text-center pb-4 pt-6 relative z-10">
                           <motion.div 
-                            className="flex justify-center mb-6"
+                            className="flex justify-center mb-4"
                             animate={{ 
-                              y: [0, -8, 0],
-                              rotateY: [0, 360]
+                              y: [0, -4, 0],
                             }}
                             transition={{ 
-                              y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
-                              rotateY: { duration: 12, repeat: Infinity, ease: "linear" }
+                              y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
                             }}
                           >
                             <div className="relative">
                               {plan.id === 'free' && (
-                                <Sparkles className="h-16 w-16 text-slate-400 drop-shadow-lg" />
+                                <Sparkles className="h-12 w-12 text-gray-500 drop-shadow-sm" />
                               )}
                               {plan.id === 'creator' && (
-                                <Star className="h-16 w-16 text-blue-400 drop-shadow-lg" />
+                                <Star className="h-12 w-12 text-blue-500 drop-shadow-sm" />
                               )}
                               {plan.id === 'pro' && (
-                                <Zap className="h-16 w-16 text-purple-400 drop-shadow-lg" />
+                                <Zap className="h-12 w-12 text-purple-500 drop-shadow-sm" />
                               )}
                               {plan.id === 'enterprise' && (
-                                <Crown className="h-16 w-16 text-indigo-400 drop-shadow-lg" />
+                                <Crown className="h-12 w-12 text-indigo-500 drop-shadow-sm" />
                               )}
-                              
-                              <motion.div
-                                className="absolute inset-0 border-2 border-current opacity-20 rounded-full"
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                style={{ width: '120%', height: '120%', top: '-10%', left: '-10%' }}
-                              />
                             </div>
                           </motion.div>
 
@@ -467,14 +458,14 @@ export default function Pricing() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
                           >
-                            <CardTitle className="text-2xl font-bold text-white mb-3 tracking-wide">
+                            <CardTitle className="text-2xl font-bold text-white mb-2 tracking-wide">
                               {plan.name}
                             </CardTitle>
-                            <CardDescription className="text-slate-400 text-sm leading-relaxed">
-                              {plan.description || (plan.id === 'free' ? 'Perfect for getting started with social media management' :
-                               plan.id === 'creator' ? 'Perfect for content creators and influencers' :
-                               plan.id === 'pro' ? 'Designed for agencies and teams' :
-                               'Custom solutions for large organizations')}
+                            <CardDescription className="text-slate-300 text-sm leading-relaxed">
+                              {plan.description || (plan.id === 'free' ? 'Perfect for getting started' :
+                               plan.id === 'creator' ? 'For content creators' :
+                               plan.id === 'pro' ? 'For agencies and teams' :
+                               'Enterprise solutions')}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
@@ -487,7 +478,7 @@ export default function Pricing() {
                             transition={{ delay: 0.4 }}
                           >
                             <div className="relative">
-                              <div className={`text-4xl font-bold mb-2 ${
+                              <div className={`text-3xl font-bold mb-1 ${
                                 isPopular ? 'text-amber-400' : 'text-white'
                               }`}>
                                 {plan.price === 0 ? 'Free' : `₹${plan.price}`}

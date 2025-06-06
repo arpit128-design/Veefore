@@ -753,14 +753,22 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         
         const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
 
+        // Get profile data to supplement insights
+        console.log(`[DASHBOARD] Fetching profile data for @${instagramAccount.username}`);
+        const profile = await instagramAPI.getUserProfile(instagramAccount.accessToken);
+        console.log(`[DASHBOARD] Profile data retrieved:`, JSON.stringify(profile, null, 2));
+        
         res.json({
           totalPosts,
           totalReach,
           engagementRate: Math.round(engagementRate * 10) / 10,
           topPlatform: 'instagram',
-          followers: insights.follower_count || 0,
+          followers: profile.followers_count || insights.follower_count || 0,
           impressions: insights.impressions || 0,
-          accountUsername: instagramAccount.username
+          accountUsername: instagramAccount.username,
+          totalLikes,
+          totalComments,
+          mediaCount: profile.media_count || totalPosts
         });
 
       } catch (instagramError: any) {

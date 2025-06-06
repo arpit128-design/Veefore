@@ -90,6 +90,9 @@ export default function Dashboard() {
     impressions: rawData?.impressions || 0,
     totalPosts: rawData?.totalPosts || 0,
     totalReach: rawData?.totalReach || 0,
+    totalLikes: rawData?.totalLikes || 0,
+    totalComments: rawData?.totalComments || 0,
+    mediaCount: rawData?.mediaCount || rawData?.totalPosts || 0,
     accountUsername: rawData?.accountUsername
   };
   
@@ -182,6 +185,11 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Posts</span>
                 <span className="text-xl font-bold text-white">{instagramData.totalPosts}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-asteroid-silver">Total Likes</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalLikes}</span>
               </div>
               
               <div className="flex justify-between items-center">

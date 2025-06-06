@@ -113,16 +113,36 @@ export class InstagramAPI {
   // Get user profile information with Business API
   async getUserProfile(accessToken: string): Promise<InstagramUser> {
     try {
-      const fields = 'id,username,account_type,media_count,followers_count,name,biography,profile_picture_url,website';
-      const response = await axios.get(`${this.baseUrl}/me`, {
-        params: {
-          fields,
-          access_token: accessToken
-        }
-      });
+      // Try comprehensive fields first, then fallback if needed
+      let fields = 'id,username,account_type,media_count,followers_count,name,biography,profile_picture_url,website';
+      let response;
+      
+      try {
+        response = await axios.get(`${this.baseUrl}/me`, {
+          params: { fields, access_token: accessToken }
+        });
+      } catch (primaryError: any) {
+        console.log(`[INSTAGRAM BUSINESS API] Trying basic profile fields due to:`, primaryError.response?.data?.error?.message);
+        // Fallback to basic fields if permissions are limited
+        fields = 'id,username,account_type,media_count';
+        response = await axios.get(`${this.baseUrl}/me`, {
+          params: { fields, access_token: accessToken }
+        });
+      }
 
       console.log(`[INSTAGRAM BUSINESS API] User profile:`, response.data);
-      return response.data;
+      
+      // Ensure we have all required properties
+      const profile = {
+        id: response.data.id,
+        username: response.data.username,
+        account_type: response.data.account_type || 'PERSONAL',
+        media_count: response.data.media_count || 0,
+        followers_count: response.data.followers_count || 0,
+        ...response.data
+      };
+      
+      return profile;
     } catch (error: any) {
       console.error(`[INSTAGRAM BUSINESS API] Profile error:`, error.response?.data || error.message);
       throw new Error('Failed to fetch Instagram Business profile');

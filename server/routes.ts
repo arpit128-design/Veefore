@@ -2125,6 +2125,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Generate AI-powered suggestions based on real data
       const suggestions = await generateIntelligentSuggestions(workspace, socialAccounts, recentAnalytics, recentContent);
       
+      // Sync Instagram account data before generating suggestions
+      try {
+        await syncInstagramData(socialAccounts);
+      } catch (syncError) {
+        console.log('[AI SUGGESTIONS] Instagram sync failed, proceeding with existing data:', syncError.message);
+      }
+
       // Save suggestions to storage
       const savedSuggestions = [];
       for (const suggestion of suggestions) {

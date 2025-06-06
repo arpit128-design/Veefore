@@ -492,6 +492,41 @@ export class MongoStorage implements IStorage {
     return accounts.map(account => this.convertSocialAccount(account));
   }
 
+  async getAllSocialAccounts(): Promise<SocialAccount[]> {
+    await this.connect();
+    const accounts = await SocialAccountModel.find({ isActive: true });
+    return accounts.map(account => this.convertSocialAccount(account));
+  }
+
+  async updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount> {
+    await this.connect();
+    
+    const updateData = { ...updates, updatedAt: new Date() };
+    
+    // Try updating by MongoDB _id first
+    let result;
+    try {
+      result = await SocialAccountModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      );
+    } catch (error) {
+      // If ObjectId fails, try by the 'id' field
+      result = await SocialAccountModel.findOneAndUpdate(
+        { id: id },
+        updateData,
+        { new: true }
+      );
+    }
+    
+    if (!result) {
+      throw new Error(`Social account with id ${id} not found`);
+    }
+    
+    return this.convertSocialAccount(result);
+  }
+
   async getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined> {
     await this.connect();
     console.log(`[MONGODB DEBUG] Looking for social account with workspaceId: ${workspaceId} (${typeof workspaceId}), platform: ${platform}`);

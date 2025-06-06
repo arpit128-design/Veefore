@@ -42,18 +42,34 @@ import {
   PawPrint,
   Star,
   Zap,
-  Globe
+  Globe,
+  Trophy,
+  ChevronDown,
+  Plus,
+  X
 } from 'lucide-react';
 
 const niches = [
-  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Daily life & wellness' },
-  { id: 'fashion', name: 'Fashion', icon: Shirt, description: 'Style & trends' },
-  { id: 'beauty', name: 'Beauty', icon: Sparkles, description: 'Makeup & skincare' },
-  { id: 'food', name: 'Food', icon: Utensils, description: 'Recipes & dining' },
-  { id: 'travel', name: 'Travel', icon: Plane, description: 'Adventures & places' },
-  { id: 'business', name: 'Business', icon: TrendingUp, description: 'Growth & strategy' },
-  { id: 'fitness', name: 'Fitness', icon: Dumbbell, description: 'Health & workouts' },
-  { id: 'tech', name: 'Technology', icon: Code, description: 'Tech & innovation' },
+  { id: 'lifestyle', name: 'Lifestyle', icon: Heart, description: 'Daily life & wellness', category: 'Personal' },
+  { id: 'fashion', name: 'Fashion', icon: Shirt, description: 'Style & trends', category: 'Creative' },
+  { id: 'beauty', name: 'Beauty', icon: Sparkles, description: 'Makeup & skincare', category: 'Creative' },
+  { id: 'food', name: 'Food', icon: Utensils, description: 'Recipes & dining', category: 'Lifestyle' },
+  { id: 'travel', name: 'Travel', icon: Plane, description: 'Adventures & places', category: 'Lifestyle' },
+  { id: 'business', name: 'Business', icon: TrendingUp, description: 'Growth & strategy', category: 'Professional' },
+  { id: 'fitness', name: 'Fitness', icon: Dumbbell, description: 'Health & workouts', category: 'Personal' },
+  { id: 'tech', name: 'Technology', icon: Code, description: 'Tech & innovation', category: 'Professional' },
+  { id: 'education', name: 'Education', icon: GraduationCap, description: 'Learning & tutorials', category: 'Professional' },
+  { id: 'entertainment', name: 'Entertainment', icon: Gamepad2, description: 'Gaming & fun content', category: 'Creative' },
+  { id: 'music', name: 'Music', icon: Music, description: 'Songs & performances', category: 'Creative' },
+  { id: 'automotive', name: 'Automotive', icon: Car, description: 'Cars & motorsports', category: 'Specialty' },
+  { id: 'home', name: 'Home & Garden', icon: Home, description: 'Interior design & DIY', category: 'Lifestyle' },
+  { id: 'shopping', name: 'Shopping', icon: ShoppingCart, description: 'Product reviews & deals', category: 'Commercial' },
+  { id: 'parenting', name: 'Parenting', icon: Baby, description: 'Family & childcare', category: 'Personal' },
+  { id: 'pets', name: 'Pets', icon: PawPrint, description: 'Pet care & training', category: 'Personal' },
+  { id: 'photography', name: 'Photography', icon: Camera, description: 'Photos & visual art', category: 'Creative' },
+  { id: 'gaming', name: 'Gaming', icon: Gamepad2, description: 'Video games & esports', category: 'Entertainment' },
+  { id: 'sports', name: 'Sports', icon: Star, description: 'Athletics & competitions', category: 'Entertainment' },
+  { id: 'art', name: 'Art & Design', icon: Palette, description: 'Creative arts & design', category: 'Creative' },
 ];
 
 const contentTypes = [
@@ -74,6 +90,7 @@ const tones = [
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [, setLocation] = useLocation();
+  const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
   const [preferences, setPreferences] = useState({
     selectedNiches: [] as string[],
     contentTypes: [] as string[],
@@ -606,193 +623,165 @@ export default function Onboarding() {
           </Card>
         </motion.div>
 
-        {/* Enhanced Niche Selection with 3D Effects */}
-        <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
-          <CardHeader className="text-center pb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto">
-                <Target className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Choose Your Creative Universe
-              </CardTitle>
-              <p className="text-white/70">Select the niches that spark your passion</p>
-            </motion.div>
-          </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {niches.map((niche, index) => {
-                const Icon = niche.icon;
-                const isSelected = preferences.selectedNiches.includes(niche.id);
-                const colors = [
-                  'from-blue-500 to-cyan-400',
-                  'from-purple-500 to-pink-400',
-                  'from-green-500 to-emerald-400',
-                  'from-orange-500 to-red-400',
-                  'from-indigo-500 to-purple-400',
-                  'from-pink-500 to-rose-400',
-                  'from-cyan-500 to-blue-400',
-                  'from-emerald-500 to-green-400',
-                  'from-rose-500 to-pink-400',
-                  'from-amber-500 to-orange-400',
-                  'from-violet-500 to-purple-400',
-                  'from-teal-500 to-cyan-400',
-                  'from-red-500 to-pink-400',
-                  'from-lime-500 to-green-400',
-                  'from-sky-500 to-blue-400',
-                  'from-fuchsia-500 to-pink-400'
-                ];
-                const colorClass = colors[index % colors.length];
-                
-                return (
+        {/* Enhanced Niche Selection Dropdown */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+            <CardHeader className="text-center pb-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Choose Your Content Niches
+                </CardTitle>
+                <p className="text-white/70">Select multiple niches that match your brand</p>
+              </motion.div>
+            </CardHeader>
+            <CardContent className="space-y-6 p-8">
+              {/* Dropdown Menu */}
+              <div className="relative">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setNicheDropdownOpen(!nicheDropdownOpen)}
+                  className="w-full p-4 bg-white/10 border border-white/20 rounded-xl cursor-pointer flex items-center justify-between hover:bg-white/15 transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Plus className="w-5 h-5 text-white/70" />
+                    <span className="text-white/90">Add Niches ({preferences.selectedNiches.length} selected)</span>
+                  </div>
                   <motion.div
-                    key={niche.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ delay: index * 0.05, duration: 0.4 }}
-                    onClick={() => {
-                      setPreferences(prev => ({
-                        ...prev,
-                        selectedNiches: isSelected
-                          ? prev.selectedNiches.filter(id => id !== niche.id)
-                          : [...prev.selectedNiches, niche.id]
-                      }));
-                    }}
-                    whileHover={{ 
-                      scale: 1.05, 
-                      rotateY: 5,
-                      boxShadow: "0 20px 40px rgba(255, 255, 255, 0.1)"
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`relative p-6 rounded-2xl cursor-pointer transition-all duration-300 group overflow-hidden ${
-                      isSelected 
-                        ? 'bg-white/20 backdrop-blur-md border-2 border-white/40 shadow-xl' 
-                        : 'bg-white/5 backdrop-blur-sm border border-white/20 hover:bg-white/10'
-                    }`}
+                    animate={{ rotate: nicheDropdownOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    {/* Background Glow Effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
-                    
-                    {/* Selection Ring */}
-                    {isSelected && (
-                      <motion.div
-                        className="absolute inset-0 rounded-2xl border-2 border-white/60"
-                        animate={{ 
-                          boxShadow: [
-                            "0 0 20px rgba(255, 255, 255, 0.3)",
-                            "0 0 30px rgba(255, 255, 255, 0.5)",
-                            "0 0 20px rgba(255, 255, 255, 0.3)"
-                          ]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      />
-                    )}
-                    
-                    {/* Icon Container with 3D Effect */}
-                    <motion.div
-                      className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center mb-4 mx-auto relative z-10`}
-                      animate={isSelected ? { 
-                        rotateY: [0, 360],
-                        scale: [1, 1.1, 1]
-                      } : {}}
-                      transition={{ duration: 2, repeat: isSelected ? Infinity : 0 }}
-                    >
-                      <Icon className="w-6 h-6 text-white" />
-                      
-                      {/* Shimmer Effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-xl"
-                        animate={{ x: ["-100%", "100%"] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                      />
-                    </motion.div>
-                    
-                    {/* Text Content */}
-                    <div className="text-center relative z-10">
-                      <div className={`text-sm font-bold mb-1 ${isSelected ? 'text-white' : 'text-white/90'}`}>
-                        {niche.name}
-                      </div>
-                      <div className={`text-xs ${isSelected ? 'text-white/80' : 'text-white/60'}`}>
-                        {niche.description}
-                      </div>
-                    </div>
-                    
-                    {/* Selection Checkmark */}
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
-                      >
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      </motion.div>
-                    )}
-                    
-                    {/* Particle Effects for Selected Items */}
-                    {isSelected && (
-                      <div className="absolute inset-0 pointer-events-none">
-                        {[...Array(6)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            className="absolute w-1 h-1 bg-white rounded-full"
-                            style={{
-                              top: `${20 + Math.random() * 60}%`,
-                              left: `${20 + Math.random() * 60}%`,
-                            }}
-                            animate={{
-                              y: [-10, -20, -10],
-                              opacity: [0, 1, 0],
-                              scale: [0, 1, 0]
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              delay: i * 0.3,
-                              ease: "easeInOut"
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    <ChevronDown className="w-5 h-5 text-white/70" />
                   </motion.div>
-                );
-              })}
-            </div>
-            
-            {/* Selection Counter */}
-            <motion.div
-              className="mt-8 text-center"
-              animate={{ opacity: preferences.selectedNiches.length > 0 ? 1 : 0.6 }}
-            >
-              <div className="text-white/80">
-                Selected: <span className="font-bold text-white">{preferences.selectedNiches.length}</span> niche{preferences.selectedNiches.length !== 1 ? 's' : ''}
+                </motion.div>
+
+                {/* Dropdown Content */}
+                {nicheDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
+                  >
+                    {/* Categories */}
+                    {['Personal', 'Creative', 'Professional', 'Lifestyle', 'Commercial', 'Specialty', 'Entertainment'].map((category) => {
+                      const categoryNiches = niches.filter(n => n.category === category);
+                      if (categoryNiches.length === 0) return null;
+                      
+                      return (
+                        <div key={category} className="p-4 border-b border-white/10 last:border-b-0">
+                          <div className="text-sm font-bold text-white/90 mb-3 flex items-center space-x-2">
+                            <Globe className="w-4 h-4" />
+                            <span>{category}</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {categoryNiches.map((niche) => {
+                              const Icon = niche.icon;
+                              const isSelected = preferences.selectedNiches.includes(niche.id);
+                              
+                              return (
+                                <motion.div
+                                  key={niche.id}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => {
+                                    setPreferences(prev => ({
+                                      ...prev,
+                                      selectedNiches: isSelected
+                                        ? prev.selectedNiches.filter(id => id !== niche.id)
+                                        : [...prev.selectedNiches, niche.id]
+                                    }));
+                                  }}
+                                  className={`p-3 rounded-lg cursor-pointer transition-all duration-300 flex items-center space-x-3 ${
+                                    isSelected 
+                                      ? 'bg-green-500/20 border border-green-400/40 text-green-200' 
+                                      : 'bg-white/5 hover:bg-white/10 text-white/80'
+                                  }`}
+                                >
+                                  <Icon className="w-4 h-4 flex-shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-medium truncate">{niche.name}</div>
+                                    <div className="text-xs opacity-70 truncate">{niche.description}</div>
+                                  </div>
+                                  {isSelected && (
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
+                                    >
+                                      <CheckCircle className="w-3 h-3 text-white" />
+                                    </motion.div>
+                                  )}
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </motion.div>
+                )}
               </div>
+
+              {/* Selected Niches Display */}
               {preferences.selectedNiches.length > 0 && (
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="mt-2 flex flex-wrap justify-center gap-2"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="space-y-3"
                 >
-                  {preferences.selectedNiches.map((nicheId) => {
-                    const niche = niches.find(n => n.id === nicheId);
-                    return niche ? (
-                      <span
-                        key={nicheId}
-                        className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white border border-white/30"
-                      >
-                        {niche.name}
-                      </span>
-                    ) : null;
-                  })}
+                  <div className="text-white/80 text-sm font-medium">
+                    Selected Niches ({preferences.selectedNiches.length})
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {preferences.selectedNiches.map((nicheId) => {
+                      const niche = niches.find(n => n.id === nicheId);
+                      if (!niche) return null;
+                      const Icon = niche.icon;
+                      
+                      return (
+                        <motion.div
+                          key={nicheId}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          className="flex items-center space-x-2 px-3 py-2 bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 group hover:bg-white/20 transition-all duration-300"
+                        >
+                          <Icon className="w-4 h-4 text-white/90" />
+                          <span className="text-sm text-white/90">{niche.name}</span>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              setPreferences(prev => ({
+                                ...prev,
+                                selectedNiches: prev.selectedNiches.filter(id => id !== nicheId)
+                              }));
+                            }}
+                            className="w-4 h-4 text-white/60 hover:text-white/90 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </motion.button>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </motion.div>
               )}
-            </motion.div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Enhanced Brand Tone Section */}
         <motion.div

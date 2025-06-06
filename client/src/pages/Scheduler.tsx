@@ -81,23 +81,32 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
-  const { data: socialAccounts = [] } = useQuery({
-    queryKey: ['social-accounts', currentWorkspace?.id, currentWorkspace?.name],
-    queryFn: async () => {
-      if (!currentWorkspace?.id || !currentWorkspace?.name) {
-        console.log('[SCHEDULER DEBUG] No workspace available');
-        return [];
-      }
-      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace?.id, currentWorkspace?.name);
-      const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
-      const accounts = await response.json();
-      console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts);
-      return accounts;
-    },
-    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name,
-    staleTime: 0, // Force fresh data
-    refetchOnMount: true
-  });
+  const [socialAccounts, setSocialAccounts] = useState([]);
+  const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
+
+  // Manually fetch social accounts when workspace changes
+  useEffect(() => {
+    if (currentWorkspace?.id && currentWorkspace?.name) {
+      console.log('[SCHEDULER DEBUG] Manually fetching social accounts for workspace:', currentWorkspace?.id, currentWorkspace?.name);
+      setSocialAccountsLoading(true);
+      
+      const fetchSocialAccounts = async () => {
+        try {
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
+          const accounts = await response.json();
+          console.log('[SCHEDULER DEBUG] Manually retrieved social accounts:', accounts);
+          setSocialAccounts(accounts);
+        } catch (error) {
+          console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
+          setSocialAccounts([]);
+        } finally {
+          setSocialAccountsLoading(false);
+        }
+      };
+      
+      fetchSocialAccounts();
+    }
+  }, [currentWorkspace?.id, currentWorkspace?.name]);
 
   // Force refresh queries when workspace changes
   useEffect(() => {

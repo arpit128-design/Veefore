@@ -218,8 +218,24 @@ export default function Scheduler() {
       queryClient.removeQueries({ queryKey: ['scheduled-content'] });
       
       // Trigger the main effect to refetch with minimal delay
-      const timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(async () => {
         console.log('[SCHEDULER DEBUG] Modal refresh: Fetching accounts for workspace:', targetWorkspace.id, targetWorkspace.name);
+        
+        try {
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${targetWorkspace.id}`);
+          const accounts = await response.json();
+          
+          console.log('[SCHEDULER DEBUG] Modal fetched accounts:', accounts.length, 'for workspace:', targetWorkspace.name);
+          accounts.forEach((account: any, index: number) => {
+            console.log(`[SCHEDULER DEBUG] Modal account ${index + 1}: @${account.username} (${account.platform})`);
+          });
+          setSocialAccounts(accounts);
+          setSocialAccountsLoading(false);
+        } catch (error) {
+          console.error('[SCHEDULER DEBUG] Modal error fetching accounts:', error);
+          setSocialAccounts([]);
+          setSocialAccountsLoading(false);
+        }
       }, 50);
       
       return () => clearTimeout(timeoutId);

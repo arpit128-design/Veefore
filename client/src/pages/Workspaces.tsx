@@ -86,10 +86,31 @@ export default function Workspaces() {
   const createWorkspaceMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
-      const response = await apiRequest('POST', '/api/workspaces', data);
-      const result = await response.json();
-      console.log('=== MUTATION FUNCTION SUCCESS ===', result);
-      return result;
+      try {
+        const token = localStorage.getItem('veefore_auth_token');
+        const response = await fetch('/api/workspaces', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          console.log('=== MUTATION FUNCTION ERROR ===', result);
+          throw new Error(JSON.stringify(result));
+        }
+        
+        console.log('=== MUTATION FUNCTION SUCCESS ===', result);
+        return result;
+      } catch (error: any) {
+        console.log('=== MUTATION FUNCTION CATCH ===', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({

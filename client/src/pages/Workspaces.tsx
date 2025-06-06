@@ -86,36 +86,31 @@ export default function Workspaces() {
   const createWorkspaceMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
-      try {
-        const token = localStorage.getItem('veefore_auth_token');
-        const response = await fetch('/api/workspaces', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data),
-          credentials: 'include'
-        });
+      const token = localStorage.getItem('veefore_auth_token');
+      const response = await fetch('/api/workspaces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+      });
 
-        const result = await response.json();
-        
-        if (!response.ok) {
-          console.log('=== MUTATION FUNCTION ERROR ===', result);
-          console.log('=== RESPONSE STATUS ===', response.status);
-          const error = new Error(`${response.status}: ${JSON.stringify(result)}`);
-          (error as any).response = result;
-          (error as any).status = response.status;
-          console.log('=== THROWING ERROR ===', error);
-          throw error;
-        }
-        
-        console.log('=== MUTATION FUNCTION SUCCESS ===', result);
-        return result;
-      } catch (error: any) {
-        console.log('=== MUTATION FUNCTION CATCH ===', error);
+      const result = await response.json();
+      console.log('=== RESPONSE STATUS ===', response.status);
+      console.log('=== RESPONSE DATA ===', result);
+      
+      if (!response.ok) {
+        console.log('=== THROWING ERROR FOR TANSTACK ===');
+        const error = new Error(`${response.status}: ${JSON.stringify(result)}`);
+        (error as any).response = result;
+        (error as any).status = response.status;
         throw error;
       }
+      
+      console.log('=== MUTATION FUNCTION SUCCESS ===');
+      return result;
     },
     onSuccess: () => {
       toast({

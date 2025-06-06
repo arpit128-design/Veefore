@@ -751,22 +751,22 @@ export default function ContentStudio() {
               <span className="ml-2 text-gray-400">Loading content...</span>
             </div>
           ) : recentCreations && recentCreations.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {recentCreations.slice(0, 6).map((item: any) => (
-                <div key={item.id} className="p-4 bg-gray-700 rounded-lg border border-gray-600">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 text-white">
+                <div key={item.id} className="p-3 md:p-4 bg-gray-700 rounded-lg border border-gray-600">
+                  <div className="flex items-start justify-between mb-2 gap-2">
+                    <div className="flex items-center gap-2 text-white min-w-0 flex-1">
                       {getIconForType(item.type)}
-                      <span className="font-medium">{item.title}</span>
+                      <span className="font-medium text-sm md:text-base truncate">{item.title}</span>
                     </div>
-                    <Badge className={`${getStatusColor(item.status)} text-white`}>
+                    <Badge className={`${getStatusColor(item.status)} text-white text-xs flex-shrink-0`}>
                       {item.status}
                     </Badge>
                   </div>
-                  <p className="text-gray-400 text-sm mb-2">{item.description}</p>
+                  <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{item.platform}</span>
-                    <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                    <span className="truncate">{item.platform}</span>
+                    <span className="text-xs">{new Date(item.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))}

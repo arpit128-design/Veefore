@@ -22,6 +22,7 @@ import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Auth from "@/pages/Auth";
 import Onboarding from "@/pages/Onboarding";
+import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
@@ -83,7 +84,8 @@ function Router() {
           <Route path="/auth" component={Auth} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
-          <Route component={() => <Redirect to="/auth" />} />
+          <Route path="/" component={Landing} />
+          <Route component={() => <Redirect to="/" />} />
         </Switch>
       </div>
     );

@@ -1699,6 +1699,143 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // ==================== SUBSCRIPTION ROUTES ====================
+  
+  // Get user subscription status
+  app.get('/api/subscription', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const subscriptionService = await import('./subscription-service');
+      const status = await subscriptionService.SubscriptionService.getUserSubscriptionStatus(userId);
+      res.json(status);
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to get status:', error);
+      res.status(500).json({ error: 'Failed to get subscription status' });
+    }
+  });
+
+  // Create Razorpay order for subscription
+  app.post('/api/subscription/create-order', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { planId } = req.body;
+      const userId = req.user.id;
+      
+      if (!planId || !['creator', 'pro', 'enterprise'].includes(planId)) {
+        return res.status(400).json({ error: 'Invalid plan ID' });
+      }
+
+      const subscriptionService = await import('./subscription-service');
+      const order = await subscriptionService.SubscriptionService.createSubscription(userId, planId);
+      
+      res.json({
+        success: true,
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        key: process.env.RAZORPAY_KEY_ID
+      });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to create order:', error);
+      res.status(500).json({ error: 'Failed to create subscription order' });
+    }
+  });
+
+  // Verify Razorpay payment and activate subscription
+  app.post('/api/subscription/verify-payment', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+      
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({ error: 'Missing payment verification data' });
+      }
+
+      const subscriptionService = await import('./subscription-service');
+      
+      // Verify payment signature
+      const isValid = await subscriptionService.SubscriptionService.verifyPayment(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
+
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid payment signature' });
+      }
+
+      // Handle successful payment
+      await subscriptionService.SubscriptionService.handleSuccessfulPayment(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
+
+      res.json({ success: true, message: 'Subscription activated successfully' });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Payment verification failed:', error);
+      res.status(500).json({ error: 'Payment verification failed' });
+    }
+  });
+
+  // Cancel subscription
+  app.post('/api/subscription/cancel', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const subscriptionService = await import('./subscription-service');
+      
+      await subscriptionService.SubscriptionService.cancelSubscription(userId);
+      
+      res.json({ success: true, message: 'Subscription canceled successfully' });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to cancel subscription:', error);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
+    }
+  });
+
+  // Get plan limits and features
+  app.get('/api/subscription/plans', async (req: Request, res: Response) => {
+    try {
+      const subscriptionService = await import('./subscription-service');
+      res.json({
+        plans: subscriptionService.PLAN_LIMITS,
+        pricing: subscriptionService.PLAN_PRICING
+      });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to get plans:', error);
+      res.status(500).json({ error: 'Failed to get subscription plans' });
+    }
+  });
+
+  // Check feature access
+  app.get('/api/subscription/feature/:feature', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { feature } = req.params;
+      const userId = req.user.id;
+      
+      const subscriptionService = await import('./subscription-service');
+      const hasAccess = await subscriptionService.SubscriptionService.checkFeatureAccess(userId, feature);
+      
+      res.json({ hasAccess, feature });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Feature check failed:', error);
+      res.status(500).json({ error: 'Failed to check feature access' });
+    }
+  });
+
+  // Refresh monthly credits (admin endpoint for testing)
+  app.post('/api/subscription/refresh-credits', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const subscriptionService = await import('./subscription-service');
+      
+      await subscriptionService.SubscriptionService.refreshCredits(userId);
+      
+      res.json({ success: true, message: 'Credits refreshed successfully' });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to refresh credits:', error);
+      res.status(500).json({ error: 'Failed to refresh credits' });
+    }
+  });
+
   // Consume credits for a feature
   app.post('/api/credits/consume', requireAuth, async (req: any, res: Response) => {
     try {

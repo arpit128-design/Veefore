@@ -1,13 +1,13 @@
 import { 
-  users, workspaces, socialAccounts, content, analytics, 
+  users, workspaces, workspaceMembers, teamInvitations, socialAccounts, content, analytics, 
   automationRules, suggestions, creditTransactions, referrals,
   subscriptions, payments, addons,
-  type User, type Workspace, type SocialAccount, type Content,
+  type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
   type Payment, type Addon,
-  type InsertUser, type InsertWorkspace, type InsertSocialAccount,
-  type InsertContent, type InsertAutomationRule, type InsertAnalytics,
+  type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
+  type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
   type InsertSubscription, type InsertPayment, type InsertAddon
 } from "@shared/schema";
@@ -28,10 +28,25 @@ export interface IStorage {
   getWorkspace(id: number): Promise<Workspace | undefined>;
   getWorkspacesByUserId(userId: number | string): Promise<Workspace[]>;
   getDefaultWorkspace(userId: number): Promise<Workspace | undefined>;
+  getWorkspaceByInviteCode(inviteCode: string): Promise<Workspace | undefined>;
   createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
   updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace>;
   deleteWorkspace(id: number): Promise<void>;
   setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void>;
+
+  // Team management operations
+  getWorkspaceMember(workspaceId: number, userId: number): Promise<WorkspaceMember | undefined>;
+  getWorkspaceMembers(workspaceId: number): Promise<(WorkspaceMember & { user: User })[]>;
+  addWorkspaceMember(member: InsertWorkspaceMember): Promise<WorkspaceMember>;
+  updateWorkspaceMember(workspaceId: number, userId: number, updates: Partial<WorkspaceMember>): Promise<WorkspaceMember>;
+  removeWorkspaceMember(workspaceId: number, userId: number): Promise<void>;
+  
+  // Team invitation operations
+  createTeamInvitation(invitation: InsertTeamInvitation): Promise<TeamInvitation>;
+  getTeamInvitation(id: number): Promise<TeamInvitation | undefined>;
+  getTeamInvitationByToken(token: string): Promise<TeamInvitation | undefined>;
+  getTeamInvitations(workspaceId: number, status?: string): Promise<TeamInvitation[]>;
+  updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation>;
 
   // Social account operations
   getSocialAccount(id: number): Promise<SocialAccount | undefined>;

@@ -33,8 +33,39 @@ export const workspaces = pgTable("workspaces", {
   aiPersonality: text("ai_personality"),
   credits: integer("credits").default(0),
   isDefault: boolean("is_default").default(false),
+  maxTeamMembers: integer("max_team_members").default(1), // Based on subscription
+  inviteCode: text("invite_code").unique(), // For easy team invites
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Workspace team members and roles
+export const workspaceMembers = pgTable("workspace_members", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull(), // owner, editor, viewer
+  permissions: json("permissions"), // Custom permissions object
+  invitedBy: integer("invited_by").references(() => users.id),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  status: text("status").default("active"), // active, pending, suspended
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Team invitations
+export const teamInvitations = pgTable("team_invitations", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  invitedBy: integer("invited_by").references(() => users.id).notNull(),
+  email: text("email").notNull(),
+  role: text("role").notNull(), // editor, viewer
+  permissions: json("permissions"),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  status: text("status").default("pending"), // pending, accepted, expired, cancelled
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow()
 });
 
 export const socialAccounts = pgTable("social_accounts", {
@@ -217,6 +248,24 @@ export const insertWorkspaceSchema = createInsertSchema(workspaces).pick({
   isDefault: true
 });
 
+export const insertWorkspaceMemberSchema = createInsertSchema(workspaceMembers).pick({
+  workspaceId: true,
+  userId: true,
+  role: true,
+  permissions: true,
+  invitedBy: true
+});
+
+export const insertTeamInvitationSchema = createInsertSchema(teamInvitations).pick({
+  workspaceId: true,
+  invitedBy: true,
+  email: true,
+  role: true,
+  permissions: true,
+  token: true,
+  expiresAt: true
+});
+
 export const insertSocialAccountSchema = createInsertSchema(socialAccounts).pick({
   workspaceId: true,
   platform: true,
@@ -331,6 +380,8 @@ export const insertAddonSchema = createInsertSchema(addons).pick({
 // Select types
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
+export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
+export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type SocialAccount = typeof socialAccounts.$inferSelect;
 export type Content = typeof content.$inferSelect;
 export type Analytics = typeof analytics.$inferSelect;
@@ -346,6 +397,8 @@ export type Addon = typeof addons.$inferSelect;
 // Insert types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
+export type InsertWorkspaceMember = z.infer<typeof insertWorkspaceMemberSchema>;
+export type InsertTeamInvitation = z.infer<typeof insertTeamInvitationSchema>;
 export type InsertSocialAccount = z.infer<typeof insertSocialAccountSchema>;
 export type InsertContent = z.infer<typeof insertContentSchema>;
 export type InsertAutomationRule = z.infer<typeof insertAutomationRuleSchema>;

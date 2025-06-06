@@ -85,17 +85,7 @@ export default function Scheduler() {
   const [socialAccounts, setSocialAccounts] = useState([]);
   const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
 
-  // Check what workspace should be active from localStorage
-  const getExpectedWorkspace = () => {
-    try {
-      const saved = localStorage.getItem('currentWorkspace');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  };
-
-  // Fetch social accounts with proper workspace restoration check
+  // Fetch social accounts with proper workspace restoration timing
   useEffect(() => {
     let isCancelled = false;
     let timeoutId: NodeJS.Timeout;
@@ -111,40 +101,39 @@ export default function Scheduler() {
     setSocialAccountsLoading(true);
     
     if (currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
-      // Check if current workspace matches what should be restored
-      const expectedWorkspace = getExpectedWorkspace();
-      const isWorkspaceFullyRestored = !expectedWorkspace || currentWorkspace.name === expectedWorkspace.name;
-      
-      console.log('[SCHEDULER DEBUG] Workspace restoration check:', {
-        expectedName: expectedWorkspace?.name,
-        currentName: currentWorkspace?.name,
-        isFullyRestored: isWorkspaceFullyRestored
-      });
-      
-      if (!isWorkspaceFullyRestored) {
-        console.log('[SCHEDULER DEBUG] Workspace not fully restored yet, waiting...');
-        // Wait longer for restoration to complete
-        timeoutId = setTimeout(() => {
-          // Trigger re-check after restoration should be done
-          if (!isCancelled) {
-            setSocialAccountsLoading(false);
-          }
-        }, 2000);
-        return;
-      }
-      
-      // Workspace is properly restored, fetch accounts
+      // Always wait a sufficient time for workspace restoration to complete fully
+      // The logs show restoration happens AFTER the scheduler effect triggers
       timeoutId = setTimeout(async () => {
         if (isCancelled) return;
         
-        console.log('[SCHEDULER DEBUG] Fetching accounts for RESTORED workspace:', currentWorkspace.id, currentWorkspace.name);
+        // Get the workspace that should be active after restoration
+        let expectedWorkspace;
+        try {
+          const saved = localStorage.getItem('currentWorkspace');
+          expectedWorkspace = saved ? JSON.parse(saved) : null;
+        } catch {
+          expectedWorkspace = null;
+        }
+        
+        // Find the correct workspace from the workspaces list
+        let targetWorkspace = currentWorkspace;
+        
+        if (expectedWorkspace) {
+          const foundWorkspace = workspaces.find(w => w.name === expectedWorkspace.name);
+          if (foundWorkspace && foundWorkspace.id !== currentWorkspace.id) {
+            console.log('[SCHEDULER DEBUG] Using restored workspace:', foundWorkspace.name, foundWorkspace.id, 'instead of current:', currentWorkspace.name, currentWorkspace.id);
+            targetWorkspace = foundWorkspace;
+          }
+        }
+        
+        console.log('[SCHEDULER DEBUG] Fetching accounts for workspace:', targetWorkspace.id, targetWorkspace.name);
         
         try {
-          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${targetWorkspace.id}`);
           const accounts = await response.json();
           
           if (!isCancelled) {
-            console.log('[SCHEDULER DEBUG] Retrieved accounts:', accounts.length, 'for workspace:', currentWorkspace.name);
+            console.log('[SCHEDULER DEBUG] Retrieved accounts:', accounts.length, 'for workspace:', targetWorkspace.name);
             accounts.forEach((account: any, index: number) => {
               console.log(`[SCHEDULER DEBUG]   ${index + 1}. @${account.username} (${account.platform})`);
             });
@@ -160,7 +149,7 @@ export default function Scheduler() {
             setSocialAccountsLoading(false);
           }
         }
-      }, 500);
+      }, 2000); // Wait longer for restoration to complete
     } else {
       setSocialAccountsLoading(false);
     }

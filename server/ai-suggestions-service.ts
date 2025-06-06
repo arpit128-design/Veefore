@@ -1,9 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// the newest Anthropic model is "claude-sonnet-4-20250514" which was released May 14, 2025. Use this by default unless user has already selected claude-3-7-sonnet-20250219
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 
 interface SuggestionData {
   type: 'trending' | 'hashtag' | 'audio' | 'timing' | 'engagement' | 'growth';
@@ -159,19 +156,13 @@ Based on this data, provide suggestions in JSON format:
 
 Focus on data-driven insights and practical actions they can take immediately.`;
 
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2000,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  
+  const response = await model.generateContent(prompt);
+  const responseText = response.response.text();
 
   try {
-    const content = response.content[0];
-    if (content.type === 'text') {
-      return JSON.parse(content.text);
-    } else {
-      throw new Error('Unexpected content type from AI');
-    }
+    return JSON.parse(responseText);
   } catch (parseError) {
     console.error('[AI SUGGESTIONS] Failed to parse AI response:', parseError);
     throw new Error('Invalid AI response format');

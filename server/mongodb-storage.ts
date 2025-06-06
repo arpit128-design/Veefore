@@ -779,11 +779,31 @@ export class MongoStorage implements IStorage {
   }
 
   async createSuggestion(suggestion: InsertSuggestion): Promise<Suggestion> {
-    throw new Error('Not implemented');
+    await this.connect();
+    const newSuggestion = new SuggestionModel({
+      workspaceId: suggestion.workspaceId.toString(),
+      type: suggestion.type,
+      data: suggestion.data,
+      confidence: suggestion.confidence,
+      isUsed: false,
+      validUntil: suggestion.validUntil,
+      createdAt: new Date()
+    });
+    const saved = await newSuggestion.save();
+    return this.convertSuggestion(saved);
   }
 
   async markSuggestionUsed(id: number): Promise<Suggestion> {
-    throw new Error('Not implemented');
+    await this.connect();
+    const updated = await SuggestionModel.findByIdAndUpdate(
+      id,
+      { isUsed: true },
+      { new: true }
+    );
+    if (!updated) {
+      throw new Error('Suggestion not found');
+    }
+    return this.convertSuggestion(updated);
   }
 
   async getCreditTransactions(userId: number, limit?: number): Promise<CreditTransaction[]> {

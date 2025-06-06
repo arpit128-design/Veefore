@@ -500,7 +500,7 @@ export class InstagramAPI {
       const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
         video_url: videoUrl,
         caption: caption,
-        media_type: 'VIDEO',
+        media_type: 'REELS', // VIDEO is deprecated, use REELS for all video content
         access_token: accessToken
       });
 

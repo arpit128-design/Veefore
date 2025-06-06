@@ -14,6 +14,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { PublishingProgressTracker } from "@/components/PublishingProgressTracker";
 import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2, Edit, AlertCircle } from "lucide-react";
 import { useState } from "react";
 

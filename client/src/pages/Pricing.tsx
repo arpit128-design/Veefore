@@ -161,7 +161,7 @@ export default function Pricing() {
   const addons = pricingData?.addons || {};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden">
+    <div className="min-h-screen text-gray-900 relative overflow-hidden">
       <SpaceBackground />
       
       {/* Enhanced Cosmic Background */}
@@ -223,10 +223,10 @@ export default function Pricing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
               Choose Your Cosmic Plan
             </h1>
-            <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto rounded-full mb-6"></div>
+            <div className="w-32 h-1 bg-gradient-to-r from-cyan-600 to-purple-600 mx-auto rounded-full mb-6"></div>
           </motion.div>
 
           <motion.div
@@ -235,7 +235,7 @@ export default function Pricing() {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="max-w-5xl mx-auto mb-12"
           >
-            <p className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-8">
+            <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
               VeeFore is your AI-powered social media command center. Transform content creation, automate scheduling, and dominate multiple platforms with intelligent analytics and cosmic-level insights.
             </p>
             
@@ -394,16 +394,16 @@ export default function Pricing() {
                         className="relative h-full"
                       >
                         <Card className={`
-                          h-full relative overflow-hidden border-2 backdrop-blur-xl transition-all duration-700 group-hover:shadow-2xl
+                          h-full relative overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 group-hover:shadow-xl
                           ${isPopular 
-                            ? 'border-amber-400/60 bg-gradient-to-br from-amber-900/30 via-orange-900/25 to-amber-900/30 shadow-amber-500/20' 
+                            ? 'border-amber-400/60 bg-white/95 shadow-amber-500/10' 
                             : plan.id === 'free'
-                              ? 'border-slate-500/40 bg-gradient-to-br from-slate-800/40 via-slate-700/30 to-slate-800/40 hover:border-slate-400/60'
+                              ? 'border-gray-300/60 bg-white/90 hover:border-gray-400/80'
                               : plan.id === 'creator'
-                                ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/40 via-cyan-900/30 to-blue-900/40 hover:border-blue-400/70'
+                                ? 'border-blue-400/60 bg-white/90 hover:border-blue-500/80'
                                 : plan.id === 'pro'
-                                  ? 'border-purple-500/50 bg-gradient-to-br from-purple-900/40 via-violet-900/30 to-purple-900/40 hover:border-purple-400/70'
-                                  : 'border-indigo-500/50 bg-gradient-to-br from-indigo-900/40 via-blue-900/30 to-indigo-900/40 hover:border-indigo-400/70'
+                                  ? 'border-purple-400/60 bg-white/90 hover:border-purple-500/80'
+                                  : 'border-indigo-400/60 bg-white/90 hover:border-indigo-500/80'
                           }
                         `}>
                         

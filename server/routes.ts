@@ -1563,31 +1563,31 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         razorpayOrderId: razorpay_order_id,
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
-        amount: order.amount / 100, // Convert from paise
+        amount: Number(order.amount) / 100, // Convert from paise
         currency: order.currency,
         status: 'paid',
-        purpose: order.notes.purpose,
+        purpose: order.notes?.purpose || 'unknown',
         metadata: {
           orderId: razorpay_order_id,
-          planId: order.notes.planId,
-          packageId: order.notes.packageId,
-          addonId: order.notes.addonId
+          planId: order.notes?.planId,
+          packageId: order.notes?.packageId,
+          addonId: order.notes?.addonId
         }
       });
 
       // Process based on payment purpose
-      if (order.notes.purpose === 'subscription') {
-        await processSubscriptionPayment(userId, order.notes.planId);
-      } else if (order.notes.purpose === 'credits') {
+      if (order.notes?.purpose === 'subscription') {
+        await processSubscriptionPayment(userId, order.notes.planId as string);
+      } else if (order.notes?.purpose === 'credits') {
         await processCreditPurchase(userId, order.notes);
-      } else if (order.notes.purpose === 'addon') {
+      } else if (order.notes?.purpose === 'addon') {
         await processAddonPurchase(userId, order.notes);
       }
 
       res.json({ 
         success: true, 
         message: 'Payment processed successfully',
-        purpose: order.notes.purpose
+        purpose: order.notes?.purpose || 'unknown'
       });
 
     } catch (error: any) {

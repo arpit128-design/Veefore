@@ -1,12 +1,15 @@
 import { 
   users, workspaces, socialAccounts, content, analytics, 
   automationRules, suggestions, creditTransactions, referrals,
+  subscriptions, payments, addons,
   type User, type Workspace, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
-  type CreditTransaction, type Referral,
+  type CreditTransaction, type Referral, type Subscription, 
+  type Payment, type Addon,
   type InsertUser, type InsertWorkspace, type InsertSocialAccount,
   type InsertContent, type InsertAutomationRule, type InsertAnalytics,
-  type InsertSuggestion, type InsertCreditTransaction, type InsertReferral
+  type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
+  type InsertSubscription, type InsertPayment, type InsertAddon
 } from "@shared/schema";
 
 export interface IStorage {
@@ -73,6 +76,19 @@ export interface IStorage {
   createReferral(referral: InsertReferral): Promise<Referral>;
   confirmReferral(id: number): Promise<Referral>;
   getLeaderboard(limit?: number): Promise<Array<User & { referralCount: number }>>;
+
+  // Subscription operations
+  getSubscription(userId: number): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscriptionStatus(userId: number, status: string, canceledAt?: Date): Promise<Subscription>;
+
+  // Payment operations
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPaymentsByUser(userId: number): Promise<Payment[]>;
+
+  // Addon operations
+  getUserAddons(userId: number): Promise<Addon[]>;
+  createAddon(addon: InsertAddon): Promise<Addon>;
 }
 
 export class MemStorage implements IStorage {
@@ -85,6 +101,9 @@ export class MemStorage implements IStorage {
   private suggestions: Map<number, Suggestion> = new Map();
   private creditTransactions: Map<number, CreditTransaction> = new Map();
   private referrals: Map<number, Referral> = new Map();
+  private subscriptions: Map<number, Subscription> = new Map();
+  private payments: Map<number, Payment> = new Map();
+  private addons: Map<number, Addon> = new Map();
   
   private currentUserId: number = 1;
   private currentWorkspaceId: number = 1;
@@ -95,6 +114,9 @@ export class MemStorage implements IStorage {
   private currentSuggestionId: number = 1;
   private currentCreditTransactionId: number = 1;
   private currentReferralId: number = 1;
+  private currentSubscriptionId: number = 1;
+  private currentPaymentId: number = 1;
+  private currentAddonId: number = 1;
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
@@ -510,9 +532,73 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.referralCount - a.referralCount)
       .slice(0, limit);
   }
+
+  // Subscription operations
+  async getSubscription(userId: number): Promise<Subscription | undefined> {
+    return Array.from(this.subscriptions.values()).find(subscription => subscription.userId === userId);
+  }
+
+  async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
+    const id = this.currentSubscriptionId++;
+    const subscription: Subscription = {
+      ...insertSubscription,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.subscriptions.set(id, subscription);
+    return subscription;
+  }
+
+  async updateSubscriptionStatus(userId: number, status: string, canceledAt?: Date): Promise<Subscription> {
+    const subscription = Array.from(this.subscriptions.values()).find(sub => sub.userId === userId);
+    if (!subscription) throw new Error("Subscription not found");
+    
+    const updatedSubscription = {
+      ...subscription,
+      status,
+      canceledAt,
+      updatedAt: new Date()
+    };
+    this.subscriptions.set(subscription.id, updatedSubscription);
+    return updatedSubscription;
+  }
+
+  // Payment operations
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = this.currentPaymentId++;
+    const payment: Payment = {
+      ...insertPayment,
+      id,
+      createdAt: new Date()
+    };
+    this.payments.set(id, payment);
+    return payment;
+  }
+
+  async getPaymentsByUser(userId: number): Promise<Payment[]> {
+    return Array.from(this.payments.values()).filter(payment => payment.userId === userId);
+  }
+
+  // Addon operations
+  async getUserAddons(userId: number): Promise<Addon[]> {
+    return Array.from(this.addons.values()).filter(addon => addon.userId === userId && addon.isActive);
+  }
+
+  async createAddon(insertAddon: InsertAddon): Promise<Addon> {
+    const id = this.currentAddonId++;
+    const addon: Addon = {
+      ...insertAddon,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.addons.set(id, addon);
+    return addon;
+  }
 }
 
-import { MongoStorage } from './mongodb-storage';
+import { DatabaseStorage } from './db-storage';
 
-// Use MongoDB Atlas if connection string is available, otherwise fallback to memory storage
-export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();
+// Use PostgreSQL database if available, otherwise fallback to memory storage
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

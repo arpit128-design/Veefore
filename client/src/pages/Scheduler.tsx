@@ -128,16 +128,19 @@ export default function Scheduler() {
       console.log('[SCHEDULER DEBUG] Available workspaces:', workspaces.map((w: any) => w.name));
       console.log('[SCHEDULER DEBUG] User ID:', user?.id);
       
-      // Determine the target workspace immediately
+      // Always prioritize current workspace context over localStorage for immediate response
       let targetWorkspace = currentWorkspace;
       
-      if (expectedWorkspace) {
+      // Only use localStorage if current workspace context doesn't match what we expect
+      if (expectedWorkspace && expectedWorkspace.name !== currentWorkspace.name) {
         const foundWorkspace = workspaces.find(w => w.name === expectedWorkspace.name);
         if (foundWorkspace) {
-          console.log('[SCHEDULER DEBUG] Found expected workspace in array:', foundWorkspace.name, foundWorkspace.id);
+          console.log('[SCHEDULER DEBUG] Found different workspace in localStorage, using:', foundWorkspace.name, foundWorkspace.id);
           targetWorkspace = foundWorkspace;
         }
       }
+      
+      console.log('[SCHEDULER DEBUG] Final target workspace:', targetWorkspace.name, targetWorkspace.id);
       
       // Fetch accounts after a brief delay
       timeoutId = setTimeout(async () => {
@@ -166,7 +169,7 @@ export default function Scheduler() {
             setSocialAccountsLoading(false);
           }
         }
-      }, 500); // Shorter delay since we're determining workspace immediately
+      }, 100); // Minimal delay for immediate response to workspace changes
     } else {
       setSocialAccountsLoading(false);
     }

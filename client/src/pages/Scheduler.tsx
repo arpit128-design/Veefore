@@ -84,8 +84,11 @@ export default function Scheduler() {
   const { data: socialAccounts = [] } = useQuery({
     queryKey: ['social-accounts', currentWorkspace?.id],
     queryFn: async () => {
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace?.id, currentWorkspace?.name);
       const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
-      return response.json();
+      const accounts = await response.json();
+      console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts);
+      return accounts;
     },
     enabled: !!currentWorkspace?.id
   });

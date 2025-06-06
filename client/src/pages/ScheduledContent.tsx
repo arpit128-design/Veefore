@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, Edit, Trash2, Play, Pause, Image as ImageIcon, Video, FileText, AlertCircle } from "lucide-react";
+import { PublishingProgressTracker } from "@/components/PublishingProgressTracker";
 
 interface ScheduledContentItem {
   id: string;
@@ -41,6 +42,7 @@ export default function ScheduledContent() {
   const queryClient = useQueryClient();
   
   const [editDialog, setEditDialog] = useState(false);
+  const [publishingItems, setPublishingItems] = useState<Set<string>>(new Set());
   const [editForm, setEditForm] = useState<EditFormData>({
     id: "",
     title: "",
@@ -228,6 +230,29 @@ export default function ScheduledContent() {
             return (
               <Card key={content.id} className="content-card glassmorphism hover:border-electric-cyan/50 transition-colors">
                 <CardContent className="p-6">
+                  {/* Publishing Progress Tracker for Scheduled Content */}
+                  {publishingItems.has(content.id) && (
+                    <div className="mb-4">
+                      <PublishingProgressTracker 
+                        contentType={content.type}
+                        isPublishing={true}
+                        isScheduled={true}
+                        contentId={content.id}
+                        onComplete={() => {
+                          setPublishingItems(prev => {
+                            const updated = new Set(prev);
+                            updated.delete(content.id);
+                            return updated;
+                          });
+                          toast({
+                            title: "Content Published Successfully!",
+                            description: `Your ${content.type} has been published to ${content.platform}.`
+                          });
+                        }}
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">

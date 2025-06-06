@@ -1,40 +1,47 @@
 import { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Clock, AlertCircle, Video, Image } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, Video, Image, Upload, Cog } from 'lucide-react';
 
 interface PublishingProgressTrackerProps {
   contentType: string;
   isPublishing: boolean;
+  isScheduled?: boolean;
+  contentId?: string;
   onComplete?: () => void;
 }
 
 export function PublishingProgressTracker({ 
   contentType, 
   isPublishing, 
+  isScheduled = false,
+  contentId,
   onComplete 
 }: PublishingProgressTrackerProps) {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [publishingStatus, setPublishingStatus] = useState<string>('preparing');
 
-  const getSteps = (type: string) => {
+  const getSteps = (type: string, scheduled: boolean = false) => {
     const isVideo = type === 'video' || type === 'reel';
-    return [
-      { name: 'Uploading file', duration: 3 },
-      { name: 'Creating media container', duration: 2 },
+    const baseSteps = [
+      ...(scheduled ? [{ name: 'Scheduled time reached', duration: 1 }] : []),
+      { name: isScheduled ? 'Retrieving content' : 'Uploading file', duration: isScheduled ? 2 : 3 },
+      { name: 'Creating Instagram container', duration: 2 },
       ...(isVideo ? [
-        { name: 'Processing video', duration: 60 },
-        { name: 'Quality checks', duration: 15 }
+        { name: 'Processing video (Instagram)', duration: 90 },
+        { name: 'Quality verification', duration: 15 }
       ] : [
-        { name: 'Processing image', duration: 5 }
+        { name: 'Processing image', duration: 8 }
       ]),
-      { name: 'Publishing to Instagram', duration: 3 },
-      { name: 'Complete', duration: 0 }
+      { name: 'Publishing to feed', duration: 5 },
+      { name: 'Verification complete', duration: 0 }
     ];
+    return baseSteps;
   };
 
-  const steps = getSteps(contentType);
+  const steps = getSteps(contentType, isScheduled);
   const totalDuration = steps.reduce((acc, step) => acc + step.duration, 0);
 
   useEffect(() => {

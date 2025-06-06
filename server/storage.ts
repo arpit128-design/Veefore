@@ -36,6 +36,7 @@ export interface IStorage {
   getSocialAccount(id: number): Promise<SocialAccount | undefined>;
   getSocialAccountsByWorkspace(workspaceId: number): Promise<SocialAccount[]>;
   getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined>;
+  getSocialConnections(userId: number): Promise<SocialAccount[]>;
   createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount>;
   updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount>;
   deleteSocialAccount(id: number): Promise<void>;
@@ -234,6 +235,14 @@ export class MemStorage implements IStorage {
   async getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined> {
     return Array.from(this.socialAccounts.values()).find(
       account => account.workspaceId.toString() === workspaceId.toString() && account.platform === platform
+    );
+  }
+
+  async getSocialConnections(userId: number): Promise<SocialAccount[]> {
+    const userWorkspaces = await this.getWorkspacesByUserId(userId);
+    const workspaceIds = userWorkspaces.map(w => w.id);
+    return Array.from(this.socialAccounts.values()).filter(
+      account => workspaceIds.includes(account.workspaceId)
     );
   }
 

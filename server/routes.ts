@@ -193,11 +193,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Add global plan context middleware
-  app.use(requireAuth, addPlanContext, enrichResponseWithPlanInfo);
-
   // Content creation and publishing
-  app.post('/api/content', requireCredits(5), validateSchedulingLimit(), enforceWatermarkPolicy(), async (req: any, res: Response) => {
+  app.post('/api/content', requireAuth, addPlanContext, requireCredits(5), validateSchedulingLimit(), enforceWatermarkPolicy(), enrichResponseWithPlanInfo(), async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { workspaceId, title, description, type, platform, scheduledAt, publishNow, contentData } = req.body;
@@ -909,7 +906,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Manual Instagram account connection
-  app.post('/api/instagram/manual-connect', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/instagram/manual-connect', requireAuth, addPlanContext, validateSocialAccountLimit('instagram'), enrichResponseWithPlanInfo(), async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { accessToken, username } = req.body;
@@ -1340,7 +1337,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Create workspace
-  app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/workspaces', requireAuth, addPlanContext, validateWorkspaceLimit(), enrichResponseWithPlanInfo(), async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { name, description, theme } = req.body;

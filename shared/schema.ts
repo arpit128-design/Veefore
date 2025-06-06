@@ -47,6 +47,22 @@ export const socialAccounts = pgTable("social_accounts", {
   refreshToken: text("refresh_token"),
   expiresAt: timestamp("expires_at"),
   isActive: boolean("is_active").default(true),
+  // Instagram-specific profile data
+  followersCount: integer("followers_count"),
+  followingCount: integer("following_count"),
+  mediaCount: integer("media_count"),
+  biography: text("biography"),
+  website: text("website"),
+  profilePictureUrl: text("profile_picture_url"),
+  accountType: text("account_type"), // PERSONAL, BUSINESS, CREATOR
+  isBusinessAccount: boolean("is_business_account").default(false),
+  isVerified: boolean("is_verified").default(false),
+  // Performance metrics for AI analysis
+  avgLikes: integer("avg_likes"),
+  avgComments: integer("avg_comments"),
+  avgReach: integer("avg_reach"),
+  engagementRate: integer("engagement_rate"), // stored as percentage * 100 (e.g., 3.45% = 345)
+  lastSyncAt: timestamp("last_sync_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });

@@ -257,6 +257,21 @@ export class MemStorage implements IStorage {
     return Array.from(this.socialAccounts.values()).filter(account => account.workspaceId === workspaceId);
   }
 
+  async getAllSocialAccounts(): Promise<SocialAccount[]> {
+    return Array.from(this.socialAccounts.values());
+  }
+
+  async updateSocialAccount(id: number, updates: Partial<SocialAccount>): Promise<SocialAccount> {
+    const account = this.socialAccounts.get(id);
+    if (!account) {
+      throw new Error(`Social account with id ${id} not found`);
+    }
+    
+    const updatedAccount = { ...account, ...updates, updatedAt: new Date() };
+    this.socialAccounts.set(id, updatedAccount);
+    return updatedAccount;
+  }
+
   async getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined> {
     return Array.from(this.socialAccounts.values()).find(
       account => account.workspaceId.toString() === workspaceId.toString() && account.platform === platform

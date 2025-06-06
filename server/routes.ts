@@ -2111,7 +2111,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log('- Content entries:', recentContent?.length || 0);
       
       if (socialAccounts?.length > 0) {
-        console.log('- Instagram account:', socialAccounts[0]?.username, 'followers:', socialAccounts[0]?.followersCount);
+        const account = socialAccounts[0];
+        console.log('- Instagram account:', account?.username, 'followers:', account?.followersCount);
+        console.log('- Account details:', JSON.stringify({
+          platform: account?.platform,
+          accountId: account?.accountId,
+          mediaCount: account?.mediaCount,
+          accountType: account?.accountType,
+          isBusinessAccount: account?.isBusinessAccount
+        }, null, 2));
       }
       
       // Generate AI-powered suggestions based on real data

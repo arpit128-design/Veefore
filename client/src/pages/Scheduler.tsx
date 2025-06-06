@@ -225,6 +225,50 @@ export default function Scheduler() {
     setIsScheduleDialogOpen(true);
   };
 
+  const handleScheduleSubmit = async (publishNow: boolean = false, event?: React.FormEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    if (!scheduleForm.title || !scheduleForm.description || !scheduleForm.mediaUrl) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields and upload media.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!publishNow && !scheduleForm.scheduledDate) {
+      toast({
+        title: "Missing Schedule Date",
+        description: "Please select a date and time to schedule your content.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const scheduledAt = publishNow ? 
+      new Date().toISOString() : 
+      new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}:00.000Z`).toISOString();
+
+    createContentMutation.mutate({
+      workspaceId: currentWorkspace?.id,
+      title: scheduleForm.title,
+      description: scheduleForm.description,
+      type: scheduleForm.type,
+      platform: scheduleForm.platform,
+      scheduledAt,
+      publishNow,
+      contentData: {
+        mediaUrl: scheduleForm.mediaUrl,
+        caption: scheduleForm.description,
+        isAIGenerated: scheduleForm.useAIGenerated,
+        aiPrompt: scheduleForm.aiPrompt
+      }
+    });
+  };
+
   const getTimeUntilScheduled = (scheduledAt: string) => {
     const now = new Date();
     const scheduled = new Date(scheduledAt);
@@ -415,76 +459,6 @@ export default function Scheduler() {
     } catch (error) {
       throw new Error("Failed to publish to Instagram");
     }
-  };
-
-  const handleScheduleSubmit = async (publishNow = false, e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    
-    if (!currentWorkspace?.id || !scheduleForm.title.trim()) {
-      toast({
-        title: "Missing information",
-        description: publishNow ? "Please enter a title for your post." : "Please fill in all required fields.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!publishNow && (!scheduleForm.scheduledDate || !scheduleForm.scheduledTime)) {
-      toast({
-        title: "Missing schedule information",
-        description: "Please select a date and time for scheduling.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!scheduleForm.mediaUrl && scheduleForm.platform === 'instagram') {
-      toast({
-        title: "Media required",
-        description: "Instagram posts require an image or video. Please upload media or generate AI content.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    let scheduledDateTime = new Date();
-    
-    if (!publishNow) {
-      // Create date in UTC to avoid time zone conversion issues
-      scheduledDateTime = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}:00.000Z`);
-      const now = new Date();
-
-      if (scheduledDateTime < now) {
-        toast({
-          title: "Invalid date",
-          description: "Please select a future date and time.",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
-
-    const contentData = {
-      workspaceId: currentWorkspace.id,
-      title: scheduleForm.title.trim(),
-      description: scheduleForm.description?.trim() || '',
-      type: scheduleForm.type,
-      platform: scheduleForm.platform,
-      scheduledAt: publishNow ? new Date().toISOString() : scheduledDateTime.toISOString(),
-      publishNow: publishNow,
-      contentData: {
-        mediaUrl: scheduleForm.mediaUrl,
-        caption: scheduleForm.description?.trim() || '',
-        isAIGenerated: scheduleForm.useAIGenerated,
-        aiPrompt: scheduleForm.aiPrompt
-      }
-    };
-
-    console.log('[CLIENT] Submitting content data:', contentData);
-
-    createContentMutation.mutate(contentData);
   };
 
   const getContentTypeIcon = (type: string) => {

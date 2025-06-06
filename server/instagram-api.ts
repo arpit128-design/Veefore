@@ -676,11 +676,11 @@ export class InstagramAPI {
                   console.log(`[INSTAGRAM PUBLISH] Attempting video compression for file: ${localPath}`);
                   
                   try {
-                    // Use simple, fast compression
-                    const { SimpleVideoCompressor } = await import('./simple-video-compressor');
+                    // Use ultra-fast compression for large files
+                    const { FastVideoCompressor } = await import('./fast-video-compressor');
                     
-                    console.log(`[INSTAGRAM PUBLISH] Starting fast compression process...`);
-                    const compressionResult = await SimpleVideoCompressor.compressVideo(localPath, 20);
+                    console.log(`[INSTAGRAM PUBLISH] Starting ultra-fast compression process...`);
+                    const compressionResult = await FastVideoCompressor.compressVideoForInstagram(localPath);
                     
                     console.log(`[INSTAGRAM PUBLISH] Compression result:`, {
                       success: compressionResult.success,

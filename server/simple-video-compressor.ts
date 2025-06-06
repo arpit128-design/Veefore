@@ -13,7 +13,8 @@ interface SimpleCompressionResult {
 export class SimpleVideoCompressor {
   static async compressVideo(inputPath: string, targetSizeMB: number = 25): Promise<SimpleCompressionResult> {
     const originalSize = fs.statSync(inputPath).size;
-    const outputPath = inputPath.replace('.mp4', '-compressed.mp4');
+    const timestamp = Date.now();
+    const outputPath = inputPath.replace('.mp4', `-compressed-${timestamp}.mp4`);
     
     console.log(`[SIMPLE COMPRESSION] Compressing ${inputPath} to target ${targetSizeMB}MB`);
     

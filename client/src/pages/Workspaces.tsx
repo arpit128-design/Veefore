@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,18 @@ export default function Workspaces() {
 
   // Debug modal state changes
   console.log('[WORKSPACES] Current upgrade modal state:', upgradeModal);
+
+  // Prevent modal from closing unexpectedly
+  const closeUpgradeModal = () => {
+    console.log('[WORKSPACES] Closing upgrade modal');
+    setUpgradeModal({
+      isOpen: false,
+      feature: '',
+      currentPlan: '',
+      upgradeMessage: '',
+      limitReached: null
+    });
+  };
 
   // Workspace management state
   const [isManageOpen, setIsManageOpen] = useState(false);
@@ -705,7 +717,7 @@ export default function Workspaces() {
       {/* Plan Upgrade Modal */}
       <PlanUpgradeModal
         isOpen={upgradeModal.isOpen}
-        onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={closeUpgradeModal}
         feature={upgradeModal.feature}
         currentPlan={upgradeModal.currentPlan}
         upgradeMessage={upgradeModal.upgradeMessage}

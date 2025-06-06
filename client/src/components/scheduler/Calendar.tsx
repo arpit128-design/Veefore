@@ -22,8 +22,8 @@ interface CalendarProps {
 
 export function Calendar({ onScheduleContent }: CalendarProps) {
   const { currentWorkspace } = useWorkspace();
-  // Fix date to December 2024 since system date is incorrect
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 11, 6)); // December 6, 2024
+  // Use current system date (June 6, 2025)
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
 
   const { data: scheduledContent } = useQuery({
@@ -42,7 +42,8 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
+    // Adjust for Monday start (0=Sunday, 1=Monday, etc.)
+    const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
 
     const days: CalendarDay[] = [];
     const today = new Date();
@@ -63,8 +64,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
     // Add days from current month
     for (let date = 1; date <= daysInMonth; date++) {
       const fullDate = new Date(year, month, date);
-      const correctedToday = new Date(2024, 11, 6); // December 6, 2024
-      const isToday = fullDate.toDateString() === correctedToday.toDateString();
+      const isToday = fullDate.toDateString() === today.toDateString();
       
       // Filter scheduled content for this date
       const dayContent = Array.isArray(scheduledContent) ? scheduledContent.filter((content: any) => {
@@ -110,7 +110,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
   };
 
   const goToToday = () => {
-    setCurrentDate(new Date(2024, 11, 6)); // December 6, 2024
+    setCurrentDate(new Date());
   };
 
   const getContentTypeColor = (type: string) => {

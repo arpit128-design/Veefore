@@ -366,9 +366,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       let content;
       if (status === 'scheduled') {
-        content = await storage.getScheduledContent(parseInt(workspaceId));
+        content = await storage.getScheduledContent(workspaceId);
       } else {
-        content = await storage.getContentByWorkspace(parseInt(workspaceId));
+        content = await storage.getContentByWorkspace(workspaceId);
       }
       
       res.json(content);

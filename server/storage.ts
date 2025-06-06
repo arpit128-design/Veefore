@@ -39,8 +39,8 @@ export interface IStorage {
 
   // Content operations
   getContent(id: number): Promise<Content | undefined>;
-  getContentByWorkspace(workspaceId: number, limit?: number): Promise<Content[]>;
-  getScheduledContent(workspaceId?: number): Promise<Content[]>;
+  getContentByWorkspace(workspaceId: number | string, limit?: number): Promise<Content[]>;
+  getScheduledContent(workspaceId?: number | string): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
   updateContent(id: number, updates: Partial<Content>): Promise<Content>;
   deleteContent(id: number): Promise<void>;
@@ -247,22 +247,22 @@ export class MemStorage implements IStorage {
     return this.content.get(id);
   }
 
-  async getContentByWorkspace(workspaceId: number, limit = 50): Promise<Content[]> {
+  async getContentByWorkspace(workspaceId: number | string, limit = 50): Promise<Content[]> {
     const workspaceContent = Array.from(this.content.values())
-      .filter(content => content.workspaceId === workspaceId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .filter(content => content.workspaceId.toString() === workspaceId.toString())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
     
     return workspaceContent.slice(0, limit);
   }
 
-  async getScheduledContent(workspaceId?: number): Promise<Content[]> {
+  async getScheduledContent(workspaceId?: number | string): Promise<Content[]> {
     const allContent = Array.from(this.content.values()).filter(
       content => content.status === "scheduled" && content.scheduledAt
     );
     
     // If workspaceId is provided, filter by workspace
     const filteredContent = workspaceId 
-      ? allContent.filter(content => content.workspaceId === workspaceId)
+      ? allContent.filter(content => content.workspaceId.toString() === workspaceId.toString())
       : allContent;
     
     return filteredContent.sort((a, b) => (a.scheduledAt!.getTime() - b.scheduledAt!.getTime()));

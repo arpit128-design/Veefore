@@ -184,7 +184,7 @@ export default function Scheduler() {
 
   // Force refresh when modal opens to ensure fresh data
   useEffect(() => {
-    if (isScheduleModalOpen && currentWorkspace?.id && currentWorkspace?.name) {
+    if (isScheduleDialogOpen && currentWorkspace?.id && currentWorkspace?.name) {
       console.log('[SCHEDULER DEBUG] Modal opened, forcing fresh data fetch for workspace:', currentWorkspace.name);
       // Clear accounts state immediately
       setSocialAccounts([]);
@@ -201,7 +201,7 @@ export default function Scheduler() {
       
       return () => clearTimeout(timeoutId);
     }
-  }, [isScheduleModalOpen, currentWorkspace?.id, currentWorkspace?.name, queryClient]);
+  }, [isScheduleDialogOpen, currentWorkspace?.id, currentWorkspace?.name, queryClient]);
 
   // Update platform selection when workspace or social accounts change
   useEffect(() => {

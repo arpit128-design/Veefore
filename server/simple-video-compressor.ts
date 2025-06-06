@@ -22,11 +22,13 @@ export class SimpleVideoCompressor {
       const ffmpegArgs = [
         '-i', inputPath,
         '-vcodec', 'libx264',
-        '-crf', '32',
-        '-preset', 'ultrafast',
-        '-vf', 'scale=min(1080\\,iw):min(1920\\,ih):force_original_aspect_ratio=decrease',
+        '-crf', '35',
+        '-preset', 'veryfast',
+        '-vf', 'scale=720:1280',
         '-acodec', 'aac',
-        '-b:a', '64k',
+        '-b:a', '48k',
+        '-r', '30',
+        '-t', '15',
         '-movflags', '+faststart',
         '-y',
         outputPath

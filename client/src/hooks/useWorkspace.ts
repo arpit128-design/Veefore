@@ -111,6 +111,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     
     console.log('[WORKSPACE PROVIDER] Completing workspace switch to', workspace.name);
     setCurrentWorkspace(workspace);
+    
+    // Invalidate all workspace-dependent queries to force refresh
+    console.log('[WORKSPACE PROVIDER] Invalidating all workspace-dependent queries');
+    queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['analytics-realtime'] });
+    queryClient.invalidateQueries({ queryKey: ['content'] });
+    queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+    
     setIsSwitching(false);
     console.log('[WORKSPACE PROVIDER] Workspace switch completed');
   };

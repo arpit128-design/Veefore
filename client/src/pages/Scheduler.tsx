@@ -55,6 +55,13 @@ export default function Scheduler() {
     contentType?: string;
     contentId?: string;
   }>({ isPublishing: false });
+  const [progressState, setProgressState] = useState<{
+    isVisible: boolean;
+    status: string;
+    progress: number;
+    currentStep: string;
+    timeRemaining: string;
+  }>({ isVisible: false, status: 'idle', progress: 0, currentStep: '', timeRemaining: '' });
   const [editForm, setEditForm] = useState({
     id: "",
     title: "",
@@ -112,24 +119,26 @@ export default function Scheduler() {
       queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
       
       if (variables.publishNow) {
-        // For immediate publishing, continue progress tracking for Instagram processing
-        setPublishingState(prev => ({
-          ...prev,
-          contentId: data.id
-        }));
+        // Complete progress tracking for immediate publishing
+        setProgressState({
+          isVisible: true,
+          status: 'completed',
+          progress: 100,
+          currentStep: 'Published successfully!',
+          timeRemaining: 'Complete'
+        });
         
-        // Extended progress for video processing (2-3 minutes)
-        const processingTime = variables.type === 'reel' || variables.type === 'video' ? 150000 : 30000;
-        
+        // Hide progress tracker after 3 seconds
         setTimeout(() => {
-          setPublishingState({ isPublishing: false });
+          setProgressState({ isVisible: false, status: 'idle', progress: 0, currentStep: '', timeRemaining: '' });
           setIsScheduleDialogOpen(false);
           resetScheduleForm();
-          toast({
-            title: "Content Published Successfully!",
-            description: `Your ${variables.type} has been published to Instagram.`
-          });
-        }, processingTime);
+        }, 3000);
+        
+        toast({
+          title: "Content Published Successfully!",
+          description: `Your ${variables.type} has been published to Instagram.`
+        });
       } else {
         // For scheduled content
         setIsScheduleDialogOpen(false);
@@ -140,11 +149,26 @@ export default function Scheduler() {
         });
       }
     },
-    onError: () => {
+    onError: (error: any) => {
+      // Show error state in progress tracker
+      if (progressState.isVisible) {
+        setProgressState({
+          isVisible: true,
+          status: 'error',
+          progress: 0,
+          currentStep: 'Publishing failed',
+          timeRemaining: 'Error'
+        });
+        
+        setTimeout(() => {
+          setProgressState({ isVisible: false, status: 'idle', progress: 0, currentStep: '', timeRemaining: '' });
+        }, 5000);
+      }
+      
       setPublishingState({ isPublishing: false });
       toast({
         title: "Error",
-        description: "Failed to schedule content. Please try again.",
+        description: error.message || "Failed to publish content. Please try again.",
         variant: "destructive"
       });
     }
@@ -251,6 +275,36 @@ export default function Scheduler() {
     const scheduledAt = publishNow ? 
       new Date().toISOString() : 
       new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}:00.000Z`).toISOString();
+
+    // Show progress tracker immediately for "Post Now"
+    if (publishNow) {
+      setProgressState({
+        isVisible: true,
+        status: 'uploading',
+        progress: 10,
+        currentStep: 'Preparing content...',
+        timeRemaining: '2-3 minutes'
+      });
+      
+      // Update progress during processing
+      setTimeout(() => {
+        setProgressState(prev => ({
+          ...prev,
+          progress: 40,
+          currentStep: 'Uploading to Instagram...',
+          timeRemaining: '1-2 minutes'
+        }));
+      }, 2000);
+      
+      setTimeout(() => {
+        setProgressState(prev => ({
+          ...prev,
+          progress: 70,
+          currentStep: 'Processing video...',
+          timeRemaining: '30-60 seconds'
+        }));
+      }, 10000);
+    }
 
     createContentMutation.mutate({
       workspaceId: currentWorkspace?.id,

@@ -87,6 +87,9 @@ export default function Workspaces() {
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
       const token = localStorage.getItem('veefore_auth_token');
+      console.log('=== TOKEN AVAILABLE ===', !!token);
+      
+      console.log('=== MAKING FETCH REQUEST ===');
       const response = await fetch('/api/workspaces', {
         method: 'POST',
         headers: {
@@ -96,8 +99,12 @@ export default function Workspaces() {
         body: JSON.stringify(data),
         credentials: 'include'
       });
+      console.log('=== FETCH COMPLETED ===');
 
+      console.log('=== PARSING JSON ===');
       const result = await response.json();
+      console.log('=== JSON PARSED ===');
+      
       console.log('=== RESPONSE STATUS ===', response.status);
       console.log('=== RESPONSE DATA ===', result);
       

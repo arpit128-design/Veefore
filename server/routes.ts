@@ -258,6 +258,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                 
                 // Update content status
                 await storage.updateContent(content.id, {
+                  status: 'published',
                   publishedAt: new Date()
                 });
 

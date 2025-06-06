@@ -13,13 +13,14 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Globe, Settings, Star, Users } from "lucide-react";
 import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
+import PlanUpgradeModal from "@/components/subscription/PlanUpgradeModal";
 
 
 
 export default function Workspaces() {
   const { workspaces, currentWorkspace, isSwitching, switchWorkspace } = useWorkspaceContext();
   const [targetWorkspace, setTargetWorkspace] = useState<any>(null);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -28,6 +29,15 @@ export default function Workspaces() {
     name: "",
     description: "",
     theme: "default"
+  });
+
+  // Plan upgrade modal state
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    feature: '',
+    currentPlan: '',
+    upgradeMessage: '',
+    limitReached: null as any
   });
 
   // Fetch workspace-specific social accounts for activity
@@ -59,13 +69,21 @@ export default function Workspaces() {
     onError: (error: any) => {
       console.log('Workspace creation error:', error);
       
-      // Handle plan restriction errors
+      // Handle plan restriction errors with upgrade modal
       if (error?.response?.status === 403) {
         const errorData = error.response.data;
-        toast({
-          title: "Plan Limit Reached",
-          description: errorData.upgradeMessage || errorData.error || "You've reached your workspace limit for your current plan",
-          variant: "destructive",
+        setIsCreateOpen(false); // Close the creation modal immediately
+        
+        setUpgradeModal({
+          isOpen: true,
+          feature: 'workspace_creation',
+          currentPlan: user?.plan || 'Free',
+          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces",
+          limitReached: {
+            current: workspaces?.length || 0,
+            max: user?.plan === 'Free' ? 1 : 3,
+            type: 'workspaces'
+          }
         });
       } else {
         toast({
@@ -350,6 +368,16 @@ export default function Workspaces() {
         isVisible={isSwitching}
         currentWorkspace={currentWorkspace}
         targetWorkspace={targetWorkspace}
+      />
+
+      {/* Plan Upgrade Modal */}
+      <PlanUpgradeModal
+        isOpen={upgradeModal.isOpen}
+        onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+        feature={upgradeModal.feature}
+        currentPlan={upgradeModal.currentPlan}
+        upgradeMessage={upgradeModal.upgradeMessage}
+        limitReached={upgradeModal.limitReached}
       />
     </div>
   );

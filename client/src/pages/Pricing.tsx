@@ -245,7 +245,7 @@ export default function Pricing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 p-6 rounded-2xl border border-blue-500/30 backdrop-blur-sm"
+                className="bg-transparent p-6 rounded-2xl border border-blue-500/30 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl mb-4 mx-auto">
                   <Zap className="w-6 h-6 text-white" />
@@ -258,7 +258,7 @@ export default function Pricing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.6 }}
-                className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 p-6 rounded-2xl border border-purple-500/30 backdrop-blur-sm"
+                className="bg-transparent p-6 rounded-2xl border border-purple-500/30 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl mb-4 mx-auto">
                   <Star className="w-6 h-6 text-white" />
@@ -271,7 +271,7 @@ export default function Pricing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.6 }}
-                className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 p-6 rounded-2xl border border-cyan-500/30 backdrop-blur-sm"
+                className="bg-transparent p-6 rounded-2xl border border-cyan-500/30 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl mb-4 mx-auto">
                   <Rocket className="w-6 h-6 text-white" />

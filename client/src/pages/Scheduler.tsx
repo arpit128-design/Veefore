@@ -100,31 +100,36 @@ export default function Scheduler() {
     setSocialAccounts([]);
     setSocialAccountsLoading(true);
     
+    // Wait for both workspace and workspaces array to be populated
     if (currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
-      // Always wait a sufficient time for workspace restoration to complete fully
-      // The logs show restoration happens AFTER the scheduler effect triggers
+      
+      // Get the expected workspace from localStorage immediately
+      let expectedWorkspace;
+      try {
+        const saved = localStorage.getItem('currentWorkspace');
+        expectedWorkspace = saved ? JSON.parse(saved) : null;
+      } catch {
+        expectedWorkspace = null;
+      }
+      
+      console.log('[SCHEDULER DEBUG] Expected workspace from localStorage:', expectedWorkspace?.name);
+      console.log('[SCHEDULER DEBUG] Current workspace context:', currentWorkspace.name);
+      console.log('[SCHEDULER DEBUG] Available workspaces:', workspaces.map(w => w.name));
+      
+      // Determine the target workspace immediately
+      let targetWorkspace = currentWorkspace;
+      
+      if (expectedWorkspace) {
+        const foundWorkspace = workspaces.find(w => w.name === expectedWorkspace.name);
+        if (foundWorkspace) {
+          console.log('[SCHEDULER DEBUG] Found expected workspace in array:', foundWorkspace.name, foundWorkspace.id);
+          targetWorkspace = foundWorkspace;
+        }
+      }
+      
+      // Fetch accounts after a brief delay
       timeoutId = setTimeout(async () => {
         if (isCancelled) return;
-        
-        // Get the workspace that should be active after restoration
-        let expectedWorkspace;
-        try {
-          const saved = localStorage.getItem('currentWorkspace');
-          expectedWorkspace = saved ? JSON.parse(saved) : null;
-        } catch {
-          expectedWorkspace = null;
-        }
-        
-        // Find the correct workspace from the workspaces list
-        let targetWorkspace = currentWorkspace;
-        
-        if (expectedWorkspace) {
-          const foundWorkspace = workspaces.find(w => w.name === expectedWorkspace.name);
-          if (foundWorkspace && foundWorkspace.id !== currentWorkspace.id) {
-            console.log('[SCHEDULER DEBUG] Using restored workspace:', foundWorkspace.name, foundWorkspace.id, 'instead of current:', currentWorkspace.name, currentWorkspace.id);
-            targetWorkspace = foundWorkspace;
-          }
-        }
         
         console.log('[SCHEDULER DEBUG] Fetching accounts for workspace:', targetWorkspace.id, targetWorkspace.name);
         
@@ -149,7 +154,7 @@ export default function Scheduler() {
             setSocialAccountsLoading(false);
           }
         }
-      }, 2000); // Wait longer for restoration to complete
+      }, 500); // Shorter delay since we're determining workspace immediately
     } else {
       setSocialAccountsLoading(false);
     }

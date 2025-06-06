@@ -2111,7 +2111,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const savedSuggestions = [];
       for (const suggestion of suggestions) {
         const saved = await storage.createSuggestion({
-          workspaceId: parseInt(workspaceId),
+          workspaceId: workspaceId,
           type: suggestion.type,
           data: suggestion.data,
           confidence: suggestion.confidence,

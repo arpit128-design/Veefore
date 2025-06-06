@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -83,7 +83,7 @@ const platformConfig = {
 
 export default function Integrations() {
   const { user } = useAuth();
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
@@ -115,7 +115,7 @@ export default function Integrations() {
       console.log(`[CONNECT DEBUG] Token from localStorage:`, token ? `Present (${token.substring(0, 20)}...)` : 'Missing');
       
       // Handle demo mode vs real Firebase user
-      if (user) {
+      if (user && token) {
         console.log(`[CONNECT DEBUG] User exists, checking if demo mode or real Firebase user`);
         
         // Check if this is demo mode
@@ -135,8 +135,8 @@ export default function Integrations() {
               const freshToken = await auth.currentUser.getIdToken(true); // Force refresh
               if (freshToken) {
                 token = freshToken;
-                localStorage.setItem('veefore_auth_token', token);
-                console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase (${token.substring(0, 20)}...)`);
+                localStorage.setItem('veefore_auth_token', freshToken);
+                console.log(`[CONNECT DEBUG] Fresh token obtained from Firebase (${freshToken.substring(0, 20)}...)`);
               }
             } else {
               console.log(`[CONNECT DEBUG] No current Firebase user found`);

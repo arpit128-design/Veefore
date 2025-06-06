@@ -9,7 +9,7 @@ import { Eye, Heart, Users, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { currentWorkspace } = useWorkspaceContext();
 
   // Fetch real analytics data with better caching - filtered by workspace
@@ -17,10 +17,10 @@ export default function Dashboard() {
     queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
     queryFn: () => fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Authorization': `Bearer ${token}`
       }
     }).then(res => res.json()),
-    enabled: !!user && !!currentWorkspace,
+    enabled: !!user && !!currentWorkspace && !!token,
     staleTime: 30000, // Data is fresh for 30 seconds
     gcTime: 300000, // Keep in cache for 5 minutes (TanStack Query v5)
     refetchInterval: 30000, // Refetch every 30 seconds

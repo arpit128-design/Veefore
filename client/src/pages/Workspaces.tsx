@@ -13,71 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Globe, Settings, Star, Users } from "lucide-react";
 
-// Current workspace statistics with authentic Instagram data
-function CurrentWorkspaceStats({ workspaceId }: { workspaceId: string }) {
-  const { token } = useAuth();
-  
-  const { data: socialAccounts = [] } = useQuery({
-    queryKey: ['social-accounts', workspaceId],
-    queryFn: () => fetch(`/api/social-accounts?workspaceId=${workspaceId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }).then(res => res.json()),
-    enabled: !!workspaceId && !!token
-  });
 
-  const { data: content = [] } = useQuery({
-    queryKey: ['workspace-content', workspaceId],
-    queryFn: () => fetch(`/api/content?workspaceId=${workspaceId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }).then(res => res.json()),
-    enabled: !!workspaceId && !!token
-  });
-
-  const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram');
-  const contentCount = content.length || 0;
-  
-  // Show actual Instagram data for workspaces with connected accounts
-  if (instagramAccount) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-          <div className="text-lg font-bold text-electric-cyan">{contentCount}</div>
-          <div className="text-xs text-asteroid-silver">Content Items</div>
-        </div>
-        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-          <div className="text-lg font-bold text-green-400">{instagramAccount.followerCount || 0}</div>
-          <div className="text-xs text-asteroid-silver">Followers</div>
-        </div>
-        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-          <div className="text-lg font-bold text-nebula-purple">@{instagramAccount.username}</div>
-          <div className="text-xs text-asteroid-silver">Instagram</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show setup required state for new workspaces
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-        <div className="text-lg font-bold text-gray-400">0</div>
-        <div className="text-xs text-asteroid-silver">Content Items</div>
-      </div>
-      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-        <div className="text-lg font-bold text-gray-400">-</div>
-        <div className="text-xs text-asteroid-silver">Followers</div>
-      </div>
-      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-        <div className="text-lg font-bold text-yellow-400">Setup</div>
-        <div className="text-xs text-asteroid-silver">Required</div>
-      </div>
-    </div>
-  );
-}
 
 export default function Workspaces() {
   const { workspaces, currentWorkspace, setCurrentWorkspace } = useWorkspace();
@@ -202,7 +138,20 @@ export default function Workspaces() {
             {currentWorkspace.description && (
               <p className="text-asteroid-silver mb-4">{currentWorkspace.description}</p>
             )}
-            <CurrentWorkspaceStats workspaceId={currentWorkspace.id} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+                <div className="text-lg font-bold text-gray-400">0</div>
+                <div className="text-xs text-asteroid-silver">Content Items</div>
+              </div>
+              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+                <div className="text-lg font-bold text-gray-400">-</div>
+                <div className="text-xs text-asteroid-silver">Followers</div>
+              </div>
+              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+                <div className="text-lg font-bold text-yellow-400">Setup</div>
+                <div className="text-xs text-asteroid-silver">Required</div>
+              </div>
+            </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 text-sm">
                 <span className="text-asteroid-silver">Credits:</span>

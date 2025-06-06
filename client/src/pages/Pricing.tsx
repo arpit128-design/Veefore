@@ -369,7 +369,7 @@ export default function Pricing() {
 
             {/* Stellar Subscription Plans */}
             <TabsContent value="plans" className="mt-16">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 {Object.entries(plans).map(([key, plan]: [string, any]) => {
                   const isPopular = plan.popular;
                   
@@ -505,7 +505,7 @@ export default function Pricing() {
                                 <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
                                   <Check className="h-3 w-3 text-emerald-400" />
                                 </div>
-                                <span className="text-slate-300 font-medium">{plan.credits} monthly credits</span>
+                                <span className="text-white font-medium">{plan.credits} monthly credits</span>
                               </div>
                             </motion.div>
                             
@@ -526,7 +526,7 @@ export default function Pricing() {
                                   <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
                                     <Check className="h-3 w-3 text-emerald-400" />
                                   </div>
-                                  <span className="text-slate-300">{feature}</span>
+                                  <span className="text-white">{feature}</span>
                                 </div>
                               </motion.div>
                             ))}

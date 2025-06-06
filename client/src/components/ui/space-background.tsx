@@ -1,94 +1,190 @@
-import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
-interface Star {
-  x: number;
-  y: number;
-  z: number;
-  size: number;
-  speed: number;
-  opacity: number;
-}
+// Animated stars component
+const AnimatedStar = ({ delay = 0, size = 1, x = 0, y = 0 }: any) => (
+  <motion.div
+    className="absolute bg-white rounded-full"
+    style={{
+      width: size,
+      height: size,
+      left: `${x}%`,
+      top: `${y}%`,
+    }}
+    animate={{
+      opacity: [0.3, 1, 0.3],
+      scale: [1, 1.5, 1],
+    }}
+    transition={{
+      duration: 2 + delay,
+      repeat: Infinity,
+      delay: delay,
+      ease: "easeInOut"
+    }}
+  />
+);
+
+// Floating nebula clouds
+const NebulaCloud = ({ delay = 0, size = 200, x = 0, y = 0, color = "blue" }: any) => (
+  <motion.div
+    className={`absolute rounded-full blur-3xl opacity-20`}
+    style={{
+      width: size,
+      height: size,
+      left: `${x}%`,
+      top: `${y}%`,
+      background: `radial-gradient(circle, var(--${color}-500) 0%, transparent 70%)`
+    }}
+    animate={{
+      scale: [1, 1.3, 1],
+      opacity: [0.1, 0.3, 0.1],
+      rotate: [0, 180, 360],
+    }}
+    transition={{
+      duration: 20 + delay,
+      repeat: Infinity,
+      delay: delay,
+      ease: "easeInOut"
+    }}
+  />
+);
+
+// Shooting star effect
+const ShootingStar = ({ delay = 0 }: any) => (
+  <motion.div
+    className="absolute h-0.5 bg-gradient-to-r from-white via-blue-300 to-transparent"
+    style={{
+      width: 100,
+      left: '-100px',
+      top: `${Math.random() * 50}%`,
+    }}
+    animate={{
+      x: [0, window.innerWidth + 200],
+      opacity: [0, 1, 0],
+    }}
+    transition={{
+      duration: 3,
+      delay: delay,
+      ease: "easeOut"
+    }}
+  />
+);
 
 export function SpaceBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const starsRef = useRef<Star[]>([]);
-  const animationRef = useRef<number>();
+  // Generate random positions for stars
+  const stars = Array.from({ length: 100 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 2 + 1,
+    delay: Math.random() * 3,
+  }));
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // Generate nebula clouds
+  const nebulae = Array.from({ length: 6 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 300 + 150,
+    delay: Math.random() * 10,
+    color: ['blue', 'purple', 'pink', 'indigo'][Math.floor(Math.random() * 4)],
+  }));
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    const createStars = () => {
-      const stars: Star[] = [];
-      for (let i = 0; i < 200; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          z: Math.random() * 1000,
-          size: Math.random() * 2 + 0.5,
-          speed: Math.random() * 0.5 + 0.1,
-          opacity: Math.random() * 0.8 + 0.2
-        });
-      }
-      starsRef.current = stars;
-    };
-
-    const animate = () => {
-      ctx.fillStyle = 'rgba(10, 15, 35, 0.1)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      starsRef.current.forEach(star => {
-        star.z -= star.speed;
-        if (star.z <= 0) {
-          star.z = 1000;
-          star.x = Math.random() * canvas.width;
-          star.y = Math.random() * canvas.height;
-        }
-
-        const x = (star.x - canvas.width / 2) * (1000 / star.z) + canvas.width / 2;
-        const y = (star.y - canvas.height / 2) * (1000 / star.z) + canvas.height / 2;
-        const size = star.size * (1000 / star.z);
-
-        if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
-          ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity * (1000 / star.z)})`;
-          ctx.beginPath();
-          ctx.arc(x, y, size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    resizeCanvas();
-    createStars();
-    animate();
-
-    window.addEventListener('resize', resizeCanvas);
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
+  // Generate shooting stars
+  const shootingStars = Array.from({ length: 3 }, (_, i) => ({
+    id: i,
+    delay: i * 8 + Math.random() * 5,
+  }));
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ 
-        background: 'linear-gradient(135deg, #0a0f23 0%, #1a1b3f 50%, #2d1b69 100%)'
-      }}
-    />
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+      {/* Base gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-space-navy via-space-dark to-black" />
+      
+      {/* Animated gradient overlay */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-pink-900/20"
+        animate={{
+          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        style={{ backgroundSize: "200% 200%" }}
+      />
+
+      {/* Stars */}
+      {stars.map((star) => (
+        <AnimatedStar
+          key={star.id}
+          x={star.x}
+          y={star.y}
+          size={star.size}
+          delay={star.delay}
+        />
+      ))}
+
+      {/* Nebula clouds */}
+      {nebulae.map((nebula) => (
+        <NebulaCloud
+          key={nebula.id}
+          x={nebula.x}
+          y={nebula.y}
+          size={nebula.size}
+          delay={nebula.delay}
+          color={nebula.color}
+        />
+      ))}
+
+      {/* Shooting stars */}
+      {shootingStars.map((star) => (
+        <ShootingStar
+          key={star.id}
+          delay={star.delay}
+        />
+      ))}
+
+      {/* Central cosmic glow */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)"
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      {/* Particle field */}
+      <div className="absolute inset-0">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white/30 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.8, 0.3],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

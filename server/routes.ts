@@ -2127,14 +2127,85 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       // Sync Instagram account data before generating suggestions
       try {
-        await syncInstagramData(socialAccounts);
+        const instagramAccounts = socialAccounts.filter(acc => acc.platform === 'instagram' && acc.accessToken);
+        
+        for (const account of instagramAccounts) {
+          try {
+            console.log(`[INSTAGRAM SYNC] Syncing account: ${account.username}`);
+            
+            // Fetch Instagram profile data
+            const fields = 'id,username,followers_count,follows_count,media_count,biography,website,profile_picture_url,account_type';
+            const profileUrl = `https://graph.instagram.com/${account.accountId}?fields=${fields}&access_token=${account.accessToken}`;
+            
+            const profileResponse = await fetch(profileUrl);
+            if (!profileResponse.ok) {
+              console.log(`[INSTAGRAM SYNC] Profile API error for ${account.username}: ${profileResponse.status}`);
+              continue;
+            }
+            
+            const profileData = await profileResponse.json();
+            if (profileData.error) {
+              console.log(`[INSTAGRAM SYNC] Profile API error for ${account.username}:`, profileData.error.message);
+              continue;
+            }
+
+            // Fetch recent media for engagement calculation
+            const mediaFields = 'id,media_type,like_count,comments_count';
+            const mediaUrl = `https://graph.instagram.com/${account.accountId}/media?fields=${mediaFields}&limit=25&access_token=${account.accessToken}`;
+            
+            const mediaResponse = await fetch(mediaUrl);
+            let avgLikes = 0, avgComments = 0, engagementRate = 0;
+            
+            if (mediaResponse.ok) {
+              const mediaData = await mediaResponse.json();
+              if (mediaData.data?.length > 0) {
+                const totalLikes = mediaData.data.reduce((sum: number, media: any) => sum + (media.like_count || 0), 0);
+                const totalComments = mediaData.data.reduce((sum: number, media: any) => sum + (media.comments_count || 0), 0);
+                
+                avgLikes = Math.round(totalLikes / mediaData.data.length);
+                avgComments = Math.round(totalComments / mediaData.data.length);
+                
+                // Calculate engagement rate (total engagement / followers * 100)
+                if (profileData.followers_count > 0) {
+                  const avgEngagement = avgLikes + avgComments;
+                  engagementRate = Math.round((avgEngagement / profileData.followers_count) * 10000); // Store as basis points
+                }
+              }
+            }
+
+            console.log(`[INSTAGRAM SYNC] ${account.username} real data:`, {
+              followers: profileData.followers_count,
+              media: profileData.media_count,
+              avgLikes,
+              avgComments,
+              engagementRate: `${(engagementRate/100).toFixed(2)}%`,
+              accountType: profileData.account_type
+            });
+
+            // Store the real data for AI analysis (mutate the account object)
+            account.followersCount = profileData.followers_count;
+            account.mediaCount = profileData.media_count;
+            account.avgLikes = avgLikes;
+            account.avgComments = avgComments;
+            account.engagementRate = engagementRate;
+            account.accountType = profileData.account_type;
+            account.biography = profileData.biography;
+            account.realDataSynced = true;
+
+          } catch (error: any) {
+            console.log(`[INSTAGRAM SYNC] Failed to sync ${account.username}:`, error.message);
+          }
+        }
       } catch (syncError) {
         console.log('[AI SUGGESTIONS] Instagram sync failed, proceeding with existing data:', syncError.message);
       }
 
+      // Re-generate suggestions with real Instagram data
+      const updatedSuggestions = await generateIntelligentSuggestions(workspace, socialAccounts, recentAnalytics, recentContent);
+
       // Save suggestions to storage
       const savedSuggestions = [];
-      for (const suggestion of suggestions) {
+      for (const suggestion of updatedSuggestions) {
         const saved = await storage.createSuggestion({
           workspaceId: workspaceId,
           type: suggestion.type,

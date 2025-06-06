@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SpaceBackground } from '@/components/ui/space-background';
-import { Check, Star, Zap, Crown, Rocket, Sparkles } from 'lucide-react';
+import { Check, Star, Zap, Crown, Rocket, Sparkles, Coins, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -155,136 +155,443 @@ export default function Pricing() {
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       <SpaceBackground />
       
-      <div className="relative z-10 container mx-auto px-4 py-12">
-        {/* Header */}
+      {/* Floating Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-60"
+            initial={{ 
+              x: Math.random() * window.innerWidth, 
+              y: Math.random() * window.innerHeight,
+              scale: 0 
+            }}
+            animate={{ 
+              y: [null, -100, null],
+              scale: [0, 1, 0],
+              opacity: [0, 0.8, 0]
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Cosmic Rings */}
+      <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="absolute top-1/4 left-1/4 w-96 h-96 border border-purple-500/20 rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-64 h-64 border border-cyan-500/20 rounded-full"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+      
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        {/* Header with 3D Effect */}
+        <motion.div
+          initial={{ opacity: 0, y: 50, rotateX: -20 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="text-center mb-16 perspective-1000"
         >
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+          <motion.h1 
+            className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{
+              textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(147, 51, 234, 0.3)',
+              filter: 'drop-shadow(0 4px 20px rgba(59, 130, 246, 0.4))'
+            }}
+          >
             Choose Your VeeFore Plan
-          </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Unlock the full potential of AI-powered social media management with flexible pricing plans designed for creators and businesses.
-          </p>
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="relative"
+          >
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Unlock the full potential of AI-powered social media management with flexible pricing plans designed for creators and businesses.
+            </p>
+            <motion.div
+              className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"
+              initial={{ width: 0 }}
+              animate={{ width: 96 }}
+              transition={{ delay: 1, duration: 0.8 }}
+            />
+          </motion.div>
         </motion.div>
 
-        {/* Current Subscription Status */}
+        {/* Current Subscription Status with 3D Effect */}
         {userSubscription && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            initial={{ opacity: 0, y: 50, rotateX: -15 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="mb-12 perspective-1000"
           >
-            <Card className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/30 mx-auto max-w-md">
-              <CardContent className="pt-6 text-center">
-                <Badge className="mb-2 bg-blue-500/20 text-blue-300">Current Plan</Badge>
-                <h3 className="text-2xl font-bold text-white">{userSubscription.plan}</h3>
-                <p className="text-gray-300">{userSubscription.credits} credits available</p>
-                {userSubscription.currentPeriodEnd && (
-                  <p className="text-sm text-gray-400 mt-2">
-                    Renews on {new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <motion.div
+              whileHover={{ scale: 1.05, rotateY: 5 }}
+              transition={{ duration: 0.3 }}
+              className="relative mx-auto max-w-md"
+            >
+              <Card className="relative bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-cyan-900/30 border-2 border-blue-500/50 backdrop-blur-sm overflow-hidden group">
+                {/* Holographic Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 animate-pulse" />
+                
+                {/* Glowing Border Animation */}
+                <motion.div
+                  className="absolute inset-0 border-2 border-blue-400/30 rounded-lg"
+                  animate={{ 
+                    boxShadow: [
+                      '0 0 20px rgba(59, 130, 246, 0.3)',
+                      '0 0 40px rgba(59, 130, 246, 0.6)',
+                      '0 0 20px rgba(59, 130, 246, 0.3)'
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                
+                <CardContent className="pt-8 pb-6 text-center relative z-10">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring" }}
+                  >
+                    <Badge className="mb-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-400/30 px-4 py-1">
+                      Current Plan
+                    </Badge>
+                  </motion.div>
+                  <motion.h3 
+                    className="text-3xl font-bold text-white mb-2"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    {userSubscription.plan}
+                  </motion.h3>
+                  <motion.p 
+                    className="text-lg text-gray-300 mb-3"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    {userSubscription.credits} credits available
+                  </motion.p>
+                  {userSubscription.currentPeriodEnd && (
+                    <motion.p 
+                      className="text-sm text-gray-400"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      Renews on {new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}
+                    </motion.p>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           </motion.div>
         )}
 
-        {/* Pricing Tabs */}
+        {/* Enhanced Pricing Tabs with 3D Effects */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-900/50 border border-gray-700">
-            <TabsTrigger value="plans" className="data-[state=active]:bg-blue-600">
-              Subscription Plans
-            </TabsTrigger>
-            <TabsTrigger value="credits" className="data-[state=active]:bg-purple-600">
-              Credit Packages
-            </TabsTrigger>
-            <TabsTrigger value="addons" className="data-[state=active]:bg-cyan-600">
-              Premium Add-ons
-            </TabsTrigger>
-          </TabsList>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-gray-900/80 via-gray-800/80 to-gray-900/80 border-2 border-gray-600/50 backdrop-blur-md rounded-xl p-2">
+              <TabsTrigger 
+                value="plans" 
+                className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-300 rounded-lg hover:bg-blue-600/20"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2"
+                >
+                  <Rocket className="w-4 h-4" />
+                  Subscription Plans
+                </motion.div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="credits" 
+                className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-300 rounded-lg hover:bg-purple-600/20"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2"
+                >
+                  <Coins className="w-4 h-4" />
+                  Credit Packages
+                </motion.div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="addons" 
+                className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-cyan-500 data-[state=active]:text-white transition-all duration-300 rounded-lg hover:bg-cyan-600/20"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Premium Add-ons
+                </motion.div>
+              </TabsTrigger>
+            </TabsList>
+          </motion.div>
 
-          {/* Subscription Plans */}
-          <TabsContent value="plans" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Enhanced Subscription Plans with 3D Effects */}
+          <TabsContent value="plans" className="mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {Object.entries(plans).map(([key, plan]: [string, any]) => (
                 <motion.div
                   key={key}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Object.keys(plans).indexOf(key) * 0.1 }}
+                  initial={{ opacity: 0, y: 50, rotateX: -20 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ 
+                    delay: Object.keys(plans).indexOf(key) * 0.15,
+                    duration: 0.8,
+                    ease: "easeOut"
+                  }}
+                  className="perspective-1000"
                 >
-                  <Card className={`h-full relative overflow-hidden border-2 transition-all duration-300 hover:scale-105 ${
-                    plan.popular 
-                      ? 'border-yellow-500 bg-gradient-to-b from-yellow-900/20 to-orange-900/20' 
-                      : 'border-gray-700 bg-gray-900/50 hover:border-blue-500/50'
-                  }`}>
-                    {plan.popular && (
-                      <div className="absolute top-0 right-0 bg-yellow-500 text-black px-3 py-1 text-sm font-bold">
-                        Most Popular
-                      </div>
-                    )}
-                    
-                    <CardHeader className="text-center pb-4">
-                      <div className="flex justify-center mb-4">
-                        {plan.id === 'free' && <Sparkles className="h-12 w-12 text-gray-400" />}
-                        {plan.id === 'creator' && <Star className="h-12 w-12 text-blue-400" />}
-                        {plan.id === 'pro' && <Zap className="h-12 w-12 text-purple-400" />}
-                        {plan.id === 'enterprise' && <Crown className="h-12 w-12 text-yellow-400" />}
-                      </div>
-                      <CardTitle className="text-2xl font-bold text-white">{plan.name}</CardTitle>
-                      <CardDescription className="text-gray-300">
-                        {plan.description}
-                      </CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="pb-4">
-                      <div className="text-center mb-6">
-                        <div className="text-4xl font-bold text-white">
-                          {plan.price === 0 ? 'Free' : `₹${plan.price}`}
-                        </div>
-                        {plan.price > 0 && (
-                          <div className="text-gray-400 text-sm">per month</div>
-                        )}
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center text-sm">
-                          <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
-                          <span>{plan.credits} monthly credits</span>
-                        </div>
-                        {plan.features?.map((feature: string, index: number) => (
-                          <div key={index} className="flex items-center text-sm">
-                            <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-
-                    <CardFooter>
-                      <Button
-                        className={`w-full ${
-                          userSubscription?.plan === plan.id
-                            ? 'bg-gray-600 hover:bg-gray-600 cursor-not-allowed'
-                            : plan.popular
-                            ? 'bg-yellow-600 hover:bg-yellow-700'
-                            : 'bg-blue-600 hover:bg-blue-700'
+                  <motion.div
+                    whileHover={{ 
+                      scale: 1.05, 
+                      rotateY: 5,
+                      transition: { duration: 0.3 }
+                    }}
+                    className="relative h-full"
+                  >
+                    <Card className={`h-full relative overflow-hidden border-2 backdrop-blur-md transition-all duration-500 group ${
+                      plan.popular 
+                        ? 'border-yellow-400/60 bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-red-900/30' 
+                        : plan.id === 'free'
+                          ? 'border-gray-600/50 bg-gradient-to-br from-gray-900/40 via-gray-800/30 to-gray-900/40 hover:border-blue-400/60'
+                          : plan.id === 'creator'
+                            ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-blue-900/30 hover:border-blue-400/80'
+                            : plan.id === 'pro'
+                              ? 'border-purple-500/50 bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-purple-900/30 hover:border-purple-400/80'
+                              : 'border-cyan-500/50 bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-cyan-900/30 hover:border-cyan-400/80'
+                    }`}>
+                      
+                      {/* Holographic Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse" />
+                      
+                      {/* Animated Border Glow */}
+                      <motion.div
+                        className={`absolute inset-0 rounded-lg ${
+                          plan.popular ? 'border-2 border-yellow-400/40' :
+                          plan.id === 'creator' ? 'border-2 border-blue-400/40' :
+                          plan.id === 'pro' ? 'border-2 border-purple-400/40' :
+                          plan.id === 'enterprise' ? 'border-2 border-cyan-400/40' :
+                          'border-2 border-gray-400/40'
                         }`}
-                        onClick={() => handlePlanSelect(plan.id)}
-                        disabled={userSubscription?.plan === plan.id || createOrderMutation.isPending}
-                      >
-                        {userSubscription?.plan === plan.id 
-                          ? 'Current Plan' 
-                          : plan.price === 0 
-                          ? 'Get Started' 
-                          : 'Upgrade Now'
-                        }
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                        animate={{ 
+                          boxShadow: plan.popular ? [
+                            '0 0 20px rgba(251, 191, 36, 0.3)',
+                            '0 0 40px rgba(251, 191, 36, 0.6)',
+                            '0 0 20px rgba(251, 191, 36, 0.3)'
+                          ] : [
+                            '0 0 20px rgba(59, 130, 246, 0.2)',
+                            '0 0 30px rgba(59, 130, 246, 0.4)',
+                            '0 0 20px rgba(59, 130, 246, 0.2)'
+                          ]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                      />
+
+                      {/* Popular Badge with 3D Effect */}
+                      {plan.popular && (
+                        <motion.div 
+                          className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20"
+                          initial={{ scale: 0, rotate: -10 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ delay: 0.5, type: "spring", bounce: 0.5 }}
+                        >
+                          <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-black px-6 py-2 text-sm font-bold rounded-full shadow-lg border-2 border-yellow-300">
+                            <span className="flex items-center gap-1">
+                              <Crown className="w-4 h-4" />
+                              Most Popular
+                            </span>
+                          </div>
+                        </motion.div>
+                      )}
+                      
+                      <CardHeader className="text-center pb-6 pt-8 relative z-10">
+                        {/* 3D Icon with Floating Animation */}
+                        <motion.div 
+                          className="flex justify-center mb-6"
+                          animate={{ 
+                            y: [0, -10, 0],
+                            rotateY: [0, 360]
+                          }}
+                          transition={{ 
+                            y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                            rotateY: { duration: 8, repeat: Infinity, ease: "linear" }
+                          }}
+                        >
+                          <div className="relative">
+                            {plan.id === 'free' && (
+                              <Sparkles className="h-16 w-16 text-gray-400 drop-shadow-lg" 
+                                style={{ filter: 'drop-shadow(0 0 10px rgba(156, 163, 175, 0.5))' }} />
+                            )}
+                            {plan.id === 'creator' && (
+                              <Star className="h-16 w-16 text-blue-400 drop-shadow-lg" 
+                                style={{ filter: 'drop-shadow(0 0 10px rgba(59, 130, 246, 0.5))' }} />
+                            )}
+                            {plan.id === 'pro' && (
+                              <Zap className="h-16 w-16 text-purple-400 drop-shadow-lg" 
+                                style={{ filter: 'drop-shadow(0 0 10px rgba(147, 51, 234, 0.5))' }} />
+                            )}
+                            {plan.id === 'enterprise' && (
+                              <Crown className="h-16 w-16 text-yellow-400 drop-shadow-lg" 
+                                style={{ filter: 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.5))' }} />
+                            )}
+                            
+                            {/* Orbital Ring */}
+                            <motion.div
+                              className="absolute inset-0 border-2 border-current opacity-20 rounded-full"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                              style={{ width: '120%', height: '120%', top: '-10%', left: '-10%' }}
+                            />
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          <CardTitle className="text-3xl font-bold text-white mb-3 tracking-wide">
+                            {plan.name}
+                          </CardTitle>
+                          <CardDescription className="text-gray-300 text-base leading-relaxed">
+                            {plan.description}
+                          </CardDescription>
+                        </motion.div>
+                      </CardHeader>
+
+                      <CardContent className="pb-6 relative z-10">
+                        {/* 3D Pricing Display */}
+                        <motion.div 
+                          className="text-center mb-8"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          <div className="relative">
+                            <div className={`text-5xl font-bold mb-2 ${
+                              plan.popular ? 'text-yellow-400' : 'text-white'
+                            }`}
+                              style={{
+                                textShadow: plan.popular ? 
+                                  '0 0 20px rgba(251, 191, 36, 0.6)' : 
+                                  '0 0 20px rgba(255, 255, 255, 0.3)'
+                              }}
+                            >
+                              {plan.price === 0 ? 'Free' : `₹${plan.price}`}
+                            </div>
+                            {plan.price > 0 && (
+                              <div className="text-gray-400 text-sm font-medium">per month</div>
+                            )}
+                          </div>
+                        </motion.div>
+
+                        {/* Features List with Animations */}
+                        <motion.div 
+                          className="space-y-4 mb-8"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.6 }}
+                        >
+                          <motion.div 
+                            className="flex items-center text-sm"
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.7 }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-green-400" />
+                              </div>
+                              <span className="text-gray-300">{plan.credits} monthly credits</span>
+                            </div>
+                          </motion.div>
+                          {plan.features?.map((feature: string, index: number) => (
+                            <motion.div 
+                              key={index} 
+                              className="flex items-center text-sm"
+                              initial={{ x: -20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: 0.8 + index * 0.1 }}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                                  <Check className="h-3 w-3 text-green-400" />
+                                </div>
+                                <span className="text-gray-300">{feature}</span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      </CardContent>
+
+                      {/* Enhanced 3D Action Button */}
+                      <CardFooter className="pt-0">
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full"
+                        >
+                          <Button
+                            className={`w-full py-3 px-6 rounded-xl font-semibold text-base transition-all duration-300 ${
+                              userSubscription?.plan === plan.id
+                                ? 'bg-gray-600 hover:bg-gray-600 cursor-not-allowed'
+                                : plan.popular
+                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 shadow-lg hover:shadow-yellow-500/25'
+                                : plan.id === 'creator'
+                                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 shadow-lg hover:shadow-blue-500/25'
+                                  : plan.id === 'pro'
+                                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 shadow-lg hover:shadow-purple-500/25'
+                                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 shadow-lg hover:shadow-cyan-500/25'
+                            }`}
+                            onClick={() => handlePlanSelect(plan.id)}
+                            disabled={userSubscription?.plan === plan.id || createOrderMutation.isPending}
+                          >
+                            <span className="flex items-center justify-center gap-2">
+                              {userSubscription?.plan === plan.id 
+                                ? 'Current Plan' 
+                                : plan.price === 0 
+                                ? 'Get Started' 
+                                : 'Upgrade Now'
+                              }
+                              {userSubscription?.plan !== plan.id && plan.price > 0 && (
+                                <Rocket className="w-4 h-4" />
+                              )}
+                            </span>
+                          </Button>
+                        </motion.div>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
                 </motion.div>
               ))}
             </div>

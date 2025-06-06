@@ -456,6 +456,141 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Post Now endpoint - Immediate publishing with progress tracking
+  app.post('/api/content/:id/publish', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+
+      console.log(`[POST NOW] Starting immediate publish for content ${id}`);
+
+      // Get content details
+      const content = await storage.getContent(id);
+      if (!content) {
+        return res.status(404).json({ error: 'Content not found' });
+      }
+
+      // Verify user owns this content
+      const workspace = await storage.getWorkspace(content.workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Unauthorized access to content' });
+      }
+
+      // Update status to publishing
+      await storage.updateContent(id, { 
+        status: 'publishing',
+        publishedAt: new Date()
+      });
+
+      // Send immediate response to show progress tracker
+      res.json({ 
+        success: true, 
+        message: 'Publishing started',
+        status: 'publishing',
+        contentId: id
+      });
+
+      // Start publishing in background
+      setImmediate(async () => {
+        try {
+          console.log(`[POST NOW] Publishing content: ${content.title} to ${content.platform}`);
+          
+          if (content.platform === 'instagram') {
+            // Get Instagram account for workspace
+            const instagramAccount = await storage.getSocialAccountByPlatform(content.workspaceId, 'instagram');
+            
+            if (!instagramAccount?.accessToken) {
+              console.error(`[POST NOW] No Instagram access token found for workspace ${content.workspaceId}`);
+              await storage.updateContent(id, { status: 'failed' });
+              return;
+            }
+
+            // Parse contentData if it's a string
+            let contentData: any = content.contentData;
+            if (typeof contentData === 'string') {
+              try {
+                contentData = JSON.parse(contentData);
+              } catch (e) {
+                console.error(`[POST NOW] Failed to parse contentData for ${id}`);
+                contentData = {};
+              }
+            }
+
+            // Determine content type and publish accordingly
+            if (content.type === 'video' && contentData?.mediaUrl) {
+              try {
+                console.log(`[POST NOW] Publishing video content to Instagram`);
+                const result = await instagramAPI.publishReel(
+                  instagramAccount.accessToken, 
+                  contentData.mediaUrl, 
+                  contentData.caption || content.description || ''
+                );
+                
+                // Update content with success status
+                await storage.updateContent(id, { 
+                  status: 'published',
+                  publishedAt: new Date()
+                });
+                
+                console.log(`[POST NOW] Successfully published content ${id} to Instagram`);
+                
+              } catch (publishError: any) {
+                console.error(`[POST NOW] Instagram publish failed for content ${id}:`, publishError.message);
+                await storage.updateContent(id, { 
+                  status: 'failed'
+                });
+              }
+            } else if (content.type === 'image' && contentData?.mediaUrl) {
+              try {
+                console.log(`[POST NOW] Publishing image content to Instagram`);
+                const result = await instagramAPI.publishPhoto(
+                  instagramAccount.accessToken, 
+                  contentData.mediaUrl, 
+                  contentData.caption || content.description || ''
+                );
+                
+                await storage.updateContent(id, { 
+                  status: 'published',
+                  publishedAt: new Date()
+                });
+                
+                console.log(`[POST NOW] Successfully published content ${id} to Instagram`);
+                
+              } catch (publishError: any) {
+                console.error(`[POST NOW] Instagram publish failed for content ${id}:`, publishError.message);
+                await storage.updateContent(id, { 
+                  status: 'failed'
+                });
+              }
+            } else {
+              console.error(`[POST NOW] Unsupported content type or missing media: ${content.type}`);
+              await storage.updateContent(id, { 
+                status: 'failed'
+              });
+            }
+          } else {
+            console.error(`[POST NOW] Unsupported platform: ${content.platform}`);
+            await storage.updateContent(id, { 
+              status: 'failed',
+              errorMessage: `Unsupported platform: ${content.platform}`
+            });
+          }
+          
+        } catch (error: any) {
+          console.error(`[POST NOW] Error publishing content ${id}:`, error);
+          await storage.updateContent(id, { 
+            status: 'failed',
+            errorMessage: error.message 
+          });
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[POST NOW] Error starting publish:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Instagram API routes
   app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
     try {

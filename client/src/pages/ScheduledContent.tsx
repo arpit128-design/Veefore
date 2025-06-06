@@ -177,28 +177,64 @@ export default function ScheduledContent() {
     updateMutation.mutate(editForm);
   };
 
-  // Post Now functionality
+  // Post Now functionality with progress tracking
   const publishNowMutation = useMutation({
     mutationFn: async (contentId: string) => {
-      const response = await apiRequest('POST', `/api/instagram/publish`, {
-        contentId: contentId,
-        publishNow: true
+      console.log(`[CLIENT] Starting immediate publish for content ${contentId}`);
+      const response = await apiRequest(`/api/content/${contentId}/publish`, {
+        method: 'POST'
       });
-      return response.json();
+      return response;
     },
     onSuccess: (data, contentId) => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
-      setPublishingItems(prev => {
-        const updated = new Set(prev);
-        updated.delete(contentId);
-        return updated;
-      });
-      toast({
-        title: "Content Published Successfully!",
-        description: "Your content has been published to Instagram."
-      });
+      console.log(`[CLIENT] Publish request successful for ${contentId}:`, data);
+      
+      // Start polling for status updates
+      const pollInterval = setInterval(async () => {
+        try {
+          queryClient.invalidateQueries({ queryKey: ['/api/content'] });
+          
+          // Check if content is no longer in publishing state
+          const updatedContent = scheduledContent.find(c => c.id === contentId);
+          if (updatedContent && updatedContent.status !== 'publishing') {
+            clearInterval(pollInterval);
+            
+            setPublishingItems(prev => {
+              const updated = new Set(prev);
+              updated.delete(contentId);
+              return updated;
+            });
+            
+            if (updatedContent.status === 'published') {
+              toast({
+                title: "Success!",
+                description: "Content published successfully to Instagram."
+              });
+            } else if (updatedContent.status === 'failed') {
+              toast({
+                title: "Publishing Failed",
+                description: updatedContent.errorMessage || "Failed to publish content",
+                variant: "destructive"
+              });
+            }
+          }
+        } catch (error) {
+          console.error('[CLIENT] Status polling error:', error);
+        }
+      }, 3000);
+      
+      // Clear polling after 2 minutes maximum
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        setPublishingItems(prev => {
+          const updated = new Set(prev);
+          updated.delete(contentId);
+          return updated;
+        });
+      }, 120000);
     },
     onError: (error: any, contentId) => {
+      console.error('[CLIENT] Publish request failed:', error);
       setPublishingItems(prev => {
         const updated = new Set(prev);
         updated.delete(contentId);
@@ -206,13 +242,14 @@ export default function ScheduledContent() {
       });
       toast({
         title: "Publishing Failed",
-        description: error.message || "Failed to publish content to Instagram",
+        description: error.message || "Failed to start publishing process",
         variant: "destructive",
       });
     }
   });
 
   const handlePostNow = (contentId: string) => {
+    console.log(`[CLIENT] Post Now clicked for content ${contentId}`);
     // Start showing progress tracker immediately
     setPublishingItems(prev => new Set(prev).add(contentId));
     publishNowMutation.mutate(contentId);
@@ -339,34 +376,36 @@ export default function ScheduledContent() {
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-2 ml-4">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handlePostNow(content.id)}
-                        className="bg-electric-cyan hover:bg-electric-cyan/80 text-black"
-                        disabled={publishingItems.has(content.id)}
-                      >
-                        <Play className="h-4 w-4 mr-1" />
-                        Post Now
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(content)}
-                        className="glassmorphism"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(content.id)}
-                        className="glassmorphism text-red-400 hover:text-red-300"
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handlePostNow(content.id)}
+                          className="bg-electric-cyan hover:bg-electric-cyan/80 text-black font-medium"
+                          disabled={publishingItems.has(content.id)}
+                        >
+                          <Play className="h-4 w-4 mr-1" />
+                          Post Now
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(content)}
+                          className="glassmorphism"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(content.id)}
+                          className="glassmorphism text-red-400 hover:text-red-300"
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

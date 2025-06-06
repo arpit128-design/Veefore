@@ -528,11 +528,11 @@ export class InstagramAPI {
         }
       }
       
-      // Step 1: Create video media container
+      // Step 1: Create video media container - use REELS as VIDEO is deprecated
       const containerPayload = {
         video_url: currentVideoUrl,
         caption: caption,
-        media_type: 'VIDEO',
+        media_type: 'REELS', // Instagram now requires REELS instead of deprecated VIDEO
         access_token: accessToken
       };
 
@@ -569,6 +569,13 @@ export class InstagramAPI {
           }
         } catch (statusError: any) {
           console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);
+          
+          // Handle rate limiting with exponential backoff
+          if (statusError.response?.data?.error?.code === 4 && statusError.response?.data?.error?.error_subcode === 1349210) {
+            console.log(`[INSTAGRAM PUBLISH] Rate limit detected, waiting before retry...`);
+            await new Promise(resolve => setTimeout(resolve, Math.min(30000, 5000 * Math.pow(2, Math.floor(attempts / 10)))));
+            continue; // Skip to next iteration
+          }
           
           // Detect Instagram file processing failures and trigger intelligent compression
           if (attempts > 8 && !isRetryWithCompression) {

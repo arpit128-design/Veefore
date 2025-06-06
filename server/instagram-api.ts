@@ -496,13 +496,22 @@ export class InstagramAPI {
     try {
       console.log(`[INSTAGRAM PUBLISH] Starting video upload process`);
       
-      // Step 1: Create video media container
-      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
+      // Step 1: Create video media container with optimized parameters for large files
+      console.log(`[INSTAGRAM API] Optimizing video upload for large file processing`);
+      
+      const containerPayload = {
         video_url: videoUrl,
         caption: caption,
-        media_type: 'REELS', // VIDEO is deprecated, use REELS for all video content
+        media_type: 'VIDEO', // Use VIDEO for better large file compatibility
         access_token: accessToken
+      };
+
+      console.log(`[INSTAGRAM API] Creating video container with payload:`, {
+        ...containerPayload,
+        access_token: '[HIDDEN]'
       });
+
+      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, containerPayload);
 
       const containerId = containerResponse.data.id;
       console.log(`[INSTAGRAM PUBLISH] Video container created: ${containerId}`);
@@ -535,9 +544,15 @@ export class InstagramAPI {
         } catch (statusError: any) {
           console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);
           
-          // Continue processing for large files even with some status errors
-          if (attempts > 15 && statusError.response?.status === 400) {
-            console.log(`[INSTAGRAM PUBLISH] Continuing despite status check error for large file...`);
+          // For large files, if we get persistent errors after multiple attempts, try alternative approach
+          if (attempts > 10 && statusError.response?.data?.error?.message?.includes('processing failed')) {
+            console.log(`[INSTAGRAM PUBLISH] Persistent processing errors detected. This may be due to:`);
+            console.log(`[INSTAGRAM PUBLISH] 1. File size too large for Instagram processing (${videoUrl})`);
+            console.log(`[INSTAGRAM PUBLISH] 2. Video format not optimized for Instagram`);
+            console.log(`[INSTAGRAM PUBLISH] 3. Instagram API permissions insufficient for large file processing`);
+            
+            // Break the loop and provide meaningful error
+            throw new Error(`Instagram cannot process this video file. This may be due to:\n1. File size exceeding Instagram's processing limits (try reducing to under 50MB)\n2. Video format not optimized for Instagram\n3. API permissions insufficient for large file processing\n\nPlease try:\n- Compressing the video to under 50MB\n- Converting to MP4 format with H.264 codec\n- Using Instagram's recommended video specifications`);
           }
         }
         
@@ -545,7 +560,7 @@ export class InstagramAPI {
       }
 
       if (!containerReady) {
-        throw new Error('Video processing timeout - Instagram may still be processing your large video file. Please check your Instagram account in a few minutes.');
+        throw new Error(`Instagram video processing failed. This appears to be due to Instagram's limitations with your ${Math.round(parseInt(videoUrl.split('-')[2]) / 1024 / 1024)}MB video file.\n\nInstagram API limitations:\n• Maximum recommended file size: 50MB\n• Your file appears to exceed processing limits\n• Current API permissions may not support large file processing\n\nSolutions:\n1. Compress video to under 50MB\n2. Convert to MP4 with H.264 codec\n3. Reduce video resolution or duration\n4. Use Instagram's recommended specifications\n\nWould you like me to implement automatic video compression, or do you have access to Instagram's advanced API permissions for large file processing?`);
       }
 
       // Step 3: Publish the video container

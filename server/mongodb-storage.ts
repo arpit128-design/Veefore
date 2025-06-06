@@ -820,7 +820,28 @@ export class MongoStorage implements IStorage {
   }
 
   async createCreditTransaction(transaction: InsertCreditTransaction): Promise<CreditTransaction> {
-    throw new Error('Not implemented');
+    await this.connect();
+    
+    const CreditTransactionModel = mongoose.model('CreditTransaction', CreditTransactionSchema);
+    const transactionData = {
+      ...transaction,
+      id: Date.now(),
+      createdAt: new Date()
+    };
+    
+    const newTransaction = new CreditTransactionModel(transactionData);
+    await newTransaction.save();
+    
+    return {
+      id: transactionData.id,
+      userId: transaction.userId,
+      type: transaction.type,
+      amount: transaction.amount,
+      description: transaction.description || null,
+      workspaceId: transaction.workspaceId || null,
+      referenceId: transaction.referenceId || null,
+      createdAt: transactionData.createdAt
+    };
   }
 
   async getReferrals(referrerId: number): Promise<Referral[]> {

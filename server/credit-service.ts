@@ -140,7 +140,7 @@ export class CreditService {
     
     // Record the transaction
     await storage.createCreditTransaction({
-      userId: userIdNum,
+      userId,
       type: 'spent',
       amount: -amount,
       description,

@@ -43,12 +43,8 @@ export default function Workspaces() {
     limitReached: null as any
   });
 
-  // Debug modal state changes
-  console.log('[WORKSPACES] Current upgrade modal state:', upgradeModal);
-
   // Prevent modal from closing unexpectedly
   const closeUpgradeModal = () => {
-    console.log('[WORKSPACES] Closing upgrade modal');
     setUpgradeModal({
       isOpen: false,
       feature: '',
@@ -183,13 +179,7 @@ export default function Workspaces() {
         };
         
         console.log('Setting upgrade modal with data:', modalData);
-        
-        // Use setTimeout to ensure state update happens after current render cycle
-        setTimeout(() => {
-          setUpgradeModal(modalData);
-          console.log('Upgrade modal state set via setTimeout');
-        }, 100);
-        
+        setUpgradeModal(modalData);
         console.log('Upgrade modal should now be open');
       } else {
         console.log('Non-403 error, showing toast');

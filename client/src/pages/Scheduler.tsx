@@ -112,7 +112,7 @@ export default function Scheduler() {
   });
 
   const deleteContentMutation = useMutation({
-    mutationFn: async (contentId: number) => {
+    mutationFn: async (contentId: string) => {
       const response = await apiRequest('DELETE', `/api/content/${contentId}`);
       return response.json();
     },
@@ -235,7 +235,7 @@ export default function Scheduler() {
 
   const handleDelete = (contentId: string) => {
     if (window.confirm('Are you sure you want to cancel this scheduled post?')) {
-      deleteContentMutation.mutate(parseInt(contentId));
+      deleteContentMutation.mutate(contentId);
     }
   };
 

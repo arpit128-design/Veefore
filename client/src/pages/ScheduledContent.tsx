@@ -177,6 +177,47 @@ export default function ScheduledContent() {
     updateMutation.mutate(editForm);
   };
 
+  // Post Now functionality
+  const publishNowMutation = useMutation({
+    mutationFn: async (contentId: string) => {
+      const response = await apiRequest('POST', `/api/instagram/publish`, {
+        contentId: contentId,
+        publishNow: true
+      });
+      return response.json();
+    },
+    onSuccess: (data, contentId) => {
+      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      setPublishingItems(prev => {
+        const updated = new Set(prev);
+        updated.delete(contentId);
+        return updated;
+      });
+      toast({
+        title: "Content Published Successfully!",
+        description: "Your content has been published to Instagram."
+      });
+    },
+    onError: (error: any, contentId) => {
+      setPublishingItems(prev => {
+        const updated = new Set(prev);
+        updated.delete(contentId);
+        return updated;
+      });
+      toast({
+        title: "Publishing Failed",
+        description: error.message || "Failed to publish content to Instagram",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handlePostNow = (contentId: string) => {
+    // Start showing progress tracker immediately
+    setPublishingItems(prev => new Set(prev).add(contentId));
+    publishNowMutation.mutate(contentId);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -299,6 +340,16 @@ export default function ScheduledContent() {
                     </div>
                     
                     <div className="flex items-center gap-2 ml-4">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handlePostNow(content.id)}
+                        className="bg-electric-cyan hover:bg-electric-cyan/80 text-black"
+                        disabled={publishingItems.has(content.id)}
+                      >
+                        <Play className="h-4 w-4 mr-1" />
+                        Post Now
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

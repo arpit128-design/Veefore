@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { VideoCompressor } from './video-compression';
+import fs from 'fs';
+import path from 'path';
 
 interface InstagramUser {
   id: string;
@@ -488,29 +491,52 @@ export class InstagramAPI {
     }
   }
 
-  // Publish video to Instagram
+  // Intelligent video publishing with automatic compression when Instagram rejects due to file size
   async publishVideo(accessToken: string, videoUrl: string, caption: string): Promise<{
     id: string;
     permalink?: string;
   }> {
+    return this.publishVideoWithCompression(accessToken, videoUrl, caption, false);
+  }
+
+  private async publishVideoWithCompression(
+    accessToken: string, 
+    videoUrl: string, 
+    caption: string, 
+    isRetryWithCompression: boolean = false
+  ): Promise<{ id: string; permalink?: string; }> {
     try {
-      console.log(`[INSTAGRAM PUBLISH] Starting video upload process`);
+      const currentVideoUrl = videoUrl;
       
-      // Step 1: Create video media container with optimized parameters for large files
-      console.log(`[INSTAGRAM API] Optimizing video upload for large file processing`);
+      if (isRetryWithCompression) {
+        console.log(`[INSTAGRAM PUBLISH] Retrying with compressed video`);
+      } else {
+        console.log(`[INSTAGRAM PUBLISH] Starting video upload process`);
+        
+        // Check if video needs compression preemptively
+        const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+        if (isLocalFile) {
+          const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+          if (fs.existsSync(localPath)) {
+            const fileSizeMB = VideoCompressor.getFileSizeMB(localPath);
+            console.log(`[INSTAGRAM PUBLISH] Video file size: ${fileSizeMB.toFixed(2)}MB`);
+            
+            if (fileSizeMB > 50) {
+              console.log(`[INSTAGRAM PUBLISH] File size exceeds 50MB, but proceeding with original - will compress only if Instagram rejects`);
+            }
+          }
+        }
+      }
       
+      // Step 1: Create video media container
       const containerPayload = {
-        video_url: videoUrl,
+        video_url: currentVideoUrl,
         caption: caption,
-        media_type: 'VIDEO', // Use VIDEO for better large file compatibility
+        media_type: 'VIDEO',
         access_token: accessToken
       };
 
-      console.log(`[INSTAGRAM API] Creating video container with payload:`, {
-        ...containerPayload,
-        access_token: '[HIDDEN]'
-      });
-
+      console.log(`[INSTAGRAM API] Creating video container`);
       const containerResponse = await axios.post(`${this.baseUrl}/me/media`, containerPayload);
 
       const containerId = containerResponse.data.id;
@@ -544,15 +570,50 @@ export class InstagramAPI {
         } catch (statusError: any) {
           console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);
           
-          // For large files, if we get persistent errors after multiple attempts, try alternative approach
-          if (attempts > 10 && statusError.response?.data?.error?.message?.includes('processing failed')) {
-            console.log(`[INSTAGRAM PUBLISH] Persistent processing errors detected. This may be due to:`);
-            console.log(`[INSTAGRAM PUBLISH] 1. File size too large for Instagram processing (${videoUrl})`);
-            console.log(`[INSTAGRAM PUBLISH] 2. Video format not optimized for Instagram`);
-            console.log(`[INSTAGRAM PUBLISH] 3. Instagram API permissions insufficient for large file processing`);
+          // Detect Instagram file processing failures and trigger intelligent compression
+          if (attempts > 8 && !isRetryWithCompression) {
+            const isFileSizeIssue = statusError.response?.data?.error?.message?.includes('processing failed') ||
+                                   statusError.response?.data?.error?.message?.includes('Media ID is not available') ||
+                                   statusError.response?.data?.error?.message?.includes('video could not be processed');
             
-            // Break the loop and provide meaningful error
-            throw new Error(`Instagram cannot process this video file. This may be due to:\n1. File size exceeding Instagram's processing limits (try reducing to under 50MB)\n2. Video format not optimized for Instagram\n3. API permissions insufficient for large file processing\n\nPlease try:\n- Compressing the video to under 50MB\n- Converting to MP4 format with H.264 codec\n- Using Instagram's recommended video specifications`);
+            if (isFileSizeIssue) {
+              console.log(`[INSTAGRAM PUBLISH] Detected Instagram processing failure - attempting intelligent video compression`);
+              
+              // Check if this is a local file we can compress
+              const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+              if (isLocalFile) {
+                const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+                
+                if (fs.existsSync(localPath)) {
+                  console.log(`[INSTAGRAM PUBLISH] Instagram rejected video - activating intelligent compression system`);
+                  
+                  try {
+                    const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                      quality: 'high',
+                      targetSizeMB: 45, // Target 45MB to be safely under Instagram's 50MB limit
+                      maintainAspectRatio: true
+                    });
+                    
+                    if (compressionResult.success && compressionResult.outputPath) {
+                      console.log(`[INSTAGRAM PUBLISH] Video compressed successfully from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                      
+                      // Convert compressed file path to URL format
+                      const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                      
+                      // Retry with compressed video
+                      return this.publishVideoWithCompression(accessToken, compressedUrl, caption, true);
+                    } else {
+                      console.error(`[INSTAGRAM PUBLISH] Video compression failed: ${compressionResult.error}`);
+                    }
+                  } catch (compressionError: any) {
+                    console.error(`[INSTAGRAM PUBLISH] Video compression error:`, compressionError.message);
+                  }
+                }
+              }
+              
+              // If compression failed or not possible, throw descriptive error
+              throw new Error(`Instagram rejected your video due to processing limitations. The video compression system attempted to optimize the file but was unable to resolve the issue. This may be due to:\n\n1. File size exceeding Instagram's processing capacity\n2. Video format incompatibility\n3. Insufficient API permissions for large file processing\n\nSolutions:\n• Manually reduce video file size to under 50MB\n• Convert to MP4 format with H.264 codec\n• Ensure video meets Instagram's specifications\n• Contact support if the issue persists`);
+            }
           }
         }
         

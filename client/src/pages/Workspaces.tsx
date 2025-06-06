@@ -88,10 +88,16 @@ export default function Workspaces() {
     },
     onError: async (error: any) => {
       console.log('Workspace creation error:', error);
+      console.log('Error message:', error?.message);
+      console.log('Error type:', typeof error);
       
       // Handle plan restriction errors with upgrade modal
-      // Check if error message contains "403:" indicating plan limits
-      if (error?.message?.includes('403:')) {
+      // Check if error message contains "403:" indicating plan limits OR if it's a 403 status
+      const is403Error = error?.message?.includes('403:') || error?.status === 403 || error?.message?.includes('plan allows');
+      console.log('Is 403 error:', is403Error);
+      
+      if (is403Error) {
+        console.log('Processing 403 error for upgrade modal');
         setIsCreateOpen(false); // Close the creation modal immediately
         
         // Parse the error message to extract the JSON response
@@ -105,13 +111,25 @@ export default function Workspaces() {
             console.log('Parsed error data:', errorData);
           }
         } catch (e) {
-          console.log('Could not parse error data, trying alternative method:', e);
+          console.log('Could not parse error data, using fallback:', e);
           // If parsing fails, show upgrade modal anyway for 403 errors
           errorData = {
             upgradeMessage: "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
             currentPlan: user?.plan || 'Free'
           };
         }
+        
+        console.log('Setting upgrade modal with data:', {
+          isOpen: true,
+          feature: 'workspace_creation',
+          currentPlan: errorData.currentPlan || user?.plan || 'Free',
+          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
+          limitReached: {
+            current: errorData.currentWorkspaces || workspaces?.length || 0,
+            max: errorData.maxWorkspaces || (user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10),
+            type: 'workspaces'
+          }
+        });
         
         setUpgradeModal({
           isOpen: true,
@@ -124,7 +142,10 @@ export default function Workspaces() {
             type: 'workspaces'
           }
         });
+        
+        console.log('Upgrade modal should now be open');
       } else {
+        console.log('Non-403 error, showing toast');
         toast({
           title: "Creation Failed",
           description: error.message || "Failed to create workspace",

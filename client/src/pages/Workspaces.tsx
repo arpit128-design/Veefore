@@ -83,34 +83,41 @@ export default function Workspaces() {
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
       
-      const token = localStorage.getItem('veefore_auth_token');
-      const response = await fetch('/api/workspaces', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-        credentials: 'include'
-      });
-      
-      console.log('=== RESPONSE RECEIVED ===', response.status, response.ok);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('=== ERROR RESPONSE TEXT ===', errorText);
+      try {
+        const token = localStorage.getItem('veefore_auth_token');
+        console.log('=== MAKING FETCH REQUEST ===');
         
-        // Create structured error that onError can handle
-        const error = new Error(errorText);
-        (error as any).status = response.status;
-        (error as any).response = { status: response.status, data: JSON.parse(errorText) };
+        const response = await fetch('/api/workspaces', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
         
-        console.log('=== THROWING ERROR ===', error);
-        throw error;
+        console.log('=== RESPONSE RECEIVED ===', response.status, response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.log('=== ERROR RESPONSE TEXT ===', errorText);
+          
+          // Create structured error that onError can handle
+          const error = new Error(errorText);
+          (error as any).status = response.status;
+          (error as any).response = { status: response.status, data: JSON.parse(errorText) };
+          
+          console.log('=== THROWING ERROR ===', error);
+          throw error;
+        }
+        
+        console.log('=== MUTATION SUCCESS ===');
+        return response.json();
+      } catch (error) {
+        console.log('=== MUTATION FUNCTION CAUGHT ERROR ===', error);
+        throw error; // Re-throw to trigger onError
       }
-      
-      console.log('=== MUTATION SUCCESS ===');
-      return response.json();
     },
     onSuccess: () => {
       toast({

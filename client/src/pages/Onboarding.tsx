@@ -12,11 +12,11 @@ import { SpaceBackground } from '@/components/ui/space-background';
 import { FloatingRocket, FloatingSparkles, FloatingOrbs, FloatingIcons } from '@/components/ui/floating-elements';
 import { apiRequest } from '@/lib/queryClient';
 import { 
-  Rocket, 
   Instagram, 
   CheckCircle, 
   ArrowRight, 
   ArrowLeft,
+  Rocket,
   Sparkles,
   Target,
   TrendingUp,
@@ -46,7 +46,8 @@ import {
   Trophy,
   ChevronDown,
   Plus,
-  X
+  X,
+  Calendar
 } from 'lucide-react';
 
 const niches = [

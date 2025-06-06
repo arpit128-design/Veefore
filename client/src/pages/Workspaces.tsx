@@ -34,7 +34,7 @@ export default function Workspaces() {
     theme: "default"
   });
 
-  // Plan upgrade modal state
+  // Plan upgrade modal state - persist across re-renders
   const [upgradeModal, setUpgradeModal] = useState({
     isOpen: false,
     feature: '',
@@ -42,6 +42,9 @@ export default function Workspaces() {
     upgradeMessage: '',
     limitReached: null as any
   });
+
+  // Debug modal state changes
+  console.log('[WORKSPACES] Current upgrade modal state:', upgradeModal);
 
   // Workspace management state
   const [isManageOpen, setIsManageOpen] = useState(false);

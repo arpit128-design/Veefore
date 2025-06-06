@@ -798,58 +798,117 @@ export default function Scheduler() {
 
                 <div className="space-y-2">
                   <Label className="text-asteroid-silver">Time *</Label>
-                  <Select value={scheduleForm.scheduledTime} onValueChange={(value) => setScheduleForm(prev => ({ ...prev, scheduledTime: value }))}>
-                    <SelectTrigger className="glassmorphism">
-                      <Clock className="mr-2 h-4 w-4" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getOptimalTimes().map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time} <Badge variant="secondary" className="ml-2">Optimal</Badge>
-                        </SelectItem>
-                      ))}
-                      {/* Additional times */}
-                      {Array.from({ length: 24 }, (_, i) => {
-                        const time = `${i.toString().padStart(2, '0')}:00`;
-                        if (!getOptimalTimes().includes(time)) {
-                          return (
-                            <SelectItem key={time} value={time}>
-                              {time}
-                            </SelectItem>
-                          );
-                        }
-                        return null;
-                      })}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex space-x-2">
+                    <Select value={scheduleForm.scheduledTime} onValueChange={(value) => setScheduleForm(prev => ({ ...prev, scheduledTime: value }))}>
+                      <SelectTrigger className="glassmorphism flex-1">
+                        <Clock className="mr-2 h-4 w-4" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {/* Optimal times first */}
+                        {getOptimalTimes().map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time} <Badge variant="secondary" className="ml-2">Optimal</Badge>
+                          </SelectItem>
+                        ))}
+                        <div className="px-2 py-1">
+                          <div className="border-t border-border my-1"></div>
+                          <p className="text-xs text-muted-foreground font-medium">Custom Times</p>
+                        </div>
+                        {/* All hourly slots */}
+                        {Array.from({ length: 24 }, (_, hour) => {
+                          return Array.from({ length: 4 }, (_, quarter) => {
+                            const minutes = quarter * 15;
+                            const time = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                            if (!getOptimalTimes().includes(time)) {
+                              return (
+                                <SelectItem key={time} value={time}>
+                                  {time}
+                                </SelectItem>
+                              );
+                            }
+                            return null;
+                          });
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="time"
+                      value={scheduleForm.scheduledTime}
+                      onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                      className="glassmorphism w-32"
+                      step="300"
+                    />
+                  </div>
+                  <p className="text-xs text-asteroid-silver/60">
+                    Use the dropdown for optimal times or the time picker for precise scheduling
+                  </p>
                 </div>
               </div>
 
-              {/* Optimal Times Suggestion */}
-              {scheduleForm.platform && (
+              {/* Time Presets and Optimal Times */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Quick Time Presets */}
                 <Card className="content-card holographic">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium text-electric-cyan">
-                        Optimal posting times for {scheduleForm.platform}
+                        Quick Presets
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {getOptimalTimes().map((time) => (
-                        <Badge
-                          key={time}
-                          variant={scheduleForm.scheduledTime === time ? "default" : "secondary"}
-                          className="cursor-pointer"
-                          onClick={() => setScheduleForm(prev => ({ ...prev, scheduledTime: time }))}
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: "Now", time: new Date().toTimeString().slice(0, 5) },
+                        { label: "In 1 hour", time: new Date(Date.now() + 60 * 60 * 1000).toTimeString().slice(0, 5) },
+                        { label: "In 2 hours", time: new Date(Date.now() + 2 * 60 * 60 * 1000).toTimeString().slice(0, 5) },
+                        { label: "Tomorrow 9AM", time: "09:00" }
+                      ].map((preset) => (
+                        <Button
+                          key={preset.label}
+                          variant="outline"
+                          size="sm"
+                          className="glassmorphism text-xs"
+                          onClick={() => {
+                            setScheduleForm(prev => ({ ...prev, scheduledTime: preset.time }));
+                            if (preset.label === "Tomorrow 9AM") {
+                              const tomorrow = new Date();
+                              tomorrow.setDate(tomorrow.getDate() + 1);
+                              setScheduleForm(prev => ({ ...prev, scheduledDate: tomorrow.toISOString().split('T')[0] }));
+                            }
+                          }}
                         >
-                          {time}
-                        </Badge>
+                          {preset.label}
+                        </Button>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
-              )}
+
+                {/* Optimal Times */}
+                {scheduleForm.platform && (
+                  <Card className="content-card holographic">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-medium text-electric-cyan">
+                          Optimal for {scheduleForm.platform}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {getOptimalTimes().map((time) => (
+                          <Badge
+                            key={time}
+                            variant={scheduleForm.scheduledTime === time ? "default" : "secondary"}
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setScheduleForm(prev => ({ ...prev, scheduledTime: time }))}
+                          >
+                            {time}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end space-x-4 pt-4">

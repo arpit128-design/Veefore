@@ -730,10 +730,27 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
         // Calculate real metrics from Instagram data
         const totalPosts = media.length;
-        const totalReach = insights.reach || 0;
         const totalLikes = media.reduce((sum, post) => sum + (post.like_count || 0), 0);
         const totalComments = media.reduce((sum, post) => sum + (post.comments_count || 0), 0);
         const totalEngagement = totalLikes + totalComments;
+        
+        // Get reach from media insights if available, otherwise use account insights
+        let totalReach = insights.reach || 0;
+        if (totalReach === 0 && media.length > 0) {
+          // Try to get reach from individual media insights
+          const mediaReach = await Promise.all(
+            media.map(async (post) => {
+              try {
+                const mediaInsights = await instagramAPI.getMediaInsights(post.id, instagramAccount.accessToken);
+                return mediaInsights.reach || 0;
+              } catch (e) {
+                return 0;
+              }
+            })
+          );
+          totalReach = mediaReach.reduce((sum, reach) => sum + reach, 0);
+        }
+        
         const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
 
         res.json({

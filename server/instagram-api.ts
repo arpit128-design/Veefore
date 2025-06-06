@@ -559,17 +559,34 @@ export class InstagramAPI {
             console.log(`[INSTAGRAM PUBLISH] Video file size: ${fileSizeMB.toFixed(2)}MB`);
             
             if (fileSizeMB > 50) {
-              console.log(`[INSTAGRAM PUBLISH] File size exceeds 50MB, but proceeding with original - will compress only if Instagram rejects`);
+              console.log(`[INSTAGRAM PUBLISH] File size exceeds 50MB - activating intelligent compression immediately`);
+              
+              try {
+                const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                  quality: 'high',
+                  targetSizeMB: 25,
+                  maintainAspectRatio: true
+                });
+                
+                if (compressionResult.success && compressionResult.outputPath) {
+                  console.log(`[INSTAGRAM PUBLISH] Video compressed from ${fileSizeMB.toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                  
+                  currentVideoUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                  console.log(`[INSTAGRAM PUBLISH] Using compressed video: ${currentVideoUrl}`);
+                }
+              } catch (compressionError: any) {
+                console.error(`[INSTAGRAM PUBLISH] Compression failed, proceeding with original:`, compressionError.message);
+              }
             }
           }
         }
       }
       
-      // Step 1: Create video media container - try VIDEO first, fallback to REELS
+      // Step 1: Create video media container - use REELS as VIDEO is deprecated
       const containerPayload = {
-        video_url: currentVideoUrl,
+        video_url: videoUrl.startsWith('http') ? videoUrl : `http://15a46e73-e0eb-45c2-8225-17edc84946f6-00-1dy2h828k4y1r.worf.replit.dev${currentVideoUrl}`,
         caption: caption,
-        media_type: 'VIDEO', // Try VIDEO first for better compatibility
+        media_type: 'REELS', // Instagram now requires REELS instead of deprecated VIDEO
         access_token: accessToken
       };
 
@@ -593,6 +610,9 @@ export class InstagramAPI {
             
             if (fs.existsSync(localPath)) {
               try {
+                // Import VideoCompressor
+                const { VideoCompressor } = await import('./video-compression');
+                
                 const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
                   quality: 'high',
                   targetSizeMB: 25,
@@ -603,7 +623,7 @@ export class InstagramAPI {
                   console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
                   
                   const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
-                  return this.publishVideo(accessToken, compressedUrl, caption, true);
+                  return await this.publishVideo(accessToken, compressedUrl, caption, true);
                 }
               } catch (compressionError: any) {
                 console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);

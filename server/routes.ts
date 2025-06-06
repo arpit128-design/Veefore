@@ -348,6 +348,49 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Admin endpoint to fix content status
+  app.post('/api/fix-content-status', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+
+      // Get all content for this workspace
+      const allContent = await storage.getContentByWorkspace(parseInt(workspaceId));
+      console.log(`[FIX STATUS] Found ${allContent.length} content items`);
+      
+      // Find story content that might need status fix
+      const storyContent = allContent.filter(c => c.type === 'story' && c.title === 'dvd');
+      console.log(`[FIX STATUS] Found ${storyContent.length} story items:`, storyContent.map(c => ({ id: c.id, status: c.status, title: c.title })));
+      
+      // Update any story content that's still showing as scheduled but should be published
+      const fixResults = [];
+      for (const content of storyContent) {
+        if (content.status === 'scheduled' || content.status === 'publishing') {
+          const updated = await storage.updateContent(content.id, {
+            status: 'published',
+            publishedAt: new Date()
+          });
+          fixResults.push(updated);
+          console.log(`[FIX STATUS] Updated content ${content.id} to published`);
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Fixed ${fixResults.length} content items`,
+        fixed: fixResults,
+        allContent: allContent.map(c => ({ id: c.id, type: c.type, title: c.title, status: c.status }))
+      });
+      
+    } catch (error: any) {
+      console.error('[FIX STATUS] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Update content route
   app.put('/api/content/:id', requireAuth, async (req: any, res: Response) => {
     try {

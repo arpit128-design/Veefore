@@ -119,7 +119,20 @@ export default function Pricing() {
       return apiRequest('POST', '/api/subscription/create-order', { planId });
     },
     onSuccess: (data: any) => {
+      console.log('Razorpay order response:', data);
+      console.log('Window Razorpay available:', !!window.Razorpay);
+      
       if (data && window.Razorpay) {
+        if (!data.key) {
+          console.error('No Razorpay key in response');
+          toast({
+            title: "Error",
+            description: "Payment configuration error. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         const options = {
           key: data.key,
           amount: data.amount,
@@ -159,9 +172,21 @@ export default function Pricing() {
           },
         };
         
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+        console.log('Razorpay options:', options);
+        
+        try {
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } catch (error) {
+          console.error('Razorpay initialization error:', error);
+          toast({
+            title: "Error",
+            description: "Payment system error. Please try again.",
+            variant: "destructive",
+          });
+        }
       } else {
+        console.error('Missing data or Razorpay not loaded:', { data, razorpayLoaded: !!window.Razorpay });
         toast({
           title: "Error",
           description: "Failed to initialize payment. Please try again.",

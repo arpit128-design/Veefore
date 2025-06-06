@@ -740,6 +740,28 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const profile = await instagramAPI.getUserProfile(longLivedToken.access_token);
       console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
       
+      // Validate workspace ID and handle undefined/null cases
+      console.log(`[INSTAGRAM CALLBACK] Processing workspace ID: ${workspaceId} (type: ${typeof workspaceId})`);
+      
+      if (!workspaceId || workspaceId === 'undefined' || workspaceId === 'null') {
+        console.error(`[INSTAGRAM CALLBACK] Invalid workspace ID: ${workspaceId}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_workspace`);
+      }
+      
+      // Verify workspace exists and user has access
+      let workspace;
+      try {
+        workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          console.error(`[INSTAGRAM CALLBACK] Workspace not found: ${workspaceId}`);
+          return res.redirect(`https://${req.get('host')}/integrations?error=workspace_not_found`);
+        }
+        console.log(`[INSTAGRAM CALLBACK] Verified workspace: ${workspace.name} (${workspace.id})`);
+      } catch (error) {
+        console.error(`[INSTAGRAM CALLBACK] Error verifying workspace:`, error);
+        return res.redirect(`https://${req.get('host')}/integrations?error=workspace_error`);
+      }
+      
       // Save to database - handle workspace ID conversion
       console.log(`[INSTAGRAM CALLBACK] Looking for existing Instagram account in workspace: ${workspaceId}`);
       

@@ -91,12 +91,32 @@ export default function Workspaces() {
       setNewWorkspace({ name: "", description: "", theme: "default" });
     },
     onError: (error: any) => {
-      // apiRequest throws errors with response data directly accessible
-      const errorData = error?.response?.data || error;
-      const statusCode = error?.response?.status || error?.status;
+      console.log('=== WORKSPACE CREATION ERROR CAUGHT ===');
+      console.log('Error object:', error);
+      console.log('Error message:', error?.message);
+      console.log('Error status:', error?.status);
+      console.log('Error keys:', Object.keys(error || {}));
       
-      // Handle plan restriction errors (403 status)
-      if (statusCode === 403 || error?.message?.includes('plan allows')) {
+      // Parse error message to extract JSON response (format: "403: {json}")
+      let errorData: any = {};
+      let is403Error = false;
+      
+      if (error?.message?.includes('403:')) {
+        is403Error = true;
+        try {
+          const jsonStart = error.message.indexOf('{');
+          if (jsonStart !== -1) {
+            const jsonStr = error.message.substring(jsonStart);
+            errorData = JSON.parse(jsonStr);
+            console.log('Parsed error data:', errorData);
+          }
+        } catch (e) {
+          console.log('Could not parse JSON from error message:', e);
+        }
+      }
+      
+      if (is403Error) {
+        console.log('Processing 403 error for upgrade modal');
         setIsCreateOpen(false); // Close the creation modal
         
         const modalData = {
@@ -111,8 +131,11 @@ export default function Workspaces() {
           }
         };
         
+        console.log('Setting upgrade modal:', modalData);
         setUpgradeModal(modalData);
+        console.log('Upgrade modal state should now be open');
       } else {
+        console.log('Non-403 error, showing toast');
         toast({
           title: "Creation Failed",
           description: error.message || "Failed to create workspace",

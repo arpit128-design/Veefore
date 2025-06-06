@@ -126,8 +126,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       }
       
       setCurrentWorkspace(workspaceToSet);
+      
+      // Immediately invalidate all workspace-dependent queries
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+      console.log('[WORKSPACE PROVIDER] Invalidated all workspace queries after restoration');
     }
-  }, [workspaces, currentWorkspace, user?.id]);
+  }, [workspaces, currentWorkspace, user?.id, queryClient]);
 
   const switchWorkspace = async (workspace: Workspace) => {
     console.log('[WORKSPACE PROVIDER] Switching from', currentWorkspace?.name, 'to', workspace.name);

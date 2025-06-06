@@ -295,6 +295,8 @@ export class MongoStorage implements IStorage {
       totalReferrals: mongoUser.totalReferrals || 0,
       totalEarned: mongoUser.totalEarned || 0,
       referredBy: mongoUser.referredBy || null,
+      preferences: mongoUser.preferences || {},
+      isOnboarded: mongoUser.isOnboarded || false,
       createdAt: mongoUser.createdAt,
       updatedAt: mongoUser.updatedAt
     };

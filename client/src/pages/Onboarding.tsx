@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspaceContext } from '@/hooks/useWorkspace';
 import { SpaceBackground } from '@/components/ui/space-background';
 import { FloatingRocket, FloatingSparkles, FloatingOrbs, FloatingIcons } from '@/components/ui/floating-elements';
 import { apiRequest } from '@/lib/queryClient';
@@ -102,11 +103,87 @@ export default function Onboarding() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { token } = useAuth();
+  const { user } = useAuth();
+  const { currentWorkspace } = useWorkspaceContext();
 
   const { data: socialAccounts = [] } = useQuery({
     queryKey: ['/api/social-accounts'],
     enabled: currentStep === 1
+  });
+
+  // Instagram connection mutation using the same flow as integrations page
+  const connectInstagramMutation = useMutation({
+    mutationFn: async () => {
+      console.log(`[ONBOARDING CONNECT] Attempting to connect Instagram`);
+      console.log(`[ONBOARDING CONNECT] User state:`, user ? 'Present' : 'Missing');
+      console.log(`[ONBOARDING CONNECT] Workspace:`, currentWorkspace?.id);
+      
+      // Get fresh token from localStorage
+      let token = localStorage.getItem('veefore_auth_token');
+      console.log(`[ONBOARDING CONNECT] Token from localStorage:`, token ? `Present` : 'Missing');
+      
+      if (user && token) {
+        // Handle demo mode vs real Firebase user
+        if (user.firebaseUid === 'demo-user') {
+          console.log(`[ONBOARDING CONNECT] Demo mode detected`);
+          token = 'demo-token';
+          localStorage.setItem('veefore_auth_token', token);
+        } else {
+          // Real Firebase user - get fresh token
+          try {
+            const { auth } = await import('@/lib/firebase');
+            if (auth.currentUser) {
+              const freshToken = await auth.currentUser.getIdToken(true);
+              if (freshToken) {
+                token = freshToken;
+                localStorage.setItem('veefore_auth_token', freshToken);
+                console.log(`[ONBOARDING CONNECT] Fresh token obtained from Firebase`);
+              }
+            }
+          } catch (error) {
+            console.error(`[ONBOARDING CONNECT] Failed to get fresh token:`, error);
+          }
+        }
+      }
+      
+      if (!token) {
+        throw new Error('Authentication token not found. Please refresh the page and try again.');
+      }
+      
+      // Make authenticated request to Instagram OAuth
+      const response = await fetch(`/api/instagram/auth?workspaceId=${currentWorkspace?.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[ONBOARDING CONNECT] Response error:`, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log(`[ONBOARDING CONNECT] Response data:`, data);
+      
+      if (data.authUrl) {
+        console.log(`[ONBOARDING CONNECT] Redirecting to Instagram OAuth:`, data.authUrl);
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error('Failed to get Instagram authorization URL');
+      }
+    },
+    onError: (error: any) => {
+      console.error('[ONBOARDING CONNECT] Instagram connection failed:', error);
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Failed to connect Instagram account",
+        variant: "destructive"
+      });
+    }
   });
 
   const completeOnboardingMutation = useMutation({
@@ -464,10 +541,11 @@ export default function Onboarding() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button 
-                  onClick={() => setLocation('/integrations')}
-                  className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-pink-500/25 px-6 py-3 text-lg font-medium"
+                  onClick={() => connectInstagramMutation.mutate()}
+                  disabled={connectInstagramMutation.isPending}
+                  className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-pink-500/25 px-6 py-3 text-lg font-medium disabled:opacity-50"
                 >
-                  Connect
+                  {connectInstagramMutation.isPending ? 'Connecting...' : 'Connect'}
                 </Button>
               </motion.div>
             </div>

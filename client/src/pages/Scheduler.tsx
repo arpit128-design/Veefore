@@ -84,17 +84,21 @@ export default function Scheduler() {
   const [socialAccounts, setSocialAccounts] = useState([]);
   const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
 
-  // Manually fetch social accounts when workspace changes
+  // Manually fetch social accounts when workspace changes - wait for proper workspace restoration
   useEffect(() => {
-    if (currentWorkspace?.id && currentWorkspace?.name) {
-      console.log('[SCHEDULER DEBUG] Manually fetching social accounts for workspace:', currentWorkspace?.id, currentWorkspace?.name);
+    // Only fetch if workspace has been properly restored and is not the default fallback
+    const isCorrectWorkspace = currentWorkspace?.id && currentWorkspace?.name && 
+                               currentWorkspace.name !== 'My VeeFore Workspace';
+    
+    if (isCorrectWorkspace) {
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for RESTORED workspace:', currentWorkspace.id, currentWorkspace.name);
       setSocialAccountsLoading(true);
       
       const fetchSocialAccounts = async () => {
         try {
-          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
           const accounts = await response.json();
-          console.log('[SCHEDULER DEBUG] Manually retrieved social accounts:', accounts);
+          console.log('[SCHEDULER DEBUG] Retrieved social accounts for RESTORED workspace:', accounts);
           setSocialAccounts(accounts);
         } catch (error) {
           console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
@@ -105,6 +109,10 @@ export default function Scheduler() {
       };
       
       fetchSocialAccounts();
+    } else if (currentWorkspace?.name === 'My VeeFore Workspace') {
+      // This is the default workspace loaded before restoration - clear accounts
+      console.log('[SCHEDULER DEBUG] Detected default workspace before restoration, clearing accounts');
+      setSocialAccounts([]);
     }
   }, [currentWorkspace?.id, currentWorkspace?.name]);
 

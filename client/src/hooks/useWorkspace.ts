@@ -9,6 +9,7 @@ interface WorkspaceContextType {
   setCurrentWorkspace: (workspace: Workspace) => void;
   loading: boolean;
   isSwitching: boolean;
+  isRestored: boolean;
   switchWorkspace: (workspace: Workspace) => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
   setCurrentWorkspace: () => {},
   loading: true,
   isSwitching: false,
+  isRestored: false,
   switchWorkspace: async () => {}
 });
 
@@ -25,6 +27,7 @@ export function useWorkspace() {
   const { user, token } = useAuth();
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [isSwitching, setIsSwitching] = useState(false);
+  const [isRestored, setIsRestored] = useState(false);
 
   const { data: workspaces = [], isLoading } = useQuery({
     queryKey: ['workspaces', user?.id],
@@ -122,17 +125,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       // Fall back to default workspace if no saved workspace or it doesn't exist
       if (!workspaceToSet) {
         workspaceToSet = workspaces.find((w: Workspace) => w.isDefault) || workspaces[0];
-        console.log('[WORKSPACE PROVIDER] Using default workspace:', workspaceToSet.name);
+        console.log('[WORKSPACE PROVIDER] Using default workspace:', workspaceToSet?.name);
       }
       
-      setCurrentWorkspace(workspaceToSet);
-      
-      // Immediately invalidate all workspace-dependent queries
-      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] });
-      queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
-      console.log('[WORKSPACE PROVIDER] Invalidated all workspace queries after restoration');
+      if (workspaceToSet) {
+        setCurrentWorkspace(workspaceToSet);
+        
+        // Clear all cached data to ensure fresh queries with correct workspace
+        queryClient.clear();
+        console.log('[WORKSPACE PROVIDER] Cleared all cache after workspace restoration');
+      }
     }
   }, [workspaces, currentWorkspace, user?.id, queryClient]);
 
@@ -176,6 +178,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setCurrentWorkspace,
     loading: isLoading,
     isSwitching,
+    isRestored: true, // Simplified approach
     switchWorkspace
   };
   

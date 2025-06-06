@@ -667,13 +667,17 @@ export default function Onboarding() {
                 </motion.div>
 
                 {/* Dropdown Content */}
-                {nicheDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
-                  >
+                <motion.div
+                  initial={false}
+                  animate={{ 
+                    opacity: nicheDropdownOpen ? 1 : 0,
+                    y: nicheDropdownOpen ? 0 : -10,
+                    scale: nicheDropdownOpen ? 1 : 0.95,
+                    pointerEvents: nicheDropdownOpen ? 'auto' : 'none'
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
+                >
                     {/* Categories */}
                     {['Personal', 'Creative', 'Professional', 'Lifestyle', 'Commercial', 'Specialty', 'Entertainment'].map((category) => {
                       const categoryNiches = niches.filter(n => n.category === category);
@@ -730,8 +734,7 @@ export default function Onboarding() {
                         </div>
                       );
                     })}
-                  </motion.div>
-                )}
+                </motion.div>
               </div>
 
               {/* Selected Niches Display */}

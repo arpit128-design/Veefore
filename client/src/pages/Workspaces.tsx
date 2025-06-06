@@ -128,25 +128,11 @@ export default function Workspaces() {
       console.log('Error status:', error?.status);
       console.log('Error keys:', Object.keys(error || {}));
       
-      // Parse error message to extract JSON response (format: "403: {json}")
-      let errorData: any = {};
-      let is403Error = false;
+      // Extract error data from structured error object
+      const errorData = error?.response?.data || {};
+      const statusCode = error?.status || error?.response?.status;
       
-      if (error?.message?.includes('403:')) {
-        is403Error = true;
-        try {
-          const jsonStart = error.message.indexOf('{');
-          if (jsonStart !== -1) {
-            const jsonStr = error.message.substring(jsonStart);
-            errorData = JSON.parse(jsonStr);
-            console.log('Parsed error data:', errorData);
-          }
-        } catch (e) {
-          console.log('Could not parse JSON from error message:', e);
-        }
-      }
-      
-      if (is403Error) {
+      if (statusCode === 403) {
         console.log('Processing 403 error for upgrade modal');
         setIsCreateOpen(false); // Close the creation modal
         

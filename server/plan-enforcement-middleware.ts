@@ -75,14 +75,21 @@ export function validateWorkspaceLimit() {
       const userId = req.user.id;
       const userPlan = req.user.plan || 'free';
       
+      console.log(`[WORKSPACE LIMIT] Checking limit for user ${userId} on plan ${userPlan}`);
+      
       // Get current workspace count
       const workspaces = await storage.getWorkspacesByUserId(userId);
       const currentCount = workspaces.length;
       
+      console.log(`[WORKSPACE LIMIT] User has ${currentCount} workspaces`);
+      
       const access = AccessControl.canCreateWorkspace(userPlan, currentCount);
+      
+      console.log(`[WORKSPACE LIMIT] Access check result:`, access);
 
       if (!access.allowed) {
         const upgradeMessage = AccessControl.generateUpgradeMessage(userPlan, 'workspaces');
+        console.log(`[WORKSPACE LIMIT] BLOCKING workspace creation - returning 403`);
         return res.status(403).json({ 
           error: access.reason,
           upgradeMessage,
@@ -91,6 +98,8 @@ export function validateWorkspaceLimit() {
           currentPlan: userPlan
         });
       }
+      
+      console.log(`[WORKSPACE LIMIT] Access allowed, proceeding to workspace creation`)
 
       next();
     } catch (error) {

@@ -1342,11 +1342,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const { user } = req;
       const { name, description, theme } = req.body;
 
+      console.log(`[WORKSPACES] Starting workspace creation for user ${user.id}:`, { name, description, theme });
+
       if (!name || !name.trim()) {
+        console.log(`[WORKSPACES] Validation failed - empty name`);
         return res.status(400).json({ error: 'Workspace name is required' });
       }
 
-      console.log(`[WORKSPACES] Creating workspace for user ${user.id}:`, { name, description, theme });
+      console.log(`[WORKSPACES] Validation passed, creating workspace for user ${user.id}`);
 
       const workspaceData = {
         userId: user.id,
@@ -1357,9 +1360,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         credits: 50 // Give new workspaces 50 credits to start
       };
 
+      console.log(`[WORKSPACES] Calling storage.createWorkspace with data:`, workspaceData);
       const newWorkspace = await storage.createWorkspace(workspaceData);
       
-      console.log(`[WORKSPACES] Created workspace ${newWorkspace.id}: ${newWorkspace.name}`);
+      console.log(`[WORKSPACES] Successfully created workspace ${newWorkspace.id}: ${newWorkspace.name}`);
       
       res.json(newWorkspace);
     } catch (error: any) {

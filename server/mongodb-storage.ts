@@ -904,6 +904,20 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  async getSuggestionsByWorkspace(workspaceId: string | number): Promise<Suggestion[]> {
+    await this.connect();
+    const suggestions = await SuggestionModel.find({ workspaceId: workspaceId.toString() })
+      .sort({ createdAt: -1 });
+    return suggestions.map(this.convertSuggestion);
+  }
+
+  async getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]> {
+    await this.connect();
+    const analytics = await AnalyticsModel.find({ workspaceId: workspaceId.toString() })
+      .sort({ date: -1 });
+    return analytics.map(this.convertAnalytics);
+  }
+
   private convertAddon(doc: any): Addon {
     return {
       id: doc._id?.toString() || doc.id,

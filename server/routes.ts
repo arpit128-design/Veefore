@@ -2115,14 +2115,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           type: suggestion.type,
           data: suggestion.data,
           confidence: suggestion.confidence,
-          validUntil: suggestion.validUntil,
-          isUsed: false
+          validUntil: suggestion.validUntil
         });
         savedSuggestions.push(saved);
       }
       
       // Deduct credits
-      await creditService.deductCredits(userId, 'ai_suggestions', 1);
+      await creditService.deductCredits(userId, creditCost, 'AI suggestions generation');
       
       console.log(`[AI SUGGESTIONS] Generated ${savedSuggestions.length} suggestions successfully`);
       res.json({ 

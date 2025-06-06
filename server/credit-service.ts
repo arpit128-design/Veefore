@@ -122,9 +122,37 @@ export class CreditService {
     );
   }
 
+  // Deduct credits from user account
+  async deductCredits(userId: number | string, amount: number, description: string = 'Credit usage', referenceId?: string): Promise<void> {
+    const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+    const user = await storage.getUser(userIdNum);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    const currentCredits = user.credits || 0;
+    if (currentCredits < amount) {
+      throw new Error('Insufficient credits');
+    }
+    
+    // Deduct credits from user
+    await storage.updateUserCredits(userIdNum, currentCredits - amount);
+    
+    // Record the transaction
+    await storage.createCreditTransaction({
+      userId: userIdNum,
+      type: 'spent',
+      amount: -amount,
+      description,
+      referenceId
+    });
+  }
+
   // Get credit transaction history
   async getCreditHistory(userId: number | string, limit: number = 50) {
-    return await storage.getCreditTransactions(userId, limit);
+    const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+    return await storage.getCreditTransactions(userIdNum, limit);
   }
 
   // Calculate credit rollover (unused credits from previous month)

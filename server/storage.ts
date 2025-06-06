@@ -475,6 +475,20 @@ export class MemStorage implements IStorage {
     return updatedSuggestion;
   }
 
+  async getSuggestionsByWorkspace(workspaceId: string | number): Promise<Suggestion[]> {
+    const wsId = typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId;
+    return Array.from(this.suggestions.values())
+      .filter(suggestion => suggestion.workspaceId === wsId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]> {
+    const wsId = typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId;
+    return Array.from(this.analytics.values())
+      .filter(analytics => analytics.workspaceId === wsId)
+      .sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
+  }
+
   // Credit transactions
   async getCreditTransactions(userId: number, limit = 50): Promise<CreditTransaction[]> {
     return Array.from(this.creditTransactions.values())

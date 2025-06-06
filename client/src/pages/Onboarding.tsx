@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { SpaceBackground } from '@/components/ui/space-background';
+import { FloatingRocket, FloatingSparkles, FloatingOrbs, FloatingIcons } from '@/components/ui/floating-elements';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Rocket, 
@@ -36,7 +39,10 @@ import {
   Home,
   ShoppingCart,
   Baby,
-  PawPrint
+  PawPrint,
+  Star,
+  Zap,
+  Globe
 } from 'lucide-react';
 
 const niches = [
@@ -86,6 +92,7 @@ export default function Onboarding() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { token } = useAuth();
 
   const { data: socialAccounts = [] } = useQuery({
     queryKey: ['/api/social-accounts'],
@@ -151,64 +158,144 @@ export default function Onboarding() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-center space-y-8"
+      className="text-center space-y-12 relative z-10"
     >
-      <div className="space-y-4">
-        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <Rocket className="w-12 h-12 text-white" />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Welcome to VeeFore
+      {/* Hero Section with 3D Effect */}
+      <div className="space-y-8">
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="mx-auto relative"
+        >
+          <div className="w-32 h-32 mx-auto relative">
+            {/* Outer Glow Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-1"
+            >
+              <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-white/30" />
+            </motion.div>
+            
+            {/* Main Rocket Container */}
+            <motion.div
+              animate={{ 
+                y: [0, -10, 0],
+                boxShadow: [
+                  "0 20px 40px rgba(59, 130, 246, 0.3)",
+                  "0 25px 50px rgba(147, 51, 234, 0.4)", 
+                  "0 20px 40px rgba(59, 130, 246, 0.3)"
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-2 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center"
+            >
+              <Rocket className="w-16 h-16 text-white" />
+            </motion.div>
+            
+            {/* Particle Effects */}
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 bg-yellow-300 rounded-full"
+                style={{
+                  top: "50%",
+                  left: "50%",
+                  transform: `translate(-50%, -50%) rotate(${i * 45}deg) translateY(-80px)`
+                }}
+                animate={{
+                  scale: [0, 1, 0],
+                  opacity: [0, 1, 0]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+            VeeFore
           </h1>
-          <p className="text-xl text-gray-600 mt-2">
-            AI-Powered Social Media Management
-          </p>
-        </div>
+          <motion.p 
+            className="text-2xl md:text-3xl text-white/90 font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            AI-Powered Social Media Galaxy
+          </motion.p>
+        </motion.div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-6 h-6 text-blue-600" />
-            </div>
-            <h3 className="font-semibold mb-2">AI Content Creation</h3>
-            <p className="text-sm text-gray-600">
-              Generate engaging posts, captions, and media with AI
-            </p>
-          </CardContent>
-        </Card>
+      {/* Feature Cards with 3D Animation */}
+      <motion.div 
+        className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+      >
+        {[
+          { icon: Sparkles, title: "AI Content Creation", desc: "Generate stellar posts, captions, and media", color: "from-blue-500 to-cyan-400" },
+          { icon: Target, title: "Smart Scheduling", desc: "Launch posts at optimal galactic times", color: "from-purple-500 to-pink-400" },
+          { icon: TrendingUp, title: "Cosmic Analytics", desc: "Track performance across the social universe", color: "from-green-500 to-blue-400" }
+        ].map((feature, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20, rotateY: -30 }}
+            animate={{ opacity: 1, y: 0, rotateY: 0 }}
+            transition={{ delay: 1.2 + index * 0.2 }}
+            whileHover={{ 
+              scale: 1.05, 
+              rotateY: 5,
+              boxShadow: "0 20px 40px rgba(255, 255, 255, 0.1)"
+            }}
+            className="relative"
+          >
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white overflow-hidden group">
+              <CardContent className="pt-8 pb-6 relative">
+                {/* Background Glow */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+                
+                <motion.div
+                  className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mx-auto mb-6 relative z-10`}
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <feature.icon className="w-8 h-8 text-white" />
+                </motion.div>
+                
+                <h3 className="font-bold text-xl mb-3 relative z-10">{feature.title}</h3>
+                <p className="text-white/80 text-sm relative z-10">{feature.desc}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </motion.div>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Target className="w-6 h-6 text-green-600" />
-            </div>
-            <h3 className="font-semibold mb-2">Smart Scheduling</h3>
-            <p className="text-sm text-gray-600">
-              Schedule posts at optimal times for maximum engagement
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
-            </div>
-            <h3 className="font-semibold mb-2">Analytics & Insights</h3>
-            <p className="text-sm text-gray-600">
-              Track performance and optimize your strategy
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <p className="text-gray-600 max-w-2xl mx-auto">
-        Let's get you set up in just a few simple steps. We'll help you connect your social media accounts, 
-        set your preferences, and start creating amazing content with AI.
-      </p>
+      {/* Call to Action */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className="max-w-3xl mx-auto"
+      >
+        <p className="text-white/90 text-lg leading-relaxed">
+          Embark on a journey to transform your social media presence. 
+          <br />
+          <span className="text-blue-300 font-medium">Connect, create, and conquer the digital cosmos.</span>
+        </p>
+      </motion.div>
     </motion.div>
   );
 

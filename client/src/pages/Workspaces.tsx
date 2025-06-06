@@ -102,7 +102,10 @@ export default function Workspaces() {
         
         if (!response.ok) {
           console.log('=== MUTATION FUNCTION ERROR ===', result);
-          throw new Error(JSON.stringify(result));
+          const error = new Error(`${response.status}: ${JSON.stringify(result)}`);
+          error.response = result;
+          error.status = response.status;
+          throw error;
         }
         
         console.log('=== MUTATION FUNCTION SUCCESS ===', result);

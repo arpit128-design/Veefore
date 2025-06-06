@@ -94,8 +94,12 @@ export default function Scheduler() {
       console.log('[SCHEDULER DEBUG] Fetching social accounts for RESTORED workspace:', currentWorkspace.id, currentWorkspace.name);
       setSocialAccountsLoading(true);
       
+      // Add delay to ensure cache is cleared and workspace is fully restored
       const fetchSocialAccounts = async () => {
         try {
+          // Wait a moment for cache clearing to complete
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
           const accounts = await response.json();
           console.log('[SCHEDULER DEBUG] Retrieved social accounts for RESTORED workspace:', accounts);

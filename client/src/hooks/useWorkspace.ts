@@ -9,7 +9,6 @@ interface WorkspaceContextType {
   setCurrentWorkspace: (workspace: Workspace) => void;
   loading: boolean;
   isSwitching: boolean;
-  isRestored: boolean;
   switchWorkspace: (workspace: Workspace) => Promise<void>;
 }
 
@@ -19,7 +18,6 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
   setCurrentWorkspace: () => {},
   loading: true,
   isSwitching: false,
-  isRestored: false,
   switchWorkspace: async () => {}
 });
 
@@ -178,7 +176,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setCurrentWorkspace,
     loading: isLoading,
     isSwitching,
-    isRestored: true, // Simplified approach
     switchWorkspace
   };
   

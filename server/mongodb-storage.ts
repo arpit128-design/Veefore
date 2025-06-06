@@ -357,6 +357,22 @@ export class MongoStorage implements IStorage {
     await WorkspaceModel.findOneAndDelete({ _id: id });
   }
 
+  async setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void> {
+    await this.connect();
+    
+    // First, unset all default workspaces for this user
+    await WorkspaceModel.updateMany(
+      { userId },
+      { isDefault: false }
+    );
+    
+    // Then set the specified workspace as default
+    await WorkspaceModel.findOneAndUpdate(
+      { _id: workspaceId, userId },
+      { isDefault: true }
+    );
+  }
+
   // Helper methods for data conversion
   private convertUser(mongoUser: any): User {
     return {

@@ -31,6 +31,7 @@ export interface IStorage {
   createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
   updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace>;
   deleteWorkspace(id: number): Promise<void>;
+  setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void>;
 
   // Social account operations
   getSocialAccount(id: number): Promise<SocialAccount | undefined>;
@@ -221,6 +222,26 @@ export class MemStorage implements IStorage {
 
   async deleteWorkspace(id: number): Promise<void> {
     this.workspaces.delete(id);
+  }
+
+  async setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void> {
+    const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+    const workspaceIdNum = typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId;
+    
+    // First, unset all default workspaces for this user
+    for (const workspace of this.workspaces.values()) {
+      if (workspace.userId === userIdNum && workspace.isDefault) {
+        workspace.isDefault = false;
+        workspace.updatedAt = new Date();
+      }
+    }
+    
+    // Then set the specified workspace as default
+    const targetWorkspace = this.workspaces.get(workspaceIdNum);
+    if (targetWorkspace && targetWorkspace.userId === userIdNum) {
+      targetWorkspace.isDefault = true;
+      targetWorkspace.updatedAt = new Date();
+    }
   }
 
   // Social account operations

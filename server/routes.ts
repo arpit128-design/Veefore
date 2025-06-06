@@ -1398,6 +1398,95 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Update workspace
+  app.put('/api/workspaces/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+      const { name, description, theme } = req.body;
+
+      console.log(`[WORKSPACES] Updating workspace ${workspaceId} for user ${user.id}`);
+
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'Workspace name is required' });
+      }
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const updateData = {
+        name: name.trim(),
+        description: description?.trim() || null,
+        theme: theme || workspace.theme
+      };
+
+      console.log(`[WORKSPACES] Updating workspace with data:`, updateData);
+      const updatedWorkspace = await storage.updateWorkspace(workspaceId, updateData);
+      
+      console.log(`[WORKSPACES] Successfully updated workspace ${workspaceId}`);
+      res.json(updatedWorkspace);
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error updating workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete workspace
+  app.delete('/api/workspaces/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+
+      console.log(`[WORKSPACES] Deleting workspace ${workspaceId} for user ${user.id}`);
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Prevent deletion of default workspace
+      if (workspace.isDefault) {
+        return res.status(400).json({ error: 'Cannot delete default workspace' });
+      }
+
+      await storage.deleteWorkspace(workspaceId);
+      
+      console.log(`[WORKSPACES] Successfully deleted workspace ${workspaceId}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error deleting workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Set default workspace
+  app.put('/api/workspaces/:id/default', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+
+      console.log(`[WORKSPACES] Setting default workspace ${workspaceId} for user ${user.id}`);
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      await storage.setDefaultWorkspace(user.id, workspaceId);
+      
+      console.log(`[WORKSPACES] Successfully set default workspace ${workspaceId}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error setting default workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Publish content to Instagram
   app.post('/api/instagram/publish', requireAuth, async (req: any, res: Response) => {
     try {

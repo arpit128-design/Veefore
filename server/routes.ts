@@ -819,13 +819,30 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const workspace = await storage.getDefaultWorkspace(user.id);
+      const workspaceId = req.query.workspaceId;
       
-      if (!workspace) {
-        return res.json([]);
+      console.log('[SOCIAL ACCOUNTS] GET request for user:', user.id, 'workspaceId:', workspaceId);
+      
+      if (!workspaceId) {
+        console.log('[SOCIAL ACCOUNTS] No workspaceId provided, using default workspace');
+        const workspace = await storage.getDefaultWorkspace(user.id);
+        if (!workspace) {
+          return res.json([]);
+        }
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        console.log('[SOCIAL ACCOUNTS] Returning accounts for default workspace:', workspace.id, 'count:', accounts.length);
+        return res.json(accounts);
       }
       
-      const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      // Verify user has access to the requested workspace
+      const workspace = await storage.getWorkspace(workspaceId as string);
+      if (!workspace || workspace.userId !== user.id) {
+        console.log('[SOCIAL ACCOUNTS] Access denied to workspace:', workspaceId);
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+      
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      console.log('[SOCIAL ACCOUNTS] Returning accounts for workspace:', workspaceId, 'count:', accounts.length);
       res.json(accounts);
     } catch (error: any) {
       console.error('[SOCIAL ACCOUNTS] Error:', error);

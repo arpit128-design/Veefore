@@ -127,27 +127,57 @@ export class SchedulerService {
           );
           break;
         case 'reel':
-          publishResult = await instagramAPI.publishReel(
-            instagramAccount.accessToken,
-            mediaUrl,
-            caption
-          );
+          try {
+            publishResult = await instagramAPI.publishReel(
+              instagramAccount.accessToken,
+              mediaUrl,
+              caption
+            );
+          } catch (reelError: any) {
+            console.log(`[SCHEDULER] Reel publish failed, trying with intelligent compression`);
+            const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
+            publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
+              instagramAccount.accessToken,
+              mediaUrl,
+              caption
+            );
+          }
           break;
         case 'video':
-          publishResult = await instagramAPI.publishVideo(
-            instagramAccount.accessToken,
-            mediaUrl,
-            caption
-          );
-          break;
-        case 'post':
-        default:
-          if (isVideo) {
+          try {
             publishResult = await instagramAPI.publishVideo(
               instagramAccount.accessToken,
               mediaUrl,
               caption
             );
+          } catch (videoError: any) {
+            console.log(`[SCHEDULER] Video publish failed, trying with intelligent compression`);
+            const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
+            publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
+              instagramAccount.accessToken,
+              mediaUrl,
+              caption
+            );
+          }
+          break;
+        case 'post':
+        default:
+          if (isVideo) {
+            try {
+              publishResult = await instagramAPI.publishVideo(
+                instagramAccount.accessToken,
+                mediaUrl,
+                caption
+              );
+            } catch (videoError: any) {
+              console.log(`[SCHEDULER] Default video publish failed, trying with intelligent compression`);
+              const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
+              publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
+                instagramAccount.accessToken,
+                mediaUrl,
+                caption
+              );
+            }
           } else {
             publishResult = await instagramAPI.publishPhoto(
               instagramAccount.accessToken,

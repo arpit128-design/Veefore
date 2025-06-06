@@ -520,11 +520,22 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             if (content.type === 'video' && contentData?.mediaUrl) {
               try {
                 console.log(`[POST NOW] Publishing video content to Instagram`);
-                const result = await instagramAPI.publishReel(
-                  instagramAccount.accessToken, 
-                  contentData.mediaUrl, 
-                  contentData.caption || content.description || ''
-                );
+                let result;
+                try {
+                  result = await instagramAPI.publishReel(
+                    instagramAccount.accessToken, 
+                    contentData.mediaUrl, 
+                    contentData.caption || content.description || ''
+                  );
+                } catch (reelError: any) {
+                  console.log(`[POST NOW] Reel publish failed, trying with intelligent compression`);
+                  const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
+                  result = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
+                    instagramAccount.accessToken, 
+                    contentData.mediaUrl, 
+                    contentData.caption || content.description || ''
+                  );
+                }
                 
                 // Update content with success status
                 await storage.updateContent(id, { 
@@ -1118,11 +1129,21 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           caption
         );
       } else if (contentType === 'video') {
-        publishResult = await instagramAPI.publishVideo(
-          instagramAccount.accessToken,
-          videoUrl,
-          caption
-        );
+        try {
+          publishResult = await instagramAPI.publishVideo(
+            instagramAccount.accessToken,
+            videoUrl,
+            caption
+          );
+        } catch (videoError: any) {
+          console.log(`[INSTAGRAM PUBLISH] Video publish failed, trying with intelligent compression`);
+          const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
+          publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
+            instagramAccount.accessToken, 
+            videoUrl, 
+            caption
+          );
+        }
       } else {
         return res.status(400).json({ error: 'Invalid content type. Must be "image" or "video"' });
       }

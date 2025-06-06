@@ -2104,6 +2104,16 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const recentAnalytics = await storage.getAnalyticsByWorkspace(workspaceId);
       const recentContent = await storage.getContentByWorkspace(workspaceId);
       
+      console.log('[AI SUGGESTIONS DEBUG] Data retrieval:');
+      console.log('- Workspace:', workspace?.name);
+      console.log('- Social accounts:', socialAccounts?.length || 0);
+      console.log('- Analytics entries:', recentAnalytics?.length || 0);
+      console.log('- Content entries:', recentContent?.length || 0);
+      
+      if (socialAccounts?.length > 0) {
+        console.log('- Instagram account:', socialAccounts[0]?.username, 'followers:', socialAccounts[0]?.followersCount);
+      }
+      
       // Generate AI-powered suggestions based on real data
       const suggestions = await generateIntelligentSuggestions(workspace, socialAccounts, recentAnalytics, recentContent);
       

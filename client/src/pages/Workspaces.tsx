@@ -12,11 +12,13 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Globe, Settings, Star, Users } from "lucide-react";
+import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
 
 
 
 export default function Workspaces() {
-  const { workspaces, currentWorkspace, setCurrentWorkspace } = useWorkspace();
+  const { workspaces, currentWorkspace, isSwitching, switchWorkspace } = useWorkspace();
+  const [targetWorkspace, setTargetWorkspace] = useState<any>(null);
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -183,7 +185,11 @@ export default function Workspaces() {
                     ? 'border-electric-cyan/50 bg-electric-cyan/10'
                     : 'border-cosmic-blue bg-cosmic-blue hover:bg-space-gray/50'
                 }`}
-                onClick={() => setCurrentWorkspace(workspace)}
+                onClick={async () => {
+            setTargetWorkspace(workspace);
+            await switchWorkspace(workspace);
+            setTargetWorkspace(null);
+          }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">

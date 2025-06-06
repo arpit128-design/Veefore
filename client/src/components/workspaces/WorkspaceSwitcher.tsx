@@ -6,7 +6,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { useLocation } from "wouter";
 
 export function WorkspaceSwitcher() {
-  const { workspaces, currentWorkspace, setCurrentWorkspace } = useWorkspace();
+  const { workspaces, currentWorkspace, switchWorkspace } = useWorkspace();
   const [, setLocation] = useLocation();
 
   if (!currentWorkspace) {
@@ -32,7 +32,7 @@ export function WorkspaceSwitcher() {
         {workspaces.map((workspace) => (
           <DropdownMenuItem
             key={workspace.id}
-            onClick={() => setCurrentWorkspace(workspace)}
+            onClick={() => switchWorkspace(workspace)}
             className={`flex items-center space-x-3 cursor-pointer ${
               currentWorkspace.id === workspace.id ? 'bg-electric-cyan/20' : ''
             }`}

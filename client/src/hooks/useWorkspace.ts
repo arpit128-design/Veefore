@@ -8,18 +8,23 @@ interface WorkspaceContextType {
   currentWorkspace: Workspace | null;
   setCurrentWorkspace: (workspace: Workspace) => void;
   loading: boolean;
+  isSwitching: boolean;
+  switchWorkspace: (workspace: Workspace) => Promise<void>;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType>({
   workspaces: [],
   currentWorkspace: null,
   setCurrentWorkspace: () => {},
-  loading: true
+  loading: true,
+  isSwitching: false,
+  switchWorkspace: async () => {}
 });
 
 export function useWorkspace() {
   const { user, token } = useAuth();
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   const { data: workspaces = [], isLoading } = useQuery({
     queryKey: ['workspaces', user?.id],
@@ -39,11 +44,25 @@ export function useWorkspace() {
     }
   }, [workspaces, currentWorkspace]);
 
+  const switchWorkspace = async (workspace: Workspace) => {
+    if (workspace.id === currentWorkspace?.id) return;
+    
+    setIsSwitching(true);
+    
+    // Create switching animation delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setCurrentWorkspace(workspace);
+    setIsSwitching(false);
+  };
+
   return {
     workspaces,
     currentWorkspace,
     setCurrentWorkspace,
-    loading: isLoading
+    loading: isLoading,
+    isSwitching,
+    switchWorkspace
   };
 }
 

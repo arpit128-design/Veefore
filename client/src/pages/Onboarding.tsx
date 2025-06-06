@@ -303,60 +303,199 @@ export default function Onboarding() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-center space-y-8"
+      className="text-center space-y-12 relative z-10"
     >
-      <div className="space-y-4">
-        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full flex items-center justify-center">
-          <Instagram className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Connect Your Social Media
+      {/* Hero Section with 3D Instagram Icon */}
+      <div className="space-y-8">
+        <motion.div
+          initial={{ scale: 0, rotateY: -180 }}
+          animate={{ scale: 1, rotateY: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="mx-auto relative"
+        >
+          <div className="w-32 h-32 mx-auto relative">
+            {/* Outer Glow Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 p-1"
+            >
+              <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-white/30" />
+            </motion.div>
+            
+            {/* Main Instagram Container with 3D Effect */}
+            <motion.div
+              animate={{ 
+                y: [0, -15, 0],
+                rotateY: [0, 10, 0],
+                boxShadow: [
+                  "0 20px 40px rgba(236, 72, 153, 0.3)",
+                  "0 30px 60px rgba(147, 51, 234, 0.4)", 
+                  "0 20px 40px rgba(236, 72, 153, 0.3)"
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-2 bg-gradient-to-br from-pink-500 via-purple-600 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl"
+            >
+              <Instagram className="w-16 h-16 text-white" />
+            </motion.div>
+            
+            {/* Connection Pulse Effects */}
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-3 h-3 bg-pink-300 rounded-full"
+                style={{
+                  top: "50%",
+                  left: "50%",
+                  transform: `translate(-50%, -50%) rotate(${i * 60}deg) translateY(-100px)`
+                }}
+                animate={{
+                  scale: [0, 1.5, 0],
+                  opacity: [0, 1, 0]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-orange-400 bg-clip-text text-transparent mb-4">
+            Connect Social
           </h1>
-          <p className="text-lg text-gray-600">
+          <motion.p 
+            className="text-xl md:text-2xl text-white/90 font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
             Link your Instagram account to start creating amazing content
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
 
+      {/* Success State with Animation */}
       {Array.isArray(socialAccounts) && socialAccounts.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center justify-center text-green-600 mb-2">
-            <CheckCircle className="w-6 h-6 mr-2" />
-            <span className="font-medium">Instagram Connected Successfully!</span>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: "backOut" }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-center text-green-400 mb-3">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <CheckCircle className="w-8 h-8 mr-3" />
+            </motion.div>
+            <span className="text-xl font-bold">Instagram Connected Successfully!</span>
           </div>
-          <p className="text-sm text-gray-600">
-            Account: @{socialAccounts[0]?.username}
-          </p>
-        </div>
+          <motion.div
+            className="bg-green-500/20 backdrop-blur-md rounded-xl p-4 max-w-sm mx-auto border border-green-400/30"
+            animate={{ boxShadow: ["0 0 20px rgba(34, 197, 94, 0.3)", "0 0 40px rgba(34, 197, 94, 0.5)", "0 0 20px rgba(34, 197, 94, 0.3)"] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <p className="text-green-200 font-medium">
+              Account: @{socialAccounts[0]?.username}
+            </p>
+          </motion.div>
+        </motion.div>
       )}
 
-      <Card className="max-w-md mx-auto">
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center space-x-3">
-                <Instagram className="w-6 h-6 text-pink-600" />
-                <div>
-                  <div className="font-medium">Instagram</div>
-                  <div className="text-sm text-gray-600">Connect your Instagram Business account</div>
+      {/* Enhanced Instagram Connection Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="max-w-lg mx-auto"
+      >
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden group hover:bg-white/15 transition-all duration-500">
+          <CardContent className="p-8 relative">
+            {/* Background Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center space-x-6">
+                <motion.div
+                  className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center relative overflow-hidden"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Instagram className="w-8 h-8 text-white relative z-10" />
+                  
+                  {/* Shimmer Effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    animate={{ x: ["-100%", "100%"] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </motion.div>
+                
+                <div className="text-left">
+                  <div className="text-xl font-bold mb-1">Instagram</div>
+                  <div className="text-white/70">Connect your Instagram Business account</div>
+                  <div className="text-sm text-pink-300 mt-1">✨ AI-powered content creation</div>
                 </div>
               </div>
-              <Button 
-                onClick={() => setLocation('/integrations')}
-                variant="outline"
-                size="sm"
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                Connect
-              </Button>
+                <Button 
+                  onClick={() => setLocation('/integrations')}
+                  className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-pink-500/25 px-6 py-3 text-lg font-medium"
+                >
+                  Connect
+                </Button>
+              </motion.div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      <p className="text-sm text-gray-600 max-w-md mx-auto">
-        You can connect additional platforms later in the Integrations section.
-      </p>
+      {/* Additional Platforms Preview */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="max-w-2xl mx-auto"
+      >
+        <p className="text-white/80 text-lg mb-6">
+          More platforms coming soon
+        </p>
+        
+        <div className="flex justify-center space-x-4">
+          {[
+            { name: "TikTok", color: "from-red-500 to-black", icon: "🎵" },
+            { name: "Twitter", color: "from-blue-400 to-blue-600", icon: "🐦" },
+            { name: "LinkedIn", color: "from-blue-600 to-blue-800", icon: "💼" }
+          ].map((platform, index) => (
+            <motion.div
+              key={platform.name}
+              className={`w-12 h-12 bg-gradient-to-br ${platform.color} rounded-xl flex items-center justify-center opacity-50 relative overflow-hidden`}
+              animate={{ opacity: [0.3, 0.7, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity, delay: index * 0.5 }}
+            >
+              <span className="text-white text-lg">{platform.icon}</span>
+              
+              {/* Coming Soon Badge */}
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full" />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </motion.div>
   );
 
@@ -413,19 +552,54 @@ export default function Onboarding() {
           </CardContent>
         </Card>
 
-        {/* Niche Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Your Niches *</CardTitle>
+        {/* Enhanced Niche Selection with 3D Effects */}
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+          <CardHeader className="text-center pb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto">
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Choose Your Creative Universe
+              </CardTitle>
+              <p className="text-white/70">Select the niches that spark your passion</p>
+            </motion.div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {niches.map((niche) => {
+          <CardContent className="p-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {niches.map((niche, index) => {
                 const Icon = niche.icon;
                 const isSelected = preferences.selectedNiches.includes(niche.id);
+                const colors = [
+                  'from-blue-500 to-cyan-400',
+                  'from-purple-500 to-pink-400',
+                  'from-green-500 to-emerald-400',
+                  'from-orange-500 to-red-400',
+                  'from-indigo-500 to-purple-400',
+                  'from-pink-500 to-rose-400',
+                  'from-cyan-500 to-blue-400',
+                  'from-emerald-500 to-green-400',
+                  'from-rose-500 to-pink-400',
+                  'from-amber-500 to-orange-400',
+                  'from-violet-500 to-purple-400',
+                  'from-teal-500 to-cyan-400',
+                  'from-red-500 to-pink-400',
+                  'from-lime-500 to-green-400',
+                  'from-sky-500 to-blue-400',
+                  'from-fuchsia-500 to-pink-400'
+                ];
+                const colorClass = colors[index % colors.length];
+                
                 return (
-                  <div
+                  <motion.div
                     key={niche.id}
+                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: index * 0.05, duration: 0.4 }}
                     onClick={() => {
                       setPreferences(prev => ({
                         ...prev,
@@ -434,18 +608,135 @@ export default function Onboarding() {
                           : [...prev.selectedNiches, niche.id]
                       }));
                     }}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                    whileHover={{ 
+                      scale: 1.05, 
+                      rotateY: 5,
+                      boxShadow: "0 20px 40px rgba(255, 255, 255, 0.1)"
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`relative p-6 rounded-2xl cursor-pointer transition-all duration-300 group overflow-hidden ${
                       isSelected 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'bg-white/20 backdrop-blur-md border-2 border-white/40 shadow-xl' 
+                        : 'bg-white/5 backdrop-blur-sm border border-white/20 hover:bg-white/10'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 mb-2 ${isSelected ? 'text-blue-600' : 'text-gray-600'}`} />
-                    <div className="text-sm font-medium">{niche.name}</div>
-                  </div>
+                    {/* Background Glow Effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+                    
+                    {/* Selection Ring */}
+                    {isSelected && (
+                      <motion.div
+                        className="absolute inset-0 rounded-2xl border-2 border-white/60"
+                        animate={{ 
+                          boxShadow: [
+                            "0 0 20px rgba(255, 255, 255, 0.3)",
+                            "0 0 30px rgba(255, 255, 255, 0.5)",
+                            "0 0 20px rgba(255, 255, 255, 0.3)"
+                          ]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    )}
+                    
+                    {/* Icon Container with 3D Effect */}
+                    <motion.div
+                      className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center mb-4 mx-auto relative z-10`}
+                      animate={isSelected ? { 
+                        rotateY: [0, 360],
+                        scale: [1, 1.1, 1]
+                      } : {}}
+                      transition={{ duration: 2, repeat: isSelected ? Infinity : 0 }}
+                    >
+                      <Icon className="w-6 h-6 text-white" />
+                      
+                      {/* Shimmer Effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-xl"
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                      />
+                    </motion.div>
+                    
+                    {/* Text Content */}
+                    <div className="text-center relative z-10">
+                      <div className={`text-sm font-bold mb-1 ${isSelected ? 'text-white' : 'text-white/90'}`}>
+                        {niche.name}
+                      </div>
+                      <div className={`text-xs ${isSelected ? 'text-white/80' : 'text-white/60'}`}>
+                        {niche.description}
+                      </div>
+                    </div>
+                    
+                    {/* Selection Checkmark */}
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
+                      >
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      </motion.div>
+                    )}
+                    
+                    {/* Particle Effects for Selected Items */}
+                    {isSelected && (
+                      <div className="absolute inset-0 pointer-events-none">
+                        {[...Array(6)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className="absolute w-1 h-1 bg-white rounded-full"
+                            style={{
+                              top: `${20 + Math.random() * 60}%`,
+                              left: `${20 + Math.random() * 60}%`,
+                            }}
+                            animate={{
+                              y: [-10, -20, -10],
+                              opacity: [0, 1, 0],
+                              scale: [0, 1, 0]
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              delay: i * 0.3,
+                              ease: "easeInOut"
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
                 );
               })}
             </div>
+            
+            {/* Selection Counter */}
+            <motion.div
+              className="mt-8 text-center"
+              animate={{ opacity: preferences.selectedNiches.length > 0 ? 1 : 0.6 }}
+            >
+              <div className="text-white/80">
+                Selected: <span className="font-bold text-white">{preferences.selectedNiches.length}</span> niche{preferences.selectedNiches.length !== 1 ? 's' : ''}
+              </div>
+              {preferences.selectedNiches.length > 0 && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="mt-2 flex flex-wrap justify-center gap-2"
+                >
+                  {preferences.selectedNiches.map((nicheId) => {
+                    const niche = niches.find(n => n.id === nicheId);
+                    return niche ? (
+                      <span
+                        key={nicheId}
+                        className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white border border-white/30"
+                      >
+                        {niche.name}
+                      </span>
+                    ) : null;
+                  })}
+                </motion.div>
+              )}
+            </motion.div>
           </CardContent>
         </Card>
 

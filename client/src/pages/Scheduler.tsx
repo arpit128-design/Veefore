@@ -86,6 +86,12 @@ export default function Scheduler() {
 
   // Fetch social accounts when workspace changes - handle restoration properly
   useEffect(() => {
+    console.log('[SCHEDULER TRACE] Effect triggered - currentWorkspace:', {
+      id: currentWorkspace?.id,
+      name: currentWorkspace?.name,
+      fullObject: currentWorkspace
+    });
+    
     if (currentWorkspace?.id && currentWorkspace?.name) {
       console.log('[SCHEDULER DEBUG] Workspace context updated:', currentWorkspace.id, currentWorkspace.name);
       
@@ -96,13 +102,31 @@ export default function Scheduler() {
           // Small delay to ensure workspace context is stable
           await new Promise(resolve => setTimeout(resolve, 200));
           
-          // Always use the current workspace ID at time of execution
+          // Capture workspace ID at execution time with additional validation
           const workspaceId = currentWorkspace.id;
-          console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', workspaceId, currentWorkspace.name);
+          const workspaceName = currentWorkspace.name;
           
+          console.log('[SCHEDULER TRACE] About to fetch with:');
+          console.log('  - Captured workspaceId:', workspaceId);
+          console.log('  - Captured workspaceName:', workspaceName);
+          console.log('  - Current context ID:', currentWorkspace?.id);
+          console.log('  - Current context name:', currentWorkspace?.name);
+          
+          if (workspaceId !== currentWorkspace?.id) {
+            console.warn('[SCHEDULER WARNING] Workspace ID mismatch detected!');
+            console.warn('  - Captured ID:', workspaceId);
+            console.warn('  - Current context ID:', currentWorkspace?.id);
+          }
+          
+          console.log('[SCHEDULER DEBUG] Making API call with workspaceId:', workspaceId);
           const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${workspaceId}`);
           const accounts = await response.json();
-          console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name, 'ID:', workspaceId);
+          
+          console.log('[SCHEDULER DEBUG] API Response received:');
+          console.log('  - Accounts count:', accounts.length);
+          console.log('  - Accounts:', accounts);
+          console.log('  - For workspace:', workspaceName, 'ID:', workspaceId);
+          
           setSocialAccounts(accounts);
         } catch (error) {
           console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
@@ -114,6 +138,7 @@ export default function Scheduler() {
       
       fetchSocialAccounts();
     } else {
+      console.log('[SCHEDULER TRACE] No workspace context, clearing accounts');
       setSocialAccounts([]);
     }
   }, [currentWorkspace?.id, currentWorkspace?.name]);

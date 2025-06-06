@@ -860,7 +860,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const { user } = req;
       const workspaceId = req.query.workspaceId;
       
-      console.log('[SOCIAL ACCOUNTS] GET request for user:', user.id, 'workspaceId:', workspaceId);
+      console.log('[SOCIAL ACCOUNTS DEBUG] ===== API REQUEST START =====');
+      console.log('[SOCIAL ACCOUNTS DEBUG] User ID:', user.id);
+      console.log('[SOCIAL ACCOUNTS DEBUG] Raw workspaceId param:', workspaceId);
+      console.log('[SOCIAL ACCOUNTS DEBUG] WorkspaceId type:', typeof workspaceId);
+      console.log('[SOCIAL ACCOUNTS DEBUG] Query params:', req.query);
       
       if (!workspaceId) {
         console.log('[SOCIAL ACCOUNTS] No workspaceId provided, using default workspace');
@@ -873,15 +877,31 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.json(accounts);
       }
       
+      console.log('[SOCIAL ACCOUNTS DEBUG] Looking up workspace with ID:', workspaceId);
+      
       // Verify user has access to the requested workspace
       const workspace = await storage.getWorkspace(workspaceId as string);
+      console.log('[SOCIAL ACCOUNTS DEBUG] Found workspace:', workspace ? {
+        id: workspace.id,
+        name: workspace.name,
+        userId: workspace.userId
+      } : null);
+      
       if (!workspace || workspace.userId !== user.id) {
         console.log('[SOCIAL ACCOUNTS] Access denied to workspace:', workspaceId);
+        console.log('[SOCIAL ACCOUNTS DEBUG] Access check failed - workspace exists:', !!workspace, 'user match:', workspace?.userId === user.id);
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
       
+      console.log('[SOCIAL ACCOUNTS DEBUG] Fetching accounts for workspace:', workspaceId);
       const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      console.log('[SOCIAL ACCOUNTS DEBUG] Database returned accounts:');
+      accounts.forEach((account, index) => {
+        console.log(`[SOCIAL ACCOUNTS DEBUG]   ${index + 1}. Platform: ${account.platform}, Username: @${account.username}, WorkspaceId: ${account.workspaceId}`);
+      });
+      
       console.log('[SOCIAL ACCOUNTS] Returning accounts for workspace:', workspaceId, 'count:', accounts.length);
+      console.log('[SOCIAL ACCOUNTS DEBUG] ===== API REQUEST END =====');
       res.json(accounts);
     } catch (error: any) {
       console.error('[SOCIAL ACCOUNTS] Error:', error);

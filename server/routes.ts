@@ -194,13 +194,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                 // Determine media type and configure payload accordingly
                 switch (type) {
                   case 'story':
+                    // Note: Stories require special permissions and may not work with basic Instagram API access
                     mediaPayload.image_url = contentData.mediaUrl;
                     mediaPayload.media_type = 'STORIES';
+                    console.log('[INSTAGRAM API] WARNING: Story publishing requires advanced Instagram API permissions');
                     break;
                   case 'reel':
+                    // Note: Reels require special permissions and may not work with basic Instagram API access
                     mediaPayload.video_url = contentData.mediaUrl;
                     mediaPayload.caption = caption;
                     mediaPayload.media_type = 'REELS';
+                    console.log('[INSTAGRAM API] WARNING: Reel publishing requires advanced Instagram API permissions');
                     break;
                   case 'video':
                     mediaPayload.video_url = contentData.mediaUrl;
@@ -265,12 +269,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   message: 'Content published to Instagram successfully'
                 });
               } catch (instagramError: any) {
-                console.log('[CONTENT API] Instagram API error:', instagramError.message);
+                console.error('[CONTENT API] Instagram API error for', type, 'content:', instagramError.message);
+                console.error('[CONTENT API] Full error details:', instagramError);
                 return res.json({
                   success: true,
                   content,
                   published: false,
-                  message: 'Content saved but Instagram publishing failed',
+                  message: `Content saved but Instagram ${type} publishing failed: ${instagramError.message}`,
                   publishingError: instagramError.message
                 });
               }

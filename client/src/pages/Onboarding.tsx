@@ -211,7 +211,7 @@ export default function Onboarding() {
         title: 'Welcome to VeeFore!',
         description: 'Your onboarding is complete. Redirecting to dashboard...'
       });
-      setTimeout(() => setLocation('/dashboard'), 2000);
+      setTimeout(() => setLocation('/dashboard'), 1000);
     },
     onError: () => {
       toast({

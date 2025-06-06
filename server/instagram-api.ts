@@ -344,6 +344,139 @@ export class InstagramAPI {
     }
   }
 
+  // Publish reel to Instagram
+  async publishReel(accessToken: string, videoUrl: string, caption: string): Promise<{
+    id: string;
+    permalink?: string;
+  }> {
+    try {
+      console.log(`[INSTAGRAM PUBLISH] Starting reel upload process`);
+      
+      // Step 1: Create reel media container
+      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
+        video_url: videoUrl,
+        caption: caption,
+        media_type: 'REELS',
+        access_token: accessToken
+      });
+
+      const containerId = containerResponse.data.id;
+      console.log(`[INSTAGRAM PUBLISH] Reel container created: ${containerId}`);
+
+      // Step 2: Check container status (reels need processing time)
+      let containerReady = false;
+      let attempts = 0;
+      const maxAttempts = 15; // Reels may take longer to process
+
+      while (!containerReady && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds for reels
+        
+        const statusResponse = await axios.get(`${this.baseUrl}/${containerId}`, {
+          params: {
+            fields: 'status_code',
+            access_token: accessToken
+          }
+        });
+
+        console.log(`[INSTAGRAM PUBLISH] Reel status check ${attempts + 1}:`, statusResponse.data.status_code);
+
+        if (statusResponse.data.status_code === 'FINISHED') {
+          containerReady = true;
+        } else if (statusResponse.data.status_code === 'ERROR') {
+          throw new Error('Reel processing failed');
+        }
+        
+        attempts++;
+      }
+
+      if (!containerReady) {
+        throw new Error('Reel processing timeout');
+      }
+
+      // Step 3: Publish the reel container
+      const publishResponse = await axios.post(`${this.baseUrl}/me/media_publish`, {
+        creation_id: containerId,
+        access_token: accessToken
+      });
+
+      console.log(`[INSTAGRAM PUBLISH] Reel published successfully:`, publishResponse.data);
+      return publishResponse.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM PUBLISH] Reel publish failed:`, error.response?.data || error.message);
+      throw new Error(`Instagram reel publish failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  // Publish story to Instagram
+  async publishStory(accessToken: string, mediaUrl: string, isVideo: boolean = false): Promise<{
+    id: string;
+    permalink?: string;
+  }> {
+    try {
+      console.log(`[INSTAGRAM PUBLISH] Starting story upload process (${isVideo ? 'video' : 'image'})`);
+      
+      // Step 1: Create story media container
+      const mediaData: any = {
+        access_token: accessToken
+      };
+
+      if (isVideo) {
+        mediaData.video_url = mediaUrl;
+        mediaData.media_type = 'STORIES';
+      } else {
+        mediaData.image_url = mediaUrl;
+        mediaData.media_type = 'STORIES';
+      }
+
+      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, mediaData);
+
+      const containerId = containerResponse.data.id;
+      console.log(`[INSTAGRAM PUBLISH] Story container created: ${containerId}`);
+
+      // Step 2: For video stories, check processing status
+      if (isVideo) {
+        let containerReady = false;
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        while (!containerReady && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          
+          const statusResponse = await axios.get(`${this.baseUrl}/${containerId}`, {
+            params: {
+              fields: 'status_code',
+              access_token: accessToken
+            }
+          });
+
+          if (statusResponse.data.status_code === 'FINISHED') {
+            containerReady = true;
+          } else if (statusResponse.data.status_code === 'ERROR') {
+            throw new Error('Story video processing failed');
+          }
+          
+          attempts++;
+        }
+
+        if (!containerReady) {
+          throw new Error('Story video processing timeout');
+        }
+      }
+
+      // Step 3: Publish the story container
+      const publishResponse = await axios.post(`${this.baseUrl}/me/media_publish`, {
+        creation_id: containerId,
+        access_token: accessToken
+      });
+
+      console.log(`[INSTAGRAM PUBLISH] Story published successfully:`, publishResponse.data);
+      return publishResponse.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM PUBLISH] Story publish failed:`, error.response?.data || error.message);
+      throw new Error(`Instagram story publish failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
   // Publish video to Instagram
   async publishVideo(accessToken: string, videoUrl: string, caption: string): Promise<{
     id: string;

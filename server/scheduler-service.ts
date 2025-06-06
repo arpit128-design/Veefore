@@ -105,14 +105,45 @@ export class SchedulerService {
         return;
       }
 
-      // Publish to Instagram
-      const publishResult = await instagramAPI.publishPhoto(
-        instagramAccount.accessToken,
-        content.contentData.mediaUrl,
-        `${content.title}\n\n${content.description || ''}`
-      );
+      // Publish to Instagram based on content type
+      let publishResult;
+      const caption = `${content.title}\n\n${content.description || ''}`;
+      
+      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram`);
+      
+      switch (content.type) {
+        case 'story':
+          publishResult = await instagramAPI.publishStory(
+            instagramAccount.accessToken,
+            content.contentData.mediaUrl,
+            false // Assuming image stories for now
+          );
+          break;
+        case 'reel':
+          publishResult = await instagramAPI.publishReel(
+            instagramAccount.accessToken,
+            content.contentData.mediaUrl,
+            caption
+          );
+          break;
+        case 'video':
+          publishResult = await instagramAPI.publishVideo(
+            instagramAccount.accessToken,
+            content.contentData.mediaUrl,
+            caption
+          );
+          break;
+        case 'post':
+        default:
+          publishResult = await instagramAPI.publishPhoto(
+            instagramAccount.accessToken,
+            content.contentData.mediaUrl,
+            caption
+          );
+          break;
+      }
 
-      console.log(`[SCHEDULER] Successfully published content ${content.id} to Instagram:`, publishResult.id);
+      console.log(`[SCHEDULER] Successfully published ${content.type || 'post'} content ${content.id} to Instagram:`, publishResult.id);
 
       // Update content status
       await this.updateContentStatus(content.id, 'published', null, publishResult.id);

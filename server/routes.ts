@@ -184,15 +184,42 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   throw new Error('Blob URLs cannot be published to Instagram. Please upload an image file.');
                 }
                 
-                // Create Instagram media container
+                // Create Instagram media container based on content type
+                let mediaPayload: any = {
+                  access_token: instagramAccount.accessToken
+                };
+
+                const caption = `${title}\n\n${description || ''}`;
+
+                // Determine media type and configure payload accordingly
+                switch (type) {
+                  case 'story':
+                    mediaPayload.image_url = contentData.mediaUrl;
+                    mediaPayload.media_type = 'STORIES';
+                    break;
+                  case 'reel':
+                    mediaPayload.video_url = contentData.mediaUrl;
+                    mediaPayload.caption = caption;
+                    mediaPayload.media_type = 'REELS';
+                    break;
+                  case 'video':
+                    mediaPayload.video_url = contentData.mediaUrl;
+                    mediaPayload.caption = caption;
+                    mediaPayload.media_type = 'VIDEO';
+                    break;
+                  case 'post':
+                  default:
+                    mediaPayload.image_url = contentData.mediaUrl;
+                    mediaPayload.caption = caption;
+                    break;
+                }
+
+                console.log(`[INSTAGRAM API] Creating ${type} media container with payload:`, { ...mediaPayload, access_token: '[HIDDEN]' });
+
                 const createMediaResponse = await fetch(`https://graph.instagram.com/v18.0/${instagramAccount.accountId}/media`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    image_url: contentData.mediaUrl,
-                    caption: `${title}\n\n${description || ''}`,
-                    access_token: instagramAccount.accessToken
-                  })
+                  body: JSON.stringify(mediaPayload)
                 });
 
                 console.log('[INSTAGRAM API] Create media response status:', createMediaResponse.status);

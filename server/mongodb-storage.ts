@@ -3,9 +3,11 @@ import { IStorage } from "./storage";
 import {
   User, Workspace, SocialAccount, Content, Analytics, AutomationRule,
   Suggestion, CreditTransaction, Referral, Subscription, Payment, Addon,
+  WorkspaceMember, TeamInvitation,
   InsertUser, InsertWorkspace, InsertSocialAccount, InsertContent,
   InsertAutomationRule, InsertAnalytics, InsertSuggestion,
-  InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon
+  InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon,
+  InsertWorkspaceMember, InsertTeamInvitation
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -1085,6 +1087,172 @@ export class MongoStorage implements IStorage {
       isActive: doc.isActive || null,
       expiresAt: doc.expiresAt || null,
       metadata: doc.metadata || null,
+      createdAt: doc.createdAt || null
+    };
+  }
+
+  // Team management operations
+  async getWorkspaceByInviteCode(inviteCode: string): Promise<Workspace | undefined> {
+    await this.connect();
+    const workspace = await WorkspaceModel.findOne({ inviteCode });
+    return workspace ? this.convertWorkspace(workspace) : undefined;
+  }
+
+  async getWorkspaceMember(workspaceId: number | string, userId: number | string): Promise<WorkspaceMember | undefined> {
+    await this.connect();
+    const member = await WorkspaceMemberModel.findOne({ 
+      workspaceId: workspaceId.toString(), 
+      userId: userId.toString() 
+    });
+    return member ? this.convertWorkspaceMember(member) : undefined;
+  }
+
+  async getWorkspaceMembers(workspaceId: number | string): Promise<(WorkspaceMember & { user: User })[]> {
+    await this.connect();
+    const members = await WorkspaceMemberModel.find({ 
+      workspaceId: workspaceId.toString() 
+    });
+    
+    const result = [];
+    for (const member of members) {
+      const user = await this.getUser(member.userId);
+      if (user) {
+        result.push({
+          ...this.convertWorkspaceMember(member),
+          user
+        });
+      }
+    }
+    
+    return result;
+  }
+
+  async addWorkspaceMember(member: InsertWorkspaceMember): Promise<WorkspaceMember> {
+    await this.connect();
+    
+    const memberData = {
+      ...member,
+      id: Date.now(),
+      status: 'active',
+      joinedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const newMember = new WorkspaceMemberModel(memberData);
+    await newMember.save();
+    
+    return this.convertWorkspaceMember(newMember);
+  }
+
+  async updateWorkspaceMember(workspaceId: number | string, userId: number | string, updates: Partial<WorkspaceMember>): Promise<WorkspaceMember> {
+    await this.connect();
+    
+    const updatedMember = await WorkspaceMemberModel.findOneAndUpdate(
+      { workspaceId: workspaceId.toString(), userId: userId.toString() },
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!updatedMember) {
+      throw new Error(`Workspace member not found`);
+    }
+    
+    return this.convertWorkspaceMember(updatedMember);
+  }
+
+  async removeWorkspaceMember(workspaceId: number | string, userId: number | string): Promise<void> {
+    await this.connect();
+    await WorkspaceMemberModel.deleteOne({ 
+      workspaceId: workspaceId.toString(), 
+      userId: userId.toString() 
+    });
+  }
+
+  async createTeamInvitation(invitation: InsertTeamInvitation): Promise<TeamInvitation> {
+    await this.connect();
+    
+    const invitationData = {
+      ...invitation,
+      id: Date.now(),
+      status: 'pending',
+      createdAt: new Date()
+    };
+
+    const newInvitation = new TeamInvitationModel(invitationData);
+    await newInvitation.save();
+    
+    return this.convertTeamInvitation(newInvitation);
+  }
+
+  async getTeamInvitation(id: number): Promise<TeamInvitation | undefined> {
+    await this.connect();
+    const invitation = await TeamInvitationModel.findOne({ id });
+    return invitation ? this.convertTeamInvitation(invitation) : undefined;
+  }
+
+  async getTeamInvitationByToken(token: string): Promise<TeamInvitation | undefined> {
+    await this.connect();
+    const invitation = await TeamInvitationModel.findOne({ token });
+    return invitation ? this.convertTeamInvitation(invitation) : undefined;
+  }
+
+  async getTeamInvitations(workspaceId: number | string, status?: string): Promise<TeamInvitation[]> {
+    await this.connect();
+    const query: any = { workspaceId: workspaceId.toString() };
+    if (status) {
+      query.status = status;
+    }
+    
+    const invitations = await TeamInvitationModel.find(query)
+      .sort({ createdAt: -1 });
+    
+    return invitations.map(this.convertTeamInvitation);
+  }
+
+  async updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation> {
+    await this.connect();
+    
+    const updatedInvitation = await TeamInvitationModel.findOneAndUpdate(
+      { id },
+      updates,
+      { new: true }
+    );
+    
+    if (!updatedInvitation) {
+      throw new Error(`Team invitation with id ${id} not found`);
+    }
+    
+    return this.convertTeamInvitation(updatedInvitation);
+  }
+
+  private convertWorkspaceMember(doc: any): WorkspaceMember {
+    return {
+      id: doc._id?.toString() || doc.id,
+      userId: parseInt(doc.userId),
+      workspaceId: parseInt(doc.workspaceId),
+      role: doc.role,
+      status: doc.status || null,
+      permissions: doc.permissions || null,
+      invitedBy: doc.invitedBy || null,
+      joinedAt: doc.joinedAt || null,
+      createdAt: doc.createdAt || null,
+      updatedAt: doc.updatedAt || null
+    };
+  }
+
+  private convertTeamInvitation(doc: any): TeamInvitation {
+    return {
+      id: doc._id?.toString() || doc.id,
+      workspaceId: parseInt(doc.workspaceId),
+      email: doc.email,
+      role: doc.role,
+      status: doc.status || null,
+      token: doc.token,
+      expiresAt: doc.expiresAt,
+      invitedBy: doc.invitedBy,
+      permissions: doc.permissions || null,
+      acceptedAt: doc.acceptedAt || null,
       createdAt: doc.createdAt || null
     };
   }

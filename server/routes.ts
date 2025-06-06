@@ -2355,7 +2355,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Get pending invitations
   app.get('/api/workspaces/:workspaceId/invitations', requireAuth, async (req: any, res: Response) => {
     try {
-      const workspaceId = parseInt(req.params.workspaceId);
+      const workspaceId = req.params.workspaceId;
       const userId = req.user.id;
 
       const workspace = await storage.getWorkspace(workspaceId);

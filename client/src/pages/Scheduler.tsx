@@ -31,7 +31,7 @@ interface ScheduleForm {
 }
 
 export default function Scheduler() {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace, workspaces } = useWorkspace();
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState("calendar");

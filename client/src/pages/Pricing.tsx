@@ -118,7 +118,7 @@ export default function Pricing() {
     mutationFn: async (planId: string) => {
       return apiRequest('POST', '/api/subscription/create-order', { planId });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data && window.Razorpay) {
         const options = {
           key: data.key,
@@ -151,8 +151,8 @@ export default function Pricing() {
             }
           },
           prefill: {
-            name: userSubscription?.user?.displayName || '',
-            email: userSubscription?.user?.email || '',
+            name: '',
+            email: '',
           },
           theme: {
             color: '#6366f1',
@@ -180,7 +180,7 @@ export default function Pricing() {
 
   // Handle plan selection
   const handlePlanSelect = (planId: string) => {
-    const currentPlan = userSubscription?.plan || 'free';
+    const currentPlan = (userSubscription as any)?.plan || 'free';
     if (currentPlan === planId) return;
     
     if (planId === 'free') {
@@ -373,15 +373,15 @@ export default function Pricing() {
                 <h3 className="text-lg font-semibold text-white mb-2">Current Plan</h3>
                 <div className="flex items-center justify-center gap-4">
                   <Badge className="bg-blue-500/20 text-blue-300 px-4 py-2 text-base">
-                    {userSubscription.plan || 'Free'}
+                    {(userSubscription as any)?.plan || 'Free'}
                   </Badge>
                   <div className="text-slate-300">
-                    <span className="font-medium">{userSubscription.credits || 0}</span> credits remaining
+                    <span className="font-medium">{(userSubscription as any)?.credits || 0}</span> credits remaining
                   </div>
                 </div>
-                {userSubscription.currentPeriodEnd && (
+                {(userSubscription as any)?.currentPeriodEnd && (
                   <p className="text-slate-400 text-sm mt-2">
-                    Renews on {new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}
+                    Renews on {new Date((userSubscription as any).currentPeriodEnd).toLocaleDateString()}
                   </p>
                 )}
               </CardContent>
@@ -606,16 +606,16 @@ export default function Pricing() {
                                       : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
                               }`}
                               onClick={() => handlePlanSelect(plan.id)}
-                              disabled={userSubscription?.plan === plan.id || createSubscriptionMutation.isPending}
+                              disabled={(userSubscription as any)?.plan === plan.id || createSubscriptionMutation.isPending}
                             >
                               <span className="flex items-center justify-center gap-2">
-                                {userSubscription?.plan === plan.id 
+                                {(userSubscription as any)?.plan === plan.id 
                                   ? 'Current Plan' 
                                   : plan.price === 0 
                                   ? 'Get Started' 
                                   : 'Choose Plan'
                                 }
-                                {userSubscription?.plan !== plan.id && plan.price > 0 && (
+                                {(userSubscription as any)?.plan !== plan.id && plan.price > 0 && (
                                   <Rocket className="w-4 h-4" />
                                 )}
                               </span>

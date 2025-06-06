@@ -159,12 +159,16 @@ Focus on data-driven insights and practical actions they can take immediately.`;
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   
   const response = await model.generateContent(prompt);
-  const responseText = response.response.text();
+  let responseText = response.response.text();
+
+  // Clean up markdown formatting from Gemini response
+  responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
   try {
     return JSON.parse(responseText);
   } catch (parseError) {
     console.error('[AI SUGGESTIONS] Failed to parse AI response:', parseError);
+    console.error('[AI SUGGESTIONS] Raw response:', responseText);
     throw new Error('Invalid AI response format');
   }
 }

@@ -93,6 +93,15 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
+  // Force refresh queries when workspace changes
+  useEffect(() => {
+    if (currentWorkspace?.id && currentWorkspace?.name) {
+      console.log('[SCHEDULER DEBUG] Workspace changed, invalidating queries for:', currentWorkspace.id, currentWorkspace.name);
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+    }
+  }, [currentWorkspace?.id, currentWorkspace?.name, queryClient]);
+
   // Update platform selection when workspace or social accounts change
   useEffect(() => {
     if (socialAccounts && socialAccounts.length > 0 && currentWorkspace?.id) {

@@ -565,16 +565,55 @@ export class InstagramAPI {
         }
       }
       
-      // Step 1: Create video media container - use REELS as VIDEO is deprecated
+      // Step 1: Create video media container - try VIDEO first, fallback to REELS
       const containerPayload = {
         video_url: currentVideoUrl,
         caption: caption,
-        media_type: 'REELS', // Instagram now requires REELS instead of deprecated VIDEO
+        media_type: 'VIDEO', // Try VIDEO first for better compatibility
         access_token: accessToken
       };
 
       console.log(`[INSTAGRAM API] Creating video container`);
-      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, containerPayload);
+      
+      let containerResponse;
+      try {
+        containerResponse = await axios.post(`${this.baseUrl}/me/media`, containerPayload);
+      } catch (containerError: any) {
+        // Check if this is a video rejection that could be resolved with compression
+        const isVideoRejection = containerError.response?.status === 400 || 
+                                 containerError.response?.data?.error?.message?.includes('Invalid parameter') ||
+                                 containerError.response?.data?.error?.message?.includes('video');
+        
+        if (isVideoRejection && !isRetryWithCompression) {
+          console.log(`[INSTAGRAM PUBLISH] Video rejected by Instagram - activating intelligent compression`);
+          
+          const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+          if (isLocalFile) {
+            const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+            
+            if (fs.existsSync(localPath)) {
+              try {
+                const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                  quality: 'high',
+                  targetSizeMB: 25,
+                  maintainAspectRatio: true
+                });
+                
+                if (compressionResult.success && compressionResult.outputPath) {
+                  console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                  
+                  const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                  return this.publishVideo(accessToken, compressedUrl, caption, true);
+                }
+              } catch (compressionError: any) {
+                console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);
+              }
+            }
+          }
+        }
+        
+        throw containerError;
+      }
 
       const containerId = containerResponse.data.id;
       console.log(`[INSTAGRAM PUBLISH] Video container created: ${containerId}`);
@@ -602,6 +641,37 @@ export class InstagramAPI {
           if (statusResponse.data.status_code === 'FINISHED') {
             containerReady = true;
           } else if (statusResponse.data.status_code === 'ERROR') {
+            // Trigger intelligent compression when Instagram processing fails
+            if (!isRetryWithCompression) {
+              console.log(`[INSTAGRAM PUBLISH] Instagram processing failed - activating intelligent video compression`);
+              
+              const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
+              if (isLocalFile) {
+                const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
+                
+                if (fs.existsSync(localPath)) {
+                  try {
+                    // Import VideoCompressor
+                    const { VideoCompressor } = await import('./video-compression');
+                    
+                    const compressionResult = await VideoCompressor.compressForInstagram(localPath, {
+                      quality: 'high',
+                      targetSizeMB: 25,
+                      maintainAspectRatio: true
+                    });
+                    
+                    if (compressionResult.success && compressionResult.outputPath) {
+                      console.log(`[INSTAGRAM PUBLISH] Video compressed from ${(compressionResult.originalSize / 1024 / 1024).toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
+                      
+                      const compressedUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                      return await this.publishVideo(accessToken, compressedUrl, caption, true);
+                    }
+                  } catch (compressionError: any) {
+                    console.error(`[INSTAGRAM PUBLISH] Video compression failed:`, compressionError.message);
+                  }
+                }
+              }
+            }
             throw new Error('Video processing failed on Instagram servers');
           }
         } catch (statusError: any) {

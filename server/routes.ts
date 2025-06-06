@@ -1132,6 +1132,38 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Create workspace
+  app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { name, description, theme } = req.body;
+
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'Workspace name is required' });
+      }
+
+      console.log(`[WORKSPACES] Creating workspace for user ${user.id}:`, { name, description, theme });
+
+      const workspaceData = {
+        userId: user.id,
+        name: name.trim(),
+        description: description?.trim() || null,
+        theme: theme || 'default',
+        isDefault: false,
+        credits: 50 // Give new workspaces 50 credits to start
+      };
+
+      const newWorkspace = await storage.createWorkspace(workspaceData);
+      
+      console.log(`[WORKSPACES] Created workspace ${newWorkspace.id}: ${newWorkspace.name}`);
+      
+      res.json(newWorkspace);
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error creating workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Publish content to Instagram
   app.post('/api/instagram/publish', requireAuth, async (req: any, res: Response) => {
     try {

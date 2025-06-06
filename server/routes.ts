@@ -128,20 +128,34 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.post('/api/content', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
+      
+      console.log('[CONTENT API] Full request body:', JSON.stringify(req.body, null, 2));
+      console.log('[CONTENT API] Request body type:', typeof req.body);
+      console.log('[CONTENT API] Request body keys:', Object.keys(req.body || {}));
+      
       const { workspaceId, title, description, type, platform, scheduledAt, publishNow, contentData } = req.body;
 
-      console.log('[CONTENT API] Request body validation:', {
+      console.log('[CONTENT API] Extracted values:', {
         workspaceId,
         workspaceIdType: typeof workspaceId,
         title,
         titleType: typeof title,
+        description,
+        type,
+        platform,
+        scheduledAt,
+        publishNow,
+        contentData,
         hasWorkspaceId: !!workspaceId,
         hasTitle: !!title
       });
 
       if (!workspaceId || !title) {
         console.log('[CONTENT API] Validation failed - missing required fields');
-        return res.status(400).json({ error: 'Workspace ID and title are required' });
+        return res.status(400).json({ 
+          error: 'Workspace ID and title are required',
+          received: { workspaceId, title, bodyType: typeof req.body }
+        });
       }
 
       console.log('[CONTENT API] Creating content:', { workspaceId, title, type, platform, scheduledAt, publishNow });
@@ -800,6 +814,84 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error: any) {
       console.error('[WORKSPACES] Error:', error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Publish content to Instagram
+  app.post('/api/instagram/publish', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId, contentType, imageUrl, videoUrl, caption } = req.body;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      if (!caption) {
+        return res.status(400).json({ error: 'Caption is required' });
+      }
+
+      if (contentType === 'image' && !imageUrl) {
+        return res.status(400).json({ error: 'Image URL is required for image posts' });
+      }
+
+      if (contentType === 'video' && !videoUrl) {
+        return res.status(400).json({ error: 'Video URL is required for video posts' });
+      }
+
+      // Get Instagram account for this workspace
+      const instagramAccount = await storage.getSocialAccountByPlatform(workspaceId, 'instagram');
+      if (!instagramAccount) {
+        return res.status(404).json({ error: 'Instagram account not connected for this workspace' });
+      }
+
+      console.log(`[INSTAGRAM PUBLISH] Publishing ${contentType} to @${instagramAccount.username}`);
+
+      let publishResult;
+      if (contentType === 'image') {
+        publishResult = await instagramAPI.publishPhoto(
+          instagramAccount.accessToken,
+          imageUrl,
+          caption
+        );
+      } else if (contentType === 'video') {
+        publishResult = await instagramAPI.publishVideo(
+          instagramAccount.accessToken,
+          videoUrl,
+          caption
+        );
+      } else {
+        return res.status(400).json({ error: 'Invalid content type. Must be "image" or "video"' });
+      }
+
+      console.log(`[INSTAGRAM PUBLISH] Successfully published to Instagram:`, publishResult);
+
+      // Save the published content to database
+      const contentData = {
+        workspaceId: parseInt(workspaceId),
+        platform: 'instagram' as const,
+        content: caption,
+        mediaUrl: imageUrl || videoUrl,
+        status: 'published' as const,
+        scheduledFor: new Date(),
+        publishedAt: new Date(),
+        instagramPostId: publishResult.id
+      };
+
+      const savedContent = await storage.createContent(contentData);
+
+      res.json({
+        success: true,
+        publishResult,
+        content: savedContent,
+        message: `Successfully published ${contentType} to Instagram @${instagramAccount.username}`
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM PUBLISH] Publish error:', error);
+      res.status(500).json({ 
+        error: 'Failed to publish to Instagram', 
+        details: error.message 
+      });
     }
   });
 

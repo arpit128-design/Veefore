@@ -89,31 +89,27 @@ export default function Scheduler() {
     if (currentWorkspace?.id && currentWorkspace?.name) {
       console.log('[SCHEDULER DEBUG] Workspace context updated:', currentWorkspace.id, currentWorkspace.name);
       
-      // Only fetch if this is not the temporary default workspace
-      if (currentWorkspace.name !== 'My VeeFore Workspace') {
-        console.log('[SCHEDULER DEBUG] Fetching social accounts for restored workspace:', currentWorkspace.id, currentWorkspace.name);
-        setSocialAccountsLoading(true);
-        
-        const fetchSocialAccounts = async () => {
-          try {
-            const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
-            const accounts = await response.json();
-            console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name, 'ID:', currentWorkspace.id);
-            setSocialAccounts(accounts);
-          } catch (error) {
-            console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
-            setSocialAccounts([]);
-          } finally {
-            setSocialAccountsLoading(false);
-          }
-        };
-        
-        fetchSocialAccounts();
-      } else {
-        // Clear accounts for default workspace during restoration
-        console.log('[SCHEDULER DEBUG] Clearing accounts for default workspace during restoration');
-        setSocialAccounts([]);
-      }
+      // Always fetch social accounts for any workspace (including restored ones)
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
+      setSocialAccountsLoading(true);
+      
+      const fetchSocialAccounts = async () => {
+        try {
+          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
+          const accounts = await response.json();
+          console.log('[SCHEDULER DEBUG] Retrieved social accounts:', accounts, 'for workspace:', currentWorkspace.name, 'ID:', currentWorkspace.id);
+          setSocialAccounts(accounts);
+        } catch (error) {
+          console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
+          setSocialAccounts([]);
+        } finally {
+          setSocialAccountsLoading(false);
+        }
+      };
+      
+      fetchSocialAccounts();
+    } else {
+      setSocialAccounts([]);
     }
   }, [currentWorkspace?.id, currentWorkspace?.name]);
 

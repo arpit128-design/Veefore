@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { Workspace } from '@shared/schema';
 
@@ -75,6 +75,7 @@ export function useWorkspace() {
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { user, token } = useAuth();
+  const queryClient = useQueryClient();
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [isSwitching, setIsSwitching] = useState(false);
 
@@ -114,12 +115,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     
     // Invalidate all workspace-dependent queries to force refresh
     console.log('[WORKSPACE PROVIDER] Invalidating all workspace-dependent queries');
-    queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
-    queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['analytics-realtime'] });
-    queryClient.invalidateQueries({ queryKey: ['content'] });
-    queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+    try {
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics-realtime'] });
+      queryClient.invalidateQueries({ queryKey: ['content'] });
+      queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+      console.log('[WORKSPACE PROVIDER] Query cache invalidated successfully');
+    } catch (error) {
+      console.error('[WORKSPACE PROVIDER] Error invalidating queries:', error);
+    }
     
     setIsSwitching(false);
     console.log('[WORKSPACE PROVIDER] Workspace switch completed');

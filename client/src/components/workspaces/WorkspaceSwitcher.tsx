@@ -9,6 +9,9 @@ export function WorkspaceSwitcher() {
   const { workspaces, currentWorkspace, switchWorkspace } = useWorkspaceContext();
   const [, setLocation] = useLocation();
 
+  console.log('[WORKSPACE SWITCHER] Current workspace:', currentWorkspace?.name);
+  console.log('[WORKSPACE SWITCHER] Available workspaces:', workspaces.map(w => w.name));
+
   if (!currentWorkspace) {
     return (
       <div className="glassmorphism px-4 py-2 rounded-lg animate-pulse">

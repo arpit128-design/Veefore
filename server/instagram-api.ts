@@ -543,7 +543,7 @@ export class InstagramAPI {
     isRetryWithCompression: boolean = false
   ): Promise<{ id: string; permalink?: string; }> {
     try {
-      const currentVideoUrl = videoUrl;
+      let currentVideoUrl = videoUrl;
       
       if (isRetryWithCompression) {
         console.log(`[INSTAGRAM PUBLISH] Retrying with compressed video`);
@@ -571,7 +571,8 @@ export class InstagramAPI {
                 if (compressionResult.success && compressionResult.outputPath) {
                   console.log(`[INSTAGRAM PUBLISH] Video compressed from ${fileSizeMB.toFixed(2)}MB to ${(compressionResult.compressedSize! / 1024 / 1024).toFixed(2)}MB`);
                   
-                  currentVideoUrl = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                  const compressedPath = compressionResult.outputPath.replace(process.cwd(), '').replace(/\\/g, '/');
+                  currentVideoUrl = compressedPath.startsWith('/') ? compressedPath : '/' + compressedPath;
                   console.log(`[INSTAGRAM PUBLISH] Using compressed video: ${currentVideoUrl}`);
                 }
               } catch (compressionError: any) {
@@ -583,12 +584,16 @@ export class InstagramAPI {
       }
       
       // Step 1: Create video media container - use REELS as VIDEO is deprecated
+      const fullVideoUrl = currentVideoUrl.startsWith('http') ? currentVideoUrl : `http://15a46e73-e0eb-45c2-8225-17edc84946f6-00-1dy2h828k4y1r.worf.replit.dev${currentVideoUrl}`;
+      
       const containerPayload = {
-        video_url: videoUrl.startsWith('http') ? videoUrl : `http://15a46e73-e0eb-45c2-8225-17edc84946f6-00-1dy2h828k4y1r.worf.replit.dev${currentVideoUrl}`,
+        video_url: fullVideoUrl,
         caption: caption,
-        media_type: 'REELS', // Instagram now requires REELS instead of deprecated VIDEO
+        media_type: 'REELS',
         access_token: accessToken
       };
+      
+      console.log(`[INSTAGRAM API] Using video URL: ${fullVideoUrl}`);
 
       console.log(`[INSTAGRAM API] Creating video container`);
       

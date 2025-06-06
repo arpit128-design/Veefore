@@ -21,6 +21,7 @@ import Integrations from "@/pages/Integrations";
 import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Auth from "@/pages/Auth";
+import Onboarding from "@/pages/Onboarding";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";

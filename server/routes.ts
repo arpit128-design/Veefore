@@ -83,7 +83,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       // Check if existing user has at least one workspace, create default if not
       try {
-        const userWorkspaces = await storage.getWorkspacesByUser(user.id);
+        const userWorkspaces = await storage.getWorkspacesByUserId(user.id);
         if (userWorkspaces.length === 0) {
           console.log(`[AUTH DEBUG] User ${user.id} has no workspaces, creating default workspace`);
           const defaultWorkspace = await storage.createWorkspace({
@@ -114,6 +114,32 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.json(user);
     } catch (error: any) {
       console.error('[USER API] Error fetching user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Complete user onboarding
+  app.post('/api/user/complete-onboarding', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { preferences } = req.body;
+      
+      console.log('[ONBOARDING] Completing onboarding for user:', user.id);
+      
+      if (!preferences) {
+        return res.status(400).json({ error: 'Preferences are required' });
+      }
+      
+      // Update user with onboarding status and preferences
+      const updatedUser = await storage.updateUser(user.id, {
+        isOnboarded: true,
+        preferences: preferences
+      });
+      
+      console.log('[ONBOARDING] Successfully completed onboarding for user:', user.id);
+      res.json({ success: true, user: updatedUser });
+    } catch (error: any) {
+      console.error('[ONBOARDING] Error completing onboarding:', error);
       res.status(500).json({ error: error.message });
     }
   });

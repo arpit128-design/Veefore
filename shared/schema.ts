@@ -17,6 +17,8 @@ export const users = pgTable("users", {
   referredBy: text("referred_by"),
   totalReferrals: integer("total_referrals").default(0),
   totalEarned: integer("total_earned").default(0),
+  isOnboarded: boolean("is_onboarded").default(false),
+  preferences: json("preferences"), // User preferences for AI personalization
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });

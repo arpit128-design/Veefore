@@ -479,8 +479,28 @@ export default function Scheduler() {
       }, 10000);
     }
 
+    // Get the correct workspace ID from localStorage (same logic as modal)
+    let targetWorkspaceId = currentWorkspace?.id;
+    
+    try {
+      if (user?.id) {
+        const storageKey = `veefore_current_workspace_${user.id}`;
+        const savedWorkspace = localStorage.getItem(storageKey);
+        
+        if (savedWorkspace) {
+          const parsedWorkspace = JSON.parse(savedWorkspace);
+          if (parsedWorkspace && parsedWorkspace.id) {
+            targetWorkspaceId = parsedWorkspace.id;
+            console.log('[FORM SUBMIT] Using localStorage workspace:', parsedWorkspace.name, parsedWorkspace.id);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('[FORM SUBMIT] localStorage error, using context workspace:', error);
+    }
+
     createContentMutation.mutate({
-      workspaceId: currentWorkspace?.id,
+      workspaceId: targetWorkspaceId,
       title: scheduleForm.title,
       description: scheduleForm.description,
       type: scheduleForm.type,

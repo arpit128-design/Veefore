@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Rocket, Brain, Calendar, BarChart3, Sparkles, 
-  Globe, Share2, Settings, Link as LinkIcon, X, CreditCard
+  Globe, Users, Share2, Settings, Link as LinkIcon, X, CreditCard
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ const navigationItems = [
   { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
   { href: "/suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
+  { href: "/team", icon: Users, label: "Team", color: "text-blue-400" },
   { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },
   { href: "/pricing", icon: CreditCard, label: "Subscription", color: "text-yellow-400" },
   { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },

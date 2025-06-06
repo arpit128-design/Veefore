@@ -2233,6 +2233,201 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Team Management Routes
+  
+  // Get workspace members
+  app.get('/api/workspaces/:workspaceId/members', requireAuth, addPlanContext, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const userId = req.user.id;
+
+      // Check if user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      // Check if user is owner or member of workspace
+      const member = await storage.getWorkspaceMember(workspaceId, userId);
+      if (workspace.userId !== userId && !member) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const members = await storage.getWorkspaceMembers(workspaceId);
+      res.json(members);
+    } catch (error: any) {
+      console.error('[TEAM] Get members error:', error);
+      res.status(500).json({ error: 'Failed to get workspace members' });
+    }
+  });
+
+  // Invite team member
+  app.post('/api/workspaces/:workspaceId/invite', requireAuth, addPlanContext, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const userId = req.user.id;
+      const { email, role } = req.body;
+
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      // Check if user can invite members
+      const canInvite = await TeamService.canInviteMembers(workspace, req.user);
+      if (!canInvite.canInvite) {
+        return res.status(403).json({ error: canInvite.reason });
+      }
+
+      const result = await TeamService.inviteTeamMember(workspaceId, email, role, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ invitation: result.invitation });
+    } catch (error: any) {
+      console.error('[TEAM] Invite member error:', error);
+      res.status(500).json({ error: 'Failed to invite team member' });
+    }
+  });
+
+  // Accept team invitation
+  app.post('/api/team/invitations/:token/accept', requireAuth, async (req: any, res: Response) => {
+    try {
+      const token = req.params.token;
+      const userId = req.user.id;
+
+      const result = await TeamService.acceptInvitation(token, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ member: result.member });
+    } catch (error: any) {
+      console.error('[TEAM] Accept invitation error:', error);
+      res.status(500).json({ error: 'Failed to accept invitation' });
+    }
+  });
+
+  // Remove team member
+  app.delete('/api/workspaces/:workspaceId/members/:memberId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const memberId = parseInt(req.params.memberId);
+      const userId = req.user.id;
+
+      const result = await TeamService.removeMember(workspaceId, memberId, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[TEAM] Remove member error:', error);
+      res.status(500).json({ error: 'Failed to remove team member' });
+    }
+  });
+
+  // Update member role
+  app.patch('/api/workspaces/:workspaceId/members/:memberId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const memberId = parseInt(req.params.memberId);
+      const userId = req.user.id;
+      const { role } = req.body;
+
+      const result = await TeamService.updateMemberRole(workspaceId, memberId, role, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ member: result.member });
+    } catch (error: any) {
+      console.error('[TEAM] Update member role error:', error);
+      res.status(500).json({ error: 'Failed to update member role' });
+    }
+  });
+
+  // Get pending invitations
+  app.get('/api/workspaces/:workspaceId/invitations', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const userId = req.user.id;
+
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== userId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const invitations = await storage.getTeamInvitations(workspaceId, 'pending');
+      res.json(invitations);
+    } catch (error: any) {
+      console.error('[TEAM] Get invitations error:', error);
+      res.status(500).json({ error: 'Failed to get invitations' });
+    }
+  });
+
+  // Cancel invitation
+  app.delete('/api/team/invitations/:invitationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const invitationId = parseInt(req.params.invitationId);
+      const userId = req.user.id;
+
+      const result = await TeamService.cancelInvitation(invitationId, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[TEAM] Cancel invitation error:', error);
+      res.status(500).json({ error: 'Failed to cancel invitation' });
+    }
+  });
+
+  // Generate invite code
+  app.post('/api/workspaces/:workspaceId/invite-code', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = parseInt(req.params.workspaceId);
+      const userId = req.user.id;
+
+      const result = await TeamService.generateInviteCode(workspaceId, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ code: result.code });
+    } catch (error: any) {
+      console.error('[TEAM] Generate invite code error:', error);
+      res.status(500).json({ error: 'Failed to generate invite code' });
+    }
+  });
+
+  // Join by invite code
+  app.post('/api/team/join/:inviteCode', requireAuth, async (req: any, res: Response) => {
+    try {
+      const inviteCode = req.params.inviteCode;
+      const userId = req.user.id;
+
+      const result = await TeamService.joinByInviteCode(inviteCode, userId, storage);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+
+      res.json({ workspace: result.workspace });
+    } catch (error: any) {
+      console.error('[TEAM] Join by code error:', error);
+      res.status(500).json({ error: 'Failed to join workspace' });
+    }
+  });
+
   const http = await import('http');
   return http.createServer(app);
 }

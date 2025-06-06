@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PublishingProgressTracker } from "@/components/PublishingProgressTracker";
 import { Plus, Clock, Calendar as CalendarIcon, BarChart3, Zap, Upload, Image, Video, FileText, Trash2, Edit, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ScheduleForm {
   title: string;
@@ -72,10 +72,31 @@ export default function Scheduler() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Update platform selection when workspace or social accounts change
+  useEffect(() => {
+    if (socialAccounts.length > 0 && currentWorkspace?.id) {
+      const firstPlatform = socialAccounts[0].platform;
+      // Only update if current platform is not available in this workspace
+      const currentPlatformExists = socialAccounts.some((account: any) => account.platform === scheduleForm.platform);
+      if (!currentPlatformExists) {
+        setScheduleForm(prev => ({ ...prev, platform: firstPlatform }));
+      }
+    }
+  }, [socialAccounts, currentWorkspace?.id]);
+
   const { data: scheduledContent = [] } = useQuery({
     queryKey: ['scheduled-content', currentWorkspace?.id],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/content?workspaceId=${currentWorkspace?.id}&status=scheduled`);
+      return response.json();
+    },
+    enabled: !!currentWorkspace?.id
+  });
+
+  const { data: socialAccounts = [] } = useQuery({
+    queryKey: ['social-accounts', currentWorkspace?.id],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
       return response.json();
     },
     enabled: !!currentWorkspace?.id
@@ -896,12 +917,18 @@ export default function Scheduler() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="instagram">Instagram</SelectItem>
-                      <SelectItem value="facebook">Facebook</SelectItem>
-                      <SelectItem value="twitter">Twitter</SelectItem>
-                      <SelectItem value="linkedin">LinkedIn</SelectItem>
-                      <SelectItem value="youtube">YouTube</SelectItem>
-                      <SelectItem value="tiktok">TikTok</SelectItem>
+                      {socialAccounts.length === 0 ? (
+                        <div className="p-2 text-center text-asteroid-silver text-sm">
+                          No connected platforms. Go to Integrations to connect accounts.
+                        </div>
+                      ) : (
+                        socialAccounts.map((account: any) => (
+                          <SelectItem key={account.id} value={account.platform}>
+                            {account.platform.charAt(0).toUpperCase() + account.platform.slice(1)} 
+                            <span className="text-asteroid-silver ml-2">(@{account.username})</span>
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

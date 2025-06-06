@@ -1445,6 +1445,344 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // ==================== SUBSCRIPTION & PAYMENT ROUTES ====================
+  
+  // Import payment services
+  const { razorpayService } = await import('./razorpay-service');
+  const { creditService } = await import('./credit-service');
+  const { SUBSCRIPTION_PLANS, CREDIT_PACKAGES, ADDONS } = await import('./pricing-config');
+
+  // Get pricing information
+  app.get('/api/pricing', (req: Request, res: Response) => {
+    res.json({
+      plans: SUBSCRIPTION_PLANS,
+      creditPackages: CREDIT_PACKAGES,
+      addons: ADDONS
+    });
+  });
+
+  // Get user's subscription and credit information
+  app.get('/api/subscription', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const creditInfo = await creditService.getUserCreditInfo(userId);
+      res.json(creditInfo);
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Failed to get subscription info:', error);
+      res.status(500).json({ error: 'Failed to get subscription information' });
+    }
+  });
+
+  // Create subscription order
+  app.post('/api/subscription/create-order', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { planId } = req.body;
+      const userId = req.user.id;
+
+      if (!planId || planId === 'free') {
+        return res.status(400).json({ error: 'Invalid plan selection' });
+      }
+
+      const order = await razorpayService.createSubscriptionOrder(planId, userId.toString());
+      res.json(order);
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Order creation failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create credit purchase order
+  app.post('/api/credits/create-order', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { packageId } = req.body;
+      const userId = req.user.id;
+
+      if (!packageId) {
+        return res.status(400).json({ error: 'Package ID is required' });
+      }
+
+      const order = await razorpayService.createCreditOrder(packageId, userId.toString());
+      res.json(order);
+    } catch (error: any) {
+      console.error('[CREDITS] Order creation failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create addon order
+  app.post('/api/addons/create-order', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { addonId } = req.body;
+      const userId = req.user.id;
+
+      if (!addonId) {
+        return res.status(400).json({ error: 'Addon ID is required' });
+      }
+
+      const order = await razorpayService.createAddonOrder(addonId, userId.toString());
+      res.json(order);
+    } catch (error: any) {
+      console.error('[ADDON] Order creation failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Verify payment and process subscription
+  app.post('/api/payment/verify', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { 
+        razorpay_order_id, 
+        razorpay_payment_id, 
+        razorpay_signature,
+        purpose 
+      } = req.body;
+      const userId = req.user.id;
+
+      // Verify payment signature
+      const isValid = razorpayService.verifyPaymentSignature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
+
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid payment signature' });
+      }
+
+      // Get payment and order details
+      const payment = await razorpayService.getPayment(razorpay_payment_id);
+      const order = await razorpayService.getOrder(razorpay_order_id);
+
+      if (payment.status !== 'captured') {
+        return res.status(400).json({ error: 'Payment not captured' });
+      }
+
+      // Save payment record
+      await storage.createPayment({
+        userId,
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        amount: order.amount / 100, // Convert from paise
+        currency: order.currency,
+        status: 'paid',
+        purpose: order.notes.purpose,
+        metadata: {
+          orderId: razorpay_order_id,
+          planId: order.notes.planId,
+          packageId: order.notes.packageId,
+          addonId: order.notes.addonId
+        }
+      });
+
+      // Process based on payment purpose
+      if (order.notes.purpose === 'subscription') {
+        await processSubscriptionPayment(userId, order.notes.planId);
+      } else if (order.notes.purpose === 'credits') {
+        await processCreditPurchase(userId, order.notes);
+      } else if (order.notes.purpose === 'addon') {
+        await processAddonPurchase(userId, order.notes);
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Payment processed successfully',
+        purpose: order.notes.purpose
+      });
+
+    } catch (error: any) {
+      console.error('[PAYMENT] Verification failed:', error);
+      res.status(500).json({ error: 'Payment verification failed' });
+    }
+  });
+
+  // Process subscription payment
+  async function processSubscriptionPayment(userId: number, planId: string) {
+    const plan = SUBSCRIPTION_PLANS[planId as keyof typeof SUBSCRIPTION_PLANS];
+    if (!plan) throw new Error('Invalid plan');
+
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+    // Create subscription record
+    await storage.createSubscription({
+      userId,
+      plan: plan.id,
+      status: 'active',
+      currentPeriodStart: now,
+      currentPeriodEnd: nextMonth,
+      monthlyCredits: plan.credits,
+      extraCredits: 0,
+      autoRenew: true
+    });
+
+    // Update user plan
+    await storage.updateUser(userId, { plan: plan.id });
+
+    // Add monthly credits
+    await creditService.addCredits(
+      userId,
+      plan.credits,
+      'earned',
+      `${plan.name} subscription credits`,
+      `subscription_${planId}`
+    );
+  }
+
+  // Process credit purchase
+  async function processCreditPurchase(userId: number, orderNotes: any) {
+    const baseCredits = parseInt(orderNotes.baseCredits);
+    const bonusCredits = parseInt(orderNotes.bonusCredits);
+    const totalCredits = parseInt(orderNotes.totalCredits);
+
+    await creditService.addCredits(
+      userId,
+      totalCredits,
+      'purchase',
+      `Credit package purchase: ${baseCredits} + ${bonusCredits} bonus`,
+      `credit_purchase_${orderNotes.packageId}`
+    );
+  }
+
+  // Process addon purchase
+  async function processAddonPurchase(userId: number, orderNotes: any) {
+    const addon = ADDONS[orderNotes.addonId as keyof typeof ADDONS];
+    if (!addon) throw new Error('Invalid addon');
+
+    const now = new Date();
+    const expiresAt = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+    await storage.createAddon({
+      userId,
+      type: addon.type,
+      name: addon.name,
+      price: addon.price,
+      isActive: true,
+      expiresAt,
+      metadata: { addonId: addon.id }
+    });
+  }
+
+  // Get credit transaction history
+  app.get('/api/credits/history', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const history = await creditService.getCreditHistory(userId, limit);
+      res.json(history);
+    } catch (error: any) {
+      console.error('[CREDITS] Failed to get history:', error);
+      res.status(500).json({ error: 'Failed to get credit history' });
+    }
+  });
+
+  // Check credit cost for a feature
+  app.get('/api/credits/cost/:feature', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { feature } = req.params;
+      const quantity = parseInt(req.query.quantity as string) || 1;
+      
+      const cost = creditService.getCreditCost(feature, quantity);
+      const userId = req.user.id;
+      const hasCredits = await creditService.hasCredits(userId, feature, quantity);
+      
+      res.json({ 
+        feature,
+        quantity,
+        cost,
+        hasCredits,
+        userCredits: await creditService.getUserCredits(userId)
+      });
+    } catch (error: any) {
+      console.error('[CREDITS] Cost check failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Consume credits for a feature
+  app.post('/api/credits/consume', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { feature, quantity = 1, description } = req.body;
+      const userId = req.user.id;
+
+      if (!feature) {
+        return res.status(400).json({ error: 'Feature type is required' });
+      }
+
+      const success = await creditService.consumeCredits(userId, feature, quantity, description);
+      
+      if (!success) {
+        return res.status(400).json({ 
+          error: 'Insufficient credits',
+          required: creditService.getCreditCost(feature, quantity),
+          available: await creditService.getUserCredits(userId)
+        });
+      }
+
+      res.json({ 
+        success: true,
+        creditsUsed: creditService.getCreditCost(feature, quantity),
+        remainingCredits: await creditService.getUserCredits(userId)
+      });
+    } catch (error: any) {
+      console.error('[CREDITS] Consumption failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's active addons
+  app.get('/api/addons', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const addons = await storage.getUserAddons(userId);
+      res.json(addons);
+    } catch (error: any) {
+      console.error('[ADDONS] Failed to get addons:', error);
+      res.status(500).json({ error: 'Failed to get addons' });
+    }
+  });
+
+  // Cancel subscription
+  app.post('/api/subscription/cancel', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      
+      // Update subscription status
+      await storage.updateSubscriptionStatus(userId, 'canceled', new Date());
+      
+      // Update user plan to free
+      await storage.updateUser(userId, { plan: 'free' });
+
+      res.json({ success: true, message: 'Subscription cancelled successfully' });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Cancellation failed:', error);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
+    }
+  });
+
+  // Referral endpoints
+  app.post('/api/referrals/reward', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { type } = req.body;
+      const userId = req.user.id;
+
+      if (!['inviteFriend', 'submitFeedback'].includes(type)) {
+        return res.status(400).json({ error: 'Invalid referral type' });
+      }
+
+      await creditService.awardReferralCredits(userId, type);
+      
+      res.json({ 
+        success: true, 
+        message: `Referral reward credited`,
+        credits: await creditService.getUserCredits(userId)
+      });
+    } catch (error: any) {
+      console.error('[REFERRAL] Reward failed:', error);
+      res.status(500).json({ error: 'Failed to process referral reward' });
+    }
+  });
+
   const http = await import('http');
   return http.createServer(app);
 }

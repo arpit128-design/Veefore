@@ -125,6 +125,62 @@ export const referrals = pgTable("referrals", {
   confirmedAt: timestamp("confirmed_at")
 });
 
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  plan: text("plan").notNull(), // free, creator-pro, agency-suite, enterprise
+  status: text("status").notNull(), // active, canceled, expired, trial
+  priceId: text("price_id"), // Razorpay price ID
+  subscriptionId: text("subscription_id"), // Razorpay subscription ID
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  trialEnd: timestamp("trial_end"),
+  canceledAt: timestamp("canceled_at"),
+  monthlyCredits: integer("monthly_credits").default(60),
+  extraCredits: integer("extra_credits").default(0),
+  autoRenew: boolean("auto_renew").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const creditPackages = pgTable("credit_packages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  credits: integer("credits").notNull(),
+  price: integer("price").notNull(), // Price in paise/cents
+  currency: text("currency").default("INR"),
+  bonusPercentage: integer("bonus_percentage").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  razorpayOrderId: text("razorpay_order_id").notNull(),
+  razorpayPaymentId: text("razorpay_payment_id"),
+  razorpaySignature: text("razorpay_signature"),
+  amount: integer("amount").notNull(),
+  currency: text("currency").default("INR"),
+  status: text("status").default("created"), // created, paid, failed, refunded
+  purpose: text("purpose").notNull(), // subscription, credits, addon
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const addons = pgTable("addons", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // workspace, social-account, ai-visual, etc.
+  name: text("name").notNull(),
+  price: integer("price").notNull(),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   firebaseUid: true,
@@ -211,6 +267,51 @@ export const insertReferralSchema = createInsertSchema(referrals).pick({
   rewardAmount: true
 });
 
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
+  userId: true,
+  plan: true,
+  status: true,
+  priceId: true,
+  subscriptionId: true,
+  currentPeriodStart: true,
+  currentPeriodEnd: true,
+  trialEnd: true,
+  monthlyCredits: true,
+  extraCredits: true,
+  autoRenew: true
+});
+
+export const insertCreditPackageSchema = createInsertSchema(creditPackages).pick({
+  name: true,
+  credits: true,
+  price: true,
+  currency: true,
+  bonusPercentage: true,
+  isActive: true
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).pick({
+  userId: true,
+  razorpayOrderId: true,
+  razorpayPaymentId: true,
+  razorpaySignature: true,
+  amount: true,
+  currency: true,
+  status: true,
+  purpose: true,
+  metadata: true
+});
+
+export const insertAddonSchema = createInsertSchema(addons).pick({
+  userId: true,
+  type: true,
+  name: true,
+  price: true,
+  isActive: true,
+  expiresAt: true,
+  metadata: true
+});
+
 // Select types
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
@@ -221,6 +322,10 @@ export type AutomationRule = typeof automationRules.$inferSelect;
 export type Suggestion = typeof suggestions.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type CreditPackage = typeof creditPackages.$inferSelect;
+export type Payment = typeof payments.$inferSelect;
+export type Addon = typeof addons.$inferSelect;
 
 // Insert types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -232,3 +337,7 @@ export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 export type InsertSuggestion = z.infer<typeof insertSuggestionSchema>;
 export type InsertCreditTransaction = z.infer<typeof insertCreditTransactionSchema>;
 export type InsertReferral = z.infer<typeof insertReferralSchema>;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type InsertCreditPackage = z.infer<typeof insertCreditPackageSchema>;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type InsertAddon = z.infer<typeof insertAddonSchema>;

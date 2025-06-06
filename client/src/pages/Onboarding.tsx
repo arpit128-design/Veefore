@@ -203,7 +203,7 @@ export default function Onboarding() {
 
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/user/complete-onboarding', 'POST', data);
+      return apiRequest('POST', '/api/user/complete-onboarding', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });

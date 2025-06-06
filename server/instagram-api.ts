@@ -36,31 +36,30 @@ export class InstagramAPI {
   
   constructor() {}
 
-  // Generate Instagram OAuth URL for current API structure
+  // Generate Instagram Business Login OAuth URL (Direct Instagram API)
   generateAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
       client_id: process.env.INSTAGRAM_APP_ID!,
       redirect_uri: redirectUri,
-      scope: 'user_profile,user_media',
+      scope: 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish',
       response_type: 'code',
       ...(state && { state })
     });
 
     const authUrl = `https://api.instagram.com/oauth/authorize?${params.toString()}`;
-    console.log(`[INSTAGRAM API] Generated OAuth URL: ${authUrl}`);
-    console.log(`[INSTAGRAM API] App Type: Checking compatibility with current Instagram app configuration`);
+    console.log(`[INSTAGRAM API] Generated Business API auth URL: ${authUrl}`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] Client ID: ${process.env.INSTAGRAM_APP_ID}`);
     
     return authUrl;
   }
 
-  // Exchange authorization code for access token (Works with both API types)
+  // Exchange authorization code for access token (Instagram Business API)
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<{
     access_token: string;
     user_id?: string;
   }> {
-    console.log(`[INSTAGRAM API] Token exchange started`);
+    console.log(`[INSTAGRAM API] Business API token exchange started`);
     console.log(`[INSTAGRAM API] Code: ${code}`);
     console.log(`[INSTAGRAM API] Redirect URI: ${redirectUri}`);
     console.log(`[INSTAGRAM API] App ID: ${process.env.INSTAGRAM_APP_ID}`);
@@ -75,6 +74,7 @@ export class InstagramAPI {
 
     try {
       console.log(`[INSTAGRAM API] Making POST request to: https://api.instagram.com/oauth/access_token`);
+      console.log(`[INSTAGRAM API] Request params:`, params.toString());
       
       const response = await axios.post('https://api.instagram.com/oauth/access_token', params, {
         headers: {
@@ -82,14 +82,13 @@ export class InstagramAPI {
         }
       });
 
-      console.log(`[INSTAGRAM API] Token exchange successful:`, response.data);
+      console.log(`[INSTAGRAM API] Business API token exchange successful:`, response.data);
       return response.data;
     } catch (error: any) {
-      console.error(`[INSTAGRAM API] Token exchange failed:`, {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
+      console.error(`[INSTAGRAM API] Business API token exchange failed:`, error.response?.data || error.message);
+      console.error(`[INSTAGRAM API] Response status:`, error.response?.status);
+      console.error(`[INSTAGRAM API] Response headers:`, error.response?.headers);
+      console.error(`[INSTAGRAM API] Full error response:`, JSON.stringify(error.response?.data, null, 2));
       
       throw new Error(`Instagram token exchange failed: ${error.response?.data?.error_message || error.response?.data?.error?.message || error.message}`);
     }
@@ -111,10 +110,10 @@ export class InstagramAPI {
     return response.data;
   }
 
-  // Get user profile information (compatible with available API)
+  // Get user profile information with Business API
   async getUserProfile(accessToken: string): Promise<InstagramUser> {
     try {
-      const fields = 'id,username,account_type,media_count';
+      const fields = 'id,username,account_type,media_count,followers_count,name,biography,profile_picture_url,website';
       const response = await axios.get(`${this.baseUrl}/me`, {
         params: {
           fields,
@@ -122,16 +121,11 @@ export class InstagramAPI {
         }
       });
 
-      console.log(`[INSTAGRAM API] User profile:`, response.data);
-      
-      // Set followers_count to 0 as it may not be available in current API
-      return {
-        ...response.data,
-        followers_count: 0
-      };
+      console.log(`[INSTAGRAM BUSINESS API] User profile:`, response.data);
+      return response.data;
     } catch (error: any) {
-      console.error(`[INSTAGRAM API] Profile error:`, error.response?.data || error.message);
-      throw new Error('Failed to fetch Instagram profile');
+      console.error(`[INSTAGRAM BUSINESS API] Profile error:`, error.response?.data || error.message);
+      throw new Error('Failed to fetch Instagram Business profile');
     }
   }
 

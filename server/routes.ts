@@ -1026,15 +1026,20 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const { user } = req;
       const workspaceId = req.query.workspaceId;
       
+      console.log(`[DASHBOARD ANALYTICS] Request for user ${user.id}, workspaceId: ${workspaceId}`);
+      
       let workspace;
       if (workspaceId) {
         // Get specific workspace
         workspace = await storage.getWorkspace(workspaceId);
+        console.log(`[DASHBOARD ANALYTICS] Found workspace: ${workspace?.name} (${workspace?.id})`);
         if (!workspace || workspace.userId !== user.id) {
+          console.log(`[DASHBOARD ANALYTICS] Workspace access denied or not found`);
           return res.status(403).json({ error: 'Workspace not found or access denied' });
         }
       } else {
         // Fallback to default workspace
+        console.log(`[DASHBOARD ANALYTICS] No workspaceId provided, using default`);
         workspace = await storage.getDefaultWorkspace(user.id);
       }
       

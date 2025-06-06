@@ -72,18 +72,6 @@ export default function Scheduler() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Update platform selection when workspace or social accounts change
-  useEffect(() => {
-    if (socialAccounts.length > 0 && currentWorkspace?.id) {
-      const firstPlatform = socialAccounts[0].platform;
-      // Only update if current platform is not available in this workspace
-      const currentPlatformExists = socialAccounts.some((account: any) => account.platform === scheduleForm.platform);
-      if (!currentPlatformExists) {
-        setScheduleForm(prev => ({ ...prev, platform: firstPlatform }));
-      }
-    }
-  }, [socialAccounts, currentWorkspace?.id]);
-
   const { data: scheduledContent = [] } = useQuery({
     queryKey: ['scheduled-content', currentWorkspace?.id],
     queryFn: async () => {
@@ -101,6 +89,18 @@ export default function Scheduler() {
     },
     enabled: !!currentWorkspace?.id
   });
+
+  // Update platform selection when workspace or social accounts change
+  useEffect(() => {
+    if (socialAccounts && socialAccounts.length > 0 && currentWorkspace?.id) {
+      const firstPlatform = socialAccounts[0].platform;
+      // Only update if current platform is not available in this workspace
+      const currentPlatformExists = socialAccounts.some((account: any) => account.platform === scheduleForm.platform);
+      if (!currentPlatformExists) {
+        setScheduleForm(prev => ({ ...prev, platform: firstPlatform }));
+      }
+    }
+  }, [socialAccounts, currentWorkspace?.id, scheduleForm.platform]);
 
   const { data: analytics } = useQuery({
     queryKey: ['analytics', currentWorkspace?.id],

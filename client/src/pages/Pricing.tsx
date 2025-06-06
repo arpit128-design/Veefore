@@ -595,7 +595,7 @@ export default function Pricing() {
                           >
                             <Button
                               className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 ${
-                                userSubscription?.plan === plan.id
+                                (userSubscription as any)?.plan === plan.id
                                   ? 'bg-slate-600 hover:bg-slate-600 cursor-not-allowed text-slate-300'
                                   : isPopular
                                   ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25 text-white'

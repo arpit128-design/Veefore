@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
@@ -102,7 +102,7 @@ const AuthCard = ({ children, ...props }: any) => (
 );
 
 // Input with 3D effects
-const AnimatedInput = ({ icon: Icon, label, error, ...props }: any) => (
+const AnimatedInput = forwardRef<HTMLInputElement, any>(({ icon: Icon, label, error, ...props }, ref) => (
   <motion.div 
     className="space-y-2"
     whileHover={{ scale: 1.02 }}
@@ -114,6 +114,7 @@ const AnimatedInput = ({ icon: Icon, label, error, ...props }: any) => (
         <Icon className="w-5 h-5 text-white/50" />
       </div>
       <Input
+        ref={ref}
         className={`
           pl-12 bg-white/5 border-white/20 text-white placeholder:text-white/40
           focus:border-blue-400 focus:bg-white/10 transition-all duration-300
@@ -133,7 +134,9 @@ const AnimatedInput = ({ icon: Icon, label, error, ...props }: any) => (
       )}
     </div>
   </motion.div>
-);
+));
+
+AnimatedInput.displayName = 'AnimatedInput';
 
 export default function Auth() {
   const [, setLocation] = useLocation();
@@ -192,18 +195,31 @@ export default function Auth() {
       provider.addScope('email');
       provider.addScope('profile');
       
-      await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       
-      toast({
-        title: "Redirecting to Google",
-        description: "Please complete the sign-in process..."
-      });
+      if (result.user) {
+        toast({
+          title: "Welcome to VeeFore!",
+          description: "Successfully signed in with Google."
+        });
+      }
     } catch (error: any) {
-      toast({
-        title: "Google Sign-In Error",
-        description: error.message || "Failed to sign in with Google. Please try again.",
-        variant: "destructive"
-      });
+      console.error('Google Sign-In Error:', error);
+      
+      // Handle user cancellation gracefully
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+          title: "Sign-in cancelled",
+          description: "You can try again anytime.",
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "Google Sign-In Error",
+          description: error.message || "Failed to sign in with Google. Please try again.",
+          variant: "destructive"
+        });
+      }
       setIsLoading(false);
     }
   };

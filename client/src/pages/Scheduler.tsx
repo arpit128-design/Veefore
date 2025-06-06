@@ -81,90 +81,36 @@ export default function Scheduler() {
     enabled: !!currentWorkspace?.id && !!currentWorkspace?.name // Wait for workspace to be fully loaded
   });
 
-  const [socialAccounts, setSocialAccounts] = useState([]);
-  const [socialAccountsLoading, setSocialAccountsLoading] = useState(false);
-
-  // Fetch social accounts when workspace changes - handle restoration properly
-  useEffect(() => {
-    console.log('[SCHEDULER TRACE] Effect triggered - currentWorkspace:', {
-      id: currentWorkspace?.id,
-      name: currentWorkspace?.name,
-      fullObject: currentWorkspace
-    });
-    
-    if (currentWorkspace?.id && currentWorkspace?.name) {
-      console.log('[SCHEDULER DEBUG] Workspace context updated:', currentWorkspace.id, currentWorkspace.name);
+  // Use React Query for social accounts with proper workspace dependency
+  const { data: socialAccounts = [], isLoading: socialAccountsLoading } = useQuery({
+    queryKey: ['social-accounts', currentWorkspace?.id],
+    queryFn: async () => {
+      if (!currentWorkspace?.id) {
+        console.log('[SCHEDULER] No workspace context for social accounts fetch');
+        return [];
+      }
       
-      setSocialAccountsLoading(true);
+      console.log('[SCHEDULER DEBUG] Fetching social accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
+      console.log('[SCHEDULER DEBUG] Workspace context at fetch time:', {
+        id: currentWorkspace.id,
+        name: currentWorkspace.name,
+        workspacesCount: workspaces.length
+      });
       
-      const fetchSocialAccounts = async () => {
-        try {
-          // Small delay to ensure workspace context is stable
-          await new Promise(resolve => setTimeout(resolve, 200));
-          
-          // Capture workspace ID at execution time with additional validation
-          const workspaceId = currentWorkspace.id;
-          const workspaceName = currentWorkspace.name;
-          
-          console.log('[SCHEDULER TRACE] About to fetch with:');
-          console.log('  - Captured workspaceId:', workspaceId);
-          console.log('  - Captured workspaceName:', workspaceName);
-          console.log('  - Current context ID:', currentWorkspace?.id);
-          console.log('  - Current context name:', currentWorkspace?.name);
-          
-          if (workspaceId !== currentWorkspace?.id) {
-            console.warn('[SCHEDULER WARNING] Workspace ID mismatch detected!');
-            console.warn('  - Captured ID:', workspaceId);
-            console.warn('  - Current context ID:', currentWorkspace?.id);
-          }
-          
-          console.log('[SCHEDULER DEBUG] Making API call with workspaceId:', workspaceId);
-          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${workspaceId}`);
-          const accounts = await response.json();
-          
-          console.log('[SCHEDULER DEBUG] API Response received:');
-          console.log('  - Accounts count:', accounts.length);
-          console.log('  - Accounts:', accounts);
-          console.log('  - For workspace:', workspaceName, 'ID:', workspaceId);
-          
-          setSocialAccounts(accounts);
-        } catch (error) {
-          console.error('[SCHEDULER DEBUG] Error fetching social accounts:', error);
-          setSocialAccounts([]);
-        } finally {
-          setSocialAccountsLoading(false);
-        }
-      };
+      const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
+      const accounts = await response.json();
       
-      fetchSocialAccounts();
-    } else {
-      console.log('[SCHEDULER TRACE] No workspace context, clearing accounts');
-      setSocialAccounts([]);
-    }
-  }, [currentWorkspace?.id, currentWorkspace?.name]);
-
-  // Additional effect to handle workspace restoration completion
-  useEffect(() => {
-    // When workspace switches from default to restored workspace, refetch accounts
-    if (currentWorkspace?.name && currentWorkspace.name !== 'My VeeFore Workspace' && workspaces.length > 0) {
-      console.log('[SCHEDULER DEBUG] Detected workspace restoration to:', currentWorkspace.name, 'ID:', currentWorkspace.id);
+      console.log('[SCHEDULER DEBUG] Retrieved accounts:', accounts.length, 'for workspace:', currentWorkspace.name);
+      accounts.forEach((account: any, index: number) => {
+        console.log(`[SCHEDULER DEBUG]   ${index + 1}. @${account.username} (${account.platform}) - WorkspaceId: ${account.workspaceId}`);
+      });
       
-      // Force refresh social accounts for restored workspace
-      const refetchAccounts = async () => {
-        try {
-          await new Promise(resolve => setTimeout(resolve, 500)); // Longer delay for restoration
-          const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace.id}`);
-          const accounts = await response.json();
-          console.log('[SCHEDULER DEBUG] Refetched accounts after restoration:', accounts, 'for workspace:', currentWorkspace.name);
-          setSocialAccounts(accounts);
-        } catch (error) {
-          console.error('[SCHEDULER DEBUG] Error refetching accounts after restoration:', error);
-        }
-      };
-      
-      refetchAccounts();
-    }
-  }, [currentWorkspace?.name, workspaces.length]);
+      return accounts;
+    },
+    enabled: !!currentWorkspace?.id && !!currentWorkspace?.name && workspaces.length > 0,
+    staleTime: 30000, // Cache for 30 seconds
+    retry: false
+  });
 
   // Force refresh queries when workspace changes
   useEffect(() => {

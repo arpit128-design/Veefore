@@ -791,6 +791,20 @@ export default function Scheduler() {
             </DialogTitle>
           </DialogHeader>
 
+          {/* Publishing Progress Tracker */}
+          {createContentMutation.isPending && (
+            <PublishingProgressTracker 
+              contentType={scheduleForm.type}
+              isPublishing={true}
+              onComplete={() => {
+                toast({
+                  title: "Content Published Successfully!",
+                  description: `Your ${scheduleForm.type} has been published to Instagram.`
+                });
+              }}
+            />
+          )}
+
           {!isBulkMode ? (
             <div className="space-y-6">
               {/* Content Details */}

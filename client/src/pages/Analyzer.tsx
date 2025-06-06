@@ -219,7 +219,7 @@ export default function Analyzer() {
               <span className="text-sm">
                 {analytics?.changes?.followers !== undefined 
                   ? `${analytics.changes.followers >= 0 ? '+' : ''}${analytics.changes.followers}% vs last period`
-                  : 'Instagram Business API'
+                  : 'Authentic Instagram data'
                 }
               </span>
             </div>
@@ -351,9 +351,11 @@ export default function Analyzer() {
                   ? realtimeAnalytics.growthVelocity >= 0 
                     ? `+${realtimeAnalytics.growthVelocity}%`
                     : `${realtimeAnalytics.growthVelocity}%`
-                  : analytics?.changes?.followers !== undefined && analytics.changes.followers > 0 
-                  ? `+${analytics.changes.followers}%`
-                  : 'Calculating...'}
+                  : analytics?.changes?.followers !== undefined 
+                  ? analytics.changes.followers >= 0 
+                    ? `+${analytics.changes.followers}%`
+                    : `${analytics.changes.followers}%`
+                  : '0%'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Based on recent posting performance' : 'Follower growth rate'}

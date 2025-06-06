@@ -536,51 +536,128 @@ export default function Onboarding() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Progress Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {steps.map((step, index) => (
-              <div key={index} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    index <= currentStep
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-600'
-                  }`}
-                >
-                  {index + 1}
-                </div>
-                {index < steps.length - 1 && (
-                  <div
-                    className={`w-16 md:w-24 h-1 mx-2 ${
-                      index < currentStep ? 'bg-blue-600' : 'bg-gray-200'
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Space Background */}
+      <SpaceBackground />
+      
+      {/* Floating Elements */}
+      <FloatingSparkles />
+      <FloatingOrbs />
+      <FloatingIcons />
+      
+      <div className="container mx-auto px-4 py-8 relative z-20">
+        {/* Cosmic Progress Bar */}
+        <motion.div 
+          className="max-w-3xl mx-auto mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="relative">
+            {/* Progress Track */}
+            <div className="flex items-center justify-between mb-6">
+              {steps.map((step, index) => (
+                <div key={index} className="flex items-center flex-1">
+                  <motion.div
+                    className={`relative w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold z-10 ${
+                      index <= currentStep
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+                        : 'bg-white/20 text-white/60 backdrop-blur-sm border border-white/30'
                     }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <div className="text-sm text-gray-600">
-              Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+                    animate={index === currentStep ? { 
+                      scale: [1, 1.1, 1],
+                      boxShadow: [
+                        "0 0 20px rgba(59, 130, 246, 0.5)",
+                        "0 0 30px rgba(147, 51, 234, 0.7)",
+                        "0 0 20px rgba(59, 130, 246, 0.5)"
+                      ]
+                    } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {index <= currentStep ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <span>{index + 1}</span>
+                    )}
+                    
+                    {/* Pulsing Ring for Current Step */}
+                    {index === currentStep && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-blue-400"
+                        animate={{ scale: [1, 1.3, 1], opacity: [1, 0, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    )}
+                  </motion.div>
+                  
+                  {/* Progress Line */}
+                  {index < steps.length - 1 && (
+                    <div className="flex-1 mx-4 relative">
+                      <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                          initial={{ width: "0%" }}
+                          animate={{ 
+                            width: index < currentStep ? "100%" : "0%" 
+                          }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </div>
+                      
+                      {/* Animated Particles */}
+                      {index < currentStep && (
+                        <motion.div
+                          className="absolute top-0 left-0 w-2 h-2 bg-yellow-400 rounded-full"
+                          animate={{ x: [0, "100%"] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Step Labels */}
+            <div className="flex justify-between text-center">
+              {steps.map((step, index) => (
+                <div key={index} className="flex-1">
+                  <div className={`text-sm font-medium ${
+                    index <= currentStep ? 'text-white' : 'text-white/60'
+                  }`}>
+                    {step.title}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Step Content */}
-        <div className="max-w-5xl mx-auto">
-          {steps[currentStep].component()}
-        </div>
+        {/* Step Content with Animation */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-6xl mx-auto"
+          >
+            {steps[currentStep].component()}
+          </motion.div>
+        </AnimatePresence>
 
-        {/* Navigation */}
-        <div className="max-w-2xl mx-auto mt-12 flex justify-between">
+        {/* Cosmic Navigation */}
+        <motion.div 
+          className="max-w-3xl mx-auto mt-16 flex justify-between"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
           <Button
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 bg-white/10 border-white/20 text-white hover:bg-white/20 disabled:opacity-50 backdrop-blur-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
@@ -590,24 +667,36 @@ export default function Onboarding() {
             <Button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg shadow-blue-500/25 disabled:opacity-50"
             >
               <span>Next</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button
-              onClick={handleComplete}
-              disabled={completeOnboardingMutation.isPending}
-              className="flex items-center space-x-2"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <span>
-                {completeOnboardingMutation.isPending ? 'Completing...' : 'Complete Setup'}
-              </span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+              <Button
+                onClick={handleComplete}
+                disabled={completeOnboardingMutation.isPending}
+                className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white border-0 shadow-xl shadow-green-500/25 disabled:opacity-50 relative overflow-hidden"
+              >
+                {/* Shimmer Effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                
+                <span className="relative z-10">
+                  {completeOnboardingMutation.isPending ? 'Launching...' : 'Launch into VeeFore'}
+                </span>
+                <Rocket className="w-4 h-4 relative z-10" />
+              </Button>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

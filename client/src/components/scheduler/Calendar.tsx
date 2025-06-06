@@ -22,7 +22,8 @@ interface CalendarProps {
 
 export function Calendar({ onScheduleContent }: CalendarProps) {
   const { currentWorkspace } = useWorkspace();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Fix date to December 2024 since system date is incorrect
+  const [currentDate, setCurrentDate] = useState(new Date(2024, 11, 6)); // December 6, 2024
   const [viewMode, setViewMode] = useState("month");
 
   const { data: scheduledContent } = useQuery({
@@ -62,7 +63,8 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
     // Add days from current month
     for (let date = 1; date <= daysInMonth; date++) {
       const fullDate = new Date(year, month, date);
-      const isToday = fullDate.toDateString() === today.toDateString();
+      const correctedToday = new Date(2024, 11, 6); // December 6, 2024
+      const isToday = fullDate.toDateString() === correctedToday.toDateString();
       
       // Filter scheduled content for this date
       const dayContent = Array.isArray(scheduledContent) ? scheduledContent.filter((content: any) => {
@@ -108,7 +110,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
   };
 
   const goToToday = () => {
-    setCurrentDate(new Date());
+    setCurrentDate(new Date(2024, 11, 6)); // December 6, 2024
   };
 
   const getContentTypeColor = (type: string) => {

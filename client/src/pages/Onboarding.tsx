@@ -599,6 +599,25 @@ export default function Onboarding() {
         </Card>
       </motion.div>
 
+      {/* Skip Option */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2 }}
+        className="text-center mt-6"
+      >
+        <Button
+          variant="ghost"
+          onClick={handleNext}
+          className="text-white/70 hover:text-white hover:bg-white/10 text-lg"
+        >
+          Skip for now →
+        </Button>
+        <p className="text-white/50 text-sm mt-2">
+          You can connect Instagram later from the integrations page
+        </p>
+      </motion.div>
+
       {/* Additional Platforms Preview */}
       <motion.div
         initial={{ opacity: 0 }}

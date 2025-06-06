@@ -80,41 +80,7 @@ export default function Workspaces() {
   });
 
   const createWorkspaceMutation = useMutation({
-    mutationFn: async (data: any) => {
-      console.log('=== MUTATION FUNCTION START ===');
-      const token = localStorage.getItem('veefore_auth_token');
-      console.log('=== TOKEN AVAILABLE ===', !!token);
-      
-      console.log('=== MAKING FETCH REQUEST ===');
-      const response = await fetch('/api/workspaces', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-        credentials: 'include'
-      });
-      console.log('=== FETCH COMPLETED ===');
-
-      console.log('=== PARSING JSON ===');
-      const result = await response.json();
-      console.log('=== JSON PARSED ===');
-      
-      console.log('=== RESPONSE STATUS ===', response.status);
-      console.log('=== RESPONSE DATA ===', result);
-      
-      if (!response.ok) {
-        console.log('=== THROWING ERROR FOR TANSTACK ===');
-        const error = new Error(`${response.status}: ${JSON.stringify(result)}`);
-        (error as any).response = result;
-        (error as any).status = response.status;
-        throw error;
-      }
-      
-      console.log('=== MUTATION FUNCTION SUCCESS ===');
-      return result;
-    },
+    mutationFn: (data: any) => apiRequest('POST', '/api/workspaces', data),
     onSuccess: () => {
       toast({
         title: "Workspace Created!",
@@ -124,47 +90,14 @@ export default function Workspaces() {
       setIsCreateOpen(false);
       setNewWorkspace({ name: "", description: "", theme: "default" });
     },
-    onError: async (error: any) => {
-      console.log('=== WORKSPACE CREATION ERROR DEBUG ===');
-      console.log('Raw error object:', error);
-      console.log('Error message:', error?.message);
-      console.log('Error status:', error?.status);
-      console.log('Error code:', error?.code);
-      console.log('Error response:', error?.response);
-      console.log('Error type:', typeof error);
-      console.log('Error keys:', Object.keys(error || {}));
-      console.log('=======================================');
+    onError: (error: any) => {
+      // apiRequest throws errors with response data directly accessible
+      const errorData = error?.response?.data || error;
+      const statusCode = error?.response?.status || error?.status;
       
-      // Handle plan restriction errors with upgrade modal
-      // Check if error message contains "403:" indicating plan limits OR if it's a 403 status
-      const is403Error = error?.message?.includes('403:') || 
-                         error?.status === 403 || 
-                         error?.message?.includes('plan allows') ||
-                         error?.response?.status === 403;
-      console.log('Is 403 error check result:', is403Error);
-      
-      if (is403Error) {
-        console.log('Processing 403 error for upgrade modal');
-        setIsCreateOpen(false); // Close the creation modal immediately
-        
-        // Parse the error message to extract the JSON response
-        let errorData: any = {};
-        try {
-          // Extract JSON from error message (format: "403: {json}")
-          const statusIndex = error.message.indexOf('403:');
-          if (statusIndex !== -1) {
-            const jsonStr = error.message.substring(statusIndex + 4).trim();
-            errorData = JSON.parse(jsonStr);
-            console.log('Parsed error data:', errorData);
-          }
-        } catch (e) {
-          console.log('Could not parse error data, using fallback:', e);
-          // If parsing fails, show upgrade modal anyway for 403 errors
-          errorData = {
-            upgradeMessage: "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
-            currentPlan: user?.plan || 'Free'
-          };
-        }
+      // Handle plan restriction errors (403 status)
+      if (statusCode === 403 || error?.message?.includes('plan allows')) {
+        setIsCreateOpen(false); // Close the creation modal
         
         const modalData = {
           isOpen: true,
@@ -178,11 +111,8 @@ export default function Workspaces() {
           }
         };
         
-        console.log('Setting upgrade modal with data:', modalData);
         setUpgradeModal(modalData);
-        console.log('Upgrade modal should now be open');
       } else {
-        console.log('Non-403 error, showing toast');
         toast({
           title: "Creation Failed",
           description: error.message || "Failed to create workspace",

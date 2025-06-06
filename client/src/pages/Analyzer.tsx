@@ -62,27 +62,6 @@ export default function Analyzer() {
     enabled: !!currentWorkspace?.id && !realtimeAnalytics
   });
 
-  // Calculate authentic percentage changes from real Instagram trends data
-  const calculateAuthenticPercentageChange = (metric: string) => {
-    if (!realtimeAnalytics?.trendsData) {
-      return 0; // Return neutral when no real data available
-    }
-
-    const trends = realtimeAnalytics.trendsData;
-    
-    switch (metric) {
-      case 'totalViews':
-      case 'totalReach':
-        return trends.reachGrowth || 0;
-      case 'engagement':
-        return trends.engagementTrend || 0;
-      case 'followers':
-        return realtimeAnalytics.growthVelocity || 0;
-      default:
-        return trends.weeklyGrowth || 0;
-    }
-  };
-
   // Use real-time analytics if available, fallback to dashboard analytics
   const analytics = realtimeAnalytics ? {
     engagementRate: realtimeAnalytics.engagementRate,
@@ -100,10 +79,10 @@ export default function Analyzer() {
     totalPosts: rawAnalytics?.totalPosts || 0,
     accountUsername: rawAnalytics?.accountUsername,
     changes: {
-      views: calculateAuthenticPercentageChange('totalViews'),
-      engagement: calculateAuthenticPercentageChange('engagement'),
-      reach: calculateAuthenticPercentageChange('totalReach'),
-      followers: calculateAuthenticPercentageChange('followers')
+      views: realtimeAnalytics.trendsData?.reachGrowth || 0,
+      engagement: realtimeAnalytics.trendsData?.engagementTrend || 0,
+      reach: realtimeAnalytics.trendsData?.reachGrowth || 0,
+      followers: realtimeAnalytics.growthVelocity || 0
     }
   } : rawAnalytics ? {
     totalViews: rawAnalytics.totalReach || 0,
@@ -116,10 +95,10 @@ export default function Analyzer() {
     totalPosts: rawAnalytics.totalPosts || 0,
     accountUsername: rawAnalytics.accountUsername,
     changes: {
-      views: calculateAuthenticPercentageChange('totalViews'),
-      engagement: calculateAuthenticPercentageChange('engagement'),
-      reach: calculateAuthenticPercentageChange('totalReach'),
-      followers: calculateAuthenticPercentageChange('followers')
+      views: 0,
+      engagement: 0,
+      reach: 0,
+      followers: 0
     }
   } : null;
 

@@ -780,11 +780,33 @@ export class MongoStorage implements IStorage {
   }
 
   async getSuggestions(workspaceId: number, type?: string): Promise<Suggestion[]> {
-    return [];
+    await this.connect();
+    
+    let query: any = { workspaceId: workspaceId.toString() };
+    if (type) {
+      query.type = type;
+    }
+    
+    const suggestions = await SuggestionModel.find(query)
+      .sort({ createdAt: -1 });
+    
+    return suggestions.map(doc => this.convertSuggestion(doc));
   }
 
   async getValidSuggestions(workspaceId: number): Promise<Suggestion[]> {
-    return [];
+    await this.connect();
+    
+    const now = new Date();
+    const suggestions = await SuggestionModel.find({
+      workspaceId: workspaceId.toString(),
+      isUsed: false,
+      $or: [
+        { validUntil: { $gt: now } },
+        { validUntil: null }
+      ]
+    }).sort({ createdAt: -1 });
+    
+    return suggestions.map(doc => this.convertSuggestion(doc));
   }
 
   async createSuggestion(suggestion: InsertSuggestion): Promise<Suggestion> {

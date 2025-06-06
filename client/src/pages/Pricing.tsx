@@ -599,39 +599,39 @@ export default function Pricing() {
                         </CardContent>
 
                         <CardFooter className="pt-0">
-                          <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full"
+                          <Button
+                            className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 ${
+                              ((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
+                                ? 'bg-slate-600 hover:bg-slate-600 cursor-not-allowed text-slate-300'
+                                : isPopular
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25 text-white'
+                                : plan.id === 'creator'
+                                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 shadow-lg hover:shadow-blue-500/25 text-white'
+                                  : plan.id === 'pro'
+                                    ? 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-400 hover:to-violet-400 shadow-lg hover:shadow-purple-500/25 text-white'
+                                    : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
+                            }`}
+                            onClick={(e) => {
+                              console.log('Button clicked for plan:', plan.id);
+                              console.log('Current user plan:', (userSubscription as any)?.plan);
+                              console.log('Event target:', e.target);
+                              e.stopPropagation();
+                              handlePlanSelect(plan.id);
+                            }}
+                            disabled={((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase() || createSubscriptionMutation.isPending}
                           >
-                            <Button
-                              className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 ${
-                                (userSubscription as any)?.plan === plan.id
-                                  ? 'bg-slate-600 hover:bg-slate-600 cursor-not-allowed text-slate-300'
-                                  : isPopular
-                                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25 text-white'
-                                  : plan.id === 'creator'
-                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 shadow-lg hover:shadow-blue-500/25 text-white'
-                                    : plan.id === 'pro'
-                                      ? 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-400 hover:to-violet-400 shadow-lg hover:shadow-purple-500/25 text-white'
-                                      : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
-                              }`}
-                              onClick={() => handlePlanSelect(plan.id)}
-                              disabled={((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase() || createSubscriptionMutation.isPending}
-                            >
-                              <span className="flex items-center justify-center gap-2">
-                                {((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
-                                  ? 'Current Plan' 
-                                  : plan.price === 0 
-                                  ? 'Get Started' 
-                                  : 'Choose Plan'
-                                }
-                                {((userSubscription as any)?.plan || 'free').toLowerCase() !== plan.id.toLowerCase() && plan.price > 0 && (
-                                  <Rocket className="w-4 h-4" />
-                                )}
-                              </span>
-                            </Button>
-                          </motion.div>
+                            <span className="flex items-center justify-center gap-2 pointer-events-none">
+                              {((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
+                                ? 'Current Plan' 
+                                : plan.price === 0 
+                                ? 'Get Started' 
+                                : 'Choose Plan'
+                              }
+                              {((userSubscription as any)?.plan || 'free').toLowerCase() !== plan.id.toLowerCase() && plan.price > 0 && (
+                                <Rocket className="w-4 h-4" />
+                              )}
+                            </span>
+                          </Button>
                         </CardFooter>
                       </Card>
                     </motion.div>

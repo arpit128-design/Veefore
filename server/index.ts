@@ -43,12 +43,22 @@ const upload = multer({
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 
-// Debug middleware for request body
+// Fix body parsing middleware for content creation
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/content') && req.method === 'POST') {
     console.log('[BODY DEBUG] Raw body:', req.body);
     console.log('[BODY DEBUG] Content-Type:', req.headers['content-type']);
     console.log('[BODY DEBUG] Content-Length:', req.headers['content-length']);
+    
+    // Fix double-stringified body issue
+    if (req.body && typeof req.body === 'object' && req.body.body && typeof req.body.body === 'string') {
+      try {
+        req.body = JSON.parse(req.body.body);
+        console.log('[BODY DEBUG] Fixed double-stringified body');
+      } catch (parseError) {
+        console.error('[BODY DEBUG] Failed to parse nested body:', parseError);
+      }
+    }
   }
   next();
 });

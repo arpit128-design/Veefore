@@ -205,13 +205,18 @@ export default function Onboarding() {
     mutationFn: async (data: any) => {
       return apiRequest('POST', '/api/user/complete-onboarding', data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    onSuccess: async () => {
+      // Force refresh the user data
+      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/user'] });
+      
       toast({
         title: 'Welcome to VeeFore!',
         description: 'Your onboarding is complete. Redirecting to dashboard...'
       });
-      setTimeout(() => setLocation('/dashboard'), 1000);
+      
+      // Wait a bit longer to ensure user data is updated
+      setTimeout(() => setLocation('/dashboard'), 1500);
     },
     onError: () => {
       toast({

@@ -90,7 +90,11 @@ const tones = [
 ];
 
 export default function Onboarding() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(() => {
+    // Restore step from localStorage if returning from OAuth
+    const savedStep = localStorage.getItem('onboarding_current_step');
+    return savedStep ? parseInt(savedStep) : 0;
+  });
   const [, setLocation] = useLocation();
   const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
   const [preferences, setPreferences] = useState({
@@ -110,6 +114,27 @@ export default function Onboarding() {
     queryKey: ['/api/social-accounts'],
     enabled: currentStep === 1
   });
+
+  // Check if user is returning from Instagram OAuth and advance step
+  useEffect(() => {
+    const returningFromOAuth = localStorage.getItem('onboarding_returning_from_oauth');
+    if (returningFromOAuth === 'true') {
+      // Clean up localStorage flags
+      localStorage.removeItem('onboarding_returning_from_oauth');
+      localStorage.removeItem('onboarding_current_step');
+      
+      // Advance to next step if we were on step 1 (Instagram connection)
+      if (currentStep === 1) {
+        setTimeout(() => {
+          setCurrentStep(2);
+          toast({
+            title: 'Instagram Connected!',
+            description: 'Your Instagram account has been successfully connected.'
+          });
+        }, 1000);
+      }
+    }
+  }, [currentStep, toast]);
 
   // Fetch workspaces to ensure we have a valid workspace ID
   const { data: workspaces = [] } = useQuery({
@@ -186,6 +211,9 @@ export default function Onboarding() {
       
       if (data.authUrl) {
         console.log(`[ONBOARDING CONNECT] Redirecting to Instagram OAuth:`, data.authUrl);
+        // Save current step before redirecting to OAuth
+        localStorage.setItem('onboarding_current_step', currentStep.toString());
+        localStorage.setItem('onboarding_returning_from_oauth', 'true');
         window.location.href = data.authUrl;
       } else {
         throw new Error('Failed to get Instagram authorization URL');

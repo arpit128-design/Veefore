@@ -467,6 +467,20 @@ export class MongoStorage implements IStorage {
     return account ? this.convertSocialAccount(account) : undefined;
   }
 
+  async getSocialConnections(userId: number | string): Promise<SocialAccount[]> {
+    await this.connect();
+    // Get all workspaces for this user
+    const userWorkspaces = await this.getWorkspacesByUserId(userId);
+    const workspaceIds = userWorkspaces.map(w => w.id);
+    
+    // Get all social accounts for these workspaces
+    const accounts = await SocialAccountModel.find({ 
+      workspaceId: { $in: workspaceIds } 
+    });
+    
+    return accounts.map(account => this.convertSocialAccount(account));
+  }
+
   async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
     await this.connect();
     

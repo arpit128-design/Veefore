@@ -598,9 +598,9 @@ export default function Pricing() {
                           </motion.div>
                         </CardContent>
 
-                        <CardFooter className="pt-0">
+                        <CardFooter className="pt-0 px-6">
                           <Button
-                            className={`w-full py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 ${
+                            className={`relative w-full block py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 border-0 outline-none ${
                               ((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
                                 ? 'bg-slate-600 hover:bg-slate-600 cursor-not-allowed text-slate-300'
                                 : isPopular
@@ -611,16 +611,24 @@ export default function Pricing() {
                                     ? 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-400 hover:to-violet-400 shadow-lg hover:shadow-purple-500/25 text-white'
                                     : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 shadow-lg hover:shadow-indigo-500/25 text-white'
                             }`}
+                            style={{ 
+                              minHeight: '48px',
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
                             onClick={(e) => {
                               console.log('Button clicked for plan:', plan.id);
                               console.log('Current user plan:', (userSubscription as any)?.plan);
+                              console.log('Click coordinates:', e.clientX, e.clientY);
                               console.log('Event target:', e.target);
                               e.stopPropagation();
                               handlePlanSelect(plan.id);
                             }}
                             disabled={((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase() || createSubscriptionMutation.isPending}
                           >
-                            <span className="flex items-center justify-center gap-2 pointer-events-none">
+                            <div className="flex items-center justify-center gap-2 w-full h-full pointer-events-none">
                               {((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
                                 ? 'Current Plan' 
                                 : plan.price === 0 
@@ -630,7 +638,7 @@ export default function Pricing() {
                               {((userSubscription as any)?.plan || 'free').toLowerCase() !== plan.id.toLowerCase() && plan.price > 0 && (
                                 <Rocket className="w-4 h-4" />
                               )}
-                            </span>
+                            </div>
                           </Button>
                         </CardFooter>
                       </Card>

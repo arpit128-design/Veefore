@@ -23,6 +23,8 @@ const UserSchema = new mongoose.Schema({
   totalReferrals: { type: Number, default: 0 },
   totalEarned: { type: Number, default: 0 },
   referredBy: String,
+  preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
+  isOnboarded: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

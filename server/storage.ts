@@ -64,9 +64,13 @@ export interface IStorage {
 
   // Suggestions
   getSuggestions(workspaceId: number, type?: string): Promise<Suggestion[]>;
+  getSuggestionsByWorkspace(workspaceId: string | number): Promise<Suggestion[]>;
   getValidSuggestions(workspaceId: number): Promise<Suggestion[]>;
   createSuggestion(suggestion: InsertSuggestion): Promise<Suggestion>;
   markSuggestionUsed(id: number): Promise<Suggestion>;
+  
+  // Analytics by workspace
+  getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]>;
 
   // Credit transactions
   getCreditTransactions(userId: number, limit?: number): Promise<CreditTransaction[]>;

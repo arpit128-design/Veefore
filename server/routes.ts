@@ -16,6 +16,7 @@ import {
   enforceWatermarkPolicy,
   enrichResponseWithPlanInfo
 } from "./plan-enforcement-middleware";
+import { generateIntelligentSuggestions } from "./ai-suggestions-service";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -2047,6 +2048,92 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error: any) {
       console.error('[REFERRAL] Reward failed:', error);
       res.status(500).json({ error: 'Failed to process referral reward' });
+    }
+  });
+
+  // ==================== AI SUGGESTIONS ROUTES ====================
+  
+  // Get AI suggestions for workspace
+  app.get('/api/suggestions', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const workspaceId = req.query.workspaceId;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+      
+      // Get suggestions from storage
+      const suggestions = await storage.getSuggestionsByWorkspace(workspaceId);
+      
+      console.log(`[SUGGESTIONS] Found ${suggestions.length} suggestions for workspace ${workspaceId}`);
+      res.json(suggestions);
+    } catch (error: any) {
+      console.error('[SUGGESTIONS] Failed to get suggestions:', error);
+      res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+  });
+
+  // Generate new AI suggestions
+  app.post('/api/suggestions/generate', requireAuth, requireFeature('ai_suggestions'), async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { workspaceId } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+      
+      // Check credits
+      const creditCost = creditService.getCreditCost('ai_suggestions');
+      const hasCredits = await creditService.hasCredits(userId, 'ai_suggestions');
+      
+      if (!hasCredits) {
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          required: creditCost,
+          current: await creditService.getUserCredits(userId)
+        });
+      }
+      
+      console.log(`[AI SUGGESTIONS] Generating suggestions for workspace ${workspaceId}`);
+      
+      // Get workspace and analytics data for AI context
+      const workspace = await storage.getWorkspace(workspaceId);
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const recentAnalytics = await storage.getAnalyticsByWorkspace(workspaceId);
+      const recentContent = await storage.getContentByWorkspace(workspaceId);
+      
+      // Generate AI-powered suggestions based on real data
+      const suggestions = await generateIntelligentSuggestions(workspace, socialAccounts, recentAnalytics, recentContent);
+      
+      // Save suggestions to storage
+      const savedSuggestions = [];
+      for (const suggestion of suggestions) {
+        const saved = await storage.createSuggestion({
+          workspaceId: parseInt(workspaceId),
+          type: suggestion.type,
+          data: suggestion.data,
+          confidence: suggestion.confidence,
+          validUntil: suggestion.validUntil,
+          isUsed: false
+        });
+        savedSuggestions.push(saved);
+      }
+      
+      // Deduct credits
+      await creditService.deductCredits(userId, 'ai_suggestions', 1);
+      
+      console.log(`[AI SUGGESTIONS] Generated ${savedSuggestions.length} suggestions successfully`);
+      res.json({ 
+        suggestions: savedSuggestions,
+        creditsUsed: creditCost,
+        remainingCredits: await creditService.getUserCredits(userId)
+      });
+      
+    } catch (error: any) {
+      console.error('[AI SUGGESTIONS] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate suggestions' });
     }
   });
 

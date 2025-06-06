@@ -87,7 +87,8 @@ export default function Workspaces() {
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
       try {
-        const result = await apiRequest('POST', '/api/workspaces', data);
+        const response = await apiRequest('POST', '/api/workspaces', data);
+        const result = await response.json();
         console.log('=== MUTATION FUNCTION SUCCESS ===', result);
         return result;
       } catch (error: any) {

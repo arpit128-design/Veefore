@@ -87,6 +87,9 @@ export default function Integrations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
+  const [manualConnectOpen, setManualConnectOpen] = useState(false);
+  const [accessToken, setAccessToken] = useState("");
+  const [username, setUsername] = useState("");
 
   // Fetch connected social accounts
   const { data: socialAccounts, isLoading } = useQuery({
@@ -207,6 +210,34 @@ export default function Integrations() {
         variant: "destructive",
       });
     }
+  });
+
+  // Manual Instagram connection mutation
+  const manualConnectMutation = useMutation({
+    mutationFn: async ({ accessToken, username }: { accessToken: string; username: string }) => {
+      const response = await apiRequest('POST', '/api/instagram/manual-connect', {
+        accessToken,
+        username
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Instagram Connected",
+        description: `Successfully connected @${data.username}`,
+      });
+      setManualConnectOpen(false);
+      setAccessToken("");
+      setUsername("");
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Connection Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   // Disconnect social account mutation
@@ -491,18 +522,60 @@ export default function Integrations() {
                         )}
                       </Button>
                       {platform === 'instagram' && (
-                        <Button 
-                          onClick={() => directConnectMutation.mutate()}
-                          disabled={directConnectMutation.isPending}
-                          variant="outline"
-                          className="border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-white"
-                        >
-                          {directConnectMutation.isPending ? (
-                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          ) : (
-                            'Quick Connect'
-                          )}
-                        </Button>
+                        <Dialog open={manualConnectOpen} onOpenChange={setManualConnectOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="outline"
+                              className="border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-white"
+                            >
+                              Manual Connect
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-space-black border-asteroid-gray/20">
+                            <DialogHeader>
+                              <DialogTitle className="text-white">Connect Instagram Manually</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="username" className="text-white">Instagram Username</Label>
+                                <Input
+                                  id="username"
+                                  placeholder="Enter your Instagram username (e.g., arpit9996363)"
+                                  value={username}
+                                  onChange={(e) => setUsername(e.target.value)}
+                                  className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="token" className="text-white">Access Token</Label>
+                                <Input
+                                  id="token"
+                                  placeholder="Enter your Instagram access token"
+                                  value={accessToken}
+                                  onChange={(e) => setAccessToken(e.target.value)}
+                                  className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
+                                />
+                                <p className="text-xs text-asteroid-gray mt-1">
+                                  Get your access token from Instagram Basic Display API or Graph API
+                                </p>
+                              </div>
+                              <Button
+                                onClick={() => manualConnectMutation.mutate({ accessToken, username })}
+                                disabled={!accessToken || !username || manualConnectMutation.isPending}
+                                className="w-full bg-electric-cyan hover:bg-electric-cyan/80"
+                              >
+                                {manualConnectMutation.isPending ? (
+                                  <>
+                                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                    Connecting...
+                                  </>
+                                ) : (
+                                  'Connect Instagram'
+                                )}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       )}
                     </>
                   ) : (

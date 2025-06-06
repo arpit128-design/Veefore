@@ -311,6 +311,99 @@ export class InstagramAPI {
     const response = await axios.get(`${this.baseUrl}/refresh_access_token?${params.toString()}`);
     return response.data;
   }
+
+  // Publish photo to Instagram
+  async publishPhoto(accessToken: string, imageUrl: string, caption: string): Promise<{
+    id: string;
+    permalink?: string;
+  }> {
+    try {
+      console.log(`[INSTAGRAM PUBLISH] Starting photo upload process`);
+      
+      // Step 1: Create media container
+      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
+        image_url: imageUrl,
+        caption: caption,
+        access_token: accessToken
+      });
+
+      const containerId = containerResponse.data.id;
+      console.log(`[INSTAGRAM PUBLISH] Media container created: ${containerId}`);
+
+      // Step 2: Publish the media container
+      const publishResponse = await axios.post(`${this.baseUrl}/me/media_publish`, {
+        creation_id: containerId,
+        access_token: accessToken
+      });
+
+      console.log(`[INSTAGRAM PUBLISH] Photo published successfully:`, publishResponse.data);
+      return publishResponse.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM PUBLISH] Photo publish failed:`, error.response?.data || error.message);
+      throw new Error(`Instagram photo publish failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  // Publish video to Instagram
+  async publishVideo(accessToken: string, videoUrl: string, caption: string): Promise<{
+    id: string;
+    permalink?: string;
+  }> {
+    try {
+      console.log(`[INSTAGRAM PUBLISH] Starting video upload process`);
+      
+      // Step 1: Create video media container
+      const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
+        video_url: videoUrl,
+        caption: caption,
+        media_type: 'VIDEO',
+        access_token: accessToken
+      });
+
+      const containerId = containerResponse.data.id;
+      console.log(`[INSTAGRAM PUBLISH] Video container created: ${containerId}`);
+
+      // Step 2: Check container status (videos need processing time)
+      let containerReady = false;
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (!containerReady && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+        
+        const statusResponse = await axios.get(`${this.baseUrl}/${containerId}`, {
+          params: {
+            fields: 'status_code',
+            access_token: accessToken
+          }
+        });
+
+        if (statusResponse.data.status_code === 'FINISHED') {
+          containerReady = true;
+        } else if (statusResponse.data.status_code === 'ERROR') {
+          throw new Error('Video processing failed');
+        }
+        
+        attempts++;
+      }
+
+      if (!containerReady) {
+        throw new Error('Video processing timeout');
+      }
+
+      // Step 3: Publish the video container
+      const publishResponse = await axios.post(`${this.baseUrl}/me/media_publish`, {
+        creation_id: containerId,
+        access_token: accessToken
+      });
+
+      console.log(`[INSTAGRAM PUBLISH] Video published successfully:`, publishResponse.data);
+      return publishResponse.data;
+    } catch (error: any) {
+      console.error(`[INSTAGRAM PUBLISH] Video publish failed:`, error.response?.data || error.message);
+      throw new Error(`Instagram video publish failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
 }
 
 export const instagramAPI = new InstagramAPI();

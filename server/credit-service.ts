@@ -5,25 +5,25 @@ export class CreditService {
   
   // Get user's current credit balance
   async getUserCredits(userId: number | string): Promise<number> {
-    const user = await storage.getUser(Number(userId));
+    const user = await storage.getUser(userId);
     return user?.credits || 0;
   }
 
   // Get user's subscription and credit details
   async getUserCreditInfo(userId: number | string) {
-    const user = await storage.getUser(Number(userId));
+    const user = await storage.getUser(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
     // Get current subscription
-    const subscription = await storage.getSubscription(Number(userId));
+    const subscription = await storage.getSubscription(userId);
 
     // Get recent credit transactions
-    const recentTransactions = await storage.getCreditTransactions(Number(userId), 10);
+    const recentTransactions = await storage.getCreditTransactions(userId, 10);
 
     return {
-      currentCredits: user.credits,
+      currentCredits: user.credits || 0,
       plan: user.plan,
       subscription: subscription || null,
       recentTransactions
@@ -31,7 +31,7 @@ export class CreditService {
   }
 
   // Check if user has sufficient credits for a feature
-  async hasCredits(userId: number, featureType: string, quantity: number = 1): Promise<boolean> {
+  async hasCredits(userId: number | string, featureType: string, quantity: number = 1): Promise<boolean> {
     const creditCost = CREDIT_COSTS[featureType as keyof typeof CREDIT_COSTS];
     if (!creditCost) {
       throw new Error(`Unknown feature type: ${featureType}`);
@@ -44,7 +44,7 @@ export class CreditService {
   }
 
   // Consume credits for a feature
-  async consumeCredits(userId: number, featureType: string, quantity: number = 1, description?: string): Promise<boolean> {
+  async consumeCredits(userId: number | string, featureType: string, quantity: number = 1, description?: string): Promise<boolean> {
     const creditCost = CREDIT_COSTS[featureType as keyof typeof CREDIT_COSTS];
     if (!creditCost) {
       throw new Error(`Unknown feature type: ${featureType}`);
@@ -61,7 +61,7 @@ export class CreditService {
     const user = await storage.getUser(userId);
     if (!user) return false;
 
-    const newCredits = user.credits - totalCost;
+    const newCredits = (user.credits || 0) - totalCost;
     await storage.updateUserCredits(userId, newCredits);
 
     // Create credit transaction record
@@ -77,11 +77,11 @@ export class CreditService {
   }
 
   // Add credits to user account
-  async addCredits(userId: number, amount: number, type: 'purchase' | 'earned' | 'refund' | 'bonus', description: string, referenceId?: string): Promise<void> {
+  async addCredits(userId: number | string, amount: number, type: 'purchase' | 'earned' | 'refund' | 'bonus', description: string, referenceId?: string): Promise<void> {
     const user = await storage.getUser(userId);
     if (!user) throw new Error('User not found');
 
-    const newCredits = user.credits + amount;
+    const newCredits = (user.credits || 0) + amount;
     await storage.updateUserCredits(userId, newCredits);
 
     // Create credit transaction record
@@ -95,7 +95,7 @@ export class CreditService {
   }
 
   // Reset monthly credits based on subscription
-  async resetMonthlyCredits(userId: number): Promise<void> {
+  async resetMonthlyCredits(userId: number | string): Promise<void> {
     const subscription = await storage.getSubscription(userId);
 
     if (!subscription) {
@@ -109,7 +109,7 @@ export class CreditService {
   }
 
   // Handle referral rewards
-  async awardReferralCredits(userId: number, type: 'inviteFriend' | 'submitFeedback'): Promise<void> {
+  async awardReferralCredits(userId: number | string, type: 'inviteFriend' | 'submitFeedback'): Promise<void> {
     const credits = REFERRAL_REWARDS[type];
     if (!credits) return;
 
@@ -123,12 +123,12 @@ export class CreditService {
   }
 
   // Get credit transaction history
-  async getCreditHistory(userId: number, limit: number = 50) {
+  async getCreditHistory(userId: number | string, limit: number = 50) {
     return await storage.getCreditTransactions(userId, limit);
   }
 
   // Calculate credit rollover (unused credits from previous month)
-  async calculateCreditRollover(userId: number): Promise<number> {
+  async calculateCreditRollover(userId: number | string): Promise<number> {
     // Get last month's credit reset transactions
     const transactions = await storage.getCreditTransactions(userId, 50);
     const resets = transactions.filter(t => 

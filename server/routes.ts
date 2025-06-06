@@ -5,6 +5,17 @@ import { videoGeneratorAI } from "./video-generator";
 import { Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { AccessControl } from "./access-control";
+import { 
+  requireFeature, 
+  requireCredits, 
+  validateWorkspaceLimit, 
+  validateSocialAccountLimit,
+  validateSchedulingLimit,
+  addPlanContext,
+  enforceWatermarkPolicy,
+  enrichResponseWithPlanInfo
+} from "./plan-enforcement-middleware";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -182,8 +193,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Add global plan context middleware
+  app.use(requireAuth, addPlanContext, enrichResponseWithPlanInfo);
+
   // Content creation and publishing
-  app.post('/api/content', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/content', requireCredits(5), validateSchedulingLimit(), enforceWatermarkPolicy(), async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { workspaceId, title, description, type, platform, scheduledAt, publishNow, contentData } = req.body;

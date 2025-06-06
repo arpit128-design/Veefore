@@ -787,8 +787,25 @@ export class MongoStorage implements IStorage {
       query.type = type;
     }
     
+    console.log('[MONGODB DEBUG] getSuggestions query:', JSON.stringify(query));
+    console.log('[MONGODB DEBUG] Searching for workspace ID:', workspaceId, 'as string:', workspaceId.toString());
+    
     const suggestions = await SuggestionModel.find(query)
       .sort({ createdAt: -1 });
+    
+    console.log('[MONGODB DEBUG] Found suggestions count:', suggestions.length);
+    if (suggestions.length > 0) {
+      console.log('[MONGODB DEBUG] First suggestion workspaceId:', suggestions[0].workspaceId);
+    }
+    
+    // Also check all suggestions to see what workspace IDs exist
+    const allSuggestions = await SuggestionModel.find({}).limit(10);
+    console.log('[MONGODB DEBUG] All suggestions in DB (first 10):', allSuggestions.map(s => ({
+      id: s._id,
+      workspaceId: s.workspaceId,
+      type: s.type,
+      createdAt: s.createdAt
+    })));
     
     return suggestions.map(doc => this.convertSuggestion(doc));
   }

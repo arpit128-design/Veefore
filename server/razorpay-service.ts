@@ -35,6 +35,7 @@ export class RazorpayService {
     try {
       const order = await razorpay.orders.create(options);
       return {
+        key: process.env.RAZORPAY_KEY_ID,
         orderId: order.id,
         amount: order.amount,
         currency: order.currency,
@@ -70,6 +71,7 @@ export class RazorpayService {
     try {
       const order = await razorpay.orders.create(options);
       return {
+        key: process.env.RAZORPAY_KEY_ID,
         orderId: order.id,
         amount: order.amount,
         currency: order.currency,
@@ -103,6 +105,7 @@ export class RazorpayService {
     try {
       const order = await razorpay.orders.create(options);
       return {
+        key: process.env.RAZORPAY_KEY_ID,
         orderId: order.id,
         amount: order.amount,
         currency: order.currency,

@@ -59,7 +59,7 @@ export default function Scheduler() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: scheduledContent } = useQuery({
+  const { data: scheduledContent = [] } = useQuery({
     queryKey: ['scheduled-content', currentWorkspace?.id],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/content?workspaceId=${currentWorkspace?.id}&status=scheduled`);
@@ -184,6 +184,63 @@ export default function Scheduler() {
       }));
     }
     setIsScheduleDialogOpen(true);
+  };
+
+  const getTimeUntilScheduled = (scheduledAt: string) => {
+    const now = new Date();
+    const scheduled = new Date(scheduledAt);
+    const diff = scheduled.getTime() - now.getTime();
+    
+    if (diff <= 0) return "Publishing soon...";
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  };
+
+  const getContentIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video className="h-4 w-4" />;
+      case 'reel': return <Video className="h-4 w-4" />;
+      case 'post': return <Image className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled': return 'bg-blue-500';
+      case 'publishing': return 'bg-yellow-500';
+      case 'published': return 'bg-green-500';
+      case 'failed': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const handleEdit = (content: any) => {
+    const scheduled = new Date(content.scheduledAt);
+    setEditForm({
+      id: content.id,
+      title: content.title,
+      description: content.description || "",
+      scheduledDate: scheduled.toISOString().split('T')[0],
+      scheduledTime: scheduled.toTimeString().slice(0, 5)
+    });
+    setEditDialog(true);
+  };
+
+  const handleDelete = (contentId: string) => {
+    if (window.confirm('Are you sure you want to cancel this scheduled post?')) {
+      deleteContentMutation.mutate(parseInt(contentId));
+    }
+  };
+
+  const handleUpdate = () => {
+    updateContentMutation.mutate(editForm);
   };
 
   const handleBulkUpload = () => {
@@ -1103,6 +1160,74 @@ export default function Scheduler() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Content Dialog */}
+      <Dialog open={editDialog} onOpenChange={setEditDialog}>
+        <DialogContent className="glassmorphism border-cosmic-dark max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-electric-cyan">Edit Scheduled Content</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-asteroid-silver">Title</Label>
+              <Input
+                value={editForm.title}
+                onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                className="glassmorphism"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-asteroid-silver">Description</Label>
+              <Input
+                value={editForm.description}
+                onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                className="glassmorphism"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-asteroid-silver">Date</Label>
+                <Input
+                  type="date"
+                  value={editForm.scheduledDate}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                  className="glassmorphism"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-asteroid-silver">Time</Label>
+                <Input
+                  type="time"
+                  value={editForm.scheduledTime}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                  className="glassmorphism"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setEditDialog(false)}
+                className="glassmorphism"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdate}
+                disabled={updateContentMutation.isPending}
+                className="bg-electric-cyan hover:bg-electric-cyan/80 text-cosmic-dark"
+              >
+                {updateContentMutation.isPending ? "Updating..." : "Update"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Plus } from "lucide-react";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useLocation } from "wouter";
 
 export function WorkspaceSwitcher() {
-  const { workspaces, currentWorkspace, switchWorkspace } = useWorkspace();
+  const { workspaces, currentWorkspace, switchWorkspace } = useWorkspaceContext();
   const [, setLocation] = useLocation();
 
   if (!currentWorkspace) {
@@ -29,7 +29,7 @@ export function WorkspaceSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 glassmorphism border-electric-cyan/30">
-        {workspaces.map((workspace) => (
+        {workspaces.map((workspace: any) => (
           <DropdownMenuItem
             key={workspace.id}
             onClick={() => switchWorkspace(workspace)}

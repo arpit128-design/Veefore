@@ -99,7 +99,7 @@ export function validateWorkspaceLimit() {
         });
       }
       
-      console.log(`[WORKSPACE LIMIT] Access allowed, proceeding to workspace creation`)
+      console.log(`[WORKSPACE LIMIT] Access allowed, proceeding to workspace creation`);
 
       next();
     } catch (error) {

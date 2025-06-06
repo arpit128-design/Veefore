@@ -1337,7 +1337,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Create workspace
-  app.post('/api/workspaces', requireAuth, addPlanContext, validateWorkspaceLimit(), enrichResponseWithPlanInfo(), async (req: any, res: Response) => {
+  app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { name, description, theme } = req.body;
@@ -1347,6 +1347,32 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       if (!name || !name.trim()) {
         console.log(`[WORKSPACES] Validation failed - empty name`);
         return res.status(400).json({ error: 'Workspace name is required' });
+      }
+
+      // Check workspace limits directly
+      const userPlan = user.plan || 'free';
+      console.log(`[WORKSPACES] Getting workspaces for user ${user.id}...`);
+      
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const currentCount = workspaces.length;
+      
+      console.log(`[WORKSPACES] User ${user.id} has ${currentCount} workspaces on plan ${userPlan}`);
+      console.log(`[WORKSPACES] Checking access control...`);
+      
+      const access = AccessControl.canCreateWorkspace(userPlan, currentCount);
+      
+      console.log(`[WORKSPACES] Access control result:`, access);
+      
+      if (!access.allowed) {
+        const upgradeMessage = AccessControl.generateUpgradeMessage(userPlan, 'workspaces');
+        console.log(`[WORKSPACES] BLOCKING workspace creation - plan limit reached`);
+        return res.status(403).json({ 
+          error: access.reason,
+          upgradeMessage,
+          currentWorkspaces: currentCount,
+          maxWorkspaces: AccessControl.getPlanLimits(userPlan).workspaces,
+          currentPlan: userPlan
+        });
       }
 
       console.log(`[WORKSPACES] Validation passed, creating workspace for user ${user.id}`);

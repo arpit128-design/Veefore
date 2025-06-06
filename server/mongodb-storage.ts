@@ -301,8 +301,16 @@ export class MongoStorage implements IStorage {
 
   async getWorkspacesByUserId(userId: number | string): Promise<Workspace[]> {
     await this.connect();
-    const workspaces = await WorkspaceModel.find({ userId });
-    return workspaces.map(this.convertWorkspace);
+    console.log('[MONGODB DEBUG] getWorkspacesByUserId - userId:', userId, typeof userId);
+    
+    try {
+      const workspaces = await WorkspaceModel.find({ userId }).maxTimeMS(5000);
+      console.log('[MONGODB DEBUG] Found workspaces:', workspaces.length);
+      return workspaces.map(this.convertWorkspace);
+    } catch (error) {
+      console.error('[MONGODB DEBUG] getWorkspacesByUserId error:', error);
+      throw error;
+    }
   }
 
   async getDefaultWorkspace(userId: number | string): Promise<Workspace | undefined> {

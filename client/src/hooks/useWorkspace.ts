@@ -45,15 +45,22 @@ export function useWorkspace() {
   }, [workspaces, currentWorkspace]);
 
   const switchWorkspace = async (workspace: Workspace) => {
-    if (workspace.id === currentWorkspace?.id) return;
+    console.log('[WORKSPACE] Switching from', currentWorkspace?.name, 'to', workspace.name);
+    if (workspace.id === currentWorkspace?.id) {
+      console.log('[WORKSPACE] Same workspace, skipping switch');
+      return;
+    }
     
+    console.log('[WORKSPACE] Starting workspace switch animation');
     setIsSwitching(true);
     
     // Create switching animation delay - slower for readability
     await new Promise(resolve => setTimeout(resolve, 5000));
     
+    console.log('[WORKSPACE] Completing workspace switch to', workspace.name);
     setCurrentWorkspace(workspace);
     setIsSwitching(false);
+    console.log('[WORKSPACE] Workspace switch completed');
   };
 
   return {
@@ -90,15 +97,22 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [workspaces, currentWorkspace]);
 
   const switchWorkspace = async (workspace: Workspace) => {
-    if (workspace.id === currentWorkspace?.id) return;
+    console.log('[WORKSPACE PROVIDER] Switching from', currentWorkspace?.name, 'to', workspace.name);
+    if (workspace.id === currentWorkspace?.id) {
+      console.log('[WORKSPACE PROVIDER] Same workspace, skipping switch');
+      return;
+    }
     
+    console.log('[WORKSPACE PROVIDER] Starting workspace switch animation');
     setIsSwitching(true);
     
     // Create switching animation delay - slower for readability
     await new Promise(resolve => setTimeout(resolve, 5000));
     
+    console.log('[WORKSPACE PROVIDER] Completing workspace switch to', workspace.name);
     setCurrentWorkspace(workspace);
     setIsSwitching(false);
+    console.log('[WORKSPACE PROVIDER] Workspace switch completed');
   };
 
   const contextValue = {

@@ -209,13 +209,13 @@ export default function Dashboard() {
 
         {/* Twitter Analytics */}
         <div className="content-card holographic">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <i className="fab fa-x-twitter text-2xl text-white" />
-                <h3 className="text-xl font-orbitron font-semibold">Twitter Analytics</h3>
+          <div className="p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <i className="fab fa-x-twitter text-xl md:text-2xl text-white" />
+                <h3 className="text-lg md:text-xl font-orbitron font-semibold">Twitter Analytics</h3>
               </div>
-              <div className="w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
             </div>
             
             <div className="space-y-4">

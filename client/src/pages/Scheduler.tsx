@@ -769,27 +769,28 @@ export default function Scheduler() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-orbitron font-bold neon-text text-solar-gold">
+          <h2 className="text-2xl md:text-4xl font-orbitron font-bold neon-text text-solar-gold">
             Mission Scheduler
           </h2>
-          <p className="text-asteroid-silver mt-2">
+          <p className="text-asteroid-silver mt-2 text-sm md:text-base">
             Orchestrate your content across the digital cosmos
           </p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
           <Button 
             variant="outline" 
             onClick={handleBulkUpload}
-            className="glassmorphism"
+            className="glassmorphism w-full sm:w-auto"
           >
             <Upload className="w-4 h-4 mr-2" />
-            Bulk Upload
+            <span className="hidden sm:inline">Bulk Upload</span>
+            <span className="sm:hidden">Upload</span>
           </Button>
           <Button 
             onClick={() => handleScheduleContent()}
-            className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90 transition-opacity w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             Schedule Content
@@ -850,12 +851,25 @@ export default function Scheduler() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 glassmorphism">
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled Content</TabsTrigger>
-          <TabsTrigger value="list">List View</TabsTrigger>
-          <TabsTrigger value="automation">Automation</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-1 glassmorphism">
+          <TabsTrigger value="calendar" className="text-xs md:text-sm">
+            <span className="hidden md:inline">Calendar View</span>
+            <span className="md:hidden">Calendar</span>
+          </TabsTrigger>
+          <TabsTrigger value="scheduled" className="text-xs md:text-sm">
+            <span className="hidden md:inline">Scheduled Content</span>
+            <span className="md:hidden">Scheduled</span>
+          </TabsTrigger>
+          <TabsTrigger value="list" className="text-xs md:text-sm md:block">
+            <span className="hidden md:inline">List View</span>
+            <span className="md:hidden">List</span>
+          </TabsTrigger>
+          <TabsTrigger value="automation" className="text-xs md:text-sm hidden md:block">
+            Automation
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs md:text-sm hidden md:block">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendar" className="space-y-6">

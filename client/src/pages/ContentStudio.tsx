@@ -692,31 +692,34 @@ export default function ContentStudio() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Content Studio</h1>
-          <p className="text-gray-400">Create, generate, and manage your content</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Content Studio</h1>
+          <p className="text-gray-400 text-sm md:text-base">Create, generate, and manage your content</p>
         </div>
-        <div className="text-right">
-          <div className="text-sm text-gray-400">Active Workspace</div>
-          <div className="text-white font-medium">{currentWorkspace?.name}</div>
+        <div className="text-left md:text-right">
+          <div className="text-xs md:text-sm text-gray-400">Active Workspace</div>
+          <div className="text-white font-medium text-sm md:text-base">{currentWorkspace?.name}</div>
         </div>
       </div>
 
       {/* Content Creation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-800 border border-gray-600">
-          <TabsTrigger value="video" className="text-white data-[state=active]:bg-blue-600">
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 bg-gray-800 border border-gray-600 gap-1">
+          <TabsTrigger value="video" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
             <Video className="w-4 h-4 mr-2" />
-            Video Generator
+            <span className="hidden sm:inline">Video Generator</span>
+            <span className="sm:hidden">Video</span>
           </TabsTrigger>
-          <TabsTrigger value="post" className="text-white data-[state=active]:bg-blue-600">
+          <TabsTrigger value="post" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
             <ImageIcon className="w-4 h-4 mr-2" />
-            Post Creator
+            <span className="hidden sm:inline">Post Creator</span>
+            <span className="sm:hidden">Post</span>
           </TabsTrigger>
-          <TabsTrigger value="caption" className="text-white data-[state=active]:bg-blue-600">
+          <TabsTrigger value="caption" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
             <Edit className="w-4 h-4 mr-2" />
-            Caption AI
+            <span className="hidden sm:inline">Caption AI</span>
+            <span className="sm:hidden">Caption</span>
           </TabsTrigger>
         </TabsList>
 

@@ -124,8 +124,7 @@ export class CreditService {
 
   // Deduct credits from user account
   async deductCredits(userId: number | string, amount: number, description: string = 'Credit usage', referenceId?: string): Promise<void> {
-    const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
-    const user = await storage.getUser(userIdNum);
+    const user = await storage.getUser(userId);
     
     if (!user) {
       throw new Error('User not found');
@@ -137,7 +136,7 @@ export class CreditService {
     }
     
     // Deduct credits from user
-    await storage.updateUserCredits(userIdNum, currentCredits - amount);
+    await storage.updateUserCredits(userId, currentCredits - amount);
     
     // Record the transaction
     await storage.createCreditTransaction({

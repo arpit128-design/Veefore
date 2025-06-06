@@ -197,9 +197,20 @@ export class MongoStorage implements IStorage {
   }
 
   // User operations
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: number | string): Promise<User | undefined> {
     await this.connect();
-    const user = await UserModel.findOne({ _id: id });
+    
+    // Handle both string ObjectIds and numeric IDs
+    let query;
+    if (typeof id === 'string' && id.length === 24) {
+      // It's a MongoDB ObjectId string
+      query = { _id: id };
+    } else {
+      // Try to find by numeric ID field or converted string
+      query = { $or: [{ id: id }, { _id: id.toString() }] };
+    }
+    
+    const user = await UserModel.findOne(query);
     return user ? this.convertUser(user) : undefined;
   }
 
@@ -280,11 +291,11 @@ export class MongoStorage implements IStorage {
     return this.convertUser(user);
   }
 
-  async updateUserCredits(id: number, credits: number): Promise<User> {
+  async updateUserCredits(id: number | string, credits: number): Promise<User> {
     return this.updateUser(id, { credits });
   }
 
-  async updateUserStripeInfo(id: number, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User> {
+  async updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User> {
     return this.updateUser(id, { stripeCustomerId, stripeSubscriptionId });
   }
 

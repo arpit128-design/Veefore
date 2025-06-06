@@ -14,15 +14,15 @@ import {
 
 export interface IStorage {
   // User operations
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: number | string): Promise<User | undefined>;
   getUserByFirebaseUid(firebaseUid: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByReferralCode(referralCode: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number | string, updates: Partial<User>): Promise<User>;
-  updateUserCredits(id: number, credits: number): Promise<User>;
-  updateUserStripeInfo(id: number, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
+  updateUserCredits(id: number | string, credits: number): Promise<User>;
+  updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
 
   // Workspace operations
   getWorkspace(id: number): Promise<Workspace | undefined>;

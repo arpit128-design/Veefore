@@ -351,6 +351,8 @@ export class InstagramAPI {
   }> {
     try {
       console.log(`[INSTAGRAM PUBLISH] Starting reel upload process`);
+      console.log(`[INSTAGRAM API] WARNING: Reel publishing requires advanced Instagram API permissions`);
+      console.log(`[INSTAGRAM API] If this fails, the video will be published as a regular video post instead`);
       
       // Step 1: Create reel media container
       const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
@@ -366,7 +368,7 @@ export class InstagramAPI {
       // Step 2: Check container status (reels need processing time)
       let containerReady = false;
       let attempts = 0;
-      const maxAttempts = 15; // Reels may take longer to process
+      const maxAttempts = 12; // 2 minutes total wait time
 
       while (!containerReady && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds for reels
@@ -383,14 +385,18 @@ export class InstagramAPI {
         if (statusResponse.data.status_code === 'FINISHED') {
           containerReady = true;
         } else if (statusResponse.data.status_code === 'ERROR') {
-          throw new Error('Reel processing failed');
+          console.log(`[INSTAGRAM PUBLISH] Reel processing failed, falling back to regular video post`);
+          // Fall back to regular video post
+          return this.publishVideo(accessToken, videoUrl, caption);
         }
         
         attempts++;
       }
 
       if (!containerReady) {
-        throw new Error('Reel processing timeout');
+        console.log(`[INSTAGRAM PUBLISH] Reel processing timeout, falling back to regular video post`);
+        // Fall back to regular video post
+        return this.publishVideo(accessToken, videoUrl, caption);
       }
 
       // Step 3: Publish the reel container
@@ -402,8 +408,13 @@ export class InstagramAPI {
       console.log(`[INSTAGRAM PUBLISH] Reel published successfully:`, publishResponse.data);
       return publishResponse.data;
     } catch (error: any) {
-      console.error(`[INSTAGRAM PUBLISH] Reel publish failed:`, error.response?.data || error.message);
-      throw new Error(`Instagram reel publish failed: ${error.response?.data?.error?.message || error.message}`);
+      console.error(`[INSTAGRAM PUBLISH] Reel publish failed, trying regular video:`, error.response?.data || error.message);
+      // Fall back to regular video post if Reels fail
+      try {
+        return await this.publishVideo(accessToken, videoUrl, caption);
+      } catch (fallbackError: any) {
+        throw new Error(`Instagram publish failed: ${error.response?.data?.error?.message || error.message}`);
+      }
     }
   }
 

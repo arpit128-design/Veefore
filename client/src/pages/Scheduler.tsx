@@ -951,9 +951,21 @@ export default function Scheduler() {
                           </Button>
                         </div>
                         {uploadedFile && (
-                          <p className="text-xs text-asteroid-silver mt-2">
-                            {uploadedFile.name} ({uploadedFile.type.startsWith('video/') ? 'Video' : 'Image'})
-                          </p>
+                          <div className="mt-2">
+                            <p className="text-xs text-asteroid-silver">
+                              {uploadedFile.name} ({uploadedFile.type.startsWith('video/') ? 'Video' : 'Image'})
+                            </p>
+                            {uploadedFile.type.startsWith('video/') && uploadedFile.size > 50 * 1024 * 1024 && (
+                              <p className="text-xs text-yellow-400 mt-1">
+                                ⚠️ Large video ({(uploadedFile.size / (1024 * 1024)).toFixed(1)}MB) - Instagram may take longer to process
+                              </p>
+                            )}
+                            {scheduleForm.type === 'reel' && uploadedFile.type.startsWith('video/') && (
+                              <p className="text-xs text-blue-400 mt-1">
+                                📝 Note: If Reel publishing fails, your video will be posted as a regular video instead
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
@@ -1152,7 +1164,9 @@ export default function Scheduler() {
                   disabled={createContentMutation.isPending || !scheduleForm.mediaUrl}
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                 >
-                  {createContentMutation.isPending ? "Publishing..." : "Post Now"}
+                  {createContentMutation.isPending ? (
+                    scheduleForm.type === 'reel' || scheduleForm.type === 'video' ? "Processing Video..." : "Publishing..."
+                  ) : "Post Now"}
                 </Button>
                 <Button
                   type="button"

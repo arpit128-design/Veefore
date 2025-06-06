@@ -328,6 +328,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'No file uploaded' });
       }
 
+      const fileSizeMB = req.file.size / (1024 * 1024);
+      console.log(`[UPLOAD] File uploaded: ${req.file.filename} (${fileSizeMB.toFixed(2)} MB)`);
+
+      // Warn for large video files that may affect Instagram processing
+      if (req.file.mimetype.startsWith('video/') && fileSizeMB > 50) {
+        console.log(`[UPLOAD WARNING] Large video file (${fileSizeMB.toFixed(2)} MB) - Instagram may take longer to process`);
+      }
+
       const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
       
       res.json({
@@ -335,7 +343,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         fileUrl,
         filename: req.file.filename,
         originalName: req.file.originalname,
-        size: req.file.size
+        size: req.file.size,
+        sizeMB: fileSizeMB.toFixed(2),
+        type: req.file.mimetype,
+        isVideo: req.file.mimetype.startsWith('video/'),
+        warning: req.file.mimetype.startsWith('video/') && fileSizeMB > 50 ? 'Large video files may take longer to process on Instagram' : null
       });
     } catch (error: any) {
       console.error('Upload error:', error);

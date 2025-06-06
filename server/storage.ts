@@ -17,7 +17,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByReferralCode(referralCode: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, updates: Partial<User>): Promise<User>;
+  updateUser(id: number | string, updates: Partial<User>): Promise<User>;
   updateUserCredits(id: number, credits: number): Promise<User>;
   updateUserStripeInfo(id: number, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
 
@@ -136,12 +136,13 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const user = this.users.get(id);
+  async updateUser(id: number | string, updates: Partial<User>): Promise<User> {
+    const numId = typeof id === 'string' ? parseInt(id) : id;
+    const user = this.users.get(numId);
     if (!user) throw new Error("User not found");
     
     const updatedUser = { ...user, ...updates, updatedAt: new Date() };
-    this.users.set(id, updatedUser);
+    this.users.set(numId, updatedUser);
     return updatedUser;
   }
 

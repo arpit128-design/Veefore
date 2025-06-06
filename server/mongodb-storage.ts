@@ -202,14 +202,39 @@ export class MongoStorage implements IStorage {
     return this.convertUser(savedUser);
   }
 
-  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+  async updateUser(id: number | string, updates: Partial<User>): Promise<User> {
     await this.connect();
-    const user = await UserModel.findOneAndUpdate(
-      { _id: id },
-      { ...updates, updatedAt: new Date() },
-      { new: true }
-    );
-    if (!user) throw new Error('User not found');
+    
+    console.log(`[MONGODB DEBUG] Updating user with ID: ${id} (type: ${typeof id})`);
+    console.log(`[MONGODB DEBUG] Updates:`, updates);
+    
+    // Handle both ObjectId strings and numeric IDs
+    let user;
+    try {
+      if (mongoose.Types.ObjectId.isValid(id.toString())) {
+        user = await UserModel.findByIdAndUpdate(
+          id.toString(),
+          { ...updates, updatedAt: new Date() },
+          { new: true }
+        );
+      } else {
+        user = await UserModel.findOneAndUpdate(
+          { _id: id },
+          { ...updates, updatedAt: new Date() },
+          { new: true }
+        );
+      }
+    } catch (error) {
+      console.error(`[MONGODB DEBUG] Error updating user:`, error);
+      throw error;
+    }
+    
+    if (!user) {
+      console.error(`[MONGODB DEBUG] User not found with ID: ${id}`);
+      throw new Error('User not found');
+    }
+    
+    console.log(`[MONGODB DEBUG] Successfully updated user: ${user._id}, isOnboarded: ${user.isOnboarded}`);
     return this.convertUser(user);
   }
 

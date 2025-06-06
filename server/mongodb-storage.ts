@@ -522,18 +522,31 @@ export class MongoStorage implements IStorage {
   async deleteContent(id: number | string): Promise<void> {
     await this.connect();
     
+    console.log(`[MONGODB DELETE] Attempting to delete content with ID: ${id} (type: ${typeof id})`);
+    
+    // Try deleting by MongoDB _id first (ObjectId format)
+    let deleteResult;
     try {
-      const deleteResult = await ContentModel.deleteOne({ _id: id });
+      deleteResult = await ContentModel.deleteOne({ _id: id });
+      console.log(`[MONGODB DELETE] Delete by _id result:`, deleteResult);
+    } catch (objectIdError: any) {
+      console.log(`[MONGODB DELETE] ObjectId deletion failed, trying by 'id' field:`, objectIdError.message);
       
-      if (deleteResult.deletedCount === 0) {
-        throw new Error(`Content with id ${id} not found`);
+      // If ObjectId fails, try deleting by the 'id' field
+      try {
+        deleteResult = await ContentModel.deleteOne({ id: id });
+        console.log(`[MONGODB DELETE] Delete by id field result:`, deleteResult);
+      } catch (idError) {
+        console.error(`[MONGODB DELETE] Both deletion methods failed:`, idError);
+        throw new Error(`Failed to delete content with id ${id}`);
       }
-      
-      console.log(`[MONGODB] Successfully deleted content: ${id}`);
-    } catch (error) {
-      console.error(`[MONGODB] Error deleting content ${id}:`, error);
-      throw error;
     }
+    
+    if (deleteResult.deletedCount === 0) {
+      throw new Error(`Content with id ${id} not found`);
+    }
+    
+    console.log(`[MONGODB] Successfully deleted content: ${id}`);
   }
 
   async getAnalytics(workspaceId: number | string, platform?: string, days?: number): Promise<Analytics[]> {

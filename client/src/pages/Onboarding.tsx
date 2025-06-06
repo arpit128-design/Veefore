@@ -770,9 +770,27 @@ export default function Onboarding() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto">
+                <motion.div 
+                  className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto relative"
+                  animate={{ 
+                    boxShadow: [
+                      "0 0 20px rgba(236, 72, 153, 0.4)",
+                      "0 0 40px rgba(236, 72, 153, 0.6)",
+                      "0 0 20px rgba(236, 72, 153, 0.4)"
+                    ]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
                   <Zap className="w-6 h-6 text-white" />
-                </div>
+                  <motion.div
+                    className="absolute inset-0 rounded-xl border-2 border-pink-400/30"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 0, 0.5]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
                 <CardTitle className="text-xl font-bold bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
                   Brand Personality
                 </CardTitle>

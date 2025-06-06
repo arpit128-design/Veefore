@@ -73,13 +73,24 @@ export default function Dashboard() {
   // Map API response to dashboard data structure
   console.log('[DASHBOARD DEBUG] Analytics data received:', analyticsData);
   
-  // Handle null/undefined data gracefully and provide fallback
+  // Map Instagram API response to dashboard format
+  const rawData = analyticsData as any;
   const analytics = {
-    totalViews: (analyticsData as any)?.totalViews || 0,
-    engagement: (analyticsData as any)?.engagement || 0,
-    newFollowers: (analyticsData as any)?.totalFollowers || (analyticsData as any)?.newFollowers || 0,
-    contentScore: (analyticsData as any)?.contentScore || 85,
-    platforms: (analyticsData as any)?.platforms || []
+    totalViews: rawData?.totalReach || rawData?.impressions || 0,
+    engagement: rawData?.engagementRate || 0,
+    newFollowers: rawData?.followers || 0,
+    contentScore: 85, // Static for now
+    platforms: rawData?.accountUsername ? ['instagram'] : []
+  };
+  
+  // Create proper data mapping for Instagram metrics
+  const instagramData = {
+    followers: rawData?.followers || 0,
+    engagementRate: rawData?.engagementRate || 0,
+    impressions: rawData?.impressions || 0,
+    totalPosts: rawData?.totalPosts || 0,
+    totalReach: rawData?.totalReach || 0,
+    accountUsername: rawData?.accountUsername
   };
   
   // Show loading message when data is null/empty
@@ -155,27 +166,27 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Followers</span>
-                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.followers || analytics.newFollowers || 0}</span>
+                <span className="text-xl font-bold text-white">{instagramData.followers}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Avg. Engagement</span>
-                <span className="text-xl font-bold text-green-400">{analytics.engagement || 0}</span>
+                <span className="text-xl font-bold text-green-400">{instagramData.engagementRate.toFixed(1)}%</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Impressions</span>
-                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.impressions || 0}</span>
+                <span className="text-xl font-bold text-white">{instagramData.impressions}</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Total Likes</span>
-                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.likes || analytics.engagement || 0}</span>
+                <span className="text-asteroid-silver">Total Posts</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalPosts}</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Reach (7d)</span>
-                <span className="text-xl font-bold text-white">{analytics.platforms[0]?.reach || 0}</span>
+                <span className="text-asteroid-silver">Reach</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalReach}</span>
               </div>
             </div>
           </div>

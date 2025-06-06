@@ -623,13 +623,13 @@ export default function Onboarding() {
           </Card>
         </motion.div>
 
-        {/* Enhanced Niche Selection Dropdown */}
+        {/* Enhanced Niche Selection with Compact List */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
             <CardHeader className="text-center pb-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -645,96 +645,66 @@ export default function Onboarding() {
                 <p className="text-white/70">Select multiple niches that match your brand</p>
               </motion.div>
             </CardHeader>
-            <CardContent className="space-y-6 p-8 overflow-visible">
-              {/* Dropdown Menu */}
-              <div className="relative z-50">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setNicheDropdownOpen(!nicheDropdownOpen)}
-                  className="w-full p-4 bg-white/10 border border-white/20 rounded-xl cursor-pointer flex items-center justify-between hover:bg-white/15 transition-all duration-300"
-                >
-                  <div className="flex items-center space-x-3">
-                    <Plus className="w-5 h-5 text-white/70" />
-                    <span className="text-white/90">Add Niches ({preferences.selectedNiches.length} selected)</span>
-                  </div>
-                  <motion.div
-                    animate={{ rotate: nicheDropdownOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ChevronDown className="w-5 h-5 text-white/70" />
-                  </motion.div>
-                </motion.div>
-
-                {/* Dropdown Content */}
-                <motion.div
-                  initial={false}
-                  animate={{ 
-                    opacity: nicheDropdownOpen ? 1 : 0,
-                    y: nicheDropdownOpen ? 0 : -10,
-                    scale: nicheDropdownOpen ? 1 : 0.95,
-                    pointerEvents: nicheDropdownOpen ? 'auto' : 'none'
-                  }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-h-96 overflow-y-auto"
-                >
-                    {/* Categories */}
-                    {['Personal', 'Creative', 'Professional', 'Lifestyle', 'Commercial', 'Specialty', 'Entertainment'].map((category) => {
-                      const categoryNiches = niches.filter(n => n.category === category);
-                      if (categoryNiches.length === 0) return null;
+            <CardContent className="space-y-6 p-8">
+              {/* Compact Grid Display */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20">
+                {niches.map((niche, index) => {
+                  const Icon = niche.icon;
+                  const isSelected = preferences.selectedNiches.includes(niche.id);
+                  
+                  return (
+                    <motion.div
+                      key={niche.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.02 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setPreferences(prev => ({
+                          ...prev,
+                          selectedNiches: isSelected
+                            ? prev.selectedNiches.filter(id => id !== niche.id)
+                            : [...prev.selectedNiches, niche.id]
+                        }));
+                      }}
+                      className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 ${
+                        isSelected 
+                          ? 'bg-green-500/20 border-2 border-green-400/50 shadow-lg' 
+                          : 'bg-white/5 border border-white/20 hover:bg-white/10'
+                      }`}
+                    >
+                      {/* Selection indicator */}
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"
+                        >
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        </motion.div>
+                      )}
                       
-                      return (
-                        <div key={category} className="p-4 border-b border-white/10 last:border-b-0">
-                          <div className="text-sm font-bold text-white/90 mb-3 flex items-center space-x-2">
-                            <Globe className="w-4 h-4" />
-                            <span>{category}</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {categoryNiches.map((niche) => {
-                              const Icon = niche.icon;
-                              const isSelected = preferences.selectedNiches.includes(niche.id);
-                              
-                              return (
-                                <motion.div
-                                  key={niche.id}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                  onClick={() => {
-                                    setPreferences(prev => ({
-                                      ...prev,
-                                      selectedNiches: isSelected
-                                        ? prev.selectedNiches.filter(id => id !== niche.id)
-                                        : [...prev.selectedNiches, niche.id]
-                                    }));
-                                  }}
-                                  className={`p-3 rounded-lg cursor-pointer transition-all duration-300 flex items-center space-x-3 ${
-                                    isSelected 
-                                      ? 'bg-green-500/20 border border-green-400/40 text-green-200' 
-                                      : 'bg-white/5 hover:bg-white/10 text-white/80'
-                                  }`}
-                                >
-                                  <Icon className="w-4 h-4 flex-shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium truncate">{niche.name}</div>
-                                    <div className="text-xs opacity-70 truncate">{niche.description}</div>
-                                  </div>
-                                  {isSelected && (
-                                    <motion.div
-                                      initial={{ scale: 0 }}
-                                      animate={{ scale: 1 }}
-                                      className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
-                                    >
-                                      <CheckCircle className="w-3 h-3 text-white" />
-                                    </motion.div>
-                                  )}
-                                </motion.div>
-                              );
-                            })}
-                          </div>
+                      {/* Icon */}
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                        <Icon className="w-4 h-4 text-white" />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-white/90 mb-1">
+                          {niche.name}
                         </div>
-                      );
-                    })}
-                </motion.div>
+                        <div className="text-xs text-white/60">
+                          {niche.description}
+                        </div>
+                        <div className="text-xs text-purple-300/80 mt-1">
+                          {niche.category}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
 
               {/* Selected Niches Display */}
@@ -742,7 +712,7 @@ export default function Onboarding() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="space-y-3"
+                  className="space-y-3 pt-4 border-t border-white/10"
                 >
                   <div className="text-white/80 text-sm font-medium">
                     Selected Niches ({preferences.selectedNiches.length})
@@ -761,20 +731,21 @@ export default function Onboarding() {
                           exit={{ opacity: 0, scale: 0.8 }}
                           className="flex items-center space-x-2 px-3 py-2 bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 group hover:bg-white/20 transition-all duration-300"
                         >
-                          <Icon className="w-4 h-4 text-white/90" />
+                          <Icon className="w-3 h-3 text-white/90" />
                           <span className="text-sm text-white/90">{niche.name}</span>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setPreferences(prev => ({
                                 ...prev,
                                 selectedNiches: prev.selectedNiches.filter(id => id !== nicheId)
                               }));
                             }}
-                            className="w-4 h-4 text-white/60 hover:text-white/90 transition-colors"
+                            className="w-3 h-3 text-white/60 hover:text-white/90 transition-colors"
                           >
-                            <X className="w-4 h-4" />
+                            <X className="w-3 h-3" />
                           </motion.button>
                         </motion.div>
                       );

@@ -182,10 +182,33 @@ export default function Scheduler() {
     };
   }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length, user?.id]);
 
-  // Force refresh when modal opens to ensure fresh data
+  // Force refresh when modal opens to ensure fresh data with correct workspace
   useEffect(() => {
-    if (isScheduleDialogOpen && currentWorkspace?.id && currentWorkspace?.name) {
-      console.log('[SCHEDULER DEBUG] Modal opened, forcing fresh data fetch for workspace:', currentWorkspace.name);
+    if (isScheduleDialogOpen && currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
+      // Use the same workspace determination logic as the main effect
+      let targetWorkspace = currentWorkspace;
+      
+      // Check localStorage for the correct workspace
+      try {
+        if (user?.id) {
+          const storageKey = `veefore_current_workspace_${user.id}`;
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+            const expectedWorkspace = JSON.parse(saved);
+            if (expectedWorkspace && expectedWorkspace.name !== currentWorkspace.name) {
+              const foundWorkspace = workspaces.find((w: any) => w.name === expectedWorkspace.name);
+              if (foundWorkspace) {
+                console.log('[SCHEDULER DEBUG] Modal using localStorage workspace:', foundWorkspace.name, foundWorkspace.id);
+                targetWorkspace = foundWorkspace;
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.log('[SCHEDULER DEBUG] Modal localStorage error:', error);
+      }
+      
+      console.log('[SCHEDULER DEBUG] Modal opened, forcing fresh data fetch for workspace:', targetWorkspace.name);
       // Clear accounts state immediately
       setSocialAccounts([]);
       setSocialAccountsLoading(true);
@@ -196,12 +219,12 @@ export default function Scheduler() {
       
       // Trigger the main effect to refetch with minimal delay
       const timeoutId = setTimeout(() => {
-        console.log('[SCHEDULER DEBUG] Modal refresh: Fetching accounts for workspace:', currentWorkspace.id, currentWorkspace.name);
+        console.log('[SCHEDULER DEBUG] Modal refresh: Fetching accounts for workspace:', targetWorkspace.id, targetWorkspace.name);
       }, 50);
       
       return () => clearTimeout(timeoutId);
     }
-  }, [isScheduleDialogOpen, currentWorkspace?.id, currentWorkspace?.name, queryClient]);
+  }, [isScheduleDialogOpen, currentWorkspace?.id, currentWorkspace?.name, workspaces.length, user?.id, queryClient]);
 
   // Update platform selection when workspace or social accounts change
   useEffect(() => {

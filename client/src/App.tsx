@@ -7,6 +7,8 @@ import { SpaceBackground } from "@/components/layout/SpaceBackground";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
+import { WorkspaceProvider } from "@/hooks/useWorkspace";
+import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";

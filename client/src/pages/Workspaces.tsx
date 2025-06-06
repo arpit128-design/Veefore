@@ -320,6 +320,13 @@ export default function Workspaces() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Beautiful workspace switching overlay */}
+      <WorkspaceSwitchingOverlay
+        isVisible={isSwitching}
+        currentWorkspace={currentWorkspace}
+        targetWorkspace={targetWorkspace}
+      />
     </div>
   );
 }

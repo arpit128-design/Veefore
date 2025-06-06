@@ -18,8 +18,8 @@ export function WorkspaceSwitchingOverlay({
   useEffect(() => {
     if (isVisible) {
       setAnimationPhase(0);
-      const timer1 = setTimeout(() => setAnimationPhase(1), 500);
-      const timer2 = setTimeout(() => setAnimationPhase(2), 1000);
+      const timer1 = setTimeout(() => setAnimationPhase(1), 2000);
+      const timer2 = setTimeout(() => setAnimationPhase(2), 4000);
       
       return () => {
         clearTimeout(timer1);

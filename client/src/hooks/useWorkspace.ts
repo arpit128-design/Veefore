@@ -49,8 +49,8 @@ export function useWorkspace() {
     
     setIsSwitching(true);
     
-    // Create switching animation delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Create switching animation delay - slower for readability
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     setCurrentWorkspace(workspace);
     setIsSwitching(false);
@@ -94,8 +94,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     
     setIsSwitching(true);
     
-    // Create switching animation delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Create switching animation delay - slower for readability
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     setCurrentWorkspace(workspace);
     setIsSwitching(false);

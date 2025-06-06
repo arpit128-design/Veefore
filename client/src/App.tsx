@@ -38,6 +38,7 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
+              <Route path="/onboarding" component={Onboarding} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={Scheduler} />
@@ -83,6 +84,19 @@ function Router() {
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route component={() => <Redirect to="/auth" />} />
+        </Switch>
+      </div>
+    );
+  }
+
+  // Check if user needs onboarding
+  if (user && !user.isOnboarded) {
+    return (
+      <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
+        <SpaceBackground />
+        <Switch>
+          <Route path="/onboarding" component={Onboarding} />
+          <Route component={() => <Redirect to="/onboarding" />} />
         </Switch>
       </div>
     );

@@ -97,13 +97,13 @@ export default function Analyzer() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-orbitron font-bold neon-text text-green-400">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold neon-text text-green-400">
           Growth & Trend Analyzer
         </h2>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32 glassmorphism">
+            <SelectTrigger className="w-full sm:w-32 glassmorphism">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -116,10 +116,11 @@ export default function Analyzer() {
             variant="outline"
             onClick={() => refetch()}
             disabled={isLoading}
-            className="glassmorphism"
+            className="glassmorphism w-full sm:w-auto"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
+            <span className="sm:hidden">Refresh Data</span>
           </Button>
         </div>
       </div>

@@ -694,7 +694,7 @@ export default function ContentStudio() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Content Studio</h1>
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">Content Studio</h1>
           <p className="text-gray-400 text-sm md:text-base">Create, generate, and manage your content</p>
         </div>
         <div className="text-left md:text-right">

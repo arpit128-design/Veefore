@@ -63,26 +63,28 @@ export default function Suggestions() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-orbitron font-bold neon-text text-nebula-purple">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold neon-text text-nebula-purple">
           AI Suggestions
         </h2>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-sm text-asteroid-silver">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
+          <div className="flex items-center space-x-2 text-xs md:text-sm text-asteroid-silver">
             <Clock className="h-4 w-4" />
-            <span>Updated 2 hours ago</span>
+            <span className="hidden sm:inline">Updated 2 hours ago</span>
+            <span className="sm:hidden">Updated 2h ago</span>
           </div>
           <Button
             onClick={() => generateSuggestionsMutation.mutate()}
             disabled={generateSuggestionsMutation.isPending}
-            className="bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90"
+            className="bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90 w-full sm:w-auto"
           >
             {generateSuggestionsMutation.isPending ? (
               <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <Zap className="w-4 h-4 mr-2" />
             )}
-            Generate New Suggestions
+            <span className="hidden sm:inline">Generate New Suggestions</span>
+            <span className="sm:hidden">Generate</span>
           </Button>
         </div>
       </div>

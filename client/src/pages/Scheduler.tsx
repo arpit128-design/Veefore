@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +33,7 @@ interface ScheduleForm {
 
 export default function Scheduler() {
   const { currentWorkspace, workspaces } = useWorkspace();
+  const { user } = useAuth();
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState("calendar");
@@ -103,18 +105,28 @@ export default function Scheduler() {
     // Wait for both workspace and workspaces array to be populated
     if (currentWorkspace?.id && currentWorkspace?.name && workspaces.length > 0) {
       
-      // Get the expected workspace from localStorage immediately
+      // Get the expected workspace from localStorage immediately using the correct user-specific key
       let expectedWorkspace;
       try {
-        const saved = localStorage.getItem('currentWorkspace');
-        expectedWorkspace = saved ? JSON.parse(saved) : null;
-      } catch {
+        if (user?.id) {
+          const storageKey = `veefore_current_workspace_${user.id}`;
+          const saved = localStorage.getItem(storageKey);
+          console.log('[SCHEDULER DEBUG] localStorage key:', storageKey);
+          console.log('[SCHEDULER DEBUG] localStorage raw value:', saved);
+          expectedWorkspace = saved ? JSON.parse(saved) : null;
+        } else {
+          expectedWorkspace = null;
+          console.log('[SCHEDULER DEBUG] No user.id available for localStorage key');
+        }
+      } catch (error) {
+        console.log('[SCHEDULER DEBUG] Error reading localStorage:', error);
         expectedWorkspace = null;
       }
       
       console.log('[SCHEDULER DEBUG] Expected workspace from localStorage:', expectedWorkspace?.name);
       console.log('[SCHEDULER DEBUG] Current workspace context:', currentWorkspace.name);
-      console.log('[SCHEDULER DEBUG] Available workspaces:', workspaces.map(w => w.name));
+      console.log('[SCHEDULER DEBUG] Available workspaces:', workspaces.map((w: any) => w.name));
+      console.log('[SCHEDULER DEBUG] User ID:', user?.id);
       
       // Determine the target workspace immediately
       let targetWorkspace = currentWorkspace;
@@ -165,7 +177,7 @@ export default function Scheduler() {
         clearTimeout(timeoutId);
       }
     };
-  }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length]);
+  }, [currentWorkspace?.id, currentWorkspace?.name, workspaces.length, user?.id]);
 
   // Force refresh queries when workspace changes
   useEffect(() => {

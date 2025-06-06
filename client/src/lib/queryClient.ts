@@ -47,9 +47,14 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  // Clone the response so we can read it multiple times if needed
-  const clonedRes = res.clone();
-  await throwIfResNotOk(clonedRes);
+  if (!res.ok) {
+    const text = (await res.text()) || res.statusText;
+    console.log('[API REQUEST] Error response text:', text);
+    const error = new Error(`${res.status}: ${text}`);
+    console.log('[API REQUEST] Throwing error:', error);
+    throw error;
+  }
+  console.log('[API REQUEST] Response OK, continuing');
   return res;
 }
 

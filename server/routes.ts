@@ -369,12 +369,16 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
   app.get('/api/instagram/callback', async (req: Request, res: Response) => {
     try {
-      const { code, state, error } = req.query;
+      const { code, state, error, error_reason, error_description } = req.query;
       
-      console.log(`[INSTAGRAM CALLBACK] Received callback:`, {
-        code: code ? 'present' : 'missing',
+      console.log(`[INSTAGRAM CALLBACK] Received callback with all parameters:`, {
+        code: code ? `present (${String(code).substring(0, 10)}...)` : 'missing',
         state: state ? 'present' : 'missing',
-        error: error || 'none'
+        error: error || 'none',
+        error_reason: error_reason || 'none',
+        error_description: error_description || 'none',
+        fullUrl: req.url,
+        host: req.get('host')
       });
       
       if (error) {

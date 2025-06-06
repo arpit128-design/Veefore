@@ -51,6 +51,7 @@ function AuthenticatedApp() {
               <Route path="/integrations" component={Integrations} />
               <Route path="/referrals" component={Referrals} />
               <Route path="/settings" component={Settings} />
+              <Route path="/pricing" component={Pricing} />
               <Route path="/subscribe" component={Subscribe} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/terms-of-service" component={TermsOfService} />

@@ -908,7 +908,7 @@ export class MongoStorage implements IStorage {
     await this.connect();
     const suggestions = await SuggestionModel.find({ workspaceId: workspaceId.toString() })
       .sort({ createdAt: -1 });
-    return suggestions.map(this.convertSuggestion);
+    return suggestions.map(doc => this.convertSuggestion(doc));
   }
 
   async getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]> {
@@ -916,6 +916,19 @@ export class MongoStorage implements IStorage {
     const analytics = await AnalyticsModel.find({ workspaceId: workspaceId.toString() })
       .sort({ date: -1 });
     return analytics.map(this.convertAnalytics);
+  }
+
+  private convertSuggestion(doc: any): Suggestion {
+    return {
+      id: doc._id?.toString() || doc.id,
+      workspaceId: parseInt(doc.workspaceId),
+      type: doc.type,
+      data: doc.data || null,
+      confidence: doc.confidence || null,
+      isUsed: doc.isUsed || false,
+      validUntil: doc.validUntil || null,
+      createdAt: doc.createdAt || null
+    };
   }
 
   private convertAddon(doc: any): Addon {

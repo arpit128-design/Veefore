@@ -8,10 +8,76 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Globe, Settings, Star, Users } from "lucide-react";
+
+// Current workspace statistics with authentic Instagram data
+function CurrentWorkspaceStats({ workspaceId }: { workspaceId: string }) {
+  const { token } = useAuth();
+  
+  const { data: socialAccounts = [] } = useQuery({
+    queryKey: ['social-accounts', workspaceId],
+    queryFn: () => fetch(`/api/social-accounts?workspaceId=${workspaceId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then(res => res.json()),
+    enabled: !!workspaceId && !!token
+  });
+
+  const { data: content = [] } = useQuery({
+    queryKey: ['workspace-content', workspaceId],
+    queryFn: () => fetch(`/api/content?workspaceId=${workspaceId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then(res => res.json()),
+    enabled: !!workspaceId && !!token
+  });
+
+  const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram');
+  const contentCount = content.length || 0;
+  
+  // Show actual Instagram data for workspaces with connected accounts
+  if (instagramAccount) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+          <div className="text-lg font-bold text-electric-cyan">{contentCount}</div>
+          <div className="text-xs text-asteroid-silver">Content Items</div>
+        </div>
+        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+          <div className="text-lg font-bold text-green-400">{instagramAccount.followerCount || 0}</div>
+          <div className="text-xs text-asteroid-silver">Followers</div>
+        </div>
+        <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+          <div className="text-lg font-bold text-nebula-purple">@{instagramAccount.username}</div>
+          <div className="text-xs text-asteroid-silver">Instagram</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show setup required state for new workspaces
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+        <div className="text-lg font-bold text-gray-400">0</div>
+        <div className="text-xs text-asteroid-silver">Content Items</div>
+      </div>
+      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+        <div className="text-lg font-bold text-gray-400">-</div>
+        <div className="text-xs text-asteroid-silver">Followers</div>
+      </div>
+      <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
+        <div className="text-lg font-bold text-yellow-400">Setup</div>
+        <div className="text-xs text-asteroid-silver">Required</div>
+      </div>
+    </div>
+  );
+}
 
 export default function Workspaces() {
   const { workspaces, currentWorkspace, setCurrentWorkspace } = useWorkspace();
@@ -136,20 +202,7 @@ export default function Workspaces() {
             {currentWorkspace.description && (
               <p className="text-asteroid-silver mb-4">{currentWorkspace.description}</p>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-electric-cyan">14</div>
-                <div className="text-xs text-asteroid-silver">Instagram Posts</div>
-              </div>
-              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-green-400">15</div>
-                <div className="text-xs text-asteroid-silver">Total Reach</div>
-              </div>
-              <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-nebula-purple">3</div>
-                <div className="text-xs text-asteroid-silver">Total Likes</div>
-              </div>
-            </div>
+            <CurrentWorkspaceStats workspaceId={currentWorkspace.id} />
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 text-sm">
                 <span className="text-asteroid-silver">Credits:</span>
@@ -205,19 +258,15 @@ export default function Workspaces() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-asteroid-silver">Instagram:</span>
-                    <span className="text-pink-500">@arpit9996363</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-asteroid-silver">Followers:</span>
-                    <span className="text-green-400">10</span>
+                    <span className="text-gray-500">Not connected</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-asteroid-silver">Content:</span>
-                    <span className="text-electric-cyan">14 posts</span>
+                    <span className="text-electric-cyan">0 items</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-asteroid-silver">Engagement:</span>
-                    <span className="text-nebula-purple">20%</span>
+                    <span className="text-asteroid-silver">Status:</span>
+                    <span className="text-yellow-400">Setup required</span>
                   </div>
                 </div>
 

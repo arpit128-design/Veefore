@@ -733,7 +733,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const stateData = {
         workspaceId: workspace.id,
         userId: user.id,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        source: req.query.source || 'integrations' // Track where OAuth was initiated
       };
       const state = JSON.stringify(stateData);
       
@@ -768,7 +769,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       if (error) {
         console.error(`[INSTAGRAM CALLBACK] OAuth error: ${error}`);
-        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error as string)}`);
+        const redirectPage = state ? 'integrations' : 'integrations'; // Default to integrations for errors
+        return res.redirect(`https://${req.get('host')}/${redirectPage}?error=${encodeURIComponent(error as string)}`);
       }
       
       if (!code || !state) {
@@ -870,7 +872,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
       
       console.log(`[INSTAGRAM CALLBACK] Successfully connected Instagram account @${profile.username}`);
-      res.redirect(`https://${req.get('host')}/integrations?success=instagram_connected&username=${profile.username}`);
+      
+      // Redirect based on where OAuth was initiated
+      const redirectPage = stateData.source === 'onboarding' ? 'onboarding' : 'integrations';
+      console.log(`[INSTAGRAM CALLBACK] Redirecting to ${redirectPage} page`);
+      res.redirect(`https://${req.get('host')}/${redirectPage}?success=instagram_connected&username=${profile.username}`);
       
     } catch (error: any) {
       console.error('[INSTAGRAM CALLBACK] Error details:', {

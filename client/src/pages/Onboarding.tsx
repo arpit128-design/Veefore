@@ -191,7 +191,7 @@ export default function Onboarding() {
       }
       
       // Make authenticated request to Instagram OAuth
-      const response = await fetch(`/api/instagram/auth?workspaceId=${workspaceId}`, {
+      const response = await fetch(`/api/instagram/auth?workspaceId=${workspaceId}&source=onboarding`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -211,9 +211,10 @@ export default function Onboarding() {
       
       if (data.authUrl) {
         console.log(`[ONBOARDING CONNECT] Redirecting to Instagram OAuth:`, data.authUrl);
-        // Save current step before redirecting to OAuth
+        // Save current step and onboarding context before redirecting to OAuth
         localStorage.setItem('onboarding_current_step', currentStep.toString());
         localStorage.setItem('onboarding_returning_from_oauth', 'true');
+        localStorage.setItem('oauth_source', 'onboarding');
         window.location.href = data.authUrl;
       } else {
         throw new Error('Failed to get Instagram authorization URL');

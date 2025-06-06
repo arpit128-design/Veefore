@@ -181,10 +181,20 @@ export default function ScheduledContent() {
   const publishNowMutation = useMutation({
     mutationFn: async (contentId: string) => {
       console.log(`[CLIENT] Starting immediate publish for content ${contentId}`);
-      const response = await apiRequest(`/api/content/${contentId}/publish`, {
-        method: 'POST'
+      const response = await fetch(`/api/content/${contentId}/publish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
       });
-      return response;
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Publishing failed');
+      }
+      
+      return response.json();
     },
     onSuccess: (data, contentId) => {
       console.log(`[CLIENT] Publish request successful for ${contentId}:`, data);
@@ -195,7 +205,7 @@ export default function ScheduledContent() {
           queryClient.invalidateQueries({ queryKey: ['/api/content'] });
           
           // Check if content is no longer in publishing state
-          const updatedContent = scheduledContent.find(c => c.id === contentId);
+          const updatedContent = scheduledContent.find((c: ScheduledContentItem) => c.id === contentId);
           if (updatedContent && updatedContent.status !== 'publishing') {
             clearInterval(pollInterval);
             

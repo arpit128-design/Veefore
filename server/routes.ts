@@ -1126,12 +1126,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.log('[ADDON PURCHASE] Creating addon for user:', user.id, 'addon:', addon);
           // Create addon record for user
           try {
-            // Convert user.id properly to handle string/number mismatch
-            const numericUserId = typeof user.id === 'string' ? parseInt(user.id.replace(/[^0-9]/g, '').slice(-10)) : parseInt(user.id);
-            console.log('[ADDON PURCHASE] Converted userId from', user.id, 'to', numericUserId);
+            // Use the user ID directly as it comes from authentication
+            let targetUserId = user.id;
+            
+            // Handle MongoDB ObjectId string format - extract numeric portion
+            if (typeof targetUserId === 'string' && targetUserId.length === 24) {
+              // Extract last 10 digits and convert to number for storage compatibility
+              targetUserId = parseInt(targetUserId.slice(-10), 16) % 2147483647; // Ensure it fits in INT range
+            } else if (typeof targetUserId === 'string') {
+              targetUserId = parseInt(targetUserId);
+            }
+            
+            console.log('[ADDON PURCHASE] Using userId:', targetUserId, 'for addon creation');
             
             const createdAddon = await storage.createAddon({
-              userId: numericUserId,
+              userId: targetUserId,
               type: addon.type,
               name: addon.name,
               price: addon.price,
@@ -1141,12 +1150,20 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                 addonId: packageId, 
                 benefit: addon.benefit,
                 paymentId: razorpay_payment_id,
-                purchaseDate: new Date().toISOString()
+                purchaseDate: new Date().toISOString(),
+                autoCreated: true,
+                createdFromPayment: true
               }
             });
             console.log('[ADDON PURCHASE] Successfully created addon:', createdAddon);
           } catch (addonError) {
             console.error('[ADDON PURCHASE] Failed to create addon:', addonError);
+            console.error('[ADDON PURCHASE] Error details:', {
+              userId: user.id,
+              targetUserId,
+              addonType: addon.type,
+              error: addonError.message
+            });
             throw addonError;
           }
 

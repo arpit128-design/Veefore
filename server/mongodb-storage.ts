@@ -583,7 +583,33 @@ export class MongoStorage implements IStorage {
   }
 
   // Social account operations
-  async getSocialAccount(workspaceId: number, platform: string): Promise<SocialAccount | undefined> {
+  async getSocialAccount(id: number | string): Promise<SocialAccount | undefined> {
+    await this.connect();
+    
+    console.log(`[MONGODB DEBUG] Getting social account with ID: ${id} (type: ${typeof id})`);
+    
+    let account;
+    try {
+      // Try by MongoDB _id first (ObjectId format)
+      account = await SocialAccountModel.findById(id);
+      console.log(`[MONGODB DEBUG] Find by _id result:`, account ? 'Found' : 'Not found');
+    } catch (objectIdError) {
+      console.log(`[MONGODB DEBUG] ObjectId lookup failed, trying by 'id' field:`, objectIdError);
+      
+      // If ObjectId fails, try by the 'id' field
+      try {
+        account = await SocialAccountModel.findOne({ id: id });
+        console.log(`[MONGODB DEBUG] Find by id field result:`, account ? 'Found' : 'Not found');
+      } catch (idError) {
+        console.error(`[MONGODB DEBUG] Both lookup methods failed:`, idError);
+        return undefined;
+      }
+    }
+    
+    return account ? this.convertSocialAccount(account) : undefined;
+  }
+
+  async getSocialAccountByWorkspaceAndPlatform(workspaceId: number, platform: string): Promise<SocialAccount | undefined> {
     await this.connect();
     const account = await SocialAccountModel.findOne({ workspaceId: workspaceId.toString(), platform });
     return account ? this.convertSocialAccount(account) : undefined;

@@ -37,8 +37,9 @@ export default function Dashboard() {
     minute: '2-digit'
   });
 
-  // Format numbers for display
-  const formatNumber = (num: number) => {
+  // Format numbers for display with null safety
+  const formatNumber = (num: number | null) => {
+    if (num === null) return null;
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();

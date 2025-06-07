@@ -7,15 +7,21 @@ export class InstagramDirectSync {
     try {
       console.log('[INSTAGRAM DIRECT] Starting direct update for workspace:', workspaceId);
       
-      // Get Instagram access token from environment
-      const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
-      if (!accessToken) {
-        console.log('[INSTAGRAM DIRECT] No access token available');
+      // Get connected Instagram accounts for this workspace
+      const accounts = await this.storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find(acc => acc.platform === 'instagram' && acc.isActive);
+      
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        console.log('[INSTAGRAM DIRECT] No connected Instagram account with access token found');
         return;
       }
 
-      // Fetch real Instagram profile data
-      const profileData = await this.fetchProfileData(accessToken);
+      console.log(`[INSTAGRAM DIRECT] Using stored access token for account: ${instagramAccount.username}`);
+      console.log(`[INSTAGRAM DIRECT] Access token exists: ${!!instagramAccount.accessToken}`);
+      console.log(`[INSTAGRAM DIRECT] Token starts with: ${instagramAccount.accessToken ? instagramAccount.accessToken.substring(0, 10) + '...' : 'None'}`);
+
+      // Fetch real Instagram profile data using the correct access token
+      const profileData = await this.fetchProfileData(instagramAccount.accessToken);
       console.log('[INSTAGRAM DIRECT] Fetched profile data:', profileData);
 
       // Calculate realistic engagement metrics

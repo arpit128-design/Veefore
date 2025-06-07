@@ -11,7 +11,18 @@ export function DailySuggestions() {
 
   const { data: suggestions, refetch } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
+    queryFn: async () => {
+      const token = localStorage.getItem('firebase_token');
+      const response = await fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+      }
+      return response.json();
+    },
     enabled: !!currentWorkspace?.id
   });
 
@@ -24,32 +35,38 @@ export function DailySuggestions() {
     }
   });
 
-  const suggestionTypes = [
-    {
-      type: 'trending',
-      title: 'Trending Content',
-      icon: Flame,
-      color: 'text-orange-500',
-      borderColor: 'border-electric-cyan/30',
-      bgColor: 'bg-cosmic-blue'
-    },
-    {
-      type: 'audio',
-      title: 'Audio Trending',
-      icon: Music,
-      color: 'text-nebula-purple',
-      borderColor: 'border-nebula-purple/30',
-      bgColor: 'bg-cosmic-blue'
-    },
-    {
-      type: 'hashtag',
-      title: 'Hashtag Strategy',
-      icon: Hash,
-      color: 'text-solar-gold',
-      borderColor: 'border-solar-gold/30',
-      bgColor: 'bg-cosmic-blue'
+  // Display actual suggestions instead of predefined categories
+  const displaySuggestions = suggestions && Array.isArray(suggestions) ? suggestions.slice(0, 3) : [];
+
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case 'growth': return Flame;
+      case 'hashtag': return Hash;
+      case 'trending': return Music;
+      case 'engagement': return Clock;
+      default: return Flame;
     }
-  ];
+  };
+
+  const getColorForType = (type: string) => {
+    switch (type) {
+      case 'growth': return 'text-electric-cyan';
+      case 'hashtag': return 'text-solar-gold';
+      case 'trending': return 'text-orange-500';
+      case 'engagement': return 'text-nebula-purple';
+      default: return 'text-electric-cyan';
+    }
+  };
+
+  const getBorderForType = (type: string) => {
+    switch (type) {
+      case 'growth': return 'border-electric-cyan/30';
+      case 'hashtag': return 'border-solar-gold/30';
+      case 'trending': return 'border-orange-500/30';
+      case 'engagement': return 'border-nebula-purple/30';
+      default: return 'border-electric-cyan/30';
+    }
+  };
 
   const getSuggestionByType = (type: string) => {
     return Array.isArray(suggestions) ? suggestions.find((s: any) => s.type === type) : null;
@@ -68,54 +85,59 @@ export function DailySuggestions() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {suggestionTypes.map((suggestionType) => {
-            const suggestion = getSuggestionByType(suggestionType.type);
-            
-            return (
-              <div
-                key={suggestionType.type}
-                className={`p-4 rounded-lg ${suggestionType.bgColor} border ${suggestionType.borderColor}`}
-              >
-                <div className="flex items-center space-x-2 mb-3">
-                  <suggestionType.icon className={`h-5 w-5 ${suggestionType.color}`} />
-                  <span className="font-medium">{suggestionType.title}</span>
-                </div>
-                
-                {suggestion ? (
+          {displaySuggestions.length > 0 ? (
+            displaySuggestions.map((suggestion: any) => {
+              const Icon = getIconForType(suggestion.type);
+              const color = getColorForType(suggestion.type);
+              const borderColor = getBorderForType(suggestion.type);
+              
+              return (
+                <div
+                  key={suggestion.id}
+                  className={`p-4 rounded-lg bg-cosmic-blue border ${borderColor}`}
+                >
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Icon className={`h-5 w-5 ${color}`} />
+                    <span className="font-medium capitalize">{suggestion.type} Strategy</span>
+                  </div>
+                  
                   <div className="space-y-2 text-sm">
-                    <div className="text-asteroid-silver">AI Suggestion:</div>
-                    <div className={`${suggestionType.color} font-medium`}>
-                      {suggestion.data?.suggestion?.substring(0, 100)}...
+                    <div className="text-asteroid-silver">AI Recommendation:</div>
+                    <div className={`${color} font-medium leading-relaxed`}>
+                      {suggestion.data?.suggestion?.substring(0, 120)}...
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mt-3">
                       <Badge variant="outline" className="text-xs">
                         {suggestion.confidence}% confidence
                       </Badge>
+                      <div className="text-xs text-asteroid-silver">
+                        {suggestion.data?.difficulty || 'Medium'} difficulty
+                      </div>
                     </div>
                     <Button
                       size="sm"
-                      className={`w-full bg-${suggestionType.type === 'trending' ? 'electric-cyan' : suggestionType.type === 'audio' ? 'nebula-purple' : 'solar-gold'}/20 hover:bg-opacity-30`}
+                      className="w-full mt-3 bg-electric-cyan/10 border-electric-cyan/30 hover:bg-electric-cyan/20 transition-colors"
                     >
-                      Use Suggestion
+                      View Details
                     </Button>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="text-asteroid-silver text-sm">No suggestions available</div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => generateSuggestionsMutation.mutate()}
-                      disabled={generateSuggestionsMutation.isPending}
-                      className="w-full"
-                    >
-                      {generateSuggestionsMutation.isPending ? 'Generating...' : 'Generate Suggestions'}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })
+          ) : (
+            <div className="col-span-3 text-center py-8">
+              <div className="text-asteroid-silver mb-4">No AI suggestions available yet</div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => generateSuggestionsMutation.mutate()}
+                disabled={generateSuggestionsMutation.isPending}
+                className="bg-electric-cyan/10 border-electric-cyan/30 hover:bg-electric-cyan/20"
+              >
+                {generateSuggestionsMutation.isPending ? 'Generating AI Strategies...' : 'Generate AI Briefing'}
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

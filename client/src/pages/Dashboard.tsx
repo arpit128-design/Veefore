@@ -150,7 +150,7 @@ export default function Dashboard() {
   console.log('[DASHBOARD DEBUG] Formatted followers:', formatNumber(analytics.newFollowers));
 
   return (
-    <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden">
+    <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden relative z-10">
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

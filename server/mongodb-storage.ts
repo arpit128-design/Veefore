@@ -1244,6 +1244,7 @@ export class MongoStorage implements IStorage {
     const shortNumeric = 6844027426; // Known numeric format from logs
     
     // Comprehensive search including all possible userId formats
+    // The newest addons should be stored with the full string userId format
     const addons = await AddonModel.find({ 
       $or: [
         { userId: userIdStr },
@@ -1255,6 +1256,7 @@ export class MongoStorage implements IStorage {
     
     // Add additional debug logging for new purchases
     console.log(`[MONGODB DEBUG] Raw database query returned ${addons.length} total addon records`);
+    console.log(`[MONGODB DEBUG] Query searched for userId formats: ${userIdStr}, ${userId}, ${userIdNum}, ${shortNumeric}`);
     
     console.log(`[MONGODB DEBUG] Found ${addons.length} addons for user ${userId}`);
     if (addons.length > 0) {

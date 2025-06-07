@@ -857,7 +857,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const userId = req.user.id;
       
       // Get subscription data
-      let subscription = await storage.getActiveSubscription(userId);
+      let subscription = await storage.getSubscription(userId);
       
       if (!subscription) {
         // Create default free plan subscription
@@ -873,7 +873,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           currentPeriodStart: null,
           currentPeriodEnd: null,
           canceledAt: null,
-          trialEnd: null
+          trialEnd: null,
+          monthlyCredits: 50,
+          extraCredits: 0,
+          autoRenew: false
         };
       }
       

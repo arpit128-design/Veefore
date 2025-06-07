@@ -86,8 +86,18 @@ export default function Subscription() {
   const currentCredits = userSubscription?.credits || 0;
 
   const planData = pricingData?.plans?.[currentPlan] || {
-    name: 'Free',
+    name: 'Free Plan',
     price: 0,
+    monthlyCredits: 50,
+    socialAccounts: 1,
+    analytics: 'Basic',
+    features: [
+      'AI Content Generation',
+      'Basic Analytics Dashboard',
+      '1 Social Account Connection',
+      'Community Support',
+      'Hashtag Suggestions'
+    ],
     color: 'text-gray-400',
     bgColor: 'bg-gray-500/10',
     borderColor: 'border-gray-500/20'
@@ -172,23 +182,7 @@ export default function Subscription() {
             Manage your plan, credits, and add-ons
           </p>
           
-          {/* Development Test Button */}
-          <div className="flex justify-center">
-            <Button 
-              onClick={() => seedTransactionsMutation.mutate()}
-              disabled={seedTransactionsMutation.isPending}
-              size="sm"
-              variant="outline"
-              className="border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10"
-            >
-              {seedTransactionsMutation.isPending ? (
-                <div className="animate-spin w-4 h-4 border-2 border-electric-cyan border-t-transparent rounded-full mr-2" />
-              ) : (
-                <Plus className="w-4 h-4 mr-2" />
-              )}
-              Test Credit Transactions
-            </Button>
-          </div>
+
         </div>
 
         {/* Current Plan Overview */}

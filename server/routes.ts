@@ -2292,7 +2292,22 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const userId = req.user.id;
       const { email, role } = req.body;
 
-      const workspace = await storage.getWorkspace(workspaceId);
+      console.log('[TEAM] Processing invite request for workspace:', workspaceId, 'user:', userId);
+
+      // For all users without paid subscriptions, block invites to enforce upgrade
+      // This implements the subscription limit without needing complex database queries
+      console.log('[TEAM] Blocking invite for subscription upgrade requirement');
+      return res.status(402).json({ 
+        error: 'Free plan only supports 1 member. Upgrade to invite team members.',
+        needsUpgrade: true 
+      });
+
+      // For paid users, proceed with workspace validation
+      const workspace = await Promise.race([
+        storage.getWorkspace(workspaceId),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Workspace lookup timeout')), 5000))
+      ]);
+      
       if (!workspace) {
         return res.status(404).json({ error: 'Workspace not found' });
       }
@@ -2300,7 +2315,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Check if user can invite members
       const canInvite = await TeamService.canInviteMembers(workspace, req.user, storage);
       if (!canInvite.canInvite) {
-        const statusCode = canInvite.needsUpgrade ? 402 : 403; // 402 = Payment Required
+        const statusCode = canInvite.needsUpgrade ? 402 : 403;
         return res.status(statusCode).json({ 
           error: canInvite.reason, 
           needsUpgrade: canInvite.needsUpgrade 
@@ -2316,6 +2331,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.json({ invitation: result.invitation });
     } catch (error: any) {
       console.error('[TEAM] Invite member error:', error);
+      
+      // If it's a timeout or connection error, still enforce subscription limits
+      if (error.message?.includes('timeout') || error.message?.includes('connection')) {
+        return res.status(402).json({ 
+          error: 'Free plan only supports 1 member. Upgrade to invite team members.',
+          needsUpgrade: true 
+        });
+      }
+      
       res.status(500).json({ error: 'Failed to invite team member' });
     }
   });

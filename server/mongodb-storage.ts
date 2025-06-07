@@ -1155,7 +1155,7 @@ export class MongoStorage implements IStorage {
     try {
       const members = await WorkspaceMemberModel.find({ 
         workspaceId: workspaceId.toString() 
-      }).timeout(5000); // 5 second timeout
+      }).maxTimeMS(5000); // 5 second timeout
       
       console.log('[MONGODB DEBUG] Found workspace members:', members.length);
       

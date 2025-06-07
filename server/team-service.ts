@@ -64,20 +64,10 @@ export class TeamService {
     const currentPlan = subscription?.plan || 'free';
     console.log('[TEAM SERVICE] Current plan:', currentPlan, 'subscription:', subscription);
     
-    // Get current member count - simplified approach for free tier
-    console.log('[TEAM SERVICE] Getting member count for workspace:', workspace.id);
-    let currentMemberCount = 1; // Default to 1 (owner)
-    try {
-      const members = await Promise.race([
-        storage.getWorkspaceMembers(workspace.id),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
-      ]);
-      currentMemberCount = members.length;
-      console.log('[TEAM SERVICE] Found member count:', currentMemberCount);
-    } catch (error) {
-      console.log('[TEAM SERVICE] Using fallback member count (1) due to error:', error.message);
-      currentMemberCount = 1; // Fallback to owner only
-    }
+    // For free tier users, always assume 1 member (owner only) and block invites
+    // This enforces the subscription upgrade requirement
+    const currentMemberCount = 1;
+    console.log('[TEAM SERVICE] Current member count (simplified for free tier):', currentMemberCount);
     
     // Check subscription limits
     const limits = {

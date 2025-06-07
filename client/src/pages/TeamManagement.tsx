@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Users, Mail, Shield, MoreVertical, Copy, Link, Trash2, Crown, Eye, Edit } from "lucide-react";
+import { UserPlus, Users, Mail, Shield, MoreVertical, Copy, Link, Trash2, Crown, Eye, Edit, AlertTriangle, Star } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspace } from "@/hooks/useWorkspace";

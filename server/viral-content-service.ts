@@ -252,7 +252,7 @@ class ViralContentService {
         },
         sourceUrl: 'https://instagram.com',
         isActive: true,
-        createdAt: new Date().toISOString()
+        createdAt: new Date()
       });
 
       // Instagram reels
@@ -274,7 +274,7 @@ class ViralContentService {
         },
         sourceUrl: 'https://instagram.com',
         isActive: true,
-        createdAt: new Date().toISOString()
+        createdAt: new Date()
       });
     });
 

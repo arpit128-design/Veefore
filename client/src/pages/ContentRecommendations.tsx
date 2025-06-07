@@ -165,20 +165,26 @@ const ContentRecommendations = () => {
 
     const handleMouseEnter = () => {
       setIsHovered(true);
-      if (isVideoContent && videoRef.current && recommendation.mediaUrl && recommendation.mediaUrl.startsWith('http')) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {
-          // Autoplay failed, user will need to click
-          console.log('Video autoplay failed for:', recommendation.title);
-        });
-        setIsPlaying(true);
+      if (isVideoContent && videoRef.current) {
+        if (recommendation.mediaUrl?.includes('youtube.com/embed')) {
+          // YouTube iframe - already has autoplay enabled in URL
+          setIsPlaying(true);
+        } else if (recommendation.mediaUrl?.startsWith('http')) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.play().catch(() => {
+            console.log('Video autoplay failed for:', recommendation.title);
+          });
+          setIsPlaying(true);
+        }
       }
     };
 
     const handleMouseLeave = () => {
       setIsHovered(false);
       if (isVideoContent && videoRef.current) {
-        videoRef.current.pause();
+        if (!recommendation.mediaUrl?.includes('youtube.com/embed')) {
+          videoRef.current.pause();
+        }
         setIsPlaying(false);
       }
     };

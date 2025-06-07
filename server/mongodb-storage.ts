@@ -1363,4 +1363,116 @@ export class MongoStorage implements IStorage {
       createdAt: doc.createdAt || null
     };
   }
+
+  // Content recommendation operations
+  async getContentRecommendation(id: number): Promise<ContentRecommendation | undefined> {
+    await this.connect();
+    const recommendation = await ContentRecommendationModel.findById(id);
+    return recommendation ? this.convertContentRecommendation(recommendation) : undefined;
+  }
+
+  async getContentRecommendations(workspaceId: number, type?: string, limit?: number): Promise<ContentRecommendation[]> {
+    await this.connect();
+    const query: any = { workspaceId: workspaceId.toString(), isActive: true };
+    
+    if (type) {
+      query.type = type;
+    }
+
+    const queryBuilder = ContentRecommendationModel.find(query).sort({ createdAt: -1 });
+    
+    if (limit) {
+      queryBuilder.limit(limit);
+    }
+
+    const recommendations = await queryBuilder.exec();
+    return recommendations.map(rec => this.convertContentRecommendation(rec));
+  }
+
+  async createContentRecommendation(insertRecommendation: InsertContentRecommendation): Promise<ContentRecommendation> {
+    await this.connect();
+    const recommendation = new ContentRecommendationModel({
+      ...insertRecommendation,
+      workspaceId: insertRecommendation.workspaceId.toString(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    const saved = await recommendation.save();
+    return this.convertContentRecommendation(saved);
+  }
+
+  async updateContentRecommendation(id: number, updates: Partial<ContentRecommendation>): Promise<ContentRecommendation> {
+    await this.connect();
+    const updated = await ContentRecommendationModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) {
+      throw new Error(`Content recommendation ${id} not found`);
+    }
+    return this.convertContentRecommendation(updated);
+  }
+
+  async deleteContentRecommendation(id: number): Promise<void> {
+    await this.connect();
+    const result = await ContentRecommendationModel.deleteOne({ _id: id });
+    if (result.deletedCount === 0) {
+      throw new Error(`Content recommendation ${id} not found`);
+    }
+  }
+
+  async getUserContentHistory(userId: number, workspaceId: number): Promise<UserContentHistory[]> {
+    await this.connect();
+    const history = await UserContentHistoryModel.find({
+      userId: userId.toString(),
+      workspaceId: workspaceId.toString()
+    }).sort({ createdAt: -1 });
+    return history.map(h => this.convertUserContentHistory(h));
+  }
+
+  async createUserContentHistory(insertHistory: InsertUserContentHistory): Promise<UserContentHistory> {
+    await this.connect();
+    const history = new UserContentHistoryModel({
+      ...insertHistory,
+      userId: insertHistory.userId.toString(),
+      workspaceId: insertHistory.workspaceId.toString(),
+      createdAt: new Date()
+    });
+    const saved = await history.save();
+    return this.convertUserContentHistory(saved);
+  }
+
+  private convertContentRecommendation(doc: any): ContentRecommendation {
+    return {
+      id: doc._id?.toString() || doc.id,
+      workspaceId: parseInt(doc.workspaceId),
+      type: doc.type,
+      title: doc.title,
+      description: doc.description || null,
+      duration: doc.duration || null,
+      category: doc.category,
+      country: doc.country,
+      tags: doc.tags || [],
+      engagement: doc.engagement || { expectedViews: 0, expectedLikes: 0, expectedShares: 0 },
+      thumbnailUrl: doc.thumbnailUrl || null,
+      mediaUrl: doc.mediaUrl || null,
+      sourceUrl: doc.sourceUrl || null,
+      isActive: doc.isActive !== false,
+      createdAt: doc.createdAt || null,
+      updatedAt: doc.updatedAt || null
+    };
+  }
+
+  private convertUserContentHistory(doc: any): UserContentHistory {
+    return {
+      id: doc._id?.toString() || doc.id,
+      userId: parseInt(doc.userId),
+      workspaceId: parseInt(doc.workspaceId),
+      action: doc.action,
+      recommendationId: doc.recommendationId || null,
+      metadata: doc.metadata || {},
+      createdAt: doc.createdAt || null
+    };
+  }
 }

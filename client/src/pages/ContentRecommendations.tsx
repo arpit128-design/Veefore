@@ -347,20 +347,28 @@ const ContentRecommendations = () => {
         </p>
       </div>
 
-      {/* Content Type Tabs */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'video' | 'reel' | 'audio')}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="video" className="flex items-center gap-2">
+      {/* Platform-Specific Content Type Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'youtube-video' | 'youtube-shorts' | 'instagram-post' | 'instagram-video' | 'instagram-reel')}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="youtube-video" className="flex items-center gap-2">
             <Play className="h-4 w-4" />
-            Videos
+            YouTube Videos
           </TabsTrigger>
-          <TabsTrigger value="reel" className="flex items-center gap-2">
-            <Play className="h-4 w-4" />
-            Reels
+          <TabsTrigger value="youtube-shorts" className="flex items-center gap-2">
+            <Smartphone className="h-4 w-4" />
+            YouTube Shorts
           </TabsTrigger>
-          <TabsTrigger value="audio" className="flex items-center gap-2">
+          <TabsTrigger value="instagram-post" className="flex items-center gap-2">
+            <Image className="h-4 w-4" />
+            Instagram Posts
+          </TabsTrigger>
+          <TabsTrigger value="instagram-video" className="flex items-center gap-2">
             <Play className="h-4 w-4" />
-            Audio
+            Instagram Videos
+          </TabsTrigger>
+          <TabsTrigger value="instagram-reel" className="flex items-center gap-2">
+            <Smartphone className="h-4 w-4" />
+            Instagram Reels
           </TabsTrigger>
         </TabsList>
 

@@ -173,7 +173,7 @@ const AddonSchema = new mongoose.Schema({
 const WorkspaceMemberSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.Mixed, required: true },
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
-  role: { type: String, required: true, enum: ['owner', 'editor', 'viewer'] },
+  role: { type: String, required: true, enum: ['owner', 'admin', 'editor', 'viewer'] },
   status: { type: String, default: 'active' },
   permissions: { type: mongoose.Schema.Types.Mixed, default: {} },
   invitedBy: { type: mongoose.Schema.Types.Mixed },
@@ -185,7 +185,7 @@ const WorkspaceMemberSchema = new mongoose.Schema({
 const TeamInvitationSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   email: { type: String, required: true },
-  role: { type: String, required: true, enum: ['editor', 'viewer'] },
+  role: { type: String, required: true, enum: ['admin', 'editor', 'viewer'] },
   status: { type: String, default: 'pending' },
   token: { type: String, required: true, unique: true },
   expiresAt: { type: Date, required: true },

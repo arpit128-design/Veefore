@@ -150,6 +150,7 @@ export default function TeamManagement() {
   
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteCodeDialogOpen, setInviteCodeDialogOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("viewer");
   const [generatedInviteCode, setGeneratedInviteCode] = useState("");
@@ -199,19 +200,7 @@ export default function TeamManagement() {
     onError: (error: any) => {
       // Check if upgrade is needed (402 Payment Required)
       if (error.status === 402 && error.needsUpgrade) {
-        toast({
-          title: "Upgrade Required",
-          description: error.message,
-          variant: "destructive",
-          action: (
-            <button 
-              onClick={() => window.location.href = '/pricing'}
-              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-            >
-              Upgrade Now
-            </button>
-          )
-        });
+        setUpgradeModalOpen(true);
       } else {
         toast({
           title: "Failed to send invitation",
@@ -642,6 +631,68 @@ export default function TeamManagement() {
             <p className="text-sm text-gray-400">
               This code can be used by anyone to join the workspace with viewer permissions.
             </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upgrade Required Modal */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 border-blue-500/20">
+          <div className="flex flex-col items-center text-center space-y-6 p-6">
+            {/* Icon */}
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <Crown className="w-8 h-8 text-white" />
+            </div>
+            
+            {/* Title */}
+            <div>
+              <DialogTitle className="text-2xl font-bold text-white mb-2">
+                Upgrade to Team Pro
+              </DialogTitle>
+              <DialogDescription className="text-gray-300 text-base">
+                Unlock team collaboration and invite unlimited members to your workspace
+              </DialogDescription>
+            </div>
+
+            {/* Features */}
+            <div className="space-y-3 w-full">
+              <div className="flex items-center space-x-3 text-gray-200">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Invite unlimited team members</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-200">
+                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                <span>Advanced role-based permissions</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-200">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span>Priority AI content generation</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-200">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span>Advanced analytics & reporting</span>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-col w-full space-y-3 pt-4">
+              <Button 
+                onClick={() => {
+                  setUpgradeModalOpen(false);
+                  window.location.href = '/pricing';
+                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold"
+              >
+                Upgrade Now
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setUpgradeModalOpen(false)}
+                className="w-full text-gray-300 hover:text-white hover:bg-gray-800/50"
+              >
+                Maybe Later
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

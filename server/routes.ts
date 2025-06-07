@@ -1359,7 +1359,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       // Direct database access
       const mongoStorage = storage as any;
-      const AddonModel = mongoStorage.AddonModel;
+      const AddonModel = mongoStorage.models?.Addon || require('./mongodb-storage').models.Addon;
       
       // Find ALL team-member addons for this user (both string and number format)
       const allTeamAddons = await AddonModel.find({ 

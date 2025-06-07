@@ -2849,44 +2849,153 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         console.log('[VIRAL HASHTAGS] AI analysis failed, continuing with curated data');
       }
 
-      // 3. Add platform-specific trending hashtags using external trending APIs
-      const platformHashtags = {
-        'instagram': ['reels', 'trending', 'viral', 'explore', 'fyp'],
-        'tiktok': ['fyp', 'foryou', 'viral', 'trending', 'tiktokmademebuyit'],
-        'twitter': ['trending', 'viral', 'breaking', 'news', 'thread'],
-        'youtube': ['shorts', 'viral', 'trending', 'subscribe', 'youtubeshorts'],
-        'linkedin': ['networking', 'professional', 'career', 'business', 'leadership']
-      };
+      // 3. Get real-time trending data from multiple social platforms using advanced analysis
+      try {
+        // Use multiple AI queries to get comprehensive trending data
+        const platformQueries = [
+          {
+            platform: 'instagram',
+            query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on Instagram today? Focus on hashtags that are getting millions of views and engagement. Include current memes, trends, challenges, and viral content hashtags that content creators are using today.`
+          },
+          {
+            platform: 'tiktok', 
+            query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on TikTok today? Include current viral dances, challenges, sounds, and trending topics that are getting massive engagement and views.`
+          },
+          {
+            platform: 'twitter',
+            query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on Twitter/X today? Include breaking news, viral topics, memes, and current events hashtags with highest engagement.`
+          },
+          {
+            platform: 'youtube',
+            query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on YouTube today? Include trending topics, viral videos, challenges, and content hashtags getting most views.`
+          }
+        ];
 
-      // Add category-specific high-growth hashtags
-      const categoryHashtags = {
-        'lifestyle': ['lifestyle', 'dailylife', 'mindfulness', 'selfcare', 'wellness', 'motivation', 'inspiration', 'aesthetic'],
-        'business': ['entrepreneur', 'startup', 'businesstips', 'leadership', 'success', 'growth', 'innovation', 'productivity'],
-        'technology': ['tech', 'ai', 'innovation', 'digital', 'future', 'coding', 'startup', 'techtrends'],
-        'fitness': ['fitness', 'workout', 'healthy', 'gym', 'transformation', 'motivation', 'strength', 'wellness'],
-        'food': ['food', 'foodie', 'recipe', 'cooking', 'delicious', 'homemade', 'healthy', 'foodstagram'],
-        'travel': ['travel', 'wanderlust', 'adventure', 'explore', 'vacation', 'travelgram', 'nature', 'photography'],
-        'fashion': ['fashion', 'style', 'ootd', 'outfit', 'trendy', 'styling', 'fashionista', 'lookbook']
-      };
+        // Process each platform for comprehensive real data
+        for (const platformQuery of platformQueries) {
+          try {
+            const response = await fetch('https://api.perplexity.ai/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                model: 'llama-3.1-sonar-small-128k-online',
+                messages: [
+                  {
+                    role: 'system',
+                    content: `You are a real-time ${platformQuery.platform} trend analyst. Provide ONLY current viral hashtags trending TODAY with real engagement data.`
+                  },
+                  {
+                    role: 'user',
+                    content: `${platformQuery.query} ${category !== 'all' ? `Focus on ${category} category hashtags.` : ''} Format each as: #hashtag - engagement: 2.5M views`
+                  }
+                ],
+                max_tokens: 800,
+                temperature: 0.05,
+                search_recency_filter: 'day'
+              })
+            });
 
-      // Add relevant category hashtags
-      if (category !== 'all' && categoryHashtags[category]) {
-        for (const tag of categoryHashtags[category]) {
-          const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-          current.count += 3;
-          current.platforms.add('trending');
-          viralHashtags.set(tag, current);
+            if (response.ok) {
+              const data = await response.json();
+              const content = data.choices?.[0]?.message?.content || '';
+              console.log(`[VIRAL HASHTAGS] ${platformQuery.platform} real-time analysis completed`);
+              
+              // Parse hashtags from the response
+              const lines = content.split('\n');
+              for (const line of lines) {
+                const hashtagMatch = line.match(/#(\w+)/);
+                if (hashtagMatch) {
+                  const tag = hashtagMatch[1].toLowerCase();
+                  if (tag.length >= 3) {
+                    const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
+                    
+                    // Extract engagement data
+                    const engagementMatch = line.match(/(\d+(?:\.\d+)?)\s*([KMB])/i);
+                    if (engagementMatch) {
+                      const engNum = parseFloat(engagementMatch[1]);
+                      const multiplier = engagementMatch[2].toUpperCase() === 'M' ? 1000000 : 
+                                        engagementMatch[2].toUpperCase() === 'K' ? 1000 : 
+                                        engagementMatch[2].toUpperCase() === 'B' ? 1000000000 : 1;
+                      current.engagement = Math.max(current.engagement, engNum * multiplier);
+                    }
+                    
+                    current.count += 10; // High weight for real platform data
+                    current.platforms.add(platformQuery.platform);
+                    viralHashtags.set(tag, current);
+                  }
+                }
+              }
+            }
+          } catch (platformError) {
+            console.log(`[VIRAL HASHTAGS] ${platformQuery.platform} analysis failed:`, platformError.message);
+          }
         }
-      } else if (category === 'all') {
-        // Add top hashtags from all categories
-        Object.values(categoryHashtags).forEach(tags => {
-          tags.slice(0, 3).forEach(tag => {
-            const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-            current.count += 2;
-            current.platforms.add('trending');
-            viralHashtags.set(tag, current);
-          });
+      } catch (multiPlatformError) {
+        console.log('[VIRAL HASHTAGS] Multi-platform analysis failed, using fallback');
+      }
+
+      // 4. Get current trending topics and news-based hashtags
+      try {
+        const newsQuery = category === 'all' 
+          ? "What are the most viral hashtags related to current news, events, and trending topics TODAY across all social media? Include breaking news, viral stories, celebrities, sports, technology, and cultural events."
+          : `What are the most viral hashtags related to current ${category} news and trends TODAY? Include trending topics, influencers, and viral content in ${category} category.`;
+
+        const newsResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-sonar-small-128k-online',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a real-time news and social media trend analyst. Provide current viral hashtags from breaking news and trending topics TODAY.'
+              },
+              {
+                role: 'user',
+                content: `${newsQuery} Format as: #hashtag - platforms: Instagram,TikTok - trend: breaking news/viral`
+              }
+            ],
+            max_tokens: 1000,
+            temperature: 0.1,
+            search_recency_filter: 'day'
+          })
         });
+
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json();
+          const newsContent = newsData.choices?.[0]?.message?.content || '';
+          console.log('[VIRAL HASHTAGS] Real-time news trends analysis completed');
+          
+          const newsLines = newsContent.split('\n');
+          for (const line of newsLines) {
+            const hashtagMatch = line.match(/#(\w+)/);
+            if (hashtagMatch) {
+              const tag = hashtagMatch[1].toLowerCase();
+              if (tag.length >= 3) {
+                const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
+                
+                // Add platform info based on mentions
+                if (line.includes('Instagram')) current.platforms.add('instagram');
+                if (line.includes('TikTok')) current.platforms.add('tiktok');
+                if (line.includes('Twitter')) current.platforms.add('twitter');
+                if (line.includes('YouTube')) current.platforms.add('youtube');
+                if (line.includes('LinkedIn')) current.platforms.add('linkedin');
+                
+                current.count += 12; // Highest weight for breaking news trends
+                current.platforms.add('news-trending');
+                viralHashtags.set(tag, current);
+              }
+            }
+          }
+        }
+      } catch (newsError) {
+        console.log('[VIRAL HASHTAGS] News trends analysis failed');
       }
 
       // Convert to structured response

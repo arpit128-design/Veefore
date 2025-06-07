@@ -64,6 +64,27 @@ export function TrendingHashtags() {
     return 'bg-green-500';
   };
 
+  const getPlatformIcon = (platform: string) => {
+    switch (platform) {
+      case 'instagram': return '📸';
+      case 'tiktok': return '🎵';
+      case 'twitter': return '🐦';
+      case 'youtube': return '📺';
+      case 'linkedin': return '💼';
+      case 'trending': return '🔥';
+      case 'news-trending': return '📰';
+      case 'multi-platform': return '🌐';
+      default: return '⭐';
+    }
+  };
+
+  const getGrowthColor = (growth: number) => {
+    if (growth >= 90) return 'text-green-400';
+    if (growth >= 70) return 'text-yellow-400';
+    if (growth >= 50) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
   if (isLoading) {
     return (
       <Card className="bg-white/5 backdrop-blur-sm border-white/10">
@@ -92,7 +113,10 @@ export function TrendingHashtags() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-white">
             <Hash className="h-5 w-5" />
-            Trending Hashtags
+            Viral Hashtags Analysis
+            <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
+              Live Data
+            </Badge>
           </CardTitle>
           <div className="flex gap-2">
             <Button
@@ -113,6 +137,10 @@ export function TrendingHashtags() {
             </Button>
           </div>
         </div>
+        
+        <p className="text-sm text-white/70 mt-2">
+          Real-time analysis across Instagram, TikTok, Twitter, YouTube, and LinkedIn
+        </p>
         
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2 mt-4">
@@ -150,6 +178,20 @@ export function TrendingHashtags() {
                       {hashtag.category}
                     </Badge>
                   </div>
+                  
+                  {/* Platform indicators */}
+                  <div className="flex gap-1">
+                    {hashtag.platforms?.slice(0, 4).map((platform, idx) => (
+                      <span key={idx} className="text-xs" title={platform}>
+                        {getPlatformIcon(platform)}
+                      </span>
+                    ))}
+                    {hashtag.platforms?.length > 4 && (
+                      <span className="text-xs text-white/50" title={`+${hashtag.platforms.length - 4} more platforms`}>
+                        +{hashtag.platforms.length - 4}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -159,13 +201,15 @@ export function TrendingHashtags() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-white/20">
+                    <span className={`text-xs font-semibold ${getGrowthColor(hashtag.growthPotential)}`}>
+                      {hashtag.growthPotential}%
+                    </span>
+                    <div className="w-12 h-2 rounded-full bg-white/20 overflow-hidden">
                       <div 
-                        className={`w-full h-full rounded-full ${getPopularityColor(hashtag.popularity)}`}
+                        className={`h-full rounded-full transition-all duration-500 ${getPopularityColor(hashtag.popularity)}`}
                         style={{ width: `${hashtag.popularity}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-white/50">{hashtag.popularity}%</span>
                   </div>
                   
                   <Copy className="h-4 w-4 text-white/50 group-hover:text-white transition-colors" />

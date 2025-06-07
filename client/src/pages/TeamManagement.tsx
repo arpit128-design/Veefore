@@ -637,121 +637,172 @@ export default function TeamManagement() {
 
       {/* Upgrade Required Modal */}
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent className="glassmorphism border-electric-cyan/30 max-w-2xl">
+        <DialogContent className="glassmorphism border-electric-cyan/30 max-w-5xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-orbitron text-electric-cyan flex items-center space-x-3">
-              <Crown className="w-6 h-6 text-solar-gold" />
-              <span>Team Collaboration Locked</span>
+            <DialogTitle className="text-2xl font-orbitron text-electric-cyan text-center">
+              Upgrade Your Plan
             </DialogTitle>
-            <DialogDescription className="text-asteroid-silver">
+            <DialogDescription className="text-asteroid-silver text-center">
               Unlock team features to invite and collaborate with unlimited members
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Current Plan Status */}
-            <div className="bg-cosmic-void/30 p-4 rounded-lg border border-red-500/20">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-asteroid-silver">Current Plan:</span>
-                <Badge className="bg-gray-700 text-gray-300">Free Plan</Badge>
-              </div>
-              <div className="text-sm text-red-400">
-                ⚠️ Limited to 1 team member only
+            {/* Plan Limit Alert */}
+            <div className="bg-gradient-to-r from-red-900/20 to-red-800/20 p-4 rounded-lg border border-red-500/30">
+              <div className="flex items-center space-x-3">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                <div>
+                  <h3 className="text-red-400 font-semibold">Plan Limit Reached</h3>
+                  <p className="text-asteroid-silver text-sm">
+                    Upgrade to Professional (₹999/month) to unlock team collaboration and more.
+                  </p>
+                  <p className="text-red-300 text-xs mt-1">Current usage: 1/1 team members</p>
+                </div>
               </div>
             </div>
 
-            {/* Recommended Plan */}
-            <div className="bg-gradient-to-r from-nebula-purple/20 to-purple-600/20 p-6 rounded-lg border border-nebula-purple/30">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-orbitron text-electric-cyan">Team Pro Plan</h3>
-                  <p className="text-asteroid-silver text-sm">Perfect for growing teams</p>
+            {/* Pricing Plans */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Creator Pro Plan */}
+              <div className="relative bg-gradient-to-b from-blue-900/20 to-blue-800/20 p-6 rounded-lg border border-blue-500/30">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-blue-600 text-white px-3 py-1">Most Popular</Badge>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-solar-gold">₹999</div>
-                  <div className="text-sm text-asteroid-silver">per month</div>
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-orbitron text-electric-cyan">Creator Pro</h3>
+                  <div className="text-3xl font-bold text-solar-gold mt-2">₹399<span className="text-sm text-asteroid-silver">/month</span></div>
                 </div>
-              </div>
-
-              {/* Team Features */}
-              <div className="space-y-3 mb-4">
-                <h4 className="text-electric-cyan font-semibold">Team Collaboration:</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  <div className="flex items-center space-x-3 text-asteroid-silver">
-                    <Users className="w-4 h-4 text-electric-cyan" />
-                    <span>Unlimited team members</span>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                    <span>Up to 5 workspaces</span>
                   </div>
-                  <div className="flex items-center space-x-3 text-asteroid-silver">
-                    <Shield className="w-4 h-4 text-nebula-purple" />
-                    <span>4-tier role system (Owner, Admin, Editor, Viewer)</span>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                    <span>500 AI credits/month</span>
                   </div>
-                  <div className="flex items-center space-x-3 text-asteroid-silver">
-                    <Crown className="w-4 h-4 text-solar-gold" />
-                    <span>Advanced permission controls</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Additional Features */}
-              <div className="space-y-3">
-                <h4 className="text-electric-cyan font-semibold">Enhanced Features:</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center space-x-2 text-asteroid-silver">
-                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
-                    <span>Priority AI generation</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
                     <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
                     <span>Advanced analytics</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                    <span>Priority support</span>
+                  </div>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:opacity-90">
+                  Upgrade to Creator Pro
+                </Button>
+              </div>
+
+              {/* Professional Plan */}
+              <div className="bg-gradient-to-b from-purple-900/20 to-purple-800/20 p-6 rounded-lg border border-purple-500/30">
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-orbitron text-electric-cyan">Professional</h3>
+                  <div className="text-3xl font-bold text-solar-gold mt-2">₹999<span className="text-sm text-asteroid-silver">/month</span></div>
+                </div>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
                     <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
-                    <span>Unlimited content</span>
+                    <span>Up to 15 workspaces</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+                    <span>2000 AI credits/month</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+                    <span>Team collaboration</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+                    <span>Custom integrations</span>
+                  </div>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:opacity-90">
+                  Upgrade to Professional
+                </Button>
+              </div>
+
+              {/* Enterprise Plan */}
+              <div className="bg-gradient-to-b from-orange-900/20 to-orange-800/20 p-6 rounded-lg border border-orange-500/30">
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Crown className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-orbitron text-electric-cyan">Enterprise</h3>
+                  <div className="text-3xl font-bold text-solar-gold mt-2">₹2499<span className="text-sm text-asteroid-silver">/month</span></div>
+                </div>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
                     <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
-                    <span>Premium support</span>
+                    <span>Unlimited workspaces</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                    <span>10000 AI credits/month</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                    <span>White-label solutions</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver text-sm">
+                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                    <span>Dedicated support</span>
                   </div>
                 </div>
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:opacity-90">
+                  Upgrade to Enterprise
+                </Button>
               </div>
             </div>
 
-            {/* Workspace Add-ons */}
-            <div className="bg-cosmic-void/20 p-4 rounded-lg">
-              <h4 className="text-electric-cyan font-semibold mb-3">Available Add-ons:</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-asteroid-silver">
-                  <span>Additional Workspaces</span>
-                  <span className="text-solar-gold">₹299/workspace/month</span>
+            {/* Add-ons Section */}
+            <div className="bg-cosmic-void/20 p-6 rounded-lg border border-electric-cyan/20">
+              <h4 className="text-electric-cyan font-orbitron text-lg mb-4 text-center">Available Add-ons</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="bg-cosmic-void/30 p-4 rounded-lg border border-electric-cyan/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-asteroid-silver font-medium">Extra Workspaces</span>
+                    <span className="text-solar-gold font-bold">₹299/month</span>
+                  </div>
+                  <p className="text-xs text-gray-400">Add unlimited additional workspaces to any plan</p>
                 </div>
-                <div className="flex items-center justify-between text-asteroid-silver">
-                  <span>Advanced Instagram Analytics</span>
-                  <span className="text-solar-gold">₹199/month</span>
+                <div className="bg-cosmic-void/30 p-4 rounded-lg border border-electric-cyan/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-asteroid-silver font-medium">Advanced Analytics</span>
+                    <span className="text-solar-gold font-bold">₹199/month</span>
+                  </div>
+                  <p className="text-xs text-gray-400">Deep insights and custom reporting features</p>
                 </div>
-                <div className="flex items-center justify-between text-asteroid-silver">
-                  <span>White-label Branding</span>
-                  <span className="text-solar-gold">₹499/month</span>
+                <div className="bg-cosmic-void/30 p-4 rounded-lg border border-electric-cyan/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-asteroid-silver font-medium">White-label Branding</span>
+                    <span className="text-solar-gold font-bold">₹499/month</span>
+                  </div>
+                  <p className="text-xs text-gray-400">Remove VeeFore branding and add your own</p>
                 </div>
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex space-x-3 pt-4">
+            {/* Footer */}
+            <div className="text-center space-y-4">
+              <p className="text-asteroid-silver text-sm">
+                All plans include 24/7 support and 30-day money-back guarantee
+              </p>
               <Button 
-                onClick={() => {
-                  setUpgradeModalOpen(false);
-                  window.location.href = '/pricing';
-                }}
-                className="flex-1 bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90"
-              >
-                View All Plans & Upgrade
-              </Button>
-              <Button 
-                variant="outline" 
+                variant="ghost" 
                 onClick={() => setUpgradeModalOpen(false)}
-                className="flex-1 glassmorphism"
+                className="text-asteroid-silver hover:text-white"
               >
-                Continue with Free
+                Continue with Free Plan
               </Button>
             </div>
           </div>

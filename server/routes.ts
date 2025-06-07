@@ -395,56 +395,40 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             });
             hasTeamAccess = true;
           } else {
-            // Method 3: Check MongoDB directly using storage instance
+            // Method 3: Check for recent team member payments without addon record
             try {
-              // Use the MongoDB storage's direct access method if available
-              if (storage instanceof (await import('./mongodb-storage.js')).MongoStorage) {
-                const mongoStorage = storage as any;
-                const payments = await mongoStorage.Payment.find({ userId: user.id }).exec();
-                console.log(`[TEAM INVITE] Found ${payments.length} payments via Mongoose model`);
-                
-                const teamPayment = payments.find((payment: any) => 
-                  payment.purpose === 'team-member' && payment.status === 'success'
-                );
-                
-                if (teamPayment) {
-                  console.log(`[TEAM INVITE] Found successful team payment via Mongoose:`, {
-                    id: teamPayment._id,
-                    purpose: teamPayment.purpose,
-                    amount: teamPayment.amount,
-                    status: teamPayment.status
-                  });
-                  
-                  // Create addon and grant access
+              const allPayments = await storage.getPaymentsByUser(user.id);
+              const teamMemberPayment = allPayments.find(payment => 
+                payment.purpose.includes('team-member') && payment.status === 'captured'
+              );
+              
+              if (teamMemberPayment) {
+                console.log(`[TEAM INVITE] Found team member payment without addon - creating addon record`);
+                try {
+                  // Create the missing team member addon
                   await storage.createAddon({
+                    userId: parseInt(user.id),
                     name: 'Additional Team Member Seat',
-                    userId: user.id,
                     type: 'team-member',
-                    price: 199,
+                    price: 19900,
                     isActive: true,
                     expiresAt: null,
                     metadata: {
-                      paymentId: teamPayment._id.toString(),
-                      purchaseDate: teamPayment.createdAt,
-                      autoCreated: true
+                      paymentId: teamMemberPayment.razorpayPaymentId,
+                      orderId: teamMemberPayment.razorpayOrderId,
+                      createdFromPayment: true
                     }
                   });
-                  console.log(`[TEAM INVITE] Successfully created team member addon from Mongoose payment`);
+                  console.log(`[TEAM INVITE] Successfully created team member addon from payment`);
                   hasTeamAccess = true;
-                } else {
-                  console.log(`[TEAM INVITE] No successful team payment found via Mongoose`);
-                  payments.forEach((payment: any, index: number) => {
-                    console.log(`[TEAM INVITE] Mongoose Payment ${index + 1}: Purpose: ${payment.purpose}, Status: ${payment.status}, Amount: ${payment.amount}`);
-                  });
+                } catch (addonCreateError) {
+                  console.error(`[TEAM INVITE] Failed to create addon:`, addonCreateError);
                 }
               }
-            } catch (error: any) {
-              console.error(`[TEAM INVITE] Error accessing MongoDB directly:`, error.message);
+            } catch (error) {
+              console.error(`[TEAM INVITE] Error during team access check:`, error);
             }
           }
-        } catch (error) {
-          console.error(`[TEAM INVITE] Error during team access check:`, error);
-        }
       }
       
       console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Has team access: ${hasTeamAccess}`);

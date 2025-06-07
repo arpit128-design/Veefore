@@ -1449,12 +1449,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       for (const workspace of workspaces) {
         // Delete all invitations for this workspace
-        const invitations = await storage.getTeamInvitations(workspace.id);
-        console.log(`[CLEANUP] Found ${invitations.length} invitations for workspace ${workspace.id}`);
-        
-        for (const invitation of invitations) {
-          await storage.updateTeamInvitation(invitation.id, { status: 'cancelled' });
-          deletedInvitations++;
+        const mongoStorage = storage as any;
+        if (mongoStorage.TeamInvitationModel) {
+          const invitationResult = await mongoStorage.TeamInvitationModel.deleteMany({
+            workspaceId: workspace.id
+          });
+          deletedInvitations += invitationResult.deletedCount || 0;
+          console.log(`[CLEANUP] Deleted ${invitationResult.deletedCount} invitations for workspace ${workspace.id}`);
         }
       }
       

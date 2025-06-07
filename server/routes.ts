@@ -48,8 +48,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.error('[AUTH] No Firebase UID found in token payload:', Object.keys(payload));
           return res.status(401).json({ error: 'Invalid token payload' });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('[AUTH] Token parsing error:', error.message);
+        console.error('[AUTH] Problematic token length:', token.length);
+        console.error('[AUTH] Token preview:', token.substring(0, 50) + '...');
         return res.status(401).json({ error: 'Invalid token format' });
       }
       

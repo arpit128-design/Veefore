@@ -126,6 +126,28 @@ export default function Subscription() {
     window.location.href = '/pricing';
   };
 
+  // Test function to create sample transactions
+  const seedTransactionsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/seed-credit-transactions');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sample Transactions Created",
+        description: "Credit transaction history has been populated with sample data",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create sample transactions",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (subscriptionLoading || pricingLoading) {
     return (
       <div className="min-h-screen bg-space-navy text-white p-8">
@@ -149,6 +171,24 @@ export default function Subscription() {
           <p className="text-asteroid-silver text-lg">
             Manage your plan, credits, and add-ons
           </p>
+          
+          {/* Development Test Button */}
+          <div className="flex justify-center">
+            <Button 
+              onClick={() => seedTransactionsMutation.mutate()}
+              disabled={seedTransactionsMutation.isPending}
+              size="sm"
+              variant="outline"
+              className="border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10"
+            >
+              {seedTransactionsMutation.isPending ? (
+                <div className="animate-spin w-4 h-4 border-2 border-electric-cyan border-t-transparent rounded-full mr-2" />
+              ) : (
+                <Plus className="w-4 h-4 mr-2" />
+              )}
+              Test Credit Transactions
+            </Button>
+          </div>
         </div>
 
         {/* Current Plan Overview */}

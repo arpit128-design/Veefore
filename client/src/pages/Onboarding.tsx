@@ -306,9 +306,9 @@ export default function Onboarding() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-1"
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-slate-800 via-cyan-500 to-yellow-500 p-1"
             >
-              <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-white/30" />
+              <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-cyan-300/40" />
             </motion.div>
             
             {/* Main Rocket Container */}
@@ -316,13 +316,13 @@ export default function Onboarding() {
               animate={{ 
                 y: [0, -10, 0],
                 boxShadow: [
-                  "0 20px 40px rgba(59, 130, 246, 0.3)",
-                  "0 25px 50px rgba(147, 51, 234, 0.4)", 
-                  "0 20px 40px rgba(59, 130, 246, 0.3)"
+                  "0 20px 40px rgba(6, 182, 212, 0.3)",
+                  "0 25px 50px rgba(251, 191, 36, 0.4)", 
+                  "0 20px 40px rgba(6, 182, 212, 0.3)"
                 ]
               }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-2 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center"
+              className="absolute inset-2 bg-gradient-to-br from-slate-800 via-cyan-600 to-yellow-500 rounded-full flex items-center justify-center"
             >
               <Rocket className="w-16 h-16 text-white" />
             </motion.div>
@@ -357,7 +357,7 @@ export default function Onboarding() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-yellow-400 to-cyan-300 bg-clip-text text-transparent mb-4">
             VeeFore
           </h1>
           <motion.p 

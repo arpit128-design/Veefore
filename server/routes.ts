@@ -231,6 +231,86 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Get workspace members
+  app.get('/api/workspaces/:workspaceId/members', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.workspaceId;
+
+      // Verify user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId.toString() !== user.id.toString()) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const members = await storage.getWorkspaceMembers(workspaceId);
+      res.json(members);
+    } catch (error: any) {
+      console.error('Error fetching workspace members:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get team invitations
+  app.get('/api/workspaces/:workspaceId/invitations', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.workspaceId;
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId.toString() !== user.id.toString()) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const invitations = await storage.getTeamInvitations(parseInt(workspaceId));
+      res.json(invitations);
+    } catch (error: any) {
+      console.error('Error fetching team invitations:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Invite team member - enforces subscription limits
+  app.post('/api/workspaces/:workspaceId/invite', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.workspaceId;
+      const { email, role } = req.body;
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId.toString() !== user.id.toString()) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Enforce subscription limits - Free plan only supports 1 member (owner)
+      const userPlan = user.plan || 'Free';
+      if (userPlan === 'Free') {
+        return res.status(402).json({ 
+          error: 'Free plan only supports 1 member. Upgrade to invite team members.',
+          needsUpgrade: true,
+          currentPlan: userPlan
+        });
+      }
+
+      // For paid plans, implement actual invitation logic
+      const invitation = await storage.createTeamInvitation({
+        workspaceId: parseInt(workspaceId),
+        email,
+        role,
+        invitedBy: user.id,
+        token: Math.random().toString(36).substring(2, 15),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+      });
+
+      res.json(invitation);
+    } catch (error: any) {
+      console.error('Error inviting team member:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Get credit transactions
   app.get('/api/credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {

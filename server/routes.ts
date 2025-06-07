@@ -2778,11 +2778,179 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
       }
 
-      // 2. Fetch real-time trending hashtags using Perplexity AI for authentic data
+      // 2. Fetch real trending data from YouTube Data API
+      try {
+        if (process.env.YOUTUBE_API_KEY) {
+          console.log('[VIRAL HASHTAGS] Fetching real YouTube trending hashtags');
+          const youtubeResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=50&regionCode=US&key=${process.env.YOUTUBE_API_KEY}`
+          );
+          
+          if (youtubeResponse.ok) {
+            const youtubeData = await youtubeResponse.json();
+            const videos = youtubeData.items || [];
+            
+            for (const video of videos) {
+              const description = video.snippet.description || '';
+              const title = video.snippet.title || '';
+              const text = `${title} ${description}`;
+              
+              // Extract hashtags from YouTube content
+              const hashtags = text.match(/#(\w+)/g) || [];
+              for (const hashtag of hashtags) {
+                const tag = hashtag.substring(1).toLowerCase();
+                if (tag.length >= 3) {
+                  const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
+                  current.count += 12; // High weight for YouTube trends
+                  current.platforms.add('youtube');
+                  current.engagement = Math.max(current.engagement, parseInt(video.statistics?.viewCount) || 100000);
+                  viralHashtags.set(tag, current);
+                }
+              }
+            }
+            console.log('[VIRAL HASHTAGS] Real YouTube trends processed');
+          }
+        }
+      } catch (youtubeError) {
+        console.log('[VIRAL HASHTAGS] YouTube API processing failed');
+      }
+
+      // 3. Fetch real trending data from Reddit API (free)
+      try {
+        console.log('[VIRAL HASHTAGS] Fetching Reddit trending topics');
+        const redditResponse = await fetch('https://www.reddit.com/r/all/hot.json?limit=100', {
+          headers: {
+            'User-Agent': 'VeeFore-HashtagAnalyzer/1.0'
+          }
+        });
+        
+        if (redditResponse.ok) {
+          const redditData = await redditResponse.json();
+          const posts = redditData.data?.children || [];
+          
+          for (const post of posts) {
+            const postData = post.data;
+            const text = `${postData.title} ${postData.selftext || ''}`;
+            
+            // Extract hashtags from Reddit content
+            const hashtags = text.match(/#(\w+)/g) || [];
+            for (const hashtag of hashtags) {
+              const tag = hashtag.substring(1).toLowerCase();
+              if (tag.length >= 3) {
+                const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
+                current.count += 8;
+                current.platforms.add('reddit');
+                current.engagement = Math.max(current.engagement, postData.score || 1000);
+                viralHashtags.set(tag, current);
+              }
+            }
+            
+            // Extract trending keywords as potential hashtags from high-engagement posts
+            if (postData.score > 5000) {
+              const words = text.toLowerCase().match(/\b\w{4,15}\b/g) || [];
+              const trendingWords = words.filter(word => 
+                !['this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'said', 'each', 'more', 'than', 'what', 'some', 'time', 'very', 'when', 'much', 'where', 'after', 'just', 'most', 'only', 'good', 'well', 'back', 'work', 'life', 'like', 'need', 'want', 'make', 'people', 'know', 'think', 'look', 'come', 'take', 'give', 'find', 'help', 'tell', 'call', 'turn', 'move', 'feel', 'seem', 'leave', 'keep', 'start', 'show', 'hear', 'play', 'run', 'ask', 'talk', 'put', 'set', 'open', 'close', 'change', 'follow', 'stop', 'try', 'learn', 'study', 'teach', 'read', 'write', 'watch', 'see', 'meet', 'visit', 'buy', 'sell', 'pay', 'spend', 'save', 'earn', 'lose', 'win', 'hope', 'believe', 'understand', 'remember', 'forget', 'choose', 'decide', 'agree', 'disagree', 'love', 'hate', 'enjoy', 'prefer', 'mind', 'matter', 'happen', 'exist', 'live', 'die', 'grow', 'develop', 'create', 'build', 'destroy', 'fix', 'break', 'cut', 'cook', 'eat', 'drink', 'sleep', 'wake', 'walk', 'drive', 'travel', 'return', 'arrive', 'begin', 'end', 'continue'].includes(word)
+              );
+              
+              for (const word of trendingWords.slice(0, 2)) {
+                const current = viralHashtags.get(word) || { count: 0, platforms: new Set(), engagement: 0 };
+                current.count += 4;
+                current.platforms.add('reddit');
+                current.engagement = Math.max(current.engagement, postData.score);
+                viralHashtags.set(word, current);
+              }
+            }
+          }
+          console.log('[VIRAL HASHTAGS] Real Reddit trends processed');
+        }
+      } catch (redditError) {
+        console.log('[VIRAL HASHTAGS] Reddit API processing failed');
+      }
+
+      // 5. Fetch real trending data from Google Trends (unofficial API)
+      try {
+        console.log('[VIRAL HASHTAGS] Fetching Google Trends data');
+        const googleTrendsResponse = await fetch('https://trends.google.com/trends/api/dailytrends?hl=en-US&tz=360&geo=US&ns=15');
+        
+        if (googleTrendsResponse.ok) {
+          let trendsText = await googleTrendsResponse.text();
+          // Remove the )]}' prefix that Google adds
+          trendsText = trendsText.substring(6);
+          
+          const trendsData = JSON.parse(trendsText);
+          const trendingSearches = trendsData.default?.trendingSearchesDays?.[0]?.trendingSearches || [];
+          
+          for (const search of trendingSearches) {
+            const searchTerm = search.title?.query?.toLowerCase() || '';
+            if (searchTerm.length >= 3 && searchTerm.length <= 20) {
+              // Convert trending search terms to hashtag format
+              const hashtagTerm = searchTerm.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+              if (hashtagTerm.length >= 3) {
+                const current = viralHashtags.get(hashtagTerm) || { count: 0, platforms: new Set(), engagement: 0 };
+                current.count += 6;
+                current.platforms.add('google-trends');
+                current.engagement = Math.max(current.engagement, search.formattedTraffic?.replace(/[^0-9]/g, '') || 50000);
+                viralHashtags.set(hashtagTerm, current);
+              }
+            }
+          }
+          console.log('[VIRAL HASHTAGS] Google Trends processed');
+        }
+      } catch (googleError) {
+        console.log('[VIRAL HASHTAGS] Google Trends processing failed');
+      }
+
+      // 6. Fetch hashtags from Newsdata.io for trending topics
+      try {
+        if (process.env.NEWSDATA_API_KEY) {
+          console.log('[VIRAL HASHTAGS] Fetching trending news hashtags');
+          const newsResponse = await fetch(`https://newsdata.io/api/1/news?apikey=${process.env.NEWSDATA_API_KEY}&language=en&category=top&size=50`);
+          
+          if (newsResponse.ok) {
+            const newsData = await newsResponse.json();
+            const articles = newsData.results || [];
+            
+            for (const article of articles) {
+              const text = `${article.title} ${article.description || ''}`;
+              
+              // Extract hashtags from news content
+              const hashtags = text.match(/#(\w+)/g) || [];
+              for (const hashtag of hashtags) {
+                const tag = hashtag.substring(1).toLowerCase();
+                if (tag.length >= 3) {
+                  const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
+                  current.count += 7;
+                  current.platforms.add('news');
+                  viralHashtags.set(tag, current);
+                }
+              }
+              
+              // Extract trending keywords from news headlines
+              const words = text.toLowerCase().match(/\b[a-zA-Z]{4,15}\b/g) || [];
+              const trendingWords = words.filter(word => 
+                !['news', 'says', 'after', 'year', 'years', 'about', 'could', 'would', 'should', 'being', 'these', 'those', 'there', 'their', 'where', 'while', 'which', 'until', 'since', 'before', 'during', 'through', 'between', 'under', 'over', 'above', 'below', 'inside', 'outside', 'around', 'across', 'along', 'against', 'within', 'without', 'toward', 'towards', 'behind', 'beside', 'among', 'amongst'].includes(word) &&
+                word.length >= 4 && word.length <= 15
+              );
+              
+              for (const word of trendingWords.slice(0, 2)) {
+                const current = viralHashtags.get(word) || { count: 0, platforms: new Set(), engagement: 0 };
+                current.count += 3;
+                current.platforms.add('news');
+                viralHashtags.set(word, current);
+              }
+            }
+            console.log('[VIRAL HASHTAGS] News trends processed');
+          }
+        }
+      } catch (newsError) {
+        console.log('[VIRAL HASHTAGS] News API processing failed');
+      }
+
+      // 4. Fetch real trending hashtags using comprehensive Perplexity search
       try {
         const trendingQuery = category === 'all' 
-          ? "List 20 most viral hashtags trending NOW across Instagram, TikTok, Twitter, YouTube, LinkedIn with real engagement data. Include current viral trends, memes, news, and high-growth hashtags that content creators are using today."
-          : `List 15 most viral ${category} hashtags trending RIGHT NOW across all social platforms. Show hashtags that are currently getting highest engagement and growth in ${category} niche today.`;
+          ? "What hashtags are currently trending on social media today? Include specific hashtags from Instagram Reels, TikTok viral videos, Twitter trending topics, YouTube Shorts, and LinkedIn posts. Focus on hashtags that are getting high engagement RIGHT NOW."
+          : `What ${category} hashtags are trending on social media today? Include specific ${category}-related hashtags that are viral on Instagram, TikTok, Twitter, YouTube, and LinkedIn with current high engagement.`;
 
         const perplexityResponse = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
@@ -2795,15 +2963,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             messages: [
               {
                 role: 'system',
-                content: 'You are a real-time social media trend analyzer. Provide current trending hashtags with authentic engagement data from live social platforms.'
+                content: 'You are analyzing current social media trends. Only provide hashtags that are actually trending TODAY with real engagement data. Format each hashtag clearly with platform and engagement info.'
               },
               {
                 role: 'user',
-                content: `${trendingQuery} Format as: #hashtag (platforms: Instagram,TikTok) - engagement: 2.5M`
+                content: `${trendingQuery} Format response as: #hashtag - Platform: Instagram/TikTok/Twitter - Engagement: 2.5M views`
               }
             ],
             max_tokens: 1500,
-            temperature: 0.1,
+            temperature: 0.05,
             search_recency_filter: 'day'
           })
         });
@@ -2811,7 +2979,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         if (perplexityResponse.ok) {
           const aiData = await perplexityResponse.json();
           const aiContent = aiData.choices?.[0]?.message?.content || '';
-          console.log('[VIRAL HASHTAGS] Real-time AI analysis completed');
+          console.log('[VIRAL HASHTAGS] Real-time Perplexity analysis completed');
           
           // Parse AI response for hashtags and engagement data
           const lines = aiContent.split('\n');
@@ -2823,22 +2991,23 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                 const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
                 
                 // Extract platform mentions
-                if (line.includes('Instagram')) current.platforms.add('instagram');
-                if (line.includes('TikTok')) current.platforms.add('tiktok');
-                if (line.includes('Twitter')) current.platforms.add('twitter');
-                if (line.includes('YouTube')) current.platforms.add('youtube');
-                if (line.includes('LinkedIn')) current.platforms.add('linkedin');
+                if (line.toLowerCase().includes('instagram')) current.platforms.add('instagram');
+                if (line.toLowerCase().includes('tiktok')) current.platforms.add('tiktok');
+                if (line.toLowerCase().includes('twitter')) current.platforms.add('twitter');
+                if (line.toLowerCase().includes('youtube')) current.platforms.add('youtube');
+                if (line.toLowerCase().includes('linkedin')) current.platforms.add('linkedin');
                 
                 // Extract engagement numbers
-                const engagementMatch = line.match(/(\d+(?:\.\d+)?)[KMB]/i);
+                const engagementMatch = line.match(/(\d+(?:\.\d+)?)\s*([KMB])/i);
                 if (engagementMatch) {
                   const engNum = parseFloat(engagementMatch[1]);
-                  const multiplier = engagementMatch[0].toUpperCase().includes('M') ? 1000000 : 
-                                  engagementMatch[0].toUpperCase().includes('K') ? 1000 : 1;
+                  const multiplier = engagementMatch[2].toUpperCase() === 'M' ? 1000000 : 
+                                    engagementMatch[2].toUpperCase() === 'K' ? 1000 : 
+                                    engagementMatch[2].toUpperCase() === 'B' ? 1000000000 : 1;
                   current.engagement = Math.max(current.engagement, engNum * multiplier);
                 }
                 
-                current.count += 8; // High weight for AI-identified trending hashtags
+                current.count += 10; // High weight for real-time trending data
                 current.platforms.add('trending');
                 viralHashtags.set(tag, current);
               }
@@ -2846,7 +3015,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           }
         }
       } catch (aiError) {
-        console.log('[VIRAL HASHTAGS] AI analysis failed, continuing with curated data');
+        console.log('[VIRAL HASHTAGS] Perplexity analysis failed');
       }
 
       // 3. Get real-time trending data from multiple social platforms using advanced analysis

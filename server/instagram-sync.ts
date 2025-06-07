@@ -142,7 +142,7 @@ export class InstagramSyncService {
           updatedAt: new Date()
         };
         
-        await this.storage.updateSocialAccount(parseInt(instagramAccount.id.toString()), updateData);
+        await this.storage.updateSocialAccount(instagramAccount.id, updateData);
         console.log('[INSTAGRAM SYNC] Updated account with metrics:', updateData);
       } else {
         console.log('[INSTAGRAM SYNC] No Instagram account found for workspace:', workspaceId);

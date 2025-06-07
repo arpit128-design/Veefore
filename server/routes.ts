@@ -4,10 +4,12 @@ import { getAuthenticHashtags } from "./authentic-hashtags";
 import { IStorage } from "./storage";
 import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
+import { InstagramDirectSync } from "./instagram-direct-sync";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
+  const instagramDirectSync = new InstagramDirectSync(storage);
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -417,22 +419,19 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Use any to avoid TypeScript issues with MongoDB dynamic fields
       const account = instagramAccount as any;
       
-      // Sync real-time Instagram data using stored or environment access token
-      const accessToken = account.accessToken || process.env.INSTAGRAM_ACCESS_TOKEN;
-      if (accessToken) {
-        try {
-          console.log('[DASHBOARD] Syncing real-time Instagram data for workspace:', workspaceId);
-          await instagramSync.syncInstagramData(workspaceId, accessToken);
-          // Refetch updated account data after sync
-          const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
-          const updatedAccount = updatedAccounts.find((acc: any) => acc.platform === 'instagram');
-          if (updatedAccount) {
-            Object.assign(account, updatedAccount);
-            console.log('[DASHBOARD] Updated account data with fresh Instagram metrics');
-          }
-        } catch (syncError: any) {
-          console.log('[DASHBOARD] Instagram sync failed, using cached data:', syncError.message);
+      // Update Instagram account with real engagement data using direct sync
+      try {
+        console.log('[DASHBOARD] Updating Instagram data with real engagement metrics for workspace:', workspaceId);
+        await instagramDirectSync.updateAccountWithRealData(workspaceId);
+        // Refetch updated account data after sync
+        const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+        const updatedAccount = updatedAccounts.find((acc: any) => acc.platform === 'instagram');
+        if (updatedAccount) {
+          Object.assign(account, updatedAccount);
+          console.log('[DASHBOARD] Successfully updated account with real Instagram engagement data');
         }
+      } catch (syncError: any) {
+        console.log('[DASHBOARD] Direct sync failed, using existing data:', syncError.message);
       }
 
       // Calculate real engagement metrics from authentic Instagram data

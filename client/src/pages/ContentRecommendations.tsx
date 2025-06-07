@@ -165,10 +165,11 @@ const ContentRecommendations = () => {
 
     const handleMouseEnter = () => {
       setIsHovered(true);
-      if (isVideoContent && videoRef.current && recommendation.mediaUrl) {
+      if (isVideoContent && videoRef.current && recommendation.mediaUrl && recommendation.mediaUrl.startsWith('http')) {
         videoRef.current.currentTime = 0;
         videoRef.current.play().catch(() => {
           // Autoplay failed, user will need to click
+          console.log('Video autoplay failed for:', recommendation.title);
         });
         setIsPlaying(true);
       }
@@ -197,7 +198,7 @@ const ContentRecommendations = () => {
         <Card className="overflow-hidden border-0 bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 h-full">
           {/* Thumbnail/Video Section */}
           <div className="relative aspect-video overflow-hidden">
-            {isVideoContent && recommendation.mediaUrl ? (
+            {isVideoContent && recommendation.mediaUrl && recommendation.mediaUrl.startsWith('http') ? (
               <video
                 ref={videoRef}
                 src={recommendation.mediaUrl}
@@ -206,6 +207,7 @@ const ContentRecommendations = () => {
                 loop
                 muted
                 playsInline
+                onError={() => console.log('Video failed to load:', recommendation.mediaUrl)}
               />
             ) : (
               <>

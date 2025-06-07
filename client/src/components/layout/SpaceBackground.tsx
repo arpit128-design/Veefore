@@ -69,19 +69,31 @@ export function SpaceBackground() {
 
   return (
     <>
-      {/* Dark Space Base Layer */}
-      <div className="fixed inset-0 bg-black z-0"></div>
+      {/* Dark Space Base Layer - Ensure this covers everything */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #000000 100%)',
+          zIndex: -1
+        }}
+      ></div>
       
       {/* Animated Star Field Background */}
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-1"
-        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #000000 100%)' }}
+        className="fixed inset-0 pointer-events-none"
+        style={{ zIndex: -1 }}
       />
       
       {/* Nebula Background Effects */}
-      <div className="fixed top-20 left-20 w-96 h-96 nebula-glow rounded-full opacity-30 animate-drift z-1"></div>
-      <div className="fixed bottom-40 right-20 w-64 h-64 nebula-glow rounded-full opacity-20 animate-drift z-1" style={{ animationDelay: '-10s' }}></div>
+      <div 
+        className="fixed top-20 left-20 w-96 h-96 nebula-glow rounded-full opacity-30 animate-drift pointer-events-none"
+        style={{ zIndex: -1 }}
+      ></div>
+      <div 
+        className="fixed bottom-40 right-20 w-64 h-64 nebula-glow rounded-full opacity-20 animate-drift pointer-events-none" 
+        style={{ animationDelay: '-10s', zIndex: -1 }}
+      ></div>
     </>
   );
 }

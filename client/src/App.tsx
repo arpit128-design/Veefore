@@ -36,12 +36,18 @@ import NotFound from "@/pages/not-found";
 function AuthenticatedApp() {
   return (
     <WorkspaceProvider>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <div 
+        className="min-h-screen text-white overflow-x-hidden relative"
+        style={{
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #000000 100%)',
+          minHeight: '100vh'
+        }}
+      >
         <SpaceBackground />
         <Header />
         <div className="flex pt-16 md:pt-20 min-h-screen pb-20 md:pb-0">
           <Sidebar />
-          <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden bg-transparent">
+          <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
               <Route path="/onboarding" component={Onboarding} />

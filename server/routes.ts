@@ -1442,42 +1442,57 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { user } = req;
       console.log('[CLEANUP] Starting cleanup for user:', user.id);
       
-      // Access MongoDB storage directly
-      const mongoStorage = storage as any;
+      // Import models directly from mongodb-storage
+      const mongoose = require('mongoose');
+      const AddonModel = mongoose.model('Addon');
+      const TeamInvitationModel = mongoose.model('TeamInvitation');
+      
+      // First, check what exists in the database
+      console.log('[CLEANUP] Checking existing data...');
+      
+      const allAddons = await AddonModel.find({}).lean();
+      console.log(`[CLEANUP] Found ${allAddons.length} total addons in database`);
+      allAddons.forEach((addon, i) => {
+        console.log(`[CLEANUP] Addon ${i+1}: userId=${addon.userId} (type: ${typeof addon.userId}), type=${addon.type}, active=${addon.isActive}`);
+      });
+      
+      const allInvitations = await TeamInvitationModel.find({}).lean();
+      console.log(`[CLEANUP] Found ${allInvitations.length} total invitations in database`);
+      allInvitations.forEach((inv, i) => {
+        console.log(`[CLEANUP] Invitation ${i+1}: workspaceId=${inv.workspaceId} (type: ${typeof inv.workspaceId}), email=${inv.email}`);
+      });
+      
       let deletedAddons = 0;
       let deletedInvitations = 0;
       
       // Delete all addons for user (try both string and numeric formats)
-      if (mongoStorage.AddonModel) {
-        const addonResult = await mongoStorage.AddonModel.deleteMany({
-          $or: [
-            { userId: user.id },
-            { userId: parseInt(user.id) },
-            { userId: user.id.toString() }
-          ]
-        });
-        deletedAddons = addonResult.deletedCount || 0;
-        console.log(`[CLEANUP] Deleted ${deletedAddons} addons`);
-      }
+      const addonQuery = {
+        $or: [
+          { userId: user.id },
+          { userId: parseInt(user.id) },
+          { userId: user.id.toString() },
+          { userId: 6844027426 }
+        ]
+      };
+      console.log('[CLEANUP] Addon delete query:', JSON.stringify(addonQuery));
+      
+      const addonResult = await AddonModel.deleteMany(addonQuery);
+      deletedAddons = addonResult.deletedCount || 0;
+      console.log(`[CLEANUP] Deleted ${deletedAddons} addons`);
       
       // Delete all invitations for user's workspaces (try multiple workspace ID formats)
-      if (mongoStorage.TeamInvitationModel) {
-        const invitationResult = await mongoStorage.TeamInvitationModel.deleteMany({
-          $or: [
-            { workspaceId: 684402 },
-            { workspaceId: '684402c2fd2cd4eb6521b386' },
-            { workspaceId: 'My VeeFore Workspace' },
-            { workspaceId: parseInt('684402c2fd2cd4eb6521b386', 16) }
-          ]
-        });
-        deletedInvitations = invitationResult.deletedCount || 0;
-        console.log(`[CLEANUP] Deleted ${deletedInvitations} invitations`);
-      }
+      const invitationQuery = {
+        $or: [
+          { workspaceId: 684402 },
+          { workspaceId: '684402c2fd2cd4eb6521b386' },
+          { workspaceId: 'My VeeFore Workspace' }
+        ]
+      };
+      console.log('[CLEANUP] Invitation delete query:', JSON.stringify(invitationQuery));
       
-      // Force clear any cached data
-      if (mongoStorage.clearUserCache) {
-        await mongoStorage.clearUserCache(user.id);
-      }
+      const invitationResult = await TeamInvitationModel.deleteMany(invitationQuery);
+      deletedInvitations = invitationResult.deletedCount || 0;
+      console.log(`[CLEANUP] Deleted ${deletedInvitations} invitations`);
       
       console.log(`[CLEANUP] Total cleanup: ${deletedAddons} addons, ${deletedInvitations} invitations`);
       

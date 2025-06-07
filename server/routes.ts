@@ -396,39 +396,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             hasTeamAccess = true;
           } else {
             // Method 3: Check for recent team member payments without addon record
-            try {
-              const allPayments = await storage.getPaymentsByUser(user.id);
-              const teamMemberPayment = allPayments.find(payment => 
-                payment.purpose.includes('team-member') && payment.status === 'captured'
-              );
-              
-              if (teamMemberPayment) {
-                console.log(`[TEAM INVITE] Found team member payment without addon - creating addon record`);
-                try {
-                  // Create the missing team member addon
-                  await storage.createAddon({
-                    userId: parseInt(user.id),
-                    name: 'Additional Team Member Seat',
-                    type: 'team-member',
-                    price: 19900,
-                    isActive: true,
-                    expiresAt: null,
-                    metadata: {
-                      paymentId: teamMemberPayment.razorpayPaymentId,
-                      orderId: teamMemberPayment.razorpayOrderId,
-                      createdFromPayment: true
-                    }
-                  });
-                  console.log(`[TEAM INVITE] Successfully created team member addon from payment`);
-                  hasTeamAccess = true;
-                } catch (addonCreateError) {
-                  console.error(`[TEAM INVITE] Failed to create addon:`, addonCreateError);
-                }
+            const allPayments = await storage.getPaymentsByUser(user.id);
+            const teamMemberPayment = allPayments.find(payment => 
+              payment.purpose.includes('team-member') && payment.status === 'captured'
+            );
+            
+            if (teamMemberPayment) {
+              console.log(`[TEAM INVITE] Found team member payment without addon - creating addon record`);
+              try {
+                // Create the missing team member addon
+                await storage.createAddon({
+                  userId: parseInt(user.id),
+                  name: 'Additional Team Member Seat',
+                  type: 'team-member',
+                  price: 19900,
+                  isActive: true,
+                  expiresAt: null,
+                  metadata: {
+                    paymentId: teamMemberPayment.razorpayPaymentId,
+                    orderId: teamMemberPayment.razorpayOrderId,
+                    createdFromPayment: true
+                  }
+                });
+                console.log(`[TEAM INVITE] Successfully created team member addon from payment`);
+                hasTeamAccess = true;
+              } catch (addonCreateError) {
+                console.error(`[TEAM INVITE] Failed to create addon:`, addonCreateError);
               }
-            } catch (error) {
-              console.error(`[TEAM INVITE] Error during team access check:`, error);
             }
           }
+        } catch (error) {
+          console.error(`[TEAM INVITE] Error during team access check:`, error);
+        }
       }
       
       console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Has team access: ${hasTeamAccess}`);

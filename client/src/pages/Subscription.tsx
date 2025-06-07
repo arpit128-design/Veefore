@@ -75,13 +75,45 @@ export default function Subscription() {
     queryFn: () => apiRequest('GET', '/api/pricing').then(res => res.json()),
   });
 
-  // Fetch credit transactions with error handling
-  const { data: creditTransactions, isLoading: transactionsLoading } = useQuery<CreditTransaction[]>({
+  // Fetch credit transactions with enhanced authentication
+  const { data: creditTransactions, isLoading: transactionsLoading, error: transactionsError } = useQuery<CreditTransaction[]>({
     queryKey: ['/api/credit-transactions'],
-    queryFn: () => apiRequest('GET', '/api/credit-transactions').then(res => res.json()),
-    retry: 3,
-    retryDelay: 1000,
-    staleTime: 30000, // Consider data fresh for 30 seconds
+    queryFn: async () => {
+      try {
+        // Get fresh Firebase token
+        const { auth } = await import('../lib/firebase');
+        let token = localStorage.getItem('veefore_auth_token');
+        
+        if (auth?.currentUser) {
+          const freshToken = await auth.currentUser.getIdToken(true);
+          if (freshToken && freshToken.split('.').length === 3) {
+            localStorage.setItem('veefore_auth_token', freshToken);
+            token = freshToken;
+          }
+        }
+        
+        const response = await fetch('/api/credit-transactions', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch transactions: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('[CREDIT TRANSACTIONS] Successfully loaded:', data.length, 'transactions');
+        return data;
+      } catch (error) {
+        console.error('[CREDIT TRANSACTIONS] Error:', error);
+        throw error;
+      }
+    },
+    retry: 2,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 60000,
   });
 
   const userSubscription = subscription as UserSubscription;
@@ -92,7 +124,10 @@ export default function Subscription() {
     return total + transaction.amount;
   }, 0) || 0;
   
-  const currentCredits = userSubscription?.credits || calculatedCredits;
+  // Use calculated credits from authentic transaction data when available
+  const currentCredits = creditTransactions && creditTransactions.length > 0 
+    ? calculatedCredits 
+    : (userSubscription?.credits || 0);
 
   // Debug logging
   console.log('[SUBSCRIPTION DEBUG] Data status:', {
@@ -103,7 +138,9 @@ export default function Subscription() {
     calculatedCredits,
     subscriptionLoading,
     pricingLoading,
-    transactionsLoading
+    transactionsLoading,
+    subscriptionCredits: userSubscription?.credits,
+    transactionCount: creditTransactions?.length
   });
 
   const planData = pricingData?.plans?.[currentPlan] || {

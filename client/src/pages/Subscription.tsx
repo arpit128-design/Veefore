@@ -69,10 +69,10 @@ export default function Subscription() {
     queryFn: () => apiRequest('GET', '/api/subscription').then(res => res.json()),
   });
 
-  // Fetch pricing data
+  // Fetch pricing data from correct endpoint
   const { data: pricingData, isLoading: pricingLoading } = useQuery<PricingData>({
-    queryKey: ['/api/pricing'],
-    queryFn: () => apiRequest('GET', '/api/pricing').then(res => res.json()),
+    queryKey: ['/api/subscription/plans'],
+    queryFn: () => apiRequest('GET', '/api/subscription/plans').then(res => res.json()),
   });
 
   // Fetch credit transactions with enhanced authentication
@@ -124,10 +124,10 @@ export default function Subscription() {
     return total + transaction.amount;
   }, 0) || 0;
   
-  // Use calculated credits from authentic transaction data when available
-  const currentCredits = creditTransactions && creditTransactions.length > 0 
-    ? calculatedCredits 
-    : (userSubscription?.credits || 0);
+  // Use subscription credits first (server-calculated from transactions), then fallback to client calculation
+  const currentCredits = userSubscription?.credits !== undefined && userSubscription.credits !== null
+    ? userSubscription.credits
+    : (creditTransactions && creditTransactions.length > 0 ? calculatedCredits : 0);
 
   // Debug logging
   console.log('[SUBSCRIPTION DEBUG] Data status:', {
@@ -144,21 +144,20 @@ export default function Subscription() {
   });
 
   const planData = pricingData?.plans?.[currentPlan] || {
-    name: 'Free Plan',
+    id: 'free',
+    name: 'Free Forever',
+    description: 'Perfect for getting started with social media management',
     price: 0,
-    monthlyCredits: 50,
-    socialAccounts: 1,
-    analytics: 'Basic',
+    credits: 60,
     features: [
-      'AI Content Generation',
-      'Basic Analytics Dashboard',
-      '1 Social Account Connection',
-      'Community Support',
-      'Hashtag Suggestions'
-    ],
-    color: 'text-gray-400',
-    bgColor: 'bg-gray-500/10',
-    borderColor: 'border-gray-500/20'
+      '1 Workspace',
+      '1 Social Account per Platform',
+      'Basic Scheduling',
+      'Limited Analytics',
+      'Chrome Extension (Limited)',
+      'Watermarked Content',
+      '7-day Calendar View'
+    ]
   };
 
   // Credit purchase mutation
@@ -264,10 +263,10 @@ export default function Subscription() {
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${planData.bgColor} border ${planData.borderColor} flex items-center justify-center`}>
-                  <Crown className={`w-8 h-8 ${planData.color}`} />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-electric-cyan/20 to-nebula-purple/20 border border-electric-cyan/30 flex items-center justify-center">
+                  <Crown className="w-8 h-8 text-electric-cyan" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{planData.name} Plan</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">{planData.name}</h3>
                 <p className="text-asteroid-silver">
                   {currentPlan === 'free' ? 'Free forever' : `₹${planData.price}/month`}
                 </p>
@@ -330,18 +329,12 @@ export default function Subscription() {
                   <div className="space-y-4">
                     <h4 className="font-semibold text-white">Plan Features</h4>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-asteroid-silver">Monthly Credits: {formatNumber(planData.monthlyCredits || 0)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-asteroid-silver">Social Accounts: {planData.socialAccounts || 'Unlimited'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-asteroid-silver">Analytics: {planData.analytics || 'Basic'}</span>
-                      </div>
+                      {planData.features?.slice(0, 5).map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-asteroid-silver">{feature}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -430,7 +423,7 @@ export default function Subscription() {
                       {creditTransactions.slice(0, 5).map((transaction) => (
                         <div key={transaction.id} className="flex justify-between items-center p-3 rounded-lg bg-cosmic-void/20">
                           <div>
-                            <div className="text-sm font-medium text-white">{transaction.purpose}</div>
+                            <div className="text-sm font-medium text-white">{transaction.description}</div>
                             <div className="text-xs text-asteroid-silver">
                               {new Date(transaction.createdAt).toLocaleDateString()}
                             </div>
@@ -439,9 +432,9 @@ export default function Subscription() {
                             <div className={`font-medium ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                               {transaction.amount > 0 ? '+' : ''}{formatNumber(transaction.amount)}
                             </div>
-                            <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-                              {transaction.status}
-                            </Badge>
+                            <div className="text-xs text-asteroid-silver capitalize">
+                              {transaction.type}
+                            </div>
                           </div>
                         </div>
                       ))}

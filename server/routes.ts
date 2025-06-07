@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Create workspace with plan restrictions
+  // Create workspace with plan restrictions and addon benefits
   app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
@@ -166,7 +166,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const userWorkspaces = await storage.getWorkspacesByUserId(userId);
       const currentPlan = req.user.plan || 'Free';
       
-      // Define workspace limits per plan
+      // Define base workspace limits per plan
       const planLimits = {
         'Free': 1,
         'Creator': 3,
@@ -174,7 +174,27 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         'Enterprise': 50
       };
       
-      const maxWorkspaces = planLimits[currentPlan as keyof typeof planLimits] || 1;
+      let maxWorkspaces = planLimits[currentPlan as keyof typeof planLimits] || 1;
+      
+      // Check for active workspace addons
+      try {
+        const activeAddons = await storage.getActiveAddonsByUser(parseInt(userId));
+        console.log('[WORKSPACE CREATION] Active addons for user:', activeAddons);
+        
+        // Count additional workspace addons
+        const workspaceAddons = activeAddons.filter(addon => 
+          addon.type === 'workspace' || 
+          (addon.metadata && (addon.metadata as any).addonId === 'extra-workspace')
+        );
+        
+        const additionalWorkspaces = workspaceAddons.length;
+        maxWorkspaces += additionalWorkspaces;
+        
+        console.log(`[WORKSPACE CREATION] Base limit: ${planLimits[currentPlan as keyof typeof planLimits] || 1}, Additional from addons: ${additionalWorkspaces}, Total: ${maxWorkspaces}`);
+      } catch (error) {
+        console.error('[WORKSPACE CREATION] Error checking addons:', error);
+        // Continue with base limits if addon check fails
+      }
       
       if (userWorkspaces.length >= maxWorkspaces) {
         return res.status(403).json({

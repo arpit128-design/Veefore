@@ -111,6 +111,7 @@ export interface IStorage {
 
   // Addon operations
   getUserAddons(userId: number): Promise<Addon[]>;
+  getActiveAddonsByUser(userId: number): Promise<Addon[]>;
   createAddon(addon: InsertAddon): Promise<Addon>;
 
   // Content recommendation operations
@@ -784,6 +785,15 @@ export class MemStorage implements IStorage {
   // Addon operations
   async getUserAddons(userId: number): Promise<Addon[]> {
     return Array.from(this.addons.values()).filter(addon => addon.userId === userId && addon.isActive);
+  }
+
+  async getActiveAddonsByUser(userId: number): Promise<Addon[]> {
+    const now = new Date();
+    return Array.from(this.addons.values()).filter(addon => 
+      addon.userId === userId && 
+      addon.isActive && 
+      (addon.expiresAt === null || addon.expiresAt > now)
+    );
   }
 
   async createAddon(insertAddon: InsertAddon): Promise<Addon> {

@@ -1236,6 +1236,20 @@ export class MongoStorage implements IStorage {
     return addons.map(addon => this.convertAddon(addon));
   }
 
+  async getActiveAddonsByUser(userId: number): Promise<Addon[]> {
+    await this.connect();
+    const now = new Date();
+    const addons = await AddonModel.find({ 
+      userId, 
+      isActive: true,
+      $or: [
+        { expiresAt: null },
+        { expiresAt: { $gt: now } }
+      ]
+    });
+    return addons.map(addon => this.convertAddon(addon));
+  }
+
   async createAddon(insertAddon: InsertAddon): Promise<Addon> {
     await this.connect();
     const addon = new AddonModel(insertAddon);

@@ -540,6 +540,197 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Instagram OAuth routes
+  app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.query.workspaceId;
+      
+      console.log('[INSTAGRAM AUTH] Request for user:', user.id, 'workspaceId:', workspaceId);
+      
+      // Check if Instagram credentials are configured
+      if (!process.env.INSTAGRAM_APP_ID || !process.env.INSTAGRAM_APP_SECRET) {
+        return res.status(400).json({ 
+          error: 'Instagram app credentials not configured. Please provide INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET.' 
+        });
+      }
+
+      let workspace;
+      if (workspaceId) {
+        workspace = await storage.getWorkspace(workspaceId.toString());
+        if (!workspace || workspace.userId !== user.id) {
+          console.log('[INSTAGRAM AUTH] Access denied to workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      } else {
+        workspace = await storage.getDefaultWorkspace(user.id);
+        if (!workspace) {
+          console.log('[INSTAGRAM AUTH] No workspace found, creating default workspace for user:', user.id);
+          workspace = await storage.createWorkspace({
+            userId: user.id,
+            name: 'My VeeFore Workspace',
+            theme: 'space',
+            isDefault: true
+          });
+        }
+      }
+
+      const currentDomain = req.get('host');
+      const redirectUri = `https://${currentDomain}/api/instagram/callback`;
+      const stateData = {
+        workspaceId: workspace.id,
+        userId: user.id,
+        timestamp: Date.now(),
+        source: req.query.source || 'integrations'
+      };
+      const state = Buffer.from(JSON.stringify(stateData)).toString('base64');
+      
+      console.log(`[INSTAGRAM AUTH] Starting OAuth flow for user ${user.id}`);
+      console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
+      console.log(`[INSTAGRAM AUTH] State data:`, stateData);
+      
+      const scopes = 'user_profile,user_media';
+      const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+      
+      res.json({ authUrl });
+    } catch (error: any) {
+      console.error('[INSTAGRAM AUTH] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/instagram/callback', async (req: Request, res: Response) => {
+    try {
+      const { code, state, error, error_reason, error_description } = req.query;
+      
+      console.log(`[INSTAGRAM CALLBACK] Received callback with parameters:`, {
+        code: code ? `present (${String(code).substring(0, 10)}...)` : 'missing',
+        state: state ? 'present' : 'missing',
+        error: error || 'none',
+        error_reason: error_reason || 'none',
+        error_description: error_description || 'none',
+        fullUrl: req.url,
+        host: req.get('host')
+      });
+      
+      if (error) {
+        console.error(`[INSTAGRAM CALLBACK] OAuth error: ${error}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error as string)}`);
+      }
+      
+      if (!code || !state) {
+        console.error('[INSTAGRAM CALLBACK] Missing code or state parameter');
+        return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
+      }
+
+      // Decode state
+      let stateData;
+      try {
+        stateData = JSON.parse(Buffer.from(state as string, 'base64').toString());
+      } catch (decodeError) {
+        console.error('[INSTAGRAM CALLBACK] Failed to decode state:', decodeError);
+        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state`);
+      }
+
+      const { workspaceId } = stateData;
+      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      
+      console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
+      console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
+      
+      // Exchange authorization code for access token
+      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for access token...`);
+      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.INSTAGRAM_APP_ID!,
+          client_secret: process.env.INSTAGRAM_APP_SECRET!,
+          grant_type: 'authorization_code',
+          redirect_uri: redirectUri,
+          code: code as string,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error(`[INSTAGRAM CALLBACK] Token exchange failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
+      }
+
+      const tokenData = await tokenResponse.json();
+      console.log(`[INSTAGRAM CALLBACK] Token exchange successful`);
+      
+      // Get long-lived access token
+      console.log(`[INSTAGRAM CALLBACK] Converting to long-lived token...`);
+      const longLivedResponse = await fetch(
+        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_APP_SECRET}&access_token=${tokenData.access_token}`
+      );
+
+      if (!longLivedResponse.ok) {
+        const errorText = await longLivedResponse.text();
+        console.error(`[INSTAGRAM CALLBACK] Long-lived token exchange failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=long_lived_token_failed`);
+      }
+
+      const longLivedToken = await longLivedResponse.json();
+      console.log(`[INSTAGRAM CALLBACK] Long-lived token obtained, expires in ${longLivedToken.expires_in} seconds`);
+      
+      // Get user profile using Instagram Business API
+      console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
+      const profileResponse = await fetch(
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${longLivedToken.access_token}`
+      );
+
+      if (!profileResponse.ok) {
+        const errorText = await profileResponse.text();
+        console.error(`[INSTAGRAM CALLBACK] Profile fetch failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=profile_fetch_failed`);
+      }
+
+      const profile = await profileResponse.json();
+      console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
+      
+      // Save the social account
+      const expiresAt = new Date(Date.now() + (longLivedToken.expires_in * 1000));
+      
+      const socialAccountData = {
+        username: profile.username,
+        workspaceId: parseInt(workspaceId),
+        platform: 'instagram',
+        accountId: profile.id,
+        accessToken: longLivedToken.access_token,
+        refreshToken: null,
+        expiresAt: expiresAt,
+        isActive: true
+      };
+
+      console.log(`[INSTAGRAM CALLBACK] Saving social account for workspace ${workspaceId}...`);
+      await storage.createSocialAccount(socialAccountData);
+      console.log(`[INSTAGRAM CALLBACK] Social account saved successfully`);
+      
+      const redirectPage = stateData.source === 'onboarding' ? 'onboarding' : 'integrations';
+      console.log(`[INSTAGRAM CALLBACK] Redirecting to ${redirectPage} page`);
+      res.redirect(`https://${req.get('host')}/${redirectPage}?success=instagram_connected&username=${profile.username}`);
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM CALLBACK] Error details:', {
+        message: error.message,
+        stack: error.stack?.split('\n')[0],
+        response: error.response?.data
+      });
+      
+      let errorMessage = error.message;
+      if (error.response?.data) {
+        errorMessage = `Instagram API Error: ${JSON.stringify(error.response.data)}`;
+      }
+      
+      res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(errorMessage)}`);
+    }
+  });
+
   // Chat performance endpoint
   app.get("/api/chat-performance", requireAuth, async (req: any, res: any) => {
     try {

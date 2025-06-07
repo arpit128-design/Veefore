@@ -131,6 +131,8 @@ const CreditTransactionSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   type: { type: String, required: true },
   description: { type: String, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed },
+  referenceId: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

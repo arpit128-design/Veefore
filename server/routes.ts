@@ -798,14 +798,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   });
 
   // Credit Transactions API
-  app.get('/api/credit-transactions', async (req: any, res: Response) => {
+  app.get('/api/credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
-      const userId = req.user.id;
-      const transactions = await storage.getCreditTransactions(userId);
+      const { user } = req;
+      const transactions = await storage.getCreditTransactions(user.id);
       
       res.json(transactions);
     } catch (error: any) {
@@ -815,14 +811,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   });
 
   // Purchase Credits API
-  app.post('/api/credits/purchase', async (req: any, res: Response) => {
+  app.post('/api/credits/purchase', requireAuth, async (req: any, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
+      const { user } = req;
       const { packageId } = req.body;
-      const userId = req.user.id;
 
       // For now, return success message - will implement Razorpay integration later
       res.json({ 
@@ -849,6 +841,67 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[SUBSCRIPTION PLANS] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to fetch subscription plans' });
+    }
+  });
+
+  // Seed Credit Transactions API (for testing)
+  app.post('/api/seed-credit-transactions', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      
+      console.log('[SEED] Creating sample credit transactions for user:', user.id);
+
+      // Create sample transactions
+      const transactions = [
+        {
+          userId: user.id,
+          type: 'earned',
+          amount: 50,
+          description: 'Monthly Free Plan Credits',
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+        },
+        {
+          userId: user.id,
+          type: 'spent',
+          amount: -5,
+          description: 'AI Content Generation - Instagram Post',
+          referenceId: 'content_12345',
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
+        },
+        {
+          userId: user.id,
+          type: 'spent',
+          amount: -3,
+          description: 'Hashtag Analysis & Suggestions',
+          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+        },
+        {
+          userId: user.id,
+          type: 'earned',
+          amount: 10,
+          description: 'Referral Bonus - Friend Signup',
+          referenceId: 'referral_abc123',
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+        },
+        {
+          userId: user.id,
+          type: 'spent',
+          amount: -2,
+          description: 'AI Caption Optimization',
+          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+        }
+      ];
+
+      for (const transaction of transactions) {
+        await storage.createCreditTransaction(transaction);
+        console.log('[SEED] Created transaction:', transaction.description);
+      }
+
+      console.log('[SEED] Successfully created', transactions.length, 'sample credit transactions');
+      res.json({ success: true, count: transactions.length });
+    } catch (error: any) {
+      console.error('[SEED] Error creating credit transactions:', error);
+      res.status(500).json({ error: error.message || 'Failed to seed credit transactions' });
     }
   });
 

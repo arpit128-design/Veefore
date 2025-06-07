@@ -118,9 +118,9 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* CSS Star Field - Behind content */}
+      {/* CSS Star Field - Behind content with reduced count */}
       <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: -3 }}>
-        {Array.from({ length: 200 }, (_, i) => (
+        {Array.from({ length: 80 }, (_, i) => (
           <div
             key={i}
             className="star"
@@ -134,17 +134,17 @@ export function SpaceBackground() {
         ))}
       </div>
 
-      {/* Shooting Stars - Behind content */}
+      {/* Shooting Stars - Behind content with reduced frequency */}
       <div className="shooting-stars fixed inset-0 pointer-events-none" style={{ zIndex: -2 }}>
-        {Array.from({ length: 5 }, (_, i) => (
+        {Array.from({ length: 2 }, (_, i) => (
           <div
             key={i}
             className="shooting-star"
             style={{
-              left: `${Math.random() * 20}%`,
-              top: `${Math.random() * 30}%`,
-              animationDelay: `${i * 6 + Math.random() * 4}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
+              left: `${Math.random() * 30}%`,
+              top: `${Math.random() * 40}%`,
+              animationDelay: `${i * 12 + Math.random() * 8}s`,
+              animationDuration: `${4 + Math.random() * 3}s`
             }}
           />
         ))}

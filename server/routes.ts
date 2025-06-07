@@ -1127,7 +1127,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           // Create addon record for user
           try {
             const createdAddon = await storage.createAddon({
-              userId: user.id, // Keep as string to match user ID format
+              userId: parseInt(user.id), // Convert to number to match storage interface
               type: addon.type,
               name: addon.name,
               price: addon.price,

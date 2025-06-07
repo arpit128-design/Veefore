@@ -184,16 +184,6 @@ export default function TeamManagement() {
         role
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        
-        // Store the response status and error data for onError handling
-        const error = new Error(errorData.error || 'Failed to send invitation');
-        (error as any).status = response.status;
-        (error as any).needsUpgrade = errorData.needsUpgrade;
-        throw error;
-      }
-      
       return response.json();
     },
     onSuccess: () => {

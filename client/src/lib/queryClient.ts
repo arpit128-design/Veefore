@@ -59,16 +59,7 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  console.log('[API REQUEST] Response status:', res.status, 'OK:', res.ok);
-  
-  if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    console.log('[API REQUEST] Error response text:', text);
-    const error = new Error(`${res.status}: ${text}`);
-    console.log('[API REQUEST] Throwing error:', error);
-    throw error;
-  }
-  console.log('[API REQUEST] Response OK, continuing');
+  await throwIfResNotOk(res);
   return res;
 }
 

@@ -95,14 +95,15 @@ export default function NewOnboarding() {
   });
 
   const savePreferencesMutation = useMutation({
-    mutationFn: (data: UserPreferences) => apiRequest('POST', '/api/user/preferences', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    mutationFn: (data: UserPreferences) => apiRequest('POST', '/api/user/complete-onboarding', { preferences: data }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/user'] });
       toast({
-        title: "Mission Initiated! 🚀",
+        title: "Mission Initiated!",
         description: "Your cosmic journey begins now. Welcome to VeeFore!",
       });
-      setLocation('/dashboard');
+      setTimeout(() => setLocation('/dashboard'), 1000);
     },
     onError: () => {
       toast({

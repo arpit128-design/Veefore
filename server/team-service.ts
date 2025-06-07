@@ -50,18 +50,34 @@ export class TeamService {
   }
 
   static async canInviteMembers(workspace: Workspace, user: User, storage: any): Promise<{ canInvite: boolean; reason?: string; needsUpgrade?: boolean }> {
+    console.log('[TEAM SERVICE] Checking invite permissions for user:', user.id, 'workspace:', workspace.id);
+    
     // Check if user has permission (owner or admin)
     if (workspace.userId !== user.id) {
+      console.log('[TEAM SERVICE] User is not workspace owner');
       return { canInvite: false, reason: 'Only workspace owners and admins can invite members' };
     }
 
     // Get user's current subscription
+    console.log('[TEAM SERVICE] Getting active subscription for user:', user.id);
     const subscription = await storage.getActiveSubscription(user.id);
     const currentPlan = subscription?.plan || 'free';
+    console.log('[TEAM SERVICE] Current plan:', currentPlan, 'subscription:', subscription);
     
-    // Get current member count
-    const members = await storage.getWorkspaceMembers(workspace.id);
-    const currentMemberCount = members.length;
+    // Get current member count - simplified approach for free tier
+    console.log('[TEAM SERVICE] Getting member count for workspace:', workspace.id);
+    let currentMemberCount = 1; // Default to 1 (owner)
+    try {
+      const members = await Promise.race([
+        storage.getWorkspaceMembers(workspace.id),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+      ]);
+      currentMemberCount = members.length;
+      console.log('[TEAM SERVICE] Found member count:', currentMemberCount);
+    } catch (error) {
+      console.log('[TEAM SERVICE] Using fallback member count (1) due to error:', error.message);
+      currentMemberCount = 1; // Fallback to owner only
+    }
     
     // Check subscription limits
     const limits = {
@@ -72,8 +88,10 @@ export class TeamService {
     };
     
     const planLimits = limits[currentPlan as keyof typeof limits] || limits.free;
+    console.log('[TEAM SERVICE] Plan limits:', planLimits);
     
     if (!planLimits.canInvite) {
+      console.log('[TEAM SERVICE] Plan does not allow invites - upgrade required');
       return { 
         canInvite: false, 
         reason: 'Free plan only supports 1 member. Upgrade to invite team members.', 
@@ -82,6 +100,7 @@ export class TeamService {
     }
     
     if (currentMemberCount >= planLimits.maxMembers) {
+      console.log('[TEAM SERVICE] Member limit reached - upgrade required');
       return { 
         canInvite: false, 
         reason: `${currentPlan} plan supports up to ${planLimits.maxMembers} members. Upgrade for more team members.`, 
@@ -89,6 +108,7 @@ export class TeamService {
       };
     }
     
+    console.log('[TEAM SERVICE] Invite allowed');
     return { canInvite: true };
   }
 

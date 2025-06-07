@@ -996,6 +996,15 @@ export class MongoStorage implements IStorage {
     return this.convertSubscription(subscription);
   }
 
+  async getActiveSubscription(userId: number): Promise<Subscription | undefined> {
+    await this.connect();
+    const subscription = await SubscriptionModel.findOne({ 
+      userId, 
+      status: { $in: ['active', 'trialing'] } 
+    });
+    return subscription ? this.convertSubscription(subscription) : undefined;
+  }
+
   // Payment operations
   async createPayment(insertPayment: InsertPayment): Promise<Payment> {
     await this.connect();
@@ -1035,6 +1044,7 @@ export class MongoStorage implements IStorage {
       subscriptionId: doc.subscriptionId || null,
       currentPeriodStart: doc.currentPeriodStart || null,
       currentPeriodEnd: doc.currentPeriodEnd || null,
+      trialEnd: doc.trialEnd || null,
       monthlyCredits: doc.monthlyCredits || null,
       extraCredits: doc.extraCredits || null,
       autoRenew: doc.autoRenew || null,
@@ -1140,23 +1150,57 @@ export class MongoStorage implements IStorage {
 
   async getWorkspaceMembers(workspaceId: number | string): Promise<(WorkspaceMember & { user: User })[]> {
     await this.connect();
-    const members = await WorkspaceMemberModel.find({ 
-      workspaceId: workspaceId.toString() 
-    });
+    console.log('[MONGODB DEBUG] Getting workspace members for workspace:', workspaceId);
     
-    const result = [];
-    for (const member of members) {
-      const user = await this.getUser(member.userId);
-      if (user) {
-        result.push({
-          ...this.convertWorkspaceMember(member),
-          user
-        });
+    try {
+      const members = await WorkspaceMemberModel.find({ 
+        workspaceId: workspaceId.toString() 
+      }).timeout(5000); // 5 second timeout
+      
+      console.log('[MONGODB DEBUG] Found workspace members:', members.length);
+      
+      const result = [];
+      for (const member of members) {
+        const user = await this.getUser(member.userId);
+        if (user) {
+          result.push({
+            ...this.convertWorkspaceMember(member),
+            user
+          });
+        }
       }
-    }
-    
-    // If no members found, add the workspace owner as a member
-    if (result.length === 0) {
+      
+      // If no members found, add the workspace owner as a member (simplified approach)
+      if (result.length === 0) {
+        console.log('[MONGODB DEBUG] No members found, adding workspace owner');
+        const workspace = await this.getWorkspace(workspaceId);
+        if (workspace) {
+          const owner = await this.getUser(workspace.userId);
+          if (owner) {
+            const ownerMember: WorkspaceMember & { user: User } = {
+              id: 1,
+              userId: typeof workspace.userId === 'string' ? parseInt(workspace.userId) : workspace.userId,
+              workspaceId: typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId,
+              role: 'Owner',
+              status: 'active',
+              permissions: null,
+              invitedBy: null,
+              joinedAt: workspace.createdAt,
+              createdAt: workspace.createdAt,
+              updatedAt: workspace.updatedAt,
+              user: owner
+            };
+            result.push(ownerMember);
+            console.log('[MONGODB DEBUG] Added owner as member:', owner.username);
+          }
+        }
+      }
+      
+      console.log('[MONGODB DEBUG] Returning members:', result.length);
+      return result;
+    } catch (error) {
+      console.error('[MONGODB DEBUG] Error getting workspace members:', error);
+      // Return just the owner as fallback
       const workspace = await this.getWorkspace(workspaceId);
       if (workspace) {
         const owner = await this.getUser(workspace.userId);
@@ -1174,12 +1218,11 @@ export class MongoStorage implements IStorage {
             updatedAt: workspace.updatedAt,
             user: owner
           };
-          result.push(ownerMember);
+          return [ownerMember];
         }
       }
+      return [];
     }
-    
-    return result;
   }
 
   async addWorkspaceMember(member: InsertWorkspaceMember): Promise<WorkspaceMember> {

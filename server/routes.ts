@@ -164,6 +164,73 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Update workspace
+  app.put('/api/workspaces/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+      const updates = req.body;
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const updatedWorkspace = await storage.updateWorkspace(workspaceId, updates);
+      res.json(updatedWorkspace);
+    } catch (error: any) {
+      console.error('Error updating workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete workspace
+  app.delete('/api/workspaces/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Prevent deleting the last/default workspace
+      const userWorkspaces = await storage.getWorkspacesByUserId(user.id);
+      if (userWorkspaces.length <= 1) {
+        return res.status(400).json({ error: 'Cannot delete your only workspace' });
+      }
+
+      await storage.deleteWorkspace(workspaceId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error deleting workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Set default workspace
+  app.put('/api/workspaces/:id/default', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.id;
+
+      // Verify user owns this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      await storage.setDefaultWorkspace(user.id, workspaceId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error setting default workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Get credit transactions
   app.get('/api/credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {

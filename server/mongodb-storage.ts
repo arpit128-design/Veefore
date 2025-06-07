@@ -437,7 +437,7 @@ export class MongoStorage implements IStorage {
     return this.convertWorkspace(savedWorkspace);
   }
 
-  async updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace> {
+  async updateWorkspace(id: number | string, updates: Partial<Workspace>): Promise<Workspace> {
     await this.connect();
     const workspace = await WorkspaceModel.findOneAndUpdate(
       { _id: id },
@@ -448,7 +448,7 @@ export class MongoStorage implements IStorage {
     return this.convertWorkspace(workspace);
   }
 
-  async deleteWorkspace(id: number): Promise<void> {
+  async deleteWorkspace(id: number | string): Promise<void> {
     await this.connect();
     await WorkspaceModel.findOneAndDelete({ _id: id });
   }

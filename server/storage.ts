@@ -26,13 +26,13 @@ export interface IStorage {
   updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
 
   // Workspace operations
-  getWorkspace(id: number): Promise<Workspace | undefined>;
+  getWorkspace(id: number | string): Promise<Workspace | undefined>;
   getWorkspacesByUserId(userId: number | string): Promise<Workspace[]>;
-  getDefaultWorkspace(userId: number): Promise<Workspace | undefined>;
+  getDefaultWorkspace(userId: number | string): Promise<Workspace | undefined>;
   getWorkspaceByInviteCode(inviteCode: string): Promise<Workspace | undefined>;
   createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
-  updateWorkspace(id: number, updates: Partial<Workspace>): Promise<Workspace>;
-  deleteWorkspace(id: number): Promise<void>;
+  updateWorkspace(id: number | string, updates: Partial<Workspace>): Promise<Workspace>;
+  deleteWorkspace(id: number | string): Promise<void>;
   setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void>;
 
   // Team management operations

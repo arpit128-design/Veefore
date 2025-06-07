@@ -670,7 +670,7 @@ export default function NewOnboarding() {
   }
 
   function ConnectStep() {
-    const hasInstagram = socialAccounts?.some((account: any) => account.platform === 'instagram');
+    const hasInstagram = Array.isArray(socialAccounts) && socialAccounts.some((account: any) => account.platform === 'instagram');
 
     return (
       <motion.div
@@ -722,7 +722,7 @@ export default function NewOnboarding() {
           </motion.button>
         </div>
 
-        {hasInstagram && socialAccounts && (
+        {hasInstagram && Array.isArray(socialAccounts) && (
           <motion.div
             className="max-w-md mx-auto p-4 bg-slate-800/50 rounded-xl border border-slate-600"
             initial={{ opacity: 0, scale: 0.9 }}

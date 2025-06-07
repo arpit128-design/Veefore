@@ -996,8 +996,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const addon = pricingData.addons[packageId];
         
         if (addon) {
+          console.log('[ADDON PURCHASE] Creating addon for user:', user.id, 'addon:', addon);
           // Create addon record for user
-          await storage.createAddon({
+          const createdAddon = await storage.createAddon({
             userId: parseInt(user.id),
             type: addon.type,
             name: addon.name,
@@ -1006,6 +1007,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
             metadata: { addonId: packageId, benefit: addon.benefit }
           });
+          console.log('[ADDON PURCHASE] Successfully created addon:', createdAddon);
 
           // Provide specific benefits based on addon type
           if (addon.type === 'ai_boost') {

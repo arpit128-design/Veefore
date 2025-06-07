@@ -254,7 +254,8 @@ export const addons = pgTable("addons", {
   isActive: boolean("is_active").default(true),
   expiresAt: timestamp("expires_at"),
   metadata: json("metadata"),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
 });
 
 // Insert schemas

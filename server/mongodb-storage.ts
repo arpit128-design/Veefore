@@ -185,7 +185,8 @@ const AddonSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   expiresAt: Date,
   metadata: mongoose.Schema.Types.Mixed,
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 const WorkspaceMemberSchema = new mongoose.Schema({
@@ -1252,9 +1253,25 @@ export class MongoStorage implements IStorage {
 
   async createAddon(insertAddon: InsertAddon): Promise<Addon> {
     await this.connect();
-    const addon = new AddonModel(insertAddon);
-    await addon.save();
-    return this.convertAddon(addon);
+    console.log('[MONGODB DEBUG] Creating addon with data:', insertAddon);
+    
+    const addonData = {
+      ...insertAddon,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    const addon = new AddonModel(addonData);
+    console.log('[MONGODB DEBUG] Addon model created:', addon);
+    
+    try {
+      const savedAddon = await addon.save();
+      console.log('[MONGODB DEBUG] Addon saved successfully:', savedAddon);
+      return this.convertAddon(savedAddon);
+    } catch (error) {
+      console.error('[MONGODB ERROR] Failed to save addon:', error);
+      throw error;
+    }
   }
 
   // Conversion methods for subscription system
@@ -1352,7 +1369,8 @@ export class MongoStorage implements IStorage {
       isActive: doc.isActive || null,
       expiresAt: doc.expiresAt || null,
       metadata: doc.metadata || null,
-      createdAt: doc.createdAt || null
+      createdAt: doc.createdAt || null,
+      updatedAt: doc.updatedAt || null
     };
   }
 

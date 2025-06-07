@@ -243,14 +243,25 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(404).json({ error: 'Workspace not found' });
       }
       
-      // Check if user owns this workspace or is a member
-      // Handle various ID formats - MongoDB ObjectId strings vs numeric IDs
+      // Check if user owns this workspace - handle multiple ID formats
       const workspaceUserId = workspace.userId.toString();
       const requestUserId = user.id.toString();
-      const userOwnsWorkspace = workspaceUserId === requestUserId;
+      const firebaseUid = user.firebaseUid;
+      
+      // Check multiple ID formats for compatibility
+      const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                               workspaceUserId === firebaseUid ||
+                               workspace.userId === user.id ||
+                               workspace.userId === user.firebaseUid;
       
       if (!userOwnsWorkspace) {
-        // For now, only workspace owners can access team management
+        console.log('[DEBUG] Access denied - ID mismatch:', {
+          workspaceUserId,
+          requestUserId,
+          firebaseUid,
+          workspaceUserIdType: typeof workspace.userId,
+          requestUserIdType: typeof user.id
+        });
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 

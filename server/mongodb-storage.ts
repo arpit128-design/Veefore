@@ -1311,8 +1311,8 @@ export class MongoStorage implements IStorage {
           if (owner) {
             const ownerMember: WorkspaceMember & { user: User } = {
               id: 1,
-              userId: typeof workspace.userId === 'string' ? parseInt(workspace.userId) : workspace.userId,
-              workspaceId: typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId,
+              userId: workspace.userId,
+              workspaceId: workspaceId.toString(),
               role: 'Owner',
               status: 'active',
               permissions: null,

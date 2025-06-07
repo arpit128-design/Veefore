@@ -42,7 +42,8 @@ interface TeamInvitation {
 }
 
 const rolePermissions = {
-  admin: { label: "Admin", icon: Crown, color: "bg-yellow-100 text-yellow-800", description: "Full access to all features" },
+  owner: { label: "Owner", icon: Crown, color: "bg-purple-100 text-purple-800", description: "Full workspace control and billing" },
+  admin: { label: "Admin", icon: Shield, color: "bg-yellow-100 text-yellow-800", description: "Full access to all features" },
   editor: { label: "Editor", icon: Edit, color: "bg-blue-100 text-blue-800", description: "Can create and manage content" },
   viewer: { label: "Viewer", icon: Eye, color: "bg-gray-100 text-gray-800", description: "Can view content and analytics" }
 };
@@ -189,6 +190,9 @@ export default function TeamManagement() {
   };
 
   const isOwner = currentWorkspace?.userId === user?.id;
+  const userMember = members?.find((member: TeamMember) => member.userId === user?.id);
+  const isAdmin = userMember?.role === 'admin';
+  const canManageTeam = isOwner || isAdmin;
 
   if (!currentWorkspace) {
     return (
@@ -213,7 +217,7 @@ export default function TeamManagement() {
           <Users className="h-6 w-6 text-blue-400" />
           <h1 className="text-2xl font-bold text-white">Team Management</h1>
         </div>
-        {isOwner && (
+        {canManageTeam && (
           <div className="flex space-x-2">
             <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
               <DialogTrigger asChild>
@@ -251,6 +255,7 @@ export default function TeamManagement() {
                       <SelectContent className="bg-gray-800 border-gray-700">
                         <SelectItem value="viewer">Viewer</SelectItem>
                         <SelectItem value="editor">Editor</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -327,7 +332,7 @@ export default function TeamManagement() {
                         {roleInfo?.label || member.role}
                       </Badge>
                       
-                      {isOwner && member.userId !== user?.id && (
+                      {canManageTeam && member.userId !== user?.id && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
@@ -335,15 +340,42 @@ export default function TeamManagement() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="bg-gray-800 border-gray-700">
-                            <DropdownMenuItem
-                              onClick={() => updateRoleMutation.mutate({ 
-                                memberId: member.userId, 
-                                role: member.role === 'editor' ? 'viewer' : 'editor'
-                              })}
-                              className="text-white hover:bg-gray-700"
-                            >
-                              Change to {member.role === 'editor' ? 'Viewer' : 'Editor'}
-                            </DropdownMenuItem>
+                            {member.role !== 'admin' && (
+                              <DropdownMenuItem
+                                onClick={() => updateRoleMutation.mutate({ 
+                                  memberId: member.userId, 
+                                  role: 'admin'
+                                })}
+                                className="text-yellow-400 hover:bg-gray-700"
+                              >
+                                <Shield className="w-4 h-4 mr-2" />
+                                Make Admin
+                              </DropdownMenuItem>
+                            )}
+                            {member.role !== 'editor' && (
+                              <DropdownMenuItem
+                                onClick={() => updateRoleMutation.mutate({ 
+                                  memberId: member.userId, 
+                                  role: 'editor'
+                                })}
+                                className="text-blue-400 hover:bg-gray-700"
+                              >
+                                <Edit className="w-4 h-4 mr-2" />
+                                Make Editor
+                              </DropdownMenuItem>
+                            )}
+                            {member.role !== 'viewer' && (
+                              <DropdownMenuItem
+                                onClick={() => updateRoleMutation.mutate({ 
+                                  memberId: member.userId, 
+                                  role: 'viewer'
+                                })}
+                                className="text-gray-400 hover:bg-gray-700"
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Make Viewer
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               onClick={() => removeMemberMutation.mutate(member.userId)}
                               className="text-red-400 hover:bg-gray-700 hover:text-red-300"

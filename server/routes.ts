@@ -2726,88 +2726,173 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Cross-platform viral hashtag analysis endpoint
+  // Authentic Instagram hashtag analysis endpoint
   app.get("/api/hashtags/trending", requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const { category = 'all', workspaceId } = req.query;
       
-      console.log('[VIRAL HASHTAGS] Analyzing trending hashtags across all platforms for user:', userId, 'workspace:', workspaceId);
+      console.log('[AUTHENTIC HASHTAGS] Analyzing hashtags from connected Instagram account for user:', userId, 'workspace:', workspaceId);
       
-      // Multi-platform hashtag analysis combining real social data and trending analysis
-      const viralHashtags = new Map();
-      const platformMetrics = new Map();
+      // Only use authentic data from connected Instagram accounts
+      const authenticHashtags = new Map();
+      let hasConnectedAccount = false;
       
-      // 1. Try to get Instagram data if available (skip database errors for now)
-      let instagramAccount = null;
+      // Get connected Instagram account
       try {
-        instagramAccount = await storage.getSocialAccount(parseInt(workspaceId), 'instagram');
-      } catch (dbError) {
-        console.log('[VIRAL HASHTAGS] Instagram account lookup failed, proceeding with external analysis');
-      }
-      
-      if (instagramAccount?.accessToken) {
-        console.log('[VIRAL HASHTAGS] Analyzing Instagram account:', instagramAccount.username);
+        const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+        const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
         
-        try {
-          const mediaResponse = await fetch(
-            `https://graph.facebook.com/v18.0/${instagramAccount.accountId}/media?fields=caption,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`
-          );
+        if (!instagramAccount || !instagramAccount.accessToken) {
+          console.log('[AUTHENTIC HASHTAGS] No Instagram account connected - returning empty results');
+          return res.json([]);
+        }
+
+        hasConnectedAccount = true;
+        console.log('[AUTHENTIC HASHTAGS] Analyzing Instagram account:', instagramAccount.username);
+
+        // Extract hashtags from user's recent Instagram posts with real engagement data
+        const mediaResponse = await fetch(
+          `https://graph.instagram.com/me/media?fields=caption,like_count,comments_count,timestamp,media_type,permalink&limit=50&access_token=${instagramAccount.accessToken}`
+        );
+        
+        if (mediaResponse.ok) {
+          const mediaData = await mediaResponse.json();
+          const posts = mediaData.data || [];
           
-          if (mediaResponse.ok) {
-            const mediaData = await mediaResponse.json();
-            console.log('[VIRAL HASHTAGS] Found Instagram posts:', mediaData.data?.length || 0);
+          for (const post of posts) {
+            const caption = post.caption || '';
+            const hashtagMatches = caption.match(/#[\w]+/g);
             
-            for (const post of mediaData.data || []) {
-              if (post.caption) {
-                const hashtags = post.caption.match(/#[\w]+/g) || [];
-                for (const hashtag of hashtags) {
-                  const tag = hashtag.substring(1).toLowerCase();
-                  if (tag.length >= 3) {
-                    const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-                    current.count++;
-                    current.platforms.add('instagram');
-                    viralHashtags.set(tag, current);
-                  }
+            if (hashtagMatches) {
+              for (const hashtag of hashtagMatches) {
+                const tag = hashtag.substring(1).toLowerCase();
+                if (tag.length >= 3 && tag.length <= 30) {
+                  const current = authenticHashtags.get(tag) || {
+                    count: 0,
+                    platforms: new Set(['instagram']),
+                    engagement: 0,
+                    source: 'user_posts',
+                    realData: true
+                  };
+                  
+                  current.count += 1;
+                  const realEngagement = (post.like_count || 0) + (post.comments_count || 0);
+                  current.engagement = Math.max(current.engagement, realEngagement);
+                  authenticHashtags.set(tag, current);
                 }
               }
             }
           }
-        } catch (igError) {
-          console.log('[VIRAL HASHTAGS] Instagram analysis failed:', igError.message);
+          console.log('[AUTHENTIC HASHTAGS] Extracted hashtags from', posts.length, 'posts');
         }
-      }
 
-      // 2. Fetch real trending data from YouTube Data API
+        // Convert to final format with real engagement data only
+        const finalHashtags = Array.from(authenticHashtags.entries())
+          .filter(([tag, data]) => data.count > 0)
+          .map(([tag, data]) => {
+            const platforms = Array.from(data.platforms);
+            const popularity = Math.min(100, Math.max(10, data.engagement > 0 ? Math.log10(data.engagement + 1) * 15 : 20));
+            const growthPotential = Math.min(100, popularity + (data.count * 5));
+            
+            // Categorize based on hashtag content
+            let hashtagCategory = 'general';
+            if (['fitness', 'workout', 'gym', 'health', 'training', 'wellness', 'sport'].some(w => tag.includes(w))) {
+              hashtagCategory = 'fitness';
+            } else if (['food', 'recipe', 'cooking', 'foodie', 'delicious', 'eat'].some(w => tag.includes(w))) {
+              hashtagCategory = 'food';
+            } else if (['travel', 'vacation', 'adventure', 'explore', 'wanderlust', 'trip'].some(w => tag.includes(w))) {
+              hashtagCategory = 'travel';
+            } else if (['fashion', 'style', 'ootd', 'outfit', 'trendy', 'clothing'].some(w => tag.includes(w))) {
+              hashtagCategory = 'fashion';
+            } else if (['business', 'entrepreneur', 'startup', 'leadership', 'networking', 'work'].some(w => tag.includes(w))) {
+              hashtagCategory = 'business';
+            } else if (['tech', 'technology', 'ai', 'coding', 'innovation', 'software'].some(w => tag.includes(w))) {
+              hashtagCategory = 'technology';
+            } else if (['lifestyle', 'life', 'daily', 'mindfulness', 'selfcare', 'wellness'].some(w => tag.includes(w))) {
+              hashtagCategory = 'lifestyle';
+            }
+
+            return {
+              tag,
+              category: hashtagCategory,
+              popularity: Math.round(popularity),
+              growthPotential: Math.round(growthPotential),
+              engagement: data.engagement.toString(),
+              platforms,
+              uses: data.count
+            };
+          })
+          .sort((a, b) => parseInt(b.engagement) - parseInt(a.engagement))
+          .slice(0, 25);
+
+        // Filter by category if specified
+        let filteredHashtags = finalHashtags;
+        if (category !== 'all') {
+          filteredHashtags = finalHashtags.filter(h => h.category === category);
+        }
+
+        console.log('[AUTHENTIC HASHTAGS] Returning', filteredHashtags.length, 'authentic hashtags with real engagement data');
+        res.json(filteredHashtags);
+
+      } catch (error) {
+        console.error('[AUTHENTIC HASHTAGS] Error analyzing authentic hashtags:', error);
+        res.status(500).json({ error: 'Failed to analyze authentic hashtags' });
+      }
+    });
+
+    // Keep the existing chat performance endpoint
+    app.get("/api/chat-performance", requireAuth, async (req: any, res: Response) => {
       try {
-        if (process.env.YOUTUBE_API_KEY) {
-          console.log('[VIRAL HASHTAGS] Fetching real YouTube trending hashtags');
-          const youtubeResponse = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=50&regionCode=US&key=${process.env.YOUTUBE_API_KEY}`
+        const userId = req.user.id;
+        const { workspaceId } = req.query;
+
+        console.log('[CHAT PERFORMANCE] Fetching chat metrics for user:', userId, 'workspace:', workspaceId);
+
+        // Get user's Instagram account
+        const socialAccount = await storage.getSocialAccount(parseInt(workspaceId), 'instagram');
+        
+        if (!socialAccount || !socialAccount.accessToken) {
+          console.log('[CHAT PERFORMANCE] No Instagram account found, returning empty metrics');
+          return res.json([]);
+        }
+
+        console.log('[CHAT PERFORMANCE] Found Instagram account:', socialAccount.username);
+
+        // Get DM conversations from Instagram Basic Display API
+        try {
+          const conversationsResponse = await fetch(
+            `https://graph.instagram.com/me/conversations?access_token=${socialAccount.accessToken}`
           );
           
-          if (youtubeResponse.ok) {
-            const youtubeData = await youtubeResponse.json();
-            const videos = youtubeData.items || [];
+          if (conversationsResponse.ok) {
+            const conversationsData = await conversationsResponse.json();
+            const conversations = conversationsData.data || [];
             
-            for (const video of videos) {
-              const description = video.snippet.description || '';
-              const title = video.snippet.title || '';
-              const text = `${title} ${description}`;
-              
-              // Extract hashtags from YouTube content
-              const hashtags = text.match(/#(\w+)/g) || [];
-              for (const hashtag of hashtags) {
-                const tag = hashtag.substring(1).toLowerCase();
-                if (tag.length >= 3) {
-                  const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-                  current.count += 12; // High weight for YouTube trends
-                  current.platforms.add('youtube');
-                  current.engagement = Math.max(current.engagement, parseInt(video.statistics?.viewCount) || 100000);
-                  viralHashtags.set(tag, current);
-                }
-              }
-            }
+            const chatMetrics = conversations.map((conversation: any) => ({
+              id: conversation.id,
+              participants: conversation.participants?.data || [],
+              messageCount: conversation.message_count || 0,
+              unreadCount: conversation.unread_count || 0,
+              lastActivity: conversation.updated_time
+            }));
+            
+            console.log('[CHAT PERFORMANCE] Returning', chatMetrics.length, 'chat conversations');
+            res.json(chatMetrics);
+          } else {
+            console.log('[CHAT PERFORMANCE] Instagram conversations API failed');
+            res.json([]);
+          }
+        } catch (conversationError) {
+          console.log('[CHAT PERFORMANCE] Error fetching conversations:', conversationError);
+          res.json([]);
+        }
+        
+      } catch (error) {
+        console.error('[CHAT PERFORMANCE] Error analyzing chat performance:', error);
+        res.status(500).json({ error: 'Failed to analyze chat performance' });
+      }
+    });
             console.log('[VIRAL HASHTAGS] Real YouTube trends processed');
           }
         }

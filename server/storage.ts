@@ -368,6 +368,10 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getWorkspaceInvitations(workspaceId: number): Promise<TeamInvitation[]> {
+    return this.getTeamInvitations(workspaceId, 'pending');
+  }
+
   async updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation> {
     const invitation = this.teamInvitations.get(id);
     if (!invitation) throw new Error("Team invitation not found");

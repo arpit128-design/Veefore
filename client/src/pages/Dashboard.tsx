@@ -12,7 +12,7 @@ export default function Dashboard() {
   const { user, token } = useAuth();
   const { currentWorkspace } = useWorkspaceContext();
 
-  // Fetch real analytics data with better caching - filtered by workspace
+  // Fetch real analytics data with immediate cache serving
   const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
     queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
     queryFn: () => fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
@@ -21,11 +21,13 @@ export default function Dashboard() {
       }
     }).then(res => res.json()),
     enabled: !!user && !!currentWorkspace && !!token,
-    staleTime: 30000, // Data is fresh for 30 seconds
-    gcTime: 300000, // Keep in cache for 5 minutes (TanStack Query v5)
-    refetchInterval: 30000, // Refetch every 30 seconds
-    retry: 2,
-    retryDelay: 1000
+    staleTime: 60000, // Data is fresh for 1 minute
+    gcTime: 600000, // Keep in cache for 10 minutes
+    refetchInterval: 60000, // Refetch every minute
+    retry: 1, // Reduced retry for faster response
+    retryDelay: 500,
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches
+    networkMode: 'always' // Always try to fetch even with cached data
   });
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
@@ -44,14 +46,14 @@ export default function Dashboard() {
 
   const formatPercentage = (num: number) => `${num}%`;
 
-  // Show loading spinner only on initial load without any data
-  if (analyticsLoading && !analyticsData) {
+  // Only show loading spinner on very first load when no workspace is available
+  if (!currentWorkspace) {
     return (
       <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden">
         <div className="flex items-center justify-center min-h-[300px] md:min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4" />
-            <div className="text-asteroid-silver text-sm">Loading your Instagram metrics...</div>
+            <div className="text-asteroid-silver text-sm">Loading workspace...</div>
           </div>
         </div>
       </div>
@@ -61,31 +63,33 @@ export default function Dashboard() {
   // Map API response to dashboard data structure
   console.log('[DASHBOARD DEBUG] Analytics data received:', analyticsData);
   
-  // Map Instagram API response to dashboard format
+  // Map Instagram API response to dashboard format with smart loading states
   const rawData = analyticsData as any;
+  const hasValidData = analyticsData && rawData?.accountUsername;
+  
   const analytics = {
-    totalViews: rawData?.totalReach || rawData?.impressions || 0,
-    engagement: rawData?.engagementRate || 0,
-    newFollowers: rawData?.followers || 0,
+    totalViews: hasValidData ? (rawData?.totalReach || rawData?.impressions || 0) : null,
+    engagement: hasValidData ? (rawData?.engagementRate || 0) : null,
+    newFollowers: hasValidData ? (rawData?.followers || 0) : null,
     contentScore: 85, // Static for now
-    platforms: rawData?.accountUsername ? ['instagram'] : []
+    platforms: hasValidData && rawData?.accountUsername ? ['instagram'] : []
   };
   
   // Create proper data mapping for Instagram metrics
   const instagramData = {
-    followers: rawData?.followers || 0,
-    engagementRate: rawData?.engagementRate || 0,
-    impressions: rawData?.impressions || 0,
-    totalPosts: rawData?.totalPosts || 0,
-    totalReach: rawData?.totalReach || 0,
-    totalLikes: rawData?.totalLikes || 0,
-    totalComments: rawData?.totalComments || 0,
-    mediaCount: rawData?.mediaCount || rawData?.totalPosts || 0,
+    followers: hasValidData ? (rawData?.followers || 0) : null,
+    engagementRate: hasValidData ? (rawData?.engagementRate || 0) : null,
+    impressions: hasValidData ? (rawData?.impressions || 0) : null,
+    totalPosts: hasValidData ? (rawData?.totalPosts || 0) : null,
+    totalReach: hasValidData ? (rawData?.totalReach || 0) : null,
+    totalLikes: hasValidData ? (rawData?.totalLikes || 0) : null,
+    totalComments: hasValidData ? (rawData?.totalComments || 0) : null,
+    mediaCount: hasValidData ? (rawData?.mediaCount || rawData?.totalPosts || 0) : null,
     accountUsername: rawData?.accountUsername
   };
   
   // Show loading message when data is null/empty
-  const isDataEmpty = !analyticsData || (analytics.engagement === 0 && analytics.newFollowers === 0 && analytics.platforms.length === 0);
+  const isDataLoading = analyticsLoading || !hasValidData;
   
   console.log('[DASHBOARD DEBUG] Mapped analytics:', analytics);
   console.log('[DASHBOARD DEBUG] Formatted engagement:', formatNumber(analytics.engagement));
@@ -113,31 +117,35 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Views"
-          value={formatNumber(analytics.totalViews)}
-          change={{ value: analytics.totalViews > 0 ? "Active data" : "Building insights", isPositive: analytics.totalViews >= 0 }}
+          value={analytics.totalViews !== null ? formatNumber(analytics.totalViews) : null}
+          change={analytics.totalViews !== null && analytics.totalViews > 0 ? { value: "Active data", isPositive: true } : undefined}
           icon={<Eye className="text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
+          isLoading={isDataLoading}
         />
         <StatsCard
           title="Engagement"
-          value={formatNumber(analytics.engagement)}
-          change={{ value: analytics.engagement > 0 ? "Active data" : "No data yet", isPositive: analytics.engagement > 0 }}
+          value={analytics.engagement !== null ? formatNumber(analytics.engagement) : null}
+          change={analytics.engagement !== null && analytics.engagement > 0 ? { value: "Active data", isPositive: true } : undefined}
           icon={<Heart className="text-xl" />}
           gradient="from-solar-gold to-red-500"
+          isLoading={isDataLoading}
         />
         <StatsCard
           title="New Followers"
-          value={formatNumber(analytics.newFollowers)}
-          change={{ value: analytics.newFollowers > 0 ? "Active data" : "No data yet", isPositive: analytics.newFollowers > 0 }}
+          value={analytics.newFollowers !== null ? formatNumber(analytics.newFollowers) : null}
+          change={analytics.newFollowers !== null && analytics.newFollowers > 0 ? { value: "Active data", isPositive: true } : undefined}
           icon={<Users className="text-xl" />}
           gradient="from-nebula-purple to-pink-500"
+          isLoading={isDataLoading}
         />
         <StatsCard
           title="Content Score"
           value={formatPercentage(analytics.contentScore)}
-          change={{ value: analytics.contentScore > 0 ? "Active data" : "No data yet", isPositive: analytics.contentScore > 0 }}
+          change={{ value: "Active data", isPositive: true }}
           icon={<TrendingUp className="text-xl" />}
           gradient="from-green-400 to-blue-500"
+          isLoading={false}
         />
       </div>
 

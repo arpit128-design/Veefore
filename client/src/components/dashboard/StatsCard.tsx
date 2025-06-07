@@ -4,16 +4,52 @@ import { ReactNode } from "react";
 
 interface StatsCardProps {
   title: string;
-  value: string | number;
+  value: string | number | null;
   change?: {
     value: string;
     isPositive: boolean;
   };
   icon: ReactNode;
   gradient: string;
+  isLoading?: boolean;
 }
 
-export function StatsCard({ title, value, change, icon, gradient }: StatsCardProps) {
+export function StatsCard({ title, value, change, icon, gradient, isLoading }: StatsCardProps) {
+  const displayValue = () => {
+    if (value === null || isLoading) {
+      return (
+        <div className="flex items-center space-x-2">
+          <div className="animate-pulse text-asteroid-silver">Building insights</div>
+        </div>
+      );
+    }
+    return value;
+  };
+
+  const displayChange = () => {
+    if (value === null || isLoading) {
+      return (
+        <div className="flex items-center space-x-2 text-asteroid-silver">
+          <div className="w-4 h-4 animate-pulse bg-asteroid-silver rounded"></div>
+          <span className="text-sm animate-pulse">No data yet</span>
+        </div>
+      );
+    }
+    if (change) {
+      return (
+        <div className={`flex items-center space-x-2 ${change.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+          {change.isPositive ? (
+            <TrendingUp className="h-4 w-4" />
+          ) : (
+            <TrendingDown className="h-4 w-4" />
+          )}
+          <span className="text-sm">{change.value}</span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="content-card holographic">
       <CardContent className="p-6">
@@ -22,20 +58,11 @@ export function StatsCard({ title, value, change, icon, gradient }: StatsCardPro
             {icon}
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-electric-cyan">{value}</div>
+            <div className="text-2xl font-bold text-electric-cyan">{displayValue()}</div>
             <div className="text-sm text-asteroid-silver">{title}</div>
           </div>
         </div>
-        {change && (
-          <div className={`flex items-center space-x-2 ${change.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-            {change.isPositive ? (
-              <TrendingUp className="h-4 w-4" />
-            ) : (
-              <TrendingDown className="h-4 w-4" />
-            )}
-            <span className="text-sm">{change.value}</span>
-          </div>
-        )}
+        {displayChange()}
       </CardContent>
     </Card>
   );

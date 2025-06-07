@@ -44,9 +44,9 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  // Map Instagram data directly from analytics response
-  const getMetricValue = (key: string, fallback: string = '0') => {
-    if (!analytics) return fallback;
+  // Map Instagram data directly from analytics response with loading states
+  const getMetricValue = (key: string, fallback: string = '—') => {
+    if (!analytics || isLoading) return fallback;
     
     switch (key) {
       case 'followers':

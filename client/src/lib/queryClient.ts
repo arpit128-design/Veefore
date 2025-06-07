@@ -29,7 +29,25 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const token = localStorage.getItem('veefore_auth_token');
+  let token = localStorage.getItem('veefore_auth_token');
+  
+  // Validate and refresh token if needed
+  if (token && (!token.includes('.') || token.split('.').length !== 3)) {
+    console.log(`[CLIENT DEBUG] Invalid token format detected for ${method} ${url}, refreshing...`);
+    try {
+      const { auth } = await import('./firebase');
+      if (auth?.currentUser) {
+        const freshToken = await auth.currentUser.getIdToken(true);
+        if (freshToken && freshToken.split('.').length === 3) {
+          localStorage.setItem('veefore_auth_token', freshToken);
+          token = freshToken;
+          console.log(`[CLIENT DEBUG] Token refreshed successfully for ${method} ${url}`);
+        }
+      }
+    } catch (error) {
+      console.error(`[CLIENT DEBUG] Token refresh failed for ${method} ${url}:`, error);
+    }
+  }
   
   console.log(`[CLIENT DEBUG] ${method} ${url} - Token:`, token ? 'Present' : 'Missing');
   

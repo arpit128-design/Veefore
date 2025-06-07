@@ -888,9 +888,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return total + transaction.amount;
       }, 0);
       
+      console.log(`[SUBSCRIPTION] User ${userId} has ${creditBalance} credits from ${transactions.length} transactions`);
+      
       res.json({
         ...subscription,
-        credits: creditBalance
+        credits: creditBalance,
+        transactionCount: transactions.length,
+        lastUpdated: new Date()
       });
     } catch (error: any) {
       console.error('[SUBSCRIPTION] Error:', error);

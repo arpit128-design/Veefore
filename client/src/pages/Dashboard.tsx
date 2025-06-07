@@ -166,32 +166,34 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Followers</span>
-                <span className="text-xl font-bold text-white">{instagramData.followers}</span>
+                <span className="text-xl font-bold text-white">{instagramData.followers ?? '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Avg. Engagement</span>
-                <span className="text-xl font-bold text-green-400">{instagramData.engagementRate.toFixed(1)}%</span>
+                <span className="text-xl font-bold text-green-400">
+                  {instagramData.engagementRate !== null ? `${instagramData.engagementRate.toFixed(1)}%` : '—'}
+                </span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Impressions</span>
-                <span className="text-xl font-bold text-white">{instagramData.impressions}</span>
+                <span className="text-xl font-bold text-white">{instagramData.impressions ?? '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Posts</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalPosts}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalPosts ?? '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Likes</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalLikes}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalLikes ?? '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Reach</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalReach}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalReach ?? '—'}</span>
               </div>
             </div>
           </div>

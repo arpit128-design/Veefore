@@ -49,11 +49,47 @@ export class TeamService {
     return resourcePermissions ? resourcePermissions.includes(action) : false;
   }
 
-  static async canInviteMembers(workspace: Workspace, user: User): Promise<{ canInvite: boolean; reason?: string }> {
-    if (workspace.userId === user.id) {
-      return { canInvite: true };
+  static async canInviteMembers(workspace: Workspace, user: User, storage: any): Promise<{ canInvite: boolean; reason?: string; needsUpgrade?: boolean }> {
+    // Check if user has permission (owner or admin)
+    if (workspace.userId !== user.id) {
+      return { canInvite: false, reason: 'Only workspace owners and admins can invite members' };
     }
-    return { canInvite: false, reason: 'Only workspace owners and admins can invite members' };
+
+    // Get user's current subscription
+    const subscription = await storage.getActiveSubscription(user.id);
+    const currentPlan = subscription?.plan || 'free';
+    
+    // Get current member count
+    const members = await storage.getWorkspaceMembers(workspace.id);
+    const currentMemberCount = members.length;
+    
+    // Check subscription limits
+    const limits = {
+      free: { maxMembers: 1, canInvite: false },
+      creator: { maxMembers: 3, canInvite: true },
+      pro: { maxMembers: 10, canInvite: true },
+      enterprise: { maxMembers: 50, canInvite: true }
+    };
+    
+    const planLimits = limits[currentPlan as keyof typeof limits] || limits.free;
+    
+    if (!planLimits.canInvite) {
+      return { 
+        canInvite: false, 
+        reason: 'Free plan only supports 1 member. Upgrade to invite team members.', 
+        needsUpgrade: true 
+      };
+    }
+    
+    if (currentMemberCount >= planLimits.maxMembers) {
+      return { 
+        canInvite: false, 
+        reason: `${currentPlan} plan supports up to ${planLimits.maxMembers} members. Upgrade for more team members.`, 
+        needsUpgrade: true 
+      };
+    }
+    
+    return { canInvite: true };
   }
 
   static async inviteTeamMember(

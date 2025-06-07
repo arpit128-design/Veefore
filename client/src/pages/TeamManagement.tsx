@@ -183,6 +183,18 @@ export default function TeamManagement() {
         email,
         role
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // Check if upgrade is needed (402 Payment Required)
+        if (response.status === 402 && errorData.needsUpgrade) {
+          throw new Error(`UPGRADE_REQUIRED:${errorData.error}`);
+        }
+        
+        throw new Error(errorData.error || 'Failed to send invitation');
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -196,11 +208,30 @@ export default function TeamManagement() {
       queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Failed to send invitation",
-        description: error.message || "An error occurred while sending the invitation.",
-        variant: "destructive"
-      });
+      const errorMessage = error.message || "An error occurred while sending the invitation.";
+      
+      if (errorMessage.startsWith('UPGRADE_REQUIRED:')) {
+        const actualMessage = errorMessage.replace('UPGRADE_REQUIRED:', '');
+        toast({
+          title: "Upgrade Required",
+          description: actualMessage,
+          variant: "destructive",
+          action: (
+            <button 
+              onClick={() => window.location.href = '/pricing'}
+              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+            >
+              Upgrade Now
+            </button>
+          )
+        });
+      } else {
+        toast({
+          title: "Failed to send invitation",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
     }
   });
 

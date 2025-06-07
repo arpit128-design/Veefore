@@ -2298,9 +2298,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
 
       // Check if user can invite members
-      const canInvite = await TeamService.canInviteMembers(workspace, req.user);
+      const canInvite = await TeamService.canInviteMembers(workspace, req.user, storage);
       if (!canInvite.canInvite) {
-        return res.status(403).json({ error: canInvite.reason });
+        const statusCode = canInvite.needsUpgrade ? 402 : 403; // 402 = Payment Required
+        return res.status(statusCode).json({ 
+          error: canInvite.reason, 
+          needsUpgrade: canInvite.needsUpgrade 
+        });
       }
 
       const result = await TeamService.inviteTeamMember(workspaceId, email, role, userId, storage);

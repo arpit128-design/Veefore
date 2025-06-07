@@ -2452,11 +2452,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const preferences = user.preferences as any || {};
       const niche = preferences.niche || 'content creation';
 
-      // Import and use real content service
-      const { realContentService } = await import('./real-content-service');
+      // Import and use trending scraper for real data
+      const { trendingScraper } = await import('./trending-scraper');
       
       // Get real trending content based on type
-      const recommendations = await realContentService.getContentRecommendations(
+      const recommendations = await trendingScraper.getContentRecommendations(
         type as string,
         niche,
         userLocation.countryCode,

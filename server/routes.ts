@@ -1085,6 +1085,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   // Razorpay Payment Verification
   app.post('/api/razorpay/verify-payment', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log('[PAYMENT VERIFICATION] Endpoint hit with body:', req.body);
       const { user } = req;
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
 
@@ -1211,13 +1212,54 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             }
           }
           // Note: social_connection addon benefit is handled in the connection limits
+        } else {
+          console.log('[ADDON PURCHASE] Addon not found in pricing data for packageId:', packageId);
+          console.log('[ADDON PURCHASE] Available addon IDs:', Object.keys(pricingData.addons));
         }
+      } else {
+        console.log('[PAYMENT VERIFICATION] No matching payment type processed:', { type, planId: !!planId, packageId: !!packageId });
       }
 
       res.json({ success: true, message: 'Payment processed successfully' });
     } catch (error: any) {
       console.error('[PAYMENT VERIFICATION] Error:', error);
       res.status(500).json({ error: error.message || 'Payment verification failed' });
+    }
+  });
+
+  // Emergency addon creation endpoint for failed automatic creation
+  app.post('/api/emergency-addon-creation', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { razorpayOrderId } = req.body;
+      
+      console.log('[EMERGENCY ADDON] Checking for missing addon from payment:', razorpayOrderId);
+      
+      // Check if this order was for a team-member addon
+      if (razorpayOrderId && razorpayOrderId.startsWith('order_')) {
+        // Create the missing addon
+        const createdAddon = await storage.createAddon({
+          userId: parseInt(user.id),
+          type: 'team-member',
+          name: 'Additional Team Member Seat',
+          price: 19900,
+          isActive: true,
+          expiresAt: null,
+          metadata: { 
+            emergencyCreated: true,
+            razorpayOrderId: razorpayOrderId,
+            createdAt: new Date().toISOString()
+          }
+        });
+        
+        console.log('[EMERGENCY ADDON] Successfully created missing addon:', createdAddon);
+        res.json({ success: true, addon: createdAddon });
+      } else {
+        res.status(400).json({ error: 'Invalid order ID' });
+      }
+    } catch (error: any) {
+      console.error('[EMERGENCY ADDON] Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 

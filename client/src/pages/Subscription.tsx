@@ -177,6 +177,18 @@ export default function Subscription() {
                 packageId: addonId
               });
 
+              // Emergency failsafe: Create addon if automatic creation failed
+              if (addonId === 'team-member') {
+                try {
+                  await apiRequest('POST', '/api/emergency-addon-creation', {
+                    razorpayOrderId: response.razorpay_order_id
+                  });
+                  console.log('[EMERGENCY ADDON] Failsafe addon creation triggered');
+                } catch (emergencyError) {
+                  console.log('[EMERGENCY ADDON] Failsafe not needed or failed:', emergencyError);
+                }
+              }
+
               toast({
                 title: "Add-on Purchased!",
                 description: `${orderData.addon.name} has been added to your account.`,

@@ -1083,7 +1083,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   });
 
   // Razorpay Payment Verification
-  app.post('/api/razorpay/verify', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/razorpay/verify-payment', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
@@ -1126,14 +1126,23 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.log('[ADDON PURCHASE] Creating addon for user:', user.id, 'addon:', addon);
           // Create addon record for user
           try {
+            // Convert user.id properly to handle string/number mismatch
+            const numericUserId = typeof user.id === 'string' ? parseInt(user.id.replace(/[^0-9]/g, '').slice(-10)) : parseInt(user.id);
+            console.log('[ADDON PURCHASE] Converted userId from', user.id, 'to', numericUserId);
+            
             const createdAddon = await storage.createAddon({
-              userId: parseInt(user.id), // Convert to number to match storage interface
+              userId: numericUserId,
               type: addon.type,
               name: addon.name,
               price: addon.price,
               isActive: true,
-              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-              metadata: { addonId: packageId, benefit: addon.benefit }
+              expiresAt: null, // No expiration for purchased addons
+              metadata: { 
+                addonId: packageId, 
+                benefit: addon.benefit,
+                paymentId: razorpay_payment_id,
+                purchaseDate: new Date().toISOString()
+              }
             });
             console.log('[ADDON PURCHASE] Successfully created addon:', createdAddon);
           } catch (addonError) {

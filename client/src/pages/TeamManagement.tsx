@@ -198,8 +198,8 @@ export default function TeamManagement() {
       queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
     },
     onError: (error: any) => {
-      // Check if upgrade is needed (402 Payment Required)
-      if (error.status === 402 && error.needsUpgrade) {
+      // Check if upgrade is needed (402 Payment Required or team limit reached)
+      if (error.status === 402 && (error.needsUpgrade || error.suggestedAddon)) {
         setUpgradeModalOpen(true);
       } else {
         toast({

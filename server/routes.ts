@@ -477,9 +477,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const userIdForLookup = typeof user.id === 'number' ? user.id : user.id;
         
         const userAddons = await storage.getUserAddons(userIdForLookup);
+        
+        console.log(`[TEAM INVITE] Debug - All user addons:`, userAddons.map(a => ({ type: a.type, isActive: a.isActive, userId: a.userId })));
+        
         const teamMemberAddons = userAddons.filter(addon => 
-          addon.type === 'team-member' && addon.isActive !== false
+          addon.type === 'team-member'
         );
+        
+        console.log(`[TEAM INVITE] Debug - Team member addons filtered:`, teamMemberAddons.map(a => ({ type: a.type, isActive: a.isActive, userId: a.userId })));
+        console.log(`[TEAM INVITE] Debug - Team member addons count: ${teamMemberAddons.length}`);
         
         // Each team member addon allows 1 additional member (owner + 1 per addon)
         const maxTeamSize = 1 + teamMemberAddons.length;

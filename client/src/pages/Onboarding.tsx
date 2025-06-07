@@ -331,7 +331,7 @@ export default function Onboarding() {
             {[...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-2 h-2 bg-yellow-300 rounded-full"
+                className="absolute w-2 h-2 bg-yellow-400 rounded-full"
                 style={{
                   top: "50%",
                   left: "50%",
@@ -379,9 +379,9 @@ export default function Onboarding() {
         transition={{ delay: 1 }}
       >
         {[
-          { icon: Sparkles, title: "AI Content Creation", desc: "Generate stellar posts, captions, and media", color: "from-blue-500 to-cyan-400" },
-          { icon: Target, title: "Smart Scheduling", desc: "Launch posts at optimal galactic times", color: "from-purple-500 to-pink-400" },
-          { icon: TrendingUp, title: "Cosmic Analytics", desc: "Track performance across the social universe", color: "from-green-500 to-blue-400" }
+          { icon: Sparkles, title: "AI Content Creation", desc: "Generate stellar posts, captions, and media", color: "from-slate-800 to-cyan-400" },
+          { icon: Target, title: "Smart Scheduling", desc: "Launch posts at optimal galactic times", color: "from-cyan-500 to-yellow-400" },
+          { icon: TrendingUp, title: "Cosmic Analytics", desc: "Track performance across the social universe", color: "from-yellow-500 to-cyan-400" }
         ].map((feature, index) => (
           <motion.div
             key={index}
@@ -426,7 +426,7 @@ export default function Onboarding() {
         <p className="text-white/90 text-lg leading-relaxed">
           Embark on a journey to transform your social media presence. 
           <br />
-          <span className="text-blue-300 font-medium">Connect, create, and conquer the digital cosmos.</span>
+          <span className="text-cyan-300 font-medium">Connect, create, and conquer the digital cosmos.</span>
         </p>
       </motion.div>
     </motion.div>
@@ -451,7 +451,7 @@ export default function Onboarding() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 p-1"
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-slate-800 via-cyan-500 to-yellow-500 p-1"
             >
               <div className="w-full h-full rounded-full bg-transparent border-2 border-dashed border-white/30" />
             </motion.div>
@@ -462,13 +462,13 @@ export default function Onboarding() {
                 y: [0, -15, 0],
                 rotateY: [0, 10, 0],
                 boxShadow: [
-                  "0 20px 40px rgba(236, 72, 153, 0.3)",
-                  "0 30px 60px rgba(147, 51, 234, 0.4)", 
-                  "0 20px 40px rgba(236, 72, 153, 0.3)"
+                  "0 20px 40px rgba(6, 182, 212, 0.3)",
+                  "0 30px 60px rgba(251, 191, 36, 0.4)", 
+                  "0 20px 40px rgba(6, 182, 212, 0.3)"
                 ]
               }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-2 bg-gradient-to-br from-pink-500 via-purple-600 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl"
+              className="absolute inset-2 bg-gradient-to-br from-slate-800 via-cyan-600 to-yellow-500 rounded-2xl flex items-center justify-center shadow-xl"
             >
               <Instagram className="w-16 h-16 text-white" />
             </motion.div>
@@ -477,7 +477,7 @@ export default function Onboarding() {
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-3 h-3 bg-pink-300 rounded-full"
+                className="absolute w-3 h-3 bg-cyan-300 rounded-full"
                 style={{
                   top: "50%",
                   left: "50%",

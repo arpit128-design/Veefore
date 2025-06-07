@@ -196,10 +196,16 @@ class ViralContentService {
       for (let i = 0; i < Math.min(searchTerms.length, 3); i++) {
         const searchTerm = searchTerms[i];
         
-        // Enhanced search with viral content focus
-        const enhancedQuery = searchTerm.includes('How I') || searchTerm.includes('Day in') || searchTerm.includes('Why I') 
-          ? searchTerm 
-          : `${searchTerm} social media business success`;
+        // Force social media management focus for MetaTraq
+        let enhancedQuery = searchTerm;
+        
+        // If search term is too generic, make it specific to social media management
+        if (!searchTerm.includes('social media') && !searchTerm.includes('marketing') && !searchTerm.includes('business')) {
+          enhancedQuery = `social media management ${searchTerm}`;
+        }
+        
+        // Add MetaTraq-specific context
+        enhancedQuery += ' entrepreneur business growth';
 
         const params: any = {
           part: 'snippet',
@@ -231,25 +237,33 @@ class ViralContentService {
           const title = video.snippet.title.toLowerCase();
           const description = video.snippet.description.toLowerCase();
           
-          // Strict filtering for social media management content only
+          // More balanced filtering for business/social media content
           const irrelevantKeywords = [
-            'dog', 'cat', 'animal', 'buried', 'accident', 'crime', 'funny', 'prank', 'gaming', 'music', 'entertainment',
-            'food', 'recipe', 'travel', 'vlog', 'reaction', 'unboxing', 'review', 'news', 'sports', 'celebrity'
+            'dog called 911', 'buried alive', 'accident', 'crime scene', 'funny animals', 'prank video'
           ];
           
-          const highlyRelevantKeywords = [
-            'social media manager', 'social media marketing', 'instagram marketing', 'content creation', 
-            'social media strategy', 'social media growth', 'social media business', 'digital marketing',
-            'online business', 'entrepreneur', 'startup', 'app development', 'saas', 'business growth',
-            'marketing strategy', 'personal brand', 'influencer marketing', 'social media tips'
+          const relevantKeywords = [
+            'social media', 'business', 'marketing', 'entrepreneur', 'startup', 'management', 
+            'growth', 'strategy', 'success', 'app', 'digital', 'online', 'brand', 'content'
           ];
           
-          const hasIrrelevant = irrelevantKeywords.some(keyword => title.includes(keyword) || description.includes(keyword));
-          const hasHighlyRelevant = highlyRelevantKeywords.some(keyword => title.includes(keyword) || description.includes(keyword));
+          const hasStrictlyIrrelevant = irrelevantKeywords.some(keyword => 
+            title.includes(keyword) || description.includes(keyword)
+          );
           
-          // Only accept content that's highly relevant and not irrelevant
-          if (hasIrrelevant || !hasHighlyRelevant) {
-            console.log('[VIRAL CONTENT] Skipping non-social-media content:', video.snippet.title);
+          const hasBusinessRelevant = relevantKeywords.some(keyword => 
+            title.includes(keyword) || description.includes(keyword) || 
+            video.snippet.channelTitle.toLowerCase().includes(keyword)
+          );
+          
+          if (hasStrictlyIrrelevant) {
+            console.log('[VIRAL CONTENT] Skipping irrelevant content:', video.snippet.title);
+            continue;
+          }
+          
+          // If not business relevant, still include if it's about growth/success/strategy
+          if (!hasBusinessRelevant && !title.includes('how i') && !title.includes('strategy') && !title.includes('success')) {
+            console.log('[VIRAL CONTENT] Skipping non-business content:', video.snippet.title);
             continue;
           }
 
@@ -401,7 +415,7 @@ class ViralContentService {
         type: contentType,
         title,
         description: `Proven strategies and real insights from successful social media management. Perfect inspiration for your MetaTraq content strategy.`,
-        thumbnailUrl: `https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg`,
+        thumbnailUrl: `https://picsum.photos/320/180?random=${i + 100}`,
         mediaUrl: contentType === 'youtube-shorts' 
           ? `https://www.youtube.com/embed/dQw4w9WgXcQ?start=30&end=90&autoplay=1&mute=1`
           : `https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1`,

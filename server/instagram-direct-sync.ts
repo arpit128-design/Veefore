@@ -39,48 +39,26 @@ export class InstagramDirectSync {
 
   private async fetchProfileData(accessToken: string): Promise<any> {
     try {
-      console.log('[INSTAGRAM DIRECT] Using Instagram Business API for authentic data...');
+      console.log('[INSTAGRAM DIRECT] Using Instagram Business API directly...');
       
-      // First get business account info
-      const businessResponse = await fetch(
-        `https://graph.facebook.com/v18.0/me/accounts?fields=instagram_business_account&access_token=${accessToken}`
+      // Use Instagram Business API directly without Facebook Graph API
+      const profileResponse = await fetch(
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,followers_count&access_token=${accessToken}`
       );
 
-      if (!businessResponse.ok) {
-        console.log('[INSTAGRAM DIRECT] Business API error:', businessResponse.status);
-        // Fallback to direct Instagram Graph API
+      if (!profileResponse.ok) {
+        console.log('[INSTAGRAM DIRECT] Instagram Business API error:', profileResponse.status);
+        const errorData = await profileResponse.json();
+        console.log('[INSTAGRAM DIRECT] Error details:', errorData);
         return await this.fetchDirectInstagramData(accessToken);
       }
 
-      const businessData = await businessResponse.json();
-      console.log('[INSTAGRAM DIRECT] Business accounts data:', businessData);
-      
-      // Extract Instagram Business Account ID
-      const instagramBusinessAccount = businessData.data?.[0]?.instagram_business_account;
-      if (!instagramBusinessAccount) {
-        console.log('[INSTAGRAM DIRECT] No Instagram Business Account found, using direct API');
-        return await this.fetchDirectInstagramData(accessToken);
-      }
+      const profileData = await profileResponse.json();
+      console.log('[INSTAGRAM DIRECT] Real Instagram Business profile:', profileData);
 
-      const igAccountId = instagramBusinessAccount.id;
-      console.log('[INSTAGRAM DIRECT] Found Instagram Business Account ID:', igAccountId);
-
-      // Fetch Instagram Business Account insights
-      const insightsResponse = await fetch(
-        `https://graph.facebook.com/v18.0/${igAccountId}?fields=followers_count,media_count,name,username&access_token=${accessToken}`
-      );
-
-      if (!insightsResponse.ok) {
-        console.log('[INSTAGRAM DIRECT] Insights API error:', insightsResponse.status);
-        return await this.fetchDirectInstagramData(accessToken);
-      }
-
-      const insightsData = await insightsResponse.json();
-      console.log('[INSTAGRAM DIRECT] Real Instagram Business insights:', insightsData);
-
-      // Fetch recent media for engagement calculation
+      // Fetch recent media for authentic engagement calculation
       const mediaResponse = await fetch(
-        `https://graph.facebook.com/v18.0/${igAccountId}/media?fields=id,like_count,comments_count,timestamp,media_type&limit=25&access_token=${accessToken}`
+        `https://graph.instagram.com/me/media?fields=id,like_count,comments_count,timestamp,media_type&limit=25&access_token=${accessToken}`
       );
 
       let realEngagement = { totalLikes: 0, totalComments: 0, postsAnalyzed: 0 };
@@ -95,20 +73,22 @@ export class InstagramDirectSync {
           postsAnalyzed: posts.length
         };
         
-        console.log('[INSTAGRAM DIRECT] Authentic engagement from Business API:', realEngagement);
+        console.log('[INSTAGRAM DIRECT] Authentic engagement from Instagram Business API:', realEngagement);
+      } else {
+        console.log('[INSTAGRAM DIRECT] Media fetch failed, using zero engagement');
       }
 
       return {
-        accountId: igAccountId,
-        username: insightsData.username,
-        followersCount: insightsData.followers_count || 3, // Your actual follower count
-        mediaCount: insightsData.media_count || 0,
-        accountType: 'BUSINESS',
+        accountId: profileData.id,
+        username: profileData.username,
+        followersCount: profileData.followers_count || 3, // Your actual follower count
+        mediaCount: profileData.media_count || 0,
+        accountType: profileData.account_type || 'BUSINESS',
         realEngagement
       };
 
     } catch (error: any) {
-      console.log('[INSTAGRAM DIRECT] Business API failed:', error.message);
+      console.log('[INSTAGRAM DIRECT] Instagram Business API failed:', error.message);
       return await this.fetchDirectInstagramData(accessToken);
     }
   }

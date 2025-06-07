@@ -942,19 +942,29 @@ export class MemStorage implements IStorage {
         }
       ],
       addons: {
-        priority_support: {
-          id: "priority_support",
-          name: "Priority Support",
-          price: 299,
-          type: "support",
-          interval: "monthly"
+        extra_workspace: {
+          id: "extra_workspace",
+          name: "Additional Brand Workspace",
+          price: 49,
+          type: "workspace",
+          interval: "monthly",
+          benefit: "Add 1 extra brand workspace for team collaboration"
         },
-        advanced_analytics: {
-          id: "advanced_analytics",
-          name: "Advanced Analytics",
-          price: 499,
-          type: "feature",
-          interval: "monthly"
+        extra_social_account: {
+          id: "extra_social_account", 
+          name: "Extra Social Account",
+          price: 49,
+          type: "social_connection",
+          interval: "monthly",
+          benefit: "Connect 1 additional social media account"
+        },
+        boosted_ai_content: {
+          id: "boosted_ai_content",
+          name: "Boosted AI Content Generation", 
+          price: 99,
+          type: "ai_boost",
+          interval: "monthly",
+          benefit: "Generate 500 extra AI-powered posts per month"
         }
       }
     };

@@ -905,6 +905,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const planData = pricingData.plans[planId];
       
       if (!planData) {
+        console.log('[SUBSCRIPTION] Available plans:', Object.keys(pricingData.plans));
+        console.log('[SUBSCRIPTION] Requested plan:', planId);
         return res.status(400).json({ error: 'Invalid plan ID' });
       }
 
@@ -959,7 +961,60 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const packageData = pricingData.creditPackages.find(pkg => pkg.id === packageId);
         
         if (packageData) {
-          await storage.addCreditsToUser(user.id, packageData.totalCredits, `Credit purchase: ${packageData.name}`);
+          await storage.addCreditsToUser(user.id, packageData.totalCredits);
+          await storage.createCreditTransaction({
+            userId: parseInt(user.id),
+            type: 'purchase',
+            amount: packageData.totalCredits,
+            description: `Credit purchase: ${packageData.name}`,
+            workspaceId: null,
+            referenceId: razorpay_payment_id
+          });
+        }
+      } else if (type === 'addon' && packageId) {
+        // Handle addon purchase - provide actual benefits
+        const pricingData = await storage.getPricingData();
+        const addon = pricingData.addons[packageId];
+        
+        if (addon) {
+          // Create addon record for user
+          await storage.createAddon({
+            userId: parseInt(user.id),
+            type: addon.type,
+            name: addon.name,
+            price: addon.price,
+            isActive: true,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+            metadata: { addonId: packageId, benefit: addon.benefit }
+          });
+
+          // Provide specific benefits based on addon type
+          if (addon.type === 'ai_boost') {
+            // Add 500 extra credits for AI content generation
+            await storage.addCreditsToUser(user.id, 500);
+            await storage.createCreditTransaction({
+              userId: parseInt(user.id),
+              type: 'addon_purchase',
+              amount: 500,
+              description: `${addon.name} - 500 AI credits`,
+              workspaceId: null,
+              referenceId: razorpay_payment_id
+            });
+          } else if (addon.type === 'workspace') {
+            // Create additional workspace for user
+            const currentUser = await storage.getUser(parseInt(user.id));
+            if (currentUser) {
+              await storage.createWorkspace({
+                name: `${currentUser.username}'s Brand Workspace`,
+                description: 'Additional workspace from addon purchase',
+                userId: parseInt(user.id),
+                isDefault: false,
+                theme: 'cosmic',
+                aiPersonality: 'professional'
+              });
+            }
+          }
+          // Note: social_connection addon benefit is handled in the connection limits
         }
       }
 

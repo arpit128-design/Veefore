@@ -6,6 +6,7 @@ import { Hash, TrendingUp, Copy, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useWorkspaceContext } from '@/hooks/useWorkspace';
 
 interface Hashtag {
   tag: string;
@@ -17,10 +18,12 @@ interface Hashtag {
 export function TrendingHashtags() {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { currentWorkspace } = useWorkspaceContext();
 
   const { data: hashtags, isLoading, refetch } = useQuery({
-    queryKey: ['/api/hashtags/trending', selectedCategory],
-    queryFn: () => apiRequest('GET', `/api/hashtags/trending?category=${selectedCategory}`).then(res => res.json()),
+    queryKey: ['/api/hashtags/trending', selectedCategory, currentWorkspace?.id],
+    queryFn: () => apiRequest('GET', `/api/hashtags/trending?category=${selectedCategory}&workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
+    enabled: !!currentWorkspace?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 

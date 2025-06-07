@@ -187,12 +187,11 @@ export default function TeamManagement() {
       if (!response.ok) {
         const errorData = await response.json();
         
-        // Check if upgrade is needed (402 Payment Required)
-        if (response.status === 402 && errorData.needsUpgrade) {
-          throw new Error(`UPGRADE_REQUIRED:${errorData.error}`);
-        }
-        
-        throw new Error(errorData.error || 'Failed to send invitation');
+        // Store the response status and error data for onError handling
+        const error = new Error(errorData.error || 'Failed to send invitation');
+        (error as any).status = response.status;
+        (error as any).needsUpgrade = errorData.needsUpgrade;
+        throw error;
       }
       
       return response.json();
@@ -208,13 +207,11 @@ export default function TeamManagement() {
       queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
     },
     onError: (error: any) => {
-      const errorMessage = error.message || "An error occurred while sending the invitation.";
-      
-      if (errorMessage.startsWith('UPGRADE_REQUIRED:')) {
-        const actualMessage = errorMessage.replace('UPGRADE_REQUIRED:', '');
+      // Check if upgrade is needed (402 Payment Required)
+      if (error.status === 402 && error.needsUpgrade) {
         toast({
           title: "Upgrade Required",
-          description: actualMessage,
+          description: error.message,
           variant: "destructive",
           action: (
             <button 
@@ -228,7 +225,7 @@ export default function TeamManagement() {
       } else {
         toast({
           title: "Failed to send invitation",
-          description: errorMessage,
+          description: error.message || "An error occurred while sending the invitation.",
           variant: "destructive"
         });
       }

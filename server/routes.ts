@@ -1110,6 +1110,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[PAYMENT VERIFICATION] Signature verified successfully');
 
       // Payment verified, process the purchase
+      console.log('[PAYMENT VERIFICATION] Processing payment type:', type, 'planId:', planId, 'packageId:', packageId);
+      
       if (type === 'subscription' && planId) {
         // Update user subscription
         await storage.updateUserSubscription(user.id, planId);

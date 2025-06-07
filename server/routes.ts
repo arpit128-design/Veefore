@@ -183,8 +183,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         // Count additional workspace addons
         const workspaceAddons = activeAddons.filter(addon => 
-          addon.type === 'workspace' || 
-          (addon.metadata && (addon.metadata as any).addonId === 'extra-workspace')
+          addon.type === 'workspace'
         );
         
         const additionalWorkspaces = workspaceAddons.length;

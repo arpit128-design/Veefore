@@ -835,21 +835,138 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Purchase Credits API
-  app.post('/api/credits/purchase', requireAuth, async (req: any, res: Response) => {
+  // Razorpay Order Creation for Credit Packages
+  app.post('/api/razorpay/create-order', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { packageId } = req.body;
 
-      // For now, return success message - will implement Razorpay integration later
-      res.json({ 
-        success: true, 
-        message: 'Credit purchase functionality coming soon',
-        packageId 
+      if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        return res.status(500).json({ error: 'Razorpay configuration missing' });
+      }
+
+      const Razorpay = require('razorpay');
+      const rzp = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      // Get package details from pricing config
+      const pricingData = await storage.getPricingData();
+      const packageData = pricingData.creditPackages.find(pkg => pkg.id === packageId);
+      
+      if (!packageData) {
+        return res.status(400).json({ error: 'Invalid package ID' });
+      }
+
+      const options = {
+        amount: packageData.price * 100, // Convert to paise
+        currency: 'INR',
+        receipt: `credit_${packageId}_${Date.now()}`,
+        notes: {
+          userId: user.id,
+          packageId,
+          credits: packageData.totalCredits,
+        },
+      };
+
+      const order = await rzp.orders.create(options);
+
+      res.json({
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        description: `${packageData.name} - ${packageData.totalCredits} Credits`,
       });
     } catch (error: any) {
       console.error('[CREDIT PURCHASE] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to purchase credits' });
+    }
+  });
+
+  // Razorpay Subscription Creation for Plans
+  app.post('/api/razorpay/create-subscription', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { planId } = req.body;
+
+      if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        return res.status(500).json({ error: 'Razorpay configuration missing' });
+      }
+
+      const Razorpay = require('razorpay');
+      const rzp = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      // Get plan details from pricing config
+      const pricingData = await storage.getPricingData();
+      const planData = pricingData.plans[planId];
+      
+      if (!planData) {
+        return res.status(400).json({ error: 'Invalid plan ID' });
+      }
+
+      // Create subscription order
+      const options = {
+        amount: planData.price * 100, // Convert to paise
+        currency: 'INR',
+        receipt: `sub_${planId}_${Date.now()}`,
+        notes: {
+          userId: user.id,
+          planId,
+          planName: planData.name,
+        },
+      };
+
+      const order = await rzp.orders.create(options);
+
+      res.json({
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        description: `${planData.name} Subscription - ₹${planData.price}/month`,
+      });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION PURCHASE] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to create subscription' });
+    }
+  });
+
+  // Razorpay Payment Verification
+  app.post('/api/razorpay/verify', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
+
+      const crypto = require('crypto');
+      const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+      hmac.update(razorpay_order_id + '|' + razorpay_payment_id);
+      const generated_signature = hmac.digest('hex');
+
+      if (generated_signature !== razorpay_signature) {
+        return res.status(400).json({ error: 'Payment verification failed' });
+      }
+
+      // Payment verified, process the purchase
+      if (type === 'subscription' && planId) {
+        // Update user subscription
+        await storage.updateUserSubscription(user.id, planId);
+      } else if (type === 'credits' && packageId) {
+        // Add credits to user account
+        const pricingData = await storage.getPricingData();
+        const packageData = pricingData.creditPackages.find(pkg => pkg.id === packageId);
+        
+        if (packageData) {
+          await storage.addCreditsToUser(user.id, packageData.totalCredits, `Credit purchase: ${packageData.name}`);
+        }
+      }
+
+      res.json({ success: true, message: 'Payment processed successfully' });
+    } catch (error: any) {
+      console.error('[PAYMENT VERIFICATION] Error:', error);
+      res.status(500).json({ error: error.message || 'Payment verification failed' });
     }
   });
 

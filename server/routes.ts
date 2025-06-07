@@ -123,12 +123,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Create workspace
+  // Create workspace with plan restrictions
   app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
     try {
+      const userId = req.user.id;
+      
+      // Check user's current subscription plan and workspace count
+      const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+      const currentPlan = req.user.plan || 'Free';
+      
+      // Define workspace limits per plan
+      const planLimits = {
+        'Free': 1,
+        'Creator': 3,
+        'Agency': 10,
+        'Enterprise': 50
+      };
+      
+      const maxWorkspaces = planLimits[currentPlan as keyof typeof planLimits] || 1;
+      
+      if (userWorkspaces.length >= maxWorkspaces) {
+        return res.status(403).json({
+          error: 'Workspace limit reached',
+          currentPlan: currentPlan,
+          currentWorkspaces: userWorkspaces.length,
+          maxWorkspaces: maxWorkspaces,
+          upgradeMessage: `Your ${currentPlan} plan allows ${maxWorkspaces} workspace${maxWorkspaces > 1 ? 's' : ''}. Upgrade to create more workspaces.`
+        });
+      }
+      
       const workspaceData = {
         ...req.body,
-        userId: req.user.id
+        userId: userId
       };
       const workspace = await storage.createWorkspace(workspaceData);
       res.json(workspace);
@@ -145,6 +171,36 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       res.json(transactions);
     } catch (error: any) {
       console.error('Error fetching credit transactions:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get social accounts
+  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.query.workspaceId;
+      
+      if (!workspaceId) {
+        const workspaces = await storage.getWorkspacesByUserId(user.id);
+        const workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
+        if (!workspace) {
+          return res.json([]);
+        }
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        return res.json(accounts);
+      }
+      
+      // Verify user has access to the requested workspace
+      const workspace = await storage.getWorkspace(workspaceId as string);
+      if (!workspace || workspace.userId !== user.id) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+      
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      res.json(accounts);
+    } catch (error: any) {
+      console.error('Error fetching social accounts:', error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -184,13 +240,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         });
       }
 
-      // Return stored Instagram data from MongoDB using actual field names
+      // Return stored Instagram data from MongoDB using correct field names from the database
       const analyticsData = {
         totalPosts: instagramAccount.mediaCount || 0,
         totalReach: instagramAccount.avgReach || 0,
         engagementRate: instagramAccount.avgEngagement || 0,
         topPlatform: 'instagram',
-        followers: instagramAccount.followers || 0,
+        followers: instagramAccount.followers || instagramAccount.followersCount || 0,
         impressions: instagramAccount.avgReach || 0,
         accountUsername: instagramAccount.username,
         totalLikes: instagramAccount.avgLikes || 0,

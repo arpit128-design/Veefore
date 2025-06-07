@@ -1,64 +1,96 @@
 import mongoose from 'mongoose';
 
-async function debugTeamAddon() {
+const connectDB = async () => {
   try {
     await mongoose.connect(process.env.DATABASE_URL);
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB Atlas');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
+  }
+};
 
-    // Check payments collection
-    const paymentsCollection = mongoose.connection.db.collection('payments');
-    const recentPayments = await paymentsCollection.find({
-      userId: '6844027426cae0200f88b5db'
-    }).sort({ createdAt: -1 }).limit(5).toArray();
+const addonSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  price: { type: Number, required: true },
+  isActive: { type: Boolean, default: true },
+  expiresAt: { type: Date, default: null },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
 
-    console.log('\n=== RECENT PAYMENTS ===');
-    recentPayments.forEach(payment => {
-      console.log(`Payment: ${payment.purpose} - ₹${payment.amount} - ${payment.status} - ${payment.createdAt}`);
+const AddonModel = mongoose.model('Addon', addonSchema);
+
+async function debugTeamAddon() {
+  try {
+    await connectDB();
+    
+    console.log('=== DEBUGGING TEAM ADDON DETECTION ===');
+    
+    // Search for ALL addons for this user
+    const userId = '6844027426cae0200f88b5db';
+    const userIdNum = 6844027426;
+    
+    console.log('1. All addons with string userId:');
+    const stringAddons = await AddonModel.find({ userId: userId });
+    console.log(`Found ${stringAddons.length} addons:`);
+    stringAddons.forEach(addon => {
+      console.log(`  - ${addon.type}: ${addon.name} (userId: ${addon.userId}, active: ${addon.isActive})`);
     });
-
-    // Check addons collection
-    const addonsCollection = mongoose.connection.db.collection('addons');
-    const userAddons = await addonsCollection.find({
-      userId: '6844027426cae0200f88b5db'
-    }).sort({ createdAt: -1 }).toArray();
-
-    console.log('\n=== USER ADDONS ===');
-    userAddons.forEach(addon => {
-      console.log(`Addon: ${addon.name} (${addon.type}) - Active: ${addon.isActive} - ${addon.createdAt}`);
+    
+    console.log('\n2. All addons with numeric userId:');
+    const numericAddons = await AddonModel.find({ userId: userIdNum });
+    console.log(`Found ${numericAddons.length} addons:`);
+    numericAddons.forEach(addon => {
+      console.log(`  - ${addon.type}: ${addon.name} (userId: ${addon.userId}, active: ${addon.isActive})`);
     });
-
-    // Find team member payment without addon
-    const teamMemberPayment = recentPayments.find(p => 
-      p.purpose.includes('team-member') || p.purpose.includes('Team Member')
-    );
-
-    if (teamMemberPayment && !userAddons.find(a => a.type === 'team-member')) {
-      console.log('\n=== CREATING MISSING TEAM MEMBER ADDON ===');
-      
-      const newAddon = {
-        userId: '6844027426cae0200f88b5db',
-        name: 'Additional Team Member Seat',
-        type: 'team-member',
-        price: 19900,
-        isActive: true,
-        expiresAt: null,
-        metadata: {
-          paymentId: teamMemberPayment.razorpayPaymentId || teamMemberPayment.id,
-          orderId: teamMemberPayment.razorpayOrderId,
-          createdFromPayment: true
-        },
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      const result = await addonsCollection.insertOne(newAddon);
-      console.log('Created team member addon:', result.insertedId);
+    
+    console.log('\n3. Team-member addons specifically:');
+    const teamAddons = await AddonModel.find({ type: 'team-member' });
+    console.log(`Found ${teamAddons.length} team-member addons:`);
+    teamAddons.forEach(addon => {
+      console.log(`  - ID: ${addon._id}`);
+      console.log(`  - UserId: ${addon.userId} (type: ${typeof addon.userId})`);
+      console.log(`  - Active: ${addon.isActive}`);
+      console.log(`  - Created: ${addon.createdAt}`);
+    });
+    
+    // Fix: Update team-member addon to use string userId format
+    console.log('\n4. Fixing userId format for team-member addons...');
+    const teamAddonToFix = await AddonModel.findOne({ 
+      type: 'team-member', 
+      userId: userIdNum 
+    });
+    
+    if (teamAddonToFix) {
+      console.log('Found team addon to fix, updating userId format...');
+      await AddonModel.updateOne(
+        { _id: teamAddonToFix._id },
+        { userId: userId }
+      );
+      console.log('✓ Updated team addon userId to string format');
     }
-
-    await mongoose.disconnect();
+    
+    console.log('\n5. Verification - All active addons after fix:');
+    const finalAddons = await AddonModel.find({ 
+      $or: [
+        { userId: userId, isActive: true },
+        { userId: userIdNum, isActive: true }
+      ]
+    });
+    console.log(`Found ${finalAddons.length} active addons:`);
+    finalAddons.forEach(addon => {
+      console.log(`  - ${addon.type}: ${addon.name} (userId: ${addon.userId})`);
+    });
+    
   } catch (error) {
     console.error('Error:', error);
-    process.exit(1);
+  } finally {
+    await mongoose.disconnect();
+    process.exit(0);
   }
 }
 

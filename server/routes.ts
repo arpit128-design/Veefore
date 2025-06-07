@@ -797,6 +797,61 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Credit Transactions API
+  app.get('/api/credit-transactions', async (req: any, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const userId = req.user.id;
+      const transactions = await storage.getCreditTransactions(userId);
+      
+      res.json(transactions);
+    } catch (error: any) {
+      console.error('[CREDIT TRANSACTIONS] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to fetch credit transactions' });
+    }
+  });
+
+  // Purchase Credits API
+  app.post('/api/credits/purchase', async (req: any, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { packageId } = req.body;
+      const userId = req.user.id;
+
+      // For now, return success message - will implement Razorpay integration later
+      res.json({ 
+        success: true, 
+        message: 'Credit purchase functionality coming soon',
+        packageId 
+      });
+    } catch (error: any) {
+      console.error('[CREDIT PURCHASE] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to purchase credits' });
+    }
+  });
+
+  // Subscription Plans API
+  app.get('/api/subscription/plans', async (req: any, res: Response) => {
+    try {
+      const pricingConfig = await import('./pricing-config');
+      
+      res.json({
+        plans: pricingConfig.SUBSCRIPTION_PLANS,
+        creditPackages: pricingConfig.CREDIT_PACKAGES,
+        addons: pricingConfig.ADDONS
+      });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION PLANS] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to fetch subscription plans' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

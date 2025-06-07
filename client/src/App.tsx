@@ -25,6 +25,7 @@ import Integrations from "@/pages/Integrations";
 import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Pricing from "@/pages/Pricing";
+import Subscription from "@/pages/Subscription";
 import Auth from "@/pages/Auth";
 import NewOnboarding from "@/pages/NewOnboarding";
 import Landing from "@/pages/Landing";
@@ -62,6 +63,7 @@ function AuthenticatedApp() {
               <Route path="/integrations" component={Integrations} />
               <Route path="/referrals" component={Referrals} />
               <Route path="/settings" component={Settings} />
+              <Route path="/subscription" component={Subscription} />
               <Route path="/pricing" component={Pricing} />
               <Route path="/subscribe" component={Subscribe} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />

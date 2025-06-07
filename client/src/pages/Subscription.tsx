@@ -1,0 +1,394 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { formatNumber } from '@/lib/utils';
+import { 
+  Crown, 
+  CreditCard, 
+  Calendar, 
+  TrendingUp, 
+  Zap, 
+  Shield, 
+  Star,
+  Plus,
+  Gift,
+  History,
+  ChevronRight,
+  Sparkles
+} from 'lucide-react';
+
+interface UserSubscription {
+  id?: string;
+  plan: string;
+  status: string;
+  credits?: number;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  priceId?: string;
+  subscriptionId?: string;
+  canceledAt?: string;
+  trialEnd?: string;
+}
+
+interface CreditTransaction {
+  id: string;
+  amount: number;
+  purpose: string;
+  status: string;
+  createdAt: string;
+  metadata?: any;
+}
+
+interface PricingData {
+  plans: Record<string, any>;
+  creditPackages: Array<{
+    id: string;
+    name: string;
+    baseCredits: number;
+    bonusCredits: number;
+    totalCredits: number;
+    price: number;
+    popular?: boolean;
+  }>;
+  addons: Record<string, any>;
+}
+
+export default function Subscription() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('overview');
+
+  // Fetch user subscription
+  const { data: subscription, isLoading: subscriptionLoading } = useQuery({
+    queryKey: ['/api/subscription'],
+    queryFn: () => apiRequest('GET', '/api/subscription').then(res => res.json()),
+  });
+
+  // Fetch pricing data
+  const { data: pricingData, isLoading: pricingLoading } = useQuery<PricingData>({
+    queryKey: ['/api/pricing'],
+    queryFn: () => apiRequest('GET', '/api/pricing').then(res => res.json()),
+  });
+
+  // Fetch credit transactions
+  const { data: creditTransactions, isLoading: transactionsLoading } = useQuery<CreditTransaction[]>({
+    queryKey: ['/api/credit-transactions'],
+    queryFn: () => apiRequest('GET', '/api/credit-transactions').then(res => res.json()),
+  });
+
+  const userSubscription = subscription as UserSubscription;
+  const currentPlan = userSubscription?.plan || 'free';
+  const currentCredits = userSubscription?.credits || 0;
+
+  const planData = pricingData?.plans?.[currentPlan] || {
+    name: 'Free',
+    price: 0,
+    color: 'text-gray-400',
+    bgColor: 'bg-gray-500/10',
+    borderColor: 'border-gray-500/20'
+  };
+
+  // Credit purchase mutation
+  const purchaseCreditsMutation = useMutation({
+    mutationFn: (packageId: string) => {
+      return apiRequest('POST', '/api/credits/purchase', { packageId });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Credits Purchased",
+        description: "Your credits have been added to your account!",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to purchase credits",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreditPurchase = (packageId: string) => {
+    toast({
+      title: "Coming Soon",
+      description: "Credit packages will be available soon!",
+    });
+  };
+
+  const handlePlanUpgrade = () => {
+    window.location.href = '/pricing';
+  };
+
+  if (subscriptionLoading || pricingLoading) {
+    return (
+      <div className="min-h-screen bg-space-navy text-white p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-space-navy text-white p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-cyan via-nebula-purple to-solar-gold bg-clip-text text-transparent">
+            Your Subscription
+          </h1>
+          <p className="text-asteroid-silver text-lg">
+            Manage your plan, credits, and add-ons
+          </p>
+        </div>
+
+        {/* Current Plan Overview */}
+        <Card className="content-card holographic">
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${planData.bgColor} border ${planData.borderColor} flex items-center justify-center`}>
+                  <Crown className={`w-8 h-8 ${planData.color}`} />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">{planData.name} Plan</h3>
+                <p className="text-asteroid-silver">
+                  {currentPlan === 'free' ? 'Free forever' : `₹${planData.price}/month`}
+                </p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-electric-cyan/20 border border-electric-cyan/30 flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-electric-cyan" />
+                </div>
+                <h3 className="text-2xl font-bold text-electric-cyan mb-2">{formatNumber(currentCredits)}</h3>
+                <p className="text-asteroid-silver">Credits remaining</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-green-400 mb-2">
+                  {userSubscription?.status === 'active' ? 'Active' : 'Inactive'}
+                </h3>
+                <p className="text-asteroid-silver">
+                  {userSubscription?.currentPeriodEnd 
+                    ? `Renews ${new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}`
+                    : 'No renewal date'
+                  }
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 glassmorphism">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Plans
+            </TabsTrigger>
+            <TabsTrigger value="credits" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Credits
+            </TabsTrigger>
+            <TabsTrigger value="addons" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Add-ons
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Plans Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <Card className="content-card holographic">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-electric-cyan">
+                  <Crown className="w-5 h-5" />
+                  Current Plan Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-white">Plan Features</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-asteroid-silver">Monthly Credits: {formatNumber(planData.monthlyCredits || 0)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-asteroid-silver">Social Accounts: {planData.socialAccounts || 'Unlimited'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-asteroid-silver">Analytics: {planData.analytics || 'Basic'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-white">Billing Information</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-asteroid-silver">Status:</span>
+                        <Badge variant={userSubscription?.status === 'active' ? 'default' : 'secondary'}>
+                          {userSubscription?.status || 'Inactive'}
+                        </Badge>
+                      </div>
+                      {userSubscription?.currentPeriodEnd && (
+                        <div className="flex justify-between">
+                          <span className="text-asteroid-silver">Next billing:</span>
+                          <span className="text-white">{new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-cosmic-void/30">
+                  <Button onClick={handlePlanUpgrade} className="w-full md:w-auto glassmorphism">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Upgrade Plan
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Credits Tab */}
+          <TabsContent value="credits" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Credit Packages */}
+              <Card className="content-card holographic">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-cyan">
+                    <Zap className="w-5 h-5" />
+                    Buy More Credits
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {pricingData?.creditPackages?.map((pkg) => (
+                    <div key={pkg.id} className="p-4 rounded-lg bg-cosmic-void/30 border border-electric-cyan/20">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-semibold text-white">{pkg.name}</h4>
+                        {pkg.popular && (
+                          <Badge className="bg-solar-gold/20 text-solar-gold">Popular</Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-asteroid-silver mb-3">
+                        {formatNumber(pkg.baseCredits)} credits + {formatNumber(pkg.bonusCredits)} bonus = {formatNumber(pkg.totalCredits)} total
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-electric-cyan">₹{pkg.price}</span>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleCreditPurchase(pkg.id)}
+                          className="glassmorphism"
+                        >
+                          Buy Now
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Credit History */}
+              <Card className="content-card holographic">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-nebula-purple">
+                    <History className="w-5 h-5" />
+                    Recent Transactions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {transactionsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full"></div>
+                    </div>
+                  ) : creditTransactions && creditTransactions.length > 0 ? (
+                    <div className="space-y-3">
+                      {creditTransactions.slice(0, 5).map((transaction) => (
+                        <div key={transaction.id} className="flex justify-between items-center p-3 rounded-lg bg-cosmic-void/20">
+                          <div>
+                            <div className="text-sm font-medium text-white">{transaction.purpose}</div>
+                            <div className="text-xs text-asteroid-silver">
+                              {new Date(transaction.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={`font-medium ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {transaction.amount > 0 ? '+' : ''}{formatNumber(transaction.amount)}
+                            </div>
+                            <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                              {transaction.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-asteroid-silver">
+                      No transactions yet
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Add-ons Tab */}
+          <TabsContent value="addons" className="space-y-6">
+            <Card className="content-card holographic">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-solar-gold">
+                  <Sparkles className="w-5 h-5" />
+                  Available Add-ons
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pricingData?.addons && Object.entries(pricingData.addons).map(([key, addon]: [string, any]) => (
+                    <div key={key} className="p-6 rounded-lg bg-cosmic-void/30 border border-solar-gold/20">
+                      <div className="text-center space-y-4">
+                        <div className="w-12 h-12 mx-auto rounded-full bg-solar-gold/20 border border-solar-gold/30 flex items-center justify-center">
+                          <Gift className="w-6 h-6 text-solar-gold" />
+                        </div>
+                        <h3 className="font-semibold text-white">{addon.name}</h3>
+                        <p className="text-sm text-asteroid-silver">{addon.description}</p>
+                        <div className="text-lg font-bold text-solar-gold">₹{addon.price}/month</div>
+                        <Button className="w-full glassmorphism" disabled>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Coming Soon
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {(!pricingData?.addons || Object.keys(pricingData.addons).length === 0) && (
+                    <div className="col-span-full text-center py-12 text-asteroid-silver">
+                      <Sparkles className="w-12 h-12 mx-auto mb-4 text-solar-gold/50" />
+                      <h3 className="text-lg font-medium mb-2">Add-ons Coming Soon</h3>
+                      <p>Powerful add-ons will be available to enhance your VeeFore experience.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}

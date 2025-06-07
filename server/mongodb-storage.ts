@@ -1107,8 +1107,31 @@ export class MongoStorage implements IStorage {
     console.log(`[MONGODB DEBUG] Deleted ${result.deletedCount} suggestions for workspace ${workspaceId}`);
   }
 
-  async getCreditTransactions(userId: number, limit?: number): Promise<CreditTransaction[]> {
-    return [];
+  async getCreditTransactions(userId: number, limit = 50): Promise<CreditTransaction[]> {
+    await this.connect();
+    
+    try {
+      const CreditTransactionModel = mongoose.model('CreditTransaction', CreditTransactionSchema);
+      const transactions = await CreditTransactionModel
+        .find({ userId: userId })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .exec();
+      
+      return transactions.map(transaction => ({
+        id: transaction.id || transaction._id.toString(),
+        userId: transaction.userId,
+        type: transaction.type,
+        amount: transaction.amount,
+        description: transaction.description || null,
+        workspaceId: transaction.workspaceId || null,
+        referenceId: transaction.referenceId || null,
+        createdAt: transaction.createdAt || new Date()
+      }));
+    } catch (error) {
+      console.log('[MONGODB DEBUG] getCreditTransactions error:', error);
+      return [];
+    }
   }
 
   async createCreditTransaction(transaction: InsertCreditTransaction): Promise<CreditTransaction> {

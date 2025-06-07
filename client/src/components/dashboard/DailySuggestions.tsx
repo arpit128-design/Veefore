@@ -12,7 +12,7 @@ export function DailySuggestions() {
   const { data: suggestions, refetch } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
     queryFn: async () => {
-      const token = localStorage.getItem('firebase_token');
+      const token = localStorage.getItem('veefore_auth_token');
       const response = await fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`

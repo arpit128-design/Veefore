@@ -1,14 +1,79 @@
-import type { Express } from "express";
+import type { Express, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { getAuthenticHashtags } from "./authentic-hashtags";
+import { IStorage } from "./storage";
 
-export async function registerRoutes(app: Express, storage: any): Promise<Server> {
-  const requireAuth = async (req: any, res: any, next: any) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
+export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
+  const requireAuth = async (req: any, res: Response, next: NextFunction) => {
+    try {
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const token = authHeader.split(' ')[1];
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Extract Firebase UID from JWT token payload
+      let firebaseUid;
+      try {
+        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+        firebaseUid = payload.user_id || payload.sub;
+      } catch (error) {
+        return res.status(401).json({ error: 'Invalid token format' });
+      }
+      
+      let user = await storage.getUserByFirebaseUid(firebaseUid);
+      if (!user) {
+        // Create new user from JWT payload
+        try {
+          const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          const userData = {
+            firebaseUid,
+            email: payload.email || `user_${firebaseUid}@example.com`,
+            username: payload.email?.split('@')[0] || `user_${firebaseUid.slice(0, 8)}`,
+            displayName: payload.name || null,
+            avatar: payload.picture || null,
+            referredBy: null
+          };
+          
+          user = await storage.createUser(userData);
+          
+          // Create default workspace for new users
+          try {
+            await storage.createWorkspace({
+              userId: user.id,
+              name: 'My VeeFore Workspace',
+              description: 'Default workspace for social media management'
+            });
+          } catch (workspaceError) {
+            console.error('Failed to create default workspace:', workspaceError);
+          }
+        } catch (error) {
+          return res.status(500).json({ error: 'Failed to create user account' });
+        }
+      }
+      
+      req.user = user;
+      next();
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      res.status(401).json({ error: 'Unauthorized' });
     }
-    next();
   };
+
+  // Get current user
+  app.get('/api/user', requireAuth, async (req: any, res: Response) => {
+    try {
+      res.json(req.user);
+    } catch (error: any) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Clean hashtags endpoint that only returns authentic Instagram data
   app.get("/api/hashtags/trending", requireAuth, async (req: any, res: any) => {

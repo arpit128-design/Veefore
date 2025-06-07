@@ -359,22 +359,24 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      // Check subscription limits including purchased addons
+      // Check subscription limits using comprehensive addon system
       const userPlan = user.plan || 'Free';
       
-      // Get user's purchased addons to check for team member seats
-      const userAddons = await storage.getUserAddons(user.id);
-      const teamMemberAddons = userAddons.filter(addon => addon.type === 'team-member' && addon.isActive);
-      const hasTeamMemberAddon = teamMemberAddons.length > 0;
+      // Import the addon checking utility
+      const pricingConfig = await import('./pricing-config');
+      const addonAccess = await pricingConfig.checkUserAddonAccess(storage, user.id, 'team-collaboration');
       
-      console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Team addons: ${teamMemberAddons.length}, Has team addon: ${hasTeamMemberAddon}`);
+      console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Addon access:`, addonAccess);
       
-      // Free plan users need either an upgrade or team member addon
-      if (userPlan === 'Free' && !hasTeamMemberAddon) {
+      // Check if user has access via plan or addon
+      const hasTeamAccess = userPlan !== 'Free' || addonAccess.hasAccess;
+      
+      if (!hasTeamAccess) {
         return res.status(402).json({ 
-          error: 'Free plan only supports 1 member. Upgrade to invite team members.',
+          error: 'Free plan only supports 1 member. Purchase team member addon or upgrade to invite team members.',
           needsUpgrade: true,
-          currentPlan: userPlan
+          currentPlan: userPlan,
+          suggestedAddon: 'team-member'
         });
       }
 

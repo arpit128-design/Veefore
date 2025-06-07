@@ -118,65 +118,29 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* Cosmic Starfield - Universe-like Stars */}
+      {/* White Starfield - Many Shining Stars */}
       <div className="space-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {/* Distant White Stars */}
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight-slow" style={{ top: '5%', left: '8%', animationDelay: '0s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-stellar-pulse" style={{ top: '15%', left: '72%', animationDelay: '1.2s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight" style={{ top: '25%', left: '15%', animationDelay: '2s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-cosmic-drift" style={{ top: '85%', left: '35%', animationDelay: '0.3s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight-fast" style={{ top: '60%', left: '55%', animationDelay: '1.8s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-stellar-pulse" style={{ top: '30%', left: '50%', animationDelay: '0.8s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight-slow" style={{ top: '10%', left: '70%', animationDelay: '1.3s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-cosmic-drift" style={{ top: '45%', left: '5%', animationDelay: '0.9s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight" style={{ top: '75%', left: '15%', animationDelay: '0.7s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-stellar-pulse" style={{ top: '55%', left: '88%', animationDelay: '1.4s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-white animate-starlight-fast" style={{ top: '95%', left: '25%', animationDelay: '2.2s' }} />
-        <div className="absolute w-1 h-1 bg-white animate-cosmic-drift" style={{ top: '35%', left: '85%', animationDelay: '0.5s' }} />
-        
-        {/* Blue Giant Stars */}
-        <div className="absolute w-1.5 h-1.5 bg-blue-300 animate-starlight-slow" style={{ top: '7%', left: '55%', animationDelay: '0.9s' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 animate-stellar-pulse" style={{ top: '20%', left: '80%', animationDelay: '1.2s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-blue-300 animate-cosmic-drift" style={{ top: '48%', left: '10%', animationDelay: '0.2s' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 animate-starlight" style={{ top: '54%', left: '75%', animationDelay: '1.4s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-blue-300 animate-stellar-pulse" style={{ top: '60%', left: '55%', animationDelay: '2.9s' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 animate-starlight-fast" style={{ top: '70%', left: '10%', animationDelay: '1.6s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-blue-300 animate-cosmic-drift" style={{ top: '85%', left: '8%', animationDelay: '2.2s' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 animate-starlight-slow" style={{ top: '92%', left: '75%', animationDelay: '0.6s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-blue-300 animate-stellar-pulse" style={{ top: '3%', left: '65%', animationDelay: '0.4s' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 animate-starlight" style={{ top: '65%', left: '60%', animationDelay: '1.4s' }} />
-        
-        {/* Cyan Stars */}
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-starlight" style={{ top: '8%', left: '22%', animationDelay: '0.3s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-stellar-pulse" style={{ top: '10%', left: '88%', animationDelay: '1.5s' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-cosmic-drift" style={{ top: '28%', left: '45%', animationDelay: '2.7s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-starlight-slow" style={{ top: '65%', left: '25%', animationDelay: '2.5s' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-stellar-pulse" style={{ top: '40%', left: '30%', animationDelay: '2.2s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-starlight" style={{ top: '36%', left: '68%', animationDelay: '2.2s' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-cosmic-drift" style={{ top: '62%', left: '7%', animationDelay: '2.0s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-stellar-pulse" style={{ top: '66%', left: '72%', animationDelay: '0.1s' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-starlight-fast" style={{ top: '50%', left: '90%', animationDelay: '2.4s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-starlight" style={{ top: '90%', left: '40%', animationDelay: '2.8s' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 animate-cosmic-drift" style={{ top: '67%', left: '22%', animationDelay: '0.5s' }} />
-        <div className="absolute w-0.5 h-0.5 bg-cyan-300 animate-stellar-pulse" style={{ top: '27%', left: '92%', animationDelay: '2.4s' }} />
-        
-        {/* Yellow Giant Stars */}
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-starlight-slow" style={{ top: '12%', left: '38%', animationDelay: '0.6s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-cosmic-drift" style={{ top: '18%', left: '95%', animationDelay: '1.8s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-stellar-pulse" style={{ top: '30%', left: '78%', animationDelay: '0.4s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-starlight" style={{ top: '42%', left: '35%', animationDelay: '1.6s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-cosmic-drift" style={{ top: '50%', left: '58%', animationDelay: '1.1s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-stellar-pulse" style={{ top: '68%', left: '38%', animationDelay: '2.6s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-starlight-slow" style={{ top: '72%', left: '48%', animationDelay: '1.3s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-cosmic-drift" style={{ top: '80%', left: '82%', animationDelay: '1.9s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-stellar-pulse" style={{ top: '87%', left: '58%', animationDelay: '0.3s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-starlight" style={{ top: '80%', left: '70%', animationDelay: '2.8s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-cosmic-drift" style={{ top: '58%', left: '8%', animationDelay: '1.5s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-stellar-pulse" style={{ top: '37%', left: '78%', animationDelay: '0.8s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-starlight-slow" style={{ top: '77%', left: '58%', animationDelay: '1.1s' }} />
-        <div className="absolute w-1.5 h-1.5 bg-yellow-400 animate-cosmic-drift" style={{ top: '23%', left: '8%', animationDelay: '2.0s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 animate-stellar-pulse" style={{ top: '43%', left: '18%', animationDelay: '0.7s' }} />
-
+        {Array.from({ length: 150 }, (_, i) => {
+          const sizes = ['w-0.5 h-0.5', 'w-1 h-1', 'w-1.5 h-1.5'];
+          const animations = ['animate-starlight', 'animate-starlight-fast', 'animate-starlight-slow', 'animate-stellar-pulse'];
+          const size = sizes[i % sizes.length];
+          const animation = animations[i % animations.length];
+          const top = (i * 7.3) % 100;
+          const left = (i * 11.7) % 100;
+          const delay = (i * 0.1) % 4;
+          
+          return (
+            <div 
+              key={i}
+              className={`absolute ${size} bg-white rounded-full ${animation}`}
+              style={{ 
+                top: `${top}%`, 
+                left: `${left}%`, 
+                animationDelay: `${delay}s` 
+              }} 
+            />
+          );
+        })}
       </div>
 
       {/* Shooting Stars - Positioned between background and content */}

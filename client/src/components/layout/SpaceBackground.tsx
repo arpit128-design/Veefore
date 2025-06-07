@@ -118,8 +118,8 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* Test stars for visibility */}
-      <div className="test-stars fixed inset-0 pointer-events-none" style={{ zIndex: -1 }}>
+      {/* Test stars for visibility - positioned between background and content */}
+      <div className="test-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
         <div 
           className="absolute w-3 h-3 bg-white rounded-full animate-pulse"
           style={{ top: '10%', left: '20%' }}
@@ -138,9 +138,9 @@ export function SpaceBackground() {
         />
       </div>
 
-      {/* CSS Star Field - Minimal count */}
-      <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: -3 }}>
-        {Array.from({ length: 20 }, (_, i) => (
+      {/* CSS Star Field - Positioned between background and content */}
+      <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: 3 }}>
+        {Array.from({ length: 25 }, (_, i) => (
           <div
             key={i}
             className="star"
@@ -154,17 +154,17 @@ export function SpaceBackground() {
         ))}
       </div>
 
-      {/* Shooting Stars - Behind content with reduced frequency */}
-      <div className="shooting-stars fixed inset-0 pointer-events-none" style={{ zIndex: -2 }}>
-        {Array.from({ length: 2 }, (_, i) => (
+      {/* Shooting Stars - Positioned between background and content */}
+      <div className="shooting-stars fixed inset-0 pointer-events-none" style={{ zIndex: 4 }}>
+        {Array.from({ length: 1 }, (_, i) => (
           <div
             key={i}
             className="shooting-star"
             style={{
               left: `${Math.random() * 30}%`,
               top: `${Math.random() * 40}%`,
-              animationDelay: `${i * 12 + Math.random() * 8}s`,
-              animationDuration: `${4 + Math.random() * 3}s`
+              animationDelay: `${i * 15 + Math.random() * 10}s`,
+              animationDuration: `${5 + Math.random() * 3}s`
             }}
           />
         ))}

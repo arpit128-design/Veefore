@@ -74,7 +74,9 @@ export default function Workspaces() {
         }
       });
       if (!response.ok) throw new Error('Failed to fetch social accounts');
-      return response.json();
+      const data = await response.json();
+      console.log('[WORKSPACE DEBUG] Social accounts data:', data);
+      return data;
     },
     enabled: !!currentWorkspace?.id && !!token
   });

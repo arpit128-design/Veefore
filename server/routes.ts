@@ -1364,6 +1364,51 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Instagram sync endpoint
+  app.post('/api/instagram/sync', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      console.log('[INSTAGRAM SYNC] Manual sync triggered by user:', user.email);
+      
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      if (!workspace) {
+        return res.status(404).json({ error: 'No workspace found' });
+      }
+      
+      const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
+      if (!instagramAccount) {
+        return res.status(404).json({ error: 'No Instagram account connected' });
+      }
+      
+      console.log('[INSTAGRAM SYNC] Syncing account:', instagramAccount.username);
+      
+      // Import and use Instagram sync service
+      const { InstagramSyncService } = await import('./instagram-sync-service');
+      const syncService = new InstagramSyncService(storage);
+      
+      const success = await syncService.syncInstagramAccountData(
+        instagramAccount.accountId, 
+        instagramAccount.accessToken
+      );
+      
+      if (success) {
+        // Return updated account data
+        const updatedAccount = await storage.getSocialAccount(instagramAccount.id);
+        res.json({ 
+          success: true, 
+          message: 'Instagram data synced successfully',
+          account: updatedAccount
+        });
+      } else {
+        res.status(500).json({ error: 'Failed to sync Instagram data' });
+      }
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM SYNC] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Get workspaces
   app.get('/api/workspaces', requireAuth, async (req: any, res: Response) => {
     try {

@@ -53,7 +53,23 @@ const SocialAccountSchema = new mongoose.Schema({
   accountId: String,
   accessToken: String,
   refreshToken: String,
+  expiresAt: Date,
   isActive: { type: Boolean, default: true },
+  // Instagram sync data fields
+  followersCount: { type: Number, default: 0 },
+  followingCount: { type: Number, default: 0 },
+  mediaCount: { type: Number, default: 0 },
+  biography: String,
+  website: String,
+  profilePictureUrl: String,
+  accountType: { type: String, default: 'PERSONAL' },
+  isBusinessAccount: { type: Boolean, default: false },
+  isVerified: { type: Boolean, default: false },
+  avgLikes: { type: Number, default: 0 },
+  avgComments: { type: Number, default: 0 },
+  avgReach: { type: Number, default: 0 },
+  engagementRate: { type: Number, default: 0 },
+  lastSyncAt: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

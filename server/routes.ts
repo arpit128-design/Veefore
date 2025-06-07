@@ -391,40 +391,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             });
             hasTeamAccess = true;
           } else {
-            // Special case: Create missing team member addon for user who has paid (only once)
-            if (user.id === '6844027426cae0200f88b5db') {
-              console.log(`[TEAM INVITE] No team member addon found for paid user - creating one`);
-              try {
-                // Check if addon was already created in a previous request
-                const recentAddons = await storage.getUserAddons(user.id);
-                const existingTeamAddon = recentAddons.find(addon => 
-                  addon.type === 'team-member' && addon.isActive
-                );
-                
-                if (existingTeamAddon) {
-                  console.log(`[TEAM INVITE] Team member addon already exists, using it`);
-                  hasTeamAccess = true;
-                } else {
-                  await storage.createAddon({
-                    userId: parseInt(user.id),
-                    name: 'Additional Team Member Seat',
-                    type: 'team-member',
-                    price: 19900,
-                    isActive: true,
-                    expiresAt: null,
-                    metadata: {
-                      createdFromPayment: true,
-                      reason: 'Missing addon record for successful payment',
-                      autoCreated: true
-                    }
-                  });
-                  console.log(`[TEAM INVITE] Successfully created team member addon for paid user`);
-                  hasTeamAccess = true;
-                }
-              } catch (createError) {
-                console.error(`[TEAM INVITE] Failed to create addon:`, createError);
-              }
-            }
+            console.log(`[TEAM INVITE] No valid team member addon found`);
+            hasTeamAccess = false;
           }
         } catch (error) {
           console.error(`[TEAM INVITE] Error during team access check:`, error);
@@ -495,13 +463,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         console.log(`[TEAM INVITE] Raw addon counts - Total: ${totalAddonCount}, Workspace: ${workspaceAddonCount}, Expected team addons: ${expectedTeamAddonCount}`);
         
-        // Use the higher count to ensure we don't undercount
-        // The user has purchased 11 team-member addons but the database query may not be detecting them all yet
-        const knownCorrectTeamAddonCount = 11; // User has purchased 11 team-member addons
-        if (expectedTeamAddonCount > actualTeamAddonCount || knownCorrectTeamAddonCount > actualTeamAddonCount) {
-          const correctedCount = Math.max(expectedTeamAddonCount, knownCorrectTeamAddonCount);
-          console.log(`[TEAM INVITE] Using corrected team addon count: ${correctedCount} instead of filtered count: ${actualTeamAddonCount}`);
-          actualTeamAddonCount = correctedCount;
+        // Use actual team addon count from database query
+        console.log(`[TEAM INVITE] Using actual team addon count: ${actualTeamAddonCount}`);
+        
+        // If no team addons found, user cannot invite team members
+        if (actualTeamAddonCount === 0) {
+          console.log(`[TEAM INVITE] No team member addons found - blocking invitation`);
+          return res.status(402).json({ 
+            error: 'No team member addons found. Purchase team member addon to invite team members.',
+            needsUpgrade: true,
+            currentPlan: userPlan,
+            suggestedAddon: 'team-member'
+          });
         }
         
         // Each team member addon allows 1 additional member (owner + 1 per addon)

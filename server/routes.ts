@@ -756,6 +756,47 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Admin endpoint to fix workspace ID mismatch
+  app.post("/api/admin/fix-workspace-id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+      const accounts = await storage.getAllSocialAccounts();
+      const fixed = [];
+      
+      for (const account of accounts) {
+        if (account.platform === 'instagram' && account.username === 'rahulc1020') {
+          console.log(`[WORKSPACE FIX] Found account with workspaceId: ${account.workspaceId}`);
+          
+          // Update to correct workspace ID
+          await storage.updateSocialAccount(account.id, {
+            workspaceId: '684402c2fd2cd4eb6521b386'
+          });
+          
+          fixed.push({
+            username: account.username,
+            oldWorkspaceId: account.workspaceId,
+            newWorkspaceId: '684402c2fd2cd4eb6521b386'
+          });
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Fixed ${fixed.length} accounts`,
+        fixed 
+      });
+    } catch (error) {
+      console.error(`[WORKSPACE FIX] Error:`, error);
+      res.status(500).json({ 
+        error: "Workspace ID fix failed", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

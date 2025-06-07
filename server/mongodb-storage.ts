@@ -660,9 +660,24 @@ export class MongoStorage implements IStorage {
     const accounts = await SocialAccountModel.find({
       $or: [
         { workspaceId: workspaceId.toString() },
-        { workspaceId: workspaceId }
+        { workspaceId: workspaceId },
+        // Handle truncated workspace IDs that need fixing
+        { workspaceId: parseInt(workspaceId.toString().substring(0, 6)) }
       ]
     });
+    
+    // Auto-fix workspace IDs that are truncated
+    for (const account of accounts) {
+      if (account.workspaceId === parseInt(workspaceId.toString().substring(0, 6)) && 
+          account.workspaceId !== workspaceId.toString()) {
+        console.log(`[MONGODB DEBUG] Auto-fixing workspace ID for ${account.username}: ${account.workspaceId} -> ${workspaceId}`);
+        await SocialAccountModel.updateOne(
+          { _id: account._id },
+          { workspaceId: workspaceId.toString(), updatedAt: new Date() }
+        );
+        account.workspaceId = workspaceId.toString();
+      }
+    }
     
     console.log(`[MONGODB DEBUG] Mongoose query result: found ${accounts.length} accounts`);
     if (accounts.length > 0) {

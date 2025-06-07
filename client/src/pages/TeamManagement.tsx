@@ -42,10 +42,104 @@ interface TeamInvitation {
 }
 
 const rolePermissions = {
-  owner: { label: "Owner", icon: Crown, color: "bg-purple-100 text-purple-800", description: "Full workspace control and billing" },
-  admin: { label: "Admin", icon: Shield, color: "bg-yellow-100 text-yellow-800", description: "Full access to all features" },
-  editor: { label: "Editor", icon: Edit, color: "bg-blue-100 text-blue-800", description: "Can create and manage content" },
-  viewer: { label: "Viewer", icon: Eye, color: "bg-gray-100 text-gray-800", description: "Can view content and analytics" }
+  owner: { 
+    label: "Owner", 
+    icon: Crown, 
+    color: "bg-purple-100 text-purple-800", 
+    description: "Full workspace control and billing",
+    permissions: {
+      can: [
+        "Manage billing and subscription",
+        "Invite and remove team members",
+        "Change member roles (including Admin)",
+        "Delete workspace",
+        "Manage workspace settings",
+        "Create, edit, and publish content",
+        "View all analytics and reports",
+        "Connect social media accounts",
+        "Use AI suggestions and content generation",
+        "Schedule and manage content",
+        "Access team management"
+      ],
+      cannot: []
+    }
+  },
+  admin: { 
+    label: "Admin", 
+    icon: Shield, 
+    color: "bg-yellow-100 text-yellow-800", 
+    description: "Full access to all features",
+    permissions: {
+      can: [
+        "Invite and remove team members",
+        "Change Editor/Viewer roles (cannot change Owner or other Admins)",
+        "Create, edit, and publish content",
+        "View all analytics and reports",
+        "Connect social media accounts",
+        "Use AI suggestions and content generation",
+        "Schedule and manage content",
+        "Access team management",
+        "Manage workspace settings (except billing)"
+      ],
+      cannot: [
+        "Manage billing and subscription",
+        "Delete workspace",
+        "Change Owner role",
+        "Remove or demote other Admins"
+      ]
+    }
+  },
+  editor: { 
+    label: "Editor", 
+    icon: Edit, 
+    color: "bg-blue-100 text-blue-800", 
+    description: "Can create and manage content",
+    permissions: {
+      can: [
+        "Create, edit, and publish content",
+        "View analytics for their own content",
+        "Use AI suggestions and content generation",
+        "Schedule content",
+        "Connect their own social media accounts",
+        "Upload and manage media"
+      ],
+      cannot: [
+        "Manage team members",
+        "Change user roles",
+        "View other members' content analytics",
+        "Access billing information",
+        "Delete workspace",
+        "Manage workspace settings",
+        "Remove other users' content"
+      ]
+    }
+  },
+  viewer: { 
+    label: "Viewer", 
+    icon: Eye, 
+    color: "bg-gray-100 text-gray-800", 
+    description: "Can view content and analytics",
+    permissions: {
+      can: [
+        "View published content",
+        "View basic analytics and reports",
+        "Export reports",
+        "View team members list"
+      ],
+      cannot: [
+        "Create or edit content",
+        "Publish content",
+        "Manage team members",
+        "Change user roles",
+        "Connect social media accounts",
+        "Use AI suggestions",
+        "Schedule content",
+        "Access billing information",
+        "Delete workspace",
+        "Manage workspace settings"
+      ]
+    }
+  }
 };
 
 export default function TeamManagement() {
@@ -392,6 +486,62 @@ export default function TeamManagement() {
               })}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Role Permissions Guide */}
+      <Card className="bg-gray-800/50 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white">Role Permissions</CardTitle>
+          <CardDescription className="text-gray-400">
+            Understand what each team role can and cannot do
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Object.entries(rolePermissions).map(([roleKey, role]) => {
+              const RoleIcon = role.icon;
+              return (
+                <div key={roleKey} className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <Badge className={role.color}>
+                      <RoleIcon className="w-3 h-3 mr-1" />
+                      {role.label}
+                    </Badge>
+                    <span className="text-sm text-gray-400">{role.description}</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="text-sm font-semibold text-green-400 mb-2">✓ Can Do:</h4>
+                      <ul className="text-xs text-gray-300 space-y-1">
+                        {role.permissions.can.map((permission, index) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <span className="text-green-400 mt-1">•</span>
+                            <span>{permission}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    {role.permissions.cannot.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-red-400 mb-2">✗ Cannot Do:</h4>
+                        <ul className="text-xs text-gray-300 space-y-1">
+                          {role.permissions.cannot.map((restriction, index) => (
+                            <li key={index} className="flex items-start space-x-2">
+                              <span className="text-red-400 mt-1">•</span>
+                              <span>{restriction}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 

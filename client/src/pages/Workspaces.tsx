@@ -317,7 +317,7 @@ export default function Workspaces() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-orbitron font-bold neon-text text-nebula-purple">
+        <h2 className="text-4xl font-orbitron font-bold text-nebula-purple">
           Brand Workspaces
         </h2>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -528,7 +528,7 @@ export default function Workspaces() {
       {/* All Workspaces */}
       <Card className="content-card holographic">
         <CardHeader>
-          <CardTitle className="text-xl font-orbitron font-semibold neon-text text-solar-gold">
+          <CardTitle className="text-xl font-orbitron font-semibold text-solar-gold">
             All Workspaces
           </CardTitle>
         </CardHeader>
@@ -622,7 +622,7 @@ export default function Workspaces() {
       {/* Recent Workspace Activity */}
       <Card className="content-card holographic">
         <CardHeader>
-          <CardTitle className="text-xl font-orbitron font-semibold neon-text text-green-400">
+          <CardTitle className="text-xl font-orbitron font-semibold text-green-400">
             Recent Activity
           </CardTitle>
         </CardHeader>

@@ -75,7 +75,7 @@ export function DailySuggestions() {
   return (
     <Card className="content-card holographic">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-orbitron font-semibold neon-text text-nebula-purple">
+        <CardTitle className="text-2xl font-orbitron font-semibold text-nebula-purple">
           Today's AI Briefing
         </CardTitle>
         <div className="flex items-center space-x-2 text-sm text-asteroid-silver">

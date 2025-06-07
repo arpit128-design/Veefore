@@ -771,7 +771,7 @@ export default function Scheduler() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold neon-text text-solar-gold">
+          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-solar-gold">
             Mission Scheduler
           </h2>
           <p className="text-asteroid-silver mt-2 text-sm md:text-base">

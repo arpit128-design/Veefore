@@ -83,7 +83,7 @@ export default function Suggestions() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold neon-text text-nebula-purple">
+        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-nebula-purple">
           AI Suggestions
         </h2>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">

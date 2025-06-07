@@ -3,11 +3,11 @@ import { IStorage } from "./storage";
 import {
   User, Workspace, SocialAccount, Content, Analytics, AutomationRule,
   Suggestion, CreditTransaction, Referral, Subscription, Payment, Addon,
-  WorkspaceMember, TeamInvitation,
+  WorkspaceMember, TeamInvitation, ContentRecommendation, UserContentHistory,
   InsertUser, InsertWorkspace, InsertSocialAccount, InsertContent,
   InsertAutomationRule, InsertAnalytics, InsertSuggestion,
   InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon,
-  InsertWorkspaceMember, InsertTeamInvitation
+  InsertWorkspaceMember, InsertTeamInvitation, InsertContentRecommendation, InsertUserContentHistory
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -195,9 +195,42 @@ const TeamInvitationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const ContentRecommendationSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  type: { type: String, required: true },
+  title: { type: String, required: true },
+  description: String,
+  thumbnailUrl: String,
+  mediaUrl: String,
+  duration: Number,
+  category: { type: String, required: true },
+  country: { type: String, required: true },
+  tags: [String],
+  engagement: {
+    expectedViews: { type: Number, default: 0 },
+    expectedLikes: { type: Number, default: 0 },
+    expectedShares: { type: Number, default: 0 }
+  },
+  sourceUrl: String,
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const UserContentHistorySchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  recommendationId: { type: mongoose.Schema.Types.Mixed },
+  action: { type: String, required: true },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+  createdAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
+const ContentRecommendationModel = mongoose.model('ContentRecommendation', ContentRecommendationSchema);
+const UserContentHistoryModel = mongoose.model('UserContentHistory', UserContentHistorySchema);
 const SocialAccountModel = mongoose.model('SocialAccount', SocialAccountSchema);
 const ContentModel = mongoose.model('Content', ContentSchema);
 const AnalyticsModel = mongoose.model('Analytics', AnalyticsSchema);

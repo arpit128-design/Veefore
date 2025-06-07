@@ -124,14 +124,23 @@ export default function Subscription() {
   const handleAddonPurchase = async (addonId: string) => {
     if (addonPurchasing) return;
     
+    console.log('[ADDON PURCHASE] Starting purchase for addon:', addonId);
     setAddonPurchasing(true);
     
     try {
       // Create Razorpay order for addon
+      console.log('[ADDON PURCHASE] Creating order...');
       const orderResponse = await apiRequest('POST', '/api/razorpay/create-addon-order', {
         addonId
       });
+      
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+      
       const orderData = await orderResponse.json();
+      console.log('[ADDON PURCHASE] Order created:', orderData);
       
       if (!orderData.orderId) {
         throw new Error('Failed to create order');
@@ -144,6 +153,7 @@ export default function Subscription() {
       document.body.appendChild(script);
 
       script.onload = () => {
+        console.log('[ADDON PURCHASE] Razorpay script loaded, key:', import.meta.env.VITE_RAZORPAY_KEY_ID ? 'Present' : 'Missing');
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           amount: orderData.amount * 100,

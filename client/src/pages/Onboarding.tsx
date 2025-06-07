@@ -1205,7 +1205,7 @@ export default function Onboarding() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-transparent">
       
       {/* Floating Elements */}
       <FloatingSparkles />

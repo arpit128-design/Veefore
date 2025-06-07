@@ -210,57 +210,6 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         userId: userId
       };
       const workspace = await storage.createWorkspace(workspaceData);
-      
-      // Check if user has existing Instagram accounts that can be connected to this new workspace
-      try {
-        const userWorkspaces = await storage.getWorkspacesByUserId(userId);
-        const existingWorkspace = userWorkspaces.find(w => w.id !== workspace.id);
-        
-        if (existingWorkspace) {
-          // Get Instagram accounts from existing workspace
-          const existingAccounts = await storage.getSocialAccountsByWorkspace(existingWorkspace.id);
-          const instagramAccounts = existingAccounts.filter(acc => acc.platform === 'instagram');
-          
-          if (instagramAccounts.length > 0) {
-            console.log('[WORKSPACE CREATION] Found existing Instagram accounts, creating connections for new workspace');
-            
-            // Create new social account connections for this workspace
-            for (const account of instagramAccounts) {
-              const newAccountData = {
-                workspaceId: parseInt(workspace.id),
-                platform: account.platform,
-                username: account.username,
-                accountId: account.accountId,
-                accessToken: account.accessToken,
-                refreshToken: account.refreshToken,
-                expiresAt: account.expiresAt,
-                isActive: account.isActive,
-                followersCount: account.followersCount,
-                followingCount: account.followingCount,
-                mediaCount: account.mediaCount,
-                biography: account.biography,
-                website: account.website,
-                profilePictureUrl: account.profilePictureUrl,
-                accountType: account.accountType,
-                isBusinessAccount: account.isBusinessAccount,
-                isVerified: account.isVerified,
-                avgLikes: account.avgLikes,
-                avgComments: account.avgComments,
-                avgReach: account.avgReach,
-                engagementRate: account.engagementRate,
-                lastSyncAt: account.lastSyncAt
-              };
-              
-              await storage.createSocialAccount(newAccountData);
-              console.log('[WORKSPACE CREATION] Created Instagram connection for new workspace:', account.username);
-            }
-          }
-        }
-      } catch (connectionError) {
-        console.error('[WORKSPACE CREATION] Error connecting Instagram accounts:', connectionError);
-        // Continue without failing workspace creation
-      }
-      
       res.json(workspace);
     } catch (error: any) {
       console.error('Error creating workspace:', error);

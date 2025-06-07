@@ -2428,13 +2428,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Content Recommendations API
   app.get('/api/content-recommendations', requireAuth, async (req: any, res: Response) => {
     try {
-      const { workspaceId, type, limit = 6 } = req.query;
+      const { workspaceId, type, limit = 12 } = req.query;
       
       if (!workspaceId) {
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
-      console.log(`[CONTENT RECOMMENDATIONS] Fetching ${type || 'all'} recommendations for workspace: ${workspaceId}`);
+      console.log(`[CONTENT RECOMMENDATIONS] Fetching real ${type || 'all'} recommendations for workspace: ${workspaceId}`);
 
       // Get user's IP for geolocation
       const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
@@ -2450,21 +2450,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       // Extract niche and interests from user preferences
       const preferences = user.preferences as any || {};
-      const niche = preferences.niche || 'general';
-      const interests = preferences.interests || ['content creation'];
+      const niche = preferences.niche || 'content creation';
 
-      // Generate personalized recommendations
-      const recommendations = await contentRecommendationService.generatePersonalizedRecommendations(
-        user,
-        workspace,
-        userLocation,
-        {
-          type: type as 'video' | 'reel' | 'audio' || 'video',
-          niche,
-          interests,
-          country: userLocation.countryCode,
-          limit: parseInt(limit as string)
-        }
+      // Import and use real content service
+      const { realContentService } = await import('./real-content-service');
+      
+      // Get real trending content based on type
+      const recommendations = await realContentService.getContentRecommendations(
+        type as string,
+        niche,
+        userLocation.countryCode,
+        parseInt(limit as string)
       );
 
       // Store recommendations in database for future reference
@@ -2473,17 +2469,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         try {
           const stored = await storage.createContentRecommendation({
             workspaceId: parseInt(workspaceId),
-            type: type as string || 'video',
+            type: rec.type,
             title: rec.title,
             description: rec.description,
-            thumbnailUrl: await contentRecommendationService.generateThumbnail(rec.thumbnailPrompt),
-            mediaUrl: rec.script || rec.audioDescription || '',
+            thumbnailUrl: rec.thumbnailUrl,
+            mediaUrl: rec.sourceUrl || '',
             duration: rec.duration,
             category: rec.category,
-            country: userLocation.countryCode,
+            country: rec.country,
             tags: rec.tags,
             engagement: rec.engagement,
-            sourceUrl: 'ai-generated',
+            sourceUrl: rec.sourceUrl,
             isActive: true
           });
           storedRecommendations.push(stored);
@@ -2492,7 +2488,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
       }
 
-      console.log(`[CONTENT RECOMMENDATIONS] Generated ${storedRecommendations.length} recommendations for ${userLocation.country}`);
+      console.log(`[CONTENT RECOMMENDATIONS] Fetched ${storedRecommendations.length} real trending recommendations from YouTube/Instagram for ${userLocation.country}`);
       
       res.json({
         recommendations: storedRecommendations,
@@ -2501,7 +2497,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       });
     } catch (error: any) {
       console.error('[CONTENT RECOMMENDATIONS] Error:', error);
-      res.status(500).json({ error: 'Failed to generate content recommendations' });
+      res.status(500).json({ error: 'Failed to fetch content recommendations' });
     }
   });
 

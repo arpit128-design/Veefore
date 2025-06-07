@@ -372,7 +372,7 @@ const ContentRecommendations = () => {
                 transition={{ duration: 0.3 }}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               >
-                {recommendations.map((recommendation, index) => (
+                {recommendations.map((recommendation: ContentRecommendation, index: number) => (
                   <motion.div
                     key={recommendation.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -395,17 +395,17 @@ const ContentRecommendations = () => {
                   <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
                     <Sparkles className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold">No recommendations yet</h3>
+                  <h3 className="text-xl font-semibold">Real Trending Content Loading</h3>
                   <p className="text-muted-foreground">
-                    We're generating personalized content recommendations for {activeTab.replace('-', ' ')}. 
-                    Check back in a moment!
+                    Fetching real trending {activeTab.replace('-', ' ')} content from YouTube and Instagram APIs. 
+                    This helps you create content that actually goes viral!
                   </p>
                   <Button 
                     onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] })}
                     className="mt-4"
                   >
                     <Zap className="h-4 w-4 mr-2" />
-                    Refresh Recommendations
+                    Load Fresh Trending Content
                   </Button>
                 </div>
               </motion.div>

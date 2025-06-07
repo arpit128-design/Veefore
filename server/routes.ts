@@ -496,6 +496,50 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Disconnect social account
+  app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const accountId = req.params.id;
+      console.log(`[DISCONNECT ACCOUNT] Attempting to disconnect account ID: ${accountId}`);
+      
+      // Verify user has access to workspace
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+      
+      // Get account details before deletion
+      let account;
+      try {
+        account = await storage.getSocialAccount(accountId);
+      } catch (castError) {
+        console.log(`[DISCONNECT ACCOUNT] Error getting account:`, castError);
+        return res.status(404).json({ error: 'Account not found' });
+      }
+      
+      if (account) {
+        console.log(`[DISCONNECT ACCOUNT] Disconnecting ${account.platform} account: @${account.username}`);
+        
+        await storage.deleteSocialAccount(account.id);
+        console.log(`[DISCONNECT ACCOUNT] Successfully disconnected ${account.platform} account`);
+        
+        res.json({ 
+          success: true, 
+          message: `Successfully disconnected ${account.platform} account`,
+          platform: account.platform,
+          username: account.username
+        });
+      } else {
+        console.log(`[DISCONNECT ACCOUNT] Account not found: ${accountId}`);
+        res.status(404).json({ error: 'Account not found' });
+      }
+    } catch (error: any) {
+      console.error('[DISCONNECT ACCOUNT] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Chat performance endpoint
   app.get("/api/chat-performance", requireAuth, async (req: any, res: any) => {
     try {

@@ -447,7 +447,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Get current team members and pending invitations
         const currentMembers = await storage.getWorkspaceMembers(parseInt(workspaceId));
         const pendingInvitations = await storage.getWorkspaceInvitations(parseInt(workspaceId));
-        const totalTeamSize = currentMembers.length + pendingInvitations.length;
+        
+        // Check for duplicate invitations and clean them up
+        const uniqueInvitations = pendingInvitations.filter((invite, index, self) => 
+          index === self.findIndex(i => i.email === invite.email)
+        );
+        
+        const totalTeamSize = currentMembers.length + uniqueInvitations.length;
         
         // Get user's team member addons to determine limit
         const userAddons = await storage.getUserAddons(user.id);
@@ -459,6 +465,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const maxTeamSize = 1 + teamMemberAddons.length;
         
         console.log(`[TEAM INVITE] Team size check: Current: ${totalTeamSize}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
+        console.log(`[TEAM INVITE] User addons found:`, userAddons.map(a => `${a.type}:${a.isActive}`));
         
         if (totalTeamSize >= maxTeamSize) {
           return res.status(402).json({ 

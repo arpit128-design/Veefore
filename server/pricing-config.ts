@@ -172,6 +172,20 @@ export const ADDONS = {
     price: 19900, // ₹199 in paise
     type: 'team-member',
     interval: 'month',
+  },
+  'advanced-analytics': {
+    id: 'advanced-analytics',
+    name: 'Advanced Analytics Package',
+    price: 19900, // ₹199 in paise
+    type: 'analytics',
+    interval: 'month',
+  },
+  'white-label-branding': {
+    id: 'white-label-branding',
+    name: 'White-label Branding',
+    price: 49900, // ₹499 in paise
+    type: 'branding',
+    interval: 'month',
   }
 };
 
@@ -226,4 +240,54 @@ export function calculateCreditPackageTotal(packageId: string) {
     totalCredits: pkg.totalCredits,
     price: pkg.price,
   };
+}
+
+// Comprehensive addon checking utility
+export async function checkUserAddonAccess(storage: any, userId: number | string, featureType: string): Promise<{
+  hasAccess: boolean;
+  addonType?: string;
+  reason?: string;
+}> {
+  try {
+    // Get user's purchased addons
+    const userAddons = await storage.getUserAddons(userId);
+    const activeAddons = userAddons.filter((addon: any) => addon.isActive);
+    
+    // Define feature-to-addon-type mapping
+    const featureAddonMap: Record<string, string[]> = {
+      'team-collaboration': ['team-member'],
+      'advanced-analytics': ['analytics', 'advanced-analytics'],
+      'white-label': ['branding', 'white-label-branding'],
+      'extra-workspace': ['workspace', 'extra-workspace'],
+      'extra-social-account': ['social-account', 'extra-social-account'],
+      'ai-boost': ['ai-boost', 'viral-boost'],
+      'affiliate-features': ['affiliate', 'affiliate-kit'],
+      'ai-visual': ['ai-visual'],
+      'social-crm': ['crm', 'social-crm']
+    };
+    
+    const requiredAddonTypes = featureAddonMap[featureType] || [];
+    
+    // Check if user has any of the required addon types
+    for (const addonType of requiredAddonTypes) {
+      const hasAddon = activeAddons.some((addon: any) => addon.type === addonType);
+      if (hasAddon) {
+        return {
+          hasAccess: true,
+          addonType
+        };
+      }
+    }
+    
+    return {
+      hasAccess: false,
+      reason: `This feature requires one of these addons: ${requiredAddonTypes.join(', ')}`
+    };
+  } catch (error) {
+    console.error('[ADDON CHECK] Error checking addon access:', error);
+    return {
+      hasAccess: false,
+      reason: 'Unable to verify addon access'
+    };
+  }
 }

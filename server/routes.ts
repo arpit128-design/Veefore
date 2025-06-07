@@ -359,9 +359,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      // Enforce subscription limits - Free plan only supports 1 member (owner)
+      // Check subscription limits including purchased addons
       const userPlan = user.plan || 'Free';
-      if (userPlan === 'Free') {
+      
+      // Get user's purchased addons to check for team member seats
+      const userAddons = await storage.getUserAddons(user.id);
+      const teamMemberAddons = userAddons.filter(addon => addon.type === 'team-member' && addon.isActive);
+      const hasTeamMemberAddon = teamMemberAddons.length > 0;
+      
+      console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Team addons: ${teamMemberAddons.length}, Has team addon: ${hasTeamMemberAddon}`);
+      
+      // Free plan users need either an upgrade or team member addon
+      if (userPlan === 'Free' && !hasTeamMemberAddon) {
         return res.status(402).json({ 
           error: 'Free plan only supports 1 member. Upgrade to invite team members.',
           needsUpgrade: true,

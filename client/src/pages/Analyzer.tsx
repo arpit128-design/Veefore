@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { BarChart3, TrendingUp, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
+import { formatNumber, formatEngagement } from "@/lib/utils";
 
 export default function Analyzer() {
   const { currentWorkspace } = useWorkspaceContext();
@@ -134,7 +135,7 @@ export default function Analyzer() {
                 <Eye className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews ?? '—'}</div>
+                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews ? formatNumber(analytics.totalViews) : '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Views</div>
               </div>
             </div>
@@ -157,7 +158,7 @@ export default function Analyzer() {
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement ?? '—'}</div>
+                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement ? formatNumber(analytics.engagement) : '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Engagement</div>
               </div>
             </div>
@@ -180,7 +181,7 @@ export default function Analyzer() {
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-solar-gold">{analytics?.totalReach ?? '—'}</div>
+                <div className="text-2xl font-bold text-solar-gold">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
@@ -203,7 +204,7 @@ export default function Analyzer() {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-400">{analytics?.followers ?? '—'}</div>
+                <div className="text-2xl font-bold text-green-400">{analytics?.followers ? formatNumber(analytics.followers) : '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Followers</div>
               </div>
             </div>
@@ -427,7 +428,7 @@ export default function Analyzer() {
                   <span className="text-sm font-medium">Posted: "hi"</span>
                   <span className="text-xs text-asteroid-silver">May 29, 2025</span>
                 </div>
-                <div className="text-xs text-green-400">3 likes • 11 reach • 0 comments</div>
+                <div className="text-xs text-green-400">{formatNumber(3)} likes • {formatNumber(11)} reach • {formatNumber(0)} comments</div>
               </div>
               <Heart className="h-4 w-4 text-pink-400" />
             </div>

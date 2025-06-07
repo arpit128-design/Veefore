@@ -160,7 +160,9 @@ export default function Dashboard() {
                 <i className="fab fa-instagram text-xl md:text-2xl text-pink-500" />
                 <h3 className="text-lg md:text-xl font-orbitron font-semibold">Instagram Analytics</h3>
               </div>
-              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+              {isDataLoading && (
+                <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+              )}
             </div>
             
             <div className="space-y-4">
@@ -207,7 +209,7 @@ export default function Dashboard() {
                 <i className="fab fa-x-twitter text-xl md:text-2xl text-white" />
                 <h3 className="text-lg md:text-xl font-orbitron font-semibold">Twitter Analytics</h3>
               </div>
-              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+              {/* No loading spinner for Twitter as no data is connected */}
             </div>
             
             <div className="space-y-4">

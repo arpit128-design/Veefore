@@ -377,10 +377,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           // Method 2: Check if user has existing team member addon
           const userAddons = await storage.getUserAddons(user.id);
           console.log(`[TEAM INVITE] Found ${userAddons.length} addons for user`);
+          userAddons.forEach((addon, index) => {
+            console.log(`[TEAM INVITE] Addon ${index + 1}: Type: ${addon.type}, Name: ${addon.name}, Active: ${addon.isActive}`);
+          });
           
-          const teamMemberAddon = userAddons.find(addon => addon.type === 'team-member');
-          if (teamMemberAddon && teamMemberAddon.isActive) {
-            console.log(`[TEAM INVITE] Found active team member addon`);
+          const teamMemberAddon = userAddons.find(addon => 
+            (addon.type === 'team-member' || addon.name?.includes('Team Member') || addon.name?.includes('team-member')) && 
+            addon.isActive
+          );
+          
+          if (teamMemberAddon) {
+            console.log(`[TEAM INVITE] Found active team member addon:`, {
+              type: teamMemberAddon.type,
+              name: teamMemberAddon.name,
+              isActive: teamMemberAddon.isActive
+            });
             hasTeamAccess = true;
           } else {
             // Method 3: Check MongoDB directly using storage instance

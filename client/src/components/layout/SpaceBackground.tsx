@@ -118,9 +118,29 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* CSS Star Field - Behind content with reduced count */}
+      {/* Test stars for visibility */}
+      <div className="test-stars fixed inset-0 pointer-events-none" style={{ zIndex: -1 }}>
+        <div 
+          className="absolute w-3 h-3 bg-white rounded-full animate-pulse"
+          style={{ top: '10%', left: '20%' }}
+        />
+        <div 
+          className="absolute w-4 h-4 bg-cyan-400 rounded-full animate-pulse"
+          style={{ top: '30%', left: '60%' }}
+        />
+        <div 
+          className="absolute w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
+          style={{ top: '70%', left: '40%' }}
+        />
+        <div 
+          className="absolute w-3 h-3 bg-blue-400 rounded-full animate-pulse"
+          style={{ top: '50%', left: '80%' }}
+        />
+      </div>
+
+      {/* CSS Star Field - Minimal count */}
       <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: -3 }}>
-        {Array.from({ length: 80 }, (_, i) => (
+        {Array.from({ length: 20 }, (_, i) => (
           <div
             key={i}
             className="star"

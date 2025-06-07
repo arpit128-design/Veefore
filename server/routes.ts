@@ -1108,18 +1108,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       });
 
       // Get addon details from pricing config
-      const pricingData = await storage.getPricingData();
-      const addon = pricingData.addons[addonId];
+      const pricingConfig = await import('./pricing-config');
+      const addon = pricingConfig.getAddonById(addonId);
       
       if (!addon) {
-        console.log('[ADDON] Available addons:', Object.keys(pricingData.addons));
+        console.log('[ADDON] Available addons:', Object.keys(pricingConfig.ADDONS));
         console.log('[ADDON] Requested addon:', addonId);
         return res.status(400).json({ error: 'Invalid addon ID' });
       }
 
       // Create addon order
       const options = {
-        amount: addon.price * 100, // Convert to paise
+        amount: addon.price, // Already in paise in config
         currency: 'INR',
         receipt: `addon_${addonId}_${Date.now()}`,
         notes: {
@@ -1135,7 +1135,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       res.json({
         orderId: order.id,
-        amount: addon.price,
+        amount: Math.floor(addon.price / 100), // Convert back to rupees for frontend
         currency: 'INR',
         addon: addon
       });

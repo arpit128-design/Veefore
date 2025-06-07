@@ -568,14 +568,14 @@ export default function Subscription() {
                         </div>
                         <h3 className="font-semibold text-white">{addon.name}</h3>
                         <p className="text-sm text-asteroid-silver">{addon.benefit || addon.description}</p>
-                        <div className="text-lg font-bold text-solar-gold">₹{addon.price}/month</div>
+                        <div className="text-lg font-bold text-solar-gold">₹{Math.floor(addon.price / 100)}/month</div>
                         <Button 
                           className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                           onClick={() => handleAddonPurchase(key)}
                           disabled={addonPurchasing}
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          {addonPurchasing ? "Processing..." : "Purchase Now"}
+                          {addonPurchasing ? "Processing..." : "Add Enhancement"}
                         </Button>
                       </div>
                     </div>

@@ -359,17 +359,46 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      // Check subscription limits using comprehensive addon system
+      // Check subscription limits with payment-based addon validation
       const userPlan = user.plan || 'Free';
       
-      // Import the addon checking utility
-      const pricingConfig = await import('./pricing-config');
-      const addonAccess = await pricingConfig.checkUserAddonAccess(storage, user.id, 'team-collaboration');
+      // For Free plan users, check if they have purchased team member addon
+      let hasTeamAccess = userPlan !== 'Free';
       
-      console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Addon access:`, addonAccess);
+      if (!hasTeamAccess) {
+        // Check for successful team member addon payments
+        const teamMemberPayments = await storage.getPaymentsByUser(user.id);
+        const successfulTeamPayment = teamMemberPayments.find(payment => 
+          payment.purpose === 'team-member' && payment.status === 'success'
+        );
+        
+        if (successfulTeamPayment) {
+          // Check if addon record exists, create if missing
+          const userAddons = await storage.getUserAddons(user.id);
+          const teamMemberAddon = userAddons.find(addon => addon.type === 'team-member');
+          
+          if (!teamMemberAddon) {
+            // Create the missing addon record
+            await storage.createAddon({
+              name: 'Additional Team Member Seat',
+              userId: user.id,
+              type: 'team-member',
+              price: 199,
+              isActive: true,
+              expiresAt: null,
+              metadata: {
+                paymentId: successfulTeamPayment.id,
+                purchaseDate: successfulTeamPayment.createdAt
+              }
+            });
+            console.log(`[TEAM INVITE] Created missing team member addon for user ${user.id}`);
+          }
+          
+          hasTeamAccess = true;
+        }
+      }
       
-      // Check if user has access via plan or addon
-      const hasTeamAccess = userPlan !== 'Free' || addonAccess.hasAccess;
+      console.log(`[TEAM INVITE] User ${user.id} - Plan: ${userPlan}, Has team access: ${hasTeamAccess}`);
       
       if (!hasTeamAccess) {
         return res.status(402).json({ 

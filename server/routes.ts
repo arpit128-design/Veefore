@@ -239,7 +239,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       // Verify user has access to this workspace
       const workspace = await storage.getWorkspace(workspaceId);
-      if (!workspace || workspace.userId.toString() !== user.id.toString()) {
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+      
+      // Check if user owns this workspace or is a member
+      // Handle various ID formats - MongoDB ObjectId strings vs numeric IDs
+      const workspaceUserId = workspace.userId.toString();
+      const requestUserId = user.id.toString();
+      const userOwnsWorkspace = workspaceUserId === requestUserId;
+      
+      if (!userOwnsWorkspace) {
+        // For now, only workspace owners can access team management
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 

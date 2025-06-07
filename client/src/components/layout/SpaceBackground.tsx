@@ -118,40 +118,23 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* Test stars for visibility - positioned between background and content */}
-      <div className="test-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        <div 
-          className="absolute w-3 h-3 bg-white rounded-full animate-pulse"
-          style={{ top: '10%', left: '20%' }}
-        />
-        <div 
-          className="absolute w-4 h-4 bg-cyan-400 rounded-full animate-pulse"
-          style={{ top: '30%', left: '60%' }}
-        />
-        <div 
-          className="absolute w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
-          style={{ top: '70%', left: '40%' }}
-        />
-        <div 
-          className="absolute w-3 h-3 bg-blue-400 rounded-full animate-pulse"
-          style={{ top: '50%', left: '80%' }}
-        />
-      </div>
-
-      {/* CSS Star Field - Positioned between background and content */}
-      <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: 3 }}>
-        {Array.from({ length: 25 }, (_, i) => (
-          <div
-            key={i}
-            className="star"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          />
-        ))}
+      {/* Simple Static Stars for Space Effect */}
+      <div className="simple-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+        <div className="absolute w-1 h-1 bg-white opacity-80" style={{ top: '15%', left: '25%' }} />
+        <div className="absolute w-1 h-1 bg-cyan-400 opacity-70" style={{ top: '35%', left: '65%' }} />
+        <div className="absolute w-1 h-1 bg-yellow-300 opacity-75" style={{ top: '75%', left: '45%' }} />
+        <div className="absolute w-1 h-1 bg-blue-300 opacity-80" style={{ top: '55%', left: '85%' }} />
+        <div className="absolute w-1 h-1 bg-white opacity-60" style={{ top: '25%', left: '15%' }} />
+        <div className="absolute w-1 h-1 bg-cyan-300 opacity-70" style={{ top: '65%', left: '25%' }} />
+        <div className="absolute w-1 h-1 bg-yellow-400 opacity-80" style={{ top: '45%', left: '75%' }} />
+        <div className="absolute w-1 h-1 bg-white opacity-90" style={{ top: '85%', left: '35%' }} />
+        <div className="absolute w-1 h-1 bg-blue-400 opacity-60" style={{ top: '20%', left: '80%' }} />
+        <div className="absolute w-1 h-1 bg-white opacity-70" style={{ top: '60%', left: '55%' }} />
+        <div className="absolute w-1 h-1 bg-cyan-400 opacity-85" style={{ top: '40%', left: '30%' }} />
+        <div className="absolute w-1 h-1 bg-yellow-300 opacity-65" style={{ top: '80%', left: '70%' }} />
+        <div className="absolute w-1 h-1 bg-white opacity-75" style={{ top: '30%', left: '50%' }} />
+        <div className="absolute w-1 h-1 bg-blue-300 opacity-80" style={{ top: '70%', left: '10%' }} />
+        <div className="absolute w-1 h-1 bg-cyan-300 opacity-70" style={{ top: '50%', left: '90%' }} />
       </div>
 
       {/* Shooting Stars - Positioned between background and content */}

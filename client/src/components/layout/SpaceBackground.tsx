@@ -118,23 +118,28 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* Visible Animated Stars for Space Effect */}
+      {/* Enhanced Twinkling Stars for Space Effect */}
       <div className="space-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '15%', left: '25%', animationDelay: '0s' }} />
-        <div className="absolute w-3 h-3 bg-cyan-400 rounded-full animate-pulse" style={{ top: '35%', left: '65%', animationDelay: '0.5s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 rounded-full animate-pulse" style={{ top: '75%', left: '45%', animationDelay: '1s' }} />
-        <div className="absolute w-3 h-3 bg-blue-300 rounded-full animate-pulse" style={{ top: '55%', left: '85%', animationDelay: '1.5s' }} />
-        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '25%', left: '15%', animationDelay: '2s' }} />
-        <div className="absolute w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{ top: '65%', left: '25%', animationDelay: '2.5s' }} />
-        <div className="absolute w-3 h-3 bg-yellow-400 rounded-full animate-pulse" style={{ top: '45%', left: '75%', animationDelay: '3s' }} />
-        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '85%', left: '35%', animationDelay: '0.3s' }} />
-        <div className="absolute w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ top: '20%', left: '80%', animationDelay: '1.2s' }} />
-        <div className="absolute w-3 h-3 bg-white rounded-full animate-pulse" style={{ top: '60%', left: '55%', animationDelay: '1.8s' }} />
-        <div className="absolute w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ top: '40%', left: '30%', animationDelay: '2.2s' }} />
-        <div className="absolute w-2 h-2 bg-yellow-300 rounded-full animate-pulse" style={{ top: '80%', left: '70%', animationDelay: '2.8s' }} />
-        <div className="absolute w-3 h-3 bg-white rounded-full animate-pulse" style={{ top: '30%', left: '50%', animationDelay: '0.8s' }} />
-        <div className="absolute w-2 h-2 bg-blue-300 rounded-full animate-pulse" style={{ top: '70%', left: '10%', animationDelay: '1.6s' }} />
-        <div className="absolute w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{ top: '50%', left: '90%', animationDelay: '2.4s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle-fast" style={{ top: '15%', left: '25%', animationDelay: '0s' }} />
+        <div className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-twinkle" style={{ top: '35%', left: '65%', animationDelay: '0.5s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-yellow-300 rounded-full animate-twinkle-slow" style={{ top: '75%', left: '45%', animationDelay: '1s' }} />
+        <div className="absolute w-1 h-1 bg-blue-300 rounded-full animate-twinkle-fast" style={{ top: '55%', left: '85%', animationDelay: '1.5s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle" style={{ top: '25%', left: '15%', animationDelay: '2s' }} />
+        <div className="absolute w-1 h-1 bg-cyan-300 rounded-full animate-twinkle-slow" style={{ top: '65%', left: '25%', animationDelay: '2.5s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-yellow-400 rounded-full animate-twinkle-fast" style={{ top: '45%', left: '75%', animationDelay: '0.2s' }} />
+        <div className="absolute w-1 h-1 bg-white rounded-full animate-twinkle" style={{ top: '85%', left: '35%', animationDelay: '0.3s' }} />
+        <div className="absolute w-1 h-1 bg-blue-400 rounded-full animate-twinkle-slow" style={{ top: '20%', left: '80%', animationDelay: '1.2s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle-fast" style={{ top: '60%', left: '55%', animationDelay: '1.8s' }} />
+        <div className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-twinkle" style={{ top: '40%', left: '30%', animationDelay: '2.2s' }} />
+        <div className="absolute w-1 h-1 bg-yellow-300 rounded-full animate-twinkle-fast" style={{ top: '80%', left: '70%', animationDelay: '2.8s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle-slow" style={{ top: '30%', left: '50%', animationDelay: '0.8s' }} />
+        <div className="absolute w-1 h-1 bg-blue-300 rounded-full animate-twinkle" style={{ top: '70%', left: '10%', animationDelay: '1.6s' }} />
+        <div className="absolute w-1 h-1 bg-cyan-300 rounded-full animate-twinkle-fast" style={{ top: '50%', left: '90%', animationDelay: '2.4s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle" style={{ top: '10%', left: '70%', animationDelay: '1.3s' }} />
+        <div className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-twinkle-slow" style={{ top: '90%', left: '20%', animationDelay: '0.7s' }} />
+        <div className="absolute w-1 h-1 bg-cyan-300 rounded-full animate-twinkle" style={{ top: '35%', left: '85%', animationDelay: '2.1s' }} />
+        <div className="absolute w-1 h-1 bg-blue-400 rounded-full animate-twinkle-fast" style={{ top: '65%', left: '60%', animationDelay: '1.4s' }} />
+        <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-twinkle-slow" style={{ top: '45%', left: '5%', animationDelay: '0.9s' }} />
       </div>
 
       {/* Shooting Stars - Positioned between background and content */}

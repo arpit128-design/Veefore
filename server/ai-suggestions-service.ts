@@ -64,7 +64,9 @@ function analyzeAccountPerformance(socialAccounts: any[], analytics: any[], cont
     engagementRate = instagramAccount.engagementRate || 0;
     accountType = instagramAccount.accountType || 'PERSONAL';
     hasRealData = true;
-    console.log(`[AI ANALYSIS] Using real Instagram data: @${instagramAccount.username} - ${followersCount} followers, ${mediaCount} posts, ${avgLikes} avg likes, ${avgComments} avg comments, ${(engagementRate/100).toFixed(2)}% engagement`);
+    // Convert from basis points to percentage for display
+    const engagementPercent = (engagementRate / 100).toFixed(1);
+    console.log(`[AI ANALYSIS] Using real Instagram data: @${instagramAccount.username} - ${followersCount} followers, ${mediaCount} posts, ${avgLikes} avg likes, ${avgComments} avg comments, ${engagementPercent}% engagement`);
   } else {
     // Fallback to analytics table data
     followersCount = instagramAccount?.followersCount || 0;

@@ -2208,10 +2208,26 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                 avgLikes = Math.round(totalLikes / mediaData.data.length);
                 avgComments = Math.round(totalComments / mediaData.data.length);
                 
-                // Calculate engagement rate (total engagement / followers * 100)
-                if (profileData.followers_count > 0) {
-                  const avgEngagement = avgLikes + avgComments;
-                  engagementRate = Math.round((avgEngagement / profileData.followers_count) * 10000); // Store as basis points
+                // Calculate engagement rate using reach-based method for consistency with analytics
+                const totalEngagements = totalLikes + totalComments;
+                
+                // Try to get reach data for more accurate engagement calculation
+                try {
+                  const reachResponse = await fetch(`https://graph.instagram.com/${profileData.id}/insights?metric=reach&period=days_28&access_token=${account.accessToken}`);
+                  if (reachResponse.ok) {
+                    const reachData = await reachResponse.json();
+                    const totalReach = reachData.data?.[0]?.values?.reduce((sum: number, val: any) => sum + (val.value || 0), 0) || 0;
+                    
+                    if (totalReach > 0) {
+                      engagementRate = Math.round((totalEngagements / totalReach) * 10000); // Reach-based calculation
+                    }
+                  }
+                } catch (reachError) {
+                  // Fallback to follower-based calculation if reach data unavailable
+                  if (profileData.followers_count > 0) {
+                    const avgEngagement = avgLikes + avgComments;
+                    engagementRate = Math.round((avgEngagement / profileData.followers_count) * 10000);
+                  }
                 }
               }
             }

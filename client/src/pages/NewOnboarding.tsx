@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -39,64 +39,33 @@ interface UserPreferences {
   };
 }
 
-// 3D Floating Elements Component
-const FloatingElements = () => {
+// Minimal static background elements to prevent typing interference
+const FloatingElements = React.memo(() => {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Floating orbs with 3D effect - reduced count for performance */}
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-8 h-8 rounded-full opacity-15"
-          style={{
-            background: `conic-gradient(from ${i * 72}deg, #00d4ff, #ffd700, #1a237e)`,
-            filter: 'blur(2px)',
-            boxShadow: '0 0 30px rgba(0, 212, 255, 0.3)'
-          }}
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-            rotate: [0, 360],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 15 + i * 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 1
-          }}
-          initial={{
-            left: `${15 + i * 15}%`,
-            top: `${25 + i * 10}%`
-          }}
-        />
-      ))}
-      
-      {/* Reduced cosmic particles for better performance */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={`particle-${i}`}
-          className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
-          animate={{
-            y: [-30, -120],
-            opacity: [0, 0.6, 0],
-            scale: [0, 1.2, 0]
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            delay: i * 0.5,
-            ease: "easeOut"
-          }}
-          style={{
-            left: `${20 + i * 10}%`,
-            top: `${Math.random() * 50 + 50}%`
-          }}
-        />
-      ))}
+    <div 
+      className="fixed inset-0 overflow-hidden pointer-events-none z-0"
+      style={{ 
+        contain: 'strict',
+        transform: 'translateZ(0)',
+        isolation: 'isolate'
+      }}
+    >
+      {/* Static decorative elements only */}
+      <div 
+        className="absolute w-4 h-4 rounded-full opacity-5 bg-cyan-400"
+        style={{ left: '20%', top: '30%' }}
+      />
+      <div 
+        className="absolute w-3 h-3 rounded-full opacity-5 bg-yellow-400"
+        style={{ left: '70%', top: '20%' }}
+      />
+      <div 
+        className="absolute w-2 h-2 rounded-full opacity-5 bg-blue-400"
+        style={{ left: '80%', top: '60%' }}
+      />
     </div>
   );
-};
+});
 
 // 3D Step Indicator
 const StepIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
@@ -349,8 +318,15 @@ export default function NewOnboarding() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="space-y-6">
-          <div>
+        <div 
+          className="space-y-6"
+          style={{ 
+            contain: 'layout style paint',
+            isolation: 'isolate',
+            transform: 'translateZ(0)'
+          }}
+        >
+          <div className="input-stable">
             <label className="block text-lg font-semibold text-cyan-400 mb-3">
               Business Name
             </label>
@@ -358,11 +334,16 @@ export default function NewOnboarding() {
               value={preferences.businessName}
               onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
               placeholder="Enter your cosmic brand name..."
-              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 h-12 text-lg backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200 input-stable"
+              className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 h-12 text-lg focus:bg-slate-800 focus:border-cyan-400 input-stable"
+              style={{
+                contain: 'layout style paint',
+                willChange: 'auto',
+                transform: 'translateZ(0)'
+              }}
             />
           </div>
           
-          <div>
+          <div className="input-stable">
             <label className="block text-lg font-semibold text-cyan-400 mb-3">
               Tell us about your mission
             </label>
@@ -370,8 +351,13 @@ export default function NewOnboarding() {
               value={preferences.description}
               onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Describe your brand's cosmic purpose and what makes you unique in the universe..."
-              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200 input-stable"
+              className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 min-h-32 focus:bg-slate-800 focus:border-cyan-400 input-stable"
               rows={4}
+              style={{
+                contain: 'layout style paint',
+                willChange: 'auto',
+                transform: 'translateZ(0)'
+              }}
             />
           </div>
         </div>
@@ -816,8 +802,8 @@ export default function NewOnboarding() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 px-8 pb-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="flex-1 px-8 pb-8 typing-container">
+          <div className="max-w-6xl mx-auto" style={{ contain: 'layout style paint', isolation: 'isolate' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}

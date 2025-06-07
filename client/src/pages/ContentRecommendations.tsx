@@ -60,6 +60,30 @@ const ContentRecommendations = () => {
   const [userInterests, setUserInterests] = useState('');
   const [userNiche, setUserNiche] = useState('');
   const [showPreferences, setShowPreferences] = useState(false);
+  const [userPreferencesLoaded, setUserPreferencesLoaded] = useState(false);
+
+  // Fetch user data to get onboarding preferences
+  const { data: userData } = useQuery({
+    queryKey: ['/api/user'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user');
+      return response.json();
+    }
+  });
+
+  // Load user's existing preferences from onboarding
+  useEffect(() => {
+    if (userData?.preferences && !userPreferencesLoaded) {
+      const prefs = userData.preferences as any;
+      if (prefs.interests && Array.isArray(prefs.interests)) {
+        setUserInterests(prefs.interests.join(', '));
+      }
+      if (prefs.niche) {
+        setUserNiche(prefs.niche);
+      }
+      setUserPreferencesLoaded(true);
+    }
+  }, [userData, userPreferencesLoaded]);
 
   const { data: recommendationsData, isLoading } = useQuery({
     queryKey: ['/api/content-recommendations', currentWorkspace?.id, activeTab, userInterests, userNiche],

@@ -42,55 +42,55 @@ interface UserPreferences {
 // 3D Floating Elements Component
 const FloatingElements = () => {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Floating orbs with 3D effect */}
-      {[...Array(8)].map((_, i) => (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Floating orbs with 3D effect - reduced count for performance */}
+      {[...Array(5)].map((_, i) => (
         <motion.div
           key={i}
-          className={`absolute w-${4 + i % 3} h-${4 + i % 3} rounded-full opacity-20`}
+          className="absolute w-8 h-8 rounded-full opacity-15"
           style={{
-            background: `conic-gradient(from ${i * 45}deg, #00d4ff, #ffd700, #1a237e)`,
-            filter: 'blur(1px)',
-            boxShadow: '0 0 20px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.3)'
+            background: `conic-gradient(from ${i * 72}deg, #00d4ff, #ffd700, #1a237e)`,
+            filter: 'blur(2px)',
+            boxShadow: '0 0 30px rgba(0, 212, 255, 0.3)'
           }}
           animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
+            x: [0, 50, 0],
+            y: [0, -30, 0],
             rotate: [0, 360],
-            scale: [1, 1.2, 1],
+            scale: [1, 1.1, 1],
           }}
           transition={{
-            duration: 10 + i * 2,
+            duration: 15 + i * 3,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: i * 0.5
+            delay: i * 1
           }}
           initial={{
-            left: `${10 + i * 12}%`,
-            top: `${20 + i * 8}%`
+            left: `${15 + i * 15}%`,
+            top: `${25 + i * 10}%`
           }}
         />
       ))}
       
-      {/* Cosmic particles */}
-      {[...Array(15)].map((_, i) => (
+      {/* Reduced cosmic particles for better performance */}
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={`particle-${i}`}
-          className="absolute w-1 h-1 bg-cyan-400 rounded-full"
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
           animate={{
-            y: [-20, -100],
-            opacity: [0, 1, 0],
-            scale: [0, 1, 0]
+            y: [-30, -120],
+            opacity: [0, 0.6, 0],
+            scale: [0, 1.2, 0]
           }}
           transition={{
-            duration: 3,
+            duration: 4,
             repeat: Infinity,
-            delay: i * 0.2,
+            delay: i * 0.5,
             ease: "easeOut"
           }}
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`
+            left: `${20 + i * 10}%`,
+            top: `${Math.random() * 50 + 50}%`
           }}
         />
       ))}
@@ -358,7 +358,7 @@ export default function NewOnboarding() {
               value={preferences.businessName}
               onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
               placeholder="Enter your cosmic brand name..."
-              className="bg-slate-800/50 border-slate-600 text-white placeholder-slate-400 h-12 text-lg backdrop-blur-sm"
+              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 h-12 text-lg backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200 input-stable"
             />
           </div>
           
@@ -370,7 +370,7 @@ export default function NewOnboarding() {
               value={preferences.description}
               onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Describe your brand's cosmic purpose and what makes you unique in the universe..."
-              className="bg-slate-800/50 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm"
+              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200"
               rows={4}
             />
           </div>
@@ -790,11 +790,11 @@ export default function NewOnboarding() {
   const CurrentStepComponent = steps[currentStep]?.component;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={{ transform: 'translateZ(0)' }}>
       <SpaceBackground />
       <FloatingElements />
       
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 min-h-screen flex flex-col will-change-auto">
         {/* Header */}
         <div className="p-8">
           <StepIndicator currentStep={currentStep} totalSteps={steps.length} />

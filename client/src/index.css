@@ -83,6 +83,27 @@
   100% { transform: rotate(360deg) scale(1.1); filter: hue-rotate(360deg); }
 }
 
+/* Performance optimizations for stable typing */
+.input-stable {
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
+.animation-layer {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
+/* Reduce repaints during typing */
+.typing-container {
+  contain: layout style paint;
+  isolation: isolate;
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }

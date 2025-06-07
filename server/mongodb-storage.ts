@@ -389,10 +389,22 @@ export class MongoStorage implements IStorage {
   // Workspace operations
   async getWorkspace(id: number | string): Promise<Workspace | undefined> {
     await this.connect();
-    // Handle both numeric IDs and ObjectId strings
-    const query = typeof id === 'string' && id.length === 24 ? { _id: id } : { _id: id };
-    const workspace = await WorkspaceModel.findOne(query);
-    return workspace ? this.convertWorkspace(workspace) : undefined;
+    
+    // Handle invalid IDs
+    if (!id || id === 'undefined' || id === 'null') {
+      console.log('[MONGODB DEBUG] getWorkspace - Invalid ID provided:', id);
+      return undefined;
+    }
+    
+    try {
+      // Handle both numeric IDs and ObjectId strings
+      const query = typeof id === 'string' && id.length === 24 ? { _id: id } : { _id: id };
+      const workspace = await WorkspaceModel.findOne(query);
+      return workspace ? this.convertWorkspace(workspace) : undefined;
+    } catch (objectIdError) {
+      console.error('[MONGODB DEBUG] getWorkspace - ObjectId conversion error:', objectIdError);
+      return undefined;
+    }
   }
 
   async getWorkspacesByUserId(userId: number | string): Promise<Workspace[]> {

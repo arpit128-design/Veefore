@@ -556,7 +556,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
 
       let workspace;
-      if (workspaceId) {
+      if (workspaceId && workspaceId !== 'undefined') {
         workspace = await storage.getWorkspace(workspaceId.toString());
         if (!workspace || workspace.userId.toString() !== user.id.toString()) {
           console.log('[INSTAGRAM AUTH] Access denied to workspace:', workspaceId);
@@ -589,6 +589,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
+      // Instagram Basic Display API OAuth
       const scopes = 'user_profile,user_media';
       const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
       
@@ -599,7 +600,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  app.get('/api/instagram/callback', async (req: Request, res: Response) => {
+  app.get('/api/instagram/callback', async (req: any, res: Response) => {
     try {
       const { code, state, error, error_reason, error_description } = req.query;
       

@@ -38,7 +38,7 @@ export function SpaceLoader({
   }, []);
 
   return (
-    <div className={`fixed inset-0 bg-gradient-to-b from-space-black via-deep-purple to-cosmic-blue overflow-hidden ${className}`}>
+    <div className={`fixed inset-0 bg-gradient-to-b from-space-navy via-space-navy to-cosmic-blue overflow-hidden ${className}`}>
       {/* Animated Stars Background */}
       <div className="absolute inset-0">
         {[...Array(100)].map((_, i) => (
@@ -101,19 +101,19 @@ export function SpaceLoader({
             </motion.div>
             
             <motion.div
-              className="absolute inset-2 rounded-full border-2 border-neon-pink/40"
+              className="absolute inset-2 rounded-full border-2 border-electric-cyan/40"
               animate={{ rotate: -360 }}
               transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
             >
-              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 bg-neon-pink rounded-full transform -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 bg-electric-cyan rounded-full transform -translate-x-1/2 -translate-y-1/2" />
             </motion.div>
             
             <motion.div
-              className="absolute inset-4 rounded-full border border-purple-500/50"
+              className="absolute inset-4 rounded-full border border-cosmic-blue/50"
               animate={{ rotate: 360 }}
               transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
             >
-              <div className="absolute top-0 left-1/2 w-1 h-1 bg-purple-400 rounded-full transform -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute top-0 left-1/2 w-1 h-1 bg-cosmic-blue rounded-full transform -translate-x-1/2 -translate-y-1/2" />
             </motion.div>
 
             {/* Central Core */}
@@ -136,7 +136,7 @@ export function SpaceLoader({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-electric-cyan via-neon-pink to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-electric-cyan via-solar-gold to-electric-cyan bg-clip-text text-transparent">
               {message}
             </h2>
             
@@ -158,7 +158,7 @@ export function SpaceLoader({
           <div className="w-80 mx-auto space-y-3">
             <div className="relative h-2 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
               <motion.div
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-electric-cyan to-neon-pink rounded-full"
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-electric-cyan to-solar-gold rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(progress + (currentPhase * 20), 100)}%` }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
@@ -227,7 +227,7 @@ export function SpaceLoader({
       
       <div className="absolute top-8 right-8">
         <motion.div
-          className="w-16 h-16 border-r-2 border-t-2 border-neon-pink/30"
+          className="w-16 h-16 border-r-2 border-t-2 border-solar-gold/30"
           animate={{ opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
         />
@@ -235,7 +235,7 @@ export function SpaceLoader({
       
       <div className="absolute bottom-8 left-8">
         <motion.div
-          className="w-16 h-16 border-l-2 border-b-2 border-purple-400/30"
+          className="w-16 h-16 border-l-2 border-b-2 border-cosmic-blue/30"
           animate={{ opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, delay: 1 }}
         />

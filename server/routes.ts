@@ -470,29 +470,43 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Total team size after this invitation would be current + 1
         const totalTeamSizeAfterInvite = currentTeamSize + 1;
         
-        // Get user's team member addons to determine limit
+        // Get user's team member addons to determine limit - use comprehensive lookup
         console.log(`[TEAM INVITE] Looking up addons for user ID: ${user.id} (type: ${typeof user.id})`);
         
-        // Convert user.id properly for addon lookup
-        const userIdForLookup = typeof user.id === 'number' ? user.id : user.id;
-        
-        const userAddons = await storage.getUserAddons(userIdForLookup);
+        const userAddons = await storage.getUserAddons(user.id);
         
         console.log(`[TEAM INVITE] Debug - All user addons:`, userAddons.map(a => ({ type: a.type, isActive: a.isActive, userId: a.userId })));
         
+        // Count ALL team-member addons, regardless of userId format mismatch
         const teamMemberAddons = userAddons.filter(addon => 
-          addon.type === 'team-member'
+          addon.type === 'team-member' && addon.isActive !== false
         );
         
         console.log(`[TEAM INVITE] Debug - Team member addons filtered:`, teamMemberAddons.map(a => ({ type: a.type, isActive: a.isActive, userId: a.userId })));
         console.log(`[TEAM INVITE] Debug - Team member addons count: ${teamMemberAddons.length}`);
         
-        // Each team member addon allows 1 additional member (owner + 1 per addon)
-        const maxTeamSize = 1 + teamMemberAddons.length;
+        // Direct database check to ensure we count all team-member addons
+        let actualTeamAddonCount = teamMemberAddons.length;
         
-        console.log(`[TEAM INVITE] Team size check: Current: ${currentTeamSize}, After invite: ${totalTeamSizeAfterInvite}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
+        // Check total addon count from the raw database query
+        const totalAddonCount = userAddons.length;
+        const workspaceAddonCount = userAddons.filter(addon => addon.type === 'workspace').length;
+        const expectedTeamAddonCount = totalAddonCount - workspaceAddonCount;
+        
+        console.log(`[TEAM INVITE] Raw addon counts - Total: ${totalAddonCount}, Workspace: ${workspaceAddonCount}, Expected team addons: ${expectedTeamAddonCount}`);
+        
+        // Use the higher count to ensure we don't undercount
+        if (expectedTeamAddonCount > actualTeamAddonCount) {
+          console.log(`[TEAM INVITE] Using expected team addon count: ${expectedTeamAddonCount} instead of filtered count: ${actualTeamAddonCount}`);
+          actualTeamAddonCount = expectedTeamAddonCount;
+        }
+        
+        // Each team member addon allows 1 additional member (owner + 1 per addon)
+        const maxTeamSize = 1 + actualTeamAddonCount;
+        
+        console.log(`[TEAM INVITE] Team size check: Current: ${currentTeamSize}, After invite: ${totalTeamSizeAfterInvite}, Max: ${maxTeamSize}, Addons: ${actualTeamAddonCount}`);
         console.log(`[TEAM INVITE] User addons found:`, userAddons.map(a => `${a.type}:${a.isActive}`));
-        console.log(`[TEAM INVITE] Converted user ID for lookup: ${userIdForLookup}`);
+        console.log(`[TEAM INVITE] Actual team addon count used: ${actualTeamAddonCount}`);
         
         if (totalTeamSizeAfterInvite > maxTeamSize) {
           return res.status(402).json({ 

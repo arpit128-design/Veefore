@@ -94,6 +94,18 @@ export default function Subscription() {
   
   const currentCredits = userSubscription?.credits || calculatedCredits;
 
+  // Debug logging
+  console.log('[SUBSCRIPTION DEBUG] Data status:', {
+    subscription: !!subscription,
+    pricingData: !!pricingData,
+    creditTransactions: !!creditTransactions,
+    currentCredits,
+    calculatedCredits,
+    subscriptionLoading,
+    pricingLoading,
+    transactionsLoading
+  });
+
   const planData = pricingData?.plans?.[currentPlan] || {
     name: 'Free Plan',
     price: 0,
@@ -173,6 +185,22 @@ export default function Subscription() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show content even if transactions are loading
+  if (!subscription || !pricingData) {
+    return (
+      <div className="min-h-screen bg-space-navy text-white p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-asteroid-silver">Loading subscription data...</p>
+            </div>
           </div>
         </div>
       </div>

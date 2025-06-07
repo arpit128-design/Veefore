@@ -70,18 +70,30 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     // Get Firebase token from local storage or auth state
-    const token = localStorage.getItem('veefore_auth_token');
+    let token = localStorage.getItem('veefore_auth_token');
     
-    // Validate token format before using
-    if (token && token.split('.').length !== 3) {
-      console.log('[CLIENT] Invalid token format detected, clearing cache');
-      localStorage.removeItem('veefore_auth_token');
-      window.location.reload(); // Force re-authentication
-      return;
+    // If no token or invalid format, try to get a fresh one from Firebase
+    if (!token || token.split('.').length !== 3) {
+      console.log('[CLIENT] No valid token found, attempting to get fresh token');
+      
+      // Try to get Firebase auth instance and fresh token
+      try {
+        const { auth } = await import('../lib/firebase');
+        if (auth?.currentUser) {
+          const freshToken = await auth.currentUser.getIdToken(true);
+          if (freshToken && freshToken.split('.').length === 3) {
+            localStorage.setItem('veefore_auth_token', freshToken);
+            token = freshToken;
+            console.log('[CLIENT] Fresh token obtained and stored');
+          }
+        }
+      } catch (error) {
+        console.error('[CLIENT] Failed to get fresh token:', error);
+      }
     }
     
     const headers: Record<string, string> = {};
-    if (token) {
+    if (token && token.split('.').length === 3) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 

@@ -462,13 +462,13 @@ const ContentRecommendations = () => {
         </div>
       </div>
 
-      {/* Personalization Interface */}
+      {/* User Preferences Display */}
       <Card className="mb-6 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-purple-400" />
-              <h3 className="text-lg font-semibold text-white">Personalize Your Content</h3>
+              <h3 className="text-lg font-semibold text-white">Your Personalized Content</h3>
             </div>
             <Button
               variant="outline"
@@ -477,9 +477,38 @@ const ContentRecommendations = () => {
               className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
             >
               <Filter className="h-4 w-4 mr-2" />
-              {showPreferences ? 'Hide' : 'Customize'}
+              {showPreferences ? 'Hide Details' : 'View Preferences'}
             </Button>
           </div>
+
+          {/* Display Current Preferences */}
+          {userData?.preferences && (
+            <div className="mb-4 space-y-3">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-gray-400 min-w-fit">Your Interests:</span>
+                {userData.preferences.interests?.map((interest: string, index: number) => (
+                  <Badge 
+                    key={index} 
+                    variant="secondary" 
+                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                  >
+                    {interest}
+                  </Badge>
+                ))}
+              </div>
+              {userData.preferences.niche && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-400">Content Niche:</span>
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-blue-500/20 text-blue-300 border-blue-500/30"
+                  >
+                    {userData.preferences.niche}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          )}
           
           <AnimatePresence>
             {showPreferences && (
@@ -489,46 +518,56 @@ const ContentRecommendations = () => {
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-4"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="interests" className="text-purple-300 mb-2 block">
-                      Your Interests (comma-separated)
-                    </Label>
-                    <Input
-                      id="interests"
-                      placeholder="e.g., technology, programming, AI, gaming"
-                      value={userInterests}
-                      onChange={(e) => setUserInterests(e.target.value)}
-                      className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="niche" className="text-purple-300 mb-2 block">
-                      Your Content Niche
-                    </Label>
-                    <Input
-                      id="niche"
-                      placeholder="e.g., tech tutorials, gaming content, business tips"
-                      value={userNiche}
-                      onChange={(e) => setUserNiche(e.target.value)}
-                      className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400"
-                    />
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                    <h4 className="text-sm font-medium text-gray-300 mb-3">Customize Preferences (Optional)</h4>
+                    <p className="text-xs text-gray-400 mb-4">
+                      Content is automatically personalized using your onboarding preferences. You can temporarily override them below.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="interests" className="text-purple-300 mb-2 block text-sm">
+                          Override Interests
+                        </Label>
+                        <Input
+                          id="interests"
+                          placeholder="e.g., AI, machine learning, startups"
+                          value={userInterests}
+                          onChange={(e) => setUserInterests(e.target.value)}
+                          className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="niche" className="text-purple-300 mb-2 block text-sm">
+                          Override Niche
+                        </Label>
+                        <Input
+                          id="niche"
+                          placeholder="e.g., AI tutorials, tech reviews"
+                          value={userNiche}
+                          onChange={(e) => setUserNiche(e.target.value)}
+                          className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400 text-sm"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 pt-2">
                   <Button
                     onClick={() => {
                       queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] });
                       toast({
-                        title: "Preferences Updated",
-                        description: "Getting fresh recommendations based on your interests..."
+                        title: "Getting Fresh Content",
+                        description: userInterests || userNiche ? "Using your custom preferences..." : "Using your onboarding preferences..."
                       });
                     }}
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    size="sm"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Get Personalized Content
+                    Refresh Content
                   </Button>
                   
                   <Button
@@ -537,10 +576,15 @@ const ContentRecommendations = () => {
                       setUserInterests('');
                       setUserNiche('');
                       queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] });
+                      toast({
+                        title: "Reset Complete",
+                        description: "Using your original onboarding preferences"
+                      });
                     }}
                     className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
+                    size="sm"
                   >
-                    Reset to Default
+                    Use Original Preferences
                   </Button>
                 </div>
               </motion.div>

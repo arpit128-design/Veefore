@@ -125,9 +125,11 @@ export function SpaceBackground() {
           const animations = ['animate-starlight', 'animate-starlight-fast', 'animate-starlight-slow', 'animate-stellar-pulse', 'animate-cosmic-drift'];
           const size = sizes[i % sizes.length];
           const animation = animations[i % animations.length];
-          const top = (i * 6.7) % 100;
-          const left = (i * 13.3) % 100;
-          const delay = (i * 0.08) % 5;
+          
+          // Better random distribution using multiple prime numbers
+          const top = (i * 37 + i * i * 13) % 100;
+          const left = (i * 73 + i * i * 17) % 100;
+          const delay = (i * 0.07) % 4;
           
           return (
             <div 

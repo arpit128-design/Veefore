@@ -14,10 +14,11 @@ export function SpaceLoader({
 }: SpaceLoaderProps) {
   const [dots, setDots] = useState('');
   const [currentPhase, setCurrentPhase] = useState(0);
+  const [dynamicProgress, setDynamicProgress] = useState(0);
   
   const phases = [
     "Connecting to VeeFore Network",
-    "Calibrating AI Engines",
+    "Calibrating AI Engines", 
     "Synchronizing Data Streams",
     "Launching Mission Control",
     "Systems Ready"
@@ -33,8 +34,20 @@ export function SpaceLoader({
   useEffect(() => {
     const phaseInterval = setInterval(() => {
       setCurrentPhase(prev => (prev + 1) % phases.length);
-    }, 2000);
+    }, 600); // Faster phase changes to sync with 3-second timer
     return () => clearInterval(phaseInterval);
+  }, []);
+
+  useEffect(() => {
+    // Smooth progress animation from 0 to 100% over 3 seconds
+    const progressInterval = setInterval(() => {
+      setDynamicProgress(prev => {
+        const increment = 100 / (3000 / 50); // 100% over 3 seconds, updating every 50ms
+        return Math.min(prev + increment, 100);
+      });
+    }, 50);
+    
+    return () => clearInterval(progressInterval);
   }, []);
 
   return (
@@ -160,8 +173,8 @@ export function SpaceLoader({
               <motion.div
                 className="absolute left-0 top-0 h-full bg-gradient-to-r from-electric-cyan to-solar-gold rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min(progress + (currentPhase * 20), 100)}%` }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
+                animate={{ width: `${dynamicProgress}%` }}
+                transition={{ duration: 0.1, ease: "easeOut" }}
               />
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -172,7 +185,7 @@ export function SpaceLoader({
             
             <div className="flex justify-between text-xs text-gray-400">
               <span>Mission Progress</span>
-              <span>{Math.min(progress + (currentPhase * 20), 100)}%</span>
+              <span>{Math.round(dynamicProgress)}%</span>
             </div>
           </div>
 

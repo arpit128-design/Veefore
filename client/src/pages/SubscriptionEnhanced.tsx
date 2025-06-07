@@ -136,6 +136,7 @@ const FloatingParticles = () => {
 export default function SubscriptionEnhanced() {
   const [activeTab, setActiveTab] = useState('plans');
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
+  const [addonPurchasing, setAddonPurchasing] = useState(false);
   const { toast } = useToast();
 
   // Fetch subscription data
@@ -170,6 +171,101 @@ export default function SubscriptionEnhanced() {
     retry: 2,
     staleTime: 30000,
   });
+
+  // Handle add-on purchase
+  const handleAddonPurchase = async (addonId: string) => {
+    if (addonPurchasing) return;
+    
+    console.log('[ADDON PURCHASE] Starting purchase for addon:', addonId);
+    setAddonPurchasing(true);
+    
+    try {
+      // Create Razorpay order for addon
+      console.log('[ADDON PURCHASE] Creating order...');
+      const orderResponse = await apiRequest('POST', '/api/razorpay/create-addon-order', {
+        addonId
+      });
+      
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+      
+      const orderData = await orderResponse.json();
+      console.log('[ADDON PURCHASE] Order created:', orderData);
+      
+      if (!orderData.orderId) {
+        throw new Error('Failed to create order');
+      }
+
+      // Load Razorpay script
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        console.log('[ADDON PURCHASE] Razorpay script loaded, key:', import.meta.env.VITE_RAZORPAY_KEY_ID ? 'Present' : 'Missing');
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: orderData.amount * 100,
+          currency: 'INR',
+          name: 'VeeFore',
+          description: `${orderData.addon.name} Purchase`,
+          order_id: orderData.orderId,
+          handler: async (response: any) => {
+            try {
+              // Verify payment on backend
+              await apiRequest('POST', '/api/razorpay/verify-payment', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                type: 'addon',
+                packageId: addonId
+              });
+
+              toast({
+                title: "Add-on Purchased!",
+                description: `${orderData.addon.name} has been added to your account.`,
+              });
+
+              // Refresh user data
+              queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+            } catch (error) {
+              console.error('Payment verification failed:', error);
+              toast({
+                title: "Payment Verification Failed",
+                description: "Please contact support if amount was deducted.",
+                variant: "destructive",
+              });
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              console.log('Payment modal dismissed');
+            }
+          },
+          theme: {
+            color: '#8B5CF6'
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      };
+    } catch (error: any) {
+      console.error('Add-on purchase error:', error);
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to initiate add-on purchase",
+        variant: "destructive",
+      });
+    } finally {
+      setAddonPurchasing(false);
+    }
+  };
 
   // Razorpay payment mutation
   const razorpayPaymentMutation = useMutation({
@@ -527,11 +623,15 @@ export default function SubscriptionEnhanced() {
                   </div>
                   <h4 className="text-xl font-bold text-white mb-4">{addon.name}</h4>
                   <div className="text-3xl font-bold bg-gradient-to-r from-electric-cyan to-nebula-purple bg-clip-text text-transparent mb-2">
-                    ₹{addon.price}
+                    ₹{Math.floor(addon.price / 100)}
                   </div>
                   <div className="text-sm text-asteroid-silver mb-6">/{addon.interval}</div>
-                  <Button className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-nebula-purple hover:to-electric-cyan rounded-xl font-semibold transition-all duration-300">
-                    Add Enhancement
+                  <Button 
+                    className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-nebula-purple hover:to-electric-cyan rounded-xl font-semibold transition-all duration-300"
+                    onClick={() => handleAddonPurchase(addon.id)}
+                    disabled={addonPurchasing}
+                  >
+                    {addonPurchasing ? "Processing..." : "Add Enhancement"}
                   </Button>
                 </AnimatedCard>
               ))}

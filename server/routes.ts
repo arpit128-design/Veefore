@@ -448,12 +448,27 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const currentMembers = await storage.getWorkspaceMembers(parseInt(workspaceId));
         const pendingInvitations = await storage.getWorkspaceInvitations(parseInt(workspaceId));
         
-        // Check for duplicate invitations and clean them up
+        // Check for duplicate invitations (including the email being invited now)
+        const duplicateInvitation = pendingInvitations.find(invite => invite.email === email);
+        if (duplicateInvitation) {
+          return res.status(409).json({ 
+            error: `User ${email} has already been invited to this workspace.`,
+            existingInvitation: duplicateInvitation
+          });
+        }
+        
+        // Filter out duplicates and count unique pending invitations
         const uniqueInvitations = pendingInvitations.filter((invite, index, self) => 
           index === self.findIndex(i => i.email === invite.email)
         );
         
-        const totalTeamSize = currentMembers.length + uniqueInvitations.length;
+        // Calculate current team size including pending invitations
+        const currentTeamSize = currentMembers.length + uniqueInvitations.length;
+        
+        console.log(`[TEAM INVITE] Current calculation: Members: ${currentMembers.length}, Pending: ${uniqueInvitations.length}, Total current: ${currentTeamSize}`);
+        
+        // Total team size after this invitation would be current + 1
+        const totalTeamSizeAfterInvite = currentTeamSize + 1;
         
         // Get user's team member addons to determine limit
         console.log(`[TEAM INVITE] Looking up addons for user ID: ${user.id} (type: ${typeof user.id})`);
@@ -469,15 +484,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Each team member addon allows 1 additional member (owner + 1 per addon)
         const maxTeamSize = 1 + teamMemberAddons.length;
         
-        console.log(`[TEAM INVITE] Team size check: Current: ${totalTeamSize}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
+        console.log(`[TEAM INVITE] Team size check: Current: ${currentTeamSize}, After invite: ${totalTeamSizeAfterInvite}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
         console.log(`[TEAM INVITE] User addons found:`, userAddons.map(a => `${a.type}:${a.isActive}`));
         console.log(`[TEAM INVITE] Converted user ID for lookup: ${userIdForLookup}`);
         
-        if (totalTeamSize >= maxTeamSize) {
+        if (totalTeamSizeAfterInvite > maxTeamSize) {
           return res.status(402).json({ 
-            error: `Team limit reached. You can have up to ${maxTeamSize} total members (including pending invitations). Purchase additional team member addons to invite more members.`,
-            currentTeamSize: totalTeamSize,
+            error: `Team limit reached. You can have up to ${maxTeamSize} total members (including pending invitations). Current: ${currentTeamSize}, would become ${totalTeamSizeAfterInvite} after this invitation. Purchase additional team member addons to invite more members.`,
+            currentTeamSize: currentTeamSize,
             maxTeamSize: maxTeamSize,
+            wouldBecome: totalTeamSizeAfterInvite,
             suggestedAddon: 'team-member'
           });
         }
@@ -1327,44 +1343,66 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Fix team addon userId format
-  app.post('/api/fix-team-addon-format', async (req: any, res: Response) => {
+  // Clean up duplicate team addons and fix format
+  app.post('/api/cleanup-team-addons', async (req: any, res: Response) => {
     try {
       const userId = '6844027426cae0200f88b5db';
       
-      console.log('[FIX TEAM ADDON] Fixing userId format for team-member addons');
+      console.log('[CLEANUP TEAM ADDON] Cleaning up duplicate team-member addons');
       
       // Direct database fix using MongoDB storage
       const mongoStorage = storage as any;
       await mongoStorage.connect();
       
-      // Update team-member addons with numeric userId to string format
       const AddonModel = mongoStorage.AddonModel;
-      const updateResult = await AddonModel.updateMany(
-        { 
-          type: 'team-member',
-          userId: 6844027426
-        },
-        { 
-          $set: { userId: userId }
-        }
-      );
       
-      console.log(`[FIX TEAM ADDON] Updated ${updateResult.modifiedCount} team-member addons`);
+      // Find all team-member addons for this user
+      const teamAddons = await AddonModel.find({ 
+        $or: [
+          { type: 'team-member', userId: userId },
+          { type: 'team-member', userId: 6844027426 }
+        ]
+      }).sort({ createdAt: 1 });
       
-      // Verify the fix
+      console.log(`[CLEANUP TEAM ADDON] Found ${teamAddons.length} team-member addons`);
+      
+      if (teamAddons.length > 1) {
+        // Keep only the first addon (oldest) and remove duplicates
+        const addonToKeep = teamAddons[0];
+        const addonsToRemove = teamAddons.slice(1);
+        
+        // Update the addon to keep with correct userId format
+        await AddonModel.updateOne(
+          { _id: addonToKeep._id },
+          { 
+            userId: userId,
+            name: 'Additional Team Member Seat',
+            updatedAt: new Date()
+          }
+        );
+        
+        // Remove duplicate addons
+        const removeIds = addonsToRemove.map(addon => addon._id);
+        const deleteResult = await AddonModel.deleteMany({
+          _id: { $in: removeIds }
+        });
+        
+        console.log(`[CLEANUP TEAM ADDON] Kept 1 addon, removed ${deleteResult.deletedCount} duplicates`);
+      }
+      
+      // Verify the cleanup
       const verifyAddons = await storage.getUserAddons(userId);
       const teamMemberAddons = verifyAddons.filter(addon => addon.type === 'team-member');
       
       res.json({
         success: true,
-        message: `Fixed ${updateResult.modifiedCount} team-member addons`,
+        message: `Cleaned up team addons - kept 1, removed ${teamAddons.length - 1} duplicates`,
         teamMemberAddons: teamMemberAddons.length,
         allAddons: verifyAddons.map(a => `${a.type}:${a.isActive}`)
       });
       
     } catch (error: any) {
-      console.error('[FIX TEAM ADDON] Error:', error);
+      console.error('[CLEANUP TEAM ADDON] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

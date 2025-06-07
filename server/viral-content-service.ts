@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { trendingScraper } from './trending-scraper';
 import { ContentRecommendation } from '@shared/schema';
 
 interface PerplexityResponse {
@@ -55,30 +56,47 @@ class ViralContentService {
   }
 
   async analyzeViralTrends(userPreferences: UserPreferences): Promise<string[]> {
-    if (!this.perplexityApiKey) {
-      console.log('[VIRAL CONTENT] Perplexity API key not available, using fallback trends');
-      return this.getFallbackTrends(userPreferences);
-    }
-
     try {
-      const interests = userPreferences.interests?.join(', ') || 'general content';
+      const interests = Array.isArray(userPreferences.interests) 
+        ? userPreferences.interests 
+        : ['general content'];
       const niche = userPreferences.niche || 'general';
       
-      const prompt = `Analyze current viral trends specifically for ${niche} professionals and ${interests.join(', ')} industry content. 
+      // Use advanced trending scraper for real viral content
+      console.log('[VIRAL CONTENT] Using advanced trending scraper for viral content analysis');
+      const viralTrends = await trendingScraper.getViralContentFromMultipleSources(niche, interests);
       
-      Focus on these professional topics that are trending NOW:
-      1. Business growth strategies and productivity hacks
-      2. App development tutorials and tech reviews
-      3. Social media marketing tips and case studies
-      4. Management and leadership insights
-      5. Technology innovations and AI tools
-      6. Professional development and entrepreneurship
-      7. Industry-specific tutorials and how-tos
-      8. Business automation and efficiency tools
+      if (viralTrends && viralTrends.length > 0) {
+        console.log('[VIRAL CONTENT] Got viral trends from multiple sources:', viralTrends);
+        return viralTrends;
+      }
+
+      // Fallback to Perplexity if trending scraper fails
+      if (!this.perplexityApiKey) {
+        console.log('[VIRAL CONTENT] No Perplexity API key, using enhanced fallback trends');
+        return this.getFallbackTrends(userPreferences);
+      }
+
+      console.log('[VIRAL CONTENT] Trending scraper returned no results, trying Perplexity fallback');
+      const interestString = interests.join(', ');
       
-      Avoid generic viral challenges, entertainment content, or lifestyle trends. Focus ONLY on professional, educational, and business-related content that would appeal to entrepreneurs, developers, and business professionals.
-      
-      Return only a JSON array of specific, professional trending topic keywords/phrases, maximum 10 items. Format: ["keyword1", "keyword2", ...]`;
+      const prompt = `You are a viral content analyst. Find CURRENT viral content trends from the last 48 hours specifically for ${niche} and ${interestString} professionals.
+
+      Search for actual viral content that is getting millions of views RIGHT NOW in these areas:
+      - Social media management automation and AI tools
+      - App development with viral growth hacks  
+      - Business productivity and management strategies
+      - Tech entrepreneur success stories and failures
+      - Social media marketing case studies with real numbers
+      - App monetization and scaling strategies
+      - Team management and remote work innovations
+      - Professional development and skill building
+
+      Focus on content that has PROVEN viral metrics (1M+ views, high engagement, trending hashtags).
+      Look for specific viral formats like "How I grew X to Y in Z days", "X mistakes that cost me $Y", "Day in the life of a X", "X vs Y comparison".
+
+      Return ONLY a JSON array of SPECIFIC viral content topics that are currently trending, with exact numbers/claims when possible. Maximum 10 items.
+      Example format: ["How I built a $1M app in 6 months", "5 social media mistakes costing you sales", "Day in the life running a tech startup"]`;
 
       const response = await axios.post(
         'https://api.perplexity.ai/chat/completions',
@@ -132,26 +150,34 @@ class ViralContentService {
       'productivity hacks', 'business automation', 'app development tutorial', 'social media strategy'
     ];
     
-    // Customize based on niche and interests
+    // High-viral potential content specifically for social media management niche
     if (niche.includes('social media management') || interests.includes('social media')) {
       return [
-        'social media management tips', 'content creation strategy', 'Instagram marketing', 'social media automation',
-        'engagement hacks', 'social media analytics', 'content calendar planning', 'social media ROI'
+        'How I grew Instagram from 0 to 100k in 90 days', 'Social media manager salary secrets exposed', 
+        'I tried every social media tool so you don\'t have to', 'Day in the life managing 50 Instagram accounts',
+        'Social media mistakes that cost me $50k', 'How to get verified on Instagram in 2025',
+        'Behind the scenes of viral content creation', 'I quit my 9-5 to become a social media manager'
       ];
     } else if (niche.includes('app development') || interests.includes('app development')) {
       return [
-        'app development tutorial', 'mobile app design', 'coding best practices', 'app monetization',
-        'React Native tips', 'app store optimization', 'mobile development', 'programming tutorial'
+        'How I built a $1M app with no coding experience', 'App developer salary vs reality check',
+        'I spent $100k on app development and failed', 'Building an app in 24 hours challenge',
+        'Why 99% of apps fail and how to avoid it', 'App store rejected my app 47 times',
+        'From idea to $1M ARR app development story', 'Junior vs senior developer code comparison'
       ];
     } else if (niche.includes('tech') || interests.includes('tech')) {
       return [
-        'tech startup tips', 'AI tools for business', 'productivity software', 'tech reviews',
-        'software development', 'digital transformation', 'tech innovation', 'startup funding'
+        'Tech CEO morning routine that changed everything', 'I interviewed at 100 tech companies',
+        'Why I left Google to start my own company', 'Tech salary negotiation secrets they don\'t want you to know',
+        'Day in the life at a $10B tech startup', 'I got fired from my tech job and this happened',
+        'Tech industry layoffs reality check 2025', 'From bootcamp to $200k tech job in 6 months'
       ];
     } else if (niche.includes('business') || interests.includes('management')) {
       return [
-        'business growth strategies', 'leadership tips', 'team management', 'entrepreneur advice',
-        'business automation', 'productivity tools', 'startup success', 'business development'
+        'How I built a $10M business in my bedroom', 'Business owner vs employee mindset shift',
+        'I hired 100 employees and learned this', 'Why I sold my $5M company and regret it',
+        'Team management secrets from Silicon Valley', 'From broke to $1M revenue in 12 months',
+        'I fired my entire team and business doubled', 'Entrepreneur morning routine that made millions'
       ];
     }
     

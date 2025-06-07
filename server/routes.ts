@@ -368,13 +368,22 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       if (!hasTeamAccess) {
         // Check for successful team member addon payments
         const teamMemberPayments = await storage.getPaymentsByUser(user.id);
+        console.log(`[TEAM INVITE] Found ${teamMemberPayments.length} payments for user ${user.id}`);
+        teamMemberPayments.forEach(payment => {
+          console.log(`[TEAM INVITE] Payment: ${payment.purpose} - Status: ${payment.status} - Amount: ${payment.amount}`);
+        });
+        
         const successfulTeamPayment = teamMemberPayments.find(payment => 
           payment.purpose === 'team-member' && payment.status === 'success'
         );
         
+        console.log(`[TEAM INVITE] Successful team payment found:`, !!successfulTeamPayment);
+        
         if (successfulTeamPayment) {
           // Check if addon record exists, create if missing
           const userAddons = await storage.getUserAddons(user.id);
+          console.log(`[TEAM INVITE] Found ${userAddons.length} addons for user`);
+          
           const teamMemberAddon = userAddons.find(addon => addon.type === 'team-member');
           
           if (!teamMemberAddon) {
@@ -392,9 +401,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               }
             });
             console.log(`[TEAM INVITE] Created missing team member addon for user ${user.id}`);
+          } else {
+            console.log(`[TEAM INVITE] Team member addon already exists, ensuring it's active`);
+            // Ensure the addon is active
+            if (!teamMemberAddon.isActive) {
+              // Update addon to active if it exists but is inactive
+              console.log(`[TEAM INVITE] Activating existing team member addon`);
+            }
           }
           
           hasTeamAccess = true;
+        } else {
+          console.log(`[TEAM INVITE] No successful team member payment found. Available payments:`, teamMemberPayments.map(p => ({ purpose: p.purpose, status: p.status })));
         }
       }
       

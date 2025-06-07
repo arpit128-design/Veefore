@@ -1314,14 +1314,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       console.log(`[CREATE TEAM ADDON] Creating team member addon for user: ${userId}`);
       
-      // Check if addon already exists
+      // Allow multiple team-member addons - each one increases team capacity by 1
       const existingAddons = await storage.getUserAddons(userId);
-      const existingTeamAddon = existingAddons.find(addon => addon.type === 'team-member');
-      
-      if (existingTeamAddon) {
-        console.log(`[CREATE TEAM ADDON] Team member addon already exists`);
-        return res.json({ success: true, message: 'Team member addon already exists', addon: existingTeamAddon });
-      }
+      const teamAddonCount = existingAddons.filter(addon => addon.type === 'team-member' && addon.isActive).length;
+      console.log(`[CREATE TEAM ADDON] User already has ${teamAddonCount} team-member addons, creating another one`);
       
       // Create the team member addon
       const newAddon = await storage.createAddon({

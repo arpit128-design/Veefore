@@ -395,10 +395,10 @@ const ContentRecommendations = () => {
                   <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
                     <Sparkles className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold">Real Trending Content Loading</h3>
+                  <h3 className="text-xl font-semibold">Loading Fresh Trending Content</h3>
                   <p className="text-muted-foreground">
-                    Fetching real trending {activeTab.replace('-', ' ')} content from YouTube and Instagram APIs. 
-                    This helps you create content that actually goes viral!
+                    Getting the latest trending {activeTab.replace('-', ' ')} content from multiple sources including Reddit, HackerNews, Dev.to, and Medium. 
+                    This real data helps you create content that resonates with your audience!
                   </p>
                   <Button 
                     onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] })}

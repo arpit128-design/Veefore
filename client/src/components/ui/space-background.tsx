@@ -86,7 +86,7 @@ export function SpaceBackground() {
     y: Math.random() * 100,
     size: Math.random() * 300 + 150,
     delay: Math.random() * 10,
-    color: ['blue', 'purple', 'pink', 'indigo'][Math.floor(Math.random() * 4)],
+    color: ['cyan', 'slate', 'yellow', 'blue'][Math.floor(Math.random() * 4)],
   }));
 
   // Generate shooting stars
@@ -98,11 +98,11 @@ export function SpaceBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       {/* Base gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-space-navy via-space-dark to-black" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-black" />
       
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-pink-900/20"
+        className="absolute inset-0 bg-gradient-to-r from-slate-900/20 via-cyan-900/20 to-yellow-900/20"
         animate={{
           backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
         }}
@@ -149,7 +149,7 @@ export function SpaceBackground() {
       <motion.div
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)"
+          background: "radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%)"
         }}
         animate={{
           scale: [1, 1.2, 1],

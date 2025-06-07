@@ -2447,11 +2447,16 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       // Extract user preferences for personalized viral content
       const preferences = user.preferences as any || {};
+      
+      // Use query parameters for real-time preference override
+      const queryInterests = req.query.interests as string;
+      const queryNiche = req.query.niche as string;
+      
       const userPreferences = {
-        interests: preferences.interests || ['content creation', 'social media'],
-        niche: preferences.niche || workspace.description || 'general content',
-        targetAudience: preferences.targetAudience || 'general',
-        contentStyle: preferences.contentStyle || 'engaging'
+        interests: queryInterests ? queryInterests.split(',') : (preferences.interests || ['technology', 'programming', 'social media']),
+        niche: queryNiche || preferences.niche || 'tech and programming',
+        targetAudience: preferences.targetAudience || 'developers and creators',
+        contentStyle: preferences.contentStyle || 'educational and engaging'
       };
 
       console.log('[VIRAL CONTENT] User preferences:', userPreferences);

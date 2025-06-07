@@ -10,8 +10,11 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { 
   Play, Pause, Heart, Share2, Bookmark, MapPin, Clock, Eye, ThumbsUp, 
   TrendingUp, Sparkles, Globe, Video, Camera, ImageIcon, Zap,
-  ArrowRight, Star, Users, MessageCircle, ExternalLink
+  ArrowRight, Star, Users, MessageCircle, ExternalLink, Settings, Filter
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ContentRecommendation {

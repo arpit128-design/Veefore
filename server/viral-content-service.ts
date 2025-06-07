@@ -64,15 +64,21 @@ class ViralContentService {
       const interests = userPreferences.interests?.join(', ') || 'general content';
       const niche = userPreferences.niche || 'general';
       
-      const prompt = `Analyze current viral trends across YouTube, Instagram, TikTok, and Twitter for ${niche} content targeting ${interests}. 
+      const prompt = `Analyze current viral trends specifically for ${niche} professionals and ${interests.join(', ')} industry content. 
       
-      Focus on:
-      1. What content is going viral RIGHT NOW (last 24-48 hours)
-      2. Trending hashtags and topics with high engagement
-      3. Video formats that are performing exceptionally well
-      4. Content ideas that have viral potential
+      Focus on these professional topics that are trending NOW:
+      1. Business growth strategies and productivity hacks
+      2. App development tutorials and tech reviews
+      3. Social media marketing tips and case studies
+      4. Management and leadership insights
+      5. Technology innovations and AI tools
+      6. Professional development and entrepreneurship
+      7. Industry-specific tutorials and how-tos
+      8. Business automation and efficiency tools
       
-      Return only a JSON array of trending topic keywords/phrases, maximum 10 items. Format: ["keyword1", "keyword2", ...]`;
+      Avoid generic viral challenges, entertainment content, or lifestyle trends. Focus ONLY on professional, educational, and business-related content that would appeal to entrepreneurs, developers, and business professionals.
+      
+      Return only a JSON array of specific, professional trending topic keywords/phrases, maximum 10 items. Format: ["keyword1", "keyword2", ...]`;
 
       const response = await axios.post(
         'https://api.perplexity.ai/chat/completions',
@@ -121,21 +127,35 @@ class ViralContentService {
     const interests = userPreferences.interests || [];
     const niche = userPreferences.niche || 'general';
     
+    // Professional base trends focused on business and development
     const baseTrends = [
-      'viral challenges', 'trending sounds', 'quick tutorials', 'behind the scenes',
-      'day in my life', 'transformation', 'reaction videos', 'tips and tricks'
+      'productivity hacks', 'business automation', 'app development tutorial', 'social media strategy'
     ];
     
-    // Customize based on niche
-    if (niche.includes('tech')) {
-      return [...baseTrends, 'ai innovations', 'tech reviews', 'coding tips', 'startup stories'];
-    } else if (niche.includes('lifestyle')) {
-      return [...baseTrends, 'morning routines', 'productivity hacks', 'self care', 'home organization'];
-    } else if (niche.includes('business')) {
-      return [...baseTrends, 'entrepreneur tips', 'business growth', 'marketing strategies', 'success stories'];
+    // Customize based on niche and interests
+    if (niche.includes('social media management') || interests.includes('social media')) {
+      return [
+        'social media management tips', 'content creation strategy', 'Instagram marketing', 'social media automation',
+        'engagement hacks', 'social media analytics', 'content calendar planning', 'social media ROI'
+      ];
+    } else if (niche.includes('app development') || interests.includes('app development')) {
+      return [
+        'app development tutorial', 'mobile app design', 'coding best practices', 'app monetization',
+        'React Native tips', 'app store optimization', 'mobile development', 'programming tutorial'
+      ];
+    } else if (niche.includes('tech') || interests.includes('tech')) {
+      return [
+        'tech startup tips', 'AI tools for business', 'productivity software', 'tech reviews',
+        'software development', 'digital transformation', 'tech innovation', 'startup funding'
+      ];
+    } else if (niche.includes('business') || interests.includes('management')) {
+      return [
+        'business growth strategies', 'leadership tips', 'team management', 'entrepreneur advice',
+        'business automation', 'productivity tools', 'startup success', 'business development'
+      ];
     }
     
-    return baseTrends.slice(0, 8);
+    return baseTrends;
   }
 
   async getYouTubeVideos(searchTerms: string[], contentType: 'youtube-video' | 'youtube-shorts'): Promise<ContentRecommendation[]> {

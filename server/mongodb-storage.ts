@@ -247,7 +247,7 @@ const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
 const ContentRecommendationModel = mongoose.model('ContentRecommendation', ContentRecommendationSchema);
 const UserContentHistoryModel = mongoose.model('UserContentHistory', UserContentHistorySchema);
-const SocialAccountModel = mongoose.model('SocialAccount', SocialAccountSchema);
+const SocialAccountModel = mongoose.model('SocialAccount', SocialAccountSchema, 'socialaccounts');
 const ContentModel = mongoose.model('Content', ContentSchema);
 const AnalyticsModel = mongoose.model('Analytics', AnalyticsSchema);
 const AutomationRuleModel = mongoose.model('AutomationRule', AutomationRuleSchema);
@@ -264,12 +264,19 @@ export class MongoStorage implements IStorage {
   private isConnected = false;
 
   async connect() {
-    if (this.isConnected) return;
+    if (this.isConnected && mongoose.connection.db?.databaseName === 'veeforedb') return;
     
     try {
-      await mongoose.connect(process.env.MONGODB_URI!);
+      // Force disconnect and reconnect to ensure correct database
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+      }
+      
+      await mongoose.connect(process.env.MONGODB_URI!, {
+        dbName: 'veeforedb'
+      });
       this.isConnected = true;
-      console.log('Connected to MongoDB Atlas');
+      console.log(`Connected to MongoDB Atlas - ${mongoose.connection.db?.databaseName} database`);
     } catch (error) {
       console.error('MongoDB connection error:', error);
       throw error;
@@ -611,8 +618,13 @@ export class MongoStorage implements IStorage {
       console.log(`[MONGODB DEBUG] Direct query failed:`, directError);
     }
     
-    // Now try Mongoose query
-    const accounts = await SocialAccountModel.find({ workspaceId: workspaceId.toString() });
+    // Now try Mongoose query with both string and numeric workspaceId
+    const accounts = await SocialAccountModel.find({
+      $or: [
+        { workspaceId: workspaceId.toString() },
+        { workspaceId: workspaceId }
+      ]
+    });
     
     console.log(`[MONGODB DEBUG] Mongoose query result: found ${accounts.length} accounts`);
     if (accounts.length > 0) {

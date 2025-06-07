@@ -1206,8 +1206,6 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Space Background */}
-      <SpaceBackground />
       
       {/* Floating Elements */}
       <FloatingSparkles />

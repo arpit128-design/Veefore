@@ -1237,17 +1237,35 @@ export class MongoStorage implements IStorage {
     return addons.map(addon => this.convertAddon(addon));
   }
 
-  async getActiveAddonsByUser(userId: number): Promise<Addon[]> {
+  async getActiveAddonsByUser(userId: number | string): Promise<Addon[]> {
     await this.connect();
     const now = new Date();
+    // Convert userId to string for MongoDB query since we store user IDs as strings
+    const userIdStr = userId.toString();
+    console.log('[MONGODB DEBUG] getActiveAddonsByUser - searching for userId:', userIdStr);
+    
     const addons = await AddonModel.find({ 
-      userId, 
+      userId: userIdStr, 
       isActive: true,
       $or: [
         { expiresAt: null },
         { expiresAt: { $gt: now } }
       ]
     });
+    
+    console.log('[MONGODB DEBUG] Found addons for user:', addons.length);
+    if (addons.length > 0) {
+      addons.forEach((addon, index) => {
+        console.log(`[MONGODB DEBUG] Addon ${index + 1}:`, {
+          id: addon._id.toString(),
+          type: addon.type,
+          name: addon.name,
+          isActive: addon.isActive,
+          expiresAt: addon.expiresAt
+        });
+      });
+    }
+    
     return addons.map(addon => this.convertAddon(addon));
   }
 

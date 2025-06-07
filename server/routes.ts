@@ -178,7 +178,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       // Check for active workspace addons
       try {
-        const activeAddons = await storage.getActiveAddonsByUser(parseInt(userId));
+        const activeAddons = await storage.getActiveAddonsByUser(userId);
         console.log('[WORKSPACE CREATION] Active addons for user:', activeAddons);
         
         // Count additional workspace addons

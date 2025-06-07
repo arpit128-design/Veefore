@@ -2448,15 +2448,53 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Extract user preferences for personalized viral content
       const preferences = user.preferences as any || {};
       
+      // Build enhanced interests from selectedNiches and business description (same logic as frontend)
+      let interests: string[] = [];
+      
+      // Get base interests from selectedNiches
+      if (preferences.selectedNiches && Array.isArray(preferences.selectedNiches)) {
+        interests = [...preferences.selectedNiches];
+      }
+      
+      // Enhance with keywords from business description
+      if (preferences.description && typeof preferences.description === 'string') {
+        const desc = preferences.description.toLowerCase();
+        const additionalInterests = [];
+        if (desc.includes('social media')) additionalInterests.push('social media');
+        if (desc.includes('management')) additionalInterests.push('management');
+        if (desc.includes('app')) additionalInterests.push('app development');
+        if (desc.includes('ai') || desc.includes('artificial intelligence')) additionalInterests.push('AI');
+        if (desc.includes('marketing')) additionalInterests.push('marketing');
+        if (desc.includes('content')) additionalInterests.push('content creation');
+        
+        // Merge and deduplicate
+        interests = [...new Set([...interests, ...additionalInterests])];
+      }
+      
+      // Fallback if no interests found
+      if (interests.length === 0) {
+        interests = ['technology', 'programming', 'social media'];
+      }
+      
+      // Build niche from business context
+      let niche = 'general tech';
+      if (preferences.businessName && preferences.description) {
+        const businessType = preferences.description.toLowerCase();
+        if (businessType.includes('social media')) niche = 'social media management';
+        else if (businessType.includes('app')) niche = 'app development';
+        else if (businessType.includes('tech')) niche = 'technology';
+        else if (businessType.includes('content')) niche = 'content creation';
+      }
+      
       // Use query parameters for real-time preference override
       const queryInterests = req.query.interests as string;
       const queryNiche = req.query.niche as string;
       
       const userPreferences = {
-        interests: queryInterests ? queryInterests.split(',') : (preferences.interests || ['technology', 'programming', 'social media']),
-        niche: queryNiche || preferences.niche || 'tech and programming',
-        targetAudience: preferences.targetAudience || 'developers and creators',
-        contentStyle: preferences.contentStyle || 'educational and engaging'
+        interests: queryInterests ? queryInterests.split(',') : interests,
+        niche: queryNiche || niche,
+        targetAudience: preferences.tone === 'professional' ? 'business professionals and entrepreneurs' : 'general audience',
+        contentStyle: preferences.tone === 'professional' ? 'professional and informative' : 'engaging and casual'
       };
 
       console.log('[VIRAL CONTENT] User preferences:', userPreferences);

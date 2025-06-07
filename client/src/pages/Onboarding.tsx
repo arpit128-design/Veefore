@@ -395,7 +395,7 @@ export default function Onboarding() {
             }}
             className="relative"
           >
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white overflow-hidden group">
+            <Card className="bg-transparent backdrop-blur-md border-white/20 text-white overflow-hidden group">
               <CardContent className="pt-8 pb-6 relative">
                 {/* Background Glow */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
@@ -553,7 +553,7 @@ export default function Onboarding() {
         transition={{ delay: 1 }}
         className="max-w-lg mx-auto"
       >
-        <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden group hover:bg-white/15 transition-all duration-500">
+        <Card className="bg-transparent backdrop-blur-lg border-white/20 text-white overflow-hidden group hover:bg-white/5 transition-all duration-500">
           <CardContent className="p-8 relative">
             {/* Background Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

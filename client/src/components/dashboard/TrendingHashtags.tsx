@@ -67,12 +67,13 @@ export function TrendingHashtags() {
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
       case 'instagram': return '📸';
-      case 'tiktok': return '🎵';
-      case 'twitter': return '🐦';
+      case 'twitter': return '𝕏';
       case 'youtube': return '📺';
-      case 'linkedin': return '💼';
+      case 'reddit': return '🗨️';
+      case 'news': return '📰';
+      case 'google-trends': return '📈';
       case 'trending': return '🔥';
-      case 'news-trending': return '📰';
+      case 'viral-now': return '🚀';
       case 'multi-platform': return '🌐';
       default: return '⭐';
     }
@@ -139,7 +140,7 @@ export function TrendingHashtags() {
         </div>
         
         <p className="text-sm text-white/70 mt-2">
-          Real-time analysis across Instagram, TikTok, Twitter, YouTube, and LinkedIn
+          Real-time analysis across Instagram, Twitter/X, YouTube, Reddit, and trending news
         </p>
         
         {/* Category Filter */}

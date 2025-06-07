@@ -110,7 +110,7 @@ export function NovaHeader() {
             <DropdownMenuSeparator className="bg-electric-cyan/20" />
             <DropdownMenuItem 
               className="gap-2 text-destructive hover:bg-destructive/10"
-              onClick={logout}
+              onClick={signOut}
             >
               <LogOut className="w-4 h-4" />
               Sign Out

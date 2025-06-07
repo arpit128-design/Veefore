@@ -300,7 +300,8 @@ export default function TeamManagement() {
           ) : (
             <div className="space-y-4">
               {members.map((member: TeamMember) => {
-                const roleInfo = rolePermissions[member.role as keyof typeof rolePermissions];
+                const normalizedRole = member.role.toLowerCase() as keyof typeof rolePermissions;
+                const roleInfo = rolePermissions[normalizedRole];
                 const RoleIcon = roleInfo?.icon || Shield;
                 
                 return (

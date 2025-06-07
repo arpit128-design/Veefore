@@ -721,17 +721,17 @@ export default function Onboarding() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+          <Card className="bg-slate-900/20 backdrop-blur-lg border-slate-700/30 text-white overflow-hidden">
             <CardHeader className="text-center pb-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-yellow-400 rounded-xl flex items-center justify-center mx-auto">
                   <Building className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent">
                   Brand Identity
                 </CardTitle>
               </motion.div>
@@ -747,7 +747,7 @@ export default function Onboarding() {
                     value={preferences.businessName}
                     onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
                     placeholder="Enter your business name"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                    className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-white/50 focus:border-cyan-400/50 focus:ring-cyan-400/20"
                   />
                 </div>
                 <div>
@@ -759,7 +759,7 @@ export default function Onboarding() {
                     value={preferences.description}
                     onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="What makes your brand unique?"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                    className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-white/50 focus:border-cyan-400/50 focus:ring-cyan-400/20"
                   />
                 </div>
               </div>
@@ -773,17 +773,17 @@ export default function Onboarding() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white">
+          <Card className="bg-slate-900/20 backdrop-blur-lg border-slate-700/30 text-white">
             <CardHeader className="text-center pb-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-yellow-400 rounded-xl flex items-center justify-center mx-auto">
                   <Target className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent">
                   Choose Your Content Niches
                 </CardTitle>
                 <p className="text-white/70">Select multiple niches that match your brand</p>

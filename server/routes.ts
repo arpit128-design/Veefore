@@ -391,25 +391,36 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             });
             hasTeamAccess = true;
           } else {
-            // Special case: Create missing team member addon for user who has paid
+            // Special case: Create missing team member addon for user who has paid (only once)
             if (user.id === '6844027426cae0200f88b5db') {
-              console.log(`[TEAM INVITE] Creating missing team member addon for paid user`);
+              console.log(`[TEAM INVITE] No team member addon found for paid user - creating one`);
               try {
-                await storage.createAddon({
-                  userId: parseInt(user.id),
-                  name: 'Additional Team Member Seat',
-                  type: 'team-member',
-                  price: 19900,
-                  isActive: true,
-                  expiresAt: null,
-                  metadata: {
-                    createdFromPayment: true,
-                    reason: 'Missing addon record for successful payment',
-                    autoCreated: true
-                  }
-                });
-                console.log(`[TEAM INVITE] Successfully created team member addon for paid user`);
-                hasTeamAccess = true;
+                // Check if addon was already created in a previous request
+                const recentAddons = await storage.getUserAddons(user.id);
+                const existingTeamAddon = recentAddons.find(addon => 
+                  addon.type === 'team-member' && addon.isActive
+                );
+                
+                if (existingTeamAddon) {
+                  console.log(`[TEAM INVITE] Team member addon already exists, using it`);
+                  hasTeamAccess = true;
+                } else {
+                  await storage.createAddon({
+                    userId: parseInt(user.id),
+                    name: 'Additional Team Member Seat',
+                    type: 'team-member',
+                    price: 19900,
+                    isActive: true,
+                    expiresAt: null,
+                    metadata: {
+                      createdFromPayment: true,
+                      reason: 'Missing addon record for successful payment',
+                      autoCreated: true
+                    }
+                  });
+                  console.log(`[TEAM INVITE] Successfully created team member addon for paid user`);
+                  hasTeamAccess = true;
+                }
               } catch (createError) {
                 console.error(`[TEAM INVITE] Failed to create addon:`, createError);
               }
@@ -431,7 +442,35 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         });
       }
 
-      // For paid plans, implement actual invitation logic
+      // Check team member limits for users with team addons
+      if (hasTeamAccess) {
+        // Get current team members and pending invitations
+        const currentMembers = await storage.getWorkspaceMembers(parseInt(workspaceId));
+        const pendingInvitations = await storage.getWorkspaceInvitations(parseInt(workspaceId));
+        const totalTeamSize = currentMembers.length + pendingInvitations.length;
+        
+        // Get user's team member addons to determine limit
+        const userAddons = await storage.getUserAddons(user.id);
+        const teamMemberAddons = userAddons.filter(addon => 
+          addon.type === 'team-member' && addon.isActive
+        );
+        
+        // Each team member addon allows 1 additional member (owner + 1 per addon)
+        const maxTeamSize = 1 + teamMemberAddons.length;
+        
+        console.log(`[TEAM INVITE] Team size check: Current: ${totalTeamSize}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
+        
+        if (totalTeamSize >= maxTeamSize) {
+          return res.status(402).json({ 
+            error: `Team limit reached. You can have up to ${maxTeamSize} total members (including pending invitations). Purchase additional team member addons to invite more members.`,
+            currentTeamSize: totalTeamSize,
+            maxTeamSize: maxTeamSize,
+            suggestedAddon: 'team-member'
+          });
+        }
+      }
+
+      // Create the invitation
       const invitation = await storage.createTeamInvitation({
         workspaceId: parseInt(workspaceId),
         email,
@@ -441,6 +480,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
       });
 
+      console.log(`[TEAM INVITE] Successfully created invitation for ${email}`);
       res.json(invitation);
     } catch (error: any) {
       console.error('Error inviting team member:', error);

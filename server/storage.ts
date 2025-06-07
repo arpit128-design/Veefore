@@ -47,6 +47,7 @@ export interface IStorage {
   getTeamInvitation(id: number): Promise<TeamInvitation | undefined>;
   getTeamInvitationByToken(token: string): Promise<TeamInvitation | undefined>;
   getTeamInvitations(workspaceId: number, status?: string): Promise<TeamInvitation[]>;
+  getWorkspaceInvitations(workspaceId: number): Promise<TeamInvitation[]>;
   updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation>;
 
   // Social account operations

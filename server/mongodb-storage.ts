@@ -1540,7 +1540,32 @@ export class MongoStorage implements IStorage {
     const newInvitation = new TeamInvitationModel(invitationData);
     await newInvitation.save();
     
+    console.log(`[MONGODB DEBUG] Created team invitation:`, {
+      email: newInvitation.email,
+      workspaceId: newInvitation.workspaceId,
+      status: newInvitation.status,
+      id: newInvitation._id
+    });
+    
     return this.convertTeamInvitation(newInvitation);
+  }
+
+  async getWorkspaceInvitations(workspaceId: number): Promise<TeamInvitation[]> {
+    await this.connect();
+    
+    console.log(`[MONGODB DEBUG] Getting invitations for workspace: ${workspaceId}`);
+    
+    const invitations = await TeamInvitationModel.find({
+      $or: [
+        { workspaceId: workspaceId.toString() },
+        { workspaceId: workspaceId }
+      ],
+      status: 'pending'
+    }).sort({ createdAt: -1 });
+    
+    console.log(`[MONGODB DEBUG] Found ${invitations.length} pending invitations`);
+    
+    return invitations.map(doc => this.convertTeamInvitation(doc));
   }
 
   async getTeamInvitation(id: number): Promise<TeamInvitation | undefined> {

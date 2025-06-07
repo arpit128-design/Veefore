@@ -1231,23 +1231,26 @@ export class MongoStorage implements IStorage {
   }
 
   // Addon operations
-  async getUserAddons(userId: number): Promise<Addon[]> {
+  async getUserAddons(userId: number | string): Promise<Addon[]> {
     await this.connect();
     
     console.log(`[MONGODB DEBUG] getUserAddons - searching for userId: ${userId} (${typeof userId})`);
     
-    // Try both numeric and string formats since MongoDB might store either
+    // Convert userId to proper format for MongoDB lookup - try both string and numeric formats
+    const userIdStr = userId.toString();
+    
+    // Try multiple formats to find addons
     const addons = await AddonModel.find({ 
       $or: [
-        { userId: userId, isActive: true },
-        { userId: userId.toString(), isActive: true }
+        { userId: userIdStr, isActive: true },
+        { userId: userId, isActive: true }
       ]
     });
     
     console.log(`[MONGODB DEBUG] Found ${addons.length} addons for user ${userId}`);
     if (addons.length > 0) {
       addons.forEach((addon, index) => {
-        console.log(`[MONGODB DEBUG] Addon ${index + 1}: ${addon.type} - ${addon.name}, active: ${addon.isActive}`);
+        console.log(`[MONGODB DEBUG] Addon ${index + 1}: ${addon.type} - ${addon.name}, userId: ${addon.userId}, active: ${addon.isActive}`);
       });
     }
     

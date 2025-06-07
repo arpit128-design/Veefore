@@ -456,7 +456,12 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const totalTeamSize = currentMembers.length + uniqueInvitations.length;
         
         // Get user's team member addons to determine limit
-        const userAddons = await storage.getUserAddons(user.id);
+        console.log(`[TEAM INVITE] Looking up addons for user ID: ${user.id} (type: ${typeof user.id})`);
+        
+        // Convert user.id properly for addon lookup
+        const userIdForLookup = typeof user.id === 'number' ? user.id : user.id;
+        
+        const userAddons = await storage.getUserAddons(userIdForLookup);
         const teamMemberAddons = userAddons.filter(addon => 
           addon.type === 'team-member' && addon.isActive
         );
@@ -466,6 +471,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         console.log(`[TEAM INVITE] Team size check: Current: ${totalTeamSize}, Max: ${maxTeamSize}, Addons: ${teamMemberAddons.length}`);
         console.log(`[TEAM INVITE] User addons found:`, userAddons.map(a => `${a.type}:${a.isActive}`));
+        console.log(`[TEAM INVITE] Converted user ID for lookup: ${userIdForLookup}`);
         
         if (totalTeamSize >= maxTeamSize) {
           return res.status(402).json({ 

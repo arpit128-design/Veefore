@@ -111,7 +111,7 @@ export interface IStorage {
   getPaymentsByUser(userId: number): Promise<Payment[]>;
 
   // Addon operations
-  getUserAddons(userId: number): Promise<Addon[]>;
+  getUserAddons(userId: number | string): Promise<Addon[]>;
   getActiveAddonsByUser(userId: number): Promise<Addon[]>;
   createAddon(addon: InsertAddon): Promise<Addon>;
 

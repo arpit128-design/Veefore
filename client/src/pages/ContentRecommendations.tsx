@@ -74,6 +74,7 @@ const ContentRecommendations = () => {
   // Load user's existing preferences from onboarding
   useEffect(() => {
     if (userData?.preferences && !userPreferencesLoaded) {
+      console.log('[PREFERENCES DEBUG] User data preferences:', userData.preferences);
       const prefs = userData.preferences as any;
       if (prefs.interests && Array.isArray(prefs.interests)) {
         setUserInterests(prefs.interests.join(', '));
@@ -486,27 +487,87 @@ const ContentRecommendations = () => {
             <div className="mb-4 space-y-3">
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-sm text-gray-400 min-w-fit">Your Interests:</span>
-                {userData.preferences.interests?.map((interest: string, index: number) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
-                  >
-                    {interest}
-                  </Badge>
-                ))}
+                {(() => {
+                  const prefs = userData.preferences as any;
+                  
+                  // Handle the actual onboarding structure - create fresh array each time
+                  const baseInterests = prefs.selectedNiches && Array.isArray(prefs.selectedNiches) 
+                    ? [...prefs.selectedNiches] 
+                    : [];
+                  
+                  // Add additional interests based on business description if available
+                  const additionalInterests = [];
+                  if (prefs.description && typeof prefs.description === 'string') {
+                    const desc = prefs.description.toLowerCase();
+                    if (desc.includes('social media')) additionalInterests.push('social media');
+                    if (desc.includes('management')) additionalInterests.push('management');
+                    if (desc.includes('app')) additionalInterests.push('app development');
+                  }
+                  
+                  // Merge and deduplicate properly
+                  const allInterests = [...new Set([...baseInterests, ...additionalInterests])];
+                  
+                  // Fallback to manual interests if no interests found
+                  const finalInterests = allInterests.length > 0 
+                    ? allInterests 
+                    : (prefs.interests && Array.isArray(prefs.interests) ? prefs.interests : []);
+                  
+                  return finalInterests.map((interest: string, index: number) => (
+                    <Badge 
+                      key={index} 
+                      variant="secondary" 
+                      className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    >
+                      {interest}
+                    </Badge>
+                  ));
+                })()}
               </div>
-              {userData.preferences.niche && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">Content Niche:</span>
-                  <Badge 
-                    variant="secondary" 
-                    className="bg-blue-500/20 text-blue-300 border-blue-500/30"
-                  >
-                    {userData.preferences.niche}
-                  </Badge>
-                </div>
-              )}
+              {(() => {
+                const prefs = userData.preferences as any;
+                
+                // Build comprehensive display of user info
+                const displayItems = [];
+                
+                // Business name
+                if (prefs.businessName) {
+                  displayItems.push({
+                    label: 'Business',
+                    value: prefs.businessName,
+                    className: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                  });
+                }
+                
+                // Description/Purpose
+                if (prefs.description) {
+                  displayItems.push({
+                    label: 'Focus',
+                    value: prefs.description,
+                    className: 'bg-green-500/20 text-green-300 border-green-500/30'
+                  });
+                }
+                
+                // Tone
+                if (prefs.tone) {
+                  displayItems.push({
+                    label: 'Tone',
+                    value: prefs.tone,
+                    className: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                  });
+                }
+                
+                return displayItems.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2 mb-2">
+                    <span className="text-sm text-gray-400 min-w-fit">{item.label}:</span>
+                    <Badge 
+                      variant="secondary" 
+                      className={item.className}
+                    >
+                      {item.value}
+                    </Badge>
+                  </div>
+                ));
+              })()}
             </div>
           )}
           

@@ -584,8 +584,55 @@ export class MongoStorage implements IStorage {
 
   async getSocialAccountsByWorkspace(workspaceId: any): Promise<SocialAccount[]> {
     await this.connect();
-    // Handle both string ObjectIds and numeric IDs
+    
+    console.log(`[MONGODB DEBUG] getSocialAccountsByWorkspace query: workspaceId=${workspaceId} (${typeof workspaceId})`);
+    console.log(`[MONGODB DEBUG] Mongoose connection state:`, mongoose.connection.readyState);
+    console.log(`[MONGODB DEBUG] Database name:`, mongoose.connection.db?.databaseName);
+    
+    // Test direct connection first
+    try {
+      const mongoClient = mongoose.connection.getClient();
+      const db = mongoClient.db('veeforedb');
+      const collection = db.collection('socialaccounts');
+      
+      const directResult = await collection.find({ workspaceId: workspaceId.toString() }).toArray();
+      console.log(`[MONGODB DEBUG] Direct collection query found: ${directResult.length} accounts`);
+      
+      if (directResult.length > 0) {
+        console.log(`[MONGODB DEBUG] Direct result sample:`, {
+          _id: directResult[0]._id,
+          username: directResult[0].username,
+          platform: directResult[0].platform,
+          workspaceId: directResult[0].workspaceId,
+          followers: directResult[0].followersCount
+        });
+      }
+    } catch (directError) {
+      console.log(`[MONGODB DEBUG] Direct query failed:`, directError);
+    }
+    
+    // Now try Mongoose query
     const accounts = await SocialAccountModel.find({ workspaceId: workspaceId.toString() });
+    
+    console.log(`[MONGODB DEBUG] Mongoose query result: found ${accounts.length} accounts`);
+    if (accounts.length > 0) {
+      accounts.forEach((account, index) => {
+        console.log(`[MONGODB DEBUG] Account ${index + 1}: @${account.username} (${account.platform}) - followers: ${account.followersCount}, media: ${account.mediaCount}`);
+      });
+    } else {
+      // Debug: check if any accounts exist at all
+      const allAccounts = await SocialAccountModel.find({}).limit(5);
+      console.log(`[MONGODB DEBUG] Total accounts in collection: ${allAccounts.length}`);
+      if (allAccounts.length > 0) {
+        console.log(`[MONGODB DEBUG] Sample account:`, {
+          _id: allAccounts[0]._id,
+          workspaceId: allAccounts[0].workspaceId,
+          platform: allAccounts[0].platform,
+          username: allAccounts[0].username
+        });
+      }
+    }
+    
     return accounts.map(account => this.convertSocialAccount(account));
   }
 

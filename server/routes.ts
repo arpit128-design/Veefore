@@ -2442,7 +2442,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       // Get user and workspace data
       const user = req.user;
-      const workspace = await storage.getWorkspace(parseInt(workspaceId));
+      const workspace = await storage.getWorkspace(workspaceId);
       
       if (!workspace) {
         return res.status(404).json({ error: 'Workspace not found' });

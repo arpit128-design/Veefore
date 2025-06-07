@@ -8,12 +8,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
-import { Play, Pause, Heart, Share2, Bookmark, MapPin, Clock, Eye, ThumbsUp } from "lucide-react";
+import { Play, Pause, Heart, Share2, Bookmark, MapPin, Clock, Eye, ThumbsUp, Image, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ContentRecommendation {
   id: number;
-  type: 'video' | 'reel' | 'audio';
+  type: 'youtube-video' | 'youtube-shorts' | 'instagram-post' | 'instagram-video' | 'instagram-reel';
   title: string;
   description: string;
   thumbnailUrl?: string;
@@ -44,7 +44,7 @@ interface RecommendationsResponse {
 }
 
 const ContentRecommendations = () => {
-  const [activeTab, setActiveTab] = useState<'video' | 'reel' | 'audio'>('video');
+  const [activeTab, setActiveTab] = useState<'youtube-video' | 'youtube-shorts' | 'instagram-post' | 'instagram-video' | 'instagram-reel'>('youtube-video');
   const [playingId, setPlayingId] = useState<number | null>(null);
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [bookmarkedItems, setBookmarkedItems] = useState<Set<number>>(new Set());
@@ -162,7 +162,7 @@ const ContentRecommendations = () => {
       >
         <Card className="h-full border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/80">
           <div className="relative">
-            {recommendation.type === 'video' || recommendation.type === 'reel' ? (
+            {recommendation.type.includes('video') || recommendation.type.includes('reel') ? (
               <div className="relative aspect-video bg-muted rounded-t-lg overflow-hidden">
                 {recommendation.thumbnailUrl ? (
                   <img 
@@ -194,7 +194,7 @@ const ContentRecommendations = () => {
 
                 <div className="absolute top-3 left-3">
                   <Badge variant="secondary" className="bg-black/60 text-white border-none">
-                    {recommendation.type.toUpperCase()}
+                    {recommendation.type.replace('-', ' ').toUpperCase()}
                   </Badge>
                 </div>
                 

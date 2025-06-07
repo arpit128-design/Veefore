@@ -637,58 +637,63 @@ export default function TeamManagement() {
 
       {/* Upgrade Required Modal */}
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 border-blue-500/20">
-          <div className="flex flex-col items-center text-center space-y-6 p-6">
-            {/* Icon */}
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <Crown className="w-8 h-8 text-white" />
-            </div>
-            
-            {/* Title */}
-            <div>
-              <DialogTitle className="text-2xl font-bold text-white mb-2">
-                Upgrade to Team Pro
-              </DialogTitle>
-              <DialogDescription className="text-gray-300 text-base">
-                Unlock team collaboration and invite unlimited members to your workspace
-              </DialogDescription>
+        <DialogContent className="glassmorphism border-electric-cyan/30">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-orbitron text-electric-cyan flex items-center space-x-3">
+              <Crown className="w-6 h-6 text-solar-gold" />
+              <span>Upgrade Required</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Message */}
+            <div className="text-center space-y-3">
+              <p className="text-asteroid-silver text-base">
+                Your <span className="text-solar-gold font-semibold">Free</span> plan only supports <span className="text-electric-cyan">1 team member</span>.
+              </p>
+              <p className="text-asteroid-silver">
+                Upgrade to unlock team collaboration and invite unlimited members to your workspace.
+              </p>
             </div>
 
             {/* Features */}
-            <div className="space-y-3 w-full">
-              <div className="flex items-center space-x-3 text-gray-200">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <span>Invite unlimited team members</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-200">
-                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                <span>Advanced role-based permissions</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-200">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span>Priority AI content generation</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-200">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span>Advanced analytics & reporting</span>
+            <div className="space-y-3 bg-cosmic-void/30 p-4 rounded-lg">
+              <h4 className="text-electric-cyan font-semibold mb-3">Team Pro Features:</h4>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3 text-asteroid-silver">
+                  <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                  <span>Invite unlimited team members</span>
+                </div>
+                <div className="flex items-center space-x-3 text-asteroid-silver">
+                  <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+                  <span>Advanced role-based permissions</span>
+                </div>
+                <div className="flex items-center space-x-3 text-asteroid-silver">
+                  <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                  <span>Priority AI content generation</span>
+                </div>
+                <div className="flex items-center space-x-3 text-asteroid-silver">
+                  <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                  <span>Advanced analytics & reporting</span>
+                </div>
               </div>
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-col w-full space-y-3 pt-4">
+            <div className="flex space-x-3 pt-4">
               <Button 
                 onClick={() => {
                   setUpgradeModalOpen(false);
                   window.location.href = '/pricing';
                 }}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold"
+                className="flex-1 bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90"
               >
                 Upgrade Now
               </Button>
               <Button 
-                variant="ghost" 
+                variant="outline" 
                 onClick={() => setUpgradeModalOpen(false)}
-                className="w-full text-gray-300 hover:text-white hover:bg-gray-800/50"
+                className="flex-1 glassmorphism"
               >
                 Maybe Later
               </Button>

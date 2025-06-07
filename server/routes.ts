@@ -1243,6 +1243,47 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Create team member addon directly (debugging endpoint)
+  app.post('/api/create-team-addon-direct', async (req: any, res: Response) => {
+    try {
+      const { userId } = req.body;
+      
+      console.log(`[CREATE TEAM ADDON] Creating team member addon for user: ${userId}`);
+      
+      // Check if addon already exists
+      const existingAddons = await storage.getUserAddons(userId);
+      const existingTeamAddon = existingAddons.find(addon => addon.type === 'team-member');
+      
+      if (existingTeamAddon) {
+        console.log(`[CREATE TEAM ADDON] Team member addon already exists`);
+        return res.json({ success: true, message: 'Team member addon already exists', addon: existingTeamAddon });
+      }
+      
+      // Create the team member addon
+      const newAddon = await storage.createAddon({
+        userId: parseInt(userId),
+        name: 'Additional Team Member Seat',
+        type: 'team-member',
+        price: 19900,
+        isActive: true,
+        expiresAt: null,
+        metadata: {
+          createdFromPayment: true,
+          autoCreated: true,
+          reason: 'Missing addon record for successful payment',
+          createdAt: new Date().toISOString()
+        }
+      });
+      
+      console.log(`[CREATE TEAM ADDON] Successfully created team member addon:`, newAddon);
+      res.json({ success: true, message: 'Team member addon created successfully', addon: newAddon });
+      
+    } catch (error: any) {
+      console.error('[CREATE TEAM ADDON] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post('/api/seed-credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;

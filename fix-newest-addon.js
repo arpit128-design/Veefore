@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 async function fixNewestAddon() {
   const client = new MongoClient(process.env.DATABASE_URL);

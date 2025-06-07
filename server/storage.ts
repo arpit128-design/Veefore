@@ -112,6 +112,16 @@ export interface IStorage {
   // Addon operations
   getUserAddons(userId: number): Promise<Addon[]>;
   createAddon(addon: InsertAddon): Promise<Addon>;
+
+  // Content recommendation operations
+  getContentRecommendation(id: number): Promise<ContentRecommendation | undefined>;
+  getContentRecommendations(workspaceId: number, type?: string, limit?: number): Promise<ContentRecommendation[]>;
+  createContentRecommendation(recommendation: InsertContentRecommendation): Promise<ContentRecommendation>;
+  updateContentRecommendation(id: number, updates: Partial<ContentRecommendation>): Promise<ContentRecommendation>;
+
+  // User content history operations
+  getUserContentHistory(userId: number, workspaceId: number): Promise<UserContentHistory[]>;
+  createUserContentHistory(history: InsertUserContentHistory): Promise<UserContentHistory>;
 }
 
 export class MemStorage implements IStorage {
@@ -129,6 +139,8 @@ export class MemStorage implements IStorage {
   private subscriptions: Map<number, Subscription> = new Map();
   private payments: Map<number, Payment> = new Map();
   private addons: Map<number, Addon> = new Map();
+  private contentRecommendations: Map<number, ContentRecommendation> = new Map();
+  private userContentHistory: Map<number, UserContentHistory> = new Map();
   
   private currentUserId: number = 1;
   private currentWorkspaceId: number = 1;
@@ -144,6 +156,8 @@ export class MemStorage implements IStorage {
   private currentSubscriptionId: number = 1;
   private currentPaymentId: number = 1;
   private currentAddonId: number = 1;
+  private currentContentRecommendationId: number = 1;
+  private currentUserContentHistoryId: number = 1;
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
@@ -777,6 +791,74 @@ export class MemStorage implements IStorage {
     };
     this.addons.set(id, addon);
     return addon;
+  }
+
+  // Content recommendation operations
+  async getContentRecommendation(id: number): Promise<ContentRecommendation | undefined> {
+    return this.contentRecommendations.get(id);
+  }
+
+  async getContentRecommendations(workspaceId: number, type?: string, limit?: number): Promise<ContentRecommendation[]> {
+    let recommendations = Array.from(this.contentRecommendations.values())
+      .filter(rec => rec.workspaceId === workspaceId && rec.isActive);
+    
+    if (type) {
+      recommendations = recommendations.filter(rec => rec.type === type);
+    }
+
+    // Sort by creation date (newest first)
+    recommendations.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+
+    if (limit) {
+      recommendations = recommendations.slice(0, limit);
+    }
+
+    return recommendations;
+  }
+
+  async createContentRecommendation(insertRecommendation: InsertContentRecommendation): Promise<ContentRecommendation> {
+    const id = this.currentContentRecommendationId++;
+    const recommendation: ContentRecommendation = {
+      ...insertRecommendation,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.contentRecommendations.set(id, recommendation);
+    return recommendation;
+  }
+
+  async updateContentRecommendation(id: number, updates: Partial<ContentRecommendation>): Promise<ContentRecommendation> {
+    const existing = this.contentRecommendations.get(id);
+    if (!existing) {
+      throw new Error(`Content recommendation ${id} not found`);
+    }
+
+    const updated: ContentRecommendation = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date()
+    };
+    this.contentRecommendations.set(id, updated);
+    return updated;
+  }
+
+  // User content history operations
+  async getUserContentHistory(userId: number, workspaceId: number): Promise<UserContentHistory[]> {
+    return Array.from(this.userContentHistory.values())
+      .filter(history => history.userId === userId && history.workspaceId === workspaceId)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async createUserContentHistory(insertHistory: InsertUserContentHistory): Promise<UserContentHistory> {
+    const id = this.currentUserContentHistoryId++;
+    const history: UserContentHistory = {
+      ...insertHistory,
+      id,
+      createdAt: new Date()
+    };
+    this.userContentHistory.set(id, history);
+    return history;
   }
 }
 

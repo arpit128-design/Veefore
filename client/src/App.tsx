@@ -17,6 +17,7 @@ import ContentStudio from "@/pages/ContentStudio";
 import Scheduler from "@/pages/Scheduler";
 import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
+import ContentRecommendations from "@/pages/ContentRecommendations";
 import Workspaces from "@/pages/Workspaces";
 import TeamManagement from "@/pages/TeamManagement";
 import Integrations from "@/pages/Integrations";
@@ -48,6 +49,7 @@ function AuthenticatedApp() {
               <Route path="/scheduler" component={Scheduler} />
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/suggestions" component={Suggestions} />
+              <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/workspaces" component={Workspaces} />
               <Route path="/team" component={TeamManagement} />
               <Route path="/integrations" component={Integrations} />

@@ -1091,6 +1091,60 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   });
 
   // Seed Credit Transactions API (for testing)
+  // Add-on Purchase Route
+  app.post('/api/razorpay/create-addon-order', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { addonId } = req.body;
+
+      if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        return res.status(500).json({ error: 'Razorpay configuration missing' });
+      }
+
+      const Razorpay = (await import('razorpay')).default;
+      const rzp = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      // Get addon details from pricing config
+      const pricingData = await storage.getPricingData();
+      const addon = pricingData.addons[addonId];
+      
+      if (!addon) {
+        console.log('[ADDON] Available addons:', Object.keys(pricingData.addons));
+        console.log('[ADDON] Requested addon:', addonId);
+        return res.status(400).json({ error: 'Invalid addon ID' });
+      }
+
+      // Create addon order
+      const options = {
+        amount: addon.price * 100, // Convert to paise
+        currency: 'INR',
+        receipt: `addon_${addonId}_${Date.now()}`,
+        notes: {
+          userId: user.id,
+          addonId,
+          addonName: addon.name,
+          type: 'addon'
+        },
+      };
+
+      const order = await rzp.orders.create(options);
+      console.log(`[ADDON PURCHASE] Created order for user ${user.id}, addon: ${addon.name}`);
+
+      res.json({
+        orderId: order.id,
+        amount: addon.price,
+        currency: 'INR',
+        addon: addon
+      });
+    } catch (error: any) {
+      console.error('[ADDON PURCHASE] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to create addon order' });
+    }
+  });
+
   app.post('/api/seed-credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;

@@ -118,6 +118,92 @@ export default function Subscription() {
 
   const userSubscription = subscription as UserSubscription;
   const currentPlan = userSubscription?.plan || 'free';
+  const [addonPurchasing, setAddonPurchasing] = useState(false);
+
+  // Handle add-on purchase
+  const handleAddonPurchase = async (addonId: string) => {
+    if (addonPurchasing) return;
+    
+    setAddonPurchasing(true);
+    
+    try {
+      // Create Razorpay order for addon
+      const orderResponse = await apiRequest('POST', '/api/razorpay/create-addon-order', {
+        addonId
+      });
+      const orderData = await orderResponse.json();
+      
+      if (!orderData.orderId) {
+        throw new Error('Failed to create order');
+      }
+
+      // Load Razorpay script
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: orderData.amount * 100,
+          currency: 'INR',
+          name: 'VeeFore',
+          description: `${orderData.addon.name} Purchase`,
+          order_id: orderData.orderId,
+          handler: async (response: any) => {
+            try {
+              // Verify payment on backend
+              await apiRequest('POST', '/api/razorpay/verify-payment', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                type: 'addon',
+                packageId: addonId
+              });
+
+              toast({
+                title: "Add-on Purchased!",
+                description: `${orderData.addon.name} has been added to your account.`,
+              });
+
+              // Refresh user data
+              queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+            } catch (error) {
+              console.error('Payment verification failed:', error);
+              toast({
+                title: "Payment Verification Failed",
+                description: "Please contact support if amount was deducted.",
+                variant: "destructive",
+              });
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              console.log('Payment modal dismissed');
+            }
+          },
+          theme: {
+            color: '#8B5CF6'
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      };
+    } catch (error: any) {
+      console.error('Add-on purchase error:', error);
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to initiate add-on purchase",
+        variant: "destructive",
+      });
+    } finally {
+      setAddonPurchasing(false);
+    }
+  };
   
   // Calculate credits from transactions as fallback if subscription API fails
   const calculatedCredits = creditTransactions?.reduce((total, transaction) => {
@@ -471,11 +557,15 @@ export default function Subscription() {
                           <Gift className="w-6 h-6 text-solar-gold" />
                         </div>
                         <h3 className="font-semibold text-white">{addon.name}</h3>
-                        <p className="text-sm text-asteroid-silver">{addon.description}</p>
+                        <p className="text-sm text-asteroid-silver">{addon.benefit || addon.description}</p>
                         <div className="text-lg font-bold text-solar-gold">₹{addon.price}/month</div>
-                        <Button className="w-full glassmorphism" disabled>
+                        <Button 
+                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          onClick={() => handleAddonPurchase(key)}
+                          disabled={addonPurchasing}
+                        >
                           <Plus className="w-4 h-4 mr-2" />
-                          Coming Soon
+                          {addonPurchasing ? "Processing..." : "Purchase Now"}
                         </Button>
                       </div>
                     </div>

@@ -2973,100 +2973,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to fetch authentic hashtags' });
     }
   });
-                  content: `${query} List only the hashtag names with # symbol, one per line. Include engagement numbers when possible.`
-                }
-              ],
-              max_tokens: 800,
-              temperature: 0.1,
-              search_recency_filter: 'day'
-            })
-          });
 
-          if (perplexityResponse.ok) {
-            const aiData = await perplexityResponse.json();
-            const aiContent = aiData.choices?.[0]?.message?.content || '';
-            
-            // Parse hashtags from response
-            const lines = aiContent.split('\n');
-            for (const line of lines) {
-              const hashtagMatch = line.match(/#(\w+)/);
-              if (hashtagMatch) {
-                const tag = hashtagMatch[1].toLowerCase();
-                if (tag.length >= 3 && tag.length <= 25) {
-                  const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-                  
-                  // Determine platform based on query
-                  if (query.includes('Instagram')) current.platforms.add('instagram');
-                  if (query.includes('Twitter') || query.includes('X')) current.platforms.add('twitter');
-                  if (query.includes('YouTube')) current.platforms.add('youtube');
-                  
-                  // Extract engagement numbers
-                  const engagementMatch = line.match(/(\d+(?:\.\d+)?)\s*([KMB])/i);
-                  if (engagementMatch) {
-                    const engNum = parseFloat(engagementMatch[1]);
-                    const multiplier = engagementMatch[2].toUpperCase() === 'M' ? 1000000 : 
-                                      engagementMatch[2].toUpperCase() === 'K' ? 1000 : 
-                                      engagementMatch[2].toUpperCase() === 'B' ? 1000000000 : 1;
-                    current.engagement = Math.max(current.engagement, engNum * multiplier);
-                  }
-                  
-                  current.count += 12; // High weight for targeted platform analysis
-                  current.platforms.add('viral-now');
-                  viralHashtags.set(tag, current);
-                }
-              }
-            }
-          }
-          
-          // Add small delay between requests
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-        
-        console.log('[VIRAL HASHTAGS] Targeted Perplexity analysis completed');
-      } catch (aiError) {
-        console.log('[VIRAL HASHTAGS] Perplexity analysis failed');
-      }
-
-      // 9. Fetch current trending data from Twitter's public trends
-      try {
-        console.log('[VIRAL HASHTAGS] Fetching Twitter trending topics');
-        const twitterTrendsResponse = await fetch('https://api.twitter.com/1.1/trends/place.json?id=1', {
-          headers: {
-            'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN || 'fallback'}`
-          }
-        });
-        
-        if (twitterTrendsResponse.ok) {
-          const twitterData = await twitterTrendsResponse.json();
-          const trends = twitterData[0]?.trends || [];
-          
-          for (const trend of trends) {
-            if (trend.name.startsWith('#')) {
-              const tag = trend.name.substring(1).toLowerCase();
-              if (tag.length >= 3) {
-                const current = viralHashtags.get(tag) || { count: 0, platforms: new Set(), engagement: 0 };
-                current.count += 20; // Very high weight for actual Twitter trends
-                current.platforms.add('twitter');
-                current.engagement = Math.max(current.engagement, trend.tweet_volume || 500000);
-                viralHashtags.set(tag, current);
-              }
-            }
-          }
-          console.log('[VIRAL HASHTAGS] Twitter trends processed');
-        }
-      } catch (twitterError) {
-        console.log('[VIRAL HASHTAGS] Twitter trends processing failed, using alternative sources');
-      }
-
-      // 3. Get real-time trending data from multiple social platforms using advanced analysis
-      try {
-        // Use multiple AI queries to get comprehensive trending data
-        const platformQueries = [
-          {
-            platform: 'instagram',
-            query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on Instagram today? Focus on hashtags that are getting millions of views and engagement. Include current memes, trends, challenges, and viral content hashtags that content creators are using today.`
-          },
-          {
+  const httpServer = createServer(app);
+  return httpServer;
+}
             platform: 'tiktok', 
             query: `What are the TOP 10 most viral hashtags trending RIGHT NOW on TikTok today? Include current viral dances, challenges, sounds, and trending topics that are getting massive engagement and views.`
           },

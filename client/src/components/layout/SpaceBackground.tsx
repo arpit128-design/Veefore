@@ -118,9 +118,9 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* CSS Star Field Fallback */}
-      <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: -6 }}>
-        {Array.from({ length: 150 }, (_, i) => (
+      {/* CSS Star Field - Now with positive z-index */}
+      <div className="stars-field fixed inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+        {Array.from({ length: 200 }, (_, i) => (
           <div
             key={i}
             className="star"
@@ -135,15 +135,15 @@ export function SpaceBackground() {
       </div>
 
       {/* Shooting Stars */}
-      <div className="shooting-stars fixed inset-0 pointer-events-none" style={{ zIndex: -4 }}>
-        {Array.from({ length: 3 }, (_, i) => (
+      <div className="shooting-stars fixed inset-0 pointer-events-none" style={{ zIndex: 11 }}>
+        {Array.from({ length: 5 }, (_, i) => (
           <div
             key={i}
             className="shooting-star"
             style={{
-              left: `${Math.random() * 50}%`,
-              top: `${Math.random() * 50}%`,
-              animationDelay: `${i * 8 + Math.random() * 5}s`,
+              left: `${Math.random() * 20}%`,
+              top: `${Math.random() * 30}%`,
+              animationDelay: `${i * 6 + Math.random() * 4}s`,
               animationDuration: `${3 + Math.random() * 2}s`
             }}
           />

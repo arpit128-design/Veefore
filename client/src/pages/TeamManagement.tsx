@@ -396,7 +396,7 @@ export default function TeamManagement() {
       </Card>
 
       {/* Pending Invitations */}
-      {isOwner && (
+      {canManageTeam && (
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader>
             <CardTitle className="text-white">Pending Invitations</CardTitle>

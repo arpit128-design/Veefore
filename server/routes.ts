@@ -589,9 +589,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      // Instagram Basic Display API OAuth
-      const scopes = 'user_profile,user_media';
-      const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+      // Instagram Business API OAuth - using correct endpoint from documentation
+      const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish';
+      const authUrl = `https://www.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {
@@ -665,10 +665,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const tokenData = await tokenResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Token exchange successful`);
       
-      // Get long-lived access token
+      // Get long-lived access token using Instagram Business API
       console.log(`[INSTAGRAM CALLBACK] Converting to long-lived token...`);
       const longLivedResponse = await fetch(
-        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_APP_SECRET}&access_token=${tokenData.access_token}`
+        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_APP_SECRET}&access_token=${tokenData.access_token}`,
+        { method: 'GET' }
       );
 
       if (!longLivedResponse.ok) {

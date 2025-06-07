@@ -637,44 +637,100 @@ export default function TeamManagement() {
 
       {/* Upgrade Required Modal */}
       <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent className="glassmorphism border-electric-cyan/30">
+        <DialogContent className="glassmorphism border-electric-cyan/30 max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-orbitron text-electric-cyan flex items-center space-x-3">
               <Crown className="w-6 h-6 text-solar-gold" />
-              <span>Upgrade Required</span>
+              <span>Team Collaboration Locked</span>
             </DialogTitle>
+            <DialogDescription className="text-asteroid-silver">
+              Unlock team features to invite and collaborate with unlimited members
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Message */}
-            <div className="text-center space-y-3">
-              <p className="text-asteroid-silver text-base">
-                Your <span className="text-solar-gold font-semibold">Free</span> plan only supports <span className="text-electric-cyan">1 team member</span>.
-              </p>
-              <p className="text-asteroid-silver">
-                Upgrade to unlock team collaboration and invite unlimited members to your workspace.
-              </p>
+            {/* Current Plan Status */}
+            <div className="bg-cosmic-void/30 p-4 rounded-lg border border-red-500/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-asteroid-silver">Current Plan:</span>
+                <Badge className="bg-gray-700 text-gray-300">Free Plan</Badge>
+              </div>
+              <div className="text-sm text-red-400">
+                ⚠️ Limited to 1 team member only
+              </div>
             </div>
 
-            {/* Features */}
-            <div className="space-y-3 bg-cosmic-void/30 p-4 rounded-lg">
-              <h4 className="text-electric-cyan font-semibold mb-3">Team Pro Features:</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-3 text-asteroid-silver">
-                  <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
-                  <span>Invite unlimited team members</span>
+            {/* Recommended Plan */}
+            <div className="bg-gradient-to-r from-nebula-purple/20 to-purple-600/20 p-6 rounded-lg border border-nebula-purple/30">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-orbitron text-electric-cyan">Team Pro Plan</h3>
+                  <p className="text-asteroid-silver text-sm">Perfect for growing teams</p>
                 </div>
-                <div className="flex items-center space-x-3 text-asteroid-silver">
-                  <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
-                  <span>Advanced role-based permissions</span>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-solar-gold">₹999</div>
+                  <div className="text-sm text-asteroid-silver">per month</div>
                 </div>
-                <div className="flex items-center space-x-3 text-asteroid-silver">
-                  <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
-                  <span>Priority AI content generation</span>
+              </div>
+
+              {/* Team Features */}
+              <div className="space-y-3 mb-4">
+                <h4 className="text-electric-cyan font-semibold">Team Collaboration:</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="flex items-center space-x-3 text-asteroid-silver">
+                    <Users className="w-4 h-4 text-electric-cyan" />
+                    <span>Unlimited team members</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-asteroid-silver">
+                    <Shield className="w-4 h-4 text-nebula-purple" />
+                    <span>4-tier role system (Owner, Admin, Editor, Viewer)</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-asteroid-silver">
+                    <Crown className="w-4 h-4 text-solar-gold" />
+                    <span>Advanced permission controls</span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3 text-asteroid-silver">
-                  <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
-                  <span>Advanced analytics & reporting</span>
+              </div>
+
+              {/* Additional Features */}
+              <div className="space-y-3">
+                <h4 className="text-electric-cyan font-semibold">Enhanced Features:</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                    <span>Priority AI generation</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                    <div className="w-2 h-2 bg-electric-cyan rounded-full"></div>
+                    <span>Advanced analytics</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                    <div className="w-2 h-2 bg-nebula-purple rounded-full"></div>
+                    <span>Unlimited content</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-asteroid-silver">
+                    <div className="w-2 h-2 bg-solar-gold rounded-full"></div>
+                    <span>Premium support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Workspace Add-ons */}
+            <div className="bg-cosmic-void/20 p-4 rounded-lg">
+              <h4 className="text-electric-cyan font-semibold mb-3">Available Add-ons:</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between text-asteroid-silver">
+                  <span>Additional Workspaces</span>
+                  <span className="text-solar-gold">₹299/workspace/month</span>
+                </div>
+                <div className="flex items-center justify-between text-asteroid-silver">
+                  <span>Advanced Instagram Analytics</span>
+                  <span className="text-solar-gold">₹199/month</span>
+                </div>
+                <div className="flex items-center justify-between text-asteroid-silver">
+                  <span>White-label Branding</span>
+                  <span className="text-solar-gold">₹499/month</span>
                 </div>
               </div>
             </div>
@@ -688,14 +744,14 @@ export default function TeamManagement() {
                 }}
                 className="flex-1 bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90"
               >
-                Upgrade Now
+                View All Plans & Upgrade
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => setUpgradeModalOpen(false)}
                 className="flex-1 glassmorphism"
               >
-                Maybe Later
+                Continue with Free
               </Button>
             </div>
           </div>

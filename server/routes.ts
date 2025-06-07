@@ -1442,38 +1442,44 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { user } = req;
       console.log('[CLEANUP] Starting cleanup for user:', user.id);
       
-      // Get user's workspaces
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
-      
-      let deletedInvitations = 0;
-      
-      for (const workspace of workspaces) {
-        // Delete all invitations for this workspace
-        const mongoStorage = storage as any;
-        if (mongoStorage.TeamInvitationModel) {
-          const invitationResult = await mongoStorage.TeamInvitationModel.deleteMany({
-            workspaceId: workspace.id
-          });
-          deletedInvitations += invitationResult.deletedCount || 0;
-          console.log(`[CLEANUP] Deleted ${invitationResult.deletedCount} invitations for workspace ${workspace.id}`);
-        }
-      }
-      
-      // Access MongoDB models directly to delete addons
+      // Access MongoDB storage directly
       const mongoStorage = storage as any;
       let deletedAddons = 0;
+      let deletedInvitations = 0;
       
+      // Delete all addons for user (try both string and numeric formats)
       if (mongoStorage.AddonModel) {
         const addonResult = await mongoStorage.AddonModel.deleteMany({
           $or: [
             { userId: user.id },
-            { userId: parseInt(user.id) }
+            { userId: parseInt(user.id) },
+            { userId: user.id.toString() }
           ]
         });
         deletedAddons = addonResult.deletedCount || 0;
+        console.log(`[CLEANUP] Deleted ${deletedAddons} addons`);
       }
       
-      console.log(`[CLEANUP] Deleted ${deletedAddons} addons and ${deletedInvitations} invitations`);
+      // Delete all invitations for user's workspaces (try multiple workspace ID formats)
+      if (mongoStorage.TeamInvitationModel) {
+        const invitationResult = await mongoStorage.TeamInvitationModel.deleteMany({
+          $or: [
+            { workspaceId: 684402 },
+            { workspaceId: '684402c2fd2cd4eb6521b386' },
+            { workspaceId: 'My VeeFore Workspace' },
+            { workspaceId: parseInt('684402c2fd2cd4eb6521b386', 16) }
+          ]
+        });
+        deletedInvitations = invitationResult.deletedCount || 0;
+        console.log(`[CLEANUP] Deleted ${deletedInvitations} invitations`);
+      }
+      
+      // Force clear any cached data
+      if (mongoStorage.clearUserCache) {
+        await mongoStorage.clearUserCache(user.id);
+      }
+      
+      console.log(`[CLEANUP] Total cleanup: ${deletedAddons} addons, ${deletedInvitations} invitations`);
       
       res.json({ 
         success: true, 

@@ -19,6 +19,7 @@ import {
 import { generateIntelligentSuggestions } from "./ai-suggestions-service";
 import { TeamService } from "./team-service";
 import { contentRecommendationService } from "./content-recommendation-service";
+import { viralContentService } from "./viral-content-service";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 

@@ -75,15 +75,24 @@ export default function Subscription() {
     queryFn: () => apiRequest('GET', '/api/pricing').then(res => res.json()),
   });
 
-  // Fetch credit transactions
+  // Fetch credit transactions with error handling
   const { data: creditTransactions, isLoading: transactionsLoading } = useQuery<CreditTransaction[]>({
     queryKey: ['/api/credit-transactions'],
     queryFn: () => apiRequest('GET', '/api/credit-transactions').then(res => res.json()),
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
   const userSubscription = subscription as UserSubscription;
   const currentPlan = userSubscription?.plan || 'free';
-  const currentCredits = userSubscription?.credits || 0;
+  
+  // Calculate credits from transactions as fallback if subscription API fails
+  const calculatedCredits = creditTransactions?.reduce((total, transaction) => {
+    return total + transaction.amount;
+  }, 0) || 0;
+  
+  const currentCredits = userSubscription?.credits || calculatedCredits;
 
   const planData = pricingData?.plans?.[currentPlan] || {
     name: 'Free Plan',

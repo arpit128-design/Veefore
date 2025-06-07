@@ -41,6 +41,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
           console.error('[AUTH] Invalid JWT structure - expected 3 parts, got:', tokenParts.length);
+          console.error('[AUTH] Token received:', token.substring(0, 100) + '...');
+          console.error('[AUTH] Authorization header:', authHeader.substring(0, 100) + '...');
           return res.status(401).json({ error: 'Invalid token format' });
         }
 

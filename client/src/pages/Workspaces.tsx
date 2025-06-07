@@ -225,7 +225,12 @@ export default function Workspaces() {
         title: "Workspace Deleted",
         description: "The workspace has been permanently removed.",
       });
+      // Invalidate multiple related queries to ensure UI updates
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      queryClient.invalidateQueries({ queryKey: ['all-workspace-accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: ['workspaces'] });
     },
     onError: (error: any) => {
       toast({
@@ -534,9 +539,9 @@ export default function Workspaces() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workspaces.map((workspace, index) => (
+            {workspaces.map((workspace) => (
               <div
-                key={`workspace-${workspace.id}-${index}`}
+                key={workspace.id}
                 className={`p-6 rounded-lg border transition-all cursor-pointer hover:border-electric-cyan/50 ${
                   currentWorkspace?.id === workspace.id
                     ? 'border-electric-cyan/50 bg-electric-cyan/10'

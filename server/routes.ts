@@ -381,9 +381,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             console.log(`[TEAM INVITE] Addon ${index + 1}: Type: ${addon.type}, Name: ${addon.name}, Active: ${addon.isActive}`);
           });
           
+          // Check for any premium addon that should grant team access
           const teamMemberAddon = userAddons.find(addon => 
             (addon.type === 'team-member' || addon.name?.includes('Team Member') || addon.name?.includes('team-member')) && 
             addon.isActive
+          );
+          
+          // Also check for workspace addon which should include team features
+          const workspaceAddon = userAddons.find(addon => 
+            addon.type === 'workspace' && addon.isActive
           );
           
           if (teamMemberAddon) {
@@ -391,6 +397,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               type: teamMemberAddon.type,
               name: teamMemberAddon.name,
               isActive: teamMemberAddon.isActive
+            });
+            hasTeamAccess = true;
+          } else if (workspaceAddon) {
+            console.log(`[TEAM INVITE] Found active workspace addon - granting team access:`, {
+              type: workspaceAddon.type,
+              name: workspaceAddon.name,
+              isActive: workspaceAddon.isActive
             });
             hasTeamAccess = true;
           } else {

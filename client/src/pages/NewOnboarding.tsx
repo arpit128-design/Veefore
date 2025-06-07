@@ -1,24 +1,29 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import { SpaceBackground } from '@/components/layout/SpaceBackground';
-import { 
-  Rocket, 
-  Sparkles, 
-  Target, 
-  TrendingUp, 
-  Building, 
-  Instagram, 
-  CheckCircle,
+import {
+  Rocket,
+  Target,
+  Users,
   Zap,
-  ChevronRight,
-  Star
+  Instagram,
+  CheckCircle,
+  ArrowRight,
+  Sparkles,
+  TrendingUp,
+  Calendar,
+  Star,
+  Globe,
+  Award
 } from 'lucide-react';
 
 interface UserPreferences {
@@ -26,7 +31,125 @@ interface UserPreferences {
   description: string;
   niches: string[];
   brandTone: string;
+  goals: {
+    primary: string;
+    followers: number;
+    engagement: number;
+    timeline: string;
+  };
 }
+
+// 3D Floating Elements Component
+const FloatingElements = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Floating orbs with 3D effect */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          className={`absolute w-${4 + i % 3} h-${4 + i % 3} rounded-full opacity-20`}
+          style={{
+            background: `conic-gradient(from ${i * 45}deg, #00d4ff, #ffd700, #1a237e)`,
+            filter: 'blur(1px)',
+            boxShadow: '0 0 20px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.3)'
+          }}
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+            rotate: [0, 360],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 10 + i * 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.5
+          }}
+          initial={{
+            left: `${10 + i * 12}%`,
+            top: `${20 + i * 8}%`
+          }}
+        />
+      ))}
+      
+      {/* Cosmic particles */}
+      {[...Array(15)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full"
+          animate={{
+            y: [-20, -100],
+            opacity: [0, 1, 0],
+            scale: [0, 1, 0]
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            delay: i * 0.2,
+            ease: "easeOut"
+          }}
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// 3D Step Indicator
+const StepIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
+  return (
+    <div className="flex justify-center items-center space-x-4 mb-12">
+      {[...Array(totalSteps)].map((_, index) => (
+        <motion.div
+          key={index}
+          className="relative"
+          initial={{ scale: 0.8, opacity: 0.5 }}
+          animate={{ 
+            scale: index <= currentStep ? 1.2 : 0.8,
+            opacity: index <= currentStep ? 1 : 0.5 
+          }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <div
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center relative overflow-hidden
+              ${index <= currentStep 
+                ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-blue-600/20' 
+                : 'border-slate-600 bg-slate-800/50'
+              }`}
+          >
+            {index < currentStep ? (
+              <CheckCircle className="w-6 h-6 text-cyan-400" />
+            ) : (
+              <span className={`text-sm font-bold ${index <= currentStep ? 'text-cyan-400' : 'text-slate-400'}`}>
+                {index + 1}
+              </span>
+            )}
+            {index <= currentStep && (
+              <motion.div
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/30 to-gold-400/30"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              />
+            )}
+          </div>
+          {index < totalSteps - 1 && (
+            <motion.div
+              className={`absolute top-6 left-12 w-8 h-0.5 ${
+                index < currentStep ? 'bg-cyan-400' : 'bg-slate-600'
+              }`}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: index < currentStep ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            />
+          )}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 export default function NewOnboarding() {
   const [, setLocation] = useLocation();
@@ -37,23 +160,45 @@ export default function NewOnboarding() {
     businessName: '',
     description: '',
     niches: [],
-    brandTone: ''
+    brandTone: '',
+    goals: {
+      primary: 'brand_awareness',
+      followers: 1000,
+      engagement: 5,
+      timeline: '3_months'
+    }
   });
 
-  // Available niches
+  // Available niches with 3D visual enhancements
   const niches = [
     'Technology', 'Fashion', 'Food & Drink', 'Travel', 'Fitness',
     'Beauty', 'Business', 'Education', 'Entertainment', 'Health',
     'Lifestyle', 'Photography', 'Sports', 'Art & Design', 'Music'
   ];
 
-  // Brand tone options
+  // Brand tone options with enhanced styling
   const brandTones = [
-    { id: 'professional', label: 'Professional', description: 'Authoritative and trustworthy' },
-    { id: 'friendly', label: 'Friendly', description: 'Warm and approachable' },
-    { id: 'playful', label: 'Playful', description: 'Fun and creative' },
-    { id: 'sophisticated', label: 'Sophisticated', description: 'Elegant and refined' },
-    { id: 'energetic', label: 'Energetic', description: 'Dynamic and exciting' }
+    { id: 'professional', label: 'Professional', description: 'Authoritative and trustworthy', icon: Award },
+    { id: 'friendly', label: 'Friendly', description: 'Warm and approachable', icon: Users },
+    { id: 'playful', label: 'Playful', description: 'Fun and creative', icon: Sparkles },
+    { id: 'sophisticated', label: 'Sophisticated', description: 'Elegant and refined', icon: Star },
+    { id: 'energetic', label: 'Energetic', description: 'Dynamic and exciting', icon: Zap }
+  ];
+
+  // Goal options with enhanced 3D visuals
+  const goalTypes = [
+    { id: 'brand_awareness', label: 'Brand Awareness', icon: Globe, description: 'Increase visibility and recognition', color: 'from-purple-500 to-pink-500' },
+    { id: 'lead_generation', label: 'Lead Generation', icon: Target, description: 'Generate qualified leads and prospects', color: 'from-blue-500 to-cyan-500' },
+    { id: 'sales', label: 'Drive Sales', icon: TrendingUp, description: 'Increase revenue and conversions', color: 'from-green-500 to-emerald-500' },
+    { id: 'engagement', label: 'Community Building', icon: Users, description: 'Build an engaged community', color: 'from-orange-500 to-red-500' },
+    { id: 'thought_leadership', label: 'Thought Leadership', icon: Award, description: 'Establish industry authority', color: 'from-indigo-500 to-purple-500' }
+  ];
+
+  const timelineOptions = [
+    { id: '1_month', label: '1 Month', description: 'Quick wins', intensity: 'high' },
+    { id: '3_months', label: '3 Months', description: 'Standard growth', intensity: 'medium' },
+    { id: '6_months', label: '6 Months', description: 'Steady progress', intensity: 'medium' },
+    { id: '1_year', label: '1 Year', description: 'Long-term success', intensity: 'low' }
   ];
 
   // User data query
@@ -94,361 +239,640 @@ export default function NewOnboarding() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       toast({
-        title: "Preferences Saved",
-        description: "Your preferences have been saved successfully!",
+        title: "🚀 Setup Complete!",
+        description: "Welcome to your cosmic social media journey",
+      });
+      setLocation('/dashboard');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Setup Failed",
+        description: error.message || "Failed to save preferences",
+        variant: "destructive",
       });
     }
   });
 
-  // Complete onboarding mutation
-  const completeOnboardingMutation = useMutation({
-    mutationFn: () => apiRequest('POST', '/api/user/complete-onboarding'),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      setLocation('/dashboard');
+  const steps = [
+    {
+      title: "Welcome to the Cosmos",
+      subtitle: "Let's launch your brand into the digital universe",
+      component: WelcomeStep
+    },
+    {
+      title: "Define Your Brand",
+      subtitle: "Tell us about your cosmic mission",
+      component: BrandStep
+    },
+    {
+      title: "Choose Your Universe",
+      subtitle: "Select your content galaxies",
+      component: NichesStep
+    },
+    {
+      title: "Set Your Voice",
+      subtitle: "How do you communicate across the cosmos?",
+      component: ToneStep
+    },
+    {
+      title: "Mission Objectives",
+      subtitle: "Define your stellar goals",
+      component: GoalsStep
+    },
+    {
+      title: "Connect Your Satellites",
+      subtitle: "Link your social media accounts",
+      component: ConnectStep
     }
-  });
+  ];
+
+  // Step Components
+  function WelcomeStep() {
+    return (
+      <motion.div
+        className="text-center space-y-8"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <motion.div
+          className="relative mx-auto w-32 h-32"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full blur-lg opacity-50" />
+          <div className="relative bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full p-8 shadow-2xl">
+            <Rocket className="w-16 h-16 text-white mx-auto" />
+          </div>
+        </motion.div>
+        
+        <div className="space-y-6">
+          <motion.h1
+            className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent"
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Welcome to VeeFore
+          </motion.h1>
+          
+          <motion.p
+            className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            Embark on an interstellar journey where AI meets creativity. 
+            We'll transform your social media presence into a cosmic phenomenon.
+          </motion.p>
+          
+          <motion.div
+            className="flex justify-center space-x-4 text-cyan-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Sparkles className="w-6 h-6 animate-pulse" />
+            <Star className="w-6 h-6 animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <Sparkles className="w-6 h-6 animate-pulse" style={{ animationDelay: '1s' }} />
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  function BrandStep() {
+    return (
+      <motion.div
+        className="space-y-8 max-w-2xl mx-auto"
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="space-y-6">
+          <div>
+            <label className="block text-lg font-semibold text-cyan-400 mb-3">
+              Business Name
+            </label>
+            <Input
+              value={preferences.businessName}
+              onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
+              placeholder="Enter your cosmic brand name..."
+              className="bg-slate-800/50 border-slate-600 text-white placeholder-slate-400 h-12 text-lg backdrop-blur-sm"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-lg font-semibold text-cyan-400 mb-3">
+              Tell us about your mission
+            </label>
+            <Textarea
+              value={preferences.description}
+              onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Describe your brand's cosmic purpose and what makes you unique in the universe..."
+              className="bg-slate-800/50 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm"
+              rows={4}
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  function NichesStep() {
+    const toggleNiche = (niche: string) => {
+      setPreferences(prev => ({
+        ...prev,
+        niches: prev.niches.includes(niche)
+          ? prev.niches.filter(n => n !== niche)
+          : [...prev.niches, niche]
+      }));
+    };
+
+    return (
+      <motion.div
+        className="space-y-8"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <p className="text-slate-300 text-center mb-8">
+          Select the galaxies where your content will shine (choose 2-5)
+        </p>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {niches.map((niche, index) => {
+            const isSelected = preferences.niches.includes(niche);
+            return (
+              <motion.button
+                key={niche}
+                onClick={() => toggleNiche(niche)}
+                className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                  isSelected
+                    ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 text-cyan-400'
+                    : 'border-slate-600 bg-slate-800/30 text-slate-300 hover:border-slate-500'
+                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isSelected && (
+                  <motion.div
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/10 to-blue-600/10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+                <span className="relative font-semibold">{niche}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+        
+        <motion.p
+          className="text-center text-slate-400"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Selected: {preferences.niches.length} galaxies
+        </motion.p>
+      </motion.div>
+    );
+  }
+
+  function ToneStep() {
+    return (
+      <motion.div
+        className="space-y-8"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="grid gap-6">
+          {brandTones.map((tone, index) => {
+            const isSelected = preferences.brandTone === tone.id;
+            const IconComponent = tone.icon;
+            
+            return (
+              <motion.button
+                key={tone.id}
+                onClick={() => setPreferences(prev => ({ ...prev, brandTone: tone.id }))}
+                className={`relative p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+                  isSelected
+                    ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-blue-600/20'
+                    : 'border-slate-600 bg-slate-800/30 hover:border-slate-500'
+                }`}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02, x: 10 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="flex items-center space-x-4">
+                  <div className={`p-3 rounded-xl ${
+                    isSelected ? 'bg-cyan-400/20' : 'bg-slate-700/50'
+                  }`}>
+                    <IconComponent className={`w-6 h-6 ${
+                      isSelected ? 'text-cyan-400' : 'text-slate-400'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-xl font-bold ${
+                      isSelected ? 'text-cyan-400' : 'text-white'
+                    }`}>
+                      {tone.label}
+                    </h3>
+                    <p className="text-slate-400">{tone.description}</p>
+                  </div>
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <CheckCircle className="w-6 h-6 text-cyan-400" />
+                    </motion.div>
+                  )}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </motion.div>
+    );
+  }
+
+  function GoalsStep() {
+    return (
+      <motion.div
+        className="space-y-10"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Primary Goal Selection */}
+        <div className="space-y-6">
+          <h3 className="text-2xl font-bold text-cyan-400 text-center">Primary Mission</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {goalTypes.map((goal, index) => {
+              const isSelected = preferences.goals.primary === goal.id;
+              const IconComponent = goal.icon;
+              
+              return (
+                <motion.button
+                  key={goal.id}
+                  onClick={() => setPreferences(prev => ({
+                    ...prev,
+                    goals: { ...prev.goals, primary: goal.id }
+                  }))}
+                  className={`relative p-6 rounded-2xl border-2 text-center transition-all duration-300 overflow-hidden ${
+                    isSelected
+                      ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-blue-600/20'
+                      : 'border-slate-600 bg-slate-800/30 hover:border-slate-500'
+                  }`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isSelected && (
+                    <motion.div
+                      className={`absolute inset-0 bg-gradient-to-br ${goal.color} opacity-10`}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  )}
+                  
+                  <div className="relative z-10 space-y-4">
+                    <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
+                      isSelected ? 'bg-cyan-400/20' : 'bg-slate-700/50'
+                    }`}>
+                      <IconComponent className={`w-8 h-8 ${
+                        isSelected ? 'text-cyan-400' : 'text-slate-400'
+                      }`} />
+                    </div>
+                    
+                    <div>
+                      <h4 className={`text-lg font-bold ${
+                        isSelected ? 'text-cyan-400' : 'text-white'
+                      }`}>
+                        {goal.label}
+                      </h4>
+                      <p className="text-slate-400 text-sm mt-2">{goal.description}</p>
+                    </div>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Follower Target */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-bold text-cyan-400 text-center">Follower Target</h3>
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="text-center">
+              <span className="text-3xl font-bold text-white">
+                {preferences.goals.followers.toLocaleString()}
+              </span>
+              <span className="text-slate-400 ml-2">followers</span>
+            </div>
+            <Slider
+              value={[preferences.goals.followers]}
+              onValueChange={(value) => setPreferences(prev => ({
+                ...prev,
+                goals: { ...prev.goals, followers: value[0] }
+              }))}
+              min={100}
+              max={100000}
+              step={100}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-slate-400">
+              <span>100</span>
+              <span>100K</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Engagement Target */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-bold text-cyan-400 text-center">Engagement Goal</h3>
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="text-center">
+              <span className="text-3xl font-bold text-white">
+                {preferences.goals.engagement}%
+              </span>
+              <span className="text-slate-400 ml-2">engagement rate</span>
+            </div>
+            <Slider
+              value={[preferences.goals.engagement]}
+              onValueChange={(value) => setPreferences(prev => ({
+                ...prev,
+                goals: { ...prev.goals, engagement: value[0] }
+              }))}
+              min={1}
+              max={20}
+              step={0.5}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-slate-400">
+              <span>1%</span>
+              <span>20%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Selection */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-bold text-cyan-400 text-center">Mission Timeline</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {timelineOptions.map((timeline, index) => {
+              const isSelected = preferences.goals.timeline === timeline.id;
+              
+              return (
+                <motion.button
+                  key={timeline.id}
+                  onClick={() => setPreferences(prev => ({
+                    ...prev,
+                    goals: { ...prev.goals, timeline: timeline.id }
+                  }))}
+                  className={`p-4 rounded-xl border-2 text-center transition-all duration-300 ${
+                    isSelected
+                      ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-blue-600/20'
+                      : 'border-slate-600 bg-slate-800/30 hover:border-slate-500'
+                  }`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className={`text-lg font-bold ${
+                    isSelected ? 'text-cyan-400' : 'text-white'
+                  }`}>
+                    {timeline.label}
+                  </div>
+                  <div className="text-slate-400 text-sm">{timeline.description}</div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  function ConnectStep() {
+    const hasInstagram = socialAccounts?.some((account: any) => account.platform === 'instagram');
+
+    return (
+      <motion.div
+        className="space-y-8 text-center"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="space-y-6">
+          <h3 className="text-2xl font-bold text-cyan-400">Connect Your Satellites</h3>
+          <p className="text-slate-300 max-w-2xl mx-auto">
+            Link your social media accounts to begin your cosmic journey. We'll analyze your existing presence and supercharge your content strategy.
+          </p>
+        </div>
+
+        <div className="max-w-md mx-auto">
+          <motion.button
+            onClick={() => connectInstagramMutation.mutate()}
+            disabled={connectInstagramMutation.isPending || hasInstagram}
+            className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 ${
+              hasInstagram
+                ? 'border-green-500 bg-gradient-to-br from-green-500/20 to-emerald-600/20'
+                : 'border-pink-500 bg-gradient-to-br from-pink-500/20 to-purple-600/20 hover:scale-105'
+            }`}
+            whileHover={!hasInstagram ? { scale: 1.05, y: -5 } : {}}
+            whileTap={!hasInstagram ? { scale: 0.95 } : {}}
+          >
+            <div className="flex items-center justify-center space-x-4">
+              <div className={`p-3 rounded-xl ${
+                hasInstagram ? 'bg-green-500/20' : 'bg-pink-500/20'
+              }`}>
+                {hasInstagram ? (
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                ) : (
+                  <Instagram className="w-8 h-8 text-pink-400" />
+                )}
+              </div>
+              <div className="text-left">
+                <h4 className={`text-xl font-bold ${
+                  hasInstagram ? 'text-green-400' : 'text-pink-400'
+                }`}>
+                  {hasInstagram ? 'Instagram Connected' : 'Connect Instagram'}
+                </h4>
+                <p className="text-slate-400">
+                  {hasInstagram ? 'Ready for cosmic content!' : 'Link your Instagram account'}
+                </p>
+              </div>
+            </div>
+          </motion.button>
+        </div>
+
+        {hasInstagram && socialAccounts && (
+          <motion.div
+            className="max-w-md mx-auto p-4 bg-slate-800/50 rounded-xl border border-slate-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            {socialAccounts
+              .filter((account: any) => account.platform === 'instagram')
+              .map((account: any) => (
+                <div key={account.id} className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <Instagram className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold text-white">@{account.username}</div>
+                    <div className="text-sm text-slate-400">
+                      {account.followers} followers • {account.mediaCount} posts
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </motion.div>
+        )}
+      </motion.div>
+    );
+  }
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
     }
   };
 
-  const handleComplete = async () => {
-    await savePreferencesMutation.mutateAsync(preferences);
-    await completeOnboardingMutation.mutateAsync();
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
-  const isStepValid = () => {
+  const handleFinish = () => {
+    if (!preferences.businessName || !preferences.description || preferences.niches.length === 0 || !preferences.brandTone) {
+      toast({
+        title: "Incomplete Setup",
+        description: "Please fill in all required fields before launching",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    savePreferencesMutation.mutate(preferences);
+  };
+
+  const canProceed = () => {
     switch (currentStep) {
-      case 0: return preferences.businessName.trim().length > 0;
-      case 1: return preferences.niches.length > 0;
-      case 2: return preferences.brandTone.length > 0;
-      case 3: return Array.isArray(socialAccounts) && socialAccounts.length > 0;
+      case 0: return true;
+      case 1: return preferences.businessName.length > 0 && preferences.description.length > 0;
+      case 2: return preferences.niches.length >= 2;
+      case 3: return preferences.brandTone.length > 0;
+      case 4: return true;
+      case 5: return true;
       default: return false;
     }
   };
 
-  const steps = [
-    {
-      title: "Brand Identity",
-      description: "Tell us about your brand",
-      icon: Building,
-      color: "from-cyan-500 to-blue-500"
-    },
-    {
-      title: "Content Focus",
-      description: "Choose your niches",
-      icon: Target,
-      color: "from-blue-500 to-purple-500"
-    },
-    {
-      title: "Brand Voice",
-      description: "Define your tone",
-      icon: Zap,
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      title: "Connect Accounts",
-      description: "Link your social media",
-      icon: Instagram,
-      color: "from-pink-500 to-orange-500"
-    }
-  ];
+  const CurrentStepComponent = steps[currentStep]?.component;
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-950">
+    <div className="min-h-screen relative overflow-hidden">
       <SpaceBackground />
+      <FloatingElements />
       
-      {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-8">
+      <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <motion.div
-            className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            animate={{ 
-              boxShadow: [
-                "0 0 30px rgba(34, 211, 238, 0.5)",
-                "0 0 50px rgba(34, 211, 238, 0.8)",
-                "0 0 30px rgba(34, 211, 238, 0.5)"
-              ]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <Rocket className="w-10 h-10 text-white" />
-          </motion.div>
+        <div className="p-8">
+          <StepIndicator currentStep={currentStep} totalSteps={steps.length} />
           
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-yellow-400 to-cyan-400 bg-clip-text text-transparent mb-4">
-            Welcome to VeeFore
-          </h1>
-          <p className="text-xl text-slate-300 font-light">
-            Let's set up your cosmic content creation journey
-          </p>
-        </motion.div>
-
-        {/* Progress Indicator */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center justify-center mb-12 space-x-4"
-        >
-          {steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <motion.div
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
-                  index <= currentStep 
-                    ? `bg-gradient-to-r ${step.color}` 
-                    : 'bg-slate-800 border-2 border-slate-700'
-                }`}
-                animate={index === currentStep ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <step.icon className="w-6 h-6 text-white" />
-              </motion.div>
-              {index < steps.length - 1 && (
-                <div className={`w-8 h-1 transition-all duration-500 ${
-                  index < currentStep ? 'bg-cyan-400' : 'bg-slate-700'
-                }`} />
-              )}
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Step Content */}
-        <div className="w-full max-w-2xl">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
-              className="bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl"
-            >
-              {/* Step 0: Brand Identity */}
-              {currentStep === 0 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent mb-3">
-                      Brand Identity
-                    </h2>
-                    <p className="text-slate-300">Tell us about your brand to personalize your experience</p>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <Label className="text-slate-200 font-medium mb-3 block">
-                        Business/Brand Name *
-                      </Label>
-                      <Input
-                        value={preferences.businessName}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
-                        placeholder="Enter your business name"
-                        className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-400/50 focus:ring-cyan-400/20 h-12 text-lg"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label className="text-slate-200 font-medium mb-3 block">
-                        Brand Description
-                      </Label>
-                      <Input
-                        value={preferences.description}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
-                        placeholder="What makes your brand unique?"
-                        className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-400/50 focus:ring-cyan-400/20 h-12 text-lg"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 1: Content Niches */}
-              {currentStep === 1 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent mb-3">
-                      Content Focus
-                    </h2>
-                    <p className="text-slate-300">Choose niches that align with your brand</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                    {niches.map((niche) => (
-                      <motion.button
-                        key={niche}
-                        onClick={() => setPreferences(prev => ({
-                          ...prev,
-                          niches: prev.niches.includes(niche)
-                            ? prev.niches.filter(n => n !== niche)
-                            : [...prev.niches, niche]
-                        }))}
-                        className={`p-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                          preferences.niches.includes(niche)
-                            ? 'bg-gradient-to-r from-cyan-500 to-yellow-400 text-white shadow-lg'
-                            : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-600/50'
-                        }`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {niche}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 2: Brand Tone */}
-              {currentStep === 2 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent mb-3">
-                      Brand Voice
-                    </h2>
-                    <p className="text-slate-300">How should your content sound?</p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {brandTones.map((tone) => (
-                      <motion.button
-                        key={tone.id}
-                        onClick={() => setPreferences(prev => ({ ...prev, brandTone: tone.id }))}
-                        className={`w-full p-4 rounded-xl text-left transition-all duration-300 ${
-                          preferences.brandTone === tone.id
-                            ? 'bg-gradient-to-r from-cyan-500/20 to-yellow-400/20 border-2 border-cyan-400/50'
-                            : 'bg-slate-800/50 border border-slate-600/50 hover:bg-slate-700/50'
-                        }`}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-white font-semibold text-lg">{tone.label}</h3>
-                            <p className="text-slate-400 text-sm">{tone.description}</p>
-                          </div>
-                          {preferences.brandTone === tone.id && (
-                            <CheckCircle className="w-6 h-6 text-cyan-400" />
-                          )}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: Connect Accounts */}
-              {currentStep === 3 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-yellow-400 bg-clip-text text-transparent mb-3">
-                      Connect Accounts
-                    </h2>
-                    <p className="text-slate-300">Link your Instagram to start creating amazing content</p>
-                  </div>
-
-                  {/* Success State */}
-                  {Array.isArray(socialAccounts) && socialAccounts.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="bg-green-500/20 backdrop-blur-md rounded-xl p-6 border border-green-400/30 text-center"
-                    >
-                      <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-green-300 mb-2">Instagram Connected!</h3>
-                      <p className="text-green-200">Account: @{socialAccounts[0]?.username}</p>
-                    </motion.div>
-                  )}
-
-                  {/* Instagram Connection */}
-                  <motion.div
-                    className="bg-slate-800/50 backdrop-blur-lg border border-slate-600/50 rounded-xl p-6"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center">
-                          <Instagram className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-white font-semibold text-lg">Instagram</h3>
-                          <p className="text-slate-400">Connect your Instagram Business account</p>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        onClick={() => connectInstagramMutation.mutate()}
-                        disabled={connectInstagramMutation.isPending}
-                        className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white border-0 shadow-lg px-6 py-3"
-                      >
-                        {connectInstagramMutation.isPending ? 'Connecting...' : 'Connect'}
-                      </Button>
-                    </div>
-                  </motion.div>
-                </div>
-              )}
-
-              {/* Navigation */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-slate-700/50">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                  disabled={currentStep === 0}
-                  className="bg-slate-800/50 border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
-                >
-                  Previous
-                </Button>
-                
-                <Button
-                  onClick={handleNext}
-                  disabled={!isStepValid() || savePreferencesMutation.isPending || completeOnboardingMutation.isPending}
-                  className="bg-gradient-to-r from-cyan-500 to-yellow-400 hover:from-cyan-600 hover:to-yellow-500 text-white border-0 shadow-lg px-6"
-                >
-                  {currentStep === 3 ? 
-                    (completeOnboardingMutation.isPending ? 'Completing...' : 'Complete Setup') : 
-                    'Next'
-                  }
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            className="text-center mb-12"
+            key={currentStep}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              {steps[currentStep]?.title}
+            </h1>
+            <p className="text-xl text-slate-300">
+              {steps[currentStep]?.subtitle}
+            </p>
+          </motion.div>
         </div>
 
-        {/* Features Preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl w-full"
-        >
-          {[
-            { icon: Sparkles, title: "AI Content Creation", desc: "Generate stellar posts and captions", color: "from-cyan-500 to-blue-500" },
-            { icon: Target, title: "Smart Scheduling", desc: "Post at optimal times", color: "from-blue-500 to-purple-500" },
-            { icon: TrendingUp, title: "Analytics", desc: "Track your cosmic growth", color: "from-purple-500 to-pink-500" }
-          ].map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 + index * 0.2 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="bg-slate-900/30 backdrop-blur-md border border-slate-700/30 rounded-xl p-6 text-center"
+        {/* Content */}
+        <div className="flex-1 px-8 pb-8">
+          <div className="max-w-6xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.5 }}
+              >
+                {CurrentStepComponent && <CurrentStepComponent />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="p-8">
+          <div className="max-w-4xl mx-auto flex justify-between items-center">
+            <Button
+              onClick={handlePrevious}
+              disabled={currentStep === 0}
+              variant="outline"
+              className="bg-slate-800/50 border-slate-600 text-white hover:bg-slate-700 disabled:opacity-50"
             >
-              <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                <feature.icon className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-bold text-lg text-white mb-2">{feature.title}</h3>
-              <p className="text-slate-400 text-sm">{feature.desc}</p>
-            </motion.div>
-          ))}
-        </motion.div>
+              Previous
+            </Button>
+
+            <div className="text-slate-400 text-sm">
+              Step {currentStep + 1} of {steps.length}
+            </div>
+
+            {currentStep === steps.length - 1 ? (
+              <Button
+                onClick={handleFinish}
+                disabled={savePreferencesMutation.isPending || !canProceed()}
+                className="bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-500 hover:to-blue-700 text-white font-semibold px-8"
+              >
+                {savePreferencesMutation.isPending ? (
+                  "Launching..."
+                ) : (
+                  <>
+                    Launch Mission <Rocket className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-500 hover:to-blue-700 text-white font-semibold px-8 disabled:opacity-50"
+              >
+                Next <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

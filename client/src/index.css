@@ -54,6 +54,86 @@
   --asteroid-silver: 220 9% 65%; /* #9CA3AF */
 }
 
+/* 3D Space Animation Enhancements */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 215, 0, 0.4); }
+}
+
+@keyframes cosmic-drift {
+  0% { transform: translateX(-100px) translateY(50px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(100vw) translateY(-50px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes starfield {
+  0% { transform: translateY(0px) scale(1); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+}
+
+@keyframes nebula-swirl {
+  0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+  100% { transform: rotate(360deg) scale(1.1); filter: hue-rotate(360deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-cosmic-drift {
+  animation: cosmic-drift 15s linear infinite;
+}
+
+.animate-starfield {
+  animation: starfield 8s linear infinite;
+}
+
+.animate-nebula-swirl {
+  animation: nebula-swirl 20s linear infinite;
+}
+
+/* 3D Transform Utilities */
+.transform-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.rotate-x-12 {
+  transform: rotateX(12deg);
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+/* Custom Gradient Overlays */
+.cosmic-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--electric-cyan)) 0%, 
+    hsl(var(--nebula-purple)) 25%, 
+    hsl(var(--solar-gold)) 50%, 
+    hsl(var(--deep-purple)) 75%, 
+    hsl(var(--space-navy)) 100%);
+}
+
+.space-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
 .dark {
   --background: 11 20% 8%;
   --foreground: 0 0% 98%;

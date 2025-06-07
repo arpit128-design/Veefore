@@ -5,7 +5,19 @@ async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     console.log('[API REQUEST] Error response text:', text);
-    const error = new Error(`${res.status}: ${text}`);
+    
+    // Try to parse JSON error response
+    let errorData: any = {};
+    try {
+      errorData = JSON.parse(text);
+    } catch {
+      // If not JSON, use text as error message
+      errorData = { error: text };
+    }
+    
+    const error = new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
+    (error as any).status = res.status;
+    (error as any).needsUpgrade = errorData.needsUpgrade;
     console.log('[API REQUEST] Throwing error:', error);
     throw error;
   }

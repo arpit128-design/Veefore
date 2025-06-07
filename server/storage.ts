@@ -1,15 +1,16 @@
 import { 
   users, workspaces, workspaceMembers, teamInvitations, socialAccounts, content, analytics, 
   automationRules, suggestions, creditTransactions, referrals,
-  subscriptions, payments, addons,
+  subscriptions, payments, addons, contentRecommendations, userContentHistory,
   type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
-  type Payment, type Addon,
+  type Payment, type Addon, type ContentRecommendation, type UserContentHistory,
   type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
   type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
-  type InsertSubscription, type InsertPayment, type InsertAddon
+  type InsertSubscription, type InsertPayment, type InsertAddon,
+  type InsertContentRecommendation, type InsertUserContentHistory
 } from "@shared/schema";
 
 export interface IStorage {

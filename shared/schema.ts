@@ -151,6 +151,35 @@ export const suggestions = pgTable("suggestions", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+export const contentRecommendations = pgTable("content_recommendations", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  type: text("type").notNull(), // video, reel, audio
+  title: text("title").notNull(),
+  description: text("description"),
+  thumbnailUrl: text("thumbnail_url"),
+  mediaUrl: text("media_url"),
+  duration: integer("duration"), // in seconds
+  category: text("category"), // niche/interest category
+  country: text("country"), // country code for regional content
+  tags: json("tags"), // array of relevant tags
+  engagement: json("engagement"), // likes, views, shares data
+  sourceUrl: text("source_url"), // original source reference
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const userContentHistory = pgTable("user_content_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  recommendationId: integer("recommendation_id").references(() => contentRecommendations.id),
+  action: text("action").notNull(), // viewed, liked, created_similar, dismissed
+  metadata: json("metadata"), // additional tracking data
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 export const creditTransactions = pgTable("credit_transactions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -410,3 +439,34 @@ export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type InsertCreditPackage = z.infer<typeof insertCreditPackageSchema>;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type InsertAddon = z.infer<typeof insertAddonSchema>;
+
+// Content recommendations schema
+export const insertContentRecommendationSchema = createInsertSchema(contentRecommendations).pick({
+  workspaceId: true,
+  type: true,
+  title: true,
+  description: true,
+  thumbnailUrl: true,
+  mediaUrl: true,
+  duration: true,
+  category: true,
+  country: true,
+  tags: true,
+  engagement: true,
+  sourceUrl: true,
+  isActive: true
+});
+
+export const insertUserContentHistorySchema = createInsertSchema(userContentHistory).pick({
+  userId: true,
+  workspaceId: true,
+  recommendationId: true,
+  action: true,
+  metadata: true
+});
+
+export type ContentRecommendation = typeof contentRecommendations.$inferSelect;
+export type InsertContentRecommendation = z.infer<typeof insertContentRecommendationSchema>;
+
+export type UserContentHistory = typeof userContentHistory.$inferSelect;
+export type InsertUserContentHistory = z.infer<typeof insertUserContentHistorySchema>;

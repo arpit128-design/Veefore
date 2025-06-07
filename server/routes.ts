@@ -18,6 +18,7 @@ import {
 } from "./plan-enforcement-middleware";
 import { generateIntelligentSuggestions } from "./ai-suggestions-service";
 import { TeamService } from "./team-service";
+import { contentRecommendationService } from "./content-recommendation-service";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -2421,6 +2422,154 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error: any) {
       console.error('[TEAM] Join by code error:', error);
       res.status(500).json({ error: 'Failed to join workspace' });
+    }
+  });
+
+  // Content Recommendations API
+  app.get('/api/content-recommendations', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId, type, limit = 6 } = req.query;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      console.log(`[CONTENT RECOMMENDATIONS] Fetching ${type || 'all'} recommendations for workspace: ${workspaceId}`);
+
+      // Get user's IP for geolocation
+      const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
+      const userLocation = await contentRecommendationService.detectUserLocation(clientIp as string);
+
+      // Get user and workspace data
+      const user = req.user;
+      const workspace = await storage.getWorkspace(parseInt(workspaceId));
+      
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      // Extract niche and interests from user preferences
+      const preferences = user.preferences as any || {};
+      const niche = preferences.niche || 'general';
+      const interests = preferences.interests || ['content creation'];
+
+      // Generate personalized recommendations
+      const recommendations = await contentRecommendationService.generatePersonalizedRecommendations(
+        user,
+        workspace,
+        userLocation,
+        {
+          type: type as 'video' | 'reel' | 'audio' || 'video',
+          niche,
+          interests,
+          country: userLocation.countryCode,
+          limit: parseInt(limit as string)
+        }
+      );
+
+      // Store recommendations in database for future reference
+      const storedRecommendations = [];
+      for (const rec of recommendations) {
+        try {
+          const stored = await storage.createContentRecommendation({
+            workspaceId: parseInt(workspaceId),
+            type: type as string || 'video',
+            title: rec.title,
+            description: rec.description,
+            thumbnailUrl: await contentRecommendationService.generateThumbnail(rec.thumbnailPrompt),
+            mediaUrl: rec.script || rec.audioDescription || '',
+            duration: rec.duration,
+            category: rec.category,
+            country: userLocation.countryCode,
+            tags: rec.tags,
+            engagement: rec.engagement,
+            sourceUrl: 'ai-generated',
+            isActive: true
+          });
+          storedRecommendations.push(stored);
+        } catch (error) {
+          console.error('[CONTENT RECOMMENDATIONS] Failed to store recommendation:', error);
+        }
+      }
+
+      console.log(`[CONTENT RECOMMENDATIONS] Generated ${storedRecommendations.length} recommendations for ${userLocation.country}`);
+      
+      res.json({
+        recommendations: storedRecommendations,
+        location: userLocation,
+        totalCount: storedRecommendations.length
+      });
+    } catch (error: any) {
+      console.error('[CONTENT RECOMMENDATIONS] Error:', error);
+      res.status(500).json({ error: 'Failed to generate content recommendations' });
+    }
+  });
+
+  // Get specific content recommendation
+  app.get('/api/content-recommendations/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const recommendationId = parseInt(req.params.id);
+      const recommendation = await storage.getContentRecommendation(recommendationId);
+      
+      if (!recommendation) {
+        return res.status(404).json({ error: 'Content recommendation not found' });
+      }
+
+      res.json(recommendation);
+    } catch (error: any) {
+      console.error('[CONTENT RECOMMENDATIONS] Get recommendation error:', error);
+      res.status(500).json({ error: 'Failed to fetch content recommendation' });
+    }
+  });
+
+  // Track user interaction with content recommendation
+  app.post('/api/content-recommendations/:id/track', requireAuth, async (req: any, res: Response) => {
+    try {
+      const recommendationId = parseInt(req.params.id);
+      const { action, metadata = {} } = req.body;
+      const userId = req.user.id;
+      const { workspaceId } = req.query;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      const validActions = ['viewed', 'liked', 'created_similar', 'dismissed'];
+      if (!validActions.includes(action)) {
+        return res.status(400).json({ error: 'Invalid action' });
+      }
+
+      await storage.createUserContentHistory({
+        userId,
+        workspaceId: parseInt(workspaceId),
+        recommendationId,
+        action,
+        metadata
+      });
+
+      console.log(`[CONTENT RECOMMENDATIONS] Tracked ${action} for recommendation ${recommendationId} by user ${userId}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[CONTENT RECOMMENDATIONS] Track error:', error);
+      res.status(500).json({ error: 'Failed to track interaction' });
+    }
+  });
+
+  // Get user's content history and preferences
+  app.get('/api/content-recommendations/history/:userId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { workspaceId } = req.query;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      const history = await storage.getUserContentHistory(userId, parseInt(workspaceId));
+      res.json(history);
+    } catch (error: any) {
+      console.error('[CONTENT RECOMMENDATIONS] Get history error:', error);
+      res.status(500).json({ error: 'Failed to fetch content history' });
     }
   });
 

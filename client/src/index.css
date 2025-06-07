@@ -20,34 +20,39 @@
 }
 
 :root {
-  --background: 11 20% 8%; /* #0B1426 */
-  --foreground: 0 0% 98%;
-  --muted: 217 19% 15%; /* #1A2332 */
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 11 20% 8%;
-  --popover-foreground: 0 0% 98%;
-  --card: 11 20% 8%;
-  --card-foreground: 0 0% 98%;
-  --border: 217 19% 15%;
-  --input: 217 19% 15%;
-  --primary: 195 100% 50%; /* #00D4FF */
-  --primary-foreground: 217 100% 99%;
-  --secondary: 217 19% 15%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 217 19% 15%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 195 100% 50%;
-  --radius: 0.5rem;
+  /* VeeFore Nova Design System - Complete Redesign */
+  --background: 220 30% 4%; /* #060B14 - Ultra deep space */
+  --foreground: 210 100% 98%; /* #FAFEFF - Pure white text */
+  --muted: 222 25% 12%; /* #1A1F2E - Muted backgrounds */
+  --muted-foreground: 215 20% 65%; /* #9CA3AF */
+  --popover: 220 30% 6%; /* #0A0F1A */
+  --popover-foreground: 210 100% 98%;
+  --card: 222 25% 8%; /* #11161F - Card background */
+  --card-foreground: 210 100% 98%;
+  --border: 222 25% 15%; /* #202634 - Subtle borders */
+  --input: 222 25% 10%; /* #171C26 - Input backgrounds */
+  --primary: 187 100% 45%; /* #00E6FF - Bright electric cyan */
+  --primary-foreground: 220 30% 4%;
+  --secondary: 45 100% 55%; /* #FFB800 - Bright solar gold */
+  --secondary-foreground: 220 30% 4%;
+  --accent: 260 80% 65%; /* #9333EA - Cosmic purple */
+  --accent-foreground: 210 100% 98%;
+  --destructive: 0 85% 60%;
+  --destructive-foreground: 210 100% 98%;
+  --ring: 187 100% 45%;
+  --radius: 0.75rem;
   
-  /* Space theme colors */
-  --space-navy: 11 20% 8%; /* #0B1426 */
-  --space-black: 0 0% 5%; /* #0D0D0D */
-  --deep-purple: 256 71% 25%; /* #2D1B69 */
-  --cosmic-blue: 217 50% 30%; /* #3B5998 */
-  --electric-cyan: 195 100% 50%; /* #00D4FF */
-  --neon-pink: 320 100% 60%; /* #FF33CC */
+  /* Enhanced Space Design Variables */
+  --void-black: 220 30% 2%; /* #030508 - Absolute void */
+  --space-navy: 220 30% 4%; /* #060B14 - Primary background */
+  --deep-slate: 222 25% 8%; /* #11161F - Secondary background */
+  --stellar-blue: 217 91% 55%; /* #3B82F6 - Space blue accents */
+  --electric-cyan: 187 100% 45%; /* #00E6FF - Primary brand */
+  --solar-gold: 45 100% 55%; /* #FFB800 - Secondary brand */
+  --cosmic-purple: 260 80% 65%; /* #9333EA - Tertiary accent */
+  --nebula-pink: 330 85% 60%; /* #EC4899 - Special highlights */
+  --quantum-green: 142 76% 55%; /* #22C55E - Success states */
+  --plasma-orange: 25 95% 60%; /* #FB923C - Warning states */
   --nebula-purple: 256 71% 58%; /* #7C3AED */
   --solar-gold: 45 96% 49%; /* #F59E0B */
   --space-gray: 220 13% 26%; /* #374151 */
@@ -182,46 +187,149 @@
   to { transform: translateX(-200px); }
 }
 
-/* 3D Dashboard Enhancements */
-.card-3d {
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-}
-
-.card-3d:hover {
-  transform: rotateY(8deg) rotateX(3deg) translateZ(20px);
-}
-
-.perspective-dashboard {
-  perspective: 1200px;
+/* VeeFore Nova 3D System - Complete Visual Overhaul */
+.nova-perspective {
+  perspective: 1500px;
   transform-style: preserve-3d;
 }
 
-@keyframes float-3d {
+.nova-card {
+  transform-style: preserve-3d;
+  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(135deg, 
+    hsl(var(--deep-slate)) 0%, 
+    hsl(var(--card)) 50%, 
+    hsl(var(--deep-slate)) 100%);
+  border: 1px solid hsl(var(--electric-cyan) / 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px hsl(var(--void-black) / 0.8),
+    0 0 20px hsl(var(--electric-cyan) / 0.1),
+    inset 0 1px 0 hsl(var(--electric-cyan) / 0.2);
+}
+
+.nova-card:hover {
+  transform: rotateY(12deg) rotateX(5deg) translateZ(30px) scale(1.02);
+  box-shadow: 
+    0 20px 60px hsl(var(--void-black) / 0.9),
+    0 0 40px hsl(var(--electric-cyan) / 0.3),
+    inset 0 1px 0 hsl(var(--electric-cyan) / 0.4);
+}
+
+.nova-sidebar {
+  background: linear-gradient(180deg, 
+    hsl(var(--void-black)) 0%, 
+    hsl(var(--space-navy)) 50%, 
+    hsl(var(--deep-slate)) 100%);
+  border-right: 1px solid hsl(var(--electric-cyan) / 0.3);
+  backdrop-filter: blur(25px);
+  box-shadow: 
+    4px 0 20px hsl(var(--void-black) / 0.7),
+    inset -1px 0 0 hsl(var(--electric-cyan) / 0.1);
+}
+
+.nova-header {
+  background: linear-gradient(90deg, 
+    hsl(var(--void-black) / 0.95) 0%, 
+    hsl(var(--deep-slate) / 0.95) 100%);
+  border-bottom: 1px solid hsl(var(--electric-cyan) / 0.3);
+  backdrop-filter: blur(25px);
+  box-shadow: 
+    0 4px 20px hsl(var(--void-black) / 0.7),
+    inset 0 -1px 0 hsl(var(--electric-cyan) / 0.1);
+}
+
+@keyframes nova-float {
   0%, 100% { 
-    transform: translateY(0px) rotateX(0deg); 
+    transform: translateY(0px) rotateX(0deg) rotateZ(0deg); 
+  }
+  33% { 
+    transform: translateY(-12px) rotateX(2deg) rotateZ(1deg); 
+  }
+  66% { 
+    transform: translateY(6px) rotateX(-1deg) rotateZ(-0.5deg); 
+  }
+}
+
+@keyframes nova-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px hsl(var(--electric-cyan) / 0.3);
   }
   50% { 
-    transform: translateY(-8px) rotateX(2deg); 
+    box-shadow: 0 0 40px hsl(var(--electric-cyan) / 0.6);
   }
 }
 
-.animate-float-3d {
-  animation: float-3d 6s ease-in-out infinite;
+@keyframes nova-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.05);
+    opacity: 1;
+  }
 }
 
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.animate-nova-float {
+  animation: nova-float 8s ease-in-out infinite;
 }
 
-.neon-border {
+.animate-nova-glow {
+  animation: nova-glow 3s ease-in-out infinite;
+}
+
+.animate-nova-pulse {
+  animation: nova-pulse 2s ease-in-out infinite;
+}
+
+.nova-glass {
+  background: linear-gradient(135deg, 
+    hsl(var(--card) / 0.1) 0%, 
+    hsl(var(--deep-slate) / 0.2) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--electric-cyan) / 0.2);
+}
+
+.nova-platform-card {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.nova-platform-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    hsl(var(--electric-cyan) / 0.1) 50%, 
+    transparent 100%);
+  transition: left 0.8s ease;
+}
+
+.nova-platform-card:hover::before {
+  left: 100%;
+}
+
+.nova-nav-item {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  border-radius: 12px;
+}
+
+.nova-nav-item:hover {
+  transform: translateX(8px) scale(1.02);
+  background: linear-gradient(90deg, 
+    hsl(var(--electric-cyan) / 0.1) 0%, 
+    hsl(var(--cosmic-purple) / 0.1) 100%);
   box-shadow: 
-    0 0 5px rgba(6, 182, 212, 0.3),
-    0 0 10px rgba(6, 182, 212, 0.2),
-    0 0 15px rgba(6, 182, 212, 0.1),
-    inset 0 0 5px rgba(6, 182, 212, 0.1);
+    4px 0 20px hsl(var(--electric-cyan) / 0.2),
+    inset 0 0 20px hsl(var(--cosmic-purple) / 0.1);
 }
 
 /* Reduce repaints during typing */

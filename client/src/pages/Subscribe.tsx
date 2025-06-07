@@ -261,7 +261,7 @@ export default function Subscribe() {
 
         {/* Features Comparison */}
         <div className="mt-16 text-center">
-          <h2 className="text-3xl font-orbitron font-bold neon-text text-nebula-purple mb-8">
+          <h2 className="text-3xl font-orbitron font-bold text-nebula-purple mb-8">
             Why Choose VeeFore?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -61,8 +61,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
-  50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 215, 0, 0.4); }
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: none; }
 }
 
 @keyframes cosmic-drift {
@@ -244,12 +244,9 @@
     background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%);
   }
   
-  /* Neon text effect */
+  /* Neon text effect - disabled */
   .neon-text {
-    text-shadow: 
-      0 0 10px currentColor, 
-      0 0 20px currentColor, 
-      0 0 40px currentColor;
+    text-shadow: none;
   }
   
   /* Energy bar effect */

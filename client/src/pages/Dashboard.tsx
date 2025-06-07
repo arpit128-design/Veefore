@@ -154,7 +154,7 @@ export default function Dashboard() {
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold neon-text text-electric-cyan mb-2">
+          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-electric-cyan mb-2">
             Mission Control
           </h2>
           <p className="text-asteroid-silver text-sm md:text-base">

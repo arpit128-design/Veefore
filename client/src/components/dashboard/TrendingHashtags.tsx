@@ -12,7 +12,10 @@ interface Hashtag {
   tag: string;
   category: string;
   popularity: number;
+  growthPotential: number;
   engagement: string;
+  platforms: string[];
+  uses: number;
 }
 
 export function TrendingHashtags() {

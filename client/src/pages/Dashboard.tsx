@@ -68,11 +68,64 @@ export default function Dashboard() {
   const rawData = analyticsData as any;
   const hasValidData = analyticsData && rawData?.accountUsername;
   
+  // Calculate real content score based on Instagram metrics
+  const calculateContentScore = (data: any) => {
+    if (!hasValidData || !data) return null;
+    
+    const engagement = data.engagementRate || 0;
+    const reach = data.totalReach || 0;
+    const posts = data.totalPosts || data.mediaCount || 1;
+    const likes = data.totalLikes || 0;
+    const comments = data.totalComments || 0;
+    
+    // Content score factors:
+    // 1. Engagement rate (0-40 points): High engagement = quality content
+    // 2. Reach efficiency (0-25 points): Good reach per post
+    // 3. Interaction quality (0-25 points): Comments vs likes ratio
+    // 4. Consistency bonus (0-10 points): Regular posting
+    
+    let score = 0;
+    
+    // Engagement rate scoring (0-40 points)
+    if (engagement > 5) score += 40;        // Excellent (>5%)
+    else if (engagement > 3) score += 32;   // Very good (3-5%)
+    else if (engagement > 1.5) score += 25; // Good (1.5-3%)
+    else if (engagement > 0.5) score += 15; // Fair (0.5-1.5%)
+    else if (engagement > 0) score += 8;    // Low but active
+    
+    // Reach efficiency (0-25 points) - reach per post
+    const reachPerPost = posts > 0 ? reach / posts : 0;
+    if (reachPerPost > 100) score += 25;      // Excellent reach
+    else if (reachPerPost > 50) score += 20;  // Good reach
+    else if (reachPerPost > 20) score += 15;  // Fair reach
+    else if (reachPerPost > 5) score += 10;   // Low reach
+    else if (reachPerPost > 0) score += 5;    // Minimal reach
+    
+    // Interaction quality (0-25 points) - comments show deeper engagement
+    const totalInteractions = likes + comments;
+    if (totalInteractions > 0) {
+      const commentRatio = comments / totalInteractions;
+      if (commentRatio > 0.8) score += 25;      // Very high comment engagement
+      else if (commentRatio > 0.5) score += 20; // High comment engagement  
+      else if (commentRatio > 0.2) score += 15; // Good comment engagement
+      else if (commentRatio > 0.1) score += 10; // Fair comment engagement
+      else score += 5;                          // Like-focused engagement
+    }
+    
+    // Consistency bonus (0-10 points) - having multiple posts
+    if (posts >= 7) score += 10;      // Very consistent
+    else if (posts >= 5) score += 8;  // Good consistency
+    else if (posts >= 3) score += 5;  // Fair consistency
+    else if (posts >= 1) score += 2;  // Some content
+    
+    return Math.min(100, Math.max(0, Math.round(score)));
+  };
+
   const analytics = {
     totalViews: hasValidData ? (rawData?.totalReach || rawData?.impressions || 0) : null,
     engagement: hasValidData ? (rawData?.engagementRate || 0) : null,
     newFollowers: hasValidData ? (rawData?.followers || 0) : null,
-    contentScore: 85, // Static for now
+    contentScore: calculateContentScore(rawData),
     platforms: hasValidData && rawData?.accountUsername ? ['instagram'] : []
   };
   

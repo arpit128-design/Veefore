@@ -118,23 +118,23 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* Simple Static Stars for Space Effect */}
-      <div className="simple-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        <div className="absolute w-1 h-1 bg-white opacity-80" style={{ top: '15%', left: '25%' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 opacity-70" style={{ top: '35%', left: '65%' }} />
-        <div className="absolute w-1 h-1 bg-yellow-300 opacity-75" style={{ top: '75%', left: '45%' }} />
-        <div className="absolute w-1 h-1 bg-blue-300 opacity-80" style={{ top: '55%', left: '85%' }} />
-        <div className="absolute w-1 h-1 bg-white opacity-60" style={{ top: '25%', left: '15%' }} />
-        <div className="absolute w-1 h-1 bg-cyan-300 opacity-70" style={{ top: '65%', left: '25%' }} />
-        <div className="absolute w-1 h-1 bg-yellow-400 opacity-80" style={{ top: '45%', left: '75%' }} />
-        <div className="absolute w-1 h-1 bg-white opacity-90" style={{ top: '85%', left: '35%' }} />
-        <div className="absolute w-1 h-1 bg-blue-400 opacity-60" style={{ top: '20%', left: '80%' }} />
-        <div className="absolute w-1 h-1 bg-white opacity-70" style={{ top: '60%', left: '55%' }} />
-        <div className="absolute w-1 h-1 bg-cyan-400 opacity-85" style={{ top: '40%', left: '30%' }} />
-        <div className="absolute w-1 h-1 bg-yellow-300 opacity-65" style={{ top: '80%', left: '70%' }} />
-        <div className="absolute w-1 h-1 bg-white opacity-75" style={{ top: '30%', left: '50%' }} />
-        <div className="absolute w-1 h-1 bg-blue-300 opacity-80" style={{ top: '70%', left: '10%' }} />
-        <div className="absolute w-1 h-1 bg-cyan-300 opacity-70" style={{ top: '50%', left: '90%' }} />
+      {/* Visible Animated Stars for Space Effect */}
+      <div className="space-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '15%', left: '25%', animationDelay: '0s' }} />
+        <div className="absolute w-3 h-3 bg-cyan-400 rounded-full animate-pulse" style={{ top: '35%', left: '65%', animationDelay: '0.5s' }} />
+        <div className="absolute w-2 h-2 bg-yellow-300 rounded-full animate-pulse" style={{ top: '75%', left: '45%', animationDelay: '1s' }} />
+        <div className="absolute w-3 h-3 bg-blue-300 rounded-full animate-pulse" style={{ top: '55%', left: '85%', animationDelay: '1.5s' }} />
+        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '25%', left: '15%', animationDelay: '2s' }} />
+        <div className="absolute w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{ top: '65%', left: '25%', animationDelay: '2.5s' }} />
+        <div className="absolute w-3 h-3 bg-yellow-400 rounded-full animate-pulse" style={{ top: '45%', left: '75%', animationDelay: '3s' }} />
+        <div className="absolute w-2 h-2 bg-white rounded-full animate-pulse" style={{ top: '85%', left: '35%', animationDelay: '0.3s' }} />
+        <div className="absolute w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ top: '20%', left: '80%', animationDelay: '1.2s' }} />
+        <div className="absolute w-3 h-3 bg-white rounded-full animate-pulse" style={{ top: '60%', left: '55%', animationDelay: '1.8s' }} />
+        <div className="absolute w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ top: '40%', left: '30%', animationDelay: '2.2s' }} />
+        <div className="absolute w-2 h-2 bg-yellow-300 rounded-full animate-pulse" style={{ top: '80%', left: '70%', animationDelay: '2.8s' }} />
+        <div className="absolute w-3 h-3 bg-white rounded-full animate-pulse" style={{ top: '30%', left: '50%', animationDelay: '0.8s' }} />
+        <div className="absolute w-2 h-2 bg-blue-300 rounded-full animate-pulse" style={{ top: '70%', left: '10%', animationDelay: '1.6s' }} />
+        <div className="absolute w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{ top: '50%', left: '90%', animationDelay: '2.4s' }} />
       </div>
 
       {/* Shooting Stars - Positioned between background and content */}

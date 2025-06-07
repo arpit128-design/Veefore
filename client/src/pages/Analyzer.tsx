@@ -389,7 +389,7 @@ export default function Analyzer() {
                 </div>
                 <div className="flex justify-between">
                   <span>Audience active</span>
-                  <span className="text-green-400">{realtimeAnalytics?.optimalTime?.audienceActive || 89}%</span>
+                  <span className="text-green-400">{formatNumber(realtimeAnalytics?.optimalTime?.audienceActive || 89)}%</span>
                 </div>
               </div>
             </div>
@@ -440,7 +440,7 @@ export default function Analyzer() {
                   <span className="text-sm font-medium">Account @arpit9996363 connected</span>
                   <span className="text-xs text-asteroid-silver">Today</span>
                 </div>
-                <div className="text-xs text-electric-cyan">14 posts analyzed • 10 followers • Business account</div>
+                <div className="text-xs text-electric-cyan">{formatNumber(14)} posts analyzed • {formatNumber(10)} followers • Business account</div>
               </div>
               <Activity className="h-4 w-4 text-electric-cyan" />
             </div>
@@ -452,7 +452,7 @@ export default function Analyzer() {
                   <span className="text-sm font-medium">Analytics tracking active</span>
                   <span className="text-xs text-asteroid-silver">Today</span>
                 </div>
-                <div className="text-xs text-nebula-purple">Real Instagram Business API data • 15 total reach</div>
+                <div className="text-xs text-nebula-purple">Real Instagram Business API data • {formatNumber(15)} total reach</div>
               </div>
               <BarChart3 className="h-4 w-4 text-nebula-purple" />
             </div>

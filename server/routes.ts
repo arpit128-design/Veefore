@@ -596,6 +596,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       res.json({ authUrl });
     } catch (error: any) {
       console.error('[INSTAGRAM AUTH] Error:', error);
+      console.error('[INSTAGRAM AUTH] Stack trace:', error.stack);
       res.status(500).json({ error: error.message || 'Failed to initiate Instagram authentication' });
     }
   });

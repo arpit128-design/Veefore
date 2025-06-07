@@ -184,17 +184,17 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         });
       }
 
-      // Return stored Instagram data from database using the available properties
+      // Return stored Instagram data from MongoDB using actual field names
       const analyticsData = {
         totalPosts: instagramAccount.mediaCount || 0,
-        totalReach: 0, // Will be calculated from actual posts
+        totalReach: instagramAccount.avgReach || 0,
         engagementRate: instagramAccount.avgEngagement || 0,
         topPlatform: 'instagram',
         followers: instagramAccount.followers || 0,
-        impressions: 0, // Will be calculated from actual posts
+        impressions: instagramAccount.avgReach || 0,
         accountUsername: instagramAccount.username,
-        totalLikes: 0, // Will be calculated from actual posts
-        totalComments: 0, // Will be calculated from actual posts
+        totalLikes: instagramAccount.avgLikes || 0,
+        totalComments: instagramAccount.avgComments || 0,
         mediaCount: instagramAccount.mediaCount || 0
       };
 

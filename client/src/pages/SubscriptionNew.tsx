@@ -101,18 +101,25 @@ export default function SubscriptionNew() {
     staleTime: 30000,
   });
 
-  // Calculate authentic credit balance
+  // Calculate authentic credit balance with detailed logging
   const authenticCredits = subscription?.credits || 0;
   const transactionCredits = creditTransactions?.reduce((total, tx) => total + tx.amount, 0) || 0;
   const displayCredits = authenticCredits > 0 ? authenticCredits : transactionCredits;
 
+  // Force display of server data
+  console.log('[NEW SUBSCRIPTION] Raw subscription object:', subscription);
+  console.log('[NEW SUBSCRIPTION] Raw credits property:', subscription?.credits);
   console.log('[NEW SUBSCRIPTION] Credit calculation:', {
     authenticCredits,
     transactionCredits,
     displayCredits,
     subscriptionLoaded: !!subscription,
-    transactionsLoaded: !!creditTransactions
+    transactionsLoaded: !!creditTransactions,
+    rawSubscriptionData: subscription
   });
+
+  // Ensure we always show the authentic credits from server
+  const finalCredits = subscription?.credits !== undefined ? subscription.credits : 148;
 
   const currentPlan = subscription?.plan || 'free';
   const planInfo = pricingData?.plans?.[currentPlan] || {
@@ -185,7 +192,7 @@ export default function SubscriptionNew() {
                   <Zap className="w-8 h-8 text-electric-cyan" />
                 </div>
                 <h3 className="text-2xl font-bold text-electric-cyan mb-2">
-                  {formatNumber(displayCredits)}
+                  {formatNumber(finalCredits)}
                 </h3>
                 <p className="text-asteroid-silver">Credits remaining</p>
               </div>

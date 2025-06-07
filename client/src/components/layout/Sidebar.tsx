@@ -17,7 +17,7 @@ const navigationItems = [
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
   { href: "/team", icon: Users, label: "Team", color: "text-blue-400" },
   { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },
-  { href: "/pricing", icon: CreditCard, label: "Subscription", color: "text-yellow-400" },
+  { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-yellow-400" },
   { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
   { href: "/settings", icon: Settings, label: "Settings", color: "text-asteroid-silver" },
 ];

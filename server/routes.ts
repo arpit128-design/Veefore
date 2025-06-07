@@ -1139,6 +1139,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             
             console.log('[ADDON PURCHASE] Using userId:', targetUserId, 'for addon creation');
             
+            // Declare targetUserId properly for error scope
+            const finalUserId = targetUserId;
+            
             const createdAddon = await storage.createAddon({
               userId: targetUserId,
               type: addon.type,
@@ -1160,7 +1163,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             console.error('[ADDON PURCHASE] Failed to create addon:', addonError);
             console.error('[ADDON PURCHASE] Error details:', {
               userId: user.id,
-              targetUserId: targetUserId,
+              targetUserId: finalUserId,
               addonType: addon.type,
               error: addonError?.message || addonError
             });

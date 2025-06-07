@@ -1,7 +1,5 @@
-import { MongoClient } from 'mongodb';
-import dotenv from 'dotenv';
-
-dotenv.config();
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
 
 async function createFifthAddon() {
   const client = new MongoClient(process.env.DATABASE_URL);
@@ -17,7 +15,7 @@ async function createFifthAddon() {
     const currentAddons = await addonsCollection.find({ userId: 6844027426, type: 'team-member', isActive: true }).toArray();
     console.log('Current addon count:', currentAddons.length);
     
-    // Create the 5th addon (should have been auto-created from recent payment)
+    // Create the 5th addon (should have been auto-created from recent payment order_QeTXEagxBlmXWu)
     const fifthAddon = {
       userId: 6844027426,
       type: 'team-member',
@@ -33,7 +31,7 @@ async function createFifthAddon() {
         autoCreated: false,
         createdFromPayment: true,
         manualFix: true,
-        note: 'Created manually to fix missing auto-creation from payment'
+        note: 'Created manually to fix missing auto-creation from payment verification bug'
       },
       createdAt: new Date(),
       updatedAt: new Date()

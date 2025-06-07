@@ -560,26 +560,33 @@ export default function Subscription() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pricingData?.addons && Object.entries(pricingData.addons).map(([key, addon]: [string, any]) => (
-                    <div key={key} className="p-6 rounded-lg bg-cosmic-void/30 border border-solar-gold/20">
-                      <div className="text-center space-y-4">
-                        <div className="w-12 h-12 mx-auto rounded-full bg-solar-gold/20 border border-solar-gold/30 flex items-center justify-center">
-                          <Gift className="w-6 h-6 text-solar-gold" />
+                  {pricingData?.addons && Object.entries(pricingData.addons).map(([key, addon]: [string, any]) => {
+                    const displayPrice = Math.floor(addon.price / 100);
+                    console.log('[ADDON DEBUG] Processing addon:', key, 'price:', addon.price, 'display price:', displayPrice);
+                    return (
+                      <div key={key} className="p-6 rounded-lg bg-cosmic-void/30 border border-solar-gold/20">
+                        <div className="text-center space-y-4">
+                          <div className="w-12 h-12 mx-auto rounded-full bg-solar-gold/20 border border-solar-gold/30 flex items-center justify-center">
+                            <Gift className="w-6 h-6 text-solar-gold" />
+                          </div>
+                          <h3 className="font-semibold text-white">{addon.name}</h3>
+                          <p className="text-sm text-asteroid-silver">{addon.benefit || addon.description}</p>
+                          <div className="text-lg font-bold text-solar-gold">₹{displayPrice}/month</div>
+                          <Button 
+                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                            onClick={() => {
+                              console.log('[ADDON BUTTON] Clicked addon:', key);
+                              handleAddonPurchase(key);
+                            }}
+                            disabled={addonPurchasing}
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            {addonPurchasing ? "Processing..." : "Add Enhancement"}
+                          </Button>
                         </div>
-                        <h3 className="font-semibold text-white">{addon.name}</h3>
-                        <p className="text-sm text-asteroid-silver">{addon.benefit || addon.description}</p>
-                        <div className="text-lg font-bold text-solar-gold">₹{Math.floor(addon.price / 100)}/month</div>
-                        <Button 
-                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                          onClick={() => handleAddonPurchase(key)}
-                          disabled={addonPurchasing}
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          {addonPurchasing ? "Processing..." : "Add Enhancement"}
-                        </Button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   
                   {(!pricingData?.addons || Object.keys(pricingData.addons).length === 0) && (
                     <div className="col-span-full text-center py-12 text-asteroid-silver">

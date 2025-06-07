@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
       
-      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      const accounts = await storage.getSocialAccountsByWorkspace(parseInt(workspaceId as string));
       res.json(accounts);
     } catch (error: any) {
       console.error('Error fetching social accounts:', error);
@@ -566,12 +566,19 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         workspace = await storage.getDefaultWorkspace(user.id);
         if (!workspace) {
           console.log('[INSTAGRAM AUTH] No workspace found, creating default workspace for user:', user.id);
-          workspace = await storage.createWorkspace({
-            userId: user.id,
-            name: 'My VeeFore Workspace',
-            theme: 'space',
-            isDefault: true
-          });
+          try {
+            workspace = await storage.createWorkspace({
+              userId: user.id,
+              name: 'My VeeFore Workspace',
+              theme: 'space',
+              isDefault: true
+            });
+            console.log('[INSTAGRAM AUTH] Workspace created successfully:', workspace.id);
+          } catch (workspaceError: any) {
+            console.error('[INSTAGRAM AUTH] Failed to create workspace:', workspaceError);
+            console.error('[INSTAGRAM AUTH] Workspace error stack:', workspaceError.stack);
+            throw new Error(`Failed to create workspace: ${workspaceError.message}`);
+          }
         }
       }
 
@@ -589,9 +596,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      // Instagram Business API OAuth - using correct endpoint from documentation
-      const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish';
-      const authUrl = `https://www.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+      // Instagram Business API OAuth - using correct format with all required parameters
+      const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights';
+      const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {

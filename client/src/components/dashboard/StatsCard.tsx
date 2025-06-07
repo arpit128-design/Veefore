@@ -16,10 +16,17 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, change, icon, gradient, isLoading }: StatsCardProps) {
   const displayValue = () => {
-    if (value === null || isLoading) {
+    if (isLoading) {
       return (
         <div className="flex items-center space-x-2">
-          <div className="animate-pulse text-asteroid-silver">Building insights</div>
+          <div className="animate-pulse text-asteroid-silver">Loading...</div>
+        </div>
+      );
+    }
+    if (value === null) {
+      return (
+        <div className="flex items-center space-x-2">
+          <div className="text-asteroid-silver">Connect account</div>
         </div>
       );
     }
@@ -27,11 +34,18 @@ export function StatsCard({ title, value, change, icon, gradient, isLoading }: S
   };
 
   const displayChange = () => {
-    if (value === null || isLoading) {
+    if (isLoading) {
       return (
         <div className="flex items-center space-x-2 text-asteroid-silver">
           <div className="w-4 h-4 animate-pulse bg-asteroid-silver rounded"></div>
-          <span className="text-sm animate-pulse">No data yet</span>
+          <span className="text-sm animate-pulse">Loading data</span>
+        </div>
+      );
+    }
+    if (value === null) {
+      return (
+        <div className="flex items-center space-x-2 text-asteroid-silver">
+          <span className="text-sm">No social account connected</span>
         </div>
       );
     }

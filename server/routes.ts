@@ -149,6 +149,63 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Dashboard analytics endpoint
+  app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.query.workspaceId;
+      
+      let workspace;
+      if (workspaceId) {
+        workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace || workspace.userId !== user.id) {
+          return res.status(403).json({ error: 'Workspace not found or access denied' });
+        }
+      } else {
+        const workspaces = await storage.getWorkspacesByUserId(user.id);
+        workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
+      }
+      
+      if (!workspace) {
+        return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
+      }
+
+      // Get connected Instagram accounts
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
+      
+      if (!instagramAccount) {
+        return res.json({ 
+          totalPosts: 0, 
+          totalReach: 0, 
+          engagementRate: 0, 
+          topPlatform: 'none',
+          message: 'No Instagram account connected'
+        });
+      }
+
+      // Return stored Instagram data from database using the available properties
+      const analyticsData = {
+        totalPosts: instagramAccount.mediaCount || 0,
+        totalReach: 0, // Will be calculated from actual posts
+        engagementRate: instagramAccount.avgEngagement || 0,
+        topPlatform: 'instagram',
+        followers: instagramAccount.followers || 0,
+        impressions: 0, // Will be calculated from actual posts
+        accountUsername: instagramAccount.username,
+        totalLikes: 0, // Will be calculated from actual posts
+        totalComments: 0, // Will be calculated from actual posts
+        mediaCount: instagramAccount.mediaCount || 0
+      };
+
+      res.json(analyticsData);
+
+    } catch (error: any) {
+      console.error('Error fetching dashboard analytics:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Chat performance endpoint
   app.get("/api/chat-performance", requireAuth, async (req: any, res: any) => {
     try {

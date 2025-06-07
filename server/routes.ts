@@ -845,7 +845,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(500).json({ error: 'Razorpay configuration missing' });
       }
 
-      const Razorpay = require('razorpay');
+      const Razorpay = (await import('razorpay')).default;
       const rzp = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -894,7 +894,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(500).json({ error: 'Razorpay configuration missing' });
       }
 
-      const Razorpay = require('razorpay');
+      const Razorpay = (await import('razorpay')).default;
       const rzp = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -940,7 +940,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { user } = req;
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
 
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
       hmac.update(razorpay_order_id + '|' + razorpay_payment_id);
       const generated_signature = hmac.digest('hex');

@@ -238,9 +238,8 @@ export default function SubscriptionEnhanced() {
 
   if (subscriptionLoading || pricingLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-space-navy via-cosmic-void to-deep-purple text-white flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-space-navy text-white flex items-center justify-center relative overflow-hidden">
         <SpaceBackground />
-        <FloatingParticles />
         <div className="relative z-10 text-center">
           <div className="w-16 h-16 border-4 border-electric-cyan border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
           <div className="space-y-3">

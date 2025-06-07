@@ -101,7 +101,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
 
       // Get authentic hashtags from connected Instagram accounts
-      const authenticHashtags = await getAuthenticHashtags(defaultWorkspace.id, category);
+      const authenticHashtags = await getAuthenticHashtags(defaultWorkspace.id.toString(), category);
       
       console.log('[HASHTAGS] Returning', authenticHashtags.length, 'authentic hashtags');
       res.json(authenticHashtags);
@@ -109,6 +109,43 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error) {
       console.error('[HASHTAGS] Error fetching authentic hashtags:', error);
       res.status(500).json({ error: 'Failed to fetch authentic hashtags' });
+    }
+  });
+
+  // Get workspaces for user
+  app.get('/api/workspaces', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaces = await storage.getWorkspacesByUserId(req.user.id);
+      res.json(workspaces);
+    } catch (error: any) {
+      console.error('Error fetching workspaces:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create workspace
+  app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceData = {
+        ...req.body,
+        userId: req.user.id
+      };
+      const workspace = await storage.createWorkspace(workspaceData);
+      res.json(workspace);
+    } catch (error: any) {
+      console.error('Error creating workspace:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get credit transactions
+  app.get('/api/credit-transactions', requireAuth, async (req: any, res: Response) => {
+    try {
+      const transactions = await storage.getCreditTransactions(req.user.id);
+      res.json(transactions);
+    } catch (error: any) {
+      console.error('Error fetching credit transactions:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 

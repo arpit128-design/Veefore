@@ -18,6 +18,9 @@ async function throwIfResNotOk(res: Response) {
     const error = new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
     (error as any).status = res.status;
     (error as any).needsUpgrade = errorData.needsUpgrade;
+    (error as any).suggestedAddon = errorData.suggestedAddon;
+    (error as any).currentTeamSize = errorData.currentTeamSize;
+    (error as any).maxTeamSize = errorData.maxTeamSize;
     console.log('[API REQUEST] Throwing error:', error);
     throw error;
   }

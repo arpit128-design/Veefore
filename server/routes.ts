@@ -419,7 +419,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
       
-      const accounts = await storage.getSocialAccountsByWorkspace(parseInt(workspaceId as string));
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
       res.json(accounts);
     } catch (error: any) {
       console.error('Error fetching social accounts:', error);

@@ -536,15 +536,6 @@ export class MongoStorage implements IStorage {
   }
 
   private convertSocialAccount(mongoAccount: any): SocialAccount {
-    console.log('[MONGODB DEBUG] Converting social account:', {
-      id: mongoAccount._id,
-      username: mongoAccount.username,
-      followersCount: mongoAccount.followersCount,
-      mediaCount: mongoAccount.mediaCount,
-      hasFollowersField: 'followersCount' in mongoAccount,
-      hasMediaField: 'mediaCount' in mongoAccount
-    });
-    
     return {
       id: mongoAccount._id.toString(),
       workspaceId: mongoAccount.workspaceId,

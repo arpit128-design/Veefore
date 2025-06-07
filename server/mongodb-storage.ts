@@ -1251,7 +1251,10 @@ export class MongoStorage implements IStorage {
         { userId: userIdNum },
         { userId: shortNumeric }
       ]
-    });
+    }).sort({ createdAt: -1 }); // Sort by newest first to ensure we catch recent purchases
+    
+    // Add additional debug logging for new purchases
+    console.log(`[MONGODB DEBUG] Raw database query returned ${addons.length} total addon records`);
     
     console.log(`[MONGODB DEBUG] Found ${addons.length} addons for user ${userId}`);
     if (addons.length > 0) {

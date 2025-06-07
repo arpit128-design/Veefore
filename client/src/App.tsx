@@ -79,6 +79,7 @@ function AuthenticatedApp() {
 function Router() {
   const { user, loading } = useAuth();
   const [showLoader, setShowLoader] = useState(true);
+  const [location] = useLocation(); // Move hook to top level
 
   useEffect(() => {
     // Add a minimum display time for the loading screen
@@ -124,7 +125,6 @@ function Router() {
   console.log('[ROUTER] User is onboarded, showing authenticated app');
 
   // Check if onboarded user is on onboarding page and redirect them
-  const [location] = useLocation();
   if (location === '/onboarding') {
     console.log('[ROUTER] Onboarded user on /onboarding, redirecting to /dashboard');
     return <Redirect to="/dashboard" />;

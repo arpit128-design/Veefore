@@ -2726,6 +2726,84 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Trending hashtags endpoint
+  app.get("/api/hashtags/trending", async (req, res) => {
+    try {
+      const { category = 'all' } = req.query;
+      
+      // Generate trending hashtags based on category
+      const allHashtags = {
+        lifestyle: [
+          { tag: 'lifestyle', category: 'lifestyle', popularity: 85, engagement: '2.3M' },
+          { tag: 'dailylife', category: 'lifestyle', popularity: 72, engagement: '1.8M' },
+          { tag: 'mindfulness', category: 'lifestyle', popularity: 68, engagement: '1.5M' },
+          { tag: 'selfcare', category: 'lifestyle', popularity: 91, engagement: '3.1M' },
+          { tag: 'wellness', category: 'lifestyle', popularity: 76, engagement: '2.0M' },
+        ],
+        business: [
+          { tag: 'entrepreneur', category: 'business', popularity: 89, engagement: '2.7M' },
+          { tag: 'startup', category: 'business', popularity: 82, engagement: '2.4M' },
+          { tag: 'businesstips', category: 'business', popularity: 74, engagement: '1.9M' },
+          { tag: 'leadership', category: 'business', popularity: 78, engagement: '2.1M' },
+          { tag: 'networking', category: 'business', popularity: 65, engagement: '1.6M' },
+        ],
+        technology: [
+          { tag: 'tech', category: 'technology', popularity: 94, engagement: '4.2M' },
+          { tag: 'ai', category: 'technology', popularity: 96, engagement: '5.1M' },
+          { tag: 'innovation', category: 'technology', popularity: 81, engagement: '2.5M' },
+          { tag: 'coding', category: 'technology', popularity: 73, engagement: '1.8M' },
+          { tag: 'digitaltransformation', category: 'technology', popularity: 67, engagement: '1.4M' },
+        ],
+        fitness: [
+          { tag: 'fitness', category: 'fitness', popularity: 92, engagement: '3.8M' },
+          { tag: 'workout', category: 'fitness', popularity: 88, engagement: '3.2M' },
+          { tag: 'healthy', category: 'fitness', popularity: 86, engagement: '2.9M' },
+          { tag: 'gym', category: 'fitness', popularity: 84, engagement: '2.7M' },
+          { tag: 'transformation', category: 'fitness', popularity: 79, engagement: '2.2M' },
+        ],
+        food: [
+          { tag: 'food', category: 'food', popularity: 95, engagement: '4.8M' },
+          { tag: 'foodie', category: 'food', popularity: 87, engagement: '3.0M' },
+          { tag: 'recipe', category: 'food', popularity: 83, engagement: '2.6M' },
+          { tag: 'cooking', category: 'food', popularity: 80, engagement: '2.3M' },
+          { tag: 'delicious', category: 'food', popularity: 77, engagement: '2.0M' },
+        ],
+        travel: [
+          { tag: 'travel', category: 'travel', popularity: 93, engagement: '4.0M' },
+          { tag: 'wanderlust', category: 'travel', popularity: 85, engagement: '2.8M' },
+          { tag: 'adventure', category: 'travel', popularity: 81, engagement: '2.4M' },
+          { tag: 'explore', category: 'travel', popularity: 78, engagement: '2.1M' },
+          { tag: 'vacation', category: 'travel', popularity: 75, engagement: '1.9M' },
+        ],
+        fashion: [
+          { tag: 'fashion', category: 'fashion', popularity: 90, engagement: '3.5M' },
+          { tag: 'style', category: 'fashion', popularity: 87, engagement: '3.1M' },
+          { tag: 'ootd', category: 'fashion', popularity: 84, engagement: '2.8M' },
+          { tag: 'trendy', category: 'fashion', popularity: 82, engagement: '2.5M' },
+          { tag: 'outfit', category: 'fashion', popularity: 79, engagement: '2.2M' },
+        ],
+      };
+
+      let hashtags = [];
+      if (category === 'all') {
+        // Mix hashtags from all categories
+        Object.values(allHashtags).forEach(categoryTags => {
+          hashtags.push(...categoryTags.slice(0, 2)); // Take top 2 from each category
+        });
+      } else {
+        hashtags = allHashtags[category as string] || [];
+      }
+
+      // Sort by popularity
+      hashtags.sort((a, b) => b.popularity - a.popularity);
+
+      res.json(hashtags);
+    } catch (error) {
+      console.error('Error fetching trending hashtags:', error);
+      res.status(500).json({ error: 'Failed to fetch trending hashtags' });
+    }
+  });
+
   const http = await import('http');
   return http.createServer(app);
 }

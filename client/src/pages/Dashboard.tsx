@@ -3,6 +3,7 @@ import { PlatformAnalytics } from "@/components/dashboard/PlatformAnalytics";
 import { ContentStudio } from "@/components/dashboard/ContentStudio";
 import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
+import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { Eye, Heart, Users, TrendingUp } from "lucide-react";
@@ -295,6 +296,9 @@ export default function Dashboard() {
 
       {/* Daily AI Suggestions */}
       <DailySuggestions />
+
+      {/* Trending Hashtags */}
+      <TrendingHashtags />
 
       {/* Recent Content Performance */}
       <ContentPerformance />

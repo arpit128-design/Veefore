@@ -1156,13 +1156,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               }
             });
             console.log('[ADDON PURCHASE] Successfully created addon:', createdAddon);
-          } catch (addonError) {
+          } catch (addonError: any) {
             console.error('[ADDON PURCHASE] Failed to create addon:', addonError);
             console.error('[ADDON PURCHASE] Error details:', {
               userId: user.id,
-              targetUserId,
+              targetUserId: targetUserId,
               addonType: addon.type,
-              error: addonError.message
+              error: addonError?.message || addonError
             });
             throw addonError;
           }
@@ -1321,6 +1321,75 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[ADDON PURCHASE] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to create addon order' });
+    }
+  });
+
+  // Test addon creation logic (debugging endpoint)
+  app.post('/api/test-addon-creation', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { packageId } = req.body;
+      
+      console.log('[TEST ADDON] Testing addon creation for user:', user.id, 'packageId:', packageId);
+      
+      // Simulate the payment verification addon creation logic
+      const pricingData = await storage.getPricingData();
+      const addon = pricingData.addons[packageId];
+      
+      if (!addon) {
+        return res.status(400).json({ error: 'Invalid addon ID' });
+      }
+
+      console.log('[TEST ADDON] Found addon:', addon);
+      
+      // Use the same logic as payment verification
+      let targetUserId = user.id;
+      
+      // Handle MongoDB ObjectId string format - extract numeric portion
+      if (typeof targetUserId === 'string' && targetUserId.length === 24) {
+        // Extract last 10 digits and convert to number for storage compatibility
+        targetUserId = parseInt(targetUserId.slice(-10), 16) % 2147483647;
+      } else if (typeof targetUserId === 'string') {
+        targetUserId = parseInt(targetUserId);
+      }
+      
+      console.log('[TEST ADDON] Using userId:', targetUserId, 'for addon creation');
+      
+      const createdAddon = await storage.createAddon({
+        userId: targetUserId,
+        type: addon.type,
+        name: addon.name,
+        price: addon.price,
+        isActive: true,
+        expiresAt: null,
+        metadata: { 
+          addonId: packageId, 
+          benefit: addon.benefit,
+          paymentId: `test_${Date.now()}`,
+          purchaseDate: new Date().toISOString(),
+          autoCreated: true,
+          createdFromPayment: true,
+          source: 'test_endpoint'
+        }
+      });
+      
+      console.log('[TEST ADDON] Successfully created addon:', createdAddon);
+      
+      // Get updated addon count
+      const allAddons = await storage.getUserAddons(user.id);
+      const teamAddons = allAddons.filter(a => a.type === 'team-member' && a.isActive);
+      
+      res.json({ 
+        success: true, 
+        message: 'Test addon created successfully',
+        createdAddon,
+        totalTeamAddons: teamAddons.length,
+        maxTeamSize: 1 + teamAddons.length
+      });
+      
+    } catch (error: any) {
+      console.error('[TEST ADDON] Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 

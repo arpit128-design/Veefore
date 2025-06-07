@@ -126,10 +126,15 @@ export function SpaceBackground() {
           const size = sizes[i % sizes.length];
           const animation = animations[i % animations.length];
           
-          // Better random distribution using multiple prime numbers
-          const top = (i * 37 + i * i * 13) % 100;
-          const left = (i * 73 + i * i * 17) % 100;
-          const delay = (i * 0.07) % 4;
+          // Use multiple mathematical operations to create truly random distribution
+          const seed1 = (i * 3571 + Math.sin(i) * 10000) % 100;
+          const seed2 = (i * 7919 + Math.cos(i) * 10000) % 100;
+          const seed3 = (i * 2741 + Math.sin(i * 1.3) * 10000) % 100;
+          const seed4 = (i * 5009 + Math.cos(i * 2.1) * 10000) % 100;
+          
+          const top = Math.abs((seed1 + seed3 * 0.7) % 100);
+          const left = Math.abs((seed2 + seed4 * 0.9) % 100);
+          const delay = (i * 0.05 + Math.sin(i * 0.1)) % 3;
           
           return (
             <div 
@@ -138,7 +143,7 @@ export function SpaceBackground() {
               style={{ 
                 top: `${top}%`, 
                 left: `${left}%`, 
-                animationDelay: `${delay}s` 
+                animationDelay: `${Math.abs(delay)}s` 
               }} 
             />
           );

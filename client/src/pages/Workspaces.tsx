@@ -79,6 +79,31 @@ export default function Workspaces() {
     enabled: !!currentWorkspace?.id && !!token
   });
 
+  // Fetch social accounts for all workspaces for the grid display
+  const { data: allWorkspaceAccounts } = useQuery({
+    queryKey: ['all-workspace-accounts'],
+    queryFn: async () => {
+      const accountsMap = new Map();
+      for (const workspace of workspaces) {
+        try {
+          const response = await fetch(`/api/social-accounts?workspaceId=${workspace.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const accounts = await response.json();
+            accountsMap.set(workspace.id, accounts);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch accounts for workspace ${workspace.id}:`, error);
+        }
+      }
+      return accountsMap;
+    },
+    enabled: !!token && workspaces.length > 0
+  });
+
   const createWorkspaceMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('=== MUTATION FUNCTION START ===');
@@ -365,16 +390,24 @@ export default function Workspaces() {
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-gray-400">0</div>
+                <div className="text-lg font-bold text-electric-cyan">
+                  {socialAccounts?.reduce((total: number, account: any) => total + (account.mediaCount || 0), 0) || 0}
+                </div>
                 <div className="text-xs text-asteroid-silver">Content Items</div>
               </div>
               <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-gray-400">-</div>
+                <div className="text-lg font-bold text-electric-cyan">
+                  {socialAccounts?.reduce((total: number, account: any) => total + (account.followersCount || 0), 0) || 0}
+                </div>
                 <div className="text-xs text-asteroid-silver">Followers</div>
               </div>
               <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
-                <div className="text-lg font-bold text-yellow-400">Setup</div>
-                <div className="text-xs text-asteroid-silver">Required</div>
+                <div className="text-lg font-bold text-green-400">
+                  {socialAccounts && socialAccounts.length > 0 ? 'Active' : 'Setup'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  {socialAccounts && socialAccounts.length > 0 ? 'Ready' : 'Required'}
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between">
@@ -493,9 +526,9 @@ export default function Workspaces() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workspaces.map((workspace) => (
+            {workspaces.map((workspace, index) => (
               <div
-                key={workspace.id}
+                key={`workspace-${workspace.id}-${index}`}
                 className={`p-6 rounded-lg border transition-all cursor-pointer hover:border-electric-cyan/50 ${
                   currentWorkspace?.id === workspace.id
                     ? 'border-electric-cyan/50 bg-electric-cyan/10'
@@ -527,18 +560,32 @@ export default function Workspaces() {
                 </div>
 
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-asteroid-silver">Instagram:</span>
-                    <span className="text-gray-500">Not connected</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-asteroid-silver">Content:</span>
-                    <span className="text-electric-cyan">0 items</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-asteroid-silver">Status:</span>
-                    <span className="text-yellow-400">Setup required</span>
-                  </div>
+                  {(() => {
+                    const workspaceAccounts = allWorkspaceAccounts?.get(workspace.id) || [];
+                    const instagramAccount = workspaceAccounts.find((acc: any) => acc.platform === 'instagram');
+                    const totalContent = workspaceAccounts.reduce((total: number, acc: any) => total + (acc.mediaCount || 0), 0);
+                    
+                    return (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-asteroid-silver">Instagram:</span>
+                          <span className={instagramAccount ? "text-electric-cyan" : "text-gray-500"}>
+                            {instagramAccount ? `@${instagramAccount.username}` : "Not connected"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-asteroid-silver">Content:</span>
+                          <span className="text-electric-cyan">{totalContent} items</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-asteroid-silver">Status:</span>
+                          <span className={workspaceAccounts.length > 0 ? "text-green-400" : "text-yellow-400"}>
+                            {workspaceAccounts.length > 0 ? "Active" : "Setup required"}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-asteroid-silver/20">

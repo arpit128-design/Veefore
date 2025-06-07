@@ -83,6 +83,7 @@ export interface IStorage {
   getValidSuggestions(workspaceId: number): Promise<Suggestion[]>;
   createSuggestion(suggestion: InsertSuggestion): Promise<Suggestion>;
   markSuggestionUsed(id: number): Promise<Suggestion>;
+  clearSuggestionsByWorkspace(workspaceId: string | number): Promise<void>;
   
   // Analytics by workspace
   getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]>;
@@ -601,6 +602,17 @@ export class MemStorage implements IStorage {
     return Array.from(this.suggestions.values())
       .filter(suggestion => suggestion.workspaceId === wsId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async clearSuggestionsByWorkspace(workspaceId: string | number): Promise<void> {
+    const wsId = typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId;
+    const suggestionIds = Array.from(this.suggestions.entries())
+      .filter(([id, suggestion]) => suggestion.workspaceId === wsId)
+      .map(([id]) => id);
+    
+    for (const id of suggestionIds) {
+      this.suggestions.delete(id);
+    }
   }
 
   async getAnalyticsByWorkspace(workspaceId: string | number): Promise<Analytics[]> {

@@ -2086,6 +2086,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       console.log(`[AI SUGGESTIONS] Generating suggestions for workspace ${workspaceId}`);
       
+      // Clear old suggestions before generating new ones
+      console.log(`[AI SUGGESTIONS] Clearing old suggestions for workspace ${workspaceId}`);
+      await storage.clearSuggestionsByWorkspace(workspaceId);
+      
       // Get workspace and analytics data for AI context
       const workspace = await storage.getWorkspace(workspaceId);
       const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);

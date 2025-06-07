@@ -922,6 +922,15 @@ export class MongoStorage implements IStorage {
     return this.convertSuggestion(updated);
   }
 
+  async clearSuggestionsByWorkspace(workspaceId: string | number): Promise<void> {
+    await this.connect();
+    const query = { workspaceId: workspaceId.toString() };
+    console.log(`[MONGODB DEBUG] Clearing suggestions for workspace ${workspaceId}`);
+    
+    const result = await SuggestionModel.deleteMany(query);
+    console.log(`[MONGODB DEBUG] Deleted ${result.deletedCount} suggestions for workspace ${workspaceId}`);
+  }
+
   async getCreditTransactions(userId: number, limit?: number): Promise<CreditTransaction[]> {
     return [];
   }

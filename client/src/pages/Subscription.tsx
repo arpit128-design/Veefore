@@ -124,12 +124,13 @@ export default function Subscription() {
     return total + transaction.amount;
   }, 0) || 0;
   
-  // Use subscription credits first (server-calculated from transactions), then fallback to client calculation
-  const currentCredits = userSubscription?.credits !== undefined && userSubscription.credits !== null
-    ? userSubscription.credits
-    : (creditTransactions && creditTransactions.length > 0 ? calculatedCredits : 0);
+  // Force display of server-calculated credits with explicit casting
+  const currentCredits = Number(subscription?.credits) || calculatedCredits || 0;
 
   // Debug logging
+  console.log('[SUBSCRIPTION DEBUG] Raw subscription object:', subscription);
+  console.log('[SUBSCRIPTION DEBUG] Subscription credits property:', subscription?.credits);
+  console.log('[SUBSCRIPTION DEBUG] Current credits calculated:', currentCredits);
   console.log('[SUBSCRIPTION DEBUG] Data status:', {
     subscription: !!subscription,
     pricingData: !!pricingData,
@@ -140,7 +141,8 @@ export default function Subscription() {
     pricingLoading,
     transactionsLoading,
     subscriptionCredits: userSubscription?.credits,
-    transactionCount: creditTransactions?.length
+    transactionCount: creditTransactions?.length,
+    rawSubscriptionCredits: subscription?.credits
   });
 
   const planData = pricingData?.plans?.[currentPlan] || {
@@ -276,7 +278,9 @@ export default function Subscription() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-electric-cyan/20 border border-electric-cyan/30 flex items-center justify-center">
                   <Zap className="w-8 h-8 text-electric-cyan" />
                 </div>
-                <h3 className="text-2xl font-bold text-electric-cyan mb-2">{formatNumber(currentCredits)}</h3>
+                <h3 className="text-2xl font-bold text-electric-cyan mb-2">
+                  {subscriptionLoading ? 'Loading...' : formatNumber(currentCredits)} credits
+                </h3>
                 <p className="text-asteroid-silver">Credits remaining</p>
               </div>
 

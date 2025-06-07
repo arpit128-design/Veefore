@@ -589,8 +589,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      const scopes = 'user_profile,user_media';
-      const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+      const scopes = 'instagram_basic,instagram_content_publish';
+      const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {
@@ -638,21 +638,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
-      // Exchange authorization code for access token
+      // Exchange authorization code for access token using Facebook Graph API
       console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for access token...`);
-      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: process.env.INSTAGRAM_APP_ID!,
-          client_secret: process.env.INSTAGRAM_APP_SECRET!,
-          grant_type: 'authorization_code',
-          redirect_uri: redirectUri,
-          code: code as string,
-        }),
-      });
+      const tokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&code=${code}`);
 
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
@@ -663,25 +651,56 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const tokenData = await tokenResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Token exchange successful`);
       
-      // Get long-lived access token
-      console.log(`[INSTAGRAM CALLBACK] Converting to long-lived token...`);
-      const longLivedResponse = await fetch(
-        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_APP_SECRET}&access_token=${tokenData.access_token}`
+      // Get Facebook Pages connected to this user
+      console.log(`[INSTAGRAM CALLBACK] Fetching Facebook Pages...`);
+      const pagesResponse = await fetch(
+        `https://graph.facebook.com/v21.0/me/accounts?access_token=${tokenData.access_token}`
       );
 
-      if (!longLivedResponse.ok) {
-        const errorText = await longLivedResponse.text();
-        console.error(`[INSTAGRAM CALLBACK] Long-lived token exchange failed:`, errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=long_lived_token_failed`);
+      if (!pagesResponse.ok) {
+        const errorText = await pagesResponse.text();
+        console.error(`[INSTAGRAM CALLBACK] Pages fetch failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=pages_fetch_failed`);
       }
 
-      const longLivedToken = await longLivedResponse.json();
-      console.log(`[INSTAGRAM CALLBACK] Long-lived token obtained, expires in ${longLivedToken.expires_in} seconds`);
+      const pagesData = await pagesResponse.json();
+      console.log(`[INSTAGRAM CALLBACK] Found ${pagesData.data.length} Facebook pages`);
       
-      // Get user profile using Instagram Business API
-      console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
+      if (!pagesData.data || pagesData.data.length === 0) {
+        console.error(`[INSTAGRAM CALLBACK] No Facebook pages found`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=no_facebook_pages`);
+      }
+
+      // Use the first page to get Instagram Business Account
+      const page = pagesData.data[0];
+      console.log(`[INSTAGRAM CALLBACK] Using Facebook page: ${page.name} (ID: ${page.id})`);
+      
+      // Get Instagram Business Account connected to this Facebook page
+      console.log(`[INSTAGRAM CALLBACK] Fetching Instagram Business Account...`);
+      const igAccountResponse = await fetch(
+        `https://graph.facebook.com/v21.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`
+      );
+
+      if (!igAccountResponse.ok) {
+        const errorText = await igAccountResponse.text();
+        console.error(`[INSTAGRAM CALLBACK] Instagram account fetch failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=instagram_account_fetch_failed`);
+      }
+
+      const igAccountData = await igAccountResponse.json();
+      
+      if (!igAccountData.instagram_business_account) {
+        console.error(`[INSTAGRAM CALLBACK] No Instagram Business Account connected to this Facebook page`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=no_instagram_business_account`);
+      }
+
+      const instagramAccountId = igAccountData.instagram_business_account.id;
+      console.log(`[INSTAGRAM CALLBACK] Found Instagram Business Account ID: ${instagramAccountId}`);
+      
+      // Get Instagram profile details
+      console.log(`[INSTAGRAM CALLBACK] Fetching Instagram profile...`);
       const profileResponse = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${longLivedToken.access_token}`
+        `https://graph.facebook.com/v21.0/${instagramAccountId}?fields=id,username,account_type,media_count,followers_count&access_token=${page.access_token}`
       );
 
       if (!profileResponse.ok) {
@@ -693,17 +712,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const profile = await profileResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
       
-      // Save the social account
-      const expiresAt = new Date(Date.now() + (longLivedToken.expires_in * 1000));
-      
+      // Save the social account with page access token (needed for Instagram Business API)
       const socialAccountData = {
         username: profile.username,
         workspaceId: parseInt(workspaceId),
         platform: 'instagram',
         accountId: profile.id,
-        accessToken: longLivedToken.access_token,
+        accessToken: page.access_token, // Use page access token for Instagram Business API
         refreshToken: null,
-        expiresAt: expiresAt,
+        expiresAt: null, // Page access tokens don't expire
         isActive: true
       };
 

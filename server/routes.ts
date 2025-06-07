@@ -941,7 +941,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
 
       const crypto = await import('crypto');
-      const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+      const hmac = crypto.default.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!);
       hmac.update(razorpay_order_id + '|' + razorpay_payment_id);
       const generated_signature = hmac.digest('hex');
 

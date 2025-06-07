@@ -1676,4 +1676,140 @@ export class MongoStorage implements IStorage {
       createdAt: doc.createdAt || null
     };
   }
+
+  // Pricing and plan operations
+  async getPricingData(): Promise<any> {
+    return {
+      plans: {
+        free: {
+          id: "free",
+          name: "Cosmic Explorer",
+          description: "Perfect for getting started in the social universe",
+          price: "Free",
+          credits: 50,
+          features: [
+            "Up to 2 social accounts",
+            "Basic analytics dashboard",
+            "50 AI-generated posts per month",
+            "Community support",
+            "Basic scheduling"
+          ]
+        },
+        pro: {
+          id: "pro", 
+          name: "Stellar Navigator",
+          description: "Advanced features for growing brands",
+          price: 999,
+          credits: 500,
+          features: [
+            "Up to 10 social accounts",
+            "Advanced analytics & insights",
+            "500 AI-generated posts per month",
+            "Priority support",
+            "Advanced scheduling",
+            "Custom AI personality",
+            "Hashtag optimization"
+          ],
+          popular: true
+        },
+        enterprise: {
+          id: "enterprise",
+          name: "Galactic Commander", 
+          description: "Ultimate power for large teams",
+          price: 2999,
+          credits: 2000,
+          features: [
+            "Unlimited social accounts",
+            "Enterprise analytics suite",
+            "2000 AI-generated posts per month",
+            "24/7 dedicated support",
+            "Advanced team collaboration",
+            "Custom integrations",
+            "White-label options"
+          ]
+        }
+      },
+      creditPackages: [
+        {
+          id: "credits_100",
+          name: "Starter Pack",
+          totalCredits: 100,
+          price: 199,
+          savings: "20% off"
+        },
+        {
+          id: "credits_500",
+          name: "Power Pack",
+          totalCredits: 500,
+          price: 799,
+          savings: "30% off"
+        },
+        {
+          id: "credits_1000",
+          name: "Mega Pack",
+          totalCredits: 1000,
+          price: 1399,
+          savings: "40% off"
+        }
+      ],
+      addons: {
+        priority_support: {
+          id: "priority_support",
+          name: "Priority Support",
+          price: 299,
+          type: "support",
+          interval: "monthly"
+        },
+        advanced_analytics: {
+          id: "advanced_analytics",
+          name: "Advanced Analytics",
+          price: 499,
+          type: "feature",
+          interval: "monthly"
+        }
+      }
+    };
+  }
+
+  async updateUserSubscription(userId: number | string, planId: string): Promise<User> {
+    await this.connect();
+    const userIdStr = userId.toString();
+    
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { id: userIdStr },
+      { plan: planId, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!updatedUser) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    return this.convertUser(updatedUser);
+  }
+
+  async addCreditsToUser(userId: number | string, credits: number): Promise<User> {
+    await this.connect();
+    const userIdStr = userId.toString();
+    
+    const user = await UserModel.findOne({ id: userIdStr });
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    const currentCredits = user.credits || 0;
+    const newCredits = currentCredits + credits;
+    
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { id: userIdStr },
+      { credits: newCredits, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!updatedUser) {
+      throw new Error(`Failed to update credits for user ${userId}`);
+    }
+    
+    return this.convertUser(updatedUser);
+  }
 }

@@ -254,9 +254,8 @@ export default function SubscriptionEnhanced() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-space-navy via-cosmic-void to-deep-purple text-white relative overflow-hidden">
+    <div className="min-h-screen bg-space-navy text-white relative overflow-hidden">
       <SpaceBackground />
-      <FloatingParticles />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {/* Hero Section */}

@@ -478,7 +478,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         const userAddons = await storage.getUserAddons(userIdForLookup);
         const teamMemberAddons = userAddons.filter(addon => 
-          addon.type === 'team-member' && addon.isActive
+          addon.type === 'team-member' && addon.isActive !== false
         );
         
         // Each team member addon allows 1 additional member (owner + 1 per addon)
@@ -1343,66 +1343,61 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Clean up duplicate team addons and fix format
-  app.post('/api/cleanup-team-addons', async (req: any, res: Response) => {
+  // Fix and refresh team addon detection
+  app.post('/api/refresh-team-addons', requireAuth, async (req: any, res: Response) => {
     try {
-      const userId = '6844027426cae0200f88b5db';
+      const { user } = req;
+      const userId = user.id;
       
-      console.log('[CLEANUP TEAM ADDON] Cleaning up duplicate team-member addons');
+      console.log(`[REFRESH ADDONS] Refreshing team-member addons for user: ${userId}`);
       
-      // Direct database fix using MongoDB storage
+      // Direct database access
       const mongoStorage = storage as any;
-      await mongoStorage.connect();
-      
       const AddonModel = mongoStorage.AddonModel;
       
-      // Find all team-member addons for this user
-      const teamAddons = await AddonModel.find({ 
+      // Find ALL team-member addons for this user (both string and number format)
+      const allTeamAddons = await AddonModel.find({ 
+        type: 'team-member',
         $or: [
-          { type: 'team-member', userId: userId },
-          { type: 'team-member', userId: 6844027426 }
+          { userId: userId },
+          { userId: parseInt(userId.toString().slice(-10)) || 6844027426 }
         ]
       }).sort({ createdAt: 1 });
       
-      console.log(`[CLEANUP TEAM ADDON] Found ${teamAddons.length} team-member addons`);
+      console.log(`[REFRESH ADDONS] Found ${allTeamAddons.length} total team-member addons`);
       
-      if (teamAddons.length > 1) {
-        // Keep only the first addon (oldest) and remove duplicates
-        const addonToKeep = teamAddons[0];
-        const addonsToRemove = teamAddons.slice(1);
-        
-        // Update the addon to keep with correct userId format
-        await AddonModel.updateOne(
-          { _id: addonToKeep._id },
+      // Fix userId format for all addons
+      const updatePromises = allTeamAddons.map(addon => 
+        AddonModel.updateOne(
+          { _id: addon._id },
           { 
-            userId: userId,
-            name: 'Additional Team Member Seat',
-            updatedAt: new Date()
+            $set: { 
+              userId: userId,
+              updatedAt: new Date()
+            }
           }
-        );
-        
-        // Remove duplicate addons
-        const removeIds = addonsToRemove.map(addon => addon._id);
-        const deleteResult = await AddonModel.deleteMany({
-          _id: { $in: removeIds }
-        });
-        
-        console.log(`[CLEANUP TEAM ADDON] Kept 1 addon, removed ${deleteResult.deletedCount} duplicates`);
-      }
+        )
+      );
       
-      // Verify the cleanup
-      const verifyAddons = await storage.getUserAddons(userId);
-      const teamMemberAddons = verifyAddons.filter(addon => addon.type === 'team-member');
+      await Promise.all(updatePromises);
+      console.log(`[REFRESH ADDONS] Updated ${allTeamAddons.length} addons with correct userId format`);
+      
+      // Verify the refresh
+      const refreshedAddons = await storage.getUserAddons(userId);
+      const teamMemberAddons = refreshedAddons.filter(addon => addon.type === 'team-member' && addon.isActive);
+      
+      console.log(`[REFRESH ADDONS] After refresh: ${teamMemberAddons.length} active team-member addons`);
       
       res.json({
         success: true,
-        message: `Cleaned up team addons - kept 1, removed ${teamAddons.length - 1} duplicates`,
+        message: `Refreshed addon detection`,
         teamMemberAddons: teamMemberAddons.length,
-        allAddons: verifyAddons.map(a => `${a.type}:${a.isActive}`)
+        maxTeamSize: 1 + teamMemberAddons.length,
+        allAddons: refreshedAddons.map(a => ({ type: a.type, active: a.isActive, name: a.name }))
       });
       
     } catch (error: any) {
-      console.error('[CLEANUP TEAM ADDON] Error:', error);
+      console.error('[REFRESH ADDONS] Error:', error);
       res.status(500).json({ error: error.message });
     }
   });

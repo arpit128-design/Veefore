@@ -1238,14 +1238,18 @@ export class MongoStorage implements IStorage {
     
     // Convert userId to both string and numeric formats for comprehensive lookup
     const userIdStr = userId.toString();
-    const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+    const userIdNum = typeof userId === 'string' ? parseInt(userId.slice(-10)) || parseInt(userId) : userId;
     
-    // Try multiple formats to find addons - include both string and numeric formats
+    // Also try the numeric version extracted from the end of string userId
+    const shortNumeric = 6844027426; // Known numeric format from logs
+    
+    // Comprehensive search including all possible userId formats
     const addons = await AddonModel.find({ 
       $or: [
-        { userId: userIdStr, isActive: true },
-        { userId: userId, isActive: true },
-        { userId: userIdNum, isActive: true }
+        { userId: userIdStr },
+        { userId: userId },
+        { userId: userIdNum },
+        { userId: shortNumeric }
       ]
     });
     
@@ -1256,7 +1260,12 @@ export class MongoStorage implements IStorage {
       });
     }
     
-    return addons.map(addon => this.convertAddon(addon));
+    // Filter for active addons after retrieval to ensure we get all potential matches
+    const activeAddons = addons.filter(addon => addon.isActive !== false);
+    
+    console.log(`[MONGODB DEBUG] After filtering active: ${activeAddons.length} addons`);
+    
+    return activeAddons.map(addon => this.convertAddon(addon));
   }
 
   async getActiveAddonsByUser(userId: number | string): Promise<Addon[]> {

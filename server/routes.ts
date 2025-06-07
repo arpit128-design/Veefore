@@ -19,8 +19,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const token = authHeader.split(' ')[1];
+      let token;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      } else {
+        token = authHeader; // Handle case where Bearer prefix is missing
+      }
+      
       if (!token) {
+        console.error('[AUTH] No token found in authorization header:', authHeader.substring(0, 20) + '...');
         return res.status(401).json({ error: 'Unauthorized' });
       }
 

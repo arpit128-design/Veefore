@@ -26,10 +26,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         token = authHeader; // Handle case where Bearer prefix is missing
       }
       
-      if (!token) {
+      if (!token || token.trim() === '') {
         console.error('[AUTH] No token found in authorization header:', authHeader.substring(0, 20) + '...');
         return res.status(401).json({ error: 'Unauthorized' });
       }
+      
+      // Clean token of any extra whitespace
+      token = token.trim();
 
       // Extract Firebase UID from JWT token payload
       let firebaseUid;
@@ -845,6 +848,48 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[CREDIT PURCHASE] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to purchase credits' });
+    }
+  });
+
+  // Get subscription with calculated credit balance
+  app.get('/api/subscription', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get subscription data
+      let subscription = await storage.getActiveSubscription(userId);
+      
+      if (!subscription) {
+        // Create default free plan subscription
+        subscription = {
+          id: 0,
+          plan: 'free',
+          status: 'active',
+          userId: userId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          priceId: null,
+          subscriptionId: null,
+          currentPeriodStart: null,
+          currentPeriodEnd: null,
+          canceledAt: null,
+          trialEnd: null
+        };
+      }
+      
+      // Calculate current credit balance from transactions
+      const transactions = await storage.getCreditTransactions(userId);
+      const creditBalance = transactions.reduce((total, transaction) => {
+        return total + transaction.amount;
+      }, 0);
+      
+      res.json({
+        ...subscription,
+        credits: creditBalance
+      });
+    } catch (error: any) {
+      console.error('[SUBSCRIPTION] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to fetch subscription' });
     }
   });
 

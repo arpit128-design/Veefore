@@ -61,14 +61,14 @@ export default function Analyzer() {
     optimalTime: realtimeAnalytics.optimalTime,
     trendsData: realtimeAnalytics.trendsData,
     // Map for backwards compatibility
-    totalViews: rawAnalytics?.totalReach || 0,
+    totalViews: rawAnalytics?.totalReach ?? null,
     engagement: realtimeAnalytics.engagementRate,
-    totalReach: rawAnalytics?.totalReach || 0,
-    followers: rawAnalytics?.followers || 0,
-    impressions: rawAnalytics?.impressions || 0,
-    totalLikes: rawAnalytics?.totalLikes || 0,
-    totalComments: rawAnalytics?.totalComments || 0,
-    totalPosts: rawAnalytics?.totalPosts || 0,
+    totalReach: rawAnalytics?.totalReach ?? null,
+    followers: rawAnalytics?.followers ?? null,
+    impressions: rawAnalytics?.impressions ?? null,
+    totalLikes: rawAnalytics?.totalLikes ?? null,
+    totalComments: rawAnalytics?.totalComments ?? null,
+    totalPosts: rawAnalytics?.totalPosts ?? null,
     accountUsername: rawAnalytics?.accountUsername,
     changes: {
       views: realtimeAnalytics.trendsData?.reachGrowth || 0,
@@ -77,14 +77,14 @@ export default function Analyzer() {
       followers: 0 // Always use authentic 0% from real Instagram data calculation
     }
   } : rawAnalytics ? {
-    totalViews: rawAnalytics.totalReach || 0,
-    engagement: rawAnalytics.engagementRate || 0,
-    totalReach: rawAnalytics.totalReach || 0,
-    followers: rawAnalytics.followers || 0,
-    impressions: rawAnalytics.impressions || 0,
-    totalLikes: rawAnalytics.totalLikes || 0,
-    totalComments: rawAnalytics.totalComments || 0,
-    totalPosts: rawAnalytics.totalPosts || 0,
+    totalViews: rawAnalytics.totalReach ?? null,
+    engagement: rawAnalytics.engagementRate ?? null,
+    totalReach: rawAnalytics.totalReach ?? null,
+    followers: rawAnalytics.followers ?? null,
+    impressions: rawAnalytics.impressions ?? null,
+    totalLikes: rawAnalytics.totalLikes ?? null,
+    totalComments: rawAnalytics.totalComments ?? null,
+    totalPosts: rawAnalytics.totalPosts ?? null,
     accountUsername: rawAnalytics.accountUsername,
     changes: {
       views: 0,
@@ -134,7 +134,7 @@ export default function Analyzer() {
                 <Eye className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews || 0}</div>
+                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews ?? '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Views</div>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function Analyzer() {
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement || 0}</div>
+                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement ?? '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Engagement</div>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Analyzer() {
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-solar-gold">{analytics?.totalReach || 0}</div>
+                <div className="text-2xl font-bold text-solar-gold">{analytics?.totalReach ?? '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function Analyzer() {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-400">{analytics?.followers || 0}</div>
+                <div className="text-2xl font-bold text-green-400">{analytics?.followers ?? '—'}</div>
                 <div className="text-sm text-asteroid-silver">Total Followers</div>
               </div>
             </div>

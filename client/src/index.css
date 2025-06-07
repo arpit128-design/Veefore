@@ -43,8 +43,11 @@
   
   /* Space theme colors */
   --space-navy: 11 20% 8%; /* #0B1426 */
-  --cosmic-blue: 217 19% 15%; /* #1A2332 */
+  --space-black: 0 0% 5%; /* #0D0D0D */
+  --deep-purple: 256 71% 25%; /* #2D1B69 */
+  --cosmic-blue: 217 50% 30%; /* #3B5998 */
   --electric-cyan: 195 100% 50%; /* #00D4FF */
+  --neon-pink: 320 100% 60%; /* #FF33CC */
   --nebula-purple: 256 71% 58%; /* #7C3AED */
   --solar-gold: 45 96% 49%; /* #F59E0B */
   --space-gray: 220 13% 26%; /* #374151 */

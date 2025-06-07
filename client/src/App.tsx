@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SpaceBackground } from "@/components/layout/SpaceBackground";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SpaceLoader } from "@/components/ui/space-loader";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/hooks/useWorkspace";
 import { GlobalWorkspaceSwitchingOverlay } from "@/components/workspaces/GlobalWorkspaceSwitchingOverlay";
@@ -73,14 +74,7 @@ function Router() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-space-navy flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-electric-cyan/30 border-t-electric-cyan rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-electric-cyan font-orbitron">Initializing Systems...</div>
-        </div>
-      </div>
-    );
+    return <SpaceLoader message="Connecting to VeeFore Network" />;
   }
 
   if (!user) {

@@ -61,6 +61,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Space theme colors
+        "space-navy": "hsl(var(--space-navy))",
+        "space-black": "hsl(var(--space-black))",
+        "deep-purple": "hsl(var(--deep-purple))",
+        "cosmic-blue": "hsl(var(--cosmic-blue))",
+        "electric-cyan": "hsl(var(--electric-cyan))",
+        "neon-pink": "hsl(var(--neon-pink))",
+        "nebula-purple": "hsl(var(--nebula-purple))",
+        "solar-gold": "hsl(var(--solar-gold))",
+        "space-gray": "hsl(var(--space-gray))",
+        "asteroid-silver": "hsl(var(--asteroid-silver))",
       },
       keyframes: {
         "accordion-down": {

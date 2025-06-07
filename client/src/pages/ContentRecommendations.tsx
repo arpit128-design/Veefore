@@ -57,10 +57,27 @@ const ContentRecommendations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [userInterests, setUserInterests] = useState('');
+  const [userNiche, setUserNiche] = useState('');
+  const [showPreferences, setShowPreferences] = useState(false);
+
   const { data: recommendationsData, isLoading } = useQuery({
-    queryKey: ['/api/content-recommendations', currentWorkspace?.id, activeTab],
+    queryKey: ['/api/content-recommendations', currentWorkspace?.id, activeTab, userInterests, userNiche],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/content-recommendations?workspaceId=${currentWorkspace?.id}&type=${activeTab}&limit=12`);
+      const params = new URLSearchParams({
+        workspaceId: currentWorkspace?.id?.toString() || '',
+        type: activeTab,
+        limit: '12'
+      });
+      
+      if (userInterests.trim()) {
+        params.set('interests', userInterests);
+      }
+      if (userNiche.trim()) {
+        params.set('niche', userNiche);
+      }
+      
+      const response = await apiRequest('GET', `/api/content-recommendations?${params.toString()}`);
       return response.json();
     },
     enabled: !!currentWorkspace?.id,
@@ -420,6 +437,93 @@ const ContentRecommendations = () => {
           )}
         </div>
       </div>
+
+      {/* Personalization Interface */}
+      <Card className="mb-6 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-purple-400" />
+              <h3 className="text-lg font-semibold text-white">Personalize Your Content</h3>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPreferences(!showPreferences)}
+              className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              {showPreferences ? 'Hide' : 'Customize'}
+            </Button>
+          </div>
+          
+          <AnimatePresence>
+            {showPreferences && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="interests" className="text-purple-300 mb-2 block">
+                      Your Interests (comma-separated)
+                    </Label>
+                    <Input
+                      id="interests"
+                      placeholder="e.g., technology, programming, AI, gaming"
+                      value={userInterests}
+                      onChange={(e) => setUserInterests(e.target.value)}
+                      className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="niche" className="text-purple-300 mb-2 block">
+                      Your Content Niche
+                    </Label>
+                    <Input
+                      id="niche"
+                      placeholder="e.g., tech tutorials, gaming content, business tips"
+                      value={userNiche}
+                      onChange={(e) => setUserNiche(e.target.value)}
+                      className="bg-gray-800/50 border-purple-500/30 text-white placeholder-gray-400"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] });
+                      toast({
+                        title: "Preferences Updated",
+                        description: "Getting fresh recommendations based on your interests..."
+                      });
+                    }}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Get Personalized Content
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setUserInterests('');
+                      setUserNiche('');
+                      queryClient.invalidateQueries({ queryKey: ['/api/content-recommendations'] });
+                    }}
+                    className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20"
+                  >
+                    Reset to Default
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
 
       {/* Platform Tabs */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>

@@ -3,9 +3,11 @@ import { createServer, type Server } from "http";
 import { getAuthenticHashtags } from "./authentic-hashtags";
 import { IStorage } from "./storage";
 import { InstagramSyncService } from "./instagram-sync";
+import { InstagramOAuthService } from "./instagram-oauth";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
+  const instagramOAuth = new InstagramOAuthService(storage);
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -415,16 +417,36 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Use any to avoid TypeScript issues with MongoDB dynamic fields
       const account = instagramAccount as any;
       
+      // Sync real-time Instagram data using stored or environment access token
+      const accessToken = account.accessToken || process.env.INSTAGRAM_ACCESS_TOKEN;
+      if (accessToken) {
+        try {
+          console.log('[DASHBOARD] Syncing real-time Instagram data for workspace:', workspaceId);
+          await instagramSync.syncInstagramData(workspaceId, accessToken);
+          // Refetch updated account data after sync
+          const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+          const updatedAccount = updatedAccounts.find((acc: any) => acc.platform === 'instagram');
+          if (updatedAccount) {
+            Object.assign(account, updatedAccount);
+            console.log('[DASHBOARD] Updated account data with fresh Instagram metrics');
+          }
+        } catch (syncError: any) {
+          console.log('[DASHBOARD] Instagram sync failed, using cached data:', syncError.message);
+        }
+      }
+
       // Calculate real engagement metrics from authentic Instagram data
       const followers = account.followers || account.followersCount || 0;
       const mediaCount = account.mediaCount || 0;
       const totalLikes = account.totalLikes || 0;
       const totalComments = account.totalComments || 0;
-      const impressions = account.impressions || (followers * 0.1) || 146; // Use actual impressions or estimate
+      const totalReach = account.totalReach || 0;
+      const impressions = account.impressions || totalReach || 0;
       
-      // Calculate authentic engagement rate: (likes + comments) / impressions * 100
+      // Calculate authentic engagement rate: (likes + comments) / reach * 100
       const totalEngagements = totalLikes + totalComments;
-      const engagementRate = impressions > 0 ? (totalEngagements / impressions) * 100 : 0;
+      const engagementRate = totalReach > 0 ? (totalEngagements / totalReach) * 100 : 
+                           followers > 0 ? (totalEngagements / followers) * 100 : 0;
       
       const analyticsData = {
         totalPosts: mediaCount,

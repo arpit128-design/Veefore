@@ -126,10 +126,26 @@ export class InstagramSyncService {
       const instagramAccount = accounts.find(acc => acc.platform === 'instagram');
       
       if (instagramAccount) {
-        await this.storage.updateSocialAccount(instagramAccount.id, {
-          ...metrics,
+        // Update with real Instagram metrics
+        const updateData = {
+          followers: metrics.followers || instagramAccount.followers,
+          followingCount: metrics.following || instagramAccount.followingCount,
+          mediaCount: metrics.mediaCount || instagramAccount.mediaCount,
+          totalLikes: metrics.totalLikes || 0,
+          totalComments: metrics.totalComments || 0,
+          avgLikes: metrics.avgLikes || 0,
+          avgComments: metrics.avgComments || 0,
+          avgEngagement: metrics.avgEngagement || 0,
+          totalReach: metrics.totalReach || 0,
+          impressions: metrics.impressions || metrics.totalReach || 0,
+          lastSyncAt: new Date(),
           updatedAt: new Date()
-        });
+        };
+        
+        await this.storage.updateSocialAccount(parseInt(instagramAccount.id.toString()), updateData);
+        console.log('[INSTAGRAM SYNC] Updated account with metrics:', updateData);
+      } else {
+        console.log('[INSTAGRAM SYNC] No Instagram account found for workspace:', workspaceId);
       }
     } catch (error) {
       console.error('[INSTAGRAM SYNC] Error updating account metrics:', error);

@@ -26,7 +26,7 @@ import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
 import Pricing from "@/pages/Pricing";
 import Auth from "@/pages/Auth";
-import Onboarding from "@/pages/Onboarding";
+import NewOnboarding from "@/pages/NewOnboarding";
 import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -50,7 +50,7 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
-              <Route path="/onboarding" component={Onboarding} />
+              <Route path="/onboarding" component={NewOnboarding} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={Scheduler} />
@@ -111,12 +111,10 @@ function Router() {
   // Check if user needs onboarding
   if (user && !user.isOnboarded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden relative">
-        <Switch>
-          <Route path="/onboarding" component={Onboarding} />
-          <Route component={() => <Redirect to="/onboarding" />} />
-        </Switch>
-      </div>
+      <Switch>
+        <Route path="/onboarding" component={NewOnboarding} />
+        <Route component={() => <Redirect to="/onboarding" />} />
+      </Switch>
     );
   }
 

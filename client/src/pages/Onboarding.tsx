@@ -907,7 +907,7 @@ export default function Onboarding() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 text-white overflow-hidden">
+          <Card className="bg-slate-900/20 backdrop-blur-lg border-slate-700/30 text-white overflow-hidden">
             <CardHeader className="text-center pb-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -915,12 +915,12 @@ export default function Onboarding() {
                 className="space-y-4"
               >
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto relative"
+                  className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-yellow-400 rounded-xl flex items-center justify-center mx-auto relative"
                   animate={{ 
                     boxShadow: [
-                      "0 0 20px rgba(236, 72, 153, 0.4)",
-                      "0 0 40px rgba(236, 72, 153, 0.6)",
-                      "0 0 20px rgba(236, 72, 153, 0.4)"
+                      "0 0 20px rgba(34, 211, 238, 0.4)",
+                      "0 0 40px rgba(34, 211, 238, 0.6)",
+                      "0 0 20px rgba(34, 211, 238, 0.4)"
                     ]
                   }}
                   transition={{ duration: 3, repeat: Infinity }}

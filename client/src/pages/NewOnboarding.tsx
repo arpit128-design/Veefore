@@ -370,7 +370,7 @@ export default function NewOnboarding() {
               value={preferences.description}
               onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Describe your brand's cosmic purpose and what makes you unique in the universe..."
-              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200"
+              className="bg-slate-800/90 border-slate-600 text-white placeholder-slate-400 min-h-32 backdrop-blur-sm focus:bg-slate-800 focus:border-cyan-400 transition-colors duration-200 input-stable"
               rows={4}
             />
           </div>

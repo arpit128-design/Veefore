@@ -240,18 +240,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         });
       }
 
-      // Return stored Instagram data from MongoDB using correct field names from the database
+      // Use any to avoid TypeScript issues with MongoDB dynamic fields
+      const account = instagramAccount as any;
+      
+      // Return stored Instagram data from MongoDB using actual field names
       const analyticsData = {
-        totalPosts: instagramAccount.mediaCount || 0,
-        totalReach: instagramAccount.avgReach || 0,
-        engagementRate: instagramAccount.avgEngagement || 0,
+        totalPosts: account.mediaCount || 0,
+        totalReach: account.avgReach || 0,
+        engagementRate: account.avgEngagement || 0,
         topPlatform: 'instagram',
-        followers: instagramAccount.followers || instagramAccount.followersCount || 0,
-        impressions: instagramAccount.avgReach || 0,
-        accountUsername: instagramAccount.username,
-        totalLikes: instagramAccount.avgLikes || 0,
-        totalComments: instagramAccount.avgComments || 0,
-        mediaCount: instagramAccount.mediaCount || 0
+        followers: account.followers || account.followersCount || 0,
+        impressions: account.avgReach || 0,
+        accountUsername: account.username,
+        totalLikes: account.avgLikes || 0,
+        totalComments: account.avgComments || 0,
+        mediaCount: account.mediaCount || 0
       };
 
       res.json(analyticsData);

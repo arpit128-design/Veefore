@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -72,8 +72,18 @@ function AuthenticatedApp() {
 
 function Router() {
   const { user, loading } = useAuth();
+  const [showLoader, setShowLoader] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    // Add a minimum display time for the loading screen
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 3000); // 3 seconds minimum display time
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || showLoader) {
     return <SpaceLoader message="Connecting to VeeFore Network" />;
   }
 

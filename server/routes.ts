@@ -1088,14 +1088,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { user } = req;
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, planId, packageId } = req.body;
 
+      console.log('[PAYMENT VERIFICATION] Starting verification:', {
+        userId: user.id,
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        type: type,
+        packageId: packageId,
+        planId: planId
+      });
+
       const crypto = await import('crypto');
       const hmac = crypto.default.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!);
       hmac.update(razorpay_order_id + '|' + razorpay_payment_id);
       const generated_signature = hmac.digest('hex');
 
       if (generated_signature !== razorpay_signature) {
+        console.log('[PAYMENT VERIFICATION] Signature verification failed');
         return res.status(400).json({ error: 'Payment verification failed' });
       }
+
+      console.log('[PAYMENT VERIFICATION] Signature verified successfully');
 
       // Payment verified, process the purchase
       if (type === 'subscription' && planId) {
@@ -1118,8 +1130,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           });
         }
       } else if (type === 'addon' && packageId) {
+        console.log('[PAYMENT VERIFICATION] Processing addon purchase:', { type, packageId });
         // Handle addon purchase - provide actual benefits
         const pricingData = await storage.getPricingData();
+        console.log('[PAYMENT VERIFICATION] Available addons:', Object.keys(pricingData.addons));
         const addon = pricingData.addons[packageId];
         
         if (addon) {

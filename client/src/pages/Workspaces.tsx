@@ -393,13 +393,19 @@ export default function Workspaces() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
                 <div className="text-lg font-bold text-electric-cyan">
-                  {socialAccounts?.reduce((total: number, account: any) => total + (account.mediaCount || 0), 0) || 0}
+                  {socialAccounts?.reduce((total: number, account: any) => {
+                    console.log('[WORKSPACE DEBUG] Account mediaCount:', account.mediaCount);
+                    return total + (account.mediaCount || 0);
+                  }, 0) || 0}
                 </div>
                 <div className="text-xs text-asteroid-silver">Content Items</div>
               </div>
               <div className="text-center p-3 bg-cosmic-void/30 rounded-lg">
                 <div className="text-lg font-bold text-electric-cyan">
-                  {socialAccounts?.reduce((total: number, account: any) => total + (account.followersCount || 0), 0) || 0}
+                  {socialAccounts?.reduce((total: number, account: any) => {
+                    console.log('[WORKSPACE DEBUG] Account followersCount:', account.followersCount);
+                    return total + (account.followersCount || 0);
+                  }, 0) || 0}
                 </div>
                 <div className="text-xs text-asteroid-silver">Followers</div>
               </div>

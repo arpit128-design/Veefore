@@ -536,6 +536,15 @@ export class MongoStorage implements IStorage {
   }
 
   private convertSocialAccount(mongoAccount: any): SocialAccount {
+    console.log('[MONGODB DEBUG] Converting social account:', {
+      id: mongoAccount._id,
+      username: mongoAccount.username,
+      followersCount: mongoAccount.followersCount,
+      mediaCount: mongoAccount.mediaCount,
+      hasFollowersField: 'followersCount' in mongoAccount,
+      hasMediaField: 'mediaCount' in mongoAccount
+    });
+    
     return {
       id: mongoAccount._id.toString(),
       workspaceId: mongoAccount.workspaceId,
@@ -546,6 +555,21 @@ export class MongoStorage implements IStorage {
       refreshToken: mongoAccount.refreshToken || null,
       expiresAt: mongoAccount.expiresAt || null,
       isActive: mongoAccount.isActive !== false,
+      // Instagram sync data fields
+      followersCount: mongoAccount.followersCount ?? null,
+      followingCount: mongoAccount.followingCount ?? null,
+      mediaCount: mongoAccount.mediaCount ?? null,
+      biography: mongoAccount.biography ?? null,
+      website: mongoAccount.website ?? null,
+      profilePictureUrl: mongoAccount.profilePictureUrl ?? null,
+      accountType: mongoAccount.accountType ?? null,
+      isBusinessAccount: mongoAccount.isBusinessAccount ?? null,
+      isVerified: mongoAccount.isVerified ?? null,
+      avgLikes: mongoAccount.avgLikes ?? null,
+      avgComments: mongoAccount.avgComments ?? null,
+      avgReach: mongoAccount.avgReach ?? null,
+      engagementRate: mongoAccount.engagementRate ?? null,
+      lastSyncAt: mongoAccount.lastSyncAt ?? null,
       createdAt: mongoAccount.createdAt || new Date(),
       updatedAt: mongoAccount.updatedAt || new Date()
     };

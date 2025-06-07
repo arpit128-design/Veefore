@@ -97,13 +97,15 @@ export default function NewOnboarding() {
   const savePreferencesMutation = useMutation({
     mutationFn: (data: UserPreferences) => apiRequest('POST', '/api/user/complete-onboarding', { preferences: data }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/user'] });
       toast({
         title: "Mission Initiated!",
         description: "Your cosmic journey begins now. Welcome to VeeFore!",
       });
-      setTimeout(() => setLocation('/dashboard'), 1000);
+      
+      // Force a complete page reload to refresh auth state
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
     },
     onError: () => {
       toast({
@@ -465,8 +467,8 @@ export default function NewOnboarding() {
   }
 
   function ConnectStep() {
-    const connectedAccounts = socialAccounts || [];
-    const hasInstagram = connectedAccounts.some((account: any) => account.platform === 'instagram');
+    const connectedAccounts = Array.isArray(socialAccounts) ? socialAccounts : [];
+    const hasInstagram = connectedAccounts.length > 0 && connectedAccounts.some((account: any) => account.platform === 'instagram');
 
     return (
       <div className="space-y-8 max-w-3xl mx-auto">
@@ -488,7 +490,7 @@ export default function NewOnboarding() {
                     <h3 className="text-lg font-semibold text-white">Instagram</h3>
                     {hasInstagram ? (
                       <div className="space-y-1">
-                        {connectedAccounts
+                        {connectedAccounts.length > 0 && connectedAccounts
                           .filter((account: any) => account.platform === 'instagram')
                           .map((account: any) => (
                             <div key={account.id} className="flex items-center space-x-2">

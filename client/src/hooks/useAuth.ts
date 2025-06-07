@@ -60,6 +60,7 @@ export function useAuth() {
             if (response.ok) {
               const userData = await response.json();
               console.log('[AUTH] User found in database:', userData.username);
+              console.log('[AUTH] User onboarding status:', userData.isOnboarded);
               setUser(userData);
             } else if (response.status === 404) {
               // User doesn't exist, create them

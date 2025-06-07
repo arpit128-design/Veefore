@@ -201,7 +201,7 @@ export function BulkScheduler({ isOpen, onClose, workspaceId }: BulkSchedulerPro
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glassmorphism border-electric-cyan/20">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
+          <DialogTitle className="text-2xl font-orbitron font-semibold text-electric-cyan">
             Bulk Content Scheduler
           </DialogTitle>
         </DialogHeader>

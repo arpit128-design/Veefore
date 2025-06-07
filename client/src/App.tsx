@@ -109,7 +109,10 @@ function Router() {
   }
 
   // Check if user needs onboarding
+  console.log('[ROUTER] User state:', { username: user?.username, isOnboarded: user?.isOnboarded });
+  
   if (user && !user.isOnboarded) {
+    console.log('[ROUTER] User needs onboarding, redirecting to /onboarding');
     return (
       <Switch>
         <Route path="/onboarding" component={NewOnboarding} />
@@ -117,20 +120,15 @@ function Router() {
       </Switch>
     );
   }
+  
+  console.log('[ROUTER] User is onboarded, showing authenticated app');
 
-  // Redirect component for onboarded users who access onboarding page
-  const OnboardingRedirect = () => {
-    const [location] = useLocation();
-    
-    useEffect(() => {
-      if (location === '/onboarding') {
-        console.log('[ROUTER] Redirecting onboarded user from /onboarding to /dashboard');
-        window.location.href = '/dashboard';
-      }
-    }, [location]);
-
+  // Check if onboarded user is on onboarding page and redirect them
+  const [location] = useLocation();
+  if (location === '/onboarding') {
+    console.log('[ROUTER] Onboarded user on /onboarding, redirecting to /dashboard');
     return <Redirect to="/dashboard" />;
-  };
+  }
 
   return <AuthenticatedApp />;
 }

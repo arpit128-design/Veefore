@@ -24,7 +24,7 @@ export function ChatPerformance() {
     refetchInterval: 30000 // Refetch every 30 seconds
   });
 
-  const metrics: ChatMetric[] = chatData || [
+  const defaultMetrics: ChatMetric[] = [
     {
       platform: "Instagram",
       icon: "fab fa-instagram",
@@ -53,6 +53,8 @@ export function ChatPerformance() {
       activeChats: 12
     }
   ];
+
+  const metrics: ChatMetric[] = Array.isArray(chatData) ? chatData : defaultMetrics;
 
   const totalMessages = metrics.reduce((sum, metric) => sum + metric.messagesHandled, 0);
   const avgSatisfaction = Math.round(metrics.reduce((sum, metric) => sum + metric.satisfactionRate, 0) / metrics.length);

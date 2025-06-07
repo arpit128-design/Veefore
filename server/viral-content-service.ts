@@ -194,7 +194,7 @@ class ViralContentService {
             },
             sourceUrl: `https://www.youtube.com/watch?v=${video.id.videoId}`,
             isActive: true,
-            createdAt: new Date(video.snippet.publishedAt).toISOString()
+            createdAt: new Date(video.snippet.publishedAt)
           });
         }
       }

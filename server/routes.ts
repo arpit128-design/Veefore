@@ -2435,11 +2435,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
-      console.log(`[CONTENT RECOMMENDATIONS] Fetching real ${type || 'all'} recommendations for workspace: ${workspaceId}`);
-
-      // Get user's IP for geolocation
-      const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
-      const userLocation = await contentRecommendationService.detectUserLocation(clientIp as string);
+      console.log(`[VIRAL CONTENT] Fetching viral ${type || 'all'} recommendations for workspace: ${workspaceId}`);
 
       // Get user and workspace data
       const user = req.user;
@@ -2449,22 +2445,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(404).json({ error: 'Workspace not found' });
       }
 
-      // Extract niche and interests from user preferences
+      // Extract user preferences for personalized viral content
       const preferences = user.preferences as any || {};
-      const niche = preferences.niche || 'content creation';
+      const userPreferences = {
+        interests: preferences.interests || ['content creation', 'social media'],
+        niche: preferences.niche || workspace.description || 'general content',
+        targetAudience: preferences.targetAudience || 'general',
+        contentStyle: preferences.contentStyle || 'engaging'
+      };
 
-      // Import and use trending scraper for real data
-      const { trendingScraper } = await import('./trending-scraper');
-      
-      // Get real trending content based on type
-      const recommendations = await trendingScraper.getContentRecommendations(
+      console.log('[VIRAL CONTENT] User preferences:', userPreferences);
+
+      // Get viral content recommendations using Perplexity and YouTube APIs
+      const recommendations = await viralContentService.getViralContentRecommendations(
         type as string,
-        niche,
-        userLocation.countryCode,
+        userPreferences,
         parseInt(limit as string)
       );
 
-      // Store recommendations in database for future reference
+      // Get user's location for context
+      const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
+      const userLocation = await contentRecommendationService.detectUserLocation(clientIp as string);
+
+      // Store recommendations in database for tracking
       const storedRecommendations = [];
       for (const rec of recommendations) {
         try {
@@ -2474,7 +2477,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             title: rec.title,
             description: rec.description,
             thumbnailUrl: rec.thumbnailUrl,
-            mediaUrl: rec.sourceUrl || '',
+            mediaUrl: rec.mediaUrl || rec.sourceUrl || '',
             duration: rec.duration,
             category: rec.category,
             country: rec.country,
@@ -2485,11 +2488,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           });
           storedRecommendations.push(stored);
         } catch (error) {
-          console.error('[CONTENT RECOMMENDATIONS] Failed to store recommendation:', error);
+          console.error('[VIRAL CONTENT] Failed to store recommendation:', error);
         }
       }
 
-      console.log(`[CONTENT RECOMMENDATIONS] Fetched ${storedRecommendations.length} real trending recommendations from YouTube/Instagram for ${userLocation.country}`);
+      console.log(`[VIRAL CONTENT] Fetched ${storedRecommendations.length} viral content recommendations with real data`);
       
       res.json({
         recommendations: storedRecommendations,
@@ -2497,7 +2500,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         totalCount: storedRecommendations.length
       });
     } catch (error: any) {
-      console.error('[CONTENT RECOMMENDATIONS] Error:', error);
+      console.error('[VIRAL CONTENT] Error:', error);
       res.status(500).json({ error: 'Failed to fetch content recommendations' });
     }
   });

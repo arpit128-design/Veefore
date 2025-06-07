@@ -198,7 +198,16 @@ const ContentRecommendations = () => {
         <Card className="overflow-hidden border-0 bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 h-full">
           {/* Thumbnail/Video Section */}
           <div className="relative aspect-video overflow-hidden">
-            {isVideoContent && recommendation.mediaUrl && recommendation.mediaUrl.startsWith('http') ? (
+            {isVideoContent && recommendation.mediaUrl && recommendation.mediaUrl.includes('youtube.com/embed') ? (
+              <iframe
+                ref={videoRef as any}
+                src={`${recommendation.mediaUrl}&autoplay=0&mute=1`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : isVideoContent && recommendation.mediaUrl && recommendation.mediaUrl.startsWith('http') ? (
               <video
                 ref={videoRef}
                 src={recommendation.mediaUrl}

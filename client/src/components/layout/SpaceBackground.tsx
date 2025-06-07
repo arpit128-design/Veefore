@@ -118,16 +118,16 @@ export function SpaceBackground() {
         }}
       ></div>
 
-      {/* White Starfield - Many Shining Stars */}
+      {/* White Starfield - Small Moving Stars */}
       <div className="space-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {Array.from({ length: 150 }, (_, i) => {
-          const sizes = ['w-0.5 h-0.5', 'w-1 h-1', 'w-1.5 h-1.5'];
-          const animations = ['animate-starlight', 'animate-starlight-fast', 'animate-starlight-slow', 'animate-stellar-pulse'];
+        {Array.from({ length: 200 }, (_, i) => {
+          const sizes = ['w-px h-px', 'w-0.5 h-0.5', 'w-1 h-1'];
+          const animations = ['animate-starlight', 'animate-starlight-fast', 'animate-starlight-slow', 'animate-stellar-pulse', 'animate-cosmic-drift'];
           const size = sizes[i % sizes.length];
           const animation = animations[i % animations.length];
-          const top = (i * 7.3) % 100;
-          const left = (i * 11.7) % 100;
-          const delay = (i * 0.1) % 4;
+          const top = (i * 6.7) % 100;
+          const left = (i * 13.3) % 100;
+          const delay = (i * 0.08) % 5;
           
           return (
             <div 

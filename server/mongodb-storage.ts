@@ -1283,16 +1283,16 @@ export class MongoStorage implements IStorage {
 
   private convertWorkspaceMember(doc: any): WorkspaceMember {
     return {
-      id: parseInt(doc._id?.toString() || doc.id),
-      userId: parseInt(doc.userId),
-      workspaceId: parseInt(doc.workspaceId),
-      role: doc.role,
-      status: doc.status || null,
-      permissions: doc.permissions || null,
-      invitedBy: doc.invitedBy ? parseInt(doc.invitedBy) : null,
-      joinedAt: doc.joinedAt || null,
-      createdAt: doc.createdAt || null,
-      updatedAt: doc.updatedAt || null
+      id: parseInt(doc._id?.toString() || doc.id || "0"),
+      userId: parseInt(doc.userId?.toString() || "0"),
+      workspaceId: parseInt(doc.workspaceId?.toString() || "0"),
+      role: doc.role || "Viewer",
+      status: doc.status || "active",
+      permissions: doc.permissions || {},
+      invitedBy: doc.invitedBy ? parseInt(doc.invitedBy.toString()) : null,
+      joinedAt: doc.joinedAt || new Date(),
+      createdAt: doc.createdAt || new Date(),
+      updatedAt: doc.updatedAt || new Date()
     };
   }
 

@@ -2236,33 +2236,49 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Team Management Routes
   
   // Get workspace members
-  app.get('/api/workspaces/:workspaceId/members', requireAuth, addPlanContext, async (req: any, res: Response) => {
+  app.get('/api/workspaces/:workspaceId/members', requireAuth, async (req: any, res: Response) => {
     try {
       const workspaceId = req.params.workspaceId;
       const userId = req.user.id;
 
+      console.log('[TEAM] Getting members for workspace:', workspaceId, 'user:', userId);
+
       // Check if user has access to this workspace
       const workspace = await storage.getWorkspace(workspaceId);
       if (!workspace) {
+        console.log('[TEAM] Workspace not found');
         return res.status(404).json({ error: 'Workspace not found' });
       }
 
-      // Check if user is owner or member of workspace
-      console.log('[TEAM] Checking workspace access for user:', userId, 'workspace:', workspaceId);
-      console.log('[TEAM] Workspace owner:', workspace.userId);
-      
-      const member = await storage.getWorkspaceMember(workspaceId, userId);
-      console.log('[TEAM] Found member:', member ? 'Yes' : 'No');
-      
-      if (workspace.userId !== userId && !member) {
+      // Check if user is owner
+      if (workspace.userId !== userId) {
+        console.log('[TEAM] Access denied - not workspace owner');
         return res.status(403).json({ error: 'Access denied' });
       }
 
-      console.log('[TEAM] Getting workspace members for:', workspaceId);
-      const members = await storage.getWorkspaceMembers(workspaceId);
-      console.log('[TEAM] Found members:', members.length);
-      
-      res.json(members);
+      // Return workspace owner as the only member for now
+      const owner = await storage.getUser(userId);
+      if (!owner) {
+        console.log('[TEAM] Owner user not found');
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const ownerMember = {
+        id: 1,
+        userId: parseInt(userId.toString()),
+        workspaceId: parseInt(workspaceId),
+        role: 'Owner',
+        status: 'active',
+        permissions: null,
+        invitedBy: null,
+        joinedAt: workspace.createdAt,
+        createdAt: workspace.createdAt,
+        updatedAt: workspace.updatedAt,
+        user: owner
+      };
+
+      console.log('[TEAM] Returning owner as member:', owner.username);
+      res.json([ownerMember]);
     } catch (error: any) {
       console.error('[TEAM] Get members error:', error);
       res.status(500).json({ error: 'Failed to get workspace members' });

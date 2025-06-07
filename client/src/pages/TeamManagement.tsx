@@ -42,7 +42,7 @@ interface TeamInvitation {
 }
 
 const rolePermissions = {
-  owner: { label: "Owner", icon: Crown, color: "bg-yellow-100 text-yellow-800", description: "Full access to all features" },
+  admin: { label: "Admin", icon: Crown, color: "bg-yellow-100 text-yellow-800", description: "Full access to all features" },
   editor: { label: "Editor", icon: Edit, color: "bg-blue-100 text-blue-800", description: "Can create and manage content" },
   viewer: { label: "Viewer", icon: Eye, color: "bg-gray-100 text-gray-800", description: "Can view content and analytics" }
 };

@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { Eye, Heart, Users, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { formatNumber, formatEngagement } from "@/lib/utils";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
@@ -39,15 +40,11 @@ export default function Dashboard() {
     minute: '2-digit'
   });
 
-  // Format numbers for display with null safety
-  const formatNumber = (num: number | null) => {
-    if (num === null) return null;
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
+  // Format numbers using Indian numbering system (K, L, Cr)
+  const formatPercentage = (num: number | null) => {
+    if (num === null) return "—";
+    return `${num}%`;
   };
-
-  const formatPercentage = (num: number) => `${num}%`;
 
   // Only show loading spinner on very first load when no workspace is available
   if (!currentWorkspace) {
@@ -181,7 +178,7 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Engagement"
-          value={analytics.engagement !== null ? formatNumber(analytics.engagement) : null}
+          value={analytics.engagement !== null ? formatEngagement(analytics.engagement) : null}
           change={analytics.engagement !== null && analytics.engagement > 0 ? { value: "Active data", isPositive: true } : undefined}
           icon={<Heart className="text-xl" />}
           gradient="from-solar-gold to-red-500"
@@ -223,34 +220,34 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Followers</span>
-                <span className="text-xl font-bold text-white">{instagramData.followers ?? '—'}</span>
+                <span className="text-xl font-bold text-white">{instagramData.followers !== null ? formatNumber(instagramData.followers) : '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Avg. Engagement</span>
                 <span className="text-xl font-bold text-green-400">
-                  {instagramData.engagementRate !== null ? `${instagramData.engagementRate.toFixed(1)}%` : '—'}
+                  {instagramData.engagementRate !== null ? formatEngagement(instagramData.engagementRate) : '—'}
                 </span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Impressions</span>
-                <span className="text-xl font-bold text-white">{instagramData.impressions ?? '—'}</span>
+                <span className="text-xl font-bold text-white">{instagramData.impressions !== null ? formatNumber(instagramData.impressions) : '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Posts</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalPosts ?? '—'}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalPosts !== null ? formatNumber(instagramData.totalPosts) : '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Likes</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalLikes ?? '—'}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalLikes !== null ? formatNumber(instagramData.totalLikes) : '—'}</span>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Reach</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalReach ?? '—'}</span>
+                <span className="text-xl font-bold text-white">{instagramData.totalReach !== null ? formatNumber(instagramData.totalReach) : '—'}</span>
               </div>
             </div>
           </div>

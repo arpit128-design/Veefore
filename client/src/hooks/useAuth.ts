@@ -25,6 +25,13 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
+    // Clear any invalid tokens on startup
+    const existingToken = localStorage.getItem('veefore_auth_token');
+    if (existingToken && existingToken.split('.').length !== 3) {
+      console.log('[AUTH] Clearing invalid token on startup');
+      localStorage.removeItem('veefore_auth_token');
+    }
+
     // Check if Firebase auth is available
     if (!auth) {
       console.warn('Firebase auth not available');
@@ -40,10 +47,20 @@ export function useAuth() {
           // Clear any demo mode when real user is authenticated
           localStorage.removeItem('veefore_demo_mode');
           
-          // Get Firebase ID token
-          const idToken = await firebaseUser.getIdToken();
-          setToken(idToken);
-          localStorage.setItem('veefore_auth_token', idToken);
+          // Get Firebase ID token (force refresh to ensure valid JWT)
+          const idToken = await firebaseUser.getIdToken(true);
+          
+          // Validate token format before storing
+          if (idToken && idToken.split('.').length === 3) {
+            setToken(idToken);
+            localStorage.setItem('veefore_auth_token', idToken);
+            console.log('[AUTH] Valid JWT token stored');
+          } else {
+            console.error('[AUTH] Invalid token format received:', idToken?.substring(0, 50));
+            // Clear any invalid tokens
+            localStorage.removeItem('veefore_auth_token');
+            setToken(null);
+          }
           
           // Check if user exists in our database
           try {

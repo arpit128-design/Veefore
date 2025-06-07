@@ -72,6 +72,14 @@ export const getQueryFn: <T>(options: {
     // Get Firebase token from local storage or auth state
     const token = localStorage.getItem('veefore_auth_token');
     
+    // Validate token format before using
+    if (token && token.split('.').length !== 3) {
+      console.log('[CLIENT] Invalid token format detected, clearing cache');
+      localStorage.removeItem('veefore_auth_token');
+      window.location.reload(); // Force re-authentication
+      return;
+    }
+    
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;

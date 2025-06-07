@@ -1327,6 +1327,48 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Fix team addon userId format
+  app.post('/api/fix-team-addon-format', async (req: any, res: Response) => {
+    try {
+      const userId = '6844027426cae0200f88b5db';
+      
+      console.log('[FIX TEAM ADDON] Fixing userId format for team-member addons');
+      
+      // Direct database fix using MongoDB storage
+      const mongoStorage = storage as any;
+      await mongoStorage.connect();
+      
+      // Update team-member addons with numeric userId to string format
+      const AddonModel = mongoStorage.AddonModel;
+      const updateResult = await AddonModel.updateMany(
+        { 
+          type: 'team-member',
+          userId: 6844027426
+        },
+        { 
+          $set: { userId: userId }
+        }
+      );
+      
+      console.log(`[FIX TEAM ADDON] Updated ${updateResult.modifiedCount} team-member addons`);
+      
+      // Verify the fix
+      const verifyAddons = await storage.getUserAddons(userId);
+      const teamMemberAddons = verifyAddons.filter(addon => addon.type === 'team-member');
+      
+      res.json({
+        success: true,
+        message: `Fixed ${updateResult.modifiedCount} team-member addons`,
+        teamMemberAddons: teamMemberAddons.length,
+        allAddons: verifyAddons.map(a => `${a.type}:${a.isActive}`)
+      });
+      
+    } catch (error: any) {
+      console.error('[FIX TEAM ADDON] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post('/api/seed-credit-transactions', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;

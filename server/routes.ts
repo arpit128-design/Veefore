@@ -27,9 +27,22 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Extract Firebase UID from JWT token payload
       let firebaseUid;
       try {
-        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+        // Validate JWT structure (should have 3 parts)
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+          console.error('[AUTH] Invalid JWT structure - expected 3 parts, got:', tokenParts.length);
+          return res.status(401).json({ error: 'Invalid token format' });
+        }
+
+        const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
         firebaseUid = payload.user_id || payload.sub;
+        
+        if (!firebaseUid) {
+          console.error('[AUTH] No Firebase UID found in token payload:', Object.keys(payload));
+          return res.status(401).json({ error: 'Invalid token payload' });
+        }
       } catch (error) {
+        console.error('[AUTH] Token parsing error:', error.message);
         return res.status(401).json({ error: 'Invalid token format' });
       }
       
@@ -757,10 +770,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   });
 
   // Admin endpoint to fix workspace ID mismatch
-  app.post("/api/admin/fix-workspace-id", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+  app.post("/api/admin/fix-workspace-id", requireAuth, async (req: any, res) => {
+    const { user } = req;
 
     try {
       const accounts = await storage.getAllSocialAccounts();

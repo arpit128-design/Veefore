@@ -23,6 +23,83 @@ import { viralContentService } from "./viral-content-service";
 
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 
+// In-memory cache for Instagram analytics data
+const analyticsCache = new Map<string, { data: any; timestamp: number; refreshing: boolean }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_REFRESH_THRESHOLD = 2 * 60 * 1000; // Start refresh 2 minutes before expiry
+
+// Function to fetch and cache Instagram analytics data
+async function fetchInstagramAnalytics(instagramAccount: any, cacheKey: string): Promise<any> {
+  try {
+    console.log(`[CACHE] Fetching fresh Instagram data for @${instagramAccount.username}`);
+    
+    const { instagramAPI } = await import('./instagram-api');
+    
+    // Parallel fetch for speed optimization
+    const [media, insights, profile] = await Promise.all([
+      instagramAPI.getUserMedia(instagramAccount.accessToken, 25),
+      instagramAPI.getAccountInsights(instagramAccount.accessToken, 'day'),
+      instagramAPI.getUserProfile(instagramAccount.accessToken)
+    ]);
+
+    // Calculate metrics
+    const totalPosts = media.length;
+    const totalLikes = media.reduce((sum, post) => sum + (post.like_count || 0), 0);
+    const totalComments = media.reduce((sum, post) => sum + (post.comments_count || 0), 0);
+    const totalEngagement = totalLikes + totalComments;
+    
+    // Get reach from insights or calculate from media
+    let totalReach = insights.reach || 0;
+    if (totalReach === 0 && media.length > 0) {
+      const mediaReach = await Promise.all(
+        media.slice(0, 10).map(async (post) => { // Limit to 10 recent posts for speed
+          try {
+            const mediaInsights = await instagramAPI.getMediaInsights(post.id, instagramAccount.accessToken);
+            return mediaInsights.reach || 0;
+          } catch (e) {
+            return 0;
+          }
+        })
+      );
+      totalReach = mediaReach.reduce((sum, reach) => sum + reach, 0);
+    }
+    
+    const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
+
+    const analyticsData = {
+      totalPosts,
+      totalReach,
+      engagementRate: Math.round(engagementRate * 10) / 10,
+      topPlatform: 'instagram',
+      followers: profile.followers_count || insights.follower_count || 0,
+      impressions: insights.impressions || 0,
+      accountUsername: instagramAccount.username,
+      totalLikes,
+      totalComments,
+      mediaCount: profile.media_count || totalPosts
+    };
+
+    // Update cache
+    analyticsCache.set(cacheKey, {
+      data: analyticsData,
+      timestamp: Date.now(),
+      refreshing: false
+    });
+
+    console.log(`[CACHE] Updated cache for @${instagramAccount.username}`);
+    return analyticsData;
+
+  } catch (error) {
+    console.error(`[CACHE] Error fetching Instagram data:`, error);
+    // Mark cache as not refreshing on error
+    const cached = analyticsCache.get(cacheKey);
+    if (cached) {
+      cached.refreshing = false;
+    }
+    throw error;
+  }
+}
+
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Middleware for authentication
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
@@ -1196,34 +1273,27 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Dashboard analytics - fetch real Instagram data filtered by workspace
+  // Dashboard analytics - optimized with aggressive caching for instant loading
   app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.query.workspaceId;
       
-      console.log(`[DASHBOARD ANALYTICS] Request for user ${user.id}, workspaceId: ${workspaceId}`);
+      console.log(`[DASHBOARD ANALYTICS] Fast request for user ${user.id}, workspaceId: ${workspaceId}`);
       
       let workspace;
       if (workspaceId) {
-        // Get specific workspace
         workspace = await storage.getWorkspace(workspaceId);
-        console.log(`[DASHBOARD ANALYTICS] Found workspace: ${workspace?.name} (${workspace?.id})`);
         if (!workspace || workspace.userId !== user.id) {
-          console.log(`[DASHBOARD ANALYTICS] Workspace access denied or not found`);
           return res.status(403).json({ error: 'Workspace not found or access denied' });
         }
       } else {
-        // Fallback to default workspace
-        console.log(`[DASHBOARD ANALYTICS] No workspaceId provided, using default`);
         workspace = await storage.getDefaultWorkspace(user.id);
       }
       
       if (!workspace) {
         return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
       }
-
-      console.log(`[DASHBOARD ANALYTICS] Fetching data for workspace: ${workspace.name} (${workspace.id})`);
 
       // Get connected Instagram account
       const instagramAccount = await storage.getSocialAccountByPlatform(workspace.id, 'instagram');
@@ -1238,67 +1308,46 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         });
       }
 
+      const cacheKey = `analytics_${workspace.id}_${instagramAccount.username}`;
+      const cached = analyticsCache.get(cacheKey);
+      const now = Date.now();
+
+      // Return cached data immediately if available
+      if (cached) {
+        const age = now - cached.timestamp;
+        const needsRefresh = age > CACHE_REFRESH_THRESHOLD;
+        const isExpired = age > CACHE_DURATION;
+
+        if (!isExpired) {
+          console.log(`[DASHBOARD FAST] Serving cached data for @${instagramAccount.username} (age: ${Math.round(age/1000)}s)`);
+          
+          // Trigger background refresh if needed
+          if (needsRefresh && !cached.refreshing) {
+            cached.refreshing = true;
+            console.log(`[DASHBOARD FAST] Triggering background refresh for @${instagramAccount.username}`);
+            fetchInstagramAnalytics(instagramAccount, cacheKey).catch(err => {
+              console.error(`[DASHBOARD FAST] Background refresh failed:`, err);
+            });
+          }
+
+          return res.json(cached.data);
+        }
+      }
+
+      // If no cache or expired, try to fetch quickly
       try {
-        console.log(`[DASHBOARD] Fetching real Instagram data for @${instagramAccount.username}`);
+        console.log(`[DASHBOARD FAST] No valid cache, fetching fresh data for @${instagramAccount.username}`);
+        const freshData = await fetchInstagramAnalytics(instagramAccount, cacheKey);
+        res.json(freshData);
+      } catch (instagramError: any) {
+        console.error(`[DASHBOARD FAST] Instagram API error for @${instagramAccount.username}:`, instagramError);
         
-        // Import Instagram API
-        const { instagramAPI } = await import('./instagram-api');
-        
-        // Get user media and insights
-        const [media, insights] = await Promise.all([
-          instagramAPI.getUserMedia(instagramAccount.accessToken, 25),
-          instagramAPI.getAccountInsights(instagramAccount.accessToken, 'day')
-        ]);
-
-        console.log(`[DASHBOARD] Retrieved ${media.length} posts and insights for @${instagramAccount.username}`);
-
-        // Calculate real metrics from Instagram data
-        const totalPosts = media.length;
-        const totalLikes = media.reduce((sum, post) => sum + (post.like_count || 0), 0);
-        const totalComments = media.reduce((sum, post) => sum + (post.comments_count || 0), 0);
-        const totalEngagement = totalLikes + totalComments;
-        
-        // Get reach from media insights if available, otherwise use account insights
-        let totalReach = insights.reach || 0;
-        if (totalReach === 0 && media.length > 0) {
-          // Try to get reach from individual media insights
-          const mediaReach = await Promise.all(
-            media.map(async (post) => {
-              try {
-                const mediaInsights = await instagramAPI.getMediaInsights(post.id, instagramAccount.accessToken);
-                return mediaInsights.reach || 0;
-              } catch (e) {
-                return 0;
-              }
-            })
-          );
-          totalReach = mediaReach.reduce((sum, reach) => sum + reach, 0);
+        // Return stale cache if available, otherwise minimal data
+        if (cached) {
+          console.log(`[DASHBOARD FAST] Returning stale cache due to API error`);
+          return res.json(cached.data);
         }
         
-        const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
-
-        // Get profile data to supplement insights
-        console.log(`[DASHBOARD] Fetching profile data for @${instagramAccount.username}`);
-        const profile = await instagramAPI.getUserProfile(instagramAccount.accessToken);
-        console.log(`[DASHBOARD] Profile data retrieved:`, JSON.stringify(profile, null, 2));
-        
-        res.json({
-          totalPosts,
-          totalReach,
-          engagementRate: Math.round(engagementRate * 10) / 10,
-          topPlatform: 'instagram',
-          followers: profile.followers_count || insights.follower_count || 0,
-          impressions: insights.impressions || 0,
-          accountUsername: instagramAccount.username,
-          totalLikes,
-          totalComments,
-          mediaCount: profile.media_count || totalPosts
-        });
-
-      } catch (instagramError: any) {
-        console.error(`[DASHBOARD] Instagram API error for @${instagramAccount.username}:`, instagramError);
-        
-        // Return minimal data if Instagram API fails
         res.json({
           totalPosts: 0,
           totalReach: 0,

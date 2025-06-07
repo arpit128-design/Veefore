@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { 
-  Play, Heart, Share2, Bookmark, MapPin, Clock, Eye, ThumbsUp, 
+  Play, Pause, Heart, Share2, Bookmark, MapPin, Clock, Eye, ThumbsUp, 
   TrendingUp, Sparkles, Globe, Video, Camera, ImageIcon, Zap,
-  ArrowRight, Star, Users, MessageCircle
+  ArrowRight, Star, Users, MessageCircle, ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -135,6 +135,52 @@ const ContentRecommendations = () => {
   const ContentCard = ({ recommendation }: { recommendation: ContentRecommendation }) => {
     const isLiked = likedItems.has(recommendation.id);
     const isBookmarked = bookmarkedItems.has(recommendation.id);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    const isVideoContent = recommendation.type.includes('video') || recommendation.type.includes('reel');
+
+    const handleCardClick = () => {
+      // Track interaction
+      trackInteractionMutation.mutate({ id: recommendation.id, action: 'viewed' });
+      
+      // Open source URL in new tab if available
+      if (recommendation.sourceUrl) {
+        window.open(recommendation.sourceUrl, '_blank', 'noopener,noreferrer');
+      }
+    };
+
+    const handleVideoToggle = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (videoRef.current) {
+        if (isPlaying) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+      }
+    };
+
+    const handleMouseEnter = () => {
+      setIsHovered(true);
+      if (isVideoContent && videoRef.current && recommendation.mediaUrl) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {
+          // Autoplay failed, user will need to click
+        });
+        setIsPlaying(true);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+      if (isVideoContent && videoRef.current) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    };
 
     return (
       <motion.div
@@ -143,23 +189,40 @@ const ContentRecommendations = () => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
-        className="group"
+        className="group cursor-pointer"
+        onClick={handleCardClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <Card className="overflow-hidden border-0 bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 h-full">
-          {/* Thumbnail Section */}
+          {/* Thumbnail/Video Section */}
           <div className="relative aspect-video overflow-hidden">
-            {recommendation.thumbnailUrl ? (
-              <img 
-                src={recommendation.thumbnailUrl} 
-                alt={recommendation.title}
+            {isVideoContent && recommendation.mediaUrl ? (
+              <video
+                ref={videoRef}
+                src={recommendation.mediaUrl}
+                poster={recommendation.thumbnailUrl || '/api/placeholder/320/180'}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loop
+                muted
+                playsInline
               />
             ) : (
-              <div className={`w-full h-full bg-gradient-to-br ${getPlatformColor(recommendation.type)} flex items-center justify-center`}>
-                <div className="text-white/80">
-                  {getPlatformIcon(recommendation.type)}
-                </div>
-              </div>
+              <>
+                {recommendation.thumbnailUrl ? (
+                  <img 
+                    src={recommendation.thumbnailUrl} 
+                    alt={recommendation.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${getPlatformColor(recommendation.type)} flex items-center justify-center`}>
+                    <div className="text-white/80">
+                      {getPlatformIcon(recommendation.type)}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             
             {/* Overlay */}
@@ -189,16 +252,45 @@ const ContentRecommendations = () => {
               </div>
             )}
 
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <Button 
-                size="lg" 
-                className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white"
-                onClick={() => trackInteractionMutation.mutate({ id: recommendation.id, action: 'viewed' })}
+            {/* External Link Indicator */}
+            {recommendation.sourceUrl && (
+              <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
+                  <ExternalLink className="h-3 w-3" />
+                </Badge>
+              </div>
+            )}
+
+            {/* Play/Pause Button Overlay for Videos */}
+            {isVideoContent && (
+              <div 
+                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={handleVideoToggle}
               >
-                <Play className="h-6 w-6 ml-1" />
-              </Button>
-            </div>
+                <Button 
+                  size="lg" 
+                  className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white"
+                >
+                  {isPlaying ? (
+                    <Pause className="h-6 w-6" />
+                  ) : (
+                    <Play className="h-6 w-6 ml-1" />
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* Click to View Indicator for Non-Videos */}
+            {!isVideoContent && recommendation.sourceUrl && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Button 
+                  size="lg" 
+                  className="rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white"
+                >
+                  <ExternalLink className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
           </div>
 
           <CardContent className="p-4 space-y-3">

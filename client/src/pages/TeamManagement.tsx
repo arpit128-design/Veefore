@@ -276,6 +276,52 @@ export default function TeamManagement() {
     }
   });
 
+  // Cancel invitation mutation
+  const cancelInvitationMutation = useMutation({
+    mutationFn: async (invitationId: number) => {
+      const response = await apiRequest('DELETE', `/api/workspaces/${currentWorkspace?.id}/invitations/${invitationId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Invitation cancelled",
+        description: "Team invitation has been cancelled successfully."
+      });
+      queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to cancel invitation",
+        description: error.message || "An error occurred while cancelling the invitation.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Cleanup user data mutation
+  const cleanupDataMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/cleanup-user-data');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Data cleaned up",
+        description: `Removed ${data.deletedAddons} addons and ${data.deletedInvitations} invitations.`
+      });
+      queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-members'] });
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to cleanup data",
+        description: error.message || "An error occurred while cleaning up data.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleInviteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail || !inviteRole) return;
@@ -377,6 +423,16 @@ export default function TeamManagement() {
             >
               <Link className="w-4 h-4 mr-2" />
               Generate Invite Code
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={() => cleanupDataMutation.mutate()}
+              disabled={cleanupDataMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              {cleanupDataMutation.isPending ? "Cleaning..." : "Cleanup Data"}
             </Button>
           </div>
         )}
@@ -599,6 +655,17 @@ export default function TeamManagement() {
                       <Badge variant="outline" className="border-orange-400 text-orange-400">
                         Pending
                       </Badge>
+                      
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => cancelInvitationMutation.mutate(invitation.id)}
+                        disabled={cancelInvitationMutation.isPending}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Cancel
+                      </Button>
                     </div>
                   </div>
                 ))}

@@ -1463,6 +1463,88 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Cleanup all user data (addons and invitations)
+  app.post('/api/cleanup-user-data', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      console.log('[CLEANUP] Starting cleanup for user:', user.id);
+      
+      // Get user's workspaces
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      
+      let deletedInvitations = 0;
+      
+      for (const workspace of workspaces) {
+        // Delete all invitations for this workspace
+        const invitations = await storage.getTeamInvitations(workspace.id);
+        console.log(`[CLEANUP] Found ${invitations.length} invitations for workspace ${workspace.id}`);
+        
+        for (const invitation of invitations) {
+          await storage.updateTeamInvitation(invitation.id, { status: 'cancelled' });
+          deletedInvitations++;
+        }
+      }
+      
+      // Access MongoDB models directly to delete addons
+      const mongoStorage = storage as any;
+      let deletedAddons = 0;
+      
+      if (mongoStorage.AddonModel) {
+        const addonResult = await mongoStorage.AddonModel.deleteMany({
+          $or: [
+            { userId: user.id },
+            { userId: parseInt(user.id) }
+          ]
+        });
+        deletedAddons = addonResult.deletedCount || 0;
+      }
+      
+      console.log(`[CLEANUP] Deleted ${deletedAddons} addons and ${deletedInvitations} invitations`);
+      
+      res.json({ 
+        success: true, 
+        message: 'User data cleaned up successfully',
+        deletedAddons,
+        deletedInvitations
+      });
+    } catch (error: any) {
+      console.error('[CLEANUP USER DATA] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to cleanup user data' });
+    }
+  });
+
+  // Cancel team invitation
+  app.delete('/api/workspaces/:workspaceId/invitations/:invitationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId, invitationId } = req.params;
+
+      // Verify workspace ownership
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace || workspace.userId !== parseInt(user.id)) {
+        return res.status(403).json({ error: 'Not authorized to manage this workspace' });
+      }
+
+      // Get and verify invitation
+      const invitation = await storage.getTeamInvitation(parseInt(invitationId));
+      if (!invitation || invitation.workspaceId !== parseInt(workspaceId)) {
+        return res.status(404).json({ error: 'Invitation not found' });
+      }
+
+      // Update invitation status to cancelled
+      await storage.updateTeamInvitation(parseInt(invitationId), { 
+        status: 'cancelled'
+      });
+
+      console.log(`[TEAM INVITE] Cancelled invitation ${invitationId} for workspace ${workspaceId}`);
+      
+      res.json({ success: true, message: 'Invitation cancelled successfully' });
+    } catch (error: any) {
+      console.error('[CANCEL INVITATION] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to cancel invitation' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -240,6 +240,53 @@ export default function OnboardingPremium() {
     setProgress((currentStep / (onboardingSteps.length - 1)) * 100);
   }, [currentStep]);
 
+  // Handle OAuth return and restore onboarding state
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isReturningFromOAuth = localStorage.getItem('onboarding_returning_from_oauth') === 'true';
+    const savedStep = localStorage.getItem('onboarding_current_step');
+    const savedFormData = localStorage.getItem('onboarding_form_data');
+    
+    if (isReturningFromOAuth && savedStep && savedFormData) {
+      try {
+        const parsedFormData = JSON.parse(savedFormData);
+        const stepNumber = parseInt(savedStep);
+        
+        // Restore form data and step
+        setFormData(parsedFormData);
+        setCurrentStep(stepNumber);
+        
+        // Check for Instagram connection success
+        if (urlParams.get('success') === 'instagram_connected') {
+          const username = urlParams.get('username');
+          
+          // Update form data to reflect Instagram connection
+          setFormData(prev => ({
+            ...prev,
+            connectedPlatforms: [...prev.connectedPlatforms.filter(p => p !== 'instagram'), 'instagram']
+          }));
+          
+          toast({
+            title: "Instagram Connected!",
+            description: `Successfully connected @${username}`,
+          });
+        }
+        
+        // Clear OAuth state
+        localStorage.removeItem('onboarding_returning_from_oauth');
+        localStorage.removeItem('onboarding_current_step');
+        localStorage.removeItem('onboarding_form_data');
+        localStorage.removeItem('oauth_source');
+        
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+      } catch (error) {
+        console.error('[ONBOARDING] Failed to restore state:', error);
+      }
+    }
+  }, []);
+
   // Helper function for category toggle
   const handleCategoryToggle = (categoryId: string) => {
     setFormData(prev => ({

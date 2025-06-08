@@ -245,14 +245,61 @@ export class InstagramWebhookHandler {
 
       console.log(`[WEBHOOK] Found ${dmRules.length} DM rules out of ${automationRules.length} total rules`);
 
-      // Only process the first active DM rule to prevent duplicates
-      const firstRule = dmRules[0];
-      if (!firstRule) {
-        console.log(`[WEBHOOK] No active DM rules found`);
+      // If multiple DM rules exist, deactivate all but the most recent one
+      if (dmRules.length > 1) {
+        console.log(`[WEBHOOK] Multiple DM rules detected (${dmRules.length}). Deactivating duplicates to prevent multiple responses.`);
+        
+        // Sort by creation date - keep the most recent
+        dmRules.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const keepRule = dmRules[0];
+        const duplicateRules = dmRules.slice(1);
+        
+        console.log(`[WEBHOOK] Keeping rule: ${keepRule.name} (${keepRule.id})`);
+        console.log(`[WEBHOOK] Deactivating ${duplicateRules.length} duplicate rules`);
+        
+        // Deactivate duplicate rules
+        for (const rule of duplicateRules) {
+          try {
+            await this.storage.updateAutomationRule(rule.id, {
+              ...rule,
+              isActive: false,
+              deactivationReason: 'Duplicate DM rule - prevented multiple responses'
+            });
+            console.log(`[WEBHOOK] Deactivated duplicate rule: ${rule.name} (${rule.id})`);
+          } catch (error) {
+            console.error(`[WEBHOOK] Error deactivating rule ${rule.id}:`, error);
+          }
+        }
+      }
+
+      // After deactivation, get fresh list of active rules
+      let activeRules = dmRules.filter(rule => rule.isActive);
+      
+      // If we just deactivated rules, update the list
+      if (dmRules.length > 1) {
+        // Re-fetch automation rules to get updated status
+        const updatedRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
+        const updatedDmRules = updatedRules.filter(rule => {
+          const isActive = rule.isActive;
+          const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
+          const hasAction = rule.action && typeof rule.action === 'object';
+          
+          const isDmTypeTrigger = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
+          const isDmTypeAction = hasAction && ('type' in rule.action) && rule.action.type === 'dm';
+          const isDmType = isDmTypeTrigger || isDmTypeAction;
+          
+          return isActive && (hasTrigger || hasAction) && isDmType;
+        });
+        activeRules = updatedDmRules;
+      }
+      
+      const activeRule = activeRules[0];
+      if (!activeRule) {
+        console.log(`[WEBHOOK] No active DM rules found after cleanup`);
         return;
       }
 
-      console.log(`[WEBHOOK] Processing single DM rule: ${firstRule.id}, name: ${firstRule.name}, active: ${firstRule.isActive}`);
+      console.log(`[WEBHOOK] Processing DM rule: ${activeRule.id}, name: ${activeRule.name}`);
 
       // Mark message as processed before handling
       this.processedMessages.add(messageKey);
@@ -263,11 +310,11 @@ export class InstagramWebhookHandler {
         messagesToDelete.forEach(msg => this.processedMessages.delete(msg));
       }
 
-      // Process only the first rule to prevent duplicates
+      // Process the active rule
       try {
-        await this.handleDirectMessageEvent(messageText, senderId, socialAccount, firstRule);
+        await this.handleDirectMessageEvent(messageText, senderId, socialAccount, activeRule);
       } catch (error) {
-        console.error(`[WEBHOOK] Error processing DM rule ${firstRule.id}:`, error);
+        console.error(`[WEBHOOK] Error processing DM rule ${activeRule.id}:`, error);
       }
 
     } catch (error) {

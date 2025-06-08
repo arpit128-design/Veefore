@@ -1,39 +1,28 @@
-// Trigger enhanced Instagram reach data sync with new methodology
-import fetch from 'node-fetch';
+import { MongoStorage } from './server/mongodb-storage.ts';
+import { InstagramDirectSync } from './server/instagram-direct-sync.ts';
 
 async function triggerEnhancedReachSync() {
-  console.log('[ENHANCED REACH] Triggering Instagram reach data sync with new methodology...');
+  console.log('[ENHANCED REACH SYNC] Starting comprehensive reach extraction...');
   
   try {
-    // Get user authentication
-    const userResponse = await fetch('http://localhost:5000/api/user', {
-      headers: {
-        'Authorization': `Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImY4M2YzMmEzNGUwNDgzNTc3NjAyNGE1ZTg2MWI2NzI3NmFhNzA1YTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdmVlZm9yZS1kZXYtZmlyZWJhc2UiLCJhdWQiOiJ2ZWVmb3JlLWRldi1maXJlYmFzZSIsImF1dGhfdGltZSI6MTczMzY2NTkzMCwidXNlcl9pZCI6IlhHME9ZeTJSa21ZTWhnUnpUNGNWamI0SDByWTIiLCJzdWIiOiJYRzBPWXkyUmttWU1oZ1J6VDRjVmpiNEgwclkyIiwiaWF0IjoxNzMzNjY1OTMwLCJleHAiOjE3MzM2Njk1MzAsImVtYWlsIjoiY2hvdWRoYXJ5YXJwaXQ5NzdAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMDk5MTQ4MzA5MzMyNjUzNzgwNzgiXSwiZW1haWwiOlsiY2hvdWRoYXJ5YXJwaXQ5NzdAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.gILJ6yRk8f6R6YOqW4oPYJfZcL7BFpWbTsaGhfcmfm8Qq8LvFj1BLPQV5nqhHXq2N3HHYu3sF7lh6LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8`
-      }
-    });
+    const storage = new MongoStorage();
+    const instagramSync = new InstagramDirectSync(storage);
     
-    if (!userResponse.ok) {
-      console.log('[ENHANCED REACH] User authentication failed');
-      return;
-    }
+    // Target the workspace showing 139 reach instead of ~747
+    const workspaceId = '68449f3852d33d75b31ce737';
     
-    // Trigger dashboard analytics refresh which includes Instagram sync
-    const analyticsResponse = await fetch('http://localhost:5000/api/dashboard/analytics?workspaceId=68449f3852d33d75b31ce737', {
-      headers: {
-        'Authorization': `Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImY4M2YzMmEzNGUwNDgzNTc3NjAyNGE1ZTg2MWI2NzI3NmFhNzA1YTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdmVlZm9yZS1kZXYtZmlyZWJhc2UiLCJhdWQiOiJ2ZWVmb3JlLWRldi1maXJlYmFzZSIsImF1dGhfdGltZSI6MTczMzY2NTkzMCwidXNlcl9pZCI6IlhHME9ZeTJSa21ZTWhnUnpUNGNWamI0SDByWTIiLCJzdWIiOiJYRzBPWXkyUmttWU1oZ1J6VDRjVmpiNEgwclkyIiwiaWF0IjoxNzMzNjY1OTMwLCJleHAiOjE3MzM2Njk1MzAsImVtYWlsIjoiY2hvdWRoYXJ5YXJwaXQ5NzdAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMDk5MTQ4MzA5MzMyNjUzNzgwNzgiXSwiZW1haWwiOlsiY2hvdWRoYXJ5YXJwaXQ5NzdAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.gILJ6yRk8f6R6YOqW4oPYJfZcL7BFpWbTsaGhfcmfm8Qq8LvFj1BLPQV5nqhHXq2N3HHYu3sF7lh6LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8LPh_Gp5qN6v8`
-      }
-    });
+    console.log('[ENHANCED REACH SYNC] Triggering comprehensive post-level reach extraction...');
+    console.log('[ENHANCED REACH SYNC] Expected: 341+124+130+20+14+118 = ~747 total reach');
+    console.log('[ENHANCED REACH SYNC] Current: 139 reach (missing ~608 reach)');
     
-    if (analyticsResponse.ok) {
-      const analyticsData = await analyticsResponse.json();
-      console.log('[ENHANCED REACH] Analytics data after sync:', analyticsData);
-    } else {
-      console.log('[ENHANCED REACH] Analytics refresh failed:', analyticsResponse.status);
-    }
+    await instagramSync.updateAccountWithRealData(workspaceId);
     
-    console.log('[ENHANCED REACH] Enhanced reach sync completed');
+    console.log('[ENHANCED REACH SYNC] Enhanced reach extraction complete');
+    
   } catch (error) {
-    console.error('[ENHANCED REACH] Error:', error);
+    console.error('[ENHANCED REACH SYNC] Error:', error);
+  } finally {
+    process.exit(0);
   }
 }
 

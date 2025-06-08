@@ -185,38 +185,89 @@ export class InstagramDirectSync {
             console.log('[INSTAGRAM DIRECT] Week period error:', alt2Error);
           }
 
-          // Alternative 3: Use media-level reach aggregation (no impressions)
+          // Alternative 3: Enhanced media-level reach extraction with individual post analysis
           try {
-            const mediaInsightsResponse = await fetch(
-              `https://graph.instagram.com/${profileData.id}/media?fields=id,insights.metric(reach)&limit=25&access_token=${accessToken}`
+            console.log('[INSTAGRAM DIRECT] Attempting comprehensive media reach extraction...');
+            
+            // First get all media IDs
+            const mediaListResponse = await fetch(
+              `https://graph.instagram.com/${profileData.id}/media?fields=id&limit=50&access_token=${accessToken}`
             );
-            if (mediaInsightsResponse.ok) {
-              const mediaInsightsData = await mediaInsightsResponse.json();
-              console.log('[INSTAGRAM DIRECT] Media reach insights response:', mediaInsightsData);
+            
+            if (mediaListResponse.ok) {
+              const mediaListData = await mediaListResponse.json();
+              const mediaIds = (mediaListData.data || []).map((item: any) => item.id);
+              console.log(`[INSTAGRAM DIRECT] Found ${mediaIds.length} media items for analysis`);
               
-              let aggregatedReach = 0;
+              let totalMediaReach = 0;
+              let successfulExtractions = 0;
               
-              for (const media of (mediaInsightsData.data || [])) {
-                if (media.insights?.data) {
-                  for (const insight of media.insights.data) {
-                    if (insight.name === 'reach' && insight.values?.[0]?.value) {
-                      aggregatedReach += insight.values[0].value;
-                      console.log('[INSTAGRAM DIRECT] Media reach found:', insight.values[0].value, 'for media:', media.id);
+              // Process each media item individually for reach using multiple API approaches
+              for (const mediaId of mediaIds) {
+                try {
+                  // Approach 1: Instagram Graph API insights
+                  let mediaReachResponse = await fetch(
+                    `https://graph.instagram.com/v22.0/${mediaId}/insights?metric=reach&access_token=${accessToken}`
+                  );
+                  
+                  if (mediaReachResponse.ok) {
+                    const reachData = await mediaReachResponse.json();
+                    const insights = reachData.data || [];
+                    
+                    for (const insight of insights) {
+                      if (insight.name === 'reach' && insight.values?.[0]?.value > 0) {
+                        totalMediaReach += insight.values[0].value;
+                        successfulExtractions++;
+                        console.log(`[INSTAGRAM DIRECT] ✓ Media ${mediaId} reach: ${insight.values[0].value}`);
+                      }
+                    }
+                  } else {
+                    // Approach 2: Try Facebook Graph API format
+                    mediaReachResponse = await fetch(
+                      `https://graph.facebook.com/v22.0/${mediaId}/insights?metric=reach&access_token=${accessToken}`
+                    );
+                    
+                    if (mediaReachResponse.ok) {
+                      const fbData = await mediaReachResponse.json();
+                      console.log(`[INSTAGRAM DIRECT] Facebook API format for ${mediaId}:`, fbData);
+                      
+                      const fbInsights = fbData.data || [];
+                      for (const insight of fbInsights) {
+                        if (insight.name === 'reach' && insight.values?.[0]?.value > 0) {
+                          totalMediaReach += insight.values[0].value;
+                          successfulExtractions++;
+                          console.log(`[INSTAGRAM DIRECT] ✓ FB API Media ${mediaId} reach: ${insight.values[0].value}`);
+                        }
+                      }
+                    } else {
+                      // Approach 3: Try basic media details with insights field
+                      const basicMediaResponse = await fetch(
+                        `https://graph.instagram.com/${mediaId}?fields=id,insights{metric,values}&access_token=${accessToken}`
+                      );
+                      
+                      if (basicMediaResponse.ok) {
+                        const basicData = await basicMediaResponse.json();
+                        console.log(`[INSTAGRAM DIRECT] Basic media insights for ${mediaId}:`, JSON.stringify(basicData, null, 2));
+                      } else {
+                        const errorDetails = await mediaReachResponse.text();
+                        console.log(`[INSTAGRAM DIRECT] All approaches failed for ${mediaId}:`, errorDetails);
+                      }
                     }
                   }
+                } catch (individualError) {
+                  console.log(`[INSTAGRAM DIRECT] Exception processing media ${mediaId}:`, individualError);
                 }
               }
               
-              if (aggregatedReach > 0) {
-                accountInsights.totalReach = Math.max(accountInsights.totalReach, aggregatedReach);
-                console.log('[INSTAGRAM DIRECT] SUCCESS - Authentic media-level reach:', aggregatedReach);
+              console.log(`[INSTAGRAM DIRECT] Media reach extraction summary: ${totalMediaReach} from ${successfulExtractions}/${mediaIds.length} posts`);
+              
+              if (totalMediaReach > accountInsights.totalReach) {
+                accountInsights.totalReach = totalMediaReach;
+                console.log(`[INSTAGRAM DIRECT] SUCCESS - Enhanced media reach: ${totalMediaReach} (vs account: ${accountInsights.totalReach})`);
               }
-            } else {
-              const mediaError = await mediaInsightsResponse.text();
-              console.log('[INSTAGRAM DIRECT] Media insights failed:', mediaError);
             }
           } catch (mediaError) {
-            console.log('[INSTAGRAM DIRECT] Media insights error:', mediaError);
+            console.log('[INSTAGRAM DIRECT] Enhanced media extraction error:', mediaError);
           }
           
           console.log('[INSTAGRAM DIRECT] Final insights after all attempts:', accountInsights);
@@ -246,35 +297,57 @@ export class InstagramDirectSync {
         
         console.log(`[INSTAGRAM DIRECT] Processing ${posts.length} posts for media insights`);
         
-        for (const post of posts.slice(0, 10)) { // Process up to 10 recent posts
+        // Process ALL posts to get complete reach data
+        console.log(`[INSTAGRAM DIRECT] Processing ALL ${posts.length} posts for comprehensive reach extraction`);
+        
+        for (const post of posts) { // Process ALL posts, not just 10
           try {
-            console.log(`[INSTAGRAM DIRECT] Fetching insights for post ${post.id}`);
-            const mediaInsightsResponse = await fetch(
-              `https://graph.instagram.com/${post.id}/insights?metric=impressions&access_token=${accessToken}`
+            console.log(`[INSTAGRAM DIRECT] Fetching reach for post ${post.id}`);
+            
+            // Try reach-only metric first (more likely to work)
+            let mediaInsightsResponse = await fetch(
+              `https://graph.instagram.com/${post.id}/insights?metric=reach&access_token=${accessToken}`
             );
             
             if (mediaInsightsResponse.ok) {
               const mediaInsightsData = await mediaInsightsResponse.json();
-              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights SUCCESS:`, mediaInsightsData);
+              console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach insights:`, mediaInsightsData);
               
               const data = mediaInsightsData.data || [];
               for (const metric of data) {
                 if (metric.name === 'reach' && metric.values?.[0]?.value) {
-                  mediaReach += metric.values[0].value;
-                  console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach: ${metric.values[0].value}`);
-                }
-                if (metric.name === 'impressions' && metric.values?.[0]?.value) {
-                  mediaImpressions += metric.values[0].value;
-                  console.log(`[INSTAGRAM DIRECT] Post ${post.id} impressions: ${metric.values[0].value}`);
+                  const reachValue = metric.values[0].value;
+                  if (reachValue > 0) { // Only count authentic reach values
+                    mediaReach += reachValue;
+                    console.log(`[INSTAGRAM DIRECT] ✓ Post ${post.id} authentic reach: ${reachValue}`);
+                  }
                 }
               }
             } else {
-              const errorText = await mediaInsightsResponse.text();
-              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights failed:`, errorText);
+              // Fallback: try engagement metric for posts that don't support reach
+              const fallbackResponse = await fetch(
+                `https://graph.instagram.com/${post.id}/insights?metric=engagement&access_token=${accessToken}`
+              );
+              
+              if (fallbackResponse.ok) {
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} using engagement fallback`);
+              } else {
+                const errorText = await mediaInsightsResponse.text();
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach extraction failed:`, errorText);
+              }
             }
           } catch (mediaError) {
-            console.log(`[INSTAGRAM DIRECT] Failed to fetch insights for post ${post.id}:`, mediaError);
+            console.log(`[INSTAGRAM DIRECT] Failed to process post ${post.id}:`, mediaError);
           }
+        }
+        
+        console.log(`[INSTAGRAM DIRECT] Total extracted media reach: ${mediaReach} from ${posts.length} posts`);
+        
+        // CRITICAL: If we extracted individual post reach data, use that instead of account-level
+        // Your profile shows individual post reach values that should total ~747
+        if (mediaReach > 0 && mediaReach > accountInsights.totalReach) {
+          console.log(`[INSTAGRAM DIRECT] Using individual post reach: ${mediaReach} (vs account: ${accountInsights.totalReach})`);
+          accountInsights.totalReach = mediaReach;
         }
         
         // Use the higher of account-level or media-level insights

@@ -96,13 +96,15 @@ function Router() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Check for completion flag and clear it
+  // Clear completion flag after authentication app loads
   useEffect(() => {
-    const justCompleted = localStorage.getItem('onboarding_just_completed');
-    if (justCompleted === 'true') {
-      localStorage.removeItem('onboarding_just_completed');
+    if (user?.isOnboarded) {
+      const justCompleted = localStorage.getItem('onboarding_just_completed');
+      if (justCompleted === 'true') {
+        localStorage.removeItem('onboarding_just_completed');
+      }
     }
-  }, []);
+  }, [user?.isOnboarded]);
 
   if (loading || showLoader) {
     return <SpaceLoader message="Connecting to VeeFore Network" />;

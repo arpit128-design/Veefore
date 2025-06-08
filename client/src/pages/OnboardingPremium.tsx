@@ -325,28 +325,17 @@ export default function OnboardingPremium() {
       // Mark user as onboarded
       await apiRequest('PATCH', '/api/user', { isOnboarded: true });
       
-      // Force refresh user data with proper await
-      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/user'] });
-      
       toast({
         title: "🚀 Workspace Created Successfully!",
         description: "Welcome to your new AI-powered creative universe!",
       });
       
-      // Clear the completing flag and redirect with longer delay
-      setIsCompleting(false);
-      setIsLoading(false);
-      
-      // Force navigation with extended delay to ensure proper data refresh
-      console.log('Redirecting to dashboard after workspace creation');
-      
-      // Set a flag in localStorage to prevent route protection conflicts
+      // Set completion flag and immediately redirect
       localStorage.setItem('onboarding_just_completed', 'true');
+      console.log('Setting completion flag and redirecting immediately');
       
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 2000);
+      // Immediate redirect to prevent any race conditions
+      window.location.href = '/dashboard';
     },
     onError: (error: any) => {
       toast({

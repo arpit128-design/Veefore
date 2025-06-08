@@ -3402,6 +3402,53 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Test OpenAI API endpoint
+  app.post('/api/test-openai', async (req, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ error: 'OpenAI API key not configured' });
+      }
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful customer service assistant. Respond professionally and helpfully.'
+            },
+            {
+              role: 'user',
+              content: message || 'Test message'
+            }
+          ],
+          max_tokens: 150
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return res.status(500).json({ error: 'OpenAI API error', details: error });
+      }
+
+      const data = await response.json();
+      res.json({ 
+        success: true, 
+        response: data.choices[0].message.content 
+      });
+    } catch (error) {
+      console.error('OpenAI test error:', error);
+      res.status(500).json({ error: 'Failed to test OpenAI API' });
+    }
+  });
+
   // Manual cleanup of expired conversation memory
   app.post('/api/conversations/cleanup', requireAuth, async (req, res) => {
     try {

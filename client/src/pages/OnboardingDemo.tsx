@@ -59,7 +59,37 @@ const demoSteps = [
     elements: ['sphere', 'cube', 'pattern']
   },
   {
-    id: 'features',
+    id: 'business',
+    title: 'Brand Identity Matrix',
+    subtitle: 'Tell Us About Your Business',
+    description: 'Help our AI understand your brand to create personalized content that resonates with your audience',
+    color: '#10b981',
+    icon: Building,
+    particles: 75,
+    elements: ['cube', 'pattern', 'sphere']
+  },
+  {
+    id: 'goals',
+    title: 'Mission Control Center',
+    subtitle: 'What Are Your Primary Goals?',
+    description: 'Define your objectives so our AI can optimize content strategy for maximum impact',
+    color: '#f59e0b',
+    icon: Zap,
+    particles: 85,
+    elements: ['pattern', 'sphere', 'cube']
+  },
+  {
+    id: 'platforms',
+    title: 'Social Galaxy Connection',
+    subtitle: 'Connect Your Social Media Platforms',
+    description: 'Link your accounts to enable cross-platform content distribution and analytics',
+    color: '#8b5cf6',
+    icon: Users,
+    particles: 80,
+    elements: ['sphere', 'cube', 'pattern']
+  },
+  {
+    id: 'personality',
     title: 'AI Personality Matrix',
     subtitle: 'Customize Your Digital Twin',
     description: 'Choose your AI personality that will represent your brand across all platforms',
@@ -86,18 +116,46 @@ const personalities = [
   { id: 'creative', name: 'Artistic Visionary', description: 'Innovative, expressive, and imaginative', icon: Wand2, color: '#a855f7' }
 ];
 
+const businessGoals = [
+  { id: 'brand-awareness', name: 'Brand Awareness', description: 'Increase visibility and recognition', icon: Star, color: '#3b82f6' },
+  { id: 'lead-generation', name: 'Lead Generation', description: 'Generate qualified prospects', icon: Users, color: '#10b981' },
+  { id: 'sales-growth', name: 'Sales Growth', description: 'Drive revenue and conversions', icon: Zap, color: '#f59e0b' },
+  { id: 'engagement', name: 'Engagement', description: 'Build community and loyalty', icon: Heart, color: '#ec4899' },
+  { id: 'thought-leadership', name: 'Thought Leadership', description: 'Establish industry authority', icon: Brain, color: '#8b5cf6' },
+  { id: 'customer-support', name: 'Customer Support', description: 'Enhance customer experience', icon: Shield, color: '#6b7280' }
+];
+
+const socialPlatforms = [
+  { id: 'instagram', name: 'Instagram', description: 'Visual storytelling & reels', icon: Camera, color: '#e4405f', connected: false },
+  { id: 'youtube', name: 'YouTube', description: 'Video content & tutorials', icon: Video, color: '#ff0000', connected: false },
+  { id: 'twitter', name: 'X (Twitter)', description: 'Real-time updates & news', icon: Wand2, color: '#1da1f2', connected: false },
+  { id: 'linkedin', name: 'LinkedIn', description: 'Professional networking', icon: Building, color: '#0077b5', connected: false },
+  { id: 'tiktok', name: 'TikTok', description: 'Short-form viral content', icon: Music, color: '#000000', connected: false },
+  { id: 'facebook', name: 'Facebook', description: 'Community building', icon: Users, color: '#1877f2', connected: false }
+];
+
 const categories = [
   { id: 'technology', name: 'Technology', icon: Cpu, color: '#3b82f6' },
   { id: 'lifestyle', name: 'Lifestyle', icon: Heart, color: '#ec4899' },
   { id: 'business', name: 'Business', icon: Building, color: '#059669' },
   { id: 'travel', name: 'Travel', icon: Plane, color: '#0891b2' },
   { id: 'fashion', name: 'Fashion', icon: Shirt, color: '#7c3aed' },
-  { id: 'gaming', name: 'Gaming', icon: Gamepad2, color: '#dc2626' }
+  { id: 'gaming', name: 'Gaming', icon: Gamepad2, color: '#dc2626' },
+  { id: 'food', name: 'Food & Dining', icon: Utensils, color: '#dc2626' },
+  { id: 'fitness', name: 'Health & Fitness', icon: Heart, color: '#10b981' },
+  { id: 'education', name: 'Education', icon: GraduationCap, color: '#f59e0b' },
+  { id: 'automotive', name: 'Automotive', icon: Car, color: '#6b7280' },
+  { id: 'real-estate', name: 'Real Estate', icon: Home, color: '#8b5cf6' },
+  { id: 'ecommerce', name: 'E-commerce', icon: ShoppingCart, color: '#059669' }
 ];
 
 export default function OnboardingDemo() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [businessName, setBusinessName] = useState('');
+  const [businessDescription, setBusinessDescription] = useState('');
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [connectedPlatforms, setConnectedPlatforms] = useState<string[]>([]);
   const [selectedPersonality, setSelectedPersonality] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -117,6 +175,22 @@ export default function OnboardingDemo() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleGoalToggle = (goalId: string) => {
+    setSelectedGoals(prev => 
+      prev.includes(goalId)
+        ? prev.filter(id => id !== goalId)
+        : [...prev, goalId]
+    );
+  };
+
+  const handlePlatformToggle = (platformId: string) => {
+    setConnectedPlatforms(prev => 
+      prev.includes(platformId)
+        ? prev.filter(id => id !== platformId)
+        : [...prev, platformId]
+    );
   };
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -309,6 +383,184 @@ export default function OnboardingDemo() {
 
                     {currentStep === 1 && (
                       <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full max-w-2xl mx-auto">
+                          <div className="space-y-6">
+                            {/* Business Name Input */}
+                            <div>
+                              <label className="block text-white/80 text-sm font-medium mb-2">
+                                Business Name *
+                              </label>
+                              <input
+                                type="text"
+                                value={businessName}
+                                onChange={(e) => setBusinessName(e.target.value)}
+                                placeholder="Enter your business or brand name"
+                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/60 focus:bg-white/15 transition-all duration-300"
+                              />
+                            </div>
+
+                            {/* Business Description */}
+                            <div>
+                              <label className="block text-white/80 text-sm font-medium mb-2">
+                                Business Description
+                              </label>
+                              <textarea
+                                value={businessDescription}
+                                onChange={(e) => setBusinessDescription(e.target.value)}
+                                placeholder="Tell us what your business does and what makes it unique..."
+                                rows={4}
+                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/60 focus:bg-white/15 transition-all duration-300 resize-none"
+                              />
+                            </div>
+
+                            {/* Preview Card */}
+                            {businessName && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-6 p-4 bg-white/5 border border-white/20 rounded-lg"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <span className="text-white font-bold text-lg">
+                                      {businessName.charAt(0).toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <h3 className="text-white font-semibold">{businessName}</h3>
+                                    {businessDescription && (
+                                      <p className="text-white/60 text-sm mt-1">
+                                        {businessDescription.substring(0, 60)}
+                                        {businessDescription.length > 60 ? '...' : ''}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 2 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full">
+                          <div className="text-center mb-6">
+                            <p className="text-white/80 mb-4">
+                              Selected: {selectedGoals.length} goals
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {businessGoals.map((goal, index) => (
+                              <motion.div
+                                key={goal.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <MagneticElement strength={8}>
+                                  <motion.div
+                                    className={`p-4 rounded-lg border cursor-pointer transition-all duration-300 ${
+                                      selectedGoals.includes(goal.id)
+                                        ? 'border-white/60 bg-white/10'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                    }`}
+                                    onClick={() => handleGoalToggle(goal.id)}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div 
+                                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                                        style={{
+                                          background: `radial-gradient(circle, ${goal.color}40 0%, ${goal.color}20 100%)`,
+                                          border: `1px solid ${goal.color}60`
+                                        }}
+                                      >
+                                        <goal.icon size={18} color={goal.color} />
+                                      </div>
+                                      <div>
+                                        <h3 className="font-semibold text-white mb-1">{goal.name}</h3>
+                                        <p className="text-sm text-white/60">{goal.description}</p>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                </MagneticElement>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 3 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full">
+                          <div className="text-center mb-6">
+                            <p className="text-white/80 mb-4">
+                              Connected: {connectedPlatforms.length} platforms
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {socialPlatforms.map((platform, index) => (
+                              <motion.div
+                                key={platform.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <MagneticElement strength={8}>
+                                  <motion.div
+                                    className={`p-4 rounded-lg border cursor-pointer transition-all duration-300 ${
+                                      connectedPlatforms.includes(platform.id)
+                                        ? 'border-green-400/60 bg-green-400/10'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                    }`}
+                                    onClick={() => handlePlatformToggle(platform.id)}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div 
+                                          className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                          style={{
+                                            background: `radial-gradient(circle, ${platform.color}40 0%, ${platform.color}20 100%)`,
+                                            border: `1px solid ${platform.color}60`
+                                          }}
+                                        >
+                                          <platform.icon size={18} color={platform.color} />
+                                        </div>
+                                        <div>
+                                          <h3 className="font-semibold text-white">{platform.name}</h3>
+                                          <p className="text-sm text-white/60">{platform.description}</p>
+                                        </div>
+                                      </div>
+                                      
+                                      {connectedPlatforms.includes(platform.id) && (
+                                        <motion.div
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center"
+                                        >
+                                          <span className="text-white text-xs">✓</span>
+                                        </motion.div>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                </MagneticElement>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 4 && (
+                      <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {personalities.map((personality, index) => (
@@ -351,7 +603,7 @@ export default function OnboardingDemo() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 2 && (
+                    {currentStep === 5 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="text-center mb-6">
@@ -441,11 +693,34 @@ export default function OnboardingDemo() {
                       </HolographicButton>
                     ) : (
                       <HolographicButton
-                        onClick={() => alert('Demo Complete! 🚀')}
+                        onClick={() => {
+                          const summary = `
+🚀 VeeFore Setup Complete!
+
+📊 Business Profile:
+• Name: ${businessName || 'Not provided'}
+• Description: ${businessDescription || 'Not provided'}
+
+🎯 Goals (${selectedGoals.length} selected):
+${selectedGoals.map(id => businessGoals.find(g => g.id === id)?.name).filter(Boolean).join(', ') || 'None selected'}
+
+🌐 Connected Platforms (${connectedPlatforms.length}):
+${connectedPlatforms.map(id => socialPlatforms.find(p => p.id === id)?.name).filter(Boolean).join(', ') || 'None connected'}
+
+🤖 AI Personality:
+${personalities.find(p => p.id === selectedPersonality)?.name || 'Not selected'}
+
+🏷️ Content Categories (${selectedCategories.length}):
+${selectedCategories.map(id => categories.find(c => c.id === id)?.name).filter(Boolean).join(', ') || 'None selected'}
+
+Your AI is now configured to create personalized content for your brand!
+                          `;
+                          alert(summary);
+                        }}
                         glowColor="#10b981"
                         className="flex items-center gap-2"
                       >
-                        Complete Demo
+                        Launch VeeFore
                         <Zap size={20} />
                       </HolographicButton>
                     )}

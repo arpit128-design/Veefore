@@ -8,6 +8,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { 
   Video, 
   Play, 
@@ -20,7 +21,8 @@ import {
   Download,
   CheckCircle,
   ArrowLeft,
-  Zap
+  Zap,
+  Sparkles
 } from "lucide-react";
 
 // AI Video Generator Component
@@ -31,56 +33,89 @@ function VideoGenerator() {
   const [generatedScript, setGeneratedScript] = useState<any>(null);
   const [generatedVideo, setGeneratedVideo] = useState<any>(null);
   const [step, setStep] = useState('input');
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    featureType: "",
+    creditsRequired: 0,
+    currentCredits: 0
+  });
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch user data for credits
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  }) as { data?: { credits?: number } };
+
   const scriptMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/content/generate-script', data);
-      return response.json();
+      return await response.json();
     },
     onSuccess: (response: any) => {
       console.log('[SCRIPT] Response received:', response);
       setGeneratedScript(response.script);
       setStep('script');
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Script Generated!",
-        description: "Your AI-generated video script is ready for review.",
+        description: `Used ${response.creditsUsed || 2} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
       });
     },
     onError: (error: any) => {
       console.error('[SCRIPT] Error:', error);
-      toast({
-        title: "Script Generation Failed",
-        description: error.message || "Failed to generate video script",
-        variant: "destructive",
-      });
+      if (error.status === 402 && error.upgradeModal) {
+        setUpgradeModal({
+          isOpen: true,
+          featureType: "AI Caption Generation",
+          creditsRequired: 2,
+          currentCredits: user?.credits || 0
+        });
+      } else {
+        toast({
+          title: "Script Generation Failed",
+          description: error.message || "Failed to generate video script",
+          variant: "destructive",
+        });
+      }
     }
   });
 
   const videoMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/content/generate-video', data);
-      return response.json();
+      return await response.json();
     },
     onSuccess: (response: any) => {
       console.log('[VIDEO] Response received:', response);
       setGeneratedVideo(response.video);
       setStep('video');
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Video Generated Successfully!",
-        description: "Your AI-powered video is ready for review.",
+        description: `Used ${response.creditsUsed || 8} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
       });
       queryClient.invalidateQueries({ queryKey: ['content'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Video Generation Failed", 
-        description: error.message || "Failed to generate video content",
-        variant: "destructive",
-      });
+      console.error('[VIDEO] Error:', error);
+      if (error.status === 402 && error.upgradeModal) {
+        setUpgradeModal({
+          isOpen: true,
+          featureType: "AI Video Generation",
+          creditsRequired: 8,
+          currentCredits: user?.credits || 0
+        });
+      } else {
+        toast({
+          title: "Video Generation Failed", 
+          description: error.message || "Failed to generate video content",
+          variant: "destructive",
+        });
+      }
     }
   });
 

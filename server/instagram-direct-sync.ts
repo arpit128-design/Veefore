@@ -45,6 +45,7 @@ export class InstagramDirectSync {
 
   private async fetchProfileData(accessToken: string): Promise<any> {
     try {
+      console.log('[INSTAGRAM DIRECT] === STARTING NEW FETCH WITH ACCOUNT INSIGHTS ===');
       console.log('[INSTAGRAM DIRECT] Using Instagram Business API directly...');
       
       // Use Instagram Business API directly without Facebook Graph API
@@ -61,10 +62,58 @@ export class InstagramDirectSync {
 
       const profileData = await profileResponse.json();
       console.log('[INSTAGRAM DIRECT] Real Instagram Business profile:', profileData);
+      console.log('[INSTAGRAM DIRECT] Profile ID for insights:', profileData.id);
 
-      // Fetch recent media with view counts for authentic reach calculation
+      // Use correct Instagram Business API approach as per documentation
+      // Step 1: Get account-level insights first
+      console.log('[INSTAGRAM DIRECT] Fetching account-level insights...');
+      let accountInsights = { totalReach: 0, totalImpressions: 0, profileViews: 0 };
+      
+      try {
+        const accountInsightsResponse = await fetch(
+          `https://graph.instagram.com/${profileData.id}/insights?metric=impressions,reach,profile_views&period=day&access_token=${accessToken}`
+        );
+        
+        if (accountInsightsResponse.ok) {
+          const accountInsightsData = await accountInsightsResponse.json();
+          console.log('[INSTAGRAM DIRECT] Account insights SUCCESS:', accountInsightsData);
+          
+          // Extract account-level metrics
+          const data = accountInsightsData.data || [];
+          for (const metric of data) {
+            if (metric.name === 'reach' && metric.values?.[0]?.value) {
+              accountInsights.totalReach = metric.values[0].value;
+            }
+            if (metric.name === 'impressions' && metric.values?.[0]?.value) {
+              accountInsights.totalImpressions = metric.values[0].value;
+            }
+            if (metric.name === 'profile_views' && metric.values?.[0]?.value) {
+              accountInsights.profileViews = metric.values[0].value;
+            }
+          }
+          console.log('[INSTAGRAM DIRECT] Extracted account insights:', accountInsights);
+        } else {
+          const errorText = await accountInsightsResponse.text();
+          console.log('[INSTAGRAM DIRECT] Account insights failed:', errorText);
+          
+          // Parse the error to understand Instagram Business API limitations
+          try {
+            const errorData = JSON.parse(errorText);
+            if (errorData.error?.code === 100) {
+              console.log('[INSTAGRAM DIRECT] Instagram Business API Error Code 100: Insights access requires specific permissions or account configuration');
+              console.log('[INSTAGRAM DIRECT] This is common for newer Instagram Business accounts or accounts without full insights access');
+            }
+          } catch (parseError) {
+            console.log('[INSTAGRAM DIRECT] Could not parse insights error response');
+          }
+        }
+      } catch (accountError) {
+        console.log('[INSTAGRAM DIRECT] Account insights error:', accountError);
+      }
+
+      // Step 2: Fetch recent media for engagement calculation
       const mediaResponse = await fetch(
-        `https://graph.instagram.com/me/media?fields=id,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=25&access_token=${accessToken}`
+        `https://graph.instagram.com/me/media?fields=id,like_count,comments_count,timestamp,media_type&limit=25&access_token=${accessToken}`
       );
 
       let realEngagement = { totalLikes: 0, totalComments: 0, postsAnalyzed: 0, totalReach: 0, totalImpressions: 0 };
@@ -73,120 +122,86 @@ export class InstagramDirectSync {
         const mediaData = await mediaResponse.json();
         const posts = mediaData.data || [];
         
-        // Fetch insights for each post to get actual reach data
-        let totalReach = 0;
-        let totalImpressions = 0;
-        
-        console.log(`[INSTAGRAM DIRECT] Processing ${posts.length} posts for individual reach data`);
-        
-        for (const post of posts.slice(0, 15)) { // Process up to 15 recent posts
-          try {
-            // Try multiple Instagram Business API fields to capture authentic view data
-            console.log(`[INSTAGRAM DIRECT] Fetching detailed data for post ${post.id} (${post.media_type})`);
-            const detailedResponse = await fetch(
-              `https://graph.instagram.com/${post.id}?fields=id,like_count,comments_count,media_type,video_views,play_count,timestamp,impressions_count,reach_count,views&access_token=${accessToken}`
-            );
-            
-            if (detailedResponse.ok) {
-              const detailedData = await detailedResponse.json();
-              console.log(`[INSTAGRAM DIRECT] Post ${post.id} detailed data:`, detailedData);
-              
-              // Check for any authentic reach/view data from Instagram Business API
-              let postReach = 0;
-              
-              if (detailedData.video_views) {
-                postReach = detailedData.video_views;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} video views: ${detailedData.video_views}`);
-              } else if (detailedData.play_count) {
-                postReach = detailedData.play_count;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} play count: ${detailedData.play_count}`);
-              } else if (detailedData.views) {
-                postReach = detailedData.views;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} views: ${detailedData.views}`);
-              } else if (detailedData.impressions_count) {
-                postReach = detailedData.impressions_count;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} impressions: ${detailedData.impressions_count}`);
-              } else if (detailedData.reach_count) {
-                postReach = detailedData.reach_count;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach: ${detailedData.reach_count}`);
-              }
-              
-              if (postReach > 0) {
-                totalReach += postReach;
-                totalImpressions += postReach;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} authentic reach: ${postReach}, running total: ${totalReach}`);
-              } else {
-                const likes = detailedData.like_count || 0;
-                const comments = detailedData.comments_count || 0;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} - No authentic reach data from Instagram Business API (${likes} likes, ${comments} comments)`);
-              }
-            }
-            
-            // Try insights as backup (will likely fail but worth attempting)
-            try {
-              console.log(`[INSTAGRAM DIRECT] Attempting insights for post ${post.id} (backup)`);
-              const insightsResponse = await fetch(
-                `https://graph.instagram.com/${post.id}/insights?metric=reach,impressions&access_token=${accessToken}`
-              );
-              
-              if (insightsResponse.ok) {
-                const insightsData = await insightsResponse.json();
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights SUCCESS:`, insightsData);
-                
-                const reachMetric = insightsData.data?.find((metric: any) => metric.name === 'reach');
-                const impressionsMetric = insightsData.data?.find((metric: any) => metric.name === 'impressions');
-                
-                if (reachMetric?.values?.[0]?.value) {
-                  const insightReach = reachMetric.values[0].value;
-                  // Use insights data if it's higher than our estimate
-                  if (insightReach > (post.like_count || 0) * 4) {
-                    totalReach += insightReach;
-                    console.log(`[INSTAGRAM DIRECT] Using insights reach: ${insightReach} for post ${post.id}`);
-                  }
-                }
-                if (impressionsMetric?.values?.[0]?.value) {
-                  const insightImpressions = impressionsMetric.values[0].value;
-                  if (insightImpressions > (post.like_count || 0) * 4) {
-                    totalImpressions += insightImpressions;
-                    console.log(`[INSTAGRAM DIRECT] Using insights impressions: ${insightImpressions} for post ${post.id}`);
-                  }
-                }
-              } else {
-                const errorText = await insightsResponse.text();
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights failed (expected):`, errorText);
-              }
-            } catch (insightError) {
-              console.log(`[INSTAGRAM DIRECT] Insights attempt failed for post ${post.id} (expected)`);
-            }
-            
-          } catch (error) {
-            console.log(`[INSTAGRAM DIRECT] Failed to fetch data for post ${post.id}:`, error);
-            
-            // No fallback calculations - only authentic Instagram Business API data
-            console.log(`[INSTAGRAM DIRECT] No authentic reach data available for post ${post.id}`);
-          }
-        }
-        
-        console.log(`[INSTAGRAM DIRECT] Final totals - Reach: ${totalReach}, Impressions: ${totalImpressions}`);
-        
-        // Calculate engagement totals
+        // Calculate engagement totals from posts
         const totalLikes = posts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
         const totalComments = posts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
         
-        // ONLY use authentic Instagram Business API data - no fallbacks or enhancements
-        console.log(`[INSTAGRAM DIRECT] Using ONLY authentic Instagram Business API reach data: ${totalReach}`);
+        // Step 3: Try to get media-level insights for each post
+        let mediaReach = 0;
+        let mediaImpressions = 0;
         
-        realEngagement = {
-          totalLikes,
-          totalComments,
-          postsAnalyzed: posts.length,
-          totalReach: totalReach,
-          totalImpressions: totalImpressions
-        };
+        console.log(`[INSTAGRAM DIRECT] Processing ${posts.length} posts for media insights`);
         
-        console.log('[INSTAGRAM DIRECT] Authentic engagement and reach from Instagram Business API:', realEngagement);
+        for (const post of posts.slice(0, 10)) { // Process up to 10 recent posts
+          try {
+            console.log(`[INSTAGRAM DIRECT] Fetching insights for post ${post.id}`);
+            const mediaInsightsResponse = await fetch(
+              `https://graph.instagram.com/${post.id}/insights?metric=engagement,impressions,reach&access_token=${accessToken}`
+            );
+            
+            if (mediaInsightsResponse.ok) {
+              const mediaInsightsData = await mediaInsightsResponse.json();
+              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights SUCCESS:`, mediaInsightsData);
+              
+              const data = mediaInsightsData.data || [];
+              for (const metric of data) {
+                if (metric.name === 'reach' && metric.values?.[0]?.value) {
+                  mediaReach += metric.values[0].value;
+                  console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach: ${metric.values[0].value}`);
+                }
+                if (metric.name === 'impressions' && metric.values?.[0]?.value) {
+                  mediaImpressions += metric.values[0].value;
+                  console.log(`[INSTAGRAM DIRECT] Post ${post.id} impressions: ${metric.values[0].value}`);
+                }
+              }
+            } else {
+              const errorText = await mediaInsightsResponse.text();
+              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights failed:`, errorText);
+            }
+          } catch (mediaError) {
+            console.log(`[INSTAGRAM DIRECT] Failed to fetch insights for post ${post.id}:`, mediaError);
+          }
+        }
+        
+        // Use the higher of account-level or media-level insights
+        const finalReach = Math.max(accountInsights.totalReach, mediaReach);
+        const finalImpressions = Math.max(accountInsights.totalImpressions, mediaImpressions);
+        
+        console.log(`[INSTAGRAM DIRECT] Final reach calculation - Account: ${accountInsights.totalReach}, Media: ${mediaReach}, Using: ${finalReach}`);
+        console.log(`[INSTAGRAM DIRECT] Final impressions calculation - Account: ${accountInsights.totalImpressions}, Media: ${mediaImpressions}, Using: ${finalImpressions}`);
+        
+        // Only include reach/impressions data if we have authentic values from Instagram Business API
+        if (finalReach > 0 || finalImpressions > 0) {
+          console.log(`[INSTAGRAM DIRECT] Using authentic Instagram Business API insights: reach=${finalReach}, impressions=${finalImpressions}`);
+          realEngagement = {
+            totalLikes,
+            totalComments,
+            postsAnalyzed: posts.length,
+            totalReach: finalReach,
+            totalImpressions: finalImpressions
+          };
+        } else {
+          console.log(`[INSTAGRAM DIRECT] No authentic insights available - Instagram Business API insights require specific permissions`);
+          console.log(`[INSTAGRAM DIRECT] Account may need Instagram Business verification or Facebook Business Manager setup`);
+          realEngagement = {
+            totalLikes,
+            totalComments,
+            postsAnalyzed: posts.length,
+            totalReach: 0, // Explicitly 0 to indicate insights unavailable, not unknown
+            totalImpressions: 0 // Explicitly 0 to indicate insights unavailable, not unknown
+          };
+        }
+        
+        console.log('[INSTAGRAM DIRECT] Authentic Instagram Business API metrics:', realEngagement);
       } else {
-        console.log('[INSTAGRAM DIRECT] Media fetch failed, using zero engagement');
+        console.log('[INSTAGRAM DIRECT] Media fetch failed, using account insights only');
+        realEngagement = {
+          totalLikes: 0,
+          totalComments: 0,
+          postsAnalyzed: 0,
+          totalReach: accountInsights.totalReach,
+          totalImpressions: accountInsights.totalImpressions
+        };
       }
 
       return {

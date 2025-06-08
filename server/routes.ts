@@ -2857,6 +2857,167 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Instagram Automation Routes
+  app.post('/api/automation/comment', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId, mediaId, message } = req.body;
+      
+      if (!workspaceId || !mediaId || !message) {
+        return res.status(400).json({ error: 'Workspace ID, media ID, and message are required' });
+      }
+
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      if (!instagramAccount?.accessToken) {
+        return res.status(400).json({ error: 'No Instagram account connected' });
+      }
+
+      const result = await instagramAutomation.sendAutomatedComment(
+        instagramAccount.accessToken,
+        mediaId,
+        message,
+        workspaceId,
+        'manual-comment' // Rule ID for manual comments
+      );
+
+      res.json(result);
+    } catch (error: any) {
+      console.error('[AUTOMATION] Comment API error:', error);
+      res.status(500).json({ error: 'Failed to send comment' });
+    }
+  });
+
+  app.post('/api/automation/dm', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId, recipientId, message } = req.body;
+      
+      if (!workspaceId || !recipientId || !message) {
+        return res.status(400).json({ error: 'Workspace ID, recipient ID, and message are required' });
+      }
+
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      if (!instagramAccount?.accessToken) {
+        return res.status(400).json({ error: 'No Instagram account connected' });
+      }
+
+      const result = await instagramAutomation.sendAutomatedDM(
+        instagramAccount.accessToken,
+        recipientId,
+        message,
+        workspaceId,
+        'manual-dm' // Rule ID for manual DMs
+      );
+
+      res.json(result);
+    } catch (error: any) {
+      console.error('[AUTOMATION] DM API error:', error);
+      res.status(500).json({ error: 'Failed to send DM' });
+    }
+  });
+
+  app.get('/api/automation/rules/:workspaceId', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.params;
+      
+      // Get automation rules for workspace
+      const rules = await storage.getAutomationRulesByWorkspace?.(workspaceId) || [];
+      
+      res.json({ rules });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Get rules error:', error);
+      res.status(500).json({ error: 'Failed to fetch automation rules' });
+    }
+  });
+
+  app.post('/api/automation/rules', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId, type, triggers, responses, conditions, schedule, isActive } = req.body;
+      
+      if (!workspaceId || !type || !triggers || !responses) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const rule = await storage.createAutomationRule?.({
+        workspaceId,
+        type,
+        triggers,
+        responses,
+        conditions: conditions || {},
+        schedule: schedule || null,
+        isActive: isActive || true
+      });
+
+      res.json({ rule });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Create rule error:', error);
+      res.status(500).json({ error: 'Failed to create automation rule' });
+    }
+  });
+
+  app.put('/api/automation/rules/:ruleId', requireAuth, async (req, res) => {
+    try {
+      const { ruleId } = req.params;
+      const updates = req.body;
+      
+      const rule = await storage.updateAutomationRule?.(ruleId, updates);
+      
+      res.json({ rule });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Update rule error:', error);
+      res.status(500).json({ error: 'Failed to update automation rule' });
+    }
+  });
+
+  app.delete('/api/automation/rules/:ruleId', requireAuth, async (req, res) => {
+    try {
+      const { ruleId } = req.params;
+      
+      await storage.deleteAutomationRule?.(ruleId);
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Delete rule error:', error);
+      res.status(500).json({ error: 'Failed to delete automation rule' });
+    }
+  });
+
+  app.get('/api/automation/logs/:workspaceId', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.params;
+      const { limit = 50, type } = req.query;
+      
+      const logs = await storage.getAutomationLogs?.(workspaceId, {
+        limit: parseInt(limit as string),
+        type: type as string
+      }) || [];
+      
+      res.json({ logs });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Get logs error:', error);
+      res.status(500).json({ error: 'Failed to fetch automation logs' });
+    }
+  });
+
+  // Process mentions endpoint for manual trigger
+  app.post('/api/automation/process-mentions/:workspaceId', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.params;
+      
+      await instagramAutomation.processMentions(workspaceId);
+      
+      res.json({ success: true, message: 'Mentions processed' });
+    } catch (error: any) {
+      console.error('[AUTOMATION] Process mentions error:', error);
+      res.status(500).json({ error: 'Failed to process mentions' });
+    }
+  });
+
+  // Start Instagram automation service
+  instagramAutomation.startAutomationService().catch(console.error);
+
   // Start automatic token refresh scheduler
   setInterval(async () => {
     try {

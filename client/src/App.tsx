@@ -20,6 +20,7 @@ import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
 import ContentRecommendations from "@/pages/ContentRecommendations";
 import AIFeatures from "@/pages/AIFeatures";
+import Automation from "@/pages/Automation";
 import Workspaces from "@/pages/Workspaces";
 import TeamManagement from "@/pages/TeamManagement";
 import Integrations from "@/pages/Integrations";
@@ -59,6 +60,7 @@ function AuthenticatedApp() {
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
+              <Route path="/automation" component={Automation} />
               <Route path="/workspaces" component={Workspaces} />
               <Route path="/team" component={TeamManagement} />
               <Route path="/integrations" component={Integrations} />

@@ -78,9 +78,8 @@ export default function Analyzer() {
       followers: 0 // Always use authentic 0% from real Instagram data calculation
     }
   } : rawAnalytics ? {
-    totalViews: rawAnalytics.totalReach ?? null,
-    engagement: rawAnalytics.engagementRate ?? null,
     totalReach: rawAnalytics.totalReach ?? null,
+    engagement: rawAnalytics.engagementRate ?? null,
     followers: rawAnalytics.followers ?? null,
     impressions: rawAnalytics.impressions ?? null,
     totalLikes: rawAnalytics.totalLikes ?? null,
@@ -135,8 +134,8 @@ export default function Analyzer() {
                 <Eye className="h-6 w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalViews ? formatNumber(analytics.totalViews) : '—'}</div>
-                <div className="text-sm text-asteroid-silver">Total Views</div>
+                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
+                <div className="text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-green-400">

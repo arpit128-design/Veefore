@@ -121,7 +121,7 @@ export default function Dashboard() {
   };
 
   const analytics = {
-    totalViews: hasValidData ? (rawData?.totalReach || rawData?.impressions || 0) : null,
+    totalReach: hasValidData ? (rawData?.totalReach || rawData?.impressions || 0) : null,
     engagement: hasValidData ? (rawData?.engagementRate || 0) : null,
     newFollowers: hasValidData ? (rawData?.followers || 0) : null,
     contentScore: calculateContentScore(rawData),
@@ -169,9 +169,9 @@ export default function Dashboard() {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Views"
-          value={analytics.totalViews !== null ? formatNumber(analytics.totalViews) : null}
-          change={analytics.totalViews !== null && analytics.totalViews > 0 ? { value: "Active data", isPositive: true } : undefined}
+          title="Total Reach"
+          value={analytics.totalReach !== null ? formatNumber(analytics.totalReach) : null}
+          change={analytics.totalReach !== null && analytics.totalReach > 0 ? { value: "Active data", isPositive: true } : undefined}
           icon={<Eye className="text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
           isLoading={isDataLoading}

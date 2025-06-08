@@ -583,7 +583,7 @@ export default function OnboardingPremium() {
       </motion.div>
 
       {/* Main Content */}
-      <div className="flex items-center justify-center min-h-screen p-6">
+      <div className="flex items-center justify-center min-h-screen p-2 sm:p-4 md:p-6">
         <div className="w-full max-w-4xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -598,7 +598,7 @@ export default function OnboardingPremium() {
                 glowColor={currentStepData.color}
                 tiltIntensity={8}
               >
-                <div className="p-8 lg:p-12">
+                <div className="p-4 sm:p-6 md:p-8 lg:p-12">
                   {/* Step Header */}
                   <div className="text-center mb-8">
                     <MagneticElement strength={15}>

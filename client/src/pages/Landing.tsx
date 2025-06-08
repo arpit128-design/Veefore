@@ -692,7 +692,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 0.8 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto px-4"
           >
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
@@ -707,16 +707,16 @@ const Landing = () => {
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div 
-                    className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4"
+                    className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-3 sm:mb-4"
                     animate={{ rotateY: [0, 360] }}
                     transition={{ duration: 20 + index * 5, repeat: Infinity, ease: "linear" }}
                   >
-                    <IconComponent className="w-8 h-8 text-blue-400" />
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-blue-400" />
                   </motion.div>
-                  <div className="text-3xl font-bold text-white mb-2">
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1 sm:mb-2">
                     <AnimatedCounter end={parseInt(stat.value.replace(/[^\d]/g, ''))} suffix={stat.value.replace(/[\d]/g, '')} />
                   </div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">{stat.label}</div>
                 </motion.div>
               );
             })}
@@ -747,24 +747,24 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Features Section */}
-      <section id="features" className="relative py-32 px-4 pt-40">
+      <section id="features" className="relative py-16 sm:py-24 md:py-32 px-2 sm:px-4 pt-20 sm:pt-32 md:pt-40">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16 md:mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Revolutionary Features
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
               Advanced AI-powered tools designed to dominate every social media platform
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-20">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-16 md:mb-20">
             {features.map((feature, index) => (
               <OptimizedFeatureCard key={index} {...feature} index={index} />
             ))}
@@ -815,24 +815,24 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Pricing Section */}
-      <section id="pricing" className="relative py-32 px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
+      <section id="pricing" className="relative py-16 sm:py-24 md:py-32 px-2 sm:px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16 md:mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Choose Your Plan
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
               Scale your social media automation from startup to enterprise
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <motion.div 
                 key={index}
@@ -915,14 +915,14 @@ const Landing = () => {
       </section>
 
       {/* Enhanced CTA Section */}
-      <section id="about" className="relative py-32 px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
+      <section id="about" className="relative py-16 sm:py-24 md:py-32 px-2 sm:px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h2 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
           >
             Ready to Dominate All Social Media?
           </motion.h2>
@@ -932,7 +932,7 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-xl text-gray-300 mb-12 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-12 leading-relaxed px-4"
           >
             Join thousands of businesses already using VeeFore to automate Instagram, YouTube, Twitter, 
             Facebook, LinkedIn and drive real growth with AI-powered cross-platform strategies.
@@ -943,20 +943,21 @@ const Landing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4"
           >
             <Link href="/auth">
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg"
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg md:text-xl font-semibold rounded-full shadow-lg"
                 >
-                  <Rocket className="w-6 h-6 mr-3" />
+                  <Rocket className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                   Start Your Free Trial
-                  <ArrowRight className="w-6 h-6 ml-3" />
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3" />
                 </Button>
               </motion.div>
             </Link>
@@ -964,13 +965,14 @@ const Landing = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto"
             >
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
+                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg md:text-xl font-semibold rounded-full backdrop-blur-sm"
               >
-                <MessageCircle className="w-6 h-6 mr-3" />
+                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                 Contact Sales
               </Button>
             </motion.div>
@@ -981,7 +983,7 @@ const Landing = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="text-gray-400 mt-8"
+            className="text-gray-400 mt-6 sm:mt-8 text-sm sm:text-base"
           >
             No credit card required • 14-day free trial • Cancel anytime
           </motion.p>
@@ -989,22 +991,22 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer id="contact" className="relative border-t border-gray-800 py-16 px-4">
+      <footer id="contact" className="relative border-t border-gray-800 py-12 sm:py-16 px-2 sm:px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-8"
+            className="text-center mb-6 sm:mb-8"
           >
             <motion.h3 
               whileHover={{ scale: 1.05 }}
-              className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4"
+              className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 sm:mb-4"
             >
               VeeFore
             </motion.h3>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base px-4">
               The future of AI-powered multi-platform social media automation. Transform your digital presence 
               across Instagram, YouTube, Twitter, Facebook, LinkedIn with intelligent automation.
             </p>
@@ -1017,7 +1019,7 @@ const Landing = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-center text-gray-500"
           >
-            <p>&copy; 2025 VeeFore. All rights reserved. | Made with ❤️ for the future of social media automation.</p>
+            <p className="text-xs sm:text-sm px-4">&copy; 2025 VeeFore. All rights reserved. | Made with ❤️ for the future of social media automation.</p>
           </motion.div>
         </div>
       </footer>

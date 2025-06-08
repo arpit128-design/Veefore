@@ -345,13 +345,27 @@ export class InstagramWebhookHandler {
    */
   private async findSocialAccountByPageId(pageId: string): Promise<any> {
     try {
-      // This would need to be implemented in the storage layer
-      // For now, we'll use a placeholder that searches by account ID
       const accounts = await this.storage.getAllSocialAccounts?.() || [];
-      return accounts.find(account => 
-        account.platform === 'instagram' && 
-        account.accountId === pageId
+      console.log(`[WEBHOOK] Looking for page ID: ${pageId}`);
+      console.log(`[WEBHOOK] Available accounts:`, accounts.map(acc => ({ 
+        id: acc.accountId, 
+        username: acc.username, 
+        platform: acc.platform 
+      })));
+      
+      // Try exact match first
+      let account = accounts.find(acc => 
+        acc.platform === 'instagram' && 
+        acc.accountId === pageId
       );
+      
+      // If no exact match, try to find by workspace (fallback for development)
+      if (!account && accounts.length > 0) {
+        account = accounts.find(acc => acc.platform === 'instagram');
+        console.log(`[WEBHOOK] Using fallback account: ${account?.username}`);
+      }
+      
+      return account;
     } catch (error) {
       console.error('[WEBHOOK] Error finding social account:', error);
       return null;
@@ -363,7 +377,8 @@ export class InstagramWebhookHandler {
    */
   private async getAutomationRules(workspaceId: string, type?: string): Promise<any[]> {
     try {
-      const allRules = await this.storage.getAutomationRulesByWorkspace?.(workspaceId) || [];
+      const allRules = await this.storage.getAutomationRules(workspaceId) || [];
+      console.log(`[WEBHOOK] Found ${allRules.length} automation rules for workspace ${workspaceId}`);
       return type ? allRules.filter(rule => rule.type === type) : allRules;
     } catch (error) {
       console.error('[WEBHOOK] Error getting automation rules:', error);

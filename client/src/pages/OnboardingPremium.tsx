@@ -1062,7 +1062,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 6 && (
+                    {currentStep === 7 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full max-w-md space-y-6">
                           <div className="space-y-4">
@@ -1097,7 +1097,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 7 && (
+                    {currentStep === 8 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="text-center space-y-8">
                           <motion.div

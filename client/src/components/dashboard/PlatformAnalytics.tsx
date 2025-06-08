@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
+import { formatNumber, formatEngagement } from "@/lib/utils";
 
 interface PlatformAnalyticsProps {
   platform: string;
@@ -44,25 +45,25 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  // Map Instagram data directly from analytics response with loading states
+  // Map Instagram data directly from analytics response with Indian number formatting
   const getMetricValue = (key: string, fallback: string = '—') => {
     if (!analytics || isLoading) return fallback;
     
     switch (key) {
       case 'followers':
-        return (analytics.followers || 0).toString();
+        return formatNumber(analytics.followers || 0);
       case 'engagement':
-        return (analytics.engagementRate || 0).toString();
+        return formatEngagement(analytics.engagementRate || 0);
       case 'reach':
-        return (analytics.totalReach || 0).toString();
+        return formatNumber(analytics.totalReach || 0);
       case 'impressions':
-        return (analytics.impressions || 0).toString();
+        return formatNumber(analytics.impressions || 0);
       case 'totalLikes':
-        return (analytics.totalLikes || 0).toString();
+        return formatNumber(analytics.totalLikes || 0);
       case 'totalComments':
-        return (analytics.totalComments || 0).toString();
+        return formatNumber(analytics.totalComments || 0);
       case 'totalPosts':
-        return (analytics.totalPosts || 0).toString();
+        return formatNumber(analytics.totalPosts || 0);
       default:
         return fallback;
     }

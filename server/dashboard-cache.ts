@@ -20,24 +20,28 @@ export class DashboardCache {
 
   constructor(private storage: IStorage) {}
 
-  // Get cached data immediately or return minimal data
-  async getCachedData(workspaceId: string): Promise<CachedDashboardData | null> {
+  // Get cached data immediately - NEVER wait for database
+  getCachedDataSync(workspaceId: string): CachedDashboardData | null {
     const cached = this.cache.get(workspaceId);
     
-    if (cached && this.isCacheValid(cached.lastUpdated)) {
-      console.log('[CACHE] Returning valid cached dashboard data');
-      return cached;
-    }
-
-    // If cache exists but expired, still return it for instant response
     if (cached) {
-      console.log('[CACHE] Returning expired cache for instant response');
+      console.log('[CACHE SYNC] Returning cached data instantly');
       return cached;
     }
 
-    // Try to get data from database quickly
+    console.log('[CACHE SYNC] No cache found');
+    return null;
+  }
+
+  // Async method only for initial population - not used in API routes
+  async getCachedData(workspaceId: string): Promise<CachedDashboardData | null> {
+    // First check sync cache
+    const syncCache = this.getCachedDataSync(workspaceId);
+    if (syncCache) return syncCache;
+
+    // Only use database for initial population
     try {
-      console.log('[CACHE] Attempting quick database lookup');
+      console.log('[CACHE] Initial database population for workspace:', workspaceId);
       const accounts = await this.storage.getSocialAccountsByWorkspace(workspaceId);
       const instagramAccount = accounts.find(acc => acc.platform === 'instagram' && acc.accessToken);
       
@@ -58,17 +62,14 @@ export class DashboardCache {
         };
 
         this.cache.set(workspaceId, dashboardData);
-        console.log('[CACHE] Created new cache from database data');
+        console.log('[CACHE] Initial cache populated from database');
         return dashboardData;
       }
     } catch (error) {
-      console.log('[CACHE] Database lookup failed, returning placeholder for instant response');
+      console.log('[CACHE] Initial database population failed');
     }
 
-    // Return placeholder data for instant response
-    const placeholderData = this.getPlaceholderData();
-    this.cache.set(workspaceId, placeholderData);
-    return placeholderData;
+    return null;
   }
 
   // Update cache with fresh data

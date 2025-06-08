@@ -41,7 +41,7 @@ class AIResponseGenerator {
     config: AIResponseConfig
   ): Promise<AIResponse> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const prompt = this.buildPrompt(context, config);
       const result = await model.generateContent(prompt);

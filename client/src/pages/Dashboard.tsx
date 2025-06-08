@@ -187,28 +187,28 @@ export default function Dashboard() {
   return (
     <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden relative z-10">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-electric-cyan mb-2">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-electric-cyan mb-1 sm:mb-2">
             Mission Control
           </h2>
-          <p className="text-asteroid-silver text-sm md:text-base">
+          <p className="text-asteroid-silver text-xs sm:text-sm md:text-base">
             Welcome back, <span className="text-solar-gold font-medium">{user?.displayName || user?.username}</span>
           </p>
         </div>
-        <div className="text-left md:text-right">
-          <div className="text-xs md:text-sm text-asteroid-silver">Current Time</div>
-          <div className="text-lg md:text-xl font-mono text-electric-cyan">{currentTime} IST</div>
+        <div className="text-left sm:text-right">
+          <div className="text-xs sm:text-sm text-asteroid-silver">Current Time</div>
+          <div className="text-base sm:text-lg md:text-xl font-mono text-electric-cyan">{currentTime} IST</div>
         </div>
       </div>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <StatsCard
           title="Total Reach"
           value={analytics.totalReach !== null ? formatNumber(analytics.totalReach) : null}
           change={analytics.totalReach !== null && analytics.totalReach > 0 ? { value: "Active data", isPositive: true } : undefined}
-          icon={<Eye className="text-xl" />}
+          icon={<Eye className="text-lg sm:text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
           isLoading={isDataLoading}
         />
@@ -216,7 +216,7 @@ export default function Dashboard() {
           title="Engagement"
           value={analytics.engagement !== null ? formatEngagement(analytics.engagement) : null}
           change={analytics.engagement !== null && analytics.engagement > 0 ? { value: "Active data", isPositive: true } : undefined}
-          icon={<Heart className="text-xl" />}
+          icon={<Heart className="text-lg sm:text-xl" />}
           gradient="from-solar-gold to-red-500"
           isLoading={isDataLoading}
         />
@@ -224,7 +224,7 @@ export default function Dashboard() {
           title="New Followers"
           value={analytics.newFollowers !== null ? formatNumber(analytics.newFollowers) : null}
           change={analytics.newFollowers !== null && analytics.newFollowers > 0 ? { value: "Active data", isPositive: true } : undefined}
-          icon={<Users className="text-xl" />}
+          icon={<Users className="text-lg sm:text-xl" />}
           gradient="from-nebula-purple to-pink-500"
           isLoading={isDataLoading}
         />
@@ -232,7 +232,7 @@ export default function Dashboard() {
           title="Content Score"
           value={formatPercentage(analytics.contentScore)}
           change={{ value: "Active data", isPositive: true }}
-          icon={<TrendingUp className="text-xl" />}
+          icon={<TrendingUp className="text-lg sm:text-xl" />}
           gradient="from-green-400 to-blue-500"
           isLoading={false}
         />

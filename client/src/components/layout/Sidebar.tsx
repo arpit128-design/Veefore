@@ -41,9 +41,9 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-16 md:top-20 bottom-0 w-64 glassmorphism z-40 overflow-y-auto hidden md:block">
-        <nav className="p-6 space-y-4">
-          <div className="space-y-2">
+      <aside className="fixed left-0 top-14 sm:top-16 md:top-20 bottom-0 w-56 lg:w-64 glassmorphism z-40 overflow-y-auto hidden md:block">
+        <nav className="p-3 lg:p-6 space-y-2 lg:space-y-4">
+          <div className="space-y-1 lg:space-y-2">
             {navigationItems.map((item) => {
               const isActive = location === item.href;
               return (
@@ -51,14 +51,14 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-lg transition-all group particle-trail",
+                    "flex items-center space-x-2 lg:space-x-3 p-2 lg:p-3 rounded-lg transition-all group particle-trail",
                     isActive 
                       ? "holographic bg-opacity-50" 
                       : "hover:bg-cosmic-blue"
                   )}
                 >
-                  <item.icon className={cn("h-5 w-5 group-hover:animate-pulse", item.color)} />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className={cn("h-4 w-4 lg:h-5 lg:w-5 group-hover:animate-pulse", item.color)} />
+                  <span className="font-medium text-sm lg:text-base">{item.label}</span>
                 </Link>
               );
             })}

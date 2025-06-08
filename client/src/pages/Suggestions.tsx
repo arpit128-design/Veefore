@@ -25,7 +25,7 @@ export default function Suggestions() {
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
     refetchInterval: 30000
-  });
+  }) as { data?: { credits?: number } };
 
   const { data: suggestionsResponse, refetch, isLoading } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],

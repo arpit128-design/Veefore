@@ -799,59 +799,59 @@ export default function Scheduler() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <Card className="content-card holographic">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-asteroid-silver">Total Scheduled</p>
-                <p className="text-2xl font-bold text-electric-cyan">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-asteroid-silver">Total Scheduled</p>
+                <p className="text-xl sm:text-2xl font-bold text-electric-cyan">{stats.total}</p>
               </div>
-              <CalendarIcon className="h-8 w-8 text-electric-cyan" />
+              <CalendarIcon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-electric-cyan" />
             </div>
           </CardContent>
         </Card>
         
         <Card className="content-card holographic">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-asteroid-silver">This Week</p>
-                <p className="text-2xl font-bold text-solar-gold">{stats.thisWeek}</p>
+                <p className="text-xs sm:text-sm text-asteroid-silver">This Week</p>
+                <p className="text-xl sm:text-2xl font-bold text-solar-gold">{stats.thisWeek}</p>
               </div>
-              <Clock className="h-8 w-8 text-solar-gold" />
+              <Clock className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-solar-gold" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="content-card holographic">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-asteroid-silver">Next Week</p>
-                <p className="text-2xl font-bold text-nebula-purple">{stats.nextWeek}</p>
+                <p className="text-xs sm:text-sm text-asteroid-silver">Next Week</p>
+                <p className="text-xl sm:text-2xl font-bold text-nebula-purple">{stats.nextWeek}</p>
               </div>
-              <BarChart3 className="h-8 w-8 text-nebula-purple" />
+              <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-nebula-purple" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="content-card holographic">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-asteroid-silver">Auto Rules</p>
-                <p className="text-2xl font-bold text-green-400">{automationRules?.length || 0}</p>
+                <p className="text-xs sm:text-sm text-asteroid-silver">Auto Rules</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-400">{automationRules?.length || 0}</p>
               </div>
-              <Zap className="h-8 w-8 text-green-400" />
+              <Zap className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-green-400" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-1 glassmorphism">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 glassmorphism p-1">
           <TabsTrigger value="calendar" className="text-xs md:text-sm">
             <span className="hidden md:inline">Calendar View</span>
             <span className="md:hidden">Calendar</span>

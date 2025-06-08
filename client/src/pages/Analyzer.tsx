@@ -97,13 +97,13 @@ export default function Analyzer() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-green-400">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <h2 className="text-xl sm:text-2xl lg:text-4xl font-orbitron font-bold text-green-400">
           Growth & Trend Analyzer
         </h2>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-full sm:w-32 glassmorphism">
+            <SelectTrigger className="w-full sm:w-32 glassmorphism text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -116,9 +116,9 @@ export default function Analyzer() {
             variant="outline"
             onClick={() => refetch()}
             disabled={isLoading}
-            className="glassmorphism w-full sm:w-auto"
+            className="glassmorphism w-full sm:w-auto text-sm"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
             <span className="sm:hidden">Refresh Data</span>
           </Button>
@@ -126,16 +126,16 @@ export default function Analyzer() {
       </div>
 
       {/* Analytics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <Card className="content-card holographic">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-electric-cyan to-blue-500 flex items-center justify-center">
-                <Eye className="h-6 w-6 text-white" />
+          <CardContent className="p-4 sm:p-5 lg:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-electric-cyan to-blue-500 flex items-center justify-center">
+                <Eye className="h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-electric-cyan">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
-                <div className="text-sm text-asteroid-silver">Total Reach</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-electric-cyan">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
+                <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 text-green-400">

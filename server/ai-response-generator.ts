@@ -59,7 +59,78 @@ class AIResponseGenerator {
       };
     } catch (error) {
       console.error('[AI RESPONSE] Error generating response:', error);
-      throw new Error('Failed to generate AI response');
+      
+      // Generate intelligent fallback based on message content and context
+      const fallbackResponse = this.generateIntelligentFallback(context, config);
+      return {
+        response: fallbackResponse.response,
+        detectedLanguage: fallbackResponse.language,
+        confidence: 0.7,
+        reasoning: "Generated using intelligent fallback due to AI service unavailability"
+      };
+    }
+  }
+
+  private generateIntelligentFallback(context: MessageContext, config: AIResponseConfig): { response: string; language: string } {
+    const message = context.message.toLowerCase();
+    const username = context.username || 'friend';
+    
+    // Detect language
+    const language = this.detectLanguage(context.message);
+    
+    // Generate contextual responses based on message content
+    if (message.includes('price') || message.includes('cost') || message.includes('chahiye')) {
+      if (language === 'hindi' || language === 'hinglish') {
+        return {
+          response: `Namaste @${username}! Price details ke liye please DM kariye. Hum aapko best rates provide karenge! 🙏`,
+          language: 'hinglish'
+        };
+      } else {
+        return {
+          response: `Hi @${username}! For pricing details, please send us a DM. We'll provide you with our best rates!`,
+          language: 'english'
+        };
+      }
+    }
+    
+    if (message.includes('info') || message.includes('details') || message.includes('help')) {
+      if (language === 'hindi' || language === 'hinglish') {
+        return {
+          response: `Hi @${username}! Hum yahan help karne ke liye hain. Kya specific information chahiye?`,
+          language: 'hinglish'
+        };
+      } else {
+        return {
+          response: `Hi @${username}! We're here to help. What specific information do you need?`,
+          language: 'english'
+        };
+      }
+    }
+    
+    // Default contextual responses
+    if (language === 'hindi' || language === 'hinglish') {
+      return {
+        response: `Dhanyawad @${username}! Aapka message receive hua hai. Hum jaldi reply karenge! 🙏`,
+        language: 'hinglish'
+      };
+    } else {
+      return {
+        response: `Thank you @${username}! We've received your message and will get back to you soon!`,
+        language: 'english'
+      };
+    }
+  }
+
+  private detectLanguage(text: string): string {
+    const hindiPattern = /[\u0900-\u097F]/;
+    const hinglishWords = ['chahiye', 'kya', 'hai', 'aur', 'kar', 'ke', 'se', 'me', 'ki', 'ka'];
+    
+    if (hindiPattern.test(text)) {
+      return 'hindi';
+    } else if (hinglishWords.some(word => text.toLowerCase().includes(word))) {
+      return 'hinglish';
+    } else {
+      return 'english';
     }
   }
 

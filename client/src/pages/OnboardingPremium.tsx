@@ -71,7 +71,7 @@ import {
   Atom
 } from 'lucide-react';
 
-// Enhanced Step Configuration
+// Complete Business Setup Flow
 const onboardingSteps = [
   {
     id: 'welcome',
@@ -84,14 +84,34 @@ const onboardingSteps = [
     elements: ['sphere', 'cube', 'pattern']
   },
   {
-    id: 'workspace',
-    title: 'Create Your Universe',
-    subtitle: 'Build Your Digital Command Center',
-    description: 'Set up your personalized workspace where creativity meets intelligence',
-    color: '#8b5cf6',
+    id: 'business',
+    title: 'Brand Identity Setup',
+    subtitle: 'Tell Us About Your Business',
+    description: 'Help our AI understand your brand to create personalized content that resonates with your audience',
+    color: '#10b981',
     icon: Building,
-    particles: 60,
+    particles: 75,
     elements: ['cube', 'pattern', 'sphere']
+  },
+  {
+    id: 'goals',
+    title: 'Mission Control Center',
+    subtitle: 'What Are Your Primary Goals?',
+    description: 'Define your objectives so our AI can optimize content strategy for maximum impact',
+    color: '#f59e0b',
+    icon: Target,
+    particles: 85,
+    elements: ['pattern', 'sphere', 'cube']
+  },
+  {
+    id: 'platforms',
+    title: 'Social Galaxy Connection',
+    subtitle: 'Connect Your Social Media Platforms',
+    description: 'Link your accounts to enable cross-platform content distribution and analytics',
+    color: '#8b5cf6',
+    icon: Users,
+    particles: 80,
+    elements: ['sphere', 'cube', 'pattern']
   },
   {
     id: 'personality',
@@ -114,6 +134,16 @@ const onboardingSteps = [
     elements: ['sphere', 'pattern', 'cube']
   },
   {
+    id: 'workspace',
+    title: 'Create Your Universe',
+    subtitle: 'Build Your Digital Command Center',
+    description: 'Set up your personalized workspace where creativity meets intelligence',
+    color: '#059669',
+    icon: Cpu,
+    particles: 60,
+    elements: ['cube', 'pattern', 'sphere']
+  },
+  {
     id: 'complete',
     title: 'Launch Sequence Initiated',
     subtitle: 'Your AI Empire Awaits',
@@ -132,6 +162,24 @@ const personalities = [
   { id: 'enthusiastic', name: 'Energy Amplifier', description: 'Dynamic, passionate, and inspiring', icon: Zap, color: '#eab308' },
   { id: 'minimalist', name: 'Zen Creator', description: 'Clean, focused, and intentional', icon: Cpu, color: '#6366f1' },
   { id: 'creative', name: 'Artistic Visionary', description: 'Innovative, expressive, and imaginative', icon: Wand2, color: '#a855f7' }
+];
+
+const businessGoals = [
+  { id: 'brand-awareness', name: 'Brand Awareness', description: 'Increase visibility and recognition', icon: TrendingUp, color: '#3b82f6' },
+  { id: 'lead-generation', name: 'Lead Generation', description: 'Generate qualified prospects', icon: Target, color: '#059669' },
+  { id: 'sales-growth', name: 'Sales Growth', description: 'Drive revenue and conversions', icon: Trophy, color: '#eab308' },
+  { id: 'community-building', name: 'Community Building', description: 'Build engaged communities', icon: Users, color: '#ec4899' },
+  { id: 'thought-leadership', name: 'Thought Leadership', description: 'Establish industry authority', icon: Brain, color: '#8b5cf6' },
+  { id: 'customer-retention', name: 'Customer Retention', description: 'Strengthen existing relationships', icon: Heart, color: '#dc2626' }
+];
+
+const socialPlatforms = [
+  { id: 'instagram', name: 'Instagram', icon: Instagram, color: '#e1306c', connected: false },
+  { id: 'youtube', name: 'YouTube', icon: Video, color: '#ff0000', connected: false },
+  { id: 'twitter', name: 'X (Twitter)', icon: Globe, color: '#1da1f2', connected: false },
+  { id: 'linkedin', name: 'LinkedIn', icon: Users, color: '#0077b5', connected: false },
+  { id: 'tiktok', name: 'TikTok', icon: Music, color: '#000000', connected: false },
+  { id: 'facebook', name: 'Facebook', icon: Users, color: '#1877f2', connected: false }
 ];
 
 const contentCategories = [
@@ -162,6 +210,10 @@ export default function OnboardingPremium() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    businessName: '',
+    businessDescription: '',
+    selectedGoals: [] as string[],
+    connectedPlatforms: [] as string[],
     workspaceName: '',
     description: '',
     aiPersonality: '',
@@ -169,6 +221,19 @@ export default function OnboardingPremium() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  // Security check - only show onboarding for new users during registration
+  const { data: userData } = useQuery({
+    queryKey: ['/api/user'],
+    enabled: !!user
+  });
+
+  // Redirect if user is already onboarded
+  useEffect(() => {
+    if (userData?.isOnboarded) {
+      setLocation('/dashboard');
+    }
+  }, [userData, setLocation]);
 
   // Calculate progress
   useEffect(() => {
@@ -459,32 +524,178 @@ export default function OnboardingPremium() {
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full max-w-md space-y-6">
                           <div className="space-y-4">
-                            <Label htmlFor="workspace-name" className="text-white font-medium">
-                              Workspace Name *
+                            <Label htmlFor="business-name" className="text-white font-medium">
+                              Business Name *
                             </Label>
                             <Input
-                              id="workspace-name"
+                              id="business-name"
                               type="text"
-                              placeholder="Enter your workspace name..."
-                              value={formData.workspaceName}
-                              onChange={(e) => setFormData(prev => ({ ...prev, workspaceName: e.target.value }))}
+                              placeholder="Enter your business name..."
+                              value={formData.businessName}
+                              onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
                               className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
                               required
                             />
                           </div>
                           
                           <div className="space-y-4">
-                            <Label htmlFor="description" className="text-white font-medium">
-                              Description (Optional)
+                            <Label htmlFor="business-description" className="text-white font-medium">
+                              Business Description *
                             </Label>
                             <Input
-                              id="description"
+                              id="business-description"
                               type="text"
-                              placeholder="Describe your workspace..."
-                              value={formData.description}
-                              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                              placeholder="Describe what your business does..."
+                              value={formData.businessDescription}
+                              onChange={(e) => setFormData(prev => ({ ...prev, businessDescription: e.target.value }))}
                               className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
+                              required
                             />
+                          </div>
+                          
+                          {formData.businessName && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="p-4 bg-white/5 rounded-lg border border-white/20"
+                            >
+                              <h3 className="text-white font-medium mb-2">Preview:</h3>
+                              <p className="text-green-400 font-semibold">{formData.businessName}</p>
+                              <p className="text-white/70 text-sm">{formData.businessDescription}</p>
+                            </motion.div>
+                          )}
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 2 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full">
+                          <div className="text-center mb-6">
+                            <p className="text-white/80 mb-4">
+                              Selected: {formData.selectedGoals.length} goals
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {businessGoals.map((goal, index) => (
+                              <motion.div
+                                key={goal.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <MagneticElement strength={10}>
+                                  <motion.div
+                                    className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                                      formData.selectedGoals.includes(goal.id)
+                                        ? 'border-white/60 bg-white/10'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                    }`}
+                                    onClick={() => {
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        selectedGoals: prev.selectedGoals.includes(goal.id)
+                                          ? prev.selectedGoals.filter(id => id !== goal.id)
+                                          : [...prev.selectedGoals, goal.id]
+                                      }));
+                                    }}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    <div className="flex items-start space-x-4">
+                                      <div 
+                                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                                        style={{
+                                          background: `radial-gradient(circle, ${goal.color}40 0%, ${goal.color}20 100%)`,
+                                          border: `1px solid ${goal.color}60`
+                                        }}
+                                      >
+                                        <goal.icon size={20} color={goal.color} />
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="font-semibold text-white mb-1">{goal.name}</h3>
+                                        <p className="text-sm text-white/60">{goal.description}</p>
+                                      </div>
+                                      {formData.selectedGoals.includes(goal.id) && (
+                                        <CheckCircle size={20} className="text-green-400" />
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                </MagneticElement>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 3 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full">
+                          <div className="text-center mb-6">
+                            <p className="text-white/80 mb-4">
+                              Connected: {formData.connectedPlatforms.length} platforms
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {socialPlatforms.map((platform, index) => (
+                              <motion.div
+                                key={platform.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <MagneticElement strength={10}>
+                                  <motion.div
+                                    className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                                      formData.connectedPlatforms.includes(platform.id)
+                                        ? 'border-white/60 bg-white/10'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                    }`}
+                                    onClick={() => {
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        connectedPlatforms: prev.connectedPlatforms.includes(platform.id)
+                                          ? prev.connectedPlatforms.filter(id => id !== platform.id)
+                                          : [...prev.connectedPlatforms, platform.id]
+                                      }));
+                                    }}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    <div className="text-center">
+                                      <div 
+                                        className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                                        style={{
+                                          background: `radial-gradient(circle, ${platform.color}40 0%, ${platform.color}20 100%)`,
+                                          border: `2px solid ${platform.color}60`
+                                        }}
+                                      >
+                                        <platform.icon size={24} color={platform.color} />
+                                      </div>
+                                      <h3 className="font-semibold text-white mb-2">{platform.name}</h3>
+                                      {formData.connectedPlatforms.includes(platform.id) ? (
+                                        <div className="flex items-center justify-center text-green-400">
+                                          <CheckCircle size={16} className="mr-1" />
+                                          <span className="text-sm">Connected</span>
+                                        </div>
+                                      ) : (
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm"
+                                          className="text-white/60 hover:text-white"
+                                        >
+                                          <Plus size={16} className="mr-1" />
+                                          Connect
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                </MagneticElement>
+                              </motion.div>
+                            ))}
                           </div>
                         </div>
                       </ScrollReveal>

@@ -70,8 +70,9 @@ export class InstagramDirectSync {
       let accountInsights = { totalReach: 0, totalImpressions: 0, profileViews: 0 };
       
       try {
+        // Use the correct Instagram Business API insights endpoint format for account-level metrics
         const accountInsightsResponse = await fetch(
-          `https://graph.instagram.com/${profileData.id}/insights?metric=impressions,reach,profile_views&period=day&access_token=${accessToken}`
+          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,impressions,profile_views&period=day&access_token=${accessToken}`
         );
         
         if (accountInsightsResponse.ok) {
@@ -94,17 +95,19 @@ export class InstagramDirectSync {
           console.log('[INSTAGRAM DIRECT] Extracted account insights:', accountInsights);
         } else {
           const errorText = await accountInsightsResponse.text();
-          console.log('[INSTAGRAM DIRECT] Account insights failed:', errorText);
+          console.log('[INSTAGRAM DIRECT] Account insights failed - Status:', accountInsightsResponse.status);
+          console.log('[INSTAGRAM DIRECT] Full error response:', errorText);
           
           // Parse the error to understand Instagram Business API limitations
           try {
             const errorData = JSON.parse(errorText);
+            console.log('[INSTAGRAM DIRECT] Parsed error data:', JSON.stringify(errorData, null, 2));
             if (errorData.error?.code === 100) {
-              console.log('[INSTAGRAM DIRECT] Instagram Business API Error Code 100: Insights access requires specific permissions or account configuration');
-              console.log('[INSTAGRAM DIRECT] This is common for newer Instagram Business accounts or accounts without full insights access');
+              console.log('[INSTAGRAM DIRECT] Instagram Business API Error Code 100: Invalid request parameters or endpoint');
+              console.log('[INSTAGRAM DIRECT] This indicates wrong API endpoint format or parameter structure');
             }
           } catch (parseError) {
-            console.log('[INSTAGRAM DIRECT] Could not parse insights error response');
+            console.log('[INSTAGRAM DIRECT] Could not parse insights error response:', parseError.message);
           }
         }
       } catch (accountError) {
@@ -136,7 +139,7 @@ export class InstagramDirectSync {
           try {
             console.log(`[INSTAGRAM DIRECT] Fetching insights for post ${post.id}`);
             const mediaInsightsResponse = await fetch(
-              `https://graph.instagram.com/${post.id}/insights?metric=engagement,impressions,reach&access_token=${accessToken}`
+              `https://graph.instagram.com/${post.id}/insights?metric=impressions&access_token=${accessToken}`
             );
             
             if (mediaInsightsResponse.ok) {

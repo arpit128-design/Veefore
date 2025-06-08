@@ -1855,8 +1855,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       engagementRate = 0
     } = instagramAccount;
 
-    // Calculate engagement percentage - if not stored, calculate from likes and comments
-    let engagementPercent = engagementRate ? engagementRate / 100 : 0;
+    // Use the authentic engagement rate directly (already stored as percentage from dashboard API)
+    let engagementPercent = engagementRate || 0;
     
     // If engagement rate is 0 but we have engagement data, calculate it
     if (engagementPercent === 0 && followersCount > 0 && (avgLikes > 0 || avgComments > 0)) {
@@ -2338,6 +2338,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           followers: instagramAccount.followersCount,
           avgLikes: instagramAccount.avgLikes,
           avgComments: instagramAccount.avgComments,
+          avgEngagement: instagramAccount.avgEngagement,
           hasToken: !!instagramAccount.accessToken
         });
       }
@@ -2502,7 +2503,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         hasAccount: !!instagramAccount,
         username: instagramAccount?.username,
         followers: instagramAccount?.followersCount,
-        engagement: instagramAccount?.engagementRate,
+        engagement: instagramAccount?.avgEngagement || 0,
         avgLikes: instagramAccount?.avgLikes,
         avgComments: instagramAccount?.avgComments,
         posts: instagramAccount?.mediaCount

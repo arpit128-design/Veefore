@@ -374,6 +374,15 @@ function VideoGenerator() {
             <div className="text-xs text-gray-400">remaining for video</div>
           </div>
         </div>
+
+        {/* Upgrade Modal */}
+        <UpgradeModal
+          isOpen={upgradeModal.isOpen}
+          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+          featureType={upgradeModal.featureType}
+          creditsRequired={upgradeModal.creditsRequired}
+          currentCredits={upgradeModal.currentCredits}
+        />
       </CardContent>
     </Card>
   );
@@ -840,9 +849,17 @@ export default function ContentStudio() {
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">Content Studio</h1>
           <p className="text-gray-400 text-sm md:text-base">Create, generate, and manage your content</p>
         </div>
-        <div className="text-left md:text-right">
-          <div className="text-xs md:text-sm text-gray-400">Active Workspace</div>
-          <div className="text-white font-medium text-sm md:text-base">{currentWorkspace?.name}</div>
+        <div className="flex flex-col sm:flex-row gap-4 text-left md:text-right">
+          <div className="text-center sm:text-right">
+            <div className="text-xs md:text-sm text-gray-400">Available Credits</div>
+            <div className="text-stellar-gold font-bold text-lg md:text-xl">
+              {user?.credits || 0}
+            </div>
+          </div>
+          <div className="text-center sm:text-right">
+            <div className="text-xs md:text-sm text-gray-400">Active Workspace</div>
+            <div className="text-white font-medium text-sm md:text-base">{currentWorkspace?.name}</div>
+          </div>
         </div>
       </div>
 

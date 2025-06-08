@@ -404,24 +404,26 @@ export default function OnboardingPremium() {
 
   const canProceedToNextStep = () => {
     switch (currentStep) {
-      case 0: // Business info
+      case 0: // Welcome screen
+        return true; // No validation needed for welcome screen
+      case 1: // Business info (now step 2)
         return formData.businessName.trim().length > 0 && formData.businessDescription.trim().length > 0;
-      case 1: // Goals
+      case 2: // Goals (now step 3)
         return formData.selectedGoals.length > 0;
-      case 2: // Growth targets (step 3)
+      case 3: // Growth targets (step 4)
         const hasFollowerGoal = formData.growthTargets.followerGoal !== '';
         const hasCustomGoal = formData.growthTargets.followerGoal !== 'Custom' || 
                              (formData.growthTargets.followerGoal === 'Custom' && formData.growthTargets.customFollowerGoal.trim() !== '');
         const hasTimeframe = formData.growthTargets.timeframe !== '';
         const hasFrequency = formData.growthTargets.contentFrequency !== '';
         return hasFollowerGoal && hasCustomGoal && hasTimeframe && hasFrequency;
-      case 3: // Platforms (step 4 - optional)
+      case 4: // Platforms (step 5 - optional)
         return true; // Optional step
-      case 4: // AI Personality (step 5)
+      case 5: // AI Personality (step 6)
         return formData.aiPersonality !== '';
-      case 5: // Categories (step 6)
+      case 6: // Categories (step 7)
         return formData.selectedCategories.length > 0;
-      case 6: // Workspace setup (step 7)
+      case 7: // Workspace setup (step 8)
         return formData.workspaceName.trim().length > 0;
       default:
         return true;

@@ -53,13 +53,14 @@ export class InstagramTokenManager {
     }
   }
 
-  // Validate Instagram access token
+  // Validate Instagram Business API access token
   private async validateToken(accessToken: string): Promise<boolean> {
-    console.log('[TOKEN MANAGER] Validating Instagram access token');
+    console.log('[TOKEN MANAGER] Validating Instagram Business API access token');
     
     try {
-      const response = await axios.get(`https://graph.facebook.com/v18.0/me?access_token=${accessToken}`);
-      return response.status === 200;
+      // Use Instagram Basic Display API endpoint for validation
+      const response = await axios.get(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
+      return response.status === 200 && !!response.data.id;
     } catch (error: any) {
       console.log('[TOKEN MANAGER] Token validation failed:', error.response?.data?.error?.message || error.message);
       return false;

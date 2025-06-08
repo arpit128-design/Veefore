@@ -370,7 +370,8 @@ export class InstagramAutomation {
     } catch (error) {
       console.error('[AI AUTOMATION] Error generating contextual response:', error);
       // Fallback to predefined responses if AI fails
-      return rule.responses[Math.floor(Math.random() * rule.responses.length)] || 'Thank you for your message!';
+      const fallbackResponses = rule.action?.responses || rule.responses || ['Thank you for your message!'];
+      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)] || 'Thank you for your message!';
     }
   }
 

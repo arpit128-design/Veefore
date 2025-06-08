@@ -225,32 +225,34 @@ export class InstagramWebhookHandler {
       const rules = await this.getAutomationRules(socialAccount.workspaceId, 'comment');
       
       for (const rule of rules) {
+        console.log(`[WEBHOOK] Processing rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);
+        
         if (!rule.isActive) {
           console.log(`[WEBHOOK] Rule ${rule.id} is inactive, skipping`);
           continue;
         }
 
-        console.log(`[WEBHOOK] Checking rule: ${rule.id}, name: ${rule.name}`);
         console.log(`[WEBHOOK] Rule structure:`, {
           trigger: rule.trigger,
           action: rule.action,
           isActive: rule.isActive
         });
 
-        // For Instagram Auto-Reply rules, always trigger (contextual AI mode)
-        console.log(`[WEBHOOK] Rule triggered, generating AI response`);
+        console.log(`[WEBHOOK] Starting AI response generation for comment: "${value.text}"`);
 
         try {
           // Generate contextual AI response for the comment
+          console.log(`[WEBHOOK] Calling generateContextualResponse...`);
           const response = await this.automation.generateContextualResponse(
             value.text,
             rule,
             { username: value.from.username }
           );
 
-          console.log(`[WEBHOOK] Generated AI response: ${response}`);
+          console.log(`[WEBHOOK] AI response generated successfully: "${response}"`);
 
           // Send the automated comment reply
+          console.log(`[WEBHOOK] Sending automated comment with access token length: ${socialAccount.accessToken?.length || 0}`);
           const result = await this.automation.sendAutomatedComment(
             socialAccount.accessToken,
             value.post_id || value.comment_id || '',
@@ -259,6 +261,8 @@ export class InstagramWebhookHandler {
             rule.id
           );
 
+          console.log(`[WEBHOOK] Comment send result:`, result);
+
           if (result.success) {
             console.log(`[WEBHOOK] ✓ Successfully sent automated comment: ${result.commentId}`);
           } else {
@@ -266,6 +270,7 @@ export class InstagramWebhookHandler {
           }
         } catch (error) {
           console.error(`[WEBHOOK] Error in automation flow:`, error);
+          console.error(`[WEBHOOK] Error stack:`, error.stack);
         }
       }
     } catch (error) {

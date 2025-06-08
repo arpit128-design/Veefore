@@ -6,6 +6,7 @@ import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
+import { generateIntelligentSuggestions } from './ai-suggestions-service';
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -1804,10 +1805,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   // ==================== AI SUGGESTIONS FUNCTIONS ====================
   
   async function generateInstagramBasedSuggestions(instagramAccount: any) {
-    const suggestions = [];
-    
     if (!instagramAccount) {
-      // Return basic suggestions when no Instagram account is connected
       return [
         {
           type: 'trending',
@@ -1856,137 +1854,113 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       engagementRate: engagementPercent
     });
 
-    console.log(`[AI SUGGESTIONS] Analyzing @${username}: ${followersCount} followers, ${engagementPercent}% engagement`);
+    console.log(`[AI SUGGESTIONS] Analyzing @${username}: ${followersCount} followers, ${engagementPercent.toFixed(1)}% engagement`);
 
-    // SPAM DETECTION & AUTHENTIC ENGAGEMENT STRATEGY for @rahulc1020
-    const commentToLikeRatio = avgLikes > 0 ? avgComments / avgLikes : 0;
-    const suspiciousEngagement = avgComments > 100 && avgLikes < 10;
+    // Use fallback suggestions with variety for authentic account data
+    return generateFallbackSuggestions(instagramAccount);
+  }
+
+  function generateFallbackSuggestions(instagramAccount: any) {
+    const { username, followersCount, avgComments, avgLikes, engagementRate } = instagramAccount;
+    const timestamp = Date.now();
     
-    // CRITICAL ISSUE: Suspicious comment patterns detected
-    if (suspiciousEngagement) {
-      suggestions.push({
+    // Generate different suggestions based on timestamp to ensure variety
+    const suggestionPool = [
+      {
+        type: 'hashtag',
+        data: {
+          suggestion: `Research competitor hashtags to discover new audiences for your ${avgComments}-comment content`,
+          reasoning: `Your content generates ${avgComments} comments per post - this shows strong discussion potential. Find where similar conversations happen.`,
+          actionItems: [
+            'Analyze top 5 accounts in your niche and save their hashtag combinations',
+            'Test 3-5 new hashtags per post to expand reach',
+            'Track which hashtags bring the most engaged followers',
+            'Create a branded hashtag for your community discussions'
+          ],
+          expectedImpact: 'Increase post reach by 40-60% through strategic hashtag research',
+          difficulty: 'Medium',
+          timeframe: '1-2 weeks'
+        },
+        confidence: 88
+      },
+      {
+        type: 'growth',
+        data: {
+          suggestion: `Convert your comment engagement into follower growth with strategic community building`,
+          reasoning: `${avgComments} comments per post indicates strong interest. Focus on converting commenters to loyal followers.`,
+          actionItems: [
+            'Reply to every comment within 2 hours to boost engagement velocity',
+            'Ask questions in your posts to encourage more comments',
+            'Create weekly discussion posts on trending topics in your niche',
+            'Share behind-the-scenes content to build personal connections'
+          ],
+          expectedImpact: 'Convert 15-25% of engaged commenters into followers',
+          difficulty: 'Easy',
+          timeframe: '2-3 weeks'
+        },
+        confidence: 92
+      },
+      {
+        type: 'trending',
+        data: {
+          suggestion: `Leverage trending audio and formats to amplify your discussion-generating content`,
+          reasoning: `Your ${avgComments} comments show content that sparks conversations. Use trending formats to reach wider audiences.`,
+          actionItems: [
+            'Create Reels using trending audio with your discussion topics',
+            'Post carousel posts with controversial but respectful opinions',
+            'Use Instagram Stories polls and question stickers for instant engagement',
+            'Jump on trending challenges while maintaining your content style'
+          ],
+          expectedImpact: 'Reach 5-10x more people with trending content formats',
+          difficulty: 'Medium',
+          timeframe: '1 week'
+        },
+        confidence: 85
+      },
+      {
         type: 'engagement',
         data: {
-          suggestion: `Address suspicious comment patterns - ${avgComments} comments vs ${avgLikes} likes indicates potential spam or bot activity`,
-          reasoning: `@${username} has ${avgComments} comments per post but only ${avgLikes} likes and 4 followers. This extreme ratio (${Math.round(commentToLikeRatio)}:1) suggests spam comments, bot engagement, or artificial inflation. Many comments from same accounts is a red flag for Instagram's algorithm.`,
+          suggestion: `Optimize posting schedule based on when your ${avgComments} commenters are most active`,
+          reasoning: `You have highly engaged commenters. Post when they're online to maximize initial engagement and algorithm boost.`,
           actionItems: [
-            'Audit your comment section - check if multiple comments come from same accounts',
-            'Report and delete obvious spam/bot comments immediately',
-            'Use Instagram\'s "Hide inappropriate comments" feature in settings',
-            'Block accounts that repeatedly spam your content',
-            'Focus on attracting genuine followers through quality content instead of engagement manipulation'
+            'Check Instagram Insights to find peak activity times',
+            'Post consistently at your top 2-3 engagement windows',
+            'Use scheduling tools to maintain consistency',
+            'Test different posting times and track engagement rates'
           ],
-          expectedImpact: 'Clean up engagement metrics and avoid Instagram penalties',
-          difficulty: 'Medium',
-          timeframe: 'Start immediately - this affects algorithm ranking'
+          expectedImpact: 'Increase average engagement by 30-50% through optimal timing',
+          difficulty: 'Easy',
+          timeframe: '1 week to test, ongoing optimization'
         },
-        confidence: 98,
-        validUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-      });
-    }
-    
-    // GROWTH HACK: Leverage existing engaged audience
-    suggestions.push({
-      type: 'trending',
-      data: {
-        suggestion: `Ask your 4 super-engaged followers to share your content - each could bring 5-10 new followers`,
-        reasoning: `Your 4 followers are extremely engaged (${avgComments} comments means they're passionate advocates). One share from each could bring 20-40 new followers immediately.`,
-        actionItems: [
-          'Send DM to your 4 followers: "Your engagement means everything! Would you mind sharing this post?"',
-          'Create content specifically asking: "If this resonates, please share in your story"',
-          'Post a story saying "Tag 3 friends who need to see this"',
-          'Create shareable quote cards that your engaged audience would want to repost'
-        ],
-        expectedImpact: 'Double or triple followers (8-12) within 1 week through shares',
-        difficulty: 'Easy',
-        timeframe: 'This week'
+        confidence: 90
       },
-      confidence: 90,
-      validUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-    });
-    
-    // CONTENT STRATEGY: Post timing and frequency optimization
-    suggestions.push({
-      type: 'growth',
-      data: {
-        suggestion: `Post 5x per week at peak times to reach the ${avgComments} people actively engaging with you`,
-        reasoning: `You have ${avgComments} people actively commenting per post. If you post more consistently, you'll stay top-of-mind and convert more commenters to followers. Your engagement rate is ${engagementPercent.toFixed(0)}% - the algorithm will boost consistent posters.`,
-        actionItems: [
-          'Post every weekday at 7 PM (peak engagement time)',
-          'Use Instagram Insights to identify when your commenters are most active',
-          'Create content batches on Sunday for the whole week',
-          'Post Stories daily with behind-the-scenes content to build personal connection'
-        ],
-        expectedImpact: 'Reach 50+ followers by staying consistent and visible',
-        difficulty: 'Medium',
-        timeframe: '4 weeks'
-      },
-      confidence: 88,
-      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    });
-    
-    // ENGAGEMENT AMPLIFICATION: Turn comments into conversations
-    suggestions.push({
-      type: 'growth',
-      data: {
-        suggestion: `Create discussion threads in your comments - turn ${avgComments} comments into ${avgComments * 2}+ through back-and-forth`,
-        reasoning: `Instagram algorithm favors posts with ongoing conversations. Your ${avgComments} comments show people want to engage - create deeper discussions to boost reach further.`,
-        actionItems: [
-          'Ask follow-up questions to every commenter to start conversations',
-          'Share controversial but respectful opinions that generate debate',
-          'Pin your best comment responses to encourage more discussion',
-          'Create "Part 2" posts responding to popular comments from previous posts'
-        ],
-        expectedImpact: 'Double engagement to 200+ comments per post, massive algorithm boost',
-        difficulty: 'Easy',
-        timeframe: '2 weeks'
-      },
-      confidence: 92,
-      validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-    });
-    
-    // VIRAL CONTENT: Create Reels from your successful comment-generating posts
-    suggestions.push({
-      type: 'audio',
-      data: {
-        suggestion: `Turn your comment-heavy posts into Reels - ${avgComments} comments shows viral potential`,
-        reasoning: `Posts generating ${avgComments} comments have viral elements. Reels format can amplify this 10x. Your discussion-worthy content could reach 10K+ people through Reels algorithm.`,
-        actionItems: [
-          'Create Reels reading out the most interesting comments from your posts',
-          'Film yourself responding to controversial comments to spark more discussion',
-          'Make "storytime" Reels about topics that generated the most comments',
-          'Use trending audio with text overlay showing your most-commented topics'
-        ],
-        expectedImpact: 'Reach 5K-50K people per Reel, gain 100+ followers per viral Reel',
-        difficulty: 'Medium',
-        timeframe: '1-2 weeks'
-      },
-      confidence: 85,
-      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    });
-    
-    // DISCOVERY STRATEGY: Target hashtags where engaged audiences hang out
-    suggestions.push({
-      type: 'hashtag',
-      data: {
-        suggestion: `Use hashtags that your ${avgComments} commenters follow - find where your audience discovers content`,
-        reasoning: `Your ${avgComments} commenters found you somehow. Research their profiles to see what hashtags they use and follow. Target those same hashtags to find similar engaged audiences.`,
-        actionItems: [
-          'Check profiles of your top 10 commenters - see what hashtags they use',
-          'Use 5-8 hashtags under 100K posts in your niche for better visibility',
-          'Create a unique hashtag for your community (#rahulc1020insights)',
-          'Comment on posts with your target hashtags to build relationships'
-        ],
-        expectedImpact: 'Discover 20-50 new highly engaged followers who match your audience',
-        difficulty: 'Medium',
-        timeframe: '2 weeks'
-      },
-      confidence: 87,
-      validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-    });
+      {
+        type: 'audio',
+        data: {
+          suggestion: `Create Reels addressing common questions from your ${avgComments} comments`,
+          reasoning: `High comment volume suggests people have questions about your content. Answer these in Reels for wider reach.`,
+          actionItems: [
+            'Compile most frequently asked questions from comments',
+            'Create weekly Q&A Reels addressing top questions',
+            'Use trending audio with text overlays for accessibility',
+            'Pin your best Q&A Reels to highlight valuable content'
+          ],
+          expectedImpact: 'Position yourself as go-to expert, gain 50-100 followers per viral Q&A Reel',
+          difficulty: 'Medium',
+          timeframe: '2-4 weeks'
+        },
+        confidence: 87
+      }
+    ];
 
-    console.log(`[AI SUGGESTIONS] Generated ${suggestions.length} personalized suggestions for @${username}`);
-    return suggestions;
+    // Select 3-4 random suggestions to ensure variety
+    const shuffled = suggestionPool.sort(() => 0.5 - Math.random());
+    const selectedSuggestions = shuffled.slice(0, 3 + Math.floor(timestamp % 2));
+
+    return selectedSuggestions.map(suggestion => ({
+      ...suggestion,
+      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    }));
   }
 
   // ==================== AI SUGGESTIONS ROUTES ====================

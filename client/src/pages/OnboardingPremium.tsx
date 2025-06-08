@@ -301,14 +301,30 @@ export default function OnboardingPremium() {
   // Onboarding completion mutation
   const completeOnboardingMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('PATCH', '/api/user', { 
-        isOnboarded: true,
-        onboardingData: data
-      });
-      if (!response.ok) {
-        throw new Error('Failed to complete onboarding');
+      try {
+        const response = await apiRequest('PATCH', '/api/user', { 
+          isOnboarded: true,
+          onboardingData: data
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[ONBOARDING] API Error:', errorText);
+          throw new Error(`Failed to complete onboarding: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return response.json();
+        } else {
+          const responseText = await response.text();
+          console.error('[ONBOARDING] Non-JSON response:', responseText);
+          throw new Error('Server returned non-JSON response');
+        }
+      } catch (error) {
+        console.error('[ONBOARDING] Completion error:', error);
+        throw error;
       }
-      return response.json();
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
@@ -1053,8 +1069,161 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
+                    {currentStep === 6 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full max-w-4xl mx-auto">
+                          <div className="text-center mb-8">
+                            <h3 className="text-2xl font-bold text-white mb-3">Launch Sequence Initiated</h3>
+                            <p className="text-white/60">Review your AI empire configuration before launch</p>
+                          </div>
 
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Business Information */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.1 }}
+                              className="p-6 rounded-xl bg-white/5 border border-white/20"
+                            >
+                              <div className="flex items-center gap-3 mb-4">
+                                <Building className="text-blue-400" size={24} />
+                                <h4 className="text-lg font-semibold text-white">Business Profile</h4>
+                              </div>
+                              <div className="space-y-3">
+                                <div>
+                                  <p className="text-sm text-white/50">Business Name</p>
+                                  <p className="text-white font-medium">{formData.businessName || 'Not specified'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-white/50">Description</p>
+                                  <p className="text-white/80 text-sm">{formData.businessDescription || 'Not specified'}</p>
+                                </div>
+                              </div>
+                            </motion.div>
 
+                            {/* Goals & Targets */}
+                            <motion.div
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.2 }}
+                              className="p-6 rounded-xl bg-white/5 border border-white/20"
+                            >
+                              <div className="flex items-center gap-3 mb-4">
+                                <Target className="text-green-400" size={24} />
+                                <h4 className="text-lg font-semibold text-white">Growth Strategy</h4>
+                              </div>
+                              <div className="space-y-3">
+                                <div>
+                                  <p className="text-sm text-white/50">Primary Goals</p>
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    {formData.selectedGoals.map(goalId => {
+                                      const goal = businessGoals.find(g => g.id === goalId);
+                                      return goal ? (
+                                        <span key={goalId} className="px-2 py-1 text-xs bg-white/10 text-white rounded-md">
+                                          {goal.name}
+                                        </span>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-white/50">Growth Targets</p>
+                                  <div className="space-y-1">
+                                    {formData.growthTargets?.followerGoal && (
+                                      <p className="text-white/80 text-sm">
+                                        Followers: {formData.growthTargets.followerGoal === 'custom' 
+                                          ? formData.growthTargets.customFollowerGoal 
+                                          : formData.growthTargets.followerGoal}
+                                      </p>
+                                    )}
+                                    {formData.growthTargets?.timeframe && (
+                                      <p className="text-white/80 text-sm">Timeframe: {formData.growthTargets.timeframe}</p>
+                                    )}
+                                    {formData.growthTargets?.contentFrequency && (
+                                      <p className="text-white/80 text-sm">Content: {formData.growthTargets.contentFrequency}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+
+                            {/* Connected Platforms */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.3 }}
+                              className="p-6 rounded-xl bg-white/5 border border-white/20"
+                            >
+                              <div className="flex items-center gap-3 mb-4">
+                                <Globe className="text-purple-400" size={24} />
+                                <h4 className="text-lg font-semibold text-white">Social Platforms</h4>
+                              </div>
+                              <div className="space-y-2">
+                                {formData.connectedPlatforms.length > 0 ? (
+                                  formData.connectedPlatforms.map(platformId => {
+                                    const platform = socialPlatforms.find(p => p.id === platformId);
+                                    return platform ? (
+                                      <div key={platformId} className="flex items-center gap-2">
+                                        <platform.icon size={16} style={{ color: platform.color }} />
+                                        <span className="text-white text-sm">{platform.name}</span>
+                                        <div className="w-2 h-2 bg-green-400 rounded-full ml-auto"></div>
+                                      </div>
+                                    ) : null;
+                                  })
+                                ) : (
+                                  <p className="text-white/60 text-sm">No platforms connected</p>
+                                )}
+                              </div>
+                            </motion.div>
+
+                            {/* AI Configuration */}
+                            <motion.div
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.4 }}
+                              className="p-6 rounded-xl bg-white/5 border border-white/20"
+                            >
+                              <div className="flex items-center gap-3 mb-4">
+                                <Cpu className="text-orange-400" size={24} />
+                                <h4 className="text-lg font-semibold text-white">AI Configuration</h4>
+                              </div>
+                              <div className="space-y-3">
+                                <div>
+                                  <p className="text-sm text-white/50">AI Personality</p>
+                                  <p className="text-white font-medium">
+                                    {personalities.find(p => p.id === formData.aiPersonality)?.name || 'Not selected'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-white/50">Content Categories</p>
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    {formData.selectedCategories.map(categoryId => {
+                                      const category = contentCategories.find(c => c.id === categoryId);
+                                      return category ? (
+                                        <span key={categoryId} className="px-2 py-1 text-xs bg-white/10 text-white rounded-md">
+                                          {category.name}
+                                        </span>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          </div>
+
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="mt-8 text-center"
+                          >
+                            <p className="text-white/60 mb-6">
+                              Your AI empire is configured and ready for launch. Welcome to the future of content creation.
+                            </p>
+                          </motion.div>
+                        </div>
+                      </ScrollReveal>
+                    )}
 
                   </div>
 

@@ -1910,11 +1910,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     suggestions.push({
       type: 'growth',
       data: {
-        suggestion: `Post 5x per week at peak times to reach the 99 people already engaging with you`,
-        reasoning: `You have 99 people actively commenting. If you post more consistently, you'll stay top-of-mind and convert more commenters to followers. Your engagement rate is 2500% - the algorithm will boost consistent posters.`,
+        suggestion: `Post 5x per week at peak times to reach the ${avgComments} people actively engaging with you`,
+        reasoning: `You have ${avgComments} people actively commenting per post. If you post more consistently, you'll stay top-of-mind and convert more commenters to followers. Your engagement rate is ${engagementPercent.toFixed(0)}% - the algorithm will boost consistent posters.`,
         actionItems: [
           'Post every weekday at 7 PM (peak engagement time)',
-          'Use Instagram Insights to identify when your 99 commenters are most active',
+          'Use Instagram Insights to identify when your commenters are most active',
           'Create content batches on Sunday for the whole week',
           'Post Stories daily with behind-the-scenes content to build personal connection'
         ],
@@ -1970,7 +1970,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     suggestions.push({
       type: 'hashtag',
       data: {
-        suggestion: `Use hashtags that your 99 commenters follow - find where your audience discovers content`,
+        suggestion: `Use hashtags that your ${avgComments} commenters follow - find where your audience discovers content`,
         reasoning: `Your commenters found you somehow. Research their profiles to see what hashtags they use and follow. Target those same hashtags to find similar engaged audiences.`,
         actionItems: [
           'Check profiles of your top 10 commenters - see what hashtags they use',
@@ -2037,24 +2037,52 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // FORCE REFRESH: Fetch real current Instagram data instead of cached numbers
       if (instagramAccount?.accessToken) {
         try {
-          console.log(`[AI SUGGESTIONS] Force refreshing Instagram data for @${instagramAccount.username} to get real current metrics`);
+          console.log(`[AI SUGGESTIONS] Starting force refresh for @${instagramAccount.username}`);
+          console.log(`[AI SUGGESTIONS] Account ID: ${instagramAccount.accountId}`);
+          console.log(`[AI SUGGESTIONS] Current cached data - Likes: ${instagramAccount.avgLikes}, Comments: ${instagramAccount.avgComments}`);
+          
+          const apiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`;
+          console.log(`[AI SUGGESTIONS] Making API call to: ${apiUrl.replace(instagramAccount.accessToken, 'TOKEN_HIDDEN')}`);
           
           // Fetch latest media with actual current engagement
-          const mediaResponse = await fetch(`https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`);
+          const mediaResponse = await fetch(apiUrl);
+          const responseStatus = mediaResponse.status;
+          
+          console.log(`[AI SUGGESTIONS] Instagram API response status: ${responseStatus}`);
           
           if (mediaResponse.ok) {
             const mediaData = await mediaResponse.json();
+            console.log(`[AI SUGGESTIONS] Raw API response structure:`, {
+              hasData: !!mediaData.data,
+              dataLength: mediaData.data?.length || 0,
+              hasError: !!mediaData.error,
+              errorMessage: mediaData.error?.message
+            });
+            
             const posts = mediaData.data || [];
             
             if (posts.length > 0) {
+              // Log first few posts for debugging
+              console.log(`[AI SUGGESTIONS] Sample posts data:`, posts.slice(0, 3).map((p: any) => ({
+                id: p.id,
+                likes: p.like_count,
+                comments: p.comments_count,
+                type: p.media_type
+              })));
+              
               // Calculate REAL current averages from actual posts
               const totalLikes = posts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
               const totalComments = posts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
               const avgLikes = Math.round(totalLikes / posts.length);
               const avgComments = Math.round(totalComments / posts.length);
               
-              console.log(`[AI SUGGESTIONS] REAL CURRENT DATA - Posts: ${posts.length}, Total Likes: ${totalLikes}, Total Comments: ${totalComments}`);
-              console.log(`[AI SUGGESTIONS] REAL AVERAGES - Avg Likes: ${avgLikes}, Avg Comments: ${avgComments} (NOT the cached 99!)`);
+              console.log(`[AI SUGGESTIONS] ===== REAL ENGAGEMENT CALCULATION =====`);
+              console.log(`[AI SUGGESTIONS] Posts analyzed: ${posts.length}`);
+              console.log(`[AI SUGGESTIONS] Total Likes across all posts: ${totalLikes}`);
+              console.log(`[AI SUGGESTIONS] Total Comments across all posts: ${totalComments}`);
+              console.log(`[AI SUGGESTIONS] Average Likes per post: ${avgLikes}`);
+              console.log(`[AI SUGGESTIONS] Average Comments per post: ${avgComments}`);
+              console.log(`[AI SUGGESTIONS] THIS SHOULD NOT BE 99 IF REFRESH WORKED!`);
               
               // Update account with REAL fresh data
               instagramAccount = {
@@ -2066,6 +2094,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
               };
               
               // Save updated real data to database
+              console.log(`[AI SUGGESTIONS] Updating database with new averages: likes=${avgLikes}, comments=${avgComments}`);
               await storage.updateSocialAccount(instagramAccount.id!, {
                 avgLikes,
                 avgComments,
@@ -2073,15 +2102,20 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                 lastSyncAt: new Date()
               });
               
-              console.log(`[AI SUGGESTIONS] Database updated with REAL current data for @${instagramAccount.username}`);
+              console.log(`[AI SUGGESTIONS] ✅ Database updated with REAL current data for @${instagramAccount.username}`);
+            } else {
+              console.warn(`[AI SUGGESTIONS] No posts found in API response - using cached data`);
             }
           } else {
-            console.warn(`[AI SUGGESTIONS] Instagram API call failed: ${mediaResponse.status}`);
+            const errorText = await mediaResponse.text();
+            console.error(`[AI SUGGESTIONS] Instagram API call failed with status ${responseStatus}: ${errorText}`);
           }
         } catch (refreshError) {
-          console.warn(`[AI SUGGESTIONS] Could not refresh Instagram data:`, refreshError);
+          console.error(`[AI SUGGESTIONS] Exception during Instagram data refresh:`, refreshError);
           // Continue with existing data if refresh fails
         }
+      } else {
+        console.warn(`[AI SUGGESTIONS] No Instagram account or access token available for refresh`);
       }
       
       console.log('[AI SUGGESTIONS] Final Instagram account data (after refresh):', {

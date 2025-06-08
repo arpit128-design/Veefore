@@ -3017,7 +3017,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const caption = data.choices[0].message.content?.trim() || '';
 
       // Deduct credits
-      await creditService.consumeCredits(userId, 'ai_caption', creditCost, 'AI caption generation');
+      await creditService.consumeCredits(userId, 'ai-caption', creditCost, 'AI caption generation');
 
       res.json({ 
         caption,
@@ -3088,7 +3088,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const hashtags = hashtagText.split(/\s+/).filter((tag: any) => tag.startsWith('#'));
 
       // Deduct credits
-      await creditService.consumeCredits(userId, 'ai_hashtags', creditCost, 'AI hashtag generation');
+      await creditService.consumeCredits(userId, 'hashtag-generation', creditCost, 'AI hashtag generation');
 
       res.json({ 
         hashtags,

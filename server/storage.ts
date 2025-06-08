@@ -76,6 +76,7 @@ export interface IStorage {
   // Automation rules
   getAutomationRules(workspaceId: number | string): Promise<AutomationRule[]>;
   getActiveAutomationRules(): Promise<AutomationRule[]>;
+  getAutomationRulesByType(type: string): Promise<AutomationRule[]>;
   createAutomationRule(rule: InsertAutomationRule): Promise<AutomationRule>;
   updateAutomationRule(id: string, updates: Partial<AutomationRule>): Promise<AutomationRule>;
   deleteAutomationRule(id: string): Promise<void>;
@@ -559,6 +560,13 @@ export class MemStorage implements IStorage {
 
   async getActiveAutomationRules(): Promise<AutomationRule[]> {
     return Array.from(this.automationRules.values()).filter(rule => rule.isActive);
+  }
+
+  async getAutomationRulesByType(type: string): Promise<AutomationRule[]> {
+    return Array.from(this.automationRules.values()).filter(rule => 
+      rule.isActive && 
+      (rule.trigger?.type === type || rule.action?.type === type)
+    );
   }
 
   async createAutomationRule(insertRule: InsertAutomationRule): Promise<AutomationRule> {

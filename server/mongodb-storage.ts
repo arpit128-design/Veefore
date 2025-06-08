@@ -1163,6 +1163,43 @@ export class MongoStorage implements IStorage {
     }
   }
 
+  async getAutomationRulesByType(type: string): Promise<AutomationRule[]> {
+    await this.connect();
+    try {
+      console.log(`[MONGODB DEBUG] getAutomationRulesByType - type: ${type}`);
+      
+      const rules = await AutomationRuleModel.find({ 
+        isActive: true,
+        type: type
+      });
+      
+      console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules of type ${type}`);
+      
+      return rules.map(rule => {
+        const trigger = rule.trigger || {};
+        const action = rule.action || {};
+        
+        return {
+          id: rule._id.toString(),
+          name: rule.name || '',
+          workspaceId: parseInt(rule.workspaceId),
+          description: rule.description || null,
+          isActive: rule.isActive !== false,
+          type: rule.type || type,
+          trigger: trigger,
+          action: action,
+          lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
+          nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
+          createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
+          updatedAt: rule.updatedAt ? new Date(rule.updatedAt) : new Date()
+        };
+      });
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] getAutomationRulesByType error:', error.message);
+      return [];
+    }
+  }
+
   async createAutomationRule(rule: InsertAutomationRule): Promise<AutomationRule> {
     await this.connect();
     try {

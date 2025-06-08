@@ -49,16 +49,25 @@ export class EnhancedAutoDMService {
         return;
       }
 
-      // Find workspace and automation rules for this Instagram account
-      const automationRules = await this.storage.getAutomationRulesByTrigger('instagram_dm');
+      // Find workspace and automation rules for DM type
+      console.log('[ENHANCED DM] Looking for active DM automation rules');
+      const automationRules = await this.storage.getAutomationRulesByType('dm');
+      console.log(`[ENHANCED DM] Found ${automationRules.length} DM rules`);
       
       for (const rule of automationRules) {
-        if (!rule.isActive) continue;
+        if (!rule.isActive) {
+          console.log(`[ENHANCED DM] Skipping inactive rule: ${rule.name}`);
+          continue;
+        }
 
+        console.log(`[ENHANCED DM] Processing rule: ${rule.name} for workspace: ${rule.workspaceId}`);
         const socialAccounts = await this.storage.getSocialAccountsByWorkspace(rule.workspaceId.toString());
+        console.log(`[ENHANCED DM] Found ${socialAccounts.length} social accounts for workspace`);
+        
         const instagramAccount = socialAccounts.find(acc => 
-          acc.platform === 'instagram' && acc.accountId === recipientId
+          acc.platform === 'instagram'
         );
+        console.log(`[ENHANCED DM] Instagram account found:`, instagramAccount ? 'YES' : 'NO');
 
         if (!instagramAccount) continue;
 

@@ -533,7 +533,8 @@ export class MongoStorage implements IStorage {
 
   // Helper methods for data conversion
   private convertUser(mongoUser: any): User {
-    return {
+    console.log(`[USER CONVERT] Raw MongoDB user isOnboarded:`, mongoUser.isOnboarded, `(type: ${typeof mongoUser.isOnboarded})`);
+    const converted = {
       id: mongoUser._id.toString(),
       firebaseUid: mongoUser.firebaseUid,
       email: mongoUser.email,
@@ -549,10 +550,12 @@ export class MongoStorage implements IStorage {
       totalEarned: mongoUser.totalEarned || 0,
       referredBy: mongoUser.referredBy || null,
       preferences: mongoUser.preferences || {},
-      isOnboarded: mongoUser.isOnboarded || false,
+      isOnboarded: mongoUser.isOnboarded === true,
       createdAt: mongoUser.createdAt,
       updatedAt: mongoUser.updatedAt
     };
+    console.log(`[USER CONVERT] Converted user isOnboarded:`, converted.isOnboarded);
+    return converted;
   }
 
   private convertWorkspace(mongoWorkspace: any): Workspace {

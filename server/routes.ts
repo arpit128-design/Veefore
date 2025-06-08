@@ -110,6 +110,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   // Get current user
   app.get('/api/user', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log(`[API] /api/user - User ${req.user.id} isOnboarded: ${req.user.isOnboarded} (type: ${typeof req.user.isOnboarded})`);
       res.json(req.user);
     } catch (error: any) {
       console.error('Error fetching user:', error);

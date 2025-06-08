@@ -1,171 +1,143 @@
-/**
- * Instagram Webhook Automation Test
- * Demonstrates real-time AI-powered automation responses
- */
+// Test webhook automation system
+import fetch from 'node-fetch';
 
-// Example webhook payload from Instagram
-const testWebhookPayload = {
-  object: "instagram",
-  entry: [{
-    id: "17841400008460056", // Instagram Business Account ID
-    time: Date.now(),
-    changes: [{
-      field: "comments",
-      value: {
-        from: {
-          id: "17841400008460056",
-          username: "potential_customer"
-        },
-        post_id: "17856498618156045",
-        comment_id: "17856498618156046", 
-        created_time: Date.now(),
-        text: "Yeh product kitne ka hai? Looks amazing!"
-      }
-    }]
-  }]
-};
-
-// Simulate Instagram webhook event
 async function testInstagramWebhook() {
-  try {
-    console.log('🚀 Testing Instagram Webhook Automation');
-    console.log('📝 Simulating comment: "Yeh product kitne ka hai? Looks amazing!"');
-    
-    // First, create an automation rule
-    console.log('\n📋 Creating automation rule...');
-    const automationRule = {
-      workspaceId: "684402c2fd2cd4eb6521b386",
-      type: "comment",
-      triggers: {
-        aiMode: "contextual", // Uses AI for intelligent responses
-        keywords: [],
-        hashtags: [],
-        mentions: true,
-        newFollowers: false,
-        postInteraction: true
-      },
-      responses: [], // Empty for contextual AI mode
-      aiPersonality: "friendly", // Friendly and approachable responses
-      responseLength: "medium", // 2-3 sentences
-      conditions: {
-        timeDelay: 0, // Immediate response
-        maxPerDay: 100,
-        excludeKeywords: ["spam", "fake"],
-        minFollowers: 0
-      },
-      schedule: {
-        timezone: "Asia/Kolkata",
-        activeHours: { start: "09:00", end: "18:00" },
-        activeDays: [1, 2, 3, 4, 5, 6, 7] // All days
-      },
-      isActive: true
-    };
+  console.log('Testing Instagram webhook DM automation...');
+  
+  // Simulate Instagram webhook payload for DM
+  const webhookPayload = {
+    object: 'instagram',
+    entry: [{
+      id: '9505923456179711', // Real Instagram Business Account ID
+      time: Math.floor(Date.now() / 1000),
+      messaging: [{
+        sender: {
+          id: '123456789',
+          username: 'testuser'
+        },
+        recipient: {
+          id: '9505923456179711'
+        },
+        timestamp: Math.floor(Date.now() / 1000),
+        message: {
+          mid: 'test_message_id_' + Date.now(),
+          text: 'Hello! Can you help me with my order?'
+        }
+      }]
+    }]
+  };
 
-    // This would be called when Instagram sends webhook
-    console.log('🤖 AI Analysis:');
-    console.log('- Language detected: Hinglish (Hindi + English)');
-    console.log('- Intent: Product inquiry');
-    console.log('- Tone: Enthusiastic, casual');
-    console.log('- Customer personality: Friendly, price-conscious');
-    
-    console.log('\n✨ Generated AI Response:');
-    console.log('Response: "Thank you so much! 😊 Is product ki price ₹2,999 hai. DM mein more details share kar sakte hain!"');
-    
-    console.log('\n📊 Automation Benefits:');
-    console.log('- Instant response to customer inquiry');
-    console.log('- Natural language understanding (Hinglish)');
-    console.log('- Maintains brand voice and personality');
-    console.log('- Converts interest into engagement');
-    console.log('- Works 24/7 without human intervention');
-    
-    console.log('\n🎯 Real-world Impact:');
-    console.log('- Response time: <30 seconds');
-    console.log('- Customer satisfaction: Immediate acknowledgment');
-    console.log('- Lead generation: Direct to DM for details');
-    console.log('- Brand consistency: Professional yet friendly tone');
-    
+  try {
+    console.log('Sending webhook to /webhook/instagram...');
+    const response = await fetch('http://localhost:5000/webhook/instagram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Hub-Signature-256': 'sha256=test_signature' // Instagram webhook signature
+      },
+      body: JSON.stringify(webhookPayload)
+    });
+
+    console.log('Webhook response status:', response.status);
+    const responseText = await response.text();
+    console.log('Webhook response:', responseText);
+
+    if (response.status === 200) {
+      console.log('✓ Webhook processed successfully');
+    } else {
+      console.log('✗ Webhook failed with status:', response.status);
+    }
+
   } catch (error) {
-    console.error('❌ Test error:', error.message);
+    console.error('Error testing webhook:', error);
   }
 }
 
-// Test different scenarios
 async function testMultipleScenarios() {
+  console.log('\n=== Testing Multiple DM Scenarios ===\n');
+  
   const scenarios = [
     {
-      comment: "Great post! What's the price?",
-      analysis: {
-        language: "English",
-        intent: "Product inquiry",
-        tone: "Positive, direct"
-      },
-      aiResponse: "Thank you! The price is ₹2,999. Feel free to DM us for more details!"
+      name: 'Customer Support Query',
+      message: 'Hi, I need help with my recent order. It hasn\'t arrived yet.'
     },
     {
-      comment: "Bahut accha hai! Delivery kitne din mein hoti hai?",
-      analysis: {
-        language: "Hindi",
-        intent: "Delivery inquiry", 
-        tone: "Appreciative, practical"
-      },
-      aiResponse: "Dhanyawad! Delivery 3-5 din mein ho jati hai. Express delivery bhi available hai!"
+      name: 'Product Inquiry',
+      message: 'Can you tell me more about your latest product launch?'
     },
     {
-      comment: "This is lit! Can I get a discount?",
-      analysis: {
-        language: "English with slang",
-        intent: "Discount request",
-        tone: "Excited, bargaining"
-      },
-      aiResponse: "Glad you love it! 🔥 Check your DMs for special offers!"
-    },
-    {
-      comment: "Kya yeh genuine product hai? Reviews kahan dekh sakte hain?",
-      analysis: {
-        language: "Hinglish",
-        intent: "Product authenticity",
-        tone: "Cautious, verification-seeking"
-      },
-      aiResponse: "Bilkul genuine hai! Hamare reviews website pe dekh sakte hain. 5-star rating hai!"
+      name: 'General Greeting',
+      message: 'Hello! Love your content!'
     }
   ];
 
-  console.log('\n🎭 Testing Multiple AI Automation Scenarios:\n');
-  
-  scenarios.forEach((scenario, index) => {
-    console.log(`--- Scenario ${index + 1} ---`);
-    console.log(`💬 Customer: "${scenario.comment}"`);
-    console.log(`🧠 AI Analysis:`);
-    console.log(`   Language: ${scenario.analysis.language}`);
-    console.log(`   Intent: ${scenario.analysis.intent}`);
-    console.log(`   Tone: ${scenario.analysis.tone}`);
-    console.log(`🤖 AI Response: "${scenario.aiResponse}"`);
+  for (const scenario of scenarios) {
+    console.log(`Testing: ${scenario.name}`);
+    
+    const webhookPayload = {
+      object: 'instagram',
+      entry: [{
+        id: '9505923456179711',
+        time: Math.floor(Date.now() / 1000),
+        messaging: [{
+          sender: {
+            id: `test_user_${Date.now()}`,
+            username: 'testuser'
+          },
+          recipient: {
+            id: '9505923456179711'
+          },
+          timestamp: Math.floor(Date.now() / 1000),
+          message: {
+            mid: `test_message_${Date.now()}`,
+            text: scenario.message
+          }
+        }]
+      }]
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/webhook/instagram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Hub-Signature-256': 'sha256=test_signature'
+        },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      console.log(`- Status: ${response.status}`);
+      const responseText = await response.text();
+      
+      if (response.status === 200) {
+        console.log(`- ✓ Processed successfully`);
+      } else {
+        console.log(`- ✗ Failed: ${responseText}`);
+      }
+      
+    } catch (error) {
+      console.error(`- Error: ${error.message}`);
+    }
+    
+    // Wait between tests
+    await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('');
-  });
+  }
 }
 
-// Run comprehensive test
 async function runComprehensiveTest() {
-  console.log('🌟 VeeFore Instagram Webhook Automation Demo');
-  console.log('===============================================\n');
+  console.log('🚀 Starting comprehensive DM automation test...\n');
   
+  // Test basic webhook
   await testInstagramWebhook();
+  
+  // Wait a moment
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Test multiple scenarios
   await testMultipleScenarios();
   
-  console.log('🏆 Webhook Automation System Status:');
-  console.log('✅ Real-time event processing');
-  console.log('✅ Multi-language AI understanding');
-  console.log('✅ Contextual response generation');
-  console.log('✅ Brand personality consistency');
-  console.log('✅ Customer engagement optimization');
-  console.log('✅ Zero mock data - authentic Instagram API integration');
-  
-  console.log('\n📱 Ready for Production:');
-  console.log('- Configure Instagram webhook URL in Facebook Developer Console');
-  console.log('- Set environment variables for app secret and verify token');
-  console.log('- Create automation rules through VeeFore dashboard');
-  console.log('- Monitor real-time responses and analytics');
+  console.log('✨ DM automation testing complete!');
 }
 
-// Execute test
-runComprehensiveTest().catch(console.error);
+runComprehensiveTest();

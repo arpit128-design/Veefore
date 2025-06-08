@@ -2934,6 +2934,58 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Debug endpoint to update automation rules structure
+  app.post('/api/debug/update-automation-rules', async (req, res) => {
+    try {
+      const { workspaceId } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId required' });
+      }
+
+      // Get existing automation rules
+      const existingRules = await storage.getAutomationRules(workspaceId);
+      console.log(`[DEBUG] Found ${existingRules.length} existing automation rules`);
+
+      // Update each rule to have proper DM structure
+      let updatedCount = 0;
+      for (const rule of existingRules) {
+        try {
+          await storage.updateAutomationRule(rule.id, {
+            trigger: {
+              type: 'dm',
+              aiMode: 'contextual',
+              keywords: [],
+              hashtags: [],
+              mentions: false,
+              newFollowers: false,
+              postInteraction: false
+            },
+            action: {
+              type: 'dm',
+              responses: [],
+              aiPersonality: 'friendly',
+              responseLength: 'medium'
+            }
+          });
+          updatedCount++;
+          console.log(`[DEBUG] Updated rule: ${rule.name} (${rule.id})`);
+        } catch (error) {
+          console.error(`[DEBUG] Failed to update rule ${rule.id}:`, error);
+        }
+      }
+
+      res.json({ 
+        message: `Updated ${updatedCount} automation rules`,
+        updatedCount,
+        totalRules: existingRules.length
+      });
+    } catch (error: any) {
+      console.error('[DEBUG] Update automation rules error:', error);
+      res.status(500).json({ error: 'Failed to update automation rules' });
+    }
+  });
+
   app.post('/api/automation/rules', requireAuth, async (req, res) => {
     try {
       const { 

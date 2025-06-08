@@ -2958,15 +2958,30 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(400).json({ error: 'Responses required for keyword mode' });
       }
 
-      const rule = await storage.createAutomationRule?.({
-        workspaceId,
-        type,
-        triggers,
+      // Convert frontend format to webhook-compatible format
+      const trigger = {
+        type: type, // 'dm' or 'comment'
+        aiMode: triggers?.aiMode || 'contextual',
+        keywords: triggers?.keywords || [],
+        hashtags: triggers?.hashtags || [],
+        mentions: triggers?.mentions || false,
+        newFollowers: triggers?.newFollowers || false,
+        postInteraction: triggers?.postInteraction || false
+      };
+
+      const action = {
+        type: type, // 'dm' or 'comment'
         responses: responses || [],
         aiPersonality: aiPersonality || 'friendly',
-        responseLength: responseLength || 'medium',
-        conditions: conditions || {},
-        schedule: schedule || null,
+        responseLength: responseLength || 'medium'
+      };
+
+      const rule = await storage.createAutomationRule?.({
+        name: `Instagram Auto-Reply (${type.toUpperCase()})`,
+        workspaceId,
+        description: `Automated ${type} responses with AI`,
+        trigger,
+        action,
         isActive: isActive !== undefined ? isActive : true
       });
 

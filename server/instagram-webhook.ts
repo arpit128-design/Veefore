@@ -227,17 +227,22 @@ export class InstagramWebhookHandler {
         action: rule.action
       })));
 
-      // Find DM automation rules
+      // Find DM automation rules - check for both trigger.type and action.type
       const dmRules = automationRules.filter(rule => {
-        console.log(`[WEBHOOK] Checking rule ${rule.name}: active=${rule.isActive}, trigger=`, rule.trigger);
+        console.log(`[WEBHOOK] Checking rule ${rule.name}: active=${rule.isActive}, trigger=`, rule.trigger, 'action=', rule.action);
         
         const isActive = rule.isActive;
         const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
-        const isDmType = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
+        const hasAction = rule.action && typeof rule.action === 'object';
         
-        console.log(`[WEBHOOK] Rule ${rule.name} filters: active=${isActive}, hasTrigger=${hasTrigger}, isDmType=${isDmType}`);
+        // Check for DM type in either trigger or action
+        const isDmTypeTrigger = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
+        const isDmTypeAction = hasAction && ('type' in rule.action) && rule.action.type === 'dm';
+        const isDmType = isDmTypeTrigger || isDmTypeAction;
         
-        return isActive && hasTrigger && isDmType;
+        console.log(`[WEBHOOK] Rule ${rule.name} filters: active=${isActive}, hasTrigger=${hasTrigger}, hasAction=${hasAction}, isDmType=${isDmType}`);
+        
+        return isActive && (hasTrigger || hasAction) && isDmType;
       });
 
       console.log(`[WEBHOOK] Found ${dmRules.length} DM rules out of ${automationRules.length} total rules`);

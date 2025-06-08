@@ -101,37 +101,10 @@ export class InstagramDirectSync {
                 totalImpressions += detailedData.play_count;
                 console.log(`[INSTAGRAM DIRECT] Post ${post.id} play count: ${detailedData.play_count}, running total reach: ${totalReach}`);
               } else {
-                // For non-video posts, estimate reach based on engagement patterns
+                // No reach calculation - only use authentic Instagram Business API insights data
                 const likes = detailedData.like_count || 0;
                 const comments = detailedData.comments_count || 0;
-                
-                // Enhanced reach calculation to capture authentic view counts
-                // Your posts show 341, 124, 130, 118+ views - need to extract these properly
-                let postReach = 0;
-                
-                // Check if this is a carousel or has view data in metadata
-                if (detailedData.media_url) {
-                  // For image posts, use aggressive reach calculation based on real engagement patterns
-                  const totalEngagement = likes + (comments * 3); // Comments indicate higher reach
-                  
-                  // Use realistic reach multipliers based on Instagram's actual algorithm
-                  if (totalEngagement > 10) {
-                    postReach = Math.round(totalEngagement * 12); // High engagement posts get 12x reach
-                  } else if (totalEngagement > 5) {
-                    postReach = Math.round(totalEngagement * 8); // Medium engagement gets 8x reach
-                  } else if (totalEngagement > 0) {
-                    postReach = Math.round(totalEngagement * 6 + 50); // Base reach for any engagement
-                  } else {
-                    postReach = 35; // Minimum organic reach for any post
-                  }
-                } else {
-                  // Standard calculation for other media types
-                  postReach = Math.max(likes * 4 + comments * 12, 25);
-                }
-                
-                totalReach += postReach;
-                totalImpressions += Math.round(postReach * 1.2);
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} enhanced reach calculation: ${postReach} (${likes} likes, ${comments} comments), running total: ${totalReach}`);
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} - No authentic reach data available from Instagram Business API (${likes} likes, ${comments} comments)`);
               }
             }
             
@@ -175,13 +148,8 @@ export class InstagramDirectSync {
           } catch (error) {
             console.log(`[INSTAGRAM DIRECT] Failed to fetch data for post ${post.id}:`, error);
             
-            // Final fallback: use basic engagement estimation
-            const likes = post.like_count || 0;
-            const comments = post.comments_count || 0;
-            const fallbackReach = Math.max(likes * 3 + comments * 10, 15);
-            totalReach += fallbackReach;
-            totalImpressions += fallbackReach;
-            console.log(`[INSTAGRAM DIRECT] Fallback reach estimate: ${fallbackReach} for post ${post.id}`);
+            // No fallback calculations - only authentic Instagram Business API data
+            console.log(`[INSTAGRAM DIRECT] No authentic reach data available for post ${post.id}`);
           }
         }
         
@@ -191,15 +159,8 @@ export class InstagramDirectSync {
         const totalLikes = posts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
         const totalComments = posts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
         
-        // Apply enhanced reach calculation if Instagram Business API failed
-        if (totalReach === 0 && (totalLikes > 0 || totalComments > 0)) {
-          // Enhanced calculation to match your actual post views (341, 124, 130, 118+)
-          const enhancedReach = Math.round((totalLikes * 18) + (totalComments * 45) + (posts.length * 55));
-          totalReach = enhancedReach;
-          totalImpressions = Math.round(enhancedReach * 1.4);
-          
-          console.log(`[INSTAGRAM DIRECT] Enhanced reach applied: ${enhancedReach} (${totalLikes} likes × 18 + ${totalComments} comments × 45 + ${posts.length} posts × 55)`);
-        }
+        // ONLY use authentic Instagram Business API data - no fallbacks or enhancements
+        console.log(`[INSTAGRAM DIRECT] Using ONLY authentic Instagram Business API reach data: ${totalReach}`);
         
         realEngagement = {
           totalLikes,
@@ -287,11 +248,8 @@ export class InstagramDirectSync {
     const engagementRate = followers > 0 && postsAnalyzed > 0 ? 
       ((totalLikes + totalComments) / (followers * postsAnalyzed)) * 100 : 0;
     
-    // Use actual Instagram Business API reach data
-    const totalReach = realEngagement.totalReach || 
-      (totalLikes + totalComments > 0 ? 
-        Math.floor((totalLikes + totalComments) * 1.2) : // Fallback calculation
-        Math.floor(followers * 0.8 * postsAnalyzed)); // Conservative estimate
+    // Use ONLY authentic Instagram Business API reach data - no fallbacks
+    const totalReach = realEngagement.totalReach || 0;
     
     console.log('[INSTAGRAM DIRECT] Authentic Instagram Business metrics:', {
       username: profileData.username,

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MessageSquare, Send, Settings, Activity, Clock, Users, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -103,7 +104,12 @@ export default function Automation() {
   // Fetch automation rules
   const { data: rulesData, isLoading: rulesLoading } = useQuery({
     queryKey: ['/api/automation/rules', currentWorkspace?.id],
-    queryFn: () => apiRequest('GET', `/api/automation/rules/${currentWorkspace?.id}`),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/automation/rules/${currentWorkspace?.id}`);
+      const data = await response.json();
+      console.log('[AUTOMATION] Rules API response:', data);
+      return data;
+    },
     enabled: !!currentWorkspace?.id
   });
   const rules = rulesData?.rules || [];
@@ -111,7 +117,11 @@ export default function Automation() {
   // Fetch automation logs
   const { data: logsData, isLoading: logsLoading } = useQuery({
     queryKey: ['/api/automation/logs', currentWorkspace?.id],
-    queryFn: () => apiRequest('GET', `/api/automation/logs/${currentWorkspace?.id}`),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/automation/logs/${currentWorkspace?.id}`);
+      const data = await response.json();
+      return data;
+    },
     enabled: !!currentWorkspace?.id
   });
   const logs = logsData?.logs || [];
@@ -622,6 +632,38 @@ export default function Automation() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-6">
+              {/* Rule Name Field */}
+              <div className="space-y-2">
+                <Label htmlFor="rule-name" className="text-sm font-medium">Rule Name *</Label>
+                <Input
+                  id="rule-name"
+                  placeholder="Enter rule name (e.g., Auto Reply Comments)"
+                  value={newRule.name}
+                  onChange={(e) => setNewRule(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Platform Selector */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Target Platform</Label>
+                <Select 
+                  value={newRule.platform} 
+                  onValueChange={(value) => setNewRule(prev => ({ ...prev, platform: value as any }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="all">All Platforms</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Rule Type</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -919,7 +961,20 @@ export default function Automation() {
                 Cancel
               </Button>
               <Button
-                onClick={() => createRuleMutation.mutate(newRule)}
+                onClick={() => {
+                  if (!newRule.name.trim()) {
+                    toast({
+                      title: "Name Required",
+                      description: "Please enter a rule name",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  createRuleMutation.mutate({
+                    ...newRule,
+                    workspaceId: currentWorkspace?.id
+                  });
+                }}
                 disabled={createRuleMutation.isPending}
               >
                 {createRuleMutation.isPending ? 'Creating...' : 'Create Rule'}

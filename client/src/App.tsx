@@ -96,6 +96,14 @@ function Router() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Check for completion flag and clear it
+  useEffect(() => {
+    const justCompleted = localStorage.getItem('onboarding_just_completed');
+    if (justCompleted === 'true') {
+      localStorage.removeItem('onboarding_just_completed');
+    }
+  }, []);
+
   if (loading || showLoader) {
     return <SpaceLoader message="Connecting to VeeFore Network" />;
   }
@@ -118,7 +126,16 @@ function Router() {
   // Check if user needs onboarding
   console.log('[ROUTER] User state:', { username: user?.username, isOnboarded: user?.isOnboarded });
   
-  // Allow onboarding page access for non-onboarded users or during completion
+  // Check if user just completed onboarding
+  const justCompleted = localStorage.getItem('onboarding_just_completed') === 'true';
+  
+  // If user just completed onboarding, allow dashboard access regardless of cached user state
+  if (justCompleted) {
+    console.log('[ROUTER] User just completed onboarding, allowing dashboard access');
+    return <AuthenticatedApp />;
+  }
+  
+  // Allow onboarding page access for non-onboarded users
   if (user && !user.isOnboarded && location === '/onboarding') {
     console.log('[ROUTER] User on onboarding page, allowing access');
     return (

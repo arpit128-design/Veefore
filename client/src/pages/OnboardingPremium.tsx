@@ -340,6 +340,10 @@ export default function OnboardingPremium() {
       
       // Force navigation with extended delay to ensure proper data refresh
       console.log('Redirecting to dashboard after workspace creation');
+      
+      // Set a flag in localStorage to prevent route protection conflicts
+      localStorage.setItem('onboarding_just_completed', 'true');
+      
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 2000);

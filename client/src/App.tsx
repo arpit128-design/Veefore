@@ -58,7 +58,6 @@ function AuthenticatedApp() {
               <Route path="/scheduler" component={Scheduler} />
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />
-              <Route path="/ai-features" component={AIFeatures} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/workspaces" component={Workspaces} />
               <Route path="/team" component={TeamManagement} />

@@ -7,11 +7,25 @@ import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Flame, Music, Hash, Clock, RefreshCw, Zap } from "lucide-react";
 import { auth } from "@/lib/firebase";
+import { UpgradeModal } from "@/components/modals/UpgradeModal";
+import { useState } from "react";
 
 export default function Suggestions() {
   const { currentWorkspace } = useWorkspaceContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    featureType: "",
+    creditsRequired: 0,
+    currentCredits: 0
+  });
+
+  // Fetch user data to get current credits
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  });
 
   const { data: suggestionsResponse, refetch, isLoading } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
@@ -38,26 +52,28 @@ export default function Suggestions() {
   const suggestions = Array.isArray(suggestionsResponse) ? suggestionsResponse : [];
 
   const generateSuggestionsMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!currentWorkspace?.id) {
         throw new Error('No workspace selected');
       }
       
       console.log(`[SUGGESTIONS] Generating new suggestions for workspace: ${currentWorkspace.id} (${currentWorkspace.name})`);
       
-      return apiRequest('POST', '/api/suggestions/generate', {
+      const response = await apiRequest('POST', '/api/suggestions/generate', {
         workspaceId: currentWorkspace.id
       });
+      return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       console.log(`[SUGGESTIONS] Generation successful, invalidating cache for workspace: ${currentWorkspace?.id}`);
       // Clear and invalidate all suggestion-related queries for this workspace
       queryClient.removeQueries({ queryKey: ['suggestions'] });
       queryClient.invalidateQueries({ queryKey: ['suggestions', currentWorkspace?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       
       toast({
         title: "AI Suggestions Generated!",
-        description: "Fresh content ideas are now available.",
+        description: `Used ${data.creditsUsed} credit. ${data.remainingCredits} credits remaining.`,
       });
       
       // Force immediate refetch
@@ -66,11 +82,20 @@ export default function Suggestions() {
       }, 100);
     },
     onError: (error: any) => {
-      toast({
-        title: "Generation Failed",
-        description: error.message || "Failed to generate suggestions",
-        variant: "destructive",
-      });
+      if (error.status === 402 && error.upgradeModal) {
+        setUpgradeModal({
+          isOpen: true,
+          featureType: "AI Suggestions",
+          creditsRequired: 1,
+          currentCredits: user?.credits || 0
+        });
+      } else {
+        toast({
+          title: "Generation Failed",
+          description: error.message || "Failed to generate suggestions",
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -100,10 +125,21 @@ export default function Suggestions() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-nebula-purple">
-          AI Suggestions
-        </h2>
+        <div>
+          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-nebula-purple">
+            AI Suggestions
+          </h2>
+          <p className="text-gray-400 mt-2">
+            Generate personalized content ideas using AI (1 credit per generation)
+          </p>
+        </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-lg px-4 py-2">
+              <Sparkles className="w-4 h-4 mr-2" />
+              {user?.credits || 0} Credits
+            </Badge>
+          </div>
           <div className="flex items-center space-x-2 text-xs md:text-sm text-asteroid-silver">
             <Clock className="h-4 w-4" />
             <span className="hidden sm:inline">Updated 2 hours ago</span>
@@ -311,6 +347,15 @@ export default function Suggestions() {
           )}
         </CardContent>
       </Card>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={upgradeModal.isOpen}
+        onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+        featureType={upgradeModal.featureType}
+        creditsRequired={upgradeModal.creditsRequired}
+        currentCredits={upgradeModal.currentCredits}
+      />
     </div>
   );
 }

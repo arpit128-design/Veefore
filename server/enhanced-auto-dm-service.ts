@@ -7,6 +7,7 @@ export class EnhancedAutoDMService {
   private storage: MongoStorage;
   private memoryService: ConversationMemoryService;
   private tokenManager: InstagramTokenManager;
+  private processedMessages: Set<string> = new Set(); // Track processed message IDs
 
   constructor(storage: MongoStorage) {
     this.storage = storage;
@@ -42,14 +43,32 @@ export class EnhancedAutoDMService {
     
     try {
       const { sender, recipient, message } = messageData;
+      
+      // Better error handling for message structure
+      if (!sender?.id || !recipient?.id || !message?.text || !message?.mid) {
+        console.log('[ENHANCED DM] Skipping message - missing required fields');
+        return;
+      }
+      
       const senderId = sender.id;
       const recipientId = recipient.id;
       const messageText = message.text;
       const messageId = message.mid;
 
-      if (!messageText || !senderId) {
-        console.log('[ENHANCED DM] Skipping non-text message or missing sender');
+      // Check if we've already processed this message to prevent duplicates
+      const messageKey = `${messageId}_${senderId}_${recipientId}`;
+      if (this.processedMessages.has(messageKey)) {
+        console.log(`[ENHANCED DM] Skipping duplicate message: ${messageKey}`);
         return;
+      }
+      
+      // Mark message as processed
+      this.processedMessages.add(messageKey);
+      
+      // Clean up old processed messages (keep only last 1000)
+      if (this.processedMessages.size > 1000) {
+        const keysArray = Array.from(this.processedMessages);
+        keysArray.slice(0, 500).forEach(key => this.processedMessages.delete(key));
       }
 
       // Find workspace and automation rules for DM type
@@ -57,9 +76,12 @@ export class EnhancedAutoDMService {
       const automationRules = await this.storage.getAutomationRulesByType('dm');
       console.log(`[ENHANCED DM] Found ${automationRules.length} DM rules`);
       
+      // Process only the first active rule to prevent duplicate responses
+      let responseGenerated = false;
+      
       for (const rule of automationRules) {
-        if (!rule.isActive) {
-          console.log(`[ENHANCED DM] Skipping inactive rule: ${rule.name}`);
+        if (!rule.isActive || responseGenerated) {
+          console.log(`[ENHANCED DM] Skipping rule: ${rule.name} (${responseGenerated ? 'response already generated' : 'inactive'})`);
           continue;
         }
 
@@ -94,11 +116,18 @@ export class EnhancedAutoDMService {
         );
 
         // Generate contextual AI response using conversation memory
-        const workspace = await this.storage.getWorkspace(rule.workspaceId.toString());
+        // Handle workspace ID format issue safely
+        let workspace = null;
+        try {
+          workspace = await this.storage.getWorkspace(rule.workspaceId.toString());
+        } catch (error) {
+          console.log(`[ENHANCED DM] Could not get workspace ${rule.workspaceId}, using default personality`);
+        }
+        
         const aiResponse = await this.memoryService.generateContextualResponse(
           conversation.id,
           messageText,
-          workspace?.aiPersonality
+          workspace?.aiPersonality || 'professional'
         );
 
         // Get valid Instagram page access token using token manager
@@ -133,6 +162,7 @@ export class EnhancedAutoDMService {
           );
 
           console.log(`[ENHANCED DM] Sent contextual response: ${aiResponse.substring(0, 50)}...`);
+          responseGenerated = true; // Prevent other rules from generating duplicate responses
         } else {
           console.error('[ENHANCED DM] Failed to send Instagram DM response');
         }

@@ -62,24 +62,69 @@ export class InstagramDirectSync {
       const profileData = await profileResponse.json();
       console.log('[INSTAGRAM DIRECT] Real Instagram Business profile:', profileData);
 
-      // Fetch recent media for authentic engagement calculation
+      // Fetch recent media with insights for authentic reach calculation
       const mediaResponse = await fetch(
         `https://graph.instagram.com/me/media?fields=id,like_count,comments_count,timestamp,media_type&limit=25&access_token=${accessToken}`
       );
 
-      let realEngagement = { totalLikes: 0, totalComments: 0, postsAnalyzed: 0 };
+      let realEngagement = { totalLikes: 0, totalComments: 0, postsAnalyzed: 0, totalReach: 0, totalImpressions: 0 };
       
       if (mediaResponse.ok) {
         const mediaData = await mediaResponse.json();
         const posts = mediaData.data || [];
         
+        // Fetch insights for each post to get actual reach data
+        let totalReach = 0;
+        let totalImpressions = 0;
+        
+        console.log(`[INSTAGRAM DIRECT] Processing ${posts.length} posts for individual reach data`);
+        
+        for (const post of posts.slice(0, 15)) { // Process up to 15 recent posts
+          try {
+            console.log(`[INSTAGRAM DIRECT] Fetching insights for post ${post.id}`);
+            const insightsResponse = await fetch(
+              `https://graph.instagram.com/${post.id}/insights?metric=reach,impressions&access_token=${accessToken}`
+            );
+            
+            console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights response status:`, insightsResponse.status);
+            
+            if (insightsResponse.ok) {
+              const insightsData = await insightsResponse.json();
+              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights data:`, insightsData);
+              
+              const reachMetric = insightsData.data?.find((metric: any) => metric.name === 'reach');
+              const impressionsMetric = insightsData.data?.find((metric: any) => metric.name === 'impressions');
+              
+              if (reachMetric?.values?.[0]?.value) {
+                const postReach = reachMetric.values[0].value;
+                totalReach += postReach;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach: ${postReach}, running total: ${totalReach}`);
+              }
+              if (impressionsMetric?.values?.[0]?.value) {
+                const postImpressions = impressionsMetric.values[0].value;
+                totalImpressions += postImpressions;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} impressions: ${postImpressions}, running total: ${totalImpressions}`);
+              }
+            } else {
+              const errorText = await insightsResponse.text();
+              console.log(`[INSTAGRAM DIRECT] Post ${post.id} insights error:`, errorText);
+            }
+          } catch (error) {
+            console.log(`[INSTAGRAM DIRECT] Failed to fetch insights for post ${post.id}:`, error);
+          }
+        }
+        
+        console.log(`[INSTAGRAM DIRECT] Final totals - Reach: ${totalReach}, Impressions: ${totalImpressions}`);
+        
         realEngagement = {
           totalLikes: posts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0),
           totalComments: posts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0),
-          postsAnalyzed: posts.length
+          postsAnalyzed: posts.length,
+          totalReach: totalReach,
+          totalImpressions: totalImpressions
         };
         
-        console.log('[INSTAGRAM DIRECT] Authentic engagement from Instagram Business API:', realEngagement);
+        console.log('[INSTAGRAM DIRECT] Authentic engagement and reach from Instagram Business API:', realEngagement);
       } else {
         console.log('[INSTAGRAM DIRECT] Media fetch failed, using zero engagement');
       }
@@ -157,10 +202,11 @@ export class InstagramDirectSync {
     const engagementRate = followers > 0 && postsAnalyzed > 0 ? 
       ((totalLikes + totalComments) / (followers * postsAnalyzed)) * 100 : 0;
     
-    // Authentic reach calculation
-    const totalReach = totalLikes + totalComments > 0 ? 
-      Math.floor((totalLikes + totalComments) * 1.2) : // Based on actual engagement
-      Math.floor(followers * 0.8 * postsAnalyzed); // Conservative estimate
+    // Use actual Instagram Business API reach data
+    const totalReach = realEngagement.totalReach || 
+      (totalLikes + totalComments > 0 ? 
+        Math.floor((totalLikes + totalComments) * 1.2) : // Fallback calculation
+        Math.floor(followers * 0.8 * postsAnalyzed)); // Conservative estimate
     
     console.log('[INSTAGRAM DIRECT] Authentic Instagram Business metrics:', {
       username: profileData.username,

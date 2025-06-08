@@ -267,16 +267,18 @@ export default function Auth() {
           <motion.div
             className="inline-block mb-4"
             animate={{ 
-              rotate: [0, 360],
               scale: [1, 1.1, 1]
             }}
             transition={{ 
-              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
               scale: { duration: 3, repeat: Infinity }
             }}
           >
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center relative overflow-hidden">
-              <Rocket className="w-10 h-10 text-white relative z-10" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center relative overflow-hidden p-4">
+              <img 
+                src="/veefore-logo.png" 
+                alt="VeeFore Logo" 
+                className="w-12 h-12 object-contain relative z-10"
+              />
               
               {/* Orbital rings */}
               <motion.div 

@@ -1802,6 +1802,293 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // ==================== AI SUGGESTIONS FUNCTIONS ====================
+  
+  async function generateInstagramBasedSuggestions(instagramAccount: any) {
+    const suggestions = [];
+    
+    if (!instagramAccount) {
+      // Return basic suggestions when no Instagram account is connected
+      return [
+        {
+          type: 'trending',
+          data: {
+            suggestion: 'Connect your Instagram account to get personalized suggestions',
+            reasoning: 'AI analysis requires real account data to provide relevant recommendations',
+            actionItems: ['Go to Integrations page', 'Connect Instagram Business account', 'Return here for personalized suggestions'],
+            expectedImpact: 'Unlock AI-powered content recommendations',
+            difficulty: 'Easy',
+            timeframe: '5 minutes'
+          },
+          confidence: 95,
+          validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      ];
+    }
+
+    const {
+      username,
+      followersCount = 0,
+      mediaCount = 0,
+      avgLikes = 0,
+      avgComments = 0,
+      avgReach = 0,
+      engagementRate = 0
+    } = instagramAccount;
+
+    // Calculate engagement percentage from stored value (stored as percentage * 100)
+    const engagementPercent = engagementRate ? engagementRate / 100 : 0;
+    
+    // Log the real data being analyzed
+    console.log(`[AI SUGGESTIONS] Real Instagram metrics:`, {
+      username,
+      followers: followersCount,
+      posts: mediaCount,
+      avgLikes,
+      avgComments,
+      avgReach,
+      engagementRate: engagementPercent
+    });
+
+    console.log(`[AI SUGGESTIONS] Analyzing @${username}: ${followersCount} followers, ${engagementPercent}% engagement`);
+
+    // Engagement rate analysis
+    if (engagementPercent > 15) {
+      suggestions.push({
+        type: 'trending',
+        data: {
+          suggestion: 'Leverage your exceptional engagement rate with viral content formats',
+          reasoning: `Your ${engagementPercent.toFixed(1)}% engagement rate is outstanding (industry average is 1-3%). Your audience is highly engaged.`,
+          actionItems: [
+            'Create behind-the-scenes content that your engaged audience loves',
+            'Post carousel posts with tips and insights',
+            'Use trending audio with your unique perspective',
+            'Ask questions in captions to boost comments'
+          ],
+          expectedImpact: 'Increase reach by 40-60% with viral potential',
+          difficulty: 'Medium',
+          timeframe: '1-2 weeks'
+        },
+        confidence: 92,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    } else if (avgEngagement < 3) {
+      suggestions.push({
+        type: 'engagement',
+        data: {
+          suggestion: 'Boost engagement with interactive content and community building',
+          reasoning: `Your ${avgEngagement.toFixed(1)}% engagement rate has room for improvement. Focus on creating more interactive content.`,
+          actionItems: [
+            'Post Instagram Stories with polls and questions',
+            'Create carousel posts with swipeable tips',
+            'Use relevant hashtags (5-10 per post)',
+            'Engage with comments within the first hour of posting'
+          ],
+          expectedImpact: 'Increase engagement rate to 3-5%',
+          difficulty: 'Medium',
+          timeframe: '2-3 weeks'
+        },
+        confidence: 88,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Comment-to-like ratio analysis
+    const commentRatio = totalLikes > 0 ? (totalComments / totalLikes) * 100 : 0;
+    if (commentRatio > 20) {
+      suggestions.push({
+        type: 'trending',
+        data: {
+          suggestion: 'Your content sparks conversations - leverage this for viral growth',
+          reasoning: `High comment ratio (${commentRatio.toFixed(1)}%) shows your content generates discussions. This is valuable for algorithm visibility.`,
+          actionItems: [
+            'Create more discussion-starter posts',
+            'Ask controversial but respectful questions',
+            'Share personal stories that resonate',
+            'Respond to every comment to boost engagement further'
+          ],
+          expectedImpact: 'Increase viral potential and reach',
+          difficulty: 'Easy',
+          timeframe: '1 week'
+        },
+        confidence: 90,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Content volume analysis
+    if (mediaCount < 10) {
+      suggestions.push({
+        type: 'growth',
+        data: {
+          suggestion: 'Increase posting consistency to build audience momentum',
+          reasoning: `With ${mediaCount} posts, increasing content volume will help establish your presence and improve algorithm visibility.`,
+          actionItems: [
+            'Aim for 3-4 posts per week minimum',
+            'Create content batches on weekends',
+            'Use Instagram Stories daily for engagement',
+            'Repurpose content across different formats'
+          ],
+          expectedImpact: 'Build audience and improve discoverability',
+          difficulty: 'Medium',
+          timeframe: '1 month'
+        },
+        confidence: 85,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Follower count specific strategies
+    if (followersCount < 100) {
+      suggestions.push({
+        type: 'growth',
+        data: {
+          suggestion: 'Focus on niche content and local engagement to reach 1K followers',
+          reasoning: `At ${followersCount} followers, you're in the foundation building phase. Quality engagement over quantity is key.`,
+          actionItems: [
+            'Post high-quality content in your niche consistently',
+            'Engage with 20-30 accounts in your niche daily',
+            'Use location tags for local discovery',
+            'Collaborate with accounts of similar size'
+          ],
+          expectedImpact: 'Steady growth to 500-1000 followers',
+          difficulty: 'Medium',
+          timeframe: '2-3 months'
+        },
+        confidence: 87,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Audio trending suggestion
+    suggestions.push({
+      type: 'audio',
+      data: {
+        suggestion: 'Use trending audio with your unique content angle',
+        reasoning: 'Trending audio can increase reach by 3-5x when paired with engaging visuals and relevant content.',
+        actionItems: [
+          'Check Instagram Reels for currently trending sounds',
+          'Create content that naturally fits the trending audio',
+          'Post during peak hours (6-9 PM local time)',
+          'Add captions since many users watch without sound'
+        ],
+        expectedImpact: 'Potential viral reach and discovery',
+        difficulty: 'Easy',
+        timeframe: 'This week'
+      },
+      confidence: 83,
+      validUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    });
+
+    // Hashtag strategy
+    suggestions.push({
+      type: 'hashtag',
+      data: {
+        suggestion: 'Optimize hashtag strategy with mix of popular and niche tags',
+        reasoning: 'Strategic hashtag use can increase post reach by 12-70% when targeting the right audience segments.',
+        actionItems: [
+          'Use 5-10 hashtags per post (Instagram\'s sweet spot)',
+          'Mix popular hashtags (100K+ posts) with niche ones (10K-100K)',
+          'Create a branded hashtag for your community',
+          'Research competitor hashtags for inspiration'
+        ],
+        expectedImpact: 'Increase discoverability and reach',
+        difficulty: 'Easy',
+        timeframe: 'Immediate'
+      },
+      confidence: 85,
+      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    });
+
+    console.log(`[AI SUGGESTIONS] Generated ${suggestions.length} personalized suggestions for @${username}`);
+    return suggestions;
+  }
+
+  // ==================== AI SUGGESTIONS ROUTES ====================
+  
+  // Get AI suggestions for workspace
+  app.get('/api/suggestions', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const workspaceId = req.query.workspaceId;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+      
+      // Get suggestions from storage
+      const suggestions = await storage.getSuggestionsByWorkspace(workspaceId);
+      
+      console.log(`[SUGGESTIONS] Found ${suggestions.length} suggestions for workspace ${workspaceId}`);
+      res.json(suggestions);
+    } catch (error: any) {
+      console.error('[SUGGESTIONS] Failed to get suggestions:', error);
+      res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+  });
+
+  // Generate new AI suggestions based on real Instagram data
+  app.post('/api/suggestions/generate', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { workspaceId } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+      
+      console.log(`[AI SUGGESTIONS] Generating suggestions for workspace ${workspaceId}`);
+      
+      // Clear old suggestions before generating new ones
+      console.log(`[AI SUGGESTIONS] Clearing old suggestions for workspace ${workspaceId}`);
+      await storage.clearSuggestionsByWorkspace(workspaceId);
+      
+      // Get workspace and real Instagram data for AI analysis
+      const workspace = await storage.getWorkspace(workspaceId);
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      console.log('[AI SUGGESTIONS] Instagram account data:', {
+        hasAccount: !!instagramAccount,
+        username: instagramAccount?.username,
+        followers: instagramAccount?.followersCount,
+        engagement: instagramAccount?.avgEngagement,
+        totalLikes: instagramAccount?.totalLikes,
+        totalComments: instagramAccount?.totalComments
+      });
+      
+      // Generate AI suggestions based on real data
+      const suggestions = await generateInstagramBasedSuggestions(instagramAccount);
+      
+      // Save suggestions to storage
+      const savedSuggestions = [];
+      for (const suggestion of suggestions) {
+        const saved = await storage.createSuggestion({
+          workspaceId: workspaceId,
+          type: suggestion.type,
+          data: suggestion.data,
+          confidence: suggestion.confidence,
+          validUntil: suggestion.validUntil
+        });
+        savedSuggestions.push(saved);
+      }
+      
+      console.log(`[AI SUGGESTIONS] Generated ${savedSuggestions.length} suggestions based on real Instagram data`);
+      res.json({ 
+        suggestions: savedSuggestions,
+        analysisData: {
+          username: instagramAccount?.username,
+          followers: instagramAccount?.followersCount,
+          engagementRate: instagramAccount?.avgEngagement
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('[AI SUGGESTIONS] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate suggestions' });
+    }
+  });
+
   // Start automatic token refresh scheduler
   setInterval(async () => {
     try {

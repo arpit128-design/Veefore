@@ -1317,18 +1317,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         };
       }
       
-      // Calculate current credit balance from transactions
-      const transactions = await storage.getCreditTransactions(userId);
-      const creditBalance = transactions.reduce((total, transaction) => {
-        return total + transaction.amount;
-      }, 0);
+      // Get user's actual credit balance from database
+      const user = await storage.getUser(userId);
+      const creditBalance = user?.credits || 0;
       
-      console.log(`[SUBSCRIPTION] User ${userId} has ${creditBalance} credits from ${transactions.length} transactions`);
+      console.log(`[SUBSCRIPTION] User ${userId} has ${creditBalance} credits from database`);
       
       res.json({
         ...subscription,
         credits: creditBalance,
-        transactionCount: transactions.length,
         lastUpdated: new Date()
       });
     } catch (error: any) {

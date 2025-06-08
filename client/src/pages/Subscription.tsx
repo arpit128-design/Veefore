@@ -244,19 +244,7 @@ export default function Subscription() {
   console.log('[SUBSCRIPTION DEBUG] Raw subscription object:', subscription);
   console.log('[SUBSCRIPTION DEBUG] Subscription credits property:', subscription?.credits);
   console.log('[SUBSCRIPTION DEBUG] Current credits calculated:', currentCredits);
-  console.log('[SUBSCRIPTION DEBUG] Data status:', {
-    subscription: !!subscription,
-    pricingData: !!pricingData,
-    creditTransactions: !!creditTransactions,
-    currentCredits,
-    calculatedCredits,
-    subscriptionLoading,
-    pricingLoading,
-    transactionsLoading,
-    subscriptionCredits: userSubscription?.credits,
-    transactionCount: creditTransactions?.length,
-    rawSubscriptionCredits: subscription?.credits
-  });
+  console.log('[SUBSCRIPTION DEBUG] User credits from database:', user?.credits);
 
   const planData = pricingData?.plans?.[currentPlan] || {
     id: 'free',

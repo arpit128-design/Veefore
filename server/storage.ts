@@ -1033,4 +1033,4 @@ export class MemStorage implements IStorage {
 import { MongoStorage } from './mongodb-storage';
 
 // Use MongoDB Atlas if connection string is available, otherwise fallback to memory storage
-export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();
+export const storage = (process.env.MONGODB_URI || process.env.DATABASE_URL) ? new MongoStorage() : new MemStorage();

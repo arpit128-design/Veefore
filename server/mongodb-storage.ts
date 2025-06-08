@@ -1017,23 +1017,171 @@ export class MongoStorage implements IStorage {
   }
 
   async getAutomationRules(workspaceId: number): Promise<AutomationRule[]> {
-    return [];
+    await this.connect();
+    try {
+      console.log(`[MONGODB DEBUG] getAutomationRules - workspaceId: ${workspaceId} (${typeof workspaceId})`);
+      
+      const collection = this.db!.collection('automation_rules');
+      const rules = await collection.find({ 
+        workspaceId: workspaceId.toString() 
+      }).toArray();
+      
+      console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules`);
+      
+      return rules.map(rule => ({
+        id: rule._id.toString(),
+        name: rule.name || '',
+        workspaceId: parseInt(rule.workspaceId),
+        description: rule.description || null,
+        isActive: rule.isActive !== false,
+        trigger: rule.trigger || {},
+        action: rule.action || {},
+        lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
+        nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
+        createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
+        updatedAt: rule.updatedAt ? new Date(rule.updatedAt) : new Date()
+      }));
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] getAutomationRules error:', error.message);
+      return [];
+    }
   }
 
   async getActiveAutomationRules(): Promise<AutomationRule[]> {
-    return [];
+    await this.connect();
+    try {
+      const collection = this.db!.collection('automation_rules');
+      const rules = await collection.find({ 
+        isActive: true 
+      }).toArray();
+      
+      return rules.map(rule => ({
+        id: rule._id.toString(),
+        name: rule.name || '',
+        workspaceId: parseInt(rule.workspaceId),
+        description: rule.description || null,
+        isActive: rule.isActive !== false,
+        trigger: rule.trigger || {},
+        action: rule.action || {},
+        lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
+        nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
+        createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
+        updatedAt: rule.updatedAt ? new Date(rule.updatedAt) : new Date()
+      }));
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] getActiveAutomationRules error:', error.message);
+      return [];
+    }
   }
 
   async createAutomationRule(rule: InsertAutomationRule): Promise<AutomationRule> {
-    throw new Error('Not implemented');
+    await this.connect();
+    try {
+      console.log(`[MONGODB DEBUG] Creating automation rule:`, rule);
+      
+      const collection = this.db!.collection('automation_rules');
+      const now = new Date();
+      
+      const ruleData = {
+        name: rule.name,
+        workspaceId: rule.workspaceId.toString(),
+        description: rule.description || null,
+        isActive: rule.isActive !== false,
+        trigger: rule.trigger || {},
+        action: rule.action || {},
+        lastRun: null,
+        nextRun: rule.nextRun || null,
+        createdAt: now,
+        updatedAt: now
+      };
+      
+      const result = await collection.insertOne(ruleData);
+      console.log(`[MONGODB DEBUG] Created automation rule with ID: ${result.insertedId}`);
+      
+      return {
+        id: result.insertedId.toString(),
+        name: ruleData.name,
+        workspaceId: parseInt(ruleData.workspaceId),
+        description: ruleData.description,
+        isActive: ruleData.isActive,
+        trigger: ruleData.trigger,
+        action: ruleData.action,
+        lastRun: ruleData.lastRun,
+        nextRun: ruleData.nextRun,
+        createdAt: ruleData.createdAt,
+        updatedAt: ruleData.updatedAt
+      };
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] createAutomationRule error:', error.message);
+      throw new Error(`Failed to create automation rule: ${error.message}`);
+    }
   }
 
   async updateAutomationRule(id: number, updates: Partial<AutomationRule>): Promise<AutomationRule> {
-    throw new Error('Not implemented');
+    await this.connect();
+    try {
+      console.log(`[MONGODB DEBUG] Updating automation rule ${id}:`, updates);
+      
+      const collection = this.db!.collection('automation_rules');
+      const updateData = {
+        ...updates,
+        updatedAt: new Date()
+      };
+      
+      // Remove fields that shouldn't be updated
+      delete updateData.id;
+      delete updateData.createdAt;
+      
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id.toString()) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      
+      if (!result) {
+        throw new Error('Automation rule not found');
+      }
+      
+      console.log(`[MONGODB DEBUG] Updated automation rule: ${id}`);
+      
+      return {
+        id: result._id.toString(),
+        name: result.name,
+        workspaceId: parseInt(result.workspaceId),
+        description: result.description || null,
+        isActive: result.isActive !== false,
+        trigger: result.trigger || {},
+        action: result.action || {},
+        lastRun: result.lastRun ? new Date(result.lastRun) : null,
+        nextRun: result.nextRun ? new Date(result.nextRun) : null,
+        createdAt: result.createdAt ? new Date(result.createdAt) : new Date(),
+        updatedAt: result.updatedAt ? new Date(result.updatedAt) : new Date()
+      };
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] updateAutomationRule error:', error.message);
+      throw new Error(`Failed to update automation rule: ${error.message}`);
+    }
   }
 
   async deleteAutomationRule(id: number): Promise<void> {
-    // Implementation needed
+    await this.connect();
+    try {
+      console.log(`[MONGODB DEBUG] Deleting automation rule: ${id}`);
+      
+      const collection = this.db!.collection('automation_rules');
+      const result = await collection.deleteOne({ 
+        _id: new ObjectId(id.toString()) 
+      });
+      
+      if (result.deletedCount === 0) {
+        throw new Error('Automation rule not found');
+      }
+      
+      console.log(`[MONGODB DEBUG] Deleted automation rule: ${id}`);
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] deleteAutomationRule error:', error.message);
+      throw new Error(`Failed to delete automation rule: ${error.message}`);
+    }
   }
 
   async getSuggestions(workspaceId: number, type?: string): Promise<Suggestion[]> {

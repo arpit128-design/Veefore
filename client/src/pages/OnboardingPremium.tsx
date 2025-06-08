@@ -225,9 +225,9 @@ export default function OnboardingPremium() {
     selectedGoals: [] as string[],
     growthTargets: {
       followerGoal: '',
-      timeframe: '6-months',
-      engagementGoal: '',
-      contentFrequency: 'daily'
+      customFollowerGoal: '',
+      timeframe: '',
+      contentFrequency: ''
     },
     connectedPlatforms: [] as string[],
     workspaceName: '',
@@ -402,7 +402,42 @@ export default function OnboardingPremium() {
     }
   };
 
+  const canProceedToNextStep = () => {
+    switch (currentStep) {
+      case 0: // Business info
+        return formData.businessName.trim().length > 0 && formData.businessDescription.trim().length > 0;
+      case 1: // Goals
+        return formData.selectedGoals.length > 0;
+      case 2: // Growth targets (step 3)
+        const hasFollowerGoal = formData.growthTargets.followerGoal !== '';
+        const hasCustomGoal = formData.growthTargets.followerGoal !== 'Custom' || 
+                             (formData.growthTargets.followerGoal === 'Custom' && formData.growthTargets.customFollowerGoal.trim() !== '');
+        const hasTimeframe = formData.growthTargets.timeframe !== '';
+        const hasFrequency = formData.growthTargets.contentFrequency !== '';
+        return hasFollowerGoal && hasCustomGoal && hasTimeframe && hasFrequency;
+      case 3: // Platforms (step 4 - optional)
+        return true; // Optional step
+      case 4: // AI Personality (step 5)
+        return formData.aiPersonality !== '';
+      case 5: // Categories (step 6)
+        return formData.selectedCategories.length > 0;
+      case 6: // Workspace setup (step 7)
+        return formData.workspaceName.trim().length > 0;
+      default:
+        return true;
+    }
+  };
+
   const handleNext = () => {
+    if (!canProceedToNextStep()) {
+      toast({
+        title: "Please Complete This Step",
+        description: "Fill in all required fields before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -762,7 +797,7 @@ export default function OnboardingPremium() {
                               <Label className="text-white/90 text-lg font-semibold mb-4 block">
                                 Follower Growth Target
                               </Label>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                                 {['1K', '5K', '10K', '50K', '100K', 'Custom'].map((target) => (
                                   <motion.button
                                     key={target}
@@ -782,6 +817,30 @@ export default function OnboardingPremium() {
                                   </motion.button>
                                 ))}
                               </div>
+                              
+                              {/* Custom Input Field */}
+                              {formData.growthTargets.followerGoal === 'Custom' && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <Input
+                                    type="text"
+                                    placeholder="Enter your custom follower goal..."
+                                    value={formData.growthTargets.customFollowerGoal || ''}
+                                    onChange={(e) => setFormData(prev => ({
+                                      ...prev,
+                                      growthTargets: { 
+                                        ...prev.growthTargets, 
+                                        customFollowerGoal: e.target.value 
+                                      }
+                                    }))}
+                                    className="bg-white/10 border-white/30 text-white placeholder:text-white/50 backdrop-blur-sm"
+                                  />
+                                </motion.div>
+                              )}
                             </div>
 
                             {/* Timeframe */}
@@ -1168,15 +1227,10 @@ export default function OnboardingPremium() {
                       <HolographicButton
                         onClick={handleNext}
                         glowColor={currentStepData.color}
-                        className="flex items-center gap-2"
-                        disabled={
-                          (currentStep === 1 && (!formData.businessName.trim() || !formData.businessDescription.trim())) ||
-                          (currentStep === 2 && formData.selectedGoals.length === 0) ||
-                          (currentStep === 3 && formData.connectedPlatforms.length === 0) ||
-                          (currentStep === 4 && !formData.aiPersonality) ||
-                          (currentStep === 5 && formData.selectedCategories.length === 0) ||
-                          (currentStep === 6 && !formData.workspaceName.trim())
-                        }
+                        className={`flex items-center gap-2 ${
+                          !canProceedToNextStep() ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={!canProceedToNextStep()}
                       >
                         Next
                         <ArrowRight size={20} />

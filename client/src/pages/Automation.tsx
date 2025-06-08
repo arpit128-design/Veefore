@@ -222,6 +222,7 @@ export default function Automation() {
     setNewRule({
       type: 'comment',
       triggers: {
+        aiMode: 'contextual',
         keywords: [],
         hashtags: [],
         mentions: false,
@@ -229,6 +230,8 @@ export default function Automation() {
         postInteraction: false
       },
       responses: [''],
+      aiPersonality: 'friendly',
+      responseLength: 'medium',
       conditions: {
         timeDelay: 0,
         maxPerDay: 10,

@@ -1,4 +1,5 @@
 import { IStorage } from './storage';
+import { AIResponseGenerator, MessageContext, AIResponseConfig } from './ai-response-generator';
 
 export interface AutomationRule {
   id: string;
@@ -6,6 +7,7 @@ export interface AutomationRule {
   type: 'comment' | 'dm';
   isActive: boolean;
   triggers: {
+    aiMode?: 'contextual' | 'keyword';
     keywords?: string[];
     hashtags?: string[];
     mentions?: boolean;
@@ -13,6 +15,8 @@ export interface AutomationRule {
     postInteraction?: boolean;
   };
   responses: string[];
+  aiPersonality?: string;
+  responseLength?: string;
   conditions: {
     timeDelay?: number; // minutes
     maxPerDay?: number;
@@ -45,7 +49,11 @@ export interface AutomationLog {
 }
 
 export class InstagramAutomation {
-  constructor(private storage: IStorage) {}
+  private aiGenerator: AIResponseGenerator;
+
+  constructor(private storage: IStorage) {
+    this.aiGenerator = new AIResponseGenerator();
+  }
 
   /**
    * Send automated comment to a post
@@ -302,8 +310,20 @@ export class InstagramAutomation {
             continue;
           }
 
-          // Select random response
-          const response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+          // Generate response based on mode
+          let response: string;
+          
+          if (rule.triggers.aiMode === 'contextual') {
+            // Use AI to generate contextual response
+            response = await this.generateContextualResponse(
+              caption, 
+              rule, 
+              { username: mention.username || 'unknown' }
+            );
+          } else {
+            // Use predefined responses for keyword mode
+            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+          }
           
           // Add delay if specified
           if (rule.conditions.timeDelay) {
@@ -322,10 +342,48 @@ export class InstagramAutomation {
   }
 
   /**
+   * Generate contextual AI response for a message
+   */
+  private async generateContextualResponse(
+    message: string,
+    rule: AutomationRule,
+    userProfile?: { username: string }
+  ): Promise<string> {
+    try {
+      console.log(`[AI AUTOMATION] Generating contextual response for: "${message}"`);
+      
+      const context: MessageContext = {
+        message,
+        userProfile
+      };
+
+      const config: AIResponseConfig = {
+        personality: rule.aiPersonality || 'friendly',
+        responseLength: rule.responseLength || 'medium'
+      };
+
+      const aiResponse = await this.aiGenerator.generateContextualResponse(context, config);
+      
+      console.log(`[AI AUTOMATION] Generated response in ${aiResponse.detectedLanguage}: "${aiResponse.response}"`);
+      
+      return aiResponse.response;
+    } catch (error) {
+      console.error('[AI AUTOMATION] Error generating contextual response:', error);
+      // Fallback to predefined responses if AI fails
+      return rule.responses[Math.floor(Math.random() * rule.responses.length)] || 'Thank you for your message!';
+    }
+  }
+
+  /**
    * Check if automation should trigger based on rule conditions
    */
   private shouldTriggerRule(rule: AutomationRule, content: string): boolean {
-    // Check for trigger keywords
+    // For contextual AI mode, always trigger (AI will decide if response is needed)
+    if (rule.triggers.aiMode === 'contextual') {
+      return true;
+    }
+
+    // For keyword mode, check for trigger keywords
     if (rule.triggers.keywords && rule.triggers.keywords.length > 0) {
       const hasKeyword = rule.triggers.keywords.some(keyword => 
         content.includes(keyword.toLowerCase())

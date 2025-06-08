@@ -50,9 +50,9 @@ function AuthenticatedApp() {
       >
         <SpaceBackground />
         <Header />
-        <div className="flex pt-14 sm:pt-16 md:pt-20 min-h-screen pb-16 sm:pb-20 md:pb-0">
+        <div className="flex pt-12 sm:pt-14 md:pt-16 lg:pt-20 min-h-screen pb-16 sm:pb-20 md:pb-0">
           <Sidebar />
-          <main className="flex-1 ml-0 md:ml-64 p-2 sm:p-3 md:p-6 lg:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
+          <main className="flex-1 ml-0 md:ml-56 lg:ml-64 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
               <Route path="/auth" component={() => <Redirect to="/dashboard" />} />

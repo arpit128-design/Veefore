@@ -865,29 +865,29 @@ export default function ContentStudio() {
 
       {/* Content Creation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 bg-gray-800 border border-gray-600 gap-1">
-          <TabsTrigger value="video" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
-            <Video className="w-4 h-4 mr-2" />
+        <TabsList className="grid w-full grid-cols-3 bg-gray-800 border border-gray-600 gap-1 p-1">
+          <TabsTrigger value="video" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
+            <Video className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Video Generator</span>
             <span className="sm:hidden">Video</span>
           </TabsTrigger>
-          <TabsTrigger value="post" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
-            <ImageIcon className="w-4 h-4 mr-2" />
+          <TabsTrigger value="post" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
+            <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Post Creator</span>
             <span className="sm:hidden">Post</span>
           </TabsTrigger>
-          <TabsTrigger value="caption" className="text-white data-[state=active]:bg-blue-600 text-xs md:text-sm">
-            <Edit className="w-4 h-4 mr-2" />
+          <TabsTrigger value="caption" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
+            <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Caption AI</span>
             <span className="sm:hidden">Caption</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="video" className="mt-6">
+        <TabsContent value="video" className="mt-4 sm:mt-6">
           <VideoGenerator />
         </TabsContent>
 
-        <TabsContent value="post" className="mt-6">
+        <TabsContent value="post" className="mt-4 sm:mt-6">
           <PostCreator />
         </TabsContent>
 

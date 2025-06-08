@@ -185,6 +185,19 @@ export const userContentHistory = pgTable("user_content_history", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+export const automationLogs = pgTable("automation_logs", {
+  id: serial("id").primaryKey(),
+  ruleId: integer("rule_id").references(() => automationRules.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  type: text("type").notNull(), // comment, dm
+  targetUserId: text("target_user_id"),
+  targetUsername: text("target_username"),
+  message: text("message").notNull(),
+  status: text("status").notNull(), // sent, failed, pending
+  errorMessage: text("error_message"),
+  sentAt: timestamp("sent_at").defaultNow()
+});
+
 export const creditTransactions = pgTable("credit_transactions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -421,6 +434,7 @@ export type SocialAccount = typeof socialAccounts.$inferSelect;
 export type Content = typeof content.$inferSelect;
 export type Analytics = typeof analytics.$inferSelect;
 export type AutomationRule = typeof automationRules.$inferSelect;
+export type AutomationLog = typeof automationLogs.$inferSelect;
 export type Suggestion = typeof suggestions.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;

@@ -28,6 +28,15 @@ interface AIResponse {
 
 class AIResponseGenerator {
   private genAI: GoogleGenerativeAI;
+  private responseHistory: Set<string> = new Set();
+  
+  // Natural response templates to avoid spam detection
+  private naturalResponses = {
+    price: ["DM me", "Check bio", "Message me", "DM for details", "Text me", "Inbox me"],
+    greeting: ["Hey!", "Hi!", "Hello", "Namaste", "What's up", "How are you"],
+    thanks: ["Thanks!", "Appreciate it", "Thank you", "Much love", "Grateful"],
+    location: ["Here!", "Present", "Available", "Around", "Online"]
+  };
 
   constructor() {
     if (!process.env.GOOGLE_API_KEY) {
@@ -48,27 +57,128 @@ class AIResponseGenerator {
       const response = result.response;
       const text = response.text();
 
-      // Parse the structured response
-      const parsedResponse = this.parseAIResponse(text);
+      // Apply anti-spam filtering and ensure uniqueness
+      const cleanResponse = this.generateAntiSpamResponse(text, context.message);
       
       return {
-        response: parsedResponse.response,
-        detectedLanguage: parsedResponse.language,
-        confidence: parsedResponse.confidence,
-        reasoning: parsedResponse.reasoning
+        response: cleanResponse,
+        detectedLanguage: this.detectLanguage(context.message),
+        confidence: 0.85,
+        reasoning: "Generated with anti-spam optimization"
       };
     } catch (error) {
       console.error('[AI RESPONSE] Error generating response:', error);
       
-      // Generate intelligent fallback based on message content and context
-      const fallbackResponse = this.generateIntelligentFallback(context, config);
+      // Generate natural fallback that avoids spam detection
+      const fallbackResponse = this.generateNaturalFallback(context.message, context.userProfile?.username);
       return {
         response: fallbackResponse.response,
         detectedLanguage: fallbackResponse.language,
-        confidence: 0.7,
-        reasoning: "Generated using intelligent fallback due to AI service unavailability"
+        confidence: 0.75,
+        reasoning: "Generated using natural fallback to avoid spam detection"
       };
     }
+  }
+
+  /**
+   * Generate anti-spam response by ensuring uniqueness and natural language
+   */
+  private generateAntiSpamResponse(aiResponse: string, originalMessage: string): string {
+    // Clean the AI response
+    let response = aiResponse.trim();
+    
+    // Remove quotes if present
+    response = response.replace(/^["']|["']$/g, '');
+    
+    // Check if this response was used recently
+    if (this.responseHistory.has(response)) {
+      // Generate a completely different response
+      return this.generateNaturalFallback(originalMessage).response;
+    }
+    
+    // Add to history (keep only last 100 responses)
+    this.responseHistory.add(response);
+    if (this.responseHistory.size > 100) {
+      const firstItem = this.responseHistory.values().next().value;
+      this.responseHistory.delete(firstItem);
+    }
+    
+    // Ensure response is short and natural
+    if (response.length > 50) {
+      response = this.shortenResponse(response, originalMessage);
+    }
+    
+    return response;
+  }
+
+  /**
+   * Generate natural fallback responses that avoid spam detection
+   */
+  private generateNaturalFallback(message: string, username?: string): { response: string; language: string } {
+    const language = this.detectLanguage(message);
+    const messageWords = message.toLowerCase();
+    
+    // Detect intent and respond naturally
+    if (messageWords.includes('price') || messageWords.includes('cost') || messageWords.includes('kitna')) {
+      const responses = language === 'hindi' || language === 'hinglish' 
+        ? ['DM karo', 'Message me', 'Inbox check karo', 'DM me bhai']
+        : ['DM me', 'Check messages', 'Text me', 'Message me'];
+      return {
+        response: this.getRandomResponse(responses),
+        language
+      };
+    }
+    
+    if (messageWords.includes('where') || messageWords.includes('kaha') || messageWords.includes('location')) {
+      const responses = language === 'hindi' || language === 'hinglish'
+        ? ['Yahan hu!', 'Present', 'Here bhai', 'Available hu']
+        : ['Here!', 'Present', 'Available', 'Around'];
+      return {
+        response: this.getRandomResponse(responses),
+        language
+      };
+    }
+    
+    if (messageWords.includes('thanks') || messageWords.includes('thank') || messageWords.includes('dhanyawad')) {
+      const responses = language === 'hindi' || language === 'hinglish'
+        ? ['Welcome!', 'Koi baat nahi', 'Mention not', 'Anytime']
+        : ['Welcome!', 'Anytime', 'Sure thing', 'No problem'];
+      return {
+        response: this.getRandomResponse(responses),
+        language
+      };
+    }
+    
+    // Default natural responses
+    const defaultResponses = language === 'hindi' || language === 'hinglish'
+      ? ['Batao!', 'Kya baat hai?', 'Haan bolo', 'Sunao', 'Yes?']
+      : ['Hey!', 'What\'s up?', 'Tell me', 'Yes?', 'Go ahead'];
+    
+    return {
+      response: this.getRandomResponse(defaultResponses),
+      language
+    };
+  }
+
+  /**
+   * Get random response from array to ensure variety
+   */
+  private getRandomResponse(responses: string[]): string {
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  /**
+   * Shorten response while maintaining meaning
+   */
+  private shortenResponse(response: string, originalMessage: string): string {
+    // Extract key intent and create short response
+    if (response.toLowerCase().includes('price') || originalMessage.toLowerCase().includes('price')) {
+      return 'DM me';
+    }
+    
+    // Default to first few words
+    const words = response.split(' ');
+    return words.slice(0, 3).join(' ');
   }
 
   private generateIntelligentFallback(context: MessageContext, config: AIResponseConfig): { response: string; language: string } {

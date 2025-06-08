@@ -109,11 +109,22 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       if (savedWorkspace) {
         try {
           const parsedWorkspace = JSON.parse(savedWorkspace);
-          // Verify the saved workspace still exists in current workspaces
-          const foundWorkspace = workspaces.find((w: Workspace) => w.id === parsedWorkspace.id);
+          console.log('[WORKSPACE PROVIDER] Attempting to restore workspace:', parsedWorkspace);
+          
+          // Try to find by ID first
+          let foundWorkspace = workspaces.find((w: Workspace) => w.id === parsedWorkspace.id);
+          
+          // If not found by ID, try to find by name (for backup compatibility)
+          if (!foundWorkspace && parsedWorkspace.name) {
+            foundWorkspace = workspaces.find((w: Workspace) => w.name === parsedWorkspace.name);
+            console.log('[WORKSPACE PROVIDER] Found workspace by name fallback:', foundWorkspace?.name, foundWorkspace?.id);
+          }
+          
           if (foundWorkspace) {
             workspaceToSet = foundWorkspace;
-            console.log('[WORKSPACE PROVIDER] Restored workspace from localStorage:', foundWorkspace.name);
+            console.log('[WORKSPACE PROVIDER] Restored workspace from localStorage:', foundWorkspace.name, 'ID:', foundWorkspace.id);
+          } else {
+            console.log('[WORKSPACE PROVIDER] Saved workspace not found in current workspaces');
           }
         } catch (error) {
           console.log('[WORKSPACE PROVIDER] Error parsing saved workspace:', error);
@@ -127,6 +138,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       }
       
       if (workspaceToSet) {
+        console.log('[WORKSPACE PROVIDER] Setting current workspace to:', workspaceToSet.name, 'ID:', workspaceToSet.id);
         setCurrentWorkspace(workspaceToSet);
         
         // Clear all cached data to ensure fresh queries with correct workspace

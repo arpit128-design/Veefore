@@ -73,7 +73,7 @@ class AIResponseGenerator {
 
   private generateIntelligentFallback(context: MessageContext, config: AIResponseConfig): { response: string; language: string } {
     const message = context.message.toLowerCase();
-    const username = context.username || 'friend';
+    const username = (context as any).username || 'friend';
     
     // Detect language
     const language = this.detectLanguage(context.message);
@@ -157,8 +157,8 @@ CRITICAL INSTRUCTIONS:
 3. If message is in English, respond in English
 4. Understand and use internet slang, emojis, and modern expressions appropriately
 5. Match the tone and energy level of the incoming message
-6. Be ${personalityMap[config.personality] || 'friendly and helpful'}
-7. Keep response ${lengthMap[config.responseLength] || 'concise (2-3 sentences)'}
+6. Be ${personalityMap[config.personality as keyof typeof personalityMap] || 'friendly and helpful'}
+7. Keep response ${lengthMap[config.responseLength as keyof typeof lengthMap] || 'concise (2-3 sentences)'}
 
 INCOMING MESSAGE TO ANALYZE:
 "${context.message}"

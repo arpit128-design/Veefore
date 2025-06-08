@@ -293,28 +293,29 @@ export class InstagramWebhookHandler {
       console.log(`[WEBHOOK] New DM from @${value.sender.username}: "${value.message.text}"`);
 
       // Get automation rules for this workspace
-      const rules = await this.getAutomationRules(socialAccount.workspaceId, 'dm');
+      const rules = await this.getAutomationRules(socialAccount.workspaceId);
       
       for (const rule of rules) {
         if (!rule.isActive) continue;
 
-        // Check if rule should trigger
-        if (this.shouldTriggerRule(rule, value.message.text)) {
+        // Check if rule should trigger for DM
+        if (rule.type === 'dm' && this.shouldTriggerRule(rule, value.message.text)) {
           console.log(`[WEBHOOK] DM rule triggered, generating response`);
 
           // Generate response based on rule type
           let response: string;
           
-          if (rule.triggers.aiMode === 'contextual') {
+          if (rule.trigger?.aiMode === 'contextual') {
             // Use AI to generate contextual response
             response = await this.generateContextualResponse(
               value.message.text,
               rule,
-              { username: value.sender.username }
+              { username: value.sender?.username || 'user' }
             );
           } else {
             // Use predefined responses for keyword mode
-            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+            const responses = rule.action?.responses || ['Thank you for your message!'];
+            response = responses[Math.floor(Math.random() * responses.length)];
           }
 
           // Apply delay if specified

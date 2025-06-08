@@ -1053,40 +1053,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 7 && (
-                      <ScrollReveal direction="up" delay={0.3}>
-                        <div className="w-full max-w-md space-y-6">
-                          <div className="space-y-4">
-                            <Label htmlFor="workspace-name" className="text-white font-medium">
-                              Workspace Name *
-                            </Label>
-                            <Input
-                              id="workspace-name"
-                              type="text"
-                              placeholder="Enter your workspace name..."
-                              value={formData.workspaceName}
-                              onChange={(e) => setFormData(prev => ({ ...prev, workspaceName: e.target.value }))}
-                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
-                              required
-                            />
-                          </div>
-                          
-                          <div className="space-y-4">
-                            <Label htmlFor="description" className="text-white font-medium">
-                              Description (Optional)
-                            </Label>
-                            <Input
-                              id="description"
-                              type="text"
-                              placeholder="Describe your workspace..."
-                              value={formData.description}
-                              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
-                            />
-                          </div>
-                        </div>
-                      </ScrollReveal>
-                    )}
+
 
                     {currentStep === 8 && (
                       <ScrollReveal direction="up" delay={0.3}>

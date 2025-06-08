@@ -367,6 +367,7 @@ export class MongoStorage implements IStorage {
     const user = new UserModel({
       ...userData,
       referralCode,
+      isOnboarded: false, // Explicitly ensure new users need onboarding
       createdAt: new Date(),
       updatedAt: new Date()
     });

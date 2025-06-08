@@ -69,6 +69,8 @@ export default function Automation() {
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [selectedTab, setSelectedTab] = useState('rules');
   const [newRule, setNewRule] = useState({
+    name: '',
+    platform: 'instagram' as 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'all',
     type: 'comment' as 'comment' | 'dm',
     triggers: {
       aiMode: 'contextual' as 'contextual' | 'keyword',
@@ -220,6 +222,8 @@ export default function Automation() {
 
   const resetNewRule = () => {
     setNewRule({
+      name: '',
+      platform: 'instagram',
       type: 'comment',
       triggers: {
         aiMode: 'contextual',

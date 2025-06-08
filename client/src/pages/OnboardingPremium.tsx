@@ -340,8 +340,11 @@ export default function OnboardingPremium() {
       setIsCompleting(false);
       setIsLoading(false);
       
-      // Immediate redirect without delay to prevent conflicts
-      setLocation('/dashboard');
+      // Force navigation with a delay to ensure user data is refreshed
+      console.log('Redirecting to dashboard after workspace creation');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
     },
     onError: (error: any) => {
       toast({

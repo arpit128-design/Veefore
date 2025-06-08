@@ -451,61 +451,64 @@ export default function Automation() {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList>
-          <TabsTrigger value="rules">
-            <Settings className="h-4 w-4 mr-2" />
-            Rules
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="rules" className="flex items-center justify-center gap-1 sm:gap-2">
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Rules</span>
+            <span className="sm:hidden text-xs">Rules</span>
           </TabsTrigger>
-          <TabsTrigger value="logs">
-            <Activity className="h-4 w-4 mr-2" />
-            Activity Log
+          <TabsTrigger value="logs" className="flex items-center justify-center gap-1 sm:gap-2">
+            <Activity className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Activity Log</span>
+            <span className="sm:hidden text-xs">Logs</span>
           </TabsTrigger>
-          <TabsTrigger value="manual">
-            <Send className="h-4 w-4 mr-2" />
-            Manual Actions
+          <TabsTrigger value="manual" className="flex items-center justify-center gap-1 sm:gap-2">
+            <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Manual Actions</span>
+            <span className="sm:hidden text-xs">Manual</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="rules" className="space-y-4">
+        <TabsContent value="rules" className="space-y-3 sm:space-y-4">
           {rulesLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-              <p>Loading automation rules...</p>
+            <div className="text-center py-6 sm:py-8">
+              <div className="animate-spin w-6 h-6 sm:w-8 sm:h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-3 sm:mb-4" />
+              <p className="text-sm sm:text-base">Loading automation rules...</p>
             </div>
           ) : rules.length === 0 ? (
             <Card>
-              <CardContent className="text-center py-8">
-                <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No automation rules yet</h3>
-                <p className="text-muted-foreground mb-4">
+              <CardContent className="text-center py-6 sm:py-8">
+                <Settings className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-medium mb-2">No automation rules yet</h3>
+                <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
                   Create your first automation rule to start automating Instagram engagement
                 </p>
-                <Button onClick={() => setIsCreatingRule(true)}>
+                <Button onClick={() => setIsCreatingRule(true)} className="w-full sm:w-auto">
                   Create First Rule
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {rules.map((rule: AutomationRule) => (
                 <Card key={rule.id}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
                     <div className="flex items-center space-x-2">
                       {rule.type === 'comment' ? (
-                        <MessageSquare className="h-5 w-5" />
+                        <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
                       ) : (
-                        <Send className="h-5 w-5" />
+                        <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                       )}
-                      <CardTitle className="text-lg">
+                      <CardTitle className="text-base sm:text-lg">
                         {rule.name || (rule.type === 'comment' ? 'Auto Comment' : 'Auto DM')}
                       </CardTitle>
                       {rule.isActive ? (
-                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                        <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
                       ) : (
-                        <Badge variant="secondary">Inactive</Badge>
+                        <Badge variant="secondary" className="text-xs">Inactive</Badge>
                       )}
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between sm:justify-end space-x-2">
                       <Switch
                         checked={rule.isActive}
                         onCheckedChange={(checked) => toggleRuleActive(rule.id, checked)}
@@ -514,6 +517,7 @@ export default function Automation() {
                         variant="destructive"
                         size="sm"
                         onClick={() => deleteRuleMutation.mutate(rule.id)}
+                        className="h-8 px-2 sm:px-3"
                       >
                         Delete
                       </Button>
@@ -574,46 +578,46 @@ export default function Automation() {
           )}
         </TabsContent>
 
-        <TabsContent value="logs" className="space-y-4">
+        <TabsContent value="logs" className="space-y-3 sm:space-y-4">
           {logsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-              <p>Loading activity logs...</p>
+            <div className="text-center py-6 sm:py-8">
+              <div className="animate-spin w-6 h-6 sm:w-8 sm:h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-3 sm:mb-4" />
+              <p className="text-sm sm:text-base">Loading activity logs...</p>
             </div>
           ) : logs.length === 0 ? (
             <Card>
-              <CardContent className="text-center py-8">
-                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No activity yet</h3>
-                <p className="text-muted-foreground">
+              <CardContent className="text-center py-6 sm:py-8">
+                <Activity className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-medium mb-2">No activity yet</h3>
+                <p className="text-muted-foreground text-sm sm:text-base">
                   Automation activities will appear here once rules are triggered
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {logs.map((log: AutomationLog) => (
                 <Card key={log.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center justify-between">
+                  <CardContent className="pt-3 sm:pt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center space-x-3">
                         {log.type === 'comment' ? (
-                          <MessageSquare className="h-5 w-5 text-blue-500" />
+                          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                         ) : (
-                          <Send className="h-5 w-5 text-green-500" />
+                          <Send className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                         )}
-                        <div>
-                          <p className="font-medium">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm sm:text-base">
                             {log.type === 'comment' ? 'Comment' : 'DM'} to @{log.targetUsername}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground break-words">
                             "{log.message}"
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="flex items-center justify-between sm:justify-end sm:text-right gap-2">
                         {getStatusBadge(log.status)}
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground">
                           {new Date(log.sentAt).toLocaleString()}
                         </p>
                       </div>
@@ -630,36 +634,38 @@ export default function Automation() {
           )}
         </TabsContent>
 
-        <TabsContent value="manual" className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-6">
+        <TabsContent value="manual" className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Send Manual Comment
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Post a comment on a specific Instagram media
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div>
-                  <Label htmlFor="comment-media-id">Media ID</Label>
+                  <Label htmlFor="comment-media-id" className="text-xs sm:text-sm">Media ID</Label>
                   <Input
                     id="comment-media-id"
                     placeholder="Enter Instagram media ID"
+                    className="text-sm"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="comment-message">Comment Text</Label>
+                  <Label htmlFor="comment-message" className="text-xs sm:text-sm">Comment Text</Label>
                   <Textarea
                     id="comment-message"
                     placeholder="Enter your comment..."
                     rows={3}
+                    className="text-sm"
                   />
                 </div>
                 <Button 
-                  className="w-full"
+                  className="w-full h-9 text-sm"
                   disabled={sendCommentMutation.isPending}
                 >
                   {sendCommentMutation.isPending ? 'Sending...' : 'Post Comment'}
@@ -668,33 +674,35 @@ export default function Automation() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Send className="h-5 w-5 mr-2" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <Send className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Send Manual DM
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Send a direct message to an Instagram user
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div>
-                  <Label htmlFor="dm-recipient-id">Recipient User ID</Label>
+                  <Label htmlFor="dm-recipient-id" className="text-xs sm:text-sm">Recipient User ID</Label>
                   <Input
                     id="dm-recipient-id"
                     placeholder="Enter Instagram user ID"
+                    className="text-sm"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="dm-message">Message Text</Label>
+                  <Label htmlFor="dm-message" className="text-xs sm:text-sm">Message Text</Label>
                   <Textarea
                     id="dm-message"
                     placeholder="Enter your message..."
                     rows={3}
+                    className="text-sm"
                   />
                 </div>
                 <Button 
-                  className="w-full"
+                  className="w-full h-9 text-sm"
                   disabled={sendDMMutation.isPending}
                 >
                   {sendDMMutation.isPending ? 'Sending...' : 'Send DM'}
@@ -707,14 +715,14 @@ export default function Automation() {
 
       {/* Create Rule Dialog */}
       <Dialog open={isCreatingRule} onOpenChange={setIsCreatingRule}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-6">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Create Automation Rule</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogTitle className="text-lg sm:text-xl font-semibold">Create Automation Rule</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm sm:text-base">
               Set up automated responses for Instagram engagement
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 py-6">
+          <div className="space-y-4 sm:space-y-6 py-4 sm:py-6">
               {/* Rule Name Field */}
               <div className="space-y-2">
                 <Label htmlFor="rule-name" className="text-sm font-medium">Rule Name *</Label>

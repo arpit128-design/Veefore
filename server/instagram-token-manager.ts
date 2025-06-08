@@ -53,16 +53,29 @@ export class InstagramTokenManager {
     }
   }
 
-  // Validate Instagram Business API access token
+  // Validate Instagram access token and check expiration
   private async validateToken(accessToken: string): Promise<boolean> {
-    console.log('[TOKEN MANAGER] Validating Instagram Business API access token');
+    console.log('[TOKEN MANAGER] Validating Instagram access token');
     
     try {
-      // Use Instagram Basic Display API endpoint for validation
+      // Check token info and expiration
       const response = await axios.get(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
-      return response.status === 200 && !!response.data.id;
+      
+      if (response.status === 200 && response.data.id) {
+        console.log('[TOKEN MANAGER] Token is valid and active');
+        return true;
+      }
+      
+      return false;
     } catch (error: any) {
-      console.log('[TOKEN MANAGER] Token validation failed:', error.response?.data?.error?.message || error.message);
+      const errorMessage = error.response?.data?.error?.message || error.message;
+      console.log('[TOKEN MANAGER] Token validation failed:', errorMessage);
+      
+      // Check for specific expiration errors
+      if (errorMessage.includes('expired') || errorMessage.includes('Cannot parse access token')) {
+        console.log('[TOKEN MANAGER] Token has expired');
+      }
+      
       return false;
     }
   }

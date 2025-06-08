@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Rocket, 
   Brain, 
@@ -10,43 +9,25 @@ import {
   BarChart3, 
   Calendar,
   Sparkles,
-  Target,
   Globe,
   Hash,
   Instagram,
   ArrowRight,
   Check,
-  Star,
   Play,
   ChevronDown,
   Crown,
-  Infinity,
-  Layers,
-  Activity,
-  Eye,
   FileText,
-  Zap,
-  Shield,
   Youtube,
   Twitter,
   Facebook,
-  Linkedin,
-  MonitorPlay,
-  Smartphone,
-  Palette,
-  Cpu,
-  RotateCcw,
-  Timer,
-  Filter,
-  Volume2,
-  Camera,
-  Video
+  Linkedin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 
-// Enhanced Animation Components
+// Simple Animation Components
 const AnimatedCounter = ({ end, suffix = "" }: { end: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
 
@@ -64,30 +45,6 @@ const AnimatedCounter = ({ end, suffix = "" }: { end: number; suffix?: string })
 
   return <span>{count}{suffix}</span>;
 };
-
-const FloatingCard = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 100, scale: 0.8 }}
-    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-    viewport={{ once: true }}
-    transition={{ 
-      duration: 0.8, 
-      delay,
-      type: "spring",
-      stiffness: 100,
-      damping: 15
-    }}
-    whileHover={{ 
-      scale: 1.05,
-      rotateY: 5,
-      rotateX: 5,
-      transition: { duration: 0.3 }
-    }}
-    className="transform-gpu perspective-1000"
-  >
-    {children}
-  </motion.div>
-);
 
 const TypewriterEffect = ({ texts, speed = 100 }: { texts: string[]; speed?: number }) => {
   const [currentText, setCurrentText] = useState('');
@@ -123,41 +80,12 @@ const TypewriterEffect = ({ texts, speed = 100 }: { texts: string[]; speed?: num
   return (
     <span className="min-h-[1em] inline-block">
       {currentText}
-      <motion.span
-        animate={{ opacity: [1, 0, 1] }}
-        transition={{ duration: 0.8, repeat: Infinity }}
-        className="ml-1"
-      >
-        |
-      </motion.span>
+      <span className="ml-1 animate-pulse">|</span>
     </span>
   );
 };
 
-const PlatformIcon = ({ icon: Icon, name, color, delay = 0 }: any) => (
-  <motion.div
-    initial={{ scale: 0, rotate: -180 }}
-    animate={{ scale: 1, rotate: 0 }}
-    transition={{ 
-      delay: delay * 0.1,
-      type: "spring",
-      stiffness: 200,
-      damping: 10
-    }}
-    whileHover={{ 
-      scale: 1.2,
-      rotate: 5,
-      transition: { duration: 0.2 }
-    }}
-    className={`w-16 h-16 rounded-2xl ${color} flex items-center justify-center shadow-lg cursor-pointer`}
-  >
-    <Icon className="w-8 h-8 text-white" />
-  </motion.div>
-);
-
 const Landing = () => {
-  const [currentFeature, setCurrentFeature] = useState(0);
-
   const heroFeatures = [
     "AI-Powered Multi-Platform Content Generation",
     "Instagram • YouTube • Twitter • Facebook Automation", 
@@ -166,13 +94,6 @@ const Landing = () => {
     "Unified Social Media Management Dashboard",
     "Viral Hashtag Discovery Across All Networks"
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % heroFeatures.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   const platforms = [
     { icon: Instagram, name: "Instagram", color: "bg-gradient-to-br from-pink-500 to-orange-500" },
@@ -196,8 +117,7 @@ const Landing = () => {
         "Viral content prediction algorithms",
         "Auto-generated captions and hashtags"
       ],
-      gradient: "from-purple-600 via-blue-600 to-cyan-600",
-      animation: "float"
+      gradient: "from-purple-600 via-blue-600 to-cyan-600"
     },
     {
       icon: Globe,
@@ -211,8 +131,7 @@ const Landing = () => {
         "Platform-specific optimization",
         "Bulk content scheduling"
       ],
-      gradient: "from-green-600 via-teal-600 to-blue-600",
-      animation: "scale"
+      gradient: "from-green-600 via-teal-600 to-blue-600"
     },
     {
       icon: Bot,
@@ -226,8 +145,7 @@ const Landing = () => {
         "Anti-spam and sentiment analysis",
         "Human handoff for complex queries"
       ],
-      gradient: "from-orange-600 via-red-600 to-pink-600",
-      animation: "pulse"
+      gradient: "from-orange-600 via-red-600 to-pink-600"
     },
     {
       icon: BarChart3,
@@ -241,8 +159,7 @@ const Landing = () => {
         "Content performance optimization",
         "ROI and conversion tracking"
       ],
-      gradient: "from-blue-600 via-indigo-600 to-purple-600",
-      animation: "slide"
+      gradient: "from-blue-600 via-indigo-600 to-purple-600"
     },
     {
       icon: Hash,
@@ -256,8 +173,7 @@ const Landing = () => {
         "Hashtag performance tracking",
         "Viral potential scoring"
       ],
-      gradient: "from-pink-600 via-rose-600 to-red-600",
-      animation: "rotate"
+      gradient: "from-pink-600 via-rose-600 to-red-600"
     },
     {
       icon: Calendar,
@@ -271,8 +187,7 @@ const Landing = () => {
         "Auto-reposting and recycling",
         "Timezone optimization"
       ],
-      gradient: "from-cyan-600 via-blue-600 to-indigo-600",
-      animation: "bounce"
+      gradient: "from-cyan-600 via-blue-600 to-indigo-600"
     }
   ];
 
@@ -296,10 +211,6 @@ const Landing = () => {
         "Basic analytics",
         "Community support"
       ],
-      limitations: [
-        "Limited to 10 posts/month",
-        "Basic templates only"
-      ],
       popular: false,
       gradient: "from-gray-600 to-gray-700"
     },
@@ -319,7 +230,6 @@ const Landing = () => {
         "Viral hashtag research",
         "Priority support"
       ],
-      limitations: [],
       popular: true,
       gradient: "from-blue-600 to-purple-600"
     },
@@ -340,7 +250,6 @@ const Landing = () => {
         "Dedicated account manager",
         "24/7 priority support"
       ],
-      limitations: [],
       popular: false,
       gradient: "from-purple-600 to-pink-600"
     }
@@ -355,27 +264,17 @@ const Landing = () => {
         <div className="absolute inset-0 bg-[conic-gradient(from_90deg_at_50%_50%,transparent,rgba(120,119,198,0.1),transparent)]" />
       </div>
 
-      {/* Dynamic Floating Elements */}
+      {/* Simple Floating Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(30)].map((_, i) => (
-          <motion.div
+        {[...Array(20)].map((_, i) => (
+          <div
             key={i}
-            className="absolute w-2 h-2 bg-blue-400/20 rounded-full"
+            className="absolute w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -50, 0],
-              x: [0, 30, 0],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: Math.random() * 4 + 3,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut"
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 3}s`
             }}
           />
         ))}
@@ -383,131 +282,82 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="relative z-10 text-center max-w-7xl mx-auto"
-        >
+        <div className="relative z-10 text-center max-w-7xl mx-auto">
           {/* Hero Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8"
-          >
+          <div className="mb-8">
             <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 text-lg border-0 shadow-lg">
               <Sparkles className="w-5 h-5 mr-3" />
               The Future of Multi-Platform Social Media Automation
             </Badge>
-          </motion.div>
+          </div>
 
           {/* Main Headline */}
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-          >
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             VeeFore
-          </motion.h1>
+          </h1>
 
           {/* Dynamic Subtitle */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="text-2xl md:text-4xl font-semibold mb-4 h-20 flex items-center justify-center"
-          >
+          <div className="text-2xl md:text-4xl font-semibold mb-4 h-20 flex items-center justify-center">
             <TypewriterEffect 
               texts={heroFeatures}
               speed={80}
             />
-          </motion.div>
+          </div>
 
           {/* Platform Icons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="flex justify-center gap-4 mb-12 flex-wrap"
-          >
-            {platforms.map((platform, index) => (
-              <PlatformIcon 
-                key={platform.name}
-                icon={platform.icon}
-                name={platform.name}
-                color={platform.color}
-                delay={index}
-              />
-            ))}
-          </motion.div>
+          <div className="flex justify-center gap-4 mb-12 flex-wrap">
+            {platforms.map((platform, index) => {
+              const IconComponent = platform.icon;
+              return (
+                <div
+                  key={platform.name}
+                  className={`w-16 h-16 rounded-2xl ${platform.color} flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform duration-300`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <IconComponent className="w-8 h-8 text-white" />
+                </div>
+              );
+            })}
+          </div>
 
           {/* Description */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed"
-          >
+          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed">
             Transform your entire social media presence with cutting-edge AI automation. 
             Manage Instagram, YouTube, Twitter, Facebook, LinkedIn and more from one powerful dashboard 
             with intelligent content generation and 100% automated engagement.
-          </motion.p>
+          </p>
 
           {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
-          >
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Link href="/onboarding">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg shadow-purple-500/25 hover:scale-105 transition-transform duration-300"
               >
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg shadow-purple-500/25"
-                >
-                  <Rocket className="w-6 h-6 mr-3" />
-                  Start Free Trial
-                  <ArrowRight className="w-6 h-6 ml-3" />
-                </Button>
-              </motion.div>
+                <Rocket className="w-6 h-6 mr-3" />
+                Start Free Trial
+                <ArrowRight className="w-6 h-6 ml-3" />
+              </Button>
             </Link>
             
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm hover:scale-105 transition-transform duration-300"
             >
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
-              >
-                <Play className="w-6 h-6 mr-3" />
-                Watch Demo
-              </Button>
-            </motion.div>
-          </motion.div>
+              <Play className="w-6 h-6 mr-3" />
+              Watch Demo
+            </Button>
+          </div>
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
-          >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-                <motion.div 
+                <div 
                   key={index} 
-                  className="text-center"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  className="text-center hover:scale-110 transition-transform duration-300"
                 >
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4">
                     <IconComponent className="w-8 h-8 text-blue-400" />
@@ -516,47 +366,32 @@ const Landing = () => {
                     <AnimatedCounter end={parseInt(stat.value.replace(/[^\d]/g, ''))} suffix={stat.value.replace(/[\d]/g, '')} />
                   </div>
                   <div className="text-gray-400 text-sm">{stat.label}</div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="flex flex-col items-center text-white/60"
-          >
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <div className="flex flex-col items-center text-white/60 animate-bounce">
             <span className="text-sm mb-2">Explore Features</span>
             <ChevronDown className="w-6 h-6" />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* Features Section with Advanced Animations */}
+      {/* Features Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
-          >
+          <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Revolutionary Features
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Advanced AI-powered tools designed to dominate every social media platform
             </p>
-          </motion.div>
+          </div>
 
           <div className="space-y-32">
             {features.map((feature, index) => {
@@ -564,22 +399,13 @@ const Landing = () => {
               const isEven = index % 2 === 0;
               
               return (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, x: isEven ? -100 : 100 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
                   className={`grid lg:grid-cols-2 gap-16 items-center ${!isEven ? 'lg:grid-flow-col-dense' : ''}`}
                 >
                   {/* Content */}
                   <div className={isEven ? '' : 'lg:col-start-2'}>
-                    <motion.div
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                    >
+                    <div className="hover:scale-105 transition-transform duration-500">
                       <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-8 shadow-2xl`}>
                         <IconComponent size={40} className="text-white" />
                       </div>
@@ -598,71 +424,49 @@ const Landing = () => {
 
                       <ul className="space-y-4">
                         {feature.benefits.map((benefit, benefitIndex) => (
-                          <motion.li 
+                          <li 
                             key={benefitIndex}
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.5 + benefitIndex * 0.1 }}
                             className="flex items-center text-lg text-gray-300"
                           >
                             <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${feature.gradient} flex items-center justify-center mr-4 flex-shrink-0`}>
                               <Check className="w-4 h-4 text-white" />
                             </div>
                             {benefit}
-                          </motion.li>
+                          </li>
                         ))}
                       </ul>
-                    </motion.div>
+                    </div>
                   </div>
 
-                  {/* Animated Visual */}
+                  {/* Visual */}
                   <div className={isEven ? 'lg:col-start-2' : 'lg:col-start-1'}>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.4 }}
-                      className="relative"
-                    >
+                    <div className="relative hover:scale-105 transition-transform duration-500">
                       <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-20 rounded-3xl blur-3xl`} />
-                      <div className={`relative p-8 bg-gradient-to-br from-gray-900/50 to-black/50 rounded-3xl border border-gray-800 backdrop-blur-sm`}>
+                      <div className="relative p-8 bg-gradient-to-br from-gray-900/50 to-black/50 rounded-3xl border border-gray-800 backdrop-blur-sm">
                         <div className="grid grid-cols-2 gap-6">
                           {platforms.slice(0, 4).map((platform, platformIndex) => {
                             const PlatformIcon = platform.icon;
                             return (
-                              <motion.div
+                              <div
                                 key={platform.name}
-                                initial={{ opacity: 0, scale: 0 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ 
-                                  delay: 0.6 + platformIndex * 0.1,
-                                  type: "spring",
-                                  stiffness: 200
-                                }}
-                                whileHover={{ scale: 1.1 }}
-                                className={`p-4 ${platform.color} rounded-2xl flex flex-col items-center gap-3 cursor-pointer shadow-lg`}
+                                className={`p-4 ${platform.color} rounded-2xl flex flex-col items-center gap-3 cursor-pointer shadow-lg hover:scale-110 transition-transform duration-300`}
                               >
                                 <PlatformIcon className="w-8 h-8 text-white" />
                                 <span className="text-white font-medium">{platform.name}</span>
                                 <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    whileInView={{ width: `${60 + Math.random() * 40}%` }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 1 + platformIndex * 0.2, duration: 1 }}
-                                    className="h-full bg-white rounded-full"
+                                  <div
+                                    className="h-full bg-white rounded-full animate-pulse"
+                                    style={{ width: `${60 + Math.random() * 40}%` }}
                                   />
                                 </div>
-                              </motion.div>
+                              </div>
                             );
                           })}
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -672,83 +476,69 @@ const Landing = () => {
       {/* Pricing Section */}
       <section className="relative py-32 px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
-          >
+          <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Choose Your Plan
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Scale your social media automation from startup to enterprise
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <FloatingCard key={index} delay={index * 0.2}>
-                <div className={`relative p-8 bg-gradient-to-br from-gray-900/50 to-black/50 rounded-3xl border ${
+              <div 
+                key={index} 
+                className={`relative p-8 bg-gradient-to-br from-gray-900/50 to-black/50 rounded-3xl border ${
                   plan.popular 
                     ? 'border-blue-500/50 scale-105' 
                     : 'border-gray-800'
-                } backdrop-blur-sm h-full`}>
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className={`bg-gradient-to-r ${plan.gradient} text-white px-6 py-2 border-0`}>
-                        <Crown className="w-4 h-4 mr-2" />
-                        Most Popular
-                      </Badge>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                    <div className="mb-4">
-                      <span className={`text-4xl font-bold bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}>
-                        {plan.price}
-                      </span>
-                      <span className="text-gray-400">{plan.period}</span>
-                    </div>
-                    <p className="text-gray-400">{plan.description}</p>
+                } backdrop-blur-sm h-full hover:scale-105 transition-transform duration-500`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className={`bg-gradient-to-r ${plan.gradient} text-white px-6 py-2 border-0`}>
+                      <Crown className="w-4 h-4 mr-2" />
+                      Most Popular
+                    </Badge>
                   </div>
+                )}
 
-                  <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
-                      <motion.li 
-                        key={featureIndex} 
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + featureIndex * 0.1 }}
-                        className="flex items-center"
-                      >
-                        <Check className="w-5 h-5 mr-3 text-green-400 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-
-                  <Link href="/onboarding">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Button 
-                        className={`w-full py-4 font-semibold rounded-xl transition-all duration-300 ${
-                          plan.popular
-                            ? `bg-gradient-to-r ${plan.gradient} hover:shadow-lg text-white`
-                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                        }`}
-                      >
-                        {plan.name === 'Free Explorer' ? 'Get Started Free' : 'Start Free Trial'}
-                      </Button>
-                    </motion.div>
-                  </Link>
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                  <div className="mb-4">
+                    <span className={`text-4xl font-bold bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}>
+                      {plan.price}
+                    </span>
+                    <span className="text-gray-400">{plan.period}</span>
+                  </div>
+                  <p className="text-gray-400">{plan.description}</p>
                 </div>
-              </FloatingCard>
+
+                <ul className="space-y-4 mb-8">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li 
+                      key={featureIndex} 
+                      className="flex items-center"
+                    >
+                      <Check className="w-5 h-5 mr-3 text-green-400 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href="/onboarding">
+                  <Button 
+                    className={`w-full py-4 font-semibold rounded-xl transition-all duration-300 hover:scale-105 ${
+                      plan.popular
+                        ? `bg-gradient-to-r ${plan.gradient} hover:shadow-lg text-white`
+                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                    }`}
+                  >
+                    {plan.name === 'Free Explorer' ? 'Get Started Free' : 'Start Free Trial'}
+                  </Button>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -757,12 +547,7 @@ const Landing = () => {
       {/* CTA Section */}
       <section className="relative py-32 px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="animate-fade-in-up">
             <h2 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               Ready to Dominate All Social Media?
             </h2>
@@ -774,40 +559,30 @@ const Landing = () => {
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link href="/onboarding">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg shadow-purple-500/25 hover:scale-105 transition-transform duration-300"
                 >
-                  <Button 
-                    size="lg"
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg shadow-purple-500/25"
-                  >
-                    <Rocket className="w-6 h-6 mr-3" />
-                    Start Your Free Trial
-                    <ArrowRight className="w-6 h-6 ml-3" />
-                  </Button>
-                </motion.div>
+                  <Rocket className="w-6 h-6 mr-3" />
+                  Start Your Free Trial
+                  <ArrowRight className="w-6 h-6 ml-3" />
+                </Button>
               </Link>
               
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm hover:scale-105 transition-transform duration-300"
               >
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
-                >
-                  <MessageCircle className="w-6 h-6 mr-3" />
-                  Contact Sales
-                </Button>
-              </motion.div>
+                <MessageCircle className="w-6 h-6 mr-3" />
+                Contact Sales
+              </Button>
             </div>
 
             <p className="text-gray-400 mt-8">
               No credit card required • 14-day free trial • Cancel anytime
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -829,6 +604,8 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+
     </div>
   );
 };

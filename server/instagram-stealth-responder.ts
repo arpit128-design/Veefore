@@ -30,22 +30,22 @@ export class InstagramStealthResponder {
   private userInteractionPatterns: Map<string, any> = new Map();
 
   private config: StealthConfig = {
-    maxDailyResponses: 50, // Increased daily limit
-    responseRate: 0.75, // Respond to 75% of comments
-    minDelayMs: 30000, // Minimum 30 seconds
-    maxDelayMs: 180000, // Maximum 3 minutes
+    maxDailyResponses: 15, // Ultra-conservative daily limit
+    responseRate: 0.25, // Only respond to 25% of comments
+    minDelayMs: 120000, // Minimum 2 minutes  
+    maxDelayMs: 600000, // Maximum 10 minutes
     useTypingSimulation: true,
     varyResponsePatterns: true
   };
 
-  // Ultra-natural response templates
+  // Ultra-natural response templates with maximum variation
   private stealthResponses = {
-    appreciation: ['🔥', '❤️', '👍', 'nice', 'love it', 'cool'],
-    agreement: ['yes', 'exactly', 'true', 'right', 'facts'],
-    questions: ['how?', 'where?', 'really?', 'details?'],
-    casual: ['haha', 'lol', 'wow', 'omg', 'nice one'],
-    price_inquiry: ['dm', 'inbox', 'price?', 'cost?'],
-    simple: ['ok', 'sure', 'good', 'great', 'ty']
+    appreciation: ['🔥', '❤️', '👍', '💯', '✨', '👌', 'nice!', 'love this', 'amazing', 'awesome work', 'so good', 'perfect'],
+    agreement: ['exactly!', 'so true', 'absolutely', 'couldn\'t agree more', 'you\'re right', 'facts', 'this!', 'yes!'],
+    questions: ['how did you do this?', 'where is this?', 'really?', 'can you share more?', 'tell me more', 'details please'],
+    casual: ['haha love it', 'lol this is great', 'wow amazing', 'omg yes', 'this made my day', 'so cool', 'brilliant'],
+    price_inquiry: ['dm me details', 'inbox please', 'can you message me?', 'send me info', 'price details?'],
+    simple: ['thanks for sharing', 'appreciate this', 'well done', 'great job', 'keep it up', 'loving your content']
   };
 
   constructor() {

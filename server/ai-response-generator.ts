@@ -93,7 +93,7 @@ class AIResponseGenerator {
     // Check if this response was used recently
     if (this.responseHistory.has(response)) {
       // Generate a completely different response
-      return this.generateNaturalFallback(originalMessage).response;
+      return this.generateNaturalFallback(originalMessage, undefined).response;
     }
     
     // Add to history (keep only last 100 responses)
@@ -259,45 +259,25 @@ class AIResponseGenerator {
       long: "3-4 sentences with detailed response"
     };
 
-    return `You are an advanced AI assistant for social media automation. Your task is to analyze incoming messages and generate contextually appropriate responses.
+    return `You are a real person managing Instagram comments. Create NATURAL responses that avoid spam detection.
 
-CRITICAL INSTRUCTIONS:
-1. ALWAYS respond in the SAME LANGUAGE as the incoming message
-2. If message is in Hindi/Hinglish, respond in Hindi/Hinglish
-3. If message is in English, respond in English
-4. Understand and use internet slang, emojis, and modern expressions appropriately
-5. Match the tone and energy level of the incoming message
-6. Be ${personalityMap[config.personality as keyof typeof personalityMap] || 'friendly and helpful'}
-7. Keep response ${lengthMap[config.responseLength as keyof typeof lengthMap] || 'concise (2-3 sentences)'}
+Comment: "${context.message}"
+User: @${context.userProfile?.username || 'user'}
+${context.postContext ? `Post context: ${context.postContext.caption}` : ''}
+${config.businessContext ? `Business: ${config.businessContext}` : ''}
 
-INCOMING MESSAGE TO ANALYZE:
-"${context.message}"
+ANTI-SPAM REQUIREMENTS:
+1. Generate UNIQUE responses - never use templates
+2. Keep under 30 characters when possible
+3. Sound conversational, not robotic
+4. Use natural language matching the comment's tone
+5. Avoid promotional language
+6. Be specific to this exact comment
+7. Use emojis sparingly (max 1)
 
-${context.userProfile?.username ? `USER: @${context.userProfile.username}` : ''}
-${context.postContext?.caption ? `POST CONTEXT: ${context.postContext.caption}` : ''}
-${context.postContext?.hashtags ? `HASHTAGS: ${context.postContext.hashtags.join(' ')}` : ''}
+Response style: ${lengthMap[config.responseLength as keyof typeof lengthMap] || 'short'}, ${personalityMap[config.personality as keyof typeof personalityMap] || 'friendly'}
 
-ANALYSIS REQUIRED:
-1. Detect the language (Hindi/Hinglish/English/Mixed)
-2. Understand the tone (positive/negative/neutral/questioning/complaining)
-3. Identify the intent (appreciation/question/complaint/general comment)
-4. Note any slang, emojis, or cultural references
-5. Determine appropriate response style
-
-Please respond in this JSON format:
-{
-  "language": "detected language code (hi/en/hi-en for hinglish)",
-  "tone": "detected tone",
-  "intent": "detected intent", 
-  "confidence": 0.95,
-  "response": "Your contextual response in the same language and appropriate tone",
-  "reasoning": "Brief explanation of your response strategy"
-}
-
-EXAMPLES:
-- For "Bhai ye product kaisa hai?" → Respond in Hinglish with product info
-- For "Amazing post! Love it ❤️" → Respond in English with gratitude
-- For "Yaar shipping kab hogi?" → Respond in Hinglish about shipping
+Generate ONLY the response text, nothing else:
 - For "This is so cool 🔥🔥" → Match the energy in English
 
 Generate response now:`;

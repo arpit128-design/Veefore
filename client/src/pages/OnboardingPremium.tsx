@@ -286,6 +286,59 @@ export default function OnboardingPremium() {
     }
   });
 
+  // Instagram OAuth mutation
+  const instagramConnectMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("GET", "/api/instagram/auth?source=onboarding");
+      if (!response.ok) {
+        throw new Error('Failed to get Instagram authorization URL');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.authUrl) {
+        // Store current onboarding state before OAuth redirect
+        localStorage.setItem('onboarding_current_step', currentStep.toString());
+        localStorage.setItem('onboarding_form_data', JSON.stringify(formData));
+        localStorage.setItem('onboarding_returning_from_oauth', 'true');
+        localStorage.setItem('oauth_source', 'onboarding');
+        
+        // Redirect to Instagram OAuth
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error('Failed to get Instagram authorization URL');
+      }
+    },
+    onError: (error: any) => {
+      console.error('[ONBOARDING] Instagram connection failed:', error);
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Failed to connect Instagram account. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handle platform connection
+  const handlePlatformConnect = (platformId: string) => {
+    if (platformId === 'instagram') {
+      instagramConnectMutation.mutate();
+    } else {
+      // For other platforms, just toggle the connection status in UI for now
+      setFormData(prev => ({
+        ...prev,
+        connectedPlatforms: prev.connectedPlatforms.includes(platformId)
+          ? prev.connectedPlatforms.filter(id => id !== platformId)
+          : [...prev.connectedPlatforms, platformId]
+      }));
+      
+      toast({
+        title: `${platformId} Connection`,
+        description: `${platformId} OAuth integration coming soon!`,
+      });
+    }
+  };
+
   const handleNext = () => {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -659,14 +712,7 @@ export default function OnboardingPremium() {
                                         ? 'border-white/60 bg-white/10'
                                         : 'border-white/20 bg-white/5 hover:border-white/40'
                                     }`}
-                                    onClick={() => {
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        connectedPlatforms: prev.connectedPlatforms.includes(platform.id)
-                                          ? prev.connectedPlatforms.filter(id => id !== platform.id)
-                                          : [...prev.connectedPlatforms, platform.id]
-                                      }));
-                                    }}
+                                    onClick={() => handlePlatformConnect(platform.id)}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                   >

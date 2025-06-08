@@ -1852,17 +1852,22 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       avgLikes = 0,
       avgComments = 0,
       avgReach = 0,
-      engagementRate = 0
+      avgEngagement = 0
     } = instagramAccount;
 
-    // Use the authentic engagement rate directly (already stored as percentage from dashboard API)
-    let engagementPercent = engagementRate || 0;
+    // Use the authentic engagement rate directly from Instagram Business API
+    let engagementPercent = avgEngagement || 0;
     
-    // If engagement rate is 0 but we have engagement data, calculate it
-    if (engagementPercent === 0 && followersCount > 0 && (avgLikes > 0 || avgComments > 0)) {
+    // Log which engagement rate we're using
+    if (engagementPercent > 0) {
+      console.log(`[AI SUGGESTIONS] Using authentic Instagram Business API engagement rate: ${engagementPercent.toFixed(2)}%`);
+    } else if (followersCount > 0 && (avgLikes > 0 || avgComments > 0)) {
+      // Only calculate as fallback if we don't have authentic API data
       const totalEngagement = avgLikes + avgComments;
       engagementPercent = (totalEngagement / followersCount) * 100;
-      console.log(`[AI SUGGESTIONS] Calculated engagement rate from data: ${engagementPercent.toFixed(2)}%`);
+      console.log(`[AI SUGGESTIONS] Fallback calculation - computed ${engagementPercent.toFixed(2)}% from basic metrics`);
+    } else {
+      console.log(`[AI SUGGESTIONS] No engagement data available`);
     }
     
     // Log the real data being analyzed

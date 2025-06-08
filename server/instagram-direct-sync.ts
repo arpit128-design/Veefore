@@ -70,9 +70,9 @@ export class InstagramDirectSync {
       let accountInsights = { totalReach: 0, totalImpressions: 0, profileViews: 0 };
       
       try {
-        // Use the correct Instagram Business API insights endpoint format for account-level metrics
+        // Try different Instagram Business API insights approaches for accounts with full permissions
         const accountInsightsResponse = await fetch(
-          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,impressions,profile_views&period=day&access_token=${accessToken}`
+          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,impressions,profile_views&period=lifetime&access_token=${accessToken}`
         );
         
         if (accountInsightsResponse.ok) {

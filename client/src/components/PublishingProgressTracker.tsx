@@ -1,181 +1,150 @@
-import { useState, useEffect } from 'react';
-import { Progress } from '@/components/ui/progress';
+import { useEffect } from 'react';
+import { X, CheckCircle, AlertCircle, Clock, Upload, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Clock, AlertCircle, Video, Image, Upload, Cog } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface PublishingProgressTrackerProps {
-  contentType: string;
-  isPublishing: boolean;
-  isScheduled?: boolean;
-  contentId?: string;
-  onComplete?: () => void;
+  isVisible: boolean;
+  status: 'preparing' | 'uploading' | 'processing' | 'scheduling' | 'completed' | 'error';
+  progress: number;
+  currentStep: string;
+  timeRemaining: string;
+  onClose: () => void;
 }
 
-export function PublishingProgressTracker({ 
-  contentType, 
-  isPublishing, 
-  isScheduled = false,
-  contentId,
-  onComplete 
+export default function PublishingProgressTracker({
+  isVisible,
+  status,
+  progress,
+  currentStep,
+  timeRemaining,
+  onClose
 }: PublishingProgressTrackerProps) {
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [publishingStatus, setPublishingStatus] = useState<string>('preparing');
-
-  const getSteps = (type: string, scheduled: boolean = false) => {
-    const isVideo = type === 'video' || type === 'reel';
-    const baseSteps = [
-      ...(scheduled ? [{ name: 'Scheduled time reached', duration: 1 }] : []),
-      { name: isScheduled ? 'Retrieving content' : 'Uploading file', duration: isScheduled ? 2 : 3 },
-      { name: 'Creating Instagram container', duration: 2 },
-      ...(isVideo ? [
-        { name: 'Processing video (Instagram)', duration: 90 },
-        { name: 'Quality verification', duration: 15 }
-      ] : [
-        { name: 'Processing image', duration: 8 }
-      ]),
-      { name: 'Publishing to feed', duration: 5 },
-      { name: 'Verification complete', duration: 0 }
-    ];
-    return baseSteps;
-  };
-
-  const steps = getSteps(contentType, isScheduled);
-  const totalDuration = steps.reduce((acc, step) => acc + step.duration, 0);
-
   useEffect(() => {
-    if (!isPublishing) {
-      setProgress(0);
-      setCurrentStep(0);
-      setTimeRemaining(0);
-      return;
+    if (status === 'completed') {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000);
+      return () => clearTimeout(timer);
     }
+  }, [status, onClose]);
 
-    let elapsedTime = 0;
-    const interval = setInterval(() => {
-      elapsedTime += 1;
-      
-      // Calculate current step and progress
-      let stepTime = 0;
-      let currentStepIndex = 0;
-      
-      for (let i = 0; i < steps.length; i++) {
-        if (elapsedTime <= stepTime + steps[i].duration) {
-          currentStepIndex = i;
-          break;
-        }
-        stepTime += steps[i].duration;
-      }
+  if (!isVisible) return null;
 
-      setCurrentStep(currentStepIndex);
-      
-      // Calculate overall progress
-      const overallProgress = Math.min((elapsedTime / totalDuration) * 100, 100);
-      setProgress(overallProgress);
-      
-      // Calculate time remaining
-      const remaining = Math.max(totalDuration - elapsedTime, 0);
-      setTimeRemaining(remaining);
-      
-      // Complete when done
-      if (elapsedTime >= totalDuration) {
-        clearInterval(interval);
-        onComplete?.();
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isPublishing, contentType, totalDuration]);
-
-  if (!isPublishing) return null;
-
-  const formatTime = (seconds: number) => {
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'preparing':
+        return <Clock className="h-5 w-5 text-solar-gold animate-pulse" />;
+      case 'uploading':
+        return <Upload className="h-5 w-5 text-electric-cyan animate-bounce" />;
+      case 'processing':
+        return <Zap className="h-5 w-5 text-nebula-purple animate-pulse" />;
+      case 'scheduling':
+        return <Clock className="h-5 w-5 text-electric-cyan animate-spin" />;
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-400" />;
+      case 'error':
+        return <AlertCircle className="h-5 w-5 text-red-400" />;
+      default:
+        return <Clock className="h-5 w-5 text-asteroid-silver" />;
+    }
   };
 
-  const getContentIcon = () => {
-    if (contentType === 'video' || contentType === 'reel') {
-      return <Video className="h-5 w-5 text-electric-cyan" />;
+  const getStatusColor = () => {
+    switch (status) {
+      case 'preparing':
+        return 'border-solar-gold/50 bg-solar-gold/10';
+      case 'uploading':
+        return 'border-electric-cyan/50 bg-electric-cyan/10';
+      case 'processing':
+        return 'border-nebula-purple/50 bg-nebula-purple/10';
+      case 'scheduling':
+        return 'border-electric-cyan/50 bg-electric-cyan/10';
+      case 'completed':
+        return 'border-green-400/50 bg-green-400/10';
+      case 'error':
+        return 'border-red-400/50 bg-red-400/10';
+      default:
+        return 'border-white/20 bg-white/5';
     }
-    return <Image className="h-5 w-5 text-electric-cyan" />;
   };
 
   return (
-    <Card className="content-card glassmorphism border-electric-cyan/30">
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <Card className={`content-card glassmorphism border-2 ${getStatusColor()} max-w-md w-full mx-auto`}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              {getContentIcon()}
-              <div>
-                <h3 className="font-semibold text-white">Publishing {contentType}</h3>
-                <p className="text-sm text-asteroid-silver">
-                  {timeRemaining > 0 ? `${formatTime(timeRemaining)} remaining` : 'Almost done...'}
+              {getStatusIcon()}
+              <h3 className="font-semibold text-white">
+                {status === 'completed' ? 'Success!' : 
+                 status === 'error' ? 'Error' : 'Publishing Content'}
+              </h3>
+            </div>
+            
+            {status !== 'completed' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="text-asteroid-silver hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            {/* Progress Bar */}
+            {status !== 'error' && (
+              <div className="space-y-2">
+                <Progress 
+                  value={progress} 
+                  className="h-2"
+                />
+                <div className="flex justify-between text-xs text-asteroid-silver">
+                  <span>{progress}%</span>
+                  <span>{timeRemaining}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Current Step */}
+            <p className="text-sm text-asteroid-silver text-center">
+              {currentStep}
+            </p>
+
+            {/* Status-specific content */}
+            {status === 'completed' && (
+              <div className="text-center">
+                <p className="text-green-400 font-medium mb-2">
+                  Content published successfully!
+                </p>
+                <p className="text-xs text-asteroid-silver">
+                  This dialog will close automatically
                 </p>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-electric-cyan">{Math.round(progress)}%</div>
-            </div>
-          </div>
+            )}
 
-          {/* Progress Bar */}
-          <Progress value={progress} className="h-2" />
-
-          {/* Steps */}
-          <div className="space-y-3">
-            {steps.map((step, index) => {
-              const isActive = currentStep === index;
-              const isComplete = currentStep > index;
-              const isPending = currentStep < index;
-
-              return (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="flex-shrink-0">
-                    {isComplete ? (
-                      <CheckCircle className="h-5 w-5 text-green-400" />
-                    ) : isActive ? (
-                      <Clock className="h-5 w-5 text-electric-cyan animate-pulse" />
-                    ) : (
-                      <div className="h-5 w-5 rounded-full border-2 border-asteroid-silver/30" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-sm ${
-                      isComplete ? 'text-green-400' : 
-                      isActive ? 'text-white' : 
-                      'text-asteroid-silver/60'
-                    }`}>
-                      {step.name}
-                    </p>
-                    {isActive && step.duration > 10 && (
-                      <p className="text-xs text-asteroid-silver/80">
-                        This may take up to {formatTime(step.duration)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Video Processing Notice */}
-          {(contentType === 'video' || contentType === 'reel') && currentStep <= 2 && (
-            <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-blue-300">
-                <p className="font-medium">Video Processing</p>
-                <p>Instagram needs time to process video files. Larger files may take longer.</p>
+            {status === 'error' && (
+              <div className="text-center space-y-3">
+                <p className="text-red-400 font-medium">
+                  Publishing failed
+                </p>
+                <Button
+                  onClick={onClose}
+                  variant="outline"
+                  size="sm"
+                  className="glassmorphism hover:bg-red-500/20 hover:border-red-400"
+                >
+                  Close
+                </Button>
               </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

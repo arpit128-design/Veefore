@@ -126,17 +126,13 @@ input[type="time"]:focus {
 .glassmorphism input[type="date"],
 .glassmorphism input[type="time"],
 input[type="date"].glassmorphism,
-input[type="time"].glassmorphism,
-div.glassmorphism input[type="date"],
-div.glassmorphism input[type="time"] {
-  background: rgba(26, 35, 50, 0.7) !important;
+input[type="time"].glassmorphism {
+  background: rgba(255, 255, 255, 0.05) !important;
   backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(0, 212, 255, 0.2) !important;
-  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: hsl(var(--foreground)) !important;
   border-radius: calc(var(--radius) - 2px) !important;
   padding: 8px 12px !important;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
 }
 
 .glassmorphism input[type="date"]::-webkit-datetime-edit,

@@ -600,10 +600,10 @@ export default function OnboardingPremium() {
               >
                 <div className="p-4 sm:p-6 md:p-8 lg:p-12">
                   {/* Step Header */}
-                  <div className="text-center mb-8">
+                  <div className="text-center mb-6 sm:mb-8">
                     <MagneticElement strength={15}>
                       <div 
-                        className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+                        className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
                         style={{
                           background: `radial-gradient(circle, ${currentStepData.color}40 0%, ${currentStepData.color}20 100%)`,
                           border: `2px solid ${currentStepData.color}60`
@@ -611,7 +611,7 @@ export default function OnboardingPremium() {
                       >
                         <MorphingIcon 
                           icons={[currentStepData.icon, Sparkles, Star]} 
-                          size={32} 
+                          size={24} 
                           color={currentStepData.color}
                           interval={3000}
                         />
@@ -619,7 +619,7 @@ export default function OnboardingPremium() {
                     </MagneticElement>
                     
                     <ScrollReveal direction="up" delay={0.2}>
-                      <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+                      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
                         <GlitchText 
                           text={currentStepData.title}
                           className="text-white"
@@ -629,7 +629,7 @@ export default function OnboardingPremium() {
                     </ScrollReveal>
                     
                     <ScrollReveal direction="up" delay={0.4}>
-                      <h2 className="text-xl lg:text-2xl text-white/80 mb-4">
+                      <h2 className="text-lg sm:text-xl lg:text-2xl text-white/80 mb-3 sm:mb-4">
                         <TypewriterText 
                           text={currentStepData.subtitle}
                           speed={50}
@@ -639,18 +639,18 @@ export default function OnboardingPremium() {
                     </ScrollReveal>
                     
                     <ScrollReveal direction="up" delay={0.6}>
-                      <p className="text-white/60 text-lg max-w-2xl mx-auto">
+                      <p className="text-white/60 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
                         {currentStepData.description}
                       </p>
                     </ScrollReveal>
                   </div>
 
                   {/* Step Content */}
-                  <div className="min-h-[400px] flex items-center justify-center">
+                  <div className="min-h-[300px] sm:min-h-[400px] flex items-center justify-center">
                     {currentStep === 0 && (
                       <ScrollReveal direction="up" delay={0.8}>
-                        <div className="text-center space-y-6">
-                          <div className="grid grid-cols-3 gap-6 mb-8">
+                        <div className="text-center space-y-4 sm:space-y-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                             {[
                               { icon: Brain, label: 'AI-Powered', color: '#6366f1' },
                               { icon: Rocket, label: 'Lightning Fast', color: '#8b5cf6' },
@@ -664,22 +664,22 @@ export default function OnboardingPremium() {
                                 transition={{ delay: 1 + index * 0.2 }}
                               >
                                 <div 
-                                  className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center"
+                                  className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 rounded-full flex items-center justify-center"
                                   style={{
                                     background: `radial-gradient(circle, ${feature.color}40 0%, ${feature.color}20 100%)`,
                                     border: `1px solid ${feature.color}60`
                                   }}
                                 >
-                                  <feature.icon size={24} color={feature.color} />
+                                  <feature.icon size={20} color={feature.color} />
                                 </div>
-                                <p className="text-white/80 text-sm">{feature.label}</p>
+                                <p className="text-white/80 text-xs sm:text-sm">{feature.label}</p>
                               </motion.div>
                             ))}
                           </div>
                           
                           <AnimatedText 
                             text="Ready to revolutionize your content creation?"
-                            className="text-2xl font-semibold text-white"
+                            className="text-lg sm:text-xl md:text-2xl font-semibold text-white px-4"
                             delay={1.5}
                             stagger={0.05}
                           />
@@ -689,9 +689,9 @@ export default function OnboardingPremium() {
 
                     {currentStep === 1 && (
                       <ScrollReveal direction="up" delay={0.3}>
-                        <div className="w-full max-w-md space-y-6">
-                          <div className="space-y-4">
-                            <Label htmlFor="business-name" className="text-white font-medium">
+                        <div className="w-full max-w-md mx-auto space-y-4 sm:space-y-6 px-4">
+                          <div className="space-y-3 sm:space-y-4">
+                            <Label htmlFor="business-name" className="text-white font-medium text-sm sm:text-base">
                               Business Name *
                             </Label>
                             <Input
@@ -1226,25 +1226,25 @@ export default function OnboardingPremium() {
                   </div>
 
                   {/* Navigation */}
-                  <div className="flex justify-between items-center mt-8">
+                  <div className="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-8 gap-4 sm:gap-0">
                     {currentStep > 0 && currentStep < onboardingSteps.length - 1 ? (
                       <HolographicButton
                         onClick={handleBack}
                         glowColor="#6b7280"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 text-sm sm:text-base"
                       >
-                        <ArrowLeft size={20} />
+                        <ArrowLeft size={16} />
                         Back
                       </HolographicButton>
                     ) : (
                       <div />
                     )}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 order-first sm:order-none">
                       {onboardingSteps.map((_, index) => (
                         <motion.div
                           key={index}
-                          className={`w-2 h-2 rounded-full ${
+                          className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                             index === currentStep ? 'bg-white' : 'bg-white/30'
                           }`}
                           animate={{
@@ -1260,19 +1260,19 @@ export default function OnboardingPremium() {
                       <HolographicButton
                         onClick={handleNext}
                         glowColor={currentStepData.color}
-                        className={`flex items-center gap-2 ${
+                        className={`flex items-center gap-2 text-sm sm:text-base ${
                           !canProceedToNextStep() ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                         disabled={!canProceedToNextStep()}
                       >
                         Next
-                        <ArrowRight size={20} />
+                        <ArrowRight size={16} />
                       </HolographicButton>
                     ) : (
                       <HolographicButton
                         onClick={handleComplete}
                         glowColor="#10b981"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 text-sm sm:text-base"
                         disabled={completeOnboardingMutation.isPending || isCompleting || isLoading}
                       >
                         {(completeOnboardingMutation.isPending || isCompleting || isLoading) ? (
@@ -1281,14 +1281,14 @@ export default function OnboardingPremium() {
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             >
-                              <Sparkles size={20} />
+                              <Sparkles size={16} />
                             </motion.div>
                             Completing...
                           </>
                         ) : (
                           <>
                             Launch
-                            <Rocket size={20} />
+                            <Rocket size={16} />
                           </>
                         )}
                       </HolographicButton>

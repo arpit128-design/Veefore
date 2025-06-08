@@ -229,16 +229,12 @@ export class InstagramWebhookHandler {
       const automationRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
       console.log(`[WEBHOOK] Found ${automationRules.length} automation rules for workspace ${socialAccount.workspaceId}`);
 
-      // Find DM automation rules - access type from trigger object
+      // Find DM automation rules - use the type field from MongoDB storage
       const dmRules = automationRules.filter((rule: any) => {
         const isActive = rule.isActive;
-        const trigger = rule.trigger || {};
-        const action = rule.action || {};
+        const isDmType = rule.type === 'dm';
         
-        // Check for DM type in trigger structure (MongoDB format)
-        const isDmType = trigger.type === 'dm' || action.type === 'dm';
-        
-        console.log(`[WEBHOOK] Rule ${rule.name}: active=${isActive}, trigger.type=${trigger.type}, action.type=${action.type}, isDmType=${isDmType}`);
+        console.log(`[WEBHOOK] Rule ${rule.name}: active=${isActive}, type=${rule.type}, isDmType=${isDmType}`);
         
         return isActive && isDmType;
       });
@@ -281,9 +277,7 @@ export class InstagramWebhookHandler {
         const updatedRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
         const updatedDmRules = updatedRules.filter((rule: any) => {
           const isActive = rule.isActive;
-          const trigger = rule.trigger || {};
-          const action = rule.action || {};
-          const isDmType = trigger.type === 'dm' || action.type === 'dm';
+          const isDmType = rule.type === 'dm';
           
           return isActive && isDmType;
         });

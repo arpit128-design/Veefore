@@ -1053,19 +1053,25 @@ export class MongoStorage implements IStorage {
       console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules`);
       console.log(`[MONGODB DEBUG] Search query workspaceId: ${workspaceId.toString()}`);
       
-      return rules.map(rule => ({
-        id: rule._id.toString(),
-        name: rule.name || '',
-        workspaceId: typeof workspaceId === 'string' ? workspaceId : parseInt(rule.workspaceId),
-        description: rule.description || null,
-        isActive: rule.isActive !== false,
-        trigger: rule.trigger || {},
-        action: rule.action || {},
-        lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
-        nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
-        createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
-        updatedAt: rule.updatedAt ? new Date(rule.updatedAt) : new Date()
-      }));
+      return rules.map(rule => {
+        const trigger = rule.trigger || {};
+        const action = rule.action || {};
+        
+        return {
+          id: rule._id.toString(),
+          name: rule.name || '',
+          workspaceId: typeof workspaceId === 'string' ? workspaceId : parseInt(rule.workspaceId),
+          description: rule.description || null,
+          isActive: rule.isActive !== false,
+          type: trigger.type || action.type || 'dm', // Extract type for webhook processing
+          trigger: trigger,
+          action: action,
+          lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
+          nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
+          createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
+          updatedAt: rule.updatedAt ? new Date(rule.updatedAt) : new Date()
+        };
+      });
     } catch (error: any) {
       console.error('[MONGODB DEBUG] getAutomationRules error:', error.message);
       return [];

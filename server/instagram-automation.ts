@@ -50,9 +50,24 @@ export interface AutomationLog {
 
 export class InstagramAutomation {
   private aiGenerator: AIResponseGenerator;
+  private processedComments = new Set<string>();
 
   constructor(private storage: IStorage) {
     this.aiGenerator = new AIResponseGenerator();
+  }
+
+  /**
+   * Check if comment has already been processed
+   */
+  isCommentProcessed(commentId: string): boolean {
+    return this.processedComments.has(commentId);
+  }
+
+  /**
+   * Mark comment as processed
+   */
+  markCommentProcessed(commentId: string): void {
+    this.processedComments.add(commentId);
   }
 
   /**

@@ -238,6 +238,17 @@ export class InstagramWebhookHandler {
           isActive: rule.isActive
         });
 
+        const commentId = value.comment_id || value.id;
+        
+        // Check if this comment has already been processed
+        if (this.automation.isCommentProcessed(commentId)) {
+          console.log(`[WEBHOOK] ⚠️ Comment ${commentId} already processed, skipping automation`);
+          return;
+        }
+
+        // Mark comment as processed to prevent duplicates
+        this.automation.markCommentProcessed(commentId);
+
         console.log(`[WEBHOOK] Starting AI response generation for comment: "${value.text}"`);
 
         try {
@@ -255,7 +266,7 @@ export class InstagramWebhookHandler {
           console.log(`[WEBHOOK] Sending automated comment with access token length: ${socialAccount.accessToken?.length || 0}`);
           const result = await this.automation.sendAutomatedComment(
             socialAccount.accessToken,
-            value.comment_id || value.id,
+            commentId,
             response,
             socialAccount.workspaceId,
             rule.id

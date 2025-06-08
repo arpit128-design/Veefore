@@ -81,30 +81,44 @@ export class InstagramDirectSync {
         
         for (const post of posts.slice(0, 15)) { // Process up to 15 recent posts
           try {
-            // First, try to get detailed media data with video views
+            // Try multiple Instagram Business API fields to capture authentic view data
             console.log(`[INSTAGRAM DIRECT] Fetching detailed data for post ${post.id} (${post.media_type})`);
             const detailedResponse = await fetch(
-              `https://graph.instagram.com/${post.id}?fields=id,like_count,comments_count,media_type,video_views,play_count,timestamp&access_token=${accessToken}`
+              `https://graph.instagram.com/${post.id}?fields=id,like_count,comments_count,media_type,video_views,play_count,timestamp,impressions_count,reach_count,views&access_token=${accessToken}`
             );
             
             if (detailedResponse.ok) {
               const detailedData = await detailedResponse.json();
               console.log(`[INSTAGRAM DIRECT] Post ${post.id} detailed data:`, detailedData);
               
-              // For videos/reels, use video views as primary reach metric
+              // Check for any authentic reach/view data from Instagram Business API
+              let postReach = 0;
+              
               if (detailedData.video_views) {
-                totalReach += detailedData.video_views;
-                totalImpressions += detailedData.video_views;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} video views: ${detailedData.video_views}, running total reach: ${totalReach}`);
+                postReach = detailedData.video_views;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} video views: ${detailedData.video_views}`);
               } else if (detailedData.play_count) {
-                totalReach += detailedData.play_count;
-                totalImpressions += detailedData.play_count;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} play count: ${detailedData.play_count}, running total reach: ${totalReach}`);
+                postReach = detailedData.play_count;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} play count: ${detailedData.play_count}`);
+              } else if (detailedData.views) {
+                postReach = detailedData.views;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} views: ${detailedData.views}`);
+              } else if (detailedData.impressions_count) {
+                postReach = detailedData.impressions_count;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} impressions: ${detailedData.impressions_count}`);
+              } else if (detailedData.reach_count) {
+                postReach = detailedData.reach_count;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} reach: ${detailedData.reach_count}`);
+              }
+              
+              if (postReach > 0) {
+                totalReach += postReach;
+                totalImpressions += postReach;
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} authentic reach: ${postReach}, running total: ${totalReach}`);
               } else {
-                // No reach calculation - only use authentic Instagram Business API insights data
                 const likes = detailedData.like_count || 0;
                 const comments = detailedData.comments_count || 0;
-                console.log(`[INSTAGRAM DIRECT] Post ${post.id} - No authentic reach data available from Instagram Business API (${likes} likes, ${comments} comments)`);
+                console.log(`[INSTAGRAM DIRECT] Post ${post.id} - No authentic reach data from Instagram Business API (${likes} likes, ${comments} comments)`);
               }
             }
             

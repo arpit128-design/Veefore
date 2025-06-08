@@ -102,15 +102,15 @@ export class InstagramStealthResponder {
   ): Promise<{ response: string; delay: number; shouldRespond: boolean }> {
     
     // Use DM-specific checks with higher response rate
-    if (!this.shouldAttemptDMResponse(message, username)) {
+    if (!this.shouldAttemptDMResponse(message, username, context)) {
       return { response: '', delay: 0, shouldRespond: false };
     }
 
-    // Generate contextual DM response
+    // Generate contextual DM response using user configuration
     const response = await this.createDMResponse(message, username, context);
     
-    // Calculate shorter delay for DMs
-    const delay = this.calculateDMDelay(message, username);
+    // Calculate delay based on user configuration
+    const delay = this.calculateDMDelay(message, username, context);
     
     // Update tracking
     this.updateResponseTracking(username);

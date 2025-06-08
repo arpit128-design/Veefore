@@ -363,6 +363,16 @@ export class InstagramAutomation {
     try {
       console.log(`[AI AUTOMATION] Processing message for rule type: ${rule.trigger?.type || rule.action?.type}`);
       
+      // Extract user configuration from rule
+      const action = rule.action || {};
+      const aiConfig = action.aiConfig || {};
+      const personality = aiConfig.personality || action.aiPersonality || 'friendly';
+      const responseLength = aiConfig.responseLength || action.responseLength || 'medium';
+      const language = aiConfig.language || 'auto';
+      const contextualMode = aiConfig.contextualMode !== false; // default to true
+      
+      console.log(`[AI AUTOMATION] Using configuration: personality=${personality}, length=${responseLength}, language=${language}, contextual=${contextualMode}`);
+      
       // Check if this is a DM rule - use DM-specific response with 100% rate
       const isDMRule = (rule.trigger?.type === 'dm') || (rule.action?.type === 'dm');
       
@@ -374,7 +384,10 @@ export class InstagramAutomation {
           { 
             platform: 'instagram', 
             ruleId: rule.id,
-            aiPersonality: rule.action?.aiPersonality || 'friendly'
+            aiPersonality: personality,
+            responseLength: responseLength,
+            language: language,
+            contextualMode: contextualMode
           }
         );
         
@@ -392,7 +405,14 @@ export class InstagramAutomation {
         const stealthResult = await this.stealthResponder.generateStealthResponse(
           message,
           userProfile?.username || 'unknown',
-          { platform: 'instagram', ruleId: rule.id }
+          { 
+            platform: 'instagram', 
+            ruleId: rule.id,
+            aiPersonality: personality,
+            responseLength: responseLength,
+            language: language,
+            contextualMode: contextualMode
+          }
         );
         
         if (stealthResult.shouldRespond && stealthResult.response) {

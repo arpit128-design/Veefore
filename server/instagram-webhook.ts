@@ -333,7 +333,15 @@ export class InstagramWebhookHandler {
   ): Promise<void> {
     try {
       console.log(`[WEBHOOK] Starting DM response generation for: "${messageText}"`);
-      console.log(`[WEBHOOK] Calling stealth response generator...`);
+      
+      // Validate rule configuration before processing
+      const validationResult = await this.validateRuleConfiguration(rule, socialAccount.workspaceId);
+      if (!validationResult.canExecute) {
+        console.log(`[WEBHOOK] Rule execution blocked: ${validationResult.reason}`);
+        return;
+      }
+
+      console.log(`[WEBHOOK] Rule validation passed, generating response...`);
 
       const automation = new InstagramAutomation(this.storage);
       const response = await automation.generateContextualResponse(
@@ -343,6 +351,13 @@ export class InstagramWebhookHandler {
       );
 
       if (response) {
+        // Apply response delay if configured
+        const responseDelay = rule.action?.aiConfig?.responseDelay || 0;
+        if (responseDelay > 0) {
+          console.log(`[WEBHOOK] Applying response delay: ${responseDelay} seconds`);
+          await new Promise(resolve => setTimeout(resolve, responseDelay * 1000));
+        }
+
         // Send DM response
         const dmResponse = await this.sendDirectMessage(
           socialAccount.accessToken,
@@ -353,6 +368,9 @@ export class InstagramWebhookHandler {
 
         if (dmResponse.success) {
           console.log(`[WEBHOOK] ✓ DM sent successfully: "${response}"`);
+          
+          // Update daily response count
+          await this.updateDailyResponseCount(rule.id, socialAccount.workspaceId);
           
           // Log successful DM interaction
           console.log(`[WEBHOOK] DM interaction logged: ${messageText} -> ${response}`);
@@ -365,6 +383,117 @@ export class InstagramWebhookHandler {
 
     } catch (error) {
       console.error(`[WEBHOOK] Error handling DM event:`, error);
+    }
+  }
+
+  /**
+   * Validate rule configuration before execution
+   */
+  private async validateRuleConfiguration(rule: any, workspaceId: string): Promise<{ canExecute: boolean; reason?: string }> {
+    try {
+      const now = new Date();
+      const action = rule.action || {};
+      const aiConfig = action.aiConfig || {};
+      
+      // Check if rule is active
+      if (!rule.isActive) {
+        return { canExecute: false, reason: 'Rule is not active' };
+      }
+
+      // Check duration settings
+      if (action.duration) {
+        const { startDate, endDate } = action.duration;
+        if (startDate && new Date(startDate) > now) {
+          return { canExecute: false, reason: 'Rule start date has not been reached' };
+        }
+        if (endDate && new Date(endDate) < now) {
+          return { canExecute: false, reason: 'Rule end date has passed' };
+        }
+      }
+
+      // Check active time settings
+      if (action.activeTime) {
+        const { startTime, endTime, days } = action.activeTime;
+        
+        // Check if current day is allowed
+        if (days && days.length > 0) {
+          const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+          const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          const currentDayName = dayNames[currentDay];
+          
+          if (!days.includes(currentDayName)) {
+            return { canExecute: false, reason: `Rule not active on ${currentDayName}` };
+          }
+        }
+
+        // Check if current time is within active hours
+        if (startTime && endTime) {
+          const currentTime = now.getHours() * 100 + now.getMinutes(); // HHMM format
+          const start = parseInt(startTime.replace(':', ''));
+          const end = parseInt(endTime.replace(':', ''));
+          
+          if (currentTime < start || currentTime > end) {
+            return { canExecute: false, reason: `Rule not active during current time (${startTime} - ${endTime})` };
+          }
+        }
+      }
+
+      // Check daily response limit
+      if (aiConfig.dailyLimit && aiConfig.dailyLimit > 0) {
+        const todayCount = await this.getDailyResponseCount(rule.id, workspaceId);
+        if (todayCount >= aiConfig.dailyLimit) {
+          return { canExecute: false, reason: `Daily response limit reached (${todayCount}/${aiConfig.dailyLimit})` };
+        }
+      }
+
+      return { canExecute: true };
+    } catch (error) {
+      console.error('[WEBHOOK] Error validating rule configuration:', error);
+      return { canExecute: false, reason: 'Rule validation failed' };
+    }
+  }
+
+  /**
+   * Get daily response count for a rule
+   */
+  private async getDailyResponseCount(ruleId: string, workspaceId: string): Promise<number> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Get automation logs for today
+      const logs = await this.storage.getAutomationLogs?.(workspaceId) || [];
+      const todayLogs = logs.filter(log => 
+        log.ruleId === ruleId &&
+        log.createdAt >= today &&
+        log.createdAt < tomorrow &&
+        log.success
+      );
+
+      return todayLogs.length;
+    } catch (error) {
+      console.error('[WEBHOOK] Error getting daily response count:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Update daily response count for a rule
+   */
+  private async updateDailyResponseCount(ruleId: string, workspaceId: string): Promise<void> {
+    try {
+      // Log the automation execution
+      await this.storage.createAutomationLog?.({
+        ruleId,
+        workspaceId,
+        type: 'dm_response',
+        success: true,
+        createdAt: new Date()
+      });
+    } catch (error) {
+      console.error('[WEBHOOK] Error updating daily response count:', error);
     }
   }
 

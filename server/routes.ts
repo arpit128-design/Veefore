@@ -3697,6 +3697,128 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Schedule content route - CRITICAL MISSING ENDPOINT
+  app.post('/api/content/schedule', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { title, description, type, platform, scheduledAt, contentData } = req.body;
+
+      console.log('[CONTENT SCHEDULE] Request body:', {
+        title, description, type, platform, scheduledAt, contentData,
+        userId: user.id
+      });
+
+      // Get user's workspace
+      const workspaces = await storage.getWorkspacesByUser(user.id);
+      const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+      
+      if (!currentWorkspace) {
+        return res.status(400).json({ error: 'No workspace found for user' });
+      }
+
+      // Create scheduled content with proper structure
+      const contentToSave = {
+        title,
+        description,
+        type,
+        platform,
+        status: 'scheduled',
+        scheduledAt: new Date(scheduledAt),
+        workspaceId: currentWorkspace.id,
+        creditsUsed: 0,
+        contentData: contentData || {},
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      console.log('[CONTENT SCHEDULE] Saving content:', contentToSave);
+
+      const savedContent = await storage.createContent(contentToSave);
+      
+      console.log('[CONTENT SCHEDULE] Content saved successfully:', savedContent.id);
+
+      res.json({ 
+        success: true, 
+        content: savedContent,
+        message: 'Content scheduled successfully'
+      });
+    } catch (error: any) {
+      console.error('[CONTENT SCHEDULE] Error scheduling content:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get scheduled content route
+  app.get('/api/content/scheduled', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId } = req.query;
+
+      console.log('[CONTENT SCHEDULED] Getting scheduled content for workspace:', workspaceId);
+
+      if (!workspaceId) {
+        // Get user's default workspace
+        const workspaces = await storage.getWorkspacesByUser(user.id);
+        const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+        
+        if (!currentWorkspace) {
+          return res.json([]);
+        }
+        
+        const scheduledContent = await storage.getScheduledContent(currentWorkspace.id);
+        console.log('[CONTENT SCHEDULED] Found scheduled content:', scheduledContent.length);
+        return res.json(scheduledContent);
+      }
+
+      const scheduledContent = await storage.getScheduledContent(workspaceId);
+      console.log('[CONTENT SCHEDULED] Found scheduled content:', scheduledContent.length);
+      
+      res.json(scheduledContent);
+    } catch (error: any) {
+      console.error('[CONTENT SCHEDULED] Error fetching scheduled content:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Content metrics route
+  app.get('/api/content/metrics', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId } = req.query;
+
+      // Get user's workspace
+      const workspaces = await storage.getUserWorkspaces(user.id);
+      const currentWorkspace = workspaceId 
+        ? workspaces.find(w => w.id === workspaceId)
+        : workspaces.find(w => w.isDefault) || workspaces[0];
+      
+      if (!currentWorkspace) {
+        return res.json({ scheduled: 0, published: 0, thisWeek: 0, successRate: 98 });
+      }
+
+      // Get content metrics for the workspace
+      const scheduledContent = await storage.getScheduledContent(currentWorkspace.id);
+      const allContent = await storage.getContentByWorkspace(currentWorkspace.id);
+      
+      const published = allContent.filter(c => c.status === 'published').length;
+      const thisWeek = allContent.filter(c => {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return c.createdAt && new Date(c.createdAt) > weekAgo;
+      }).length;
+
+      res.json({
+        scheduled: scheduledContent.length,
+        published,
+        thisWeek,
+        successRate: 98 // Static for now, can be calculated based on actual data
+      });
+    } catch (error: any) {
+      console.error('[CONTENT METRICS] Error fetching metrics:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Start automatic token refresh scheduler
   setInterval(async () => {
     try {

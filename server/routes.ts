@@ -2951,7 +2951,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       let updatedCount = 0;
       for (const rule of existingRules) {
         try {
-          await storage.updateAutomationRule(rule.id, {
+          await storage.updateAutomationRule(rule.id.toString(), {
             trigger: {
               type: 'dm',
               aiMode: 'contextual',

@@ -441,7 +441,10 @@ export default function OnboardingPremium() {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      handleComplete();
+      // Prevent multiple completion attempts
+      if (!createWorkspaceMutation.isPending && !isCompleting) {
+        handleComplete();
+      }
     }
   };
 
@@ -452,6 +455,11 @@ export default function OnboardingPremium() {
   };
 
   const handleComplete = async () => {
+    // Prevent multiple submissions
+    if (createWorkspaceMutation.isPending || isCompleting) {
+      return;
+    }
+
     if (!formData.businessName.trim() || !formData.workspaceName.trim()) {
       toast({
         title: "Required Fields Missing",
@@ -1199,9 +1207,9 @@ export default function OnboardingPremium() {
                         onClick={handleComplete}
                         glowColor="#10b981"
                         className="flex items-center gap-2"
-                        disabled={isLoading}
+                        disabled={createWorkspaceMutation.isPending || isCompleting || isLoading}
                       >
-                        {isLoading ? (
+                        {(createWorkspaceMutation.isPending || isCompleting || isLoading) ? (
                           <>
                             <motion.div
                               animate={{ rotate: 360 }}

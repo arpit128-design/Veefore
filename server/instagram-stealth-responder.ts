@@ -30,10 +30,10 @@ export class InstagramStealthResponder {
   private userInteractionPatterns: Map<string, any> = new Map();
 
   private config: StealthConfig = {
-    maxDailyResponses: 25, // Very conservative
-    responseRate: 0.4, // Only respond to 40% of comments
-    minDelayMs: 45000, // Minimum 45 seconds
-    maxDelayMs: 300000, // Maximum 5 minutes
+    maxDailyResponses: 50, // Increased daily limit
+    responseRate: 0.75, // Respond to 75% of comments
+    minDelayMs: 30000, // Minimum 30 seconds
+    maxDelayMs: 180000, // Maximum 3 minutes
     useTypingSimulation: true,
     varyResponsePatterns: true
   };
@@ -103,7 +103,7 @@ export class InstagramStealthResponder {
 
     // Skip if too soon after last response
     const timeSinceLastResponse = Date.now() - this.lastResponseTime;
-    if (timeSinceLastResponse < 30000) { // Less than 30 seconds
+    if (timeSinceLastResponse < 15000) { // Less than 15 seconds
       console.log('[STEALTH] Too soon since last response');
       return false;
     }

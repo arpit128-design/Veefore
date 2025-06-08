@@ -222,7 +222,7 @@ export class InstagramWebhookHandler {
       console.log(`[WEBHOOK] New comment from @${value.from.username}: "${value.text}"`);
 
       // Get automation rules for this workspace
-      const rules = await this.getAutomationRules(socialAccount.workspaceId, 'comment');
+      const rules = await this.getAutomationRules(socialAccount.workspaceId);
       
       for (const rule of rules) {
         console.log(`[WEBHOOK] Processing rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);

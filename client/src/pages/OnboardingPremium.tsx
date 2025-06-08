@@ -967,49 +967,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 4 && (
-                      <ScrollReveal direction="up" delay={0.3}>
-                        <div className="w-full">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {personalities.map((personality, index) => (
-                              <motion.div
-                                key={personality.id}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.1 }}
-                              >
-                                <MagneticElement strength={10}>
-                                  <motion.div
-                                    className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                                      formData.aiPersonality === personality.id
-                                        ? 'border-white/60 bg-white/10'
-                                        : 'border-white/20 bg-white/5 hover:border-white/40'
-                                    }`}
-                                    onClick={() => setFormData(prev => ({ ...prev, aiPersonality: personality.id }))}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                  >
-                                    <div className="text-center">
-                                      <div 
-                                        className="w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center"
-                                        style={{
-                                          background: `radial-gradient(circle, ${personality.color}40 0%, ${personality.color}20 100%)`,
-                                          border: `1px solid ${personality.color}60`
-                                        }}
-                                      >
-                                        <personality.icon size={20} color={personality.color} />
-                                      </div>
-                                      <h3 className="font-semibold text-white mb-2">{personality.name}</h3>
-                                      <p className="text-sm text-white/60">{personality.description}</p>
-                                    </div>
-                                  </motion.div>
-                                </MagneticElement>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-                      </ScrollReveal>
-                    )}
+
 
                     {currentStep === 5 && (
                       <ScrollReveal direction="up" delay={0.3}>

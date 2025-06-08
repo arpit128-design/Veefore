@@ -34,7 +34,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 
 // Simple Animation Components
-const AnimatedCounter = ({ end, suffix = "" }) => {
+const AnimatedCounter = ({ end, suffix = "" }: { end: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const AnimatedCounter = ({ end, suffix = "" }) => {
   return <span>{count}{suffix}</span>;
 };
 
-const FadeInWhenVisible = ({ children, delay = 0 }) => (
+const FadeInWhenVisible = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 50 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -277,22 +277,15 @@ const Landing = () => {
 
       {/* Floating Particles */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
+        {[...Array(20)].map((_, i) => (
+          <div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 3}s`
             }}
           />
         ))}
@@ -395,17 +388,20 @@ const Landing = () => {
             transition={{ delay: 1.2 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
           >
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4">
-                  <stat.icon className="w-8 h-8 text-blue-400" />
+            {stats.map((stat, index) => {
+              const IconComponent = stat.icon;
+              return (
+                <div key={index} className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4">
+                    <IconComponent className="w-8 h-8 text-blue-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-2">
+                    <AnimatedCounter end={parseInt(stat.value.replace(/[^\d]/g, ''))} suffix={stat.value.replace(/[\d]/g, '')} />
+                  </div>
+                  <div className="text-gray-400">{stat.label}</div>
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">
-                  <AnimatedCounter end={parseInt(stat.value.replace(/[^\d]/g, ''))} suffix={stat.value.replace(/[\d]/g, '')} />
-                </div>
-                <div className="text-gray-400">{stat.label}</div>
-              </div>
-            ))}
+              );
+            })}
           </motion.div>
         </motion.div>
 

@@ -365,13 +365,13 @@ function VideoGenerator() {
         <div className="flex items-center justify-between p-4 rounded-lg bg-blue-900 border border-blue-600">
           <div>
             <div className="font-medium text-blue-300">Generation Cost</div>
-            <div className="text-sm text-gray-400">25 credits per video</div>
+            <div className="text-sm text-gray-400">8 credits per video</div>
           </div>
           <div className="text-right">
             <div className="text-lg font-bold text-yellow-400">
-              {step === 'input' ? '25' : step === 'script' ? '15' : '0'} Credits
+              8 Credits
             </div>
-            <div className="text-xs text-gray-400">remaining for video</div>
+            <div className="text-xs text-gray-400">required for video</div>
           </div>
         </div>
 

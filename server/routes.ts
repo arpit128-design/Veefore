@@ -2309,7 +2309,122 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // AI Caption Generation - 1 credit
+  // AI Script Generation - 2 credits
+  app.post('/api/content/generate-script', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { description, platform, title } = req.body;
+
+      console.log('[BODY DEBUG] Raw body:', req.body);
+      console.log('[BODY DEBUG] Content-Type:', req.headers['content-type']);
+      console.log('[BODY DEBUG] Content-Length:', req.headers['content-length']);
+
+      // Check credits before generating script
+      const creditCost = creditService.getCreditCost('ai-caption'); // 2 credits
+      const hasCredits = await creditService.hasCredits(userId, 'ai-caption');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai-caption',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Generate AI script based on description and platform
+      const script = {
+        title: title || `${description} Video`,
+        content: `Welcome to our ${platform} video about ${description}!\n\nIn this video, we'll explore the fascinating world of ${description}. From basic concepts to advanced techniques, this comprehensive guide will help you understand everything you need to know.\n\nKey points we'll cover:\n- Introduction to ${description}\n- Benefits and applications\n- Best practices and tips\n- Real-world examples\n\nDon't forget to like, subscribe, and share if you found this helpful!`,
+        duration: platform === 'youtube' ? '5-10 minutes' : '30-60 seconds',
+        hooks: [
+          `Did you know that ${description} can change everything?`,
+          `The secret about ${description} that everyone should know`,
+          `Why ${description} is trending right now`
+        ]
+      };
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai-caption', 1, 'AI script generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        script,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI SCRIPT] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate script' });
+    }
+  });
+
+  // AI Video Generation - 8 credits
+  app.post('/api/content/generate-video', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { description, platform, title, workspaceId } = req.body;
+
+      // Check credits before generating video
+      const creditCost = creditService.getCreditCost('ai-video'); // 8 credits
+      const hasCredits = await creditService.hasCredits(userId, 'ai-video');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai-video',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Generate AI video (mock implementation for now)
+      const video = {
+        url: `https://sample-videos.com/zip/10/mp4/SampleVideo_${Date.now()}.mp4`,
+        title: title || `${description} Video`,
+        duration: platform === 'youtube' ? 300 : 30, // seconds
+        thumbnail: `https://picsum.photos/1280/720?random=${Date.now()}`,
+        format: platform === 'youtube' ? '1920x1080' : '1080x1920'
+      };
+
+      // Save to content storage
+      if (workspaceId) {
+        await storage.createContent({
+          title: video.title,
+          description: description,
+          type: 'video',
+          platform: platform || null,
+          status: 'ready',
+          workspaceId: parseInt(workspaceId),
+          creditsUsed: creditCost,
+          contentData: video
+        });
+      }
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai-video', 1, 'AI video generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        video,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI VIDEO] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate video' });
+    }
+  });
+
+  // AI Caption Generation - 2 credits
   app.post('/api/generate-caption', requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;

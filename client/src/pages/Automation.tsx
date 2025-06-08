@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Send, Settings, Activity, Clock, Users, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useWorkspace } from '@/hooks/useWorkspace';
+import { useWorkspaceContext } from '@/hooks/useWorkspace';
 import { apiRequest } from '@/lib/queryClient';
 
 interface AutomationRule {
@@ -59,7 +59,7 @@ interface AutomationLog {
 
 export default function Automation() {
   const { toast } = useToast();
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
   const queryClient = useQueryClient();
   
   const [isCreatingRule, setIsCreatingRule] = useState(false);

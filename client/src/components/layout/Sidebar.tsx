@@ -12,7 +12,7 @@ const navigationItems = [
   { href: "/content-studio", icon: Brain, label: "Content Studio", color: "text-nebula-purple" },
   { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
   { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
-  { href: "/suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
+  { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
   { href: "/team", icon: Users, label: "Team", color: "text-blue-400" },

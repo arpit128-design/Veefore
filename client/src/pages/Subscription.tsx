@@ -63,6 +63,11 @@ export default function Subscription() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Fetch user data for accurate credit count
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
   // Fetch user subscription
   const { data: subscription, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['/api/subscription'],
@@ -232,13 +237,8 @@ export default function Subscription() {
     }
   };
   
-  // Calculate credits from transactions as fallback if subscription API fails
-  const calculatedCredits = creditTransactions?.reduce((total, transaction) => {
-    return total + transaction.amount;
-  }, 0) || 0;
-  
-  // Force display of server-calculated credits with explicit casting
-  const currentCredits = Number(subscription?.credits) || calculatedCredits || 0;
+  // Use authentic user credits from database - same source as header
+  const currentCredits = user?.credits || 0;
 
   // Debug logging
   console.log('[SUBSCRIPTION DEBUG] Raw subscription object:', subscription);

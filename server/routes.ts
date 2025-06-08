@@ -1893,30 +1893,66 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   async function generatePersonalizedSuggestions(accountData: any) {
     const { username, followersCount, mediaCount, avgLikes, avgComments, engagementPercent, avgReach } = accountData;
     
-    const suggestions = [];
+    // Create a diverse pool of suggestions tailored to the account's specific metrics
+    const suggestionPool = [];
     
-    // Analyze follower count and growth potential
+    // Growth strategies for accounts under 100 followers (like @arpit9996363 with 8 followers)
     if (followersCount < 100) {
-      suggestions.push({
-        type: 'growth',
-        data: {
-          suggestion: `Focus on niche content to reach your first 100 followers`,
-          reasoning: `With ${followersCount} followers, you're in the early growth phase. Consistent niche content builds a loyal foundation audience.`,
-          actionItems: [
-            'Post 3-5 times per week consistently',
-            'Use 15-20 relevant hashtags per post',
-            'Engage with accounts in your niche daily',
-            'Share your expertise or passion clearly'
-          ],
-          expectedImpact: `Potential to reach 100+ followers within 2-3 months`,
-          difficulty: 'Medium',
-          timeframe: '2-3 months'
+      suggestionPool.push(
+        {
+          type: 'growth',
+          data: {
+            suggestion: `Master the "Follow-Back Formula" for organic growth`,
+            reasoning: `With ${followersCount} followers, strategic following of niche accounts can build your initial community.`,
+            actionItems: [
+              'Follow 10-15 accounts daily in your niche who have 100-1K followers',
+              'Engage meaningfully on their posts before following',
+              'Unfollow accounts that don\'t follow back after 1 week',
+              'Focus on accounts with good engagement rates (3%+)'
+            ],
+            expectedImpact: `Can gain 20-50 targeted followers per week`,
+            difficulty: 'Easy',
+            timeframe: '2-4 weeks'
+          },
+          confidence: 88
         },
-        confidence: 85,
-        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-      });
+        {
+          type: 'growth', 
+          data: {
+            suggestion: `Leverage "Comment Pod Strategy" for early visibility`,
+            reasoning: `Small accounts benefit enormously from engagement pods to boost initial reach.`,
+            actionItems: [
+              'Join 2-3 Instagram engagement groups in your niche',
+              'Comment genuinely on pod members\' posts within 1 hour of posting',
+              'Create valuable comments (not just emojis)',
+              'Share others\' posts to your stories regularly'
+            ],
+            expectedImpact: `Increase post reach by 300-500% through algorithmic boost`,
+            difficulty: 'Medium',
+            timeframe: '1-2 weeks'
+          },
+          confidence: 85
+        },
+        {
+          type: 'growth',
+          data: {
+            suggestion: `Create "Behind-the-Scenes" content for authentic connection`,
+            reasoning: `Personal content creates stronger bonds with your ${followersCount} followers.`,
+            actionItems: [
+              'Share your daily routine or workspace setup',
+              'Document your learning journey or challenges',
+              'Show the process behind your work/hobby',
+              'Ask followers questions about their experiences'
+            ],
+            expectedImpact: `Higher engagement and word-of-mouth referrals`,
+            difficulty: 'Easy',
+            timeframe: '1-3 weeks'
+          },
+          confidence: 82
+        }
+      );
     } else if (followersCount < 1000) {
-      suggestions.push({
+      suggestionPool.push({
         type: 'growth',
         data: {
           suggestion: `Scale content strategy to reach 1K milestone`,
@@ -1936,173 +1972,166 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       });
     }
 
-    // Analyze engagement rate and provide specific recommendations
+    // Engagement strategies for high-engagement accounts (like @arpit9996363 with 12.5% engagement)
     if (engagementPercent > 10) {
-      suggestions.push({
-        type: 'engagement',
-        data: {
-          suggestion: `Excellent ${engagementPercent.toFixed(1)}% engagement rate - leverage this for growth`,
-          reasoning: `Your engagement rate is exceptional (industry average is 1-3%). This shows strong audience connection.`,
-          actionItems: [
-            'Create more content similar to your top-performing posts',
-            'Ask followers to share your content in their stories',
-            'Consider Instagram Reels to reach new audiences',
-            'Collaborate with accounts in your niche'
-          ],
-          expectedImpact: `High engagement can accelerate follower growth by 200-300%`,
-          difficulty: 'Easy',
-          timeframe: '2-4 weeks'
+      suggestionPool.push(
+        {
+          type: 'engagement',
+          data: {
+            suggestion: `Your ${engagementPercent.toFixed(1)}% engagement is gold - turn it into followers`,
+            reasoning: `Exceptional engagement rate means each post has viral potential. Focus on amplifying reach.`,
+            actionItems: [
+              'Ask engaged followers to share your posts in their stories',
+              'Create "Save this post" carousel content with valuable tips',
+              'Use your high engagement to appear in Explore pages',
+              'Partner with similar small accounts for shoutout exchanges'
+            ],
+            expectedImpact: `Can 10x your follower growth using engagement momentum`,
+            difficulty: 'Medium',
+            timeframe: '2-3 weeks'
+          },
+          confidence: 95
         },
-        confidence: 95,
-        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      });
-    } else if (engagementPercent > 3) {
-      suggestions.push({
-        type: 'engagement',
-        data: {
-          suggestion: `Good ${engagementPercent.toFixed(1)}% engagement - optimize for higher interaction`,
-          reasoning: `Your engagement is above average. Focus on tactics to increase comments and saves.`,
-          actionItems: [
-            'End captions with clear questions',
-            'Create carousel posts that provide value',
-            'Respond to comments within 1 hour',
-            'Use polls and questions in Stories'
-          ],
-          expectedImpact: `Can improve engagement to 5-7% with consistent effort`,
-          difficulty: 'Easy',
-          timeframe: '2-3 weeks'
+        {
+          type: 'engagement',
+          data: {
+            suggestion: `Create "Engagement Bait" content that converts viewers to followers`,
+            reasoning: `With ${engagementPercent.toFixed(1)}% engagement, your audience loves interacting. Use this strategically.`,
+            actionItems: [
+              'Post "This or That" questions in your niche',
+              'Create "Rate my setup/work" posts for comments',
+              'Share controversial (but respectful) opinions in your field',
+              'Ask followers to guess something about your next post'
+            ],
+            expectedImpact: `Higher engagement signals to Instagram algorithm = more reach`,
+            difficulty: 'Easy',
+            timeframe: '1-2 weeks'
+          },
+          confidence: 90
         },
-        confidence: 85,
-        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      });
-    } else if (engagementPercent > 1) {
-      suggestions.push({
-        type: 'engagement',
-        data: {
-          suggestion: `Improve ${engagementPercent.toFixed(1)}% engagement with content optimization`,
-          reasoning: `Your engagement is average. Focus on creating more engaging, valuable content for your audience.`,
-          actionItems: [
-            'Analyze your top 3 posts and replicate their style',
-            'Post when your audience is most active',
-            'Create educational or entertaining content',
-            'Use trending audio in Reels'
-          ],
-          expectedImpact: `Can reach 3-4% engagement with content improvements`,
-          difficulty: 'Medium',
-          timeframe: '4-6 weeks'
-        },
-        confidence: 75,
-        validUntil: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
-      });
-    } else {
-      suggestions.push({
-        type: 'engagement',
-        data: {
-          suggestion: `Boost low engagement rate through audience connection`,
-          reasoning: `${engagementPercent.toFixed(1)}% engagement suggests content may not resonate with your audience.`,
-          actionItems: [
-            'Survey followers about what content they want',
-            'Share more personal, authentic content',
-            'Engage actively with your followers\' content',
-            'Post at optimal times for your audience'
-          ],
-          expectedImpact: `Can double engagement rate to 2-3% with authentic connection`,
-          difficulty: 'Medium',
-          timeframe: '6-8 weeks'
-        },
-        confidence: 70,
-        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-      });
+        {
+          type: 'engagement',
+          data: {
+            suggestion: `Build a "Comment Community" around your content`,
+            reasoning: `Your strong engagement suggests followers are invested. Create deeper connections.`,
+            actionItems: [
+              'Reply to every comment within 2 hours to boost post in algorithm',
+              'Ask follow-up questions in your replies to continue conversations',
+              'Create posts that require detailed responses, not just emojis',
+              'Pin your best comments to encourage others to engage similarly'
+            ],
+            expectedImpact: `Stronger community leads to word-of-mouth growth and higher reach`,
+            difficulty: 'Easy',
+            timeframe: '1-2 weeks'
+          },
+          confidence: 88
+        }
+      );
     }
 
-    // Content strategy based on post count
-    if (mediaCount < 10) {
-      suggestions.push({
-        type: 'audio',
-        data: {
-          suggestion: `Build content foundation with consistent posting`,
-          reasoning: `With ${mediaCount} posts, focus on establishing regular content rhythm first.`,
-          actionItems: [
-            'Create content calendar for next 30 days',
-            'Batch create 10-15 posts to maintain consistency',
-            'Focus on quality over quantity initially',
-            'Document your progress or expertise'
-          ],
-          expectedImpact: `Strong foundation will improve all other metrics`,
-          difficulty: 'Easy',
-          timeframe: '4-6 weeks'
-        },
-        confidence: 90,
-        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-      });
-    } else if (mediaCount > 50) {
-      suggestions.push({
-        type: 'trending',
-        data: {
-          suggestion: `Optimize existing content library for maximum reach`,
-          reasoning: `With ${mediaCount} posts, you have substantial content. Focus on leveraging what works best.`,
-          actionItems: [
-            'Identify your top 10 performing posts',
-            'Create similar content to your best performers',
-            'Repurpose top content into Reels and Stories',
-            'Update captions on older posts with better hashtags'
-          ],
-          expectedImpact: `Can increase reach by 50-100% using proven content themes`,
-          difficulty: 'Easy',
-          timeframe: '2-3 weeks'
-        },
-        confidence: 85,
-        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      });
-    }
-
-    // Comment-to-like ratio analysis
-    const commentRatio = avgLikes > 0 ? (avgComments / avgLikes) * 100 : 0;
-    if (commentRatio > 50) {
-      suggestions.push({
+    // Add diverse content and hashtag strategies to suggestion pool for all accounts
+    suggestionPool.push(
+      {
         type: 'hashtag',
         data: {
-          suggestion: `Exceptional comment engagement - leverage for community building`,
-          reasoning: `${commentRatio.toFixed(1)}% comment-to-like ratio shows strong community connection.`,
+          suggestion: `Master "Hashtag Stacking" for maximum discoverability`,
+          reasoning: `Strategic hashtag use can 5x your reach with ${followersCount} followers.`,
           actionItems: [
-            'Create posts that encourage discussion',
-            'Ask followers to share their experiences',
-            'Start a hashtag for your community',
-            'Feature follower content in your stories'
+            'Use 5 trending hashtags + 10 niche hashtags + 5 branded hashtags',
+            'Research hashtags with 10K-500K posts for best visibility',
+            'Create 3-5 branded hashtags for your content themes',
+            'Mix popular and less competitive hashtags in each post'
           ],
-          expectedImpact: `Strong community can lead to viral growth and loyal following`,
+          expectedImpact: `Can increase post reach by 300-500% through hashtag optimization`,
           difficulty: 'Medium',
-          timeframe: '3-4 weeks'
+          timeframe: '1-2 weeks'
         },
-        confidence: 90,
-        validUntil: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
-      });
-    }
-
-    // Ensure we have at least 3-4 suggestions
-    if (suggestions.length < 3) {
-      suggestions.push({
+        confidence: 87
+      },
+      {
         type: 'timing',
         data: {
-          suggestion: `Optimize posting schedule for maximum visibility`,
-          reasoning: `Timing significantly impacts reach and engagement for accounts like @${username}.`,
+          suggestion: `Leverage "Peak Activity Windows" for maximum engagement`,
+          reasoning: `With ${followersCount} followers, timing is crucial for initial engagement boost.`,
           actionItems: [
-            'Test posting at different times throughout the week',
-            'Use Instagram Insights to find your peak hours',
-            'Post when your audience is most active',
-            'Maintain consistent posting schedule'
+            'Post when your specific audience is most active (not general best times)',
+            'Test Tuesday-Thursday between 11 AM - 1 PM in your timezone',
+            'Use Instagram Insights to find your unique peak hours',
+            'Post consistently at your optimal times for 2 weeks'
           ],
-          expectedImpact: `Optimal timing can increase engagement by 30-50%`,
+          expectedImpact: `Optimal timing can double your engagement rate`,
           difficulty: 'Easy',
           timeframe: '2-3 weeks'
         },
-        confidence: 80,
-        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      });
-    }
+        confidence: 82
+      },
+      {
+        type: 'trending',
+        data: {
+          suggestion: `Create "Value-First" content that people save and share`,
+          reasoning: `Saves and shares are the strongest Instagram engagement signals for small accounts.`,
+          actionItems: [
+            'Create carousel posts with step-by-step tutorials in your niche',
+            'Share insider tips or little-known facts in your field',
+            'Design quote graphics with your unique insights',
+            'Make checklists or resource lists your audience can reference'
+          ],
+          expectedImpact: `High-value content gets saved 10x more, boosting reach significantly`,
+          difficulty: 'Medium',
+          timeframe: '2-4 weeks'
+        },
+        confidence: 91
+      },
+      {
+        type: 'audio',
+        data: {
+          suggestion: `Utilize "Trending Audio Strategy" for Reels visibility`,
+          reasoning: `Trending audio can give small accounts massive reach through Instagram's algorithm.`,
+          actionItems: [
+            'Check Instagram\'s trending audio daily and save relevant ones',
+            'Create Reels using trending audio within 24-48 hours of trending',
+            'Add your unique perspective or niche spin to trending audio',
+            'Post Reels consistently 3-4 times per week for algorithm favor'
+          ],
+          expectedImpact: `Trending audio can get you on Explore page and gain hundreds of followers`,
+          difficulty: 'Easy',
+          timeframe: '1-3 weeks'
+        },
+        confidence: 89
+      },
+      {
+        type: 'engagement',
+        data: {
+          suggestion: `Build "Micro-Influencer Partnerships" for mutual growth`,
+          reasoning: `Accounts with 1K-10K followers have 3x better engagement rates than larger accounts.`,
+          actionItems: [
+            'Find 10 accounts in your niche with 500-5K followers',
+            'Engage genuinely on their content for 1 week before reaching out',
+            'Propose collaboration: shout-out exchange, joint Lives, content swaps',
+            'Create collaborative content like "Ask me and @partner anything"'
+          ],
+          expectedImpact: `Can gain 50-200 highly targeted followers per collaboration`,
+          difficulty: 'Medium',
+          timeframe: '2-4 weeks'
+        },
+        confidence: 85
+      }
+    );
 
-    console.log(`[AI SUGGESTIONS] Generated ${suggestions.length} suggestions based on real Instagram data`);
-    return suggestions;
+    // Randomly select 3-4 suggestions from the pool for variety
+    const timestamp = Date.now();
+    const shuffled = suggestionPool.sort(() => 0.5 - Math.random());
+    const selectedCount = 3 + Math.floor((timestamp % 1000) / 333); // 3-4 suggestions
+    const selectedSuggestions = shuffled.slice(0, selectedCount);
+
+    // Add validUntil dates to selected suggestions
+    const finalSuggestions = selectedSuggestions.map(suggestion => ({
+      ...suggestion,
+      validUntil: new Date(Date.now() + (7 + Math.floor(Math.random() * 14)) * 24 * 60 * 60 * 1000) // 7-21 days
+    }));
+
+    console.log(`[AI SUGGESTIONS] Generated ${finalSuggestions.length} diverse suggestions from pool of ${suggestionPool.length} options`);
+    return finalSuggestions;
   }
 
   function generateFallbackSuggestions(instagramAccount: any) {

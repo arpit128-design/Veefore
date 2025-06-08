@@ -584,7 +584,7 @@ export default function OnboardingPremium() {
 
       {/* Main Content */}
       <div className="flex items-center justify-center min-h-screen p-2 sm:p-4 md:p-6">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}

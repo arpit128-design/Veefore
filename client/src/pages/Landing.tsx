@@ -148,7 +148,7 @@ const OptimizedFeatureCard = ({
     viewport={{ once: true }}
     transition={{ delay: index * 0.1, duration: 0.8, type: "spring" }}
     whileHover={{ scale: 1.05, rotateY: 5 }}
-    className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-white/10 overflow-hidden transform-gpu"
+    className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 overflow-hidden transform-gpu"
     style={{ transformStyle: "preserve-3d" }}
   >
     {/* Animated Background Elements */}
@@ -178,7 +178,7 @@ const OptimizedFeatureCard = ({
 
     {/* Animated Icon Container */}
     <motion.div 
-      className={`relative w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6 shadow-2xl`}
+      className={`relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 sm:mb-4 md:mb-6 shadow-2xl`}
       whileHover={{ rotateY: 15, scale: 1.1 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
@@ -186,7 +186,7 @@ const OptimizedFeatureCard = ({
         animate={{ rotateZ: [0, 5, -5, 0] }}
         transition={{ duration: 4, repeat: Infinity }}
       >
-        <Icon size={32} className="text-white relative z-10" />
+        <Icon size={24} className="text-white relative z-10 sm:w-7 sm:h-7 md:w-8 md:h-8" />
       </motion.div>
     </motion.div>
 
@@ -194,7 +194,7 @@ const OptimizedFeatureCard = ({
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ delay: 0.3 }}
-      className="text-2xl font-bold mb-4 text-white"
+      className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-white"
     >
       {title}
     </motion.h3>
@@ -203,13 +203,13 @@ const OptimizedFeatureCard = ({
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ delay: 0.4 }}
-      className="text-gray-300 leading-relaxed mb-6"
+      className="text-gray-300 leading-relaxed mb-3 sm:mb-4 md:mb-6 text-sm sm:text-base"
     >
       {description}
     </motion.p>
 
     {/* Enhanced Visual Elements Grid */}
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
       {visualElements.map((element: any, idx: number) => {
         const ElementIcon = element.icon;
         return (
@@ -219,13 +219,13 @@ const OptimizedFeatureCard = ({
             whileInView={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.1, rotateZ: 5 }}
             transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-            className={`p-3 rounded-xl ${element.color} flex flex-col items-center gap-2 cursor-pointer`}
+            className={`p-2 sm:p-3 rounded-lg sm:rounded-xl ${element.color} flex flex-col items-center gap-1 sm:gap-2 cursor-pointer`}
           >
             <motion.div
               animate={{ rotateY: [0, 360] }}
               transition={{ duration: 10 + idx * 2, repeat: Infinity, ease: "linear" }}
             >
-              <ElementIcon className="w-6 h-6 text-white" />
+              <ElementIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
             </motion.div>
             <span className="text-white text-xs font-medium">{element.name}</span>
             <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
@@ -782,17 +782,17 @@ const Landing = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2, duration: 0.8 }}
                   whileHover={{ scale: 1.05, rotateY: 5 }}
-                  className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 overflow-hidden transform-gpu"
+                  className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/10 overflow-hidden transform-gpu"
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div 
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-xl`}
+                    className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-3 sm:mb-4 shadow-xl`}
                     whileHover={{ rotateY: 15, scale: 1.1 }}
                   >
-                    <IconComponent size={24} className="text-white" />
+                    <IconComponent size={20} className="text-white sm:w-6 sm:h-6" />
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-gray-300 mb-4 text-sm">{feature.description}</p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">{feature.title}</h3>
+                  <p className="text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm">{feature.description}</p>
                   <div className="space-y-2">
                     {feature.features.map((feat, idx) => (
                       <motion.div 

@@ -431,17 +431,17 @@ export class InstagramWebhookHandler {
       if (activeTime && activeTime.enabled) {
         const { startTime, endTime, activeDays } = activeTime;
         
-        // Always use GMT timezone for validation (current time in GMT)
-        const gmtTime = new Date();
-        console.log(`[WEBHOOK] Using GMT time for validation: ${gmtTime.toISOString()}`);
-        console.log(`[WEBHOOK] IST time (GMT+5:30): ${new Date(gmtTime.getTime() + 5.5 * 60 * 60 * 1000).toISOString()}`);
+        // Always use IST timezone for validation (GMT+5:30)
+        const istTime = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+        console.log(`[WEBHOOK] Using IST time for validation: ${istTime.toISOString()}`);
+        console.log(`[WEBHOOK] Current IST time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
         
         // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
         if (activeDays && activeDays.length > 0) {
-          const currentDay = gmtTime.getUTCDay(); // Use UTC day: 0=Sunday, 1=Monday, etc.
+          const currentDay = istTime.getUTCDay(); // Get IST day: 0=Sunday, 1=Monday, etc.
           const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
           
-          console.log(`[WEBHOOK] Current GMT day: ${currentDay} (${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]})`);
+          console.log(`[WEBHOOK] Current IST day: ${currentDay} (${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]})`);
           console.log(`[WEBHOOK] Converted to Monday-first format: ${mondayFirst}, allowed days: ${activeDays}`);
           
           if (!activeDays.includes(mondayFirst)) {
@@ -454,10 +454,12 @@ export class InstagramWebhookHandler {
           }
         }
 
-        // Check if current time is within active hours (using GMT)
+        // Check if current time is within active hours (using IST)
         if (startTime && endTime) {
-          const currentHour = gmtTime.getUTCHours();
-          const currentMinute = gmtTime.getUTCMinutes();
+          // Create proper IST date and extract hours/minutes
+          const istDate = new Date(istTime.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+          const currentHour = istDate.getHours();
+          const currentMinute = istDate.getMinutes();
           const currentTimeMinutes = currentHour * 60 + currentMinute;
           
           const [startHour, startMin] = startTime.split(':').map(Number);
@@ -465,14 +467,14 @@ export class InstagramWebhookHandler {
           const startTimeMinutes = startHour * 60 + startMin;
           const endTimeMinutes = endHour * 60 + endMin;
           
-          console.log(`[WEBHOOK] Current GMT time: ${currentHour}:${currentMinute.toString().padStart(2, '0')} (${currentTimeMinutes} minutes)`);
+          console.log(`[WEBHOOK] Current IST time: ${currentHour}:${currentMinute.toString().padStart(2, '0')} (${currentTimeMinutes} minutes)`);
           console.log(`[WEBHOOK] Active hours: ${startTime}-${endTime} (${startTimeMinutes}-${endTimeMinutes} minutes)`);
           
           if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
-            console.log(`[WEBHOOK] ✗ Current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
-            return { canExecute: false, reason: `Rule active ${startTime}-${endTime} GMT, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} GMT` };
+            console.log(`[WEBHOOK] ✗ Current IST time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
+            return { canExecute: false, reason: `Rule active ${startTime}-${endTime} IST, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST` };
           } else {
-            console.log(`[WEBHOOK] ✓ Current GMT time is within active hours`);
+            console.log(`[WEBHOOK] ✓ Current IST time is within active hours`);
           }
         }
       }

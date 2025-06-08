@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { useWorkspace } from '@/lib/workspace-context';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   MessageCircle, 
@@ -60,7 +60,7 @@ interface ConversationAnalytics {
   }[];
 }
 
-export default function ConversationsPage() {
+export default function Conversations() {
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -342,7 +342,7 @@ export default function ConversationsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {analytics.analytics.topTopics.slice(0, 5).map((topic, index) => (
+                        {analytics.analytics.topTopics.slice(0, 5).map((topic: any, index: number) => (
                           <div key={index} className="flex justify-between items-center">
                             <span className="text-sm capitalize">{topic.topic}</span>
                             <Badge variant="secondary">{topic.count}</Badge>

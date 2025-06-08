@@ -21,6 +21,7 @@ import Suggestions from "@/pages/Suggestions";
 import ContentRecommendations from "@/pages/ContentRecommendations";
 import AIFeatures from "@/pages/AIFeatures";
 import Automation from "@/pages/Automation";
+import Conversations from "@/pages/Conversations";
 import Workspaces from "@/pages/Workspaces";
 import TeamManagement from "@/pages/TeamManagement";
 import Integrations from "@/pages/Integrations";
@@ -63,6 +64,7 @@ function AuthenticatedApp() {
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/automation" component={Automation} />
+              <Route path="/conversations" component={Conversations} />
               <Route path="/workspaces" component={Workspaces} />
               <Route path="/team" component={TeamManagement} />
               <Route path="/integrations" component={Integrations} />

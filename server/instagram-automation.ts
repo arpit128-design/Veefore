@@ -60,16 +60,16 @@ export class InstagramAutomation {
    */
   async sendAutomatedComment(
     accessToken: string,
-    mediaId: string,
+    commentId: string,
     message: string,
     workspaceId: string,
     ruleId: string
   ): Promise<{ success: boolean; commentId?: string; error?: string }> {
     try {
-      console.log(`[AUTOMATION] Sending comment to media ${mediaId}: "${message}"`);
+      console.log(`[AUTOMATION] Sending reply to comment ${commentId}: "${message}"`);
       
       const response = await fetch(
-        `https://graph.instagram.com/v22.0/${mediaId}/comments`,
+        `https://graph.instagram.com/v22.0/${commentId}/replies`,
         {
           method: 'POST',
           headers: {
@@ -91,7 +91,7 @@ export class InstagramAutomation {
           ruleId,
           workspaceId,
           type: 'comment',
-          targetUserId: mediaId,
+          targetUserId: commentId,
           targetUsername: 'unknown',
           message,
           status: 'sent',
@@ -107,7 +107,7 @@ export class InstagramAutomation {
           ruleId,
           workspaceId,
           type: 'comment',
-          targetUserId: mediaId,
+          targetUserId: commentId,
           targetUsername: 'unknown',
           message,
           status: 'failed',

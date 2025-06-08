@@ -255,7 +255,7 @@ export class InstagramWebhookHandler {
           console.log(`[WEBHOOK] Sending automated comment with access token length: ${socialAccount.accessToken?.length || 0}`);
           const result = await this.automation.sendAutomatedComment(
             socialAccount.accessToken,
-            value.post_id || value.comment_id || '',
+            value.comment_id || value.id,
             response,
             socialAccount.workspaceId,
             rule.id

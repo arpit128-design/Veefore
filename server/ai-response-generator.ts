@@ -233,7 +233,7 @@ Generate response now:`;
     urgency: 'low' | 'medium' | 'high';
   }> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const analysisPrompt = `Analyze this social media message and provide insights:
 

@@ -392,7 +392,7 @@ export class InstagramWebhookHandler {
           isActive: rule.isActive
         });
 
-        const commentId = value.comment_id || value.id;
+        const commentId = value.comment_id || (value as any).id;
         
         // Check if this comment has already been processed
         if (this.automation.isCommentProcessed(commentId)) {
@@ -495,7 +495,7 @@ export class InstagramWebhookHandler {
           setTimeout(async () => {
             await this.automation.sendAutomatedDM(
               socialAccount.accessToken,
-              value.sender.id,
+              value.sender!.id,
               response,
               socialAccount.workspaceId,
               rule.id
@@ -562,7 +562,7 @@ export class InstagramWebhookHandler {
     try {
       const allRules = await this.storage.getAutomationRules(workspaceId) || [];
       console.log(`[WEBHOOK] Found ${allRules.length} automation rules for workspace ${workspaceId}`);
-      return type ? allRules.filter(rule => rule.type === type) : allRules;
+      return type ? allRules.filter((rule: any) => (rule as any).type === type) : allRules;
     } catch (error) {
       console.error('[WEBHOOK] Error getting automation rules:', error);
       return [];

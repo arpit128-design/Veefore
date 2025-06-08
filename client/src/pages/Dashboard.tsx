@@ -281,6 +281,19 @@ export default function Dashboard() {
                 <span className="text-xl font-bold text-white">{instagramData.impressions !== null ? formatNumber(instagramData.impressions) : '—'}</span>
               </div>
               
+              {/* Instagram Business API Insights Notice */}
+              {instagramData.impressions === 0 && instagramData.totalReach === 0 && (
+                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <div className="flex items-start space-x-2">
+                    <i className="fas fa-info-circle text-amber-400 mt-0.5"></i>
+                    <div className="text-xs text-amber-200">
+                      <strong>Insights Limited:</strong> Instagram Business API insights require specific permissions. 
+                      Connect through Facebook Business Manager for full reach and impression data.
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-between items-center">
                 <span className="text-asteroid-silver">Total Posts</span>
                 <span className="text-xl font-bold text-white">{instagramData.totalPosts !== null ? formatNumber(instagramData.totalPosts) : '—'}</span>

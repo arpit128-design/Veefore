@@ -49,12 +49,14 @@ export default function AIFeatures() {
 
   // AI Caption Generation Mutation
   const captionMutation = useMutation({
-    mutationFn: (data: typeof captionForm) => 
-      apiRequest("POST", "/api/generate-caption", data),
-    onSuccess: (response) => {
+    mutationFn: async (data: typeof captionForm) => {
+      const response = await apiRequest("POST", "/api/generate-caption", data);
+      return await response.json();
+    },
+    onSuccess: (data) => {
       toast({
         title: "Caption Generated Successfully!",
-        description: `Used ${response.creditsUsed} credit. ${response.remainingCredits} credits remaining.`
+        description: `Used ${data.creditsUsed} credit. ${data.remainingCredits} credits remaining.`
       });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
@@ -78,12 +80,14 @@ export default function AIFeatures() {
 
   // AI Image Generation Mutation
   const imageMutation = useMutation({
-    mutationFn: (data: typeof imageForm) => 
-      apiRequest("POST", "/api/generate-image", data),
-    onSuccess: (response) => {
+    mutationFn: async (data: typeof imageForm) => {
+      const response = await apiRequest("POST", "/api/generate-image", data);
+      return await response.json();
+    },
+    onSuccess: (data) => {
       toast({
         title: "Image Generated Successfully!",
-        description: `Used ${response.creditsUsed} credits. ${response.remainingCredits} credits remaining.`
+        description: `Used ${data.creditsUsed} credits. ${data.remainingCredits} credits remaining.`
       });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
@@ -107,12 +111,14 @@ export default function AIFeatures() {
 
   // AI Video Generation Mutation
   const videoMutation = useMutation({
-    mutationFn: (data: typeof videoForm) => 
-      apiRequest("POST", "/api/generate-video", data),
-    onSuccess: (response) => {
+    mutationFn: async (data: typeof videoForm) => {
+      const response = await apiRequest("POST", "/api/generate-video", data);
+      return await response.json();
+    },
+    onSuccess: (data) => {
       toast({
         title: "Video Generated Successfully!",
-        description: `Used ${response.creditsUsed} credits. ${response.remainingCredits} credits remaining.`
+        description: `Used ${data.creditsUsed} credits. ${data.remainingCredits} credits remaining.`
       });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
@@ -136,12 +142,14 @@ export default function AIFeatures() {
 
   // AI Hashtag Generation Mutation
   const hashtagMutation = useMutation({
-    mutationFn: (data: typeof hashtagForm) => 
-      apiRequest("POST", "/api/generate-hashtags", data),
-    onSuccess: (response) => {
+    mutationFn: async (data: typeof hashtagForm) => {
+      const response = await apiRequest("POST", "/api/generate-hashtags", data);
+      return await response.json();
+    },
+    onSuccess: (data) => {
       toast({
         title: "Hashtags Generated Successfully!",
-        description: `Used ${response.creditsUsed} credit. ${response.remainingCredits} credits remaining.`
+        description: `Used ${data.creditsUsed} credit. ${data.remainingCredits} credits remaining.`
       });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },

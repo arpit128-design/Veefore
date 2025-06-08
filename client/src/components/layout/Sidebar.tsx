@@ -13,6 +13,7 @@ const navigationItems = [
   { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
   { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
+  { href: "/ai-features", icon: Brain, label: "AI Studio", color: "text-purple-500" },
   { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
   { href: "/team", icon: Users, label: "Team", color: "text-blue-400" },

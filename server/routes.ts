@@ -126,6 +126,25 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Update user (for onboarding completion)
+  app.patch('/api/user', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const updateData = req.body;
+      
+      console.log(`[API] PATCH /api/user - Updating user ${userId} with:`, updateData);
+      
+      // Update the user
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      console.log(`[API] PATCH /api/user - Updated user ${userId}, isOnboarded: ${updatedUser.isOnboarded}`);
+      res.json(updatedUser);
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Debug endpoint to test user creation and examine isOnboarded field
   app.post('/api/debug/create-test-user', async (req, res) => {
     try {

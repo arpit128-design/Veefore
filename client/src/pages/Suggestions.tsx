@@ -16,6 +16,9 @@ export default function Suggestions() {
   const { data: suggestionsResponse, refetch, isLoading } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
     queryFn: async () => {
+      console.log(`[SUGGESTIONS] Fetching suggestions for workspace: ${currentWorkspace?.id}`);
+      console.log(`[SUGGESTIONS] Current workspace name: ${currentWorkspace?.name}`);
+      
       const response = await fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`, {
         headers: {
           'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}`
@@ -24,7 +27,9 @@ export default function Suggestions() {
       if (!response.ok) {
         throw new Error('Failed to fetch suggestions');
       }
-      return response.json();
+      const data = await response.json();
+      console.log(`[SUGGESTIONS] Received ${data.length} suggestions for workspace ${currentWorkspace?.id}`);
+      return data;
     },
     enabled: !!currentWorkspace?.id
   });
@@ -37,11 +42,16 @@ export default function Suggestions() {
       if (!currentWorkspace?.id) {
         throw new Error('No workspace selected');
       }
+      console.log(`[SUGGESTIONS] Generating new suggestions for workspace: ${currentWorkspace.id} (${currentWorkspace.name})`);
       return apiRequest('POST', '/api/suggestions/generate', {
         workspaceId: currentWorkspace.id
       });
     },
     onSuccess: () => {
+      console.log(`[SUGGESTIONS] Generation successful, invalidating cache for workspace: ${currentWorkspace?.id}`);
+      // Invalidate all suggestion-related queries for this workspace
+      queryClient.invalidateQueries({ queryKey: ['suggestions'] });
+      
       toast({
         title: "AI Suggestions Generated!",
         description: "Fresh content ideas are now available.",

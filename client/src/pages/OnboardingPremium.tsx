@@ -104,6 +104,16 @@ const onboardingSteps = [
     elements: ['pattern', 'sphere', 'cube']
   },
   {
+    id: 'growth-targets',
+    title: 'Growth Trajectory Planning',
+    subtitle: 'Set Your Follower & Engagement Targets',
+    description: 'Define specific growth goals to track your success and optimize AI content generation',
+    color: '#10b981',
+    icon: TrendingUp,
+    particles: 90,
+    elements: ['sphere', 'pattern', 'cube']
+  },
+  {
     id: 'platforms',
     title: 'Social Galaxy Connection',
     subtitle: 'Connect Your Social Media Platforms',
@@ -439,7 +449,8 @@ export default function OnboardingPremium() {
       connectedPlatforms: formData.connectedPlatforms,
       aiPersonality: formData.aiPersonality,
       theme: 'space',
-      categories: formData.selectedCategories
+      categories: formData.selectedCategories,
+      isOnboarding: true // Mark as onboarding workspace to bypass limits
     });
   };
 

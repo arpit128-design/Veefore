@@ -203,7 +203,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Continue with base limits if addon check fails
       }
       
-      if (userWorkspaces.length >= maxWorkspaces) {
+      // Check if this is an onboarding workspace creation (users need their first workspace)
+      const isOnboardingWorkspace = req.body.isOnboarding || userWorkspaces.length === 0;
+      
+      // Allow onboarding workspace creation even if user has reached limit
+      if (!isOnboardingWorkspace && userWorkspaces.length >= maxWorkspaces) {
         return res.status(403).json({
           error: 'Workspace limit reached',
           currentPlan: currentPlan,

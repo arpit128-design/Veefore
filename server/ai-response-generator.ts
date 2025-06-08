@@ -265,10 +265,11 @@ class AIResponseGenerator {
       };
     }
     
-    if (messageWords.includes('where') || messageWords.includes('kaha') || messageWords.includes('location')) {
+    if (messageWords.includes('where') || messageWords.includes('kaha') || messageWords.includes('kahan') || messageWords.includes('location') || 
+        (messageWords.includes('hai') && (messageWords.includes('tu') || messageWords.includes('tum') || messageWords.includes('aap')))) {
       const responses = language === 'hindi' || language === 'hinglish'
-        ? ['Yahan', 'Here', 'Available', 'Present']
-        : ['Here', 'Available', 'Around', 'Present'];
+        ? ['Yahan hun! DM me location details 📍', 'Here only, message me for address', 'Available hun, DM karo', 'Yahan present hun']
+        : ['Right here! DM for location 📍', 'Available, message me', 'Here, text me address', 'Present, DM me'];
       return {
         response: this.getRandomResponse(responses),
         language

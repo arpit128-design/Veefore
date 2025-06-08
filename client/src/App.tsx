@@ -88,10 +88,10 @@ function Router() {
   const [location] = useLocation(); // Move hook to top level
 
   useEffect(() => {
-    // Add a minimum display time for the loading screen
+    // Fast loading screen - reduced to 800ms
     const timer = setTimeout(() => {
       setShowLoader(false);
-    }, 3000); // 3 seconds minimum display time
+    }, 800); // Fast loading time
 
     return () => clearTimeout(timer);
   }, []);
@@ -107,7 +107,7 @@ function Router() {
   }, [user?.isOnboarded]);
 
   if (loading || showLoader) {
-    return <SpaceLoader message="Connecting to VeeFore Network" />;
+    return <SpaceLoader message="Initializing VeeFore" />;
   }
 
   if (!user) {

@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface SpaceLoaderProps {
   message?: string;
@@ -8,63 +7,25 @@ interface SpaceLoaderProps {
 }
 
 export function SpaceLoader({ 
-  message = "Initializing Cosmic Systems", 
+  message = "Loading VeeFore", 
   progress = 0, 
   className = "" 
 }: SpaceLoaderProps) {
-  const [dots, setDots] = useState('');
-  const [currentPhase, setCurrentPhase] = useState(0);
-  const [dynamicProgress, setDynamicProgress] = useState(0);
-  
-  const phases = [
-    "Connecting to VeeFore Network",
-    "Calibrating AI Engines", 
-    "Synchronizing Data Streams",
-    "Launching Mission Control",
-    "Systems Ready"
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots(prev => prev.length >= 3 ? '' : prev + '.');
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const phaseInterval = setInterval(() => {
-      setCurrentPhase(prev => (prev + 1) % phases.length);
-    }, 600); // Faster phase changes to sync with 3-second timer
-    return () => clearInterval(phaseInterval);
-  }, []);
-
-  useEffect(() => {
-    // Smooth progress animation from 0 to 100% over 3 seconds
-    const progressInterval = setInterval(() => {
-      setDynamicProgress(prev => {
-        const increment = 100 / (3000 / 50); // 100% over 3 seconds, updating every 50ms
-        return Math.min(prev + increment, 100);
-      });
-    }, 50);
-    
-    return () => clearInterval(progressInterval);
-  }, []);
-
   return (
     <div className={`fixed inset-0 bg-gradient-to-b from-space-navy via-space-navy to-cosmic-blue overflow-hidden ${className}`}>
       {/* Animated Stars Background */}
       <div className="absolute inset-0">
-        {[...Array(100)].map((_, i) => (
+        {Array.from({ length: 100 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full opacity-60"
+            className="absolute w-1 h-1 bg-white rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              opacity: [0.3, 1, 0.3],
-              scale: [1, 1.5, 1],
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0],
             }}
             transition={{
               duration: 2 + Math.random() * 3,
@@ -75,220 +36,81 @@ export function SpaceLoader({
         ))}
       </div>
 
-      {/* Floating Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={`particle-${i}`}
-            className="absolute w-1 h-1 bg-electric-cyan rounded-full opacity-40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, 50, -50, 0],
-              y: [0, -30, 30, 0],
-              opacity: [0.2, 0.8, 0.2],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Central Loading Area */}
+      {/* Central Logo Animation */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center space-y-8">
-          
-          {/* 3D Rotating Galaxy */}
-          <div className="relative w-32 h-32 mx-auto">
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-electric-cyan/30"
+        <div className="text-center">
+          {/* VeeFore Logo with Animation */}
+          <motion.div
+            className="relative mb-8"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            {/* Orbital Rings */}
+            <motion.div 
+              className="absolute inset-0 w-32 h-32 border-2 border-blue-400/30 rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            >
-              <div className="absolute top-0 left-1/2 w-2 h-2 bg-electric-cyan rounded-full transform -translate-x-1/2 -translate-y-1/2" />
-            </motion.div>
-            
-            <motion.div
-              className="absolute inset-2 rounded-full border-2 border-electric-cyan/40"
+            />
+            <motion.div 
+              className="absolute inset-4 w-24 h-24 border border-purple-400/20 rounded-full"
               animate={{ rotate: -360 }}
-              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            >
-              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 bg-electric-cyan rounded-full transform -translate-x-1/2 -translate-y-1/2" />
-            </motion.div>
-            
-            <motion.div
-              className="absolute inset-4 rounded-full border border-cosmic-blue/50"
-              animate={{ rotate: 360 }}
               transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            >
-              <div className="absolute top-0 left-1/2 w-1 h-1 bg-cosmic-blue rounded-full transform -translate-x-1/2 -translate-y-1/2" />
-            </motion.div>
-
-            {/* Central Core */}
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.7, 1, 0.7],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <div className="w-6 h-6 bg-gradient-to-r from-electric-cyan to-neon-pink rounded-full blur-sm" />
-            </motion.div>
-          </div>
-
-          {/* Holographic Text */}
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-electric-cyan via-solar-gold to-electric-cyan bg-clip-text text-transparent">
-              {message}
-            </h2>
+            />
             
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={currentPhase}
-                className="text-electric-cyan/80 text-lg"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                {phases[currentPhase]}{dots}
-              </motion.p>
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Progress Bar */}
-          <div className="w-80 mx-auto space-y-3">
-            <div className="relative h-2 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-              <motion.div
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-electric-cyan to-solar-gold rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${dynamicProgress}%` }}
-                transition={{ duration: 0.1, ease: "easeOut" }}
-              />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{ x: ['-100%', '300%'] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              />
-            </div>
-            
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Mission Progress</span>
-              <span>{Math.round(dynamicProgress)}%</span>
-            </div>
-          </div>
-
-          {/* Floating Elements */}
-          <div className="relative">
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={`float-${i}`}
-                className="absolute w-3 h-3 bg-gradient-to-r from-electric-cyan/40 to-transparent rounded-full"
-                style={{
-                  left: `${30 + i * 20}%`,
-                  top: '50%',
-                }}
+            {/* VeeFore Logo */}
+            <div className="relative w-32 h-32 flex items-center justify-center">
+              <motion.img
+                src="/veefore-logo.png"
+                alt="VeeFore Logo"
+                className="w-20 h-20 object-contain"
                 animate={{
-                  y: [0, -20, 0],
-                  opacity: [0.3, 1, 0.3],
+                  scale: [1, 1.1, 1],
+                  filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  delay: i * 0.3,
-                  ease: "easeInOut",
+                  ease: "easeInOut"
                 }}
               />
-            ))}
-          </div>
+              
+              {/* Pulsing Glow */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-xl"
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.3, 0.7, 0.3]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            </div>
+          </motion.div>
 
-          {/* Loading Pulse Effect */}
-          <motion.div
-            className="absolute inset-0 rounded-full border border-electric-cyan/20"
-            animate={{
-              scale: [1, 2, 1],
-              opacity: [0.5, 0, 0.5],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeOut",
-            }}
-          />
+          {/* Loading Text */}
+          <motion.h2 
+            className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            VeeFore
+          </motion.h2>
+          
+          <motion.p 
+            className="text-white/70 text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            {message}
+          </motion.p>
         </div>
       </div>
-
-      {/* Corner Decorations */}
-      <div className="absolute top-8 left-8">
-        <motion.div
-          className="w-16 h-16 border-l-2 border-t-2 border-electric-cyan/30"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      </div>
-      
-      <div className="absolute top-8 right-8">
-        <motion.div
-          className="w-16 h-16 border-r-2 border-t-2 border-solar-gold/30"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-        />
-      </div>
-      
-      <div className="absolute bottom-8 left-8">
-        <motion.div
-          className="w-16 h-16 border-l-2 border-b-2 border-cosmic-blue/30"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-        />
-      </div>
-      
-      <div className="absolute bottom-8 right-8">
-        <motion.div
-          className="w-16 h-16 border-r-2 border-b-2 border-electric-cyan/30"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Simplified version for smaller loading states
-export function MiniSpaceLoader({ className = "" }: { className?: string }) {
-  return (
-    <div className={`relative ${className}`}>
-      <motion.div
-        className="w-8 h-8 rounded-full border-2 border-electric-cyan/30 border-t-electric-cyan"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute inset-1 rounded-full border border-neon-pink/40"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.7, 1, 0.7],
-        }}
-        transition={{ duration: 1, repeat: Infinity }}
-      >
-        <div className="w-2 h-2 bg-gradient-to-r from-electric-cyan to-neon-pink rounded-full" />
-      </motion.div>
     </div>
   );
 }

@@ -736,30 +736,54 @@ export default function Automation() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="max-per-day">Max per Day</Label>
-                  <Input
-                    id="max-per-day"
-                    type="number"
-                    value={newRule.conditions.maxPerDay}
-                    onChange={(e) => setNewRule(prev => ({
-                      ...prev,
-                      conditions: { ...prev.conditions, maxPerDay: parseInt(e.target.value) || 0 }
-                    }))}
-                  />
+                  <Label className="text-sm font-medium">Safety Settings</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Configure limits to avoid spamming and maintain authentic engagement
+                  </p>
                 </div>
-                <div>
-                  <Label htmlFor="time-delay">Delay (minutes)</Label>
-                  <Input
-                    id="time-delay"
-                    type="number"
-                    value={newRule.conditions.timeDelay}
-                    onChange={(e) => setNewRule(prev => ({
-                      ...prev,
-                      conditions: { ...prev.conditions, timeDelay: parseInt(e.target.value) || 0 }
-                    }))}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="max-per-day" className="text-sm">
+                      Daily Limit
+                    </Label>
+                    <Input
+                      id="max-per-day"
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={newRule.conditions.maxPerDay}
+                      onChange={(e) => setNewRule(prev => ({
+                        ...prev,
+                        conditions: { ...prev.conditions, maxPerDay: parseInt(e.target.value) || 0 }
+                      }))}
+                      placeholder="e.g., 10"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Max responses per day
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="time-delay" className="text-sm">
+                      Response Delay
+                    </Label>
+                    <Input
+                      id="time-delay"
+                      type="number"
+                      min="0"
+                      max="1440"
+                      value={newRule.conditions.timeDelay}
+                      onChange={(e) => setNewRule(prev => ({
+                        ...prev,
+                        conditions: { ...prev.conditions, timeDelay: parseInt(e.target.value) || 0 }
+                      }))}
+                      placeholder="e.g., 5"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Minutes before responding
+                    </p>
+                  </div>
                 </div>
               </div>
 

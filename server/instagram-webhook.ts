@@ -237,34 +237,35 @@ export class InstagramWebhookHandler {
           isActive: rule.isActive
         });
 
-        // Check if rule should trigger
-        if (this.shouldTriggerRule(rule, value.text)) {
-          console.log(`[WEBHOOK] Rule triggered, generating response`);
+        // For Instagram Auto-Reply rules, always trigger (contextual AI mode)
+        console.log(`[WEBHOOK] Rule triggered, generating AI response`);
 
+        try {
           // Generate contextual AI response for the comment
-          try {
-            const response = await this.generateContextualResponse(
-              value.text,
-              rule,
-              { username: value.from.username }
-            );
+          const response = await this.automation.generateContextualResponse(
+            value.text,
+            rule,
+            { username: value.from.username }
+          );
 
-            console.log(`[WEBHOOK] Generated response: ${response}`);
+          console.log(`[WEBHOOK] Generated AI response: ${response}`);
 
-            // Send the automated comment reply
-            await this.automation.sendAutomatedComment(
-              socialAccount.accessToken,
-              value.post_id || value.comment_id || '',
-              response,
-              socialAccount.workspaceId,
-              rule.id
-            );
-            console.log(`[WEBHOOK] Successfully sent automated comment`);
-          } catch (error) {
-            console.error(`[WEBHOOK] Error in automation flow:`, error);
+          // Send the automated comment reply
+          const result = await this.automation.sendAutomatedComment(
+            socialAccount.accessToken,
+            value.post_id || value.comment_id || '',
+            response,
+            socialAccount.workspaceId,
+            rule.id
+          );
+
+          if (result.success) {
+            console.log(`[WEBHOOK] ✓ Successfully sent automated comment: ${result.commentId}`);
+          } else {
+            console.log(`[WEBHOOK] ✗ Failed to send automated comment: ${result.error}`);
           }
-        } else {
-          console.log(`[WEBHOOK] Rule ${rule.id} did not trigger for comment: "${value.text}"`);
+        } catch (error) {
+          console.error(`[WEBHOOK] Error in automation flow:`, error);
         }
       }
     } catch (error) {

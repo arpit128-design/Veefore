@@ -344,9 +344,9 @@ export class InstagramAutomation {
   /**
    * Generate contextual AI response for a message
    */
-  private async generateContextualResponse(
+  async generateContextualResponse(
     message: string,
-    rule: AutomationRule,
+    rule: any,
     userProfile?: { username: string }
   ): Promise<string> {
     try {
@@ -358,8 +358,8 @@ export class InstagramAutomation {
       };
 
       const config: AIResponseConfig = {
-        personality: rule.aiPersonality || 'friendly',
-        responseLength: rule.responseLength || 'medium'
+        personality: (rule.action?.personality || rule.aiPersonality) || 'friendly',
+        responseLength: (rule.action?.responseLength || rule.responseLength) || 'medium'
       };
 
       const aiResponse = await this.aiGenerator.generateContextualResponse(context, config);

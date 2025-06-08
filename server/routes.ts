@@ -12,6 +12,7 @@ import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
+import OpenAI from "openai";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -2979,9 +2980,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(402).json({ error: 'Insufficient credits' });
       }
 
-      // Generate caption using OpenAI
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ error: 'OpenAI API key not configured' });
+      }
+
+      // Generate caption using OpenAI fetch API
       const prompt = `Create an engaging social media caption for ${platform || 'social media'}:
         Content Type: ${type || 'post'}
         Title: ${title || 'Content based on uploaded media'}
@@ -2990,14 +2993,28 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         Keep it concise but compelling. Include relevant emojis if appropriate.
         Do not include hashtags - those will be generated separately.`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 200,
-        temperature: 0.7,
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 200,
+          temperature: 0.7
+        })
       });
 
-      const caption = response.choices[0].message.content?.trim() || '';
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('[AI CAPTION] OpenAI API error:', error);
+        return res.status(500).json({ error: 'Failed to generate caption' });
+      }
+
+      const data = await response.json();
+      const caption = data.choices[0].message.content?.trim() || '';
 
       // Deduct credits
       await creditService.consumeCredits(userId, 'ai_caption', creditCost, 'AI caption generation');
@@ -3029,9 +3046,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(402).json({ error: 'Insufficient credits' });
       }
 
-      // Generate hashtags using OpenAI
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ error: 'OpenAI API key not configured' });
+      }
+
+      // Generate hashtags using OpenAI fetch API
       const prompt = `Generate relevant hashtags for this ${platform || 'social media'} ${type || 'post'}:
         Title: ${title || ''}
         Description: ${description || ''}
@@ -3044,15 +3063,29 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         Return only the hashtags with # symbols, separated by spaces.`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 150,
-        temperature: 0.6,
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 150,
+          temperature: 0.6
+        })
       });
 
-      const hashtagText = response.choices[0].message.content?.trim() || '';
-      const hashtags = hashtagText.split(/\s+/).filter(tag => tag.startsWith('#'));
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('[AI HASHTAGS] OpenAI API error:', error);
+        return res.status(500).json({ error: 'Failed to generate hashtags' });
+      }
+
+      const data = await response.json();
+      const hashtagText = data.choices[0].message.content?.trim() || '';
+      const hashtags = hashtagText.split(/\s+/).filter((tag: any) => tag.startsWith('#'));
 
       // Deduct credits
       await creditService.consumeCredits(userId, 'ai_hashtags', creditCost, 'AI hashtag generation');

@@ -1872,12 +1872,12 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         confidence: 92,
         validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
-    } else if (avgEngagement < 3) {
+    } else if (engagementPercent < 3) {
       suggestions.push({
         type: 'engagement',
         data: {
           suggestion: 'Boost engagement with interactive content and community building',
-          reasoning: `Your ${avgEngagement.toFixed(1)}% engagement rate has room for improvement. Focus on creating more interactive content.`,
+          reasoning: `Your ${engagementPercent.toFixed(1)}% engagement rate has room for improvement. Focus on creating more interactive content.`,
           actionItems: [
             'Post Instagram Stories with polls and questions',
             'Create carousel posts with swipeable tips',
@@ -1894,7 +1894,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
 
     // Comment-to-like ratio analysis
-    const commentRatio = totalLikes > 0 ? (totalComments / totalLikes) * 100 : 0;
+    const commentRatio = avgLikes > 0 ? (avgComments / avgLikes) * 100 : 0;
     if (commentRatio > 20) {
       suggestions.push({
         type: 'trending',
@@ -2052,9 +2052,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         hasAccount: !!instagramAccount,
         username: instagramAccount?.username,
         followers: instagramAccount?.followersCount,
-        engagement: instagramAccount?.avgEngagement,
-        totalLikes: instagramAccount?.totalLikes,
-        totalComments: instagramAccount?.totalComments
+        engagement: instagramAccount?.engagementRate,
+        avgLikes: instagramAccount?.avgLikes,
+        avgComments: instagramAccount?.avgComments
       });
       
       // Generate AI suggestions based on real data
@@ -2079,7 +2079,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         analysisData: {
           username: instagramAccount?.username,
           followers: instagramAccount?.followersCount,
-          engagementRate: instagramAccount?.avgEngagement
+          engagementRate: instagramAccount?.engagementRate ? instagramAccount.engagementRate / 100 : 0
         }
       });
       

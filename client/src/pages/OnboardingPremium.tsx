@@ -598,12 +598,12 @@ export default function OnboardingPremium() {
                 glowColor={currentStepData.color}
                 tiltIntensity={8}
               >
-                <div className="p-4 sm:p-6 md:p-8 lg:p-12">
+                <div className="p-3 sm:p-4 md:p-6 lg:p-8 xl:p-12">
                   {/* Step Header */}
-                  <div className="text-center mb-6 sm:mb-8">
+                  <div className="text-center mb-4 sm:mb-6 md:mb-8">
                     <MagneticElement strength={15}>
                       <div 
-                        className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
+                        className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full flex items-center justify-center"
                         style={{
                           background: `radial-gradient(circle, ${currentStepData.color}40 0%, ${currentStepData.color}20 100%)`,
                           border: `2px solid ${currentStepData.color}60`
@@ -611,7 +611,7 @@ export default function OnboardingPremium() {
                       >
                         <MorphingIcon 
                           icons={[currentStepData.icon, Sparkles, Star]} 
-                          size={24} 
+                          size={20} 
                           color={currentStepData.color}
                           interval={3000}
                         />
@@ -646,7 +646,7 @@ export default function OnboardingPremium() {
                   </div>
 
                   {/* Step Content */}
-                  <div className="min-h-[300px] sm:min-h-[400px] flex items-center justify-center">
+                  <div className="min-h-[200px] sm:min-h-[250px] md:min-h-[300px] lg:min-h-[400px] flex items-center justify-center">
                     {currentStep === 0 && (
                       <ScrollReveal direction="up" delay={0.8}>
                         <div className="text-center space-y-4 sm:space-y-6">

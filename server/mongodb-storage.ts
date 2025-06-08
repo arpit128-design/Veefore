@@ -1191,8 +1191,13 @@ export class MongoStorage implements IStorage {
     await this.connect();
     try {
       console.log(`[MONGODB DEBUG] Deleting automation rule: ${id}`);
+      console.log(`[MONGODB DEBUG] Database connection status:`, this.db ? 'Connected' : 'Not connected');
       
-      const collection = this.db!.collection('automation_rules');
+      if (!this.db) {
+        throw new Error('Database connection not established');
+      }
+      
+      const collection = this.db.collection('automation_rules');
       const result = await collection.deleteOne({ 
         _id: new ObjectId(id) 
       });

@@ -579,17 +579,19 @@ export class MemStorage implements IStorage {
     return rule;
   }
 
-  async updateAutomationRule(id: number, updates: Partial<AutomationRule>): Promise<AutomationRule> {
-    const rule = this.automationRules.get(id);
+  async updateAutomationRule(id: string, updates: Partial<AutomationRule>): Promise<AutomationRule> {
+    const numericId = parseInt(id);
+    const rule = this.automationRules.get(numericId);
     if (!rule) throw new Error("Automation rule not found");
     
     const updatedRule = { ...rule, ...updates, updatedAt: new Date() };
-    this.automationRules.set(id, updatedRule);
+    this.automationRules.set(numericId, updatedRule);
     return updatedRule;
   }
 
-  async deleteAutomationRule(id: number): Promise<void> {
-    this.automationRules.delete(id);
+  async deleteAutomationRule(id: string): Promise<void> {
+    const numericId = parseInt(id);
+    this.automationRules.delete(numericId);
   }
 
   async getAutomationRulesByWorkspace(workspaceId: string | number): Promise<AutomationRule[]> {

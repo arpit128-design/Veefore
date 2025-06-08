@@ -388,18 +388,24 @@ export class InstagramAPI {
         if (statusResponse.data.status_code === 'FINISHED') {
           containerReady = true;
         } else if (statusResponse.data.status_code === 'ERROR') {
-          console.log(`[INSTAGRAM PUBLISH] Reel processing failed, falling back to regular video post`);
-          // Fall back to regular video post
-          return this.publishVideo(accessToken, videoUrl, caption);
+          console.log(`[INSTAGRAM PUBLISH] Reel processing failed - likely permission issue`);
+          // Import permission helper for better error handling
+          const { InstagramPermissionHelper } = await import('./instagram-permission-helper');
+          const errorInfo = InstagramPermissionHelper.getVideoPublishingError();
+          
+          throw new Error(`${errorInfo.error}: ${errorInfo.technicalReason}. Solution: ${errorInfo.solution}`);
         }
         
         attempts++;
       }
 
       if (!containerReady) {
-        console.log(`[INSTAGRAM PUBLISH] Reel processing timeout, falling back to regular video post`);
-        // Fall back to regular video post
-        return this.publishVideo(accessToken, videoUrl, caption);
+        console.log(`[INSTAGRAM PUBLISH] Reel processing timeout - likely permission issue`);
+        // Import permission helper for better error handling
+        const { InstagramPermissionHelper } = await import('./instagram-permission-helper');
+        const errorInfo = InstagramPermissionHelper.getVideoPublishingError();
+        
+        throw new Error(`${errorInfo.error}: ${errorInfo.technicalReason}. Solution: ${errorInfo.solution}`);
       }
 
       // Step 3: Publish the reel container

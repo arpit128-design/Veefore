@@ -1088,7 +1088,7 @@ export default function Automation() {
                         ...prev,
                         duration: { ...prev.duration!, startDate: e.target.value }
                       }))}
-                      className="w-full"
+                      className="w-full glassmorphism text-foreground"
                     />
                   </div>
                   
@@ -1164,6 +1164,7 @@ export default function Automation() {
                             ...prev,
                             activeTime: { ...prev.activeTime!, startTime: e.target.value }
                           }))}
+                          className="glassmorphism text-foreground"
                         />
                       </div>
                       
@@ -1177,6 +1178,7 @@ export default function Automation() {
                             ...prev,
                             activeTime: { ...prev.activeTime!, endTime: e.target.value }
                           }))}
+                          className="glassmorphism text-foreground"
                         />
                       </div>
                       

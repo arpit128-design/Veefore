@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 async function debugInstagramData() {
   const client = new MongoClient(process.env.DATABASE_URL);

@@ -2109,6 +2109,69 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           } else {
             const errorText = await mediaResponse.text();
             console.error(`[AI SUGGESTIONS] Instagram API call failed with status ${responseStatus}: ${errorText}`);
+            
+            // If token is invalid (error 190), try to refresh it automatically
+            if (responseStatus === 400 && errorText.includes('"code":190')) {
+              console.log(`[AI SUGGESTIONS] Token expired for @${instagramAccount.username}, attempting automatic refresh...`);
+              
+              try {
+                const { InstagramTokenRefresh } = await import('./instagram-token-refresh');
+                const refreshResult = await InstagramTokenRefresh.refreshLongLivedToken(instagramAccount.accessToken);
+                
+                if (refreshResult.access_token) {
+                  console.log(`[AI SUGGESTIONS] Token refreshed successfully for @${instagramAccount.username}`);
+                  
+                  // Update token in database
+                  const newExpiresAt = new Date(Date.now() + (refreshResult.expires_in * 1000));
+                  await storage.updateSocialAccount(instagramAccount.id!, {
+                    accessToken: refreshResult.access_token,
+                    expiresAt: newExpiresAt
+                  });
+                  
+                  // Retry API call with new token
+                  console.log(`[AI SUGGESTIONS] Retrying Instagram API call with refreshed token...`);
+                  const retryApiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${refreshResult.access_token}`;
+                  const retryResponse = await fetch(retryApiUrl);
+                  
+                  if (retryResponse.ok) {
+                    const retryData = await retryResponse.json();
+                    const retryPosts = retryData.data || [];
+                    
+                    if (retryPosts.length > 0) {
+                      const totalLikes = retryPosts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
+                      const totalComments = retryPosts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
+                      const avgLikes = Math.round(totalLikes / retryPosts.length);
+                      const avgComments = Math.round(totalComments / retryPosts.length);
+                      
+                      console.log(`[AI SUGGESTIONS] ===== SUCCESS: REAL DATA RETRIEVED =====`);
+                      console.log(`[AI SUGGESTIONS] Posts: ${retryPosts.length}, Total Comments: ${totalComments}, Avg Comments: ${avgComments}`);
+                      
+                      // Update account with real fresh data
+                      instagramAccount = {
+                        ...instagramAccount,
+                        accessToken: refreshResult.access_token,
+                        avgLikes,
+                        avgComments,
+                        mediaCount: retryPosts.length,
+                        lastSyncAt: new Date(),
+                        expiresAt: newExpiresAt
+                      };
+                      
+                      await storage.updateSocialAccount(instagramAccount.id!, {
+                        avgLikes,
+                        avgComments,
+                        mediaCount: retryPosts.length,
+                        lastSyncAt: new Date()
+                      });
+                      
+                      console.log(`[AI SUGGESTIONS] ✅ Successfully updated with REAL current Instagram data!`);
+                    }
+                  }
+                }
+              } catch (refreshError) {
+                console.error(`[AI SUGGESTIONS] Failed to refresh Instagram token:`, refreshError);
+              }
+            }
           }
         } catch (refreshError) {
           console.error(`[AI SUGGESTIONS] Exception during Instagram data refresh:`, refreshError);

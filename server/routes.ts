@@ -69,6 +69,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
       
       let user = await storage.getUserByFirebaseUid(firebaseUid);
+      console.log(`[AUTH] User lookup for firebaseUid ${firebaseUid}:`, user ? `Found - isOnboarded: ${user.isOnboarded}` : 'Not found');
+      
       if (!user) {
         // Create new user from JWT payload
         try {
@@ -79,26 +81,32 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             username: payload.email?.split('@')[0] || `user_${firebaseUid.slice(0, 8)}`,
             displayName: payload.name || null,
             avatar: payload.picture || null,
-            referredBy: null
+            referredBy: null,
+            isOnboarded: false // Explicitly set to false
           };
           
+          console.log(`[AUTH] Creating new user with userData:`, { ...userData, firebaseUid: firebaseUid.slice(0, 8) + '...' });
           user = await storage.createUser(userData);
+          console.log(`[AUTH] Created user with ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
           
           // Create default workspace for new users
           try {
-            await storage.createWorkspace({
+            const workspace = await storage.createWorkspace({
               userId: user.id,
               name: 'My VeeFore Workspace',
               description: 'Default workspace for social media management'
             });
+            console.log(`[USER CREATION] Created default workspace for user ${user.id}: ${workspace.id}`);
           } catch (workspaceError) {
             console.error('Failed to create default workspace:', workspaceError);
           }
         } catch (error) {
+          console.error('[AUTH] Failed to create user:', error);
           return res.status(500).json({ error: 'Failed to create user account' });
         }
       }
       
+      console.log(`[AUTH] Setting req.user - ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
       req.user = user;
       next();
     } catch (error) {
@@ -115,6 +123,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('Error fetching user:', error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Debug endpoint to test user creation and examine isOnboarded field
+  app.post('/api/debug/create-test-user', async (req, res) => {
+    try {
+      const testUserData = {
+        firebaseUid: `test_${Date.now()}`,
+        email: `test${Date.now()}@example.com`,
+        username: `test_user_${Date.now()}`,
+        displayName: 'Test User',
+        avatar: null,
+        referredBy: null,
+        isOnboarded: false
+      };
+      
+      console.log('[DEBUG] Creating test user with data:', testUserData);
+      const user = await storage.createUser(testUserData);
+      console.log('[DEBUG] Created test user result:', { id: user.id, isOnboarded: user.isOnboarded, type: typeof user.isOnboarded });
+      
+      res.json({ 
+        success: true, 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          isOnboarded: user.isOnboarded,
+          isOnboardedType: typeof user.isOnboarded 
+        } 
+      });
+    } catch (error) {
+      console.error('[DEBUG] Failed to create test user:', error);
+      res.status(500).json({ error: 'Failed to create test user' });
     }
   });
 

@@ -25,7 +25,9 @@ const UserSchema = new mongoose.Schema({
 
 async function debugUserOnboarding() {
   try {
-    await mongoose.connect(process.env.DATABASE_URL);
+    // Use the same connection string pattern as the main app
+    const mongoUrl = process.env.DATABASE_URL || 'mongodb+srv://veefore:SIGaFT1mSpA7rCdE@cluster0.i6ctr.mongodb.net/veeforedb?retryWrites=true&w=majority&appName=Cluster0';
+    await mongoose.connect(mongoUrl);
     console.log('Connected to MongoDB');
 
     const UserModel = mongoose.model('User', UserSchema);

@@ -126,7 +126,12 @@ function Router() {
   }
 
   // Check if user needs onboarding
-  console.log('[ROUTER] User state:', { username: user?.username, isOnboarded: user?.isOnboarded });
+  console.log('[ROUTER] User state:', { 
+    username: user?.username, 
+    isOnboarded: user?.isOnboarded, 
+    location,
+    userExists: !!user 
+  });
   
   // Check if user just completed onboarding
   const justCompleted = localStorage.getItem('onboarding_just_completed') === 'true';

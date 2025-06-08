@@ -146,10 +146,10 @@ class AIResponseGenerator {
   } {
     const lowerMessage = message.toLowerCase();
     
-    // Advanced language detection with regional patterns
+    // Enhanced language detection with comprehensive Hindi/Hinglish patterns
     let language = 'english';
-    const hindiPatterns = /[\u0900-\u097F]|(?:hai|haan|nahi|kya|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi)/i;
-    const hinglishPatterns = /(?:kya|hai|haan|nahi|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi|bro|yaar)/i;
+    const hindiPatterns = /[\u0900-\u097F]|(?:hai|haan|nahi|kya|acha|achchha|theek|thik|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi|mai|main|meri|mera|mere|tera|tere|teri|uska|uski|uske|hu|hoon|hain|tha|thi|the|chaliye|chalo|batao|suno|dekho|accha|badhiya|ekdam|bilkul|zarur|pakka|sach|jhooth)/i;
+    const hinglishPatterns = /(?:kya|hai|haan|nahi|acha|achchha|theek|thik|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi|mai|main|meri|mera|mere|tera|tere|teri|uska|uski|uske|hu|hoon|hain|tha|thi|the|chaliye|chalo|batao|suno|dekho|accha|badhiya|ekdam|bilkul|zarur|pakka|sach|jhooth|bro|yaar|good|nice|okay|ok|thanks|thank|please)/i;
     
     if (hindiPatterns.test(message)) {
       language = /[\u0900-\u097F]/.test(message) ? 'hindi' : 'hinglish';
@@ -207,6 +207,67 @@ class AIResponseGenerator {
    */
   private generateContextualResponseFromAnalysis(messageAnalysis: any, originalMessage: string): string {
     const { language, tone, personality, style, formality } = messageAnalysis;
+    const lowerMessage = originalMessage.toLowerCase();
+    
+    // Specific pattern matching for common Hindi/Hinglish phrases
+    const specificPatterns = {
+      // Wellbeing responses - "mai bhi thik hu", "main theek hun"
+      wellbeing: /(?:mai|main|mein)?\s*(?:bhi)?\s*(?:theek|thik|badhiya|acha|achha)\s*(?:hu|hoon|hun|hai)/i,
+      // Location queries - "kaha pr hai", "kahan ho"
+      location: /(?:kaha|kahan)\s*(?:pr|par|pe)?\s*(?:hai|ho|hain)/i,
+      // Status updates - "kya kar rahe ho", "kya haal"
+      status: /(?:kya|kaise)\s*(?:kar|haal|chal)\s*(?:rahe|raha|rahi)?\s*(?:ho|hai|hain)?/i,
+      // Agreement - "haan", "bilkul", "sahi"
+      agreement: /^(?:haan|han|bilkul|sahi|theek|accha|okay|ok)$/i,
+      // Thanks - "shukriya", "thanks", "dhanyawad"
+      thanks: /(?:shukriya|thanks|thank\s*you|dhanyawad)/i
+    };
+
+    // Check for specific patterns first
+    if (specificPatterns.wellbeing.test(lowerMessage)) {
+      const responses = language === 'hindi' 
+        ? ['Accha hai', 'Badhiya', 'Good to know', 'Sahi hai']
+        : language === 'hinglish'
+        ? ['Nice yaar', 'Good to hear', 'Accha hai bro', 'Cool']
+        : ['Good to hear', 'That\'s great', 'Nice', 'Awesome'];
+      return this.getRandomResponse(responses);
+    }
+    
+    if (specificPatterns.location.test(lowerMessage)) {
+      const responses = language === 'hindi' 
+        ? ['Yahan', 'Online', 'Available hu', 'Present']
+        : language === 'hinglish'
+        ? ['Yahan yaar', 'Online hi hu', 'Available bro', 'Here only']
+        : ['Here', 'Available', 'Online', 'Present'];
+      return this.getRandomResponse(responses);
+    }
+    
+    if (specificPatterns.status.test(lowerMessage)) {
+      const responses = language === 'hindi' 
+        ? ['Kuch nahi', 'Bas timepass', 'Yahi sab', 'Normal']
+        : language === 'hinglish'
+        ? ['Nothing much yaar', 'Bas chill kar raha', 'Same old bro', 'Timepass']
+        : ['Nothing much', 'Just chilling', 'Same old', 'All good'];
+      return this.getRandomResponse(responses);
+    }
+    
+    if (specificPatterns.agreement.test(lowerMessage)) {
+      const responses = language === 'hindi' 
+        ? ['Bilkul', 'Sahi', 'Haan', 'Zarur']
+        : language === 'hinglish'
+        ? ['Bilkul bro', 'Haan yaar', 'Sure thing', 'Definitely']
+        : ['Absolutely', 'Sure', 'Yes', 'Of course'];
+      return this.getRandomResponse(responses);
+    }
+    
+    if (specificPatterns.thanks.test(lowerMessage)) {
+      const responses = language === 'hindi' 
+        ? ['Koi baat nahi', 'Welcome', 'Mention not', 'Anytime']
+        : language === 'hinglish'
+        ? ['No problem yaar', 'Welcome bro', 'Anytime', 'Chill']
+        : ['You\'re welcome', 'No problem', 'Anytime', 'My pleasure'];
+      return this.getRandomResponse(responses);
+    }
     
     // Base response patterns by language and context
     const responsePatterns = {

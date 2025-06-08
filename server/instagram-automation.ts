@@ -1,6 +1,6 @@
 import { IStorage } from './storage';
 import { AIResponseGenerator, MessageContext, AIResponseConfig } from './ai-response-generator';
-import { InstagramAntiSpam } from './instagram-anti-spam';
+import { InstagramStealthResponder } from './instagram-stealth-responder';
 
 export interface AutomationRule {
   id: string;
@@ -51,12 +51,12 @@ export interface AutomationLog {
 
 export class InstagramAutomation {
   private aiGenerator: AIResponseGenerator;
-  private antiSpam: InstagramAntiSpam;
+  private stealthResponder: InstagramStealthResponder;
   private processedComments = new Set<string>();
 
   constructor(private storage: IStorage) {
     this.aiGenerator = new AIResponseGenerator();
-    this.antiSpam = new InstagramAntiSpam();
+    this.stealthResponder = new InstagramStealthResponder();
   }
 
   /**
@@ -317,17 +317,6 @@ export class InstagramAutomation {
           continue;
         }
 
-        // Check anti-spam rules first
-        const shouldRespond = this.antiSpam.shouldRespond(
-          caption,
-          mention.username || 'unknown'
-        );
-        
-        if (!shouldRespond) {
-          console.log(`[ANTI-SPAM] Skipping response due to anti-spam rules`);
-          continue;
-        }
-        
         // Check if rule conditions are met
         const shouldTrigger = this.shouldTriggerRule(rule, caption);
         
@@ -339,21 +328,23 @@ export class InstagramAutomation {
             continue;
           }
 
-          // Generate anti-spam response with human-like patterns
-          const antiSpamResponse = await this.antiSpam.generateAntiSpamResponse(
+          // Generate stealth response with maximum human behavior simulation
+          const stealthResponse = await this.stealthResponder.generateStealthResponse(
             caption,
             mention.username || 'unknown',
-            rule.triggers.aiMode || 'contextual',
-            rule.aiPersonality || 'friendly',
-            rule.responseLength || 'medium'
+            { postId: mention.id, platform: 'instagram' }
           );
           
-          console.log(`[ANTI-SPAM] Generated human-like response: "${antiSpamResponse.response}" (delay: ${antiSpamResponse.delay}ms)`);
-          
-          // Apply human-like delay before responding
-          setTimeout(async () => {
-            await this.sendAutomatedComment(accessToken, mention.id, antiSpamResponse.response, workspaceId, rule.id);
-          }, antiSpamResponse.delay);
+          if (stealthResponse.shouldRespond) {
+            console.log(`[STEALTH] Generated ultra-natural response: "${stealthResponse.response}" (delay: ${stealthResponse.delay}ms)`);
+            
+            // Apply stealth delay before responding
+            setTimeout(async () => {
+              await this.sendAutomatedComment(accessToken, mention.id, stealthResponse.response, workspaceId, rule.id);
+            }, stealthResponse.delay);
+          } else {
+            console.log(`[STEALTH] Skipping response to maintain human-like behavior patterns`);
+          }
         }
       }
     } catch (error) {

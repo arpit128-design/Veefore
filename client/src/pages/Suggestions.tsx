@@ -124,36 +124,36 @@ export default function Suggestions() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl lg:text-4xl font-orbitron font-bold text-nebula-purple">
+          <h2 className="text-xl sm:text-2xl lg:text-4xl font-orbitron font-bold text-nebula-purple">
             AI Suggestions
           </h2>
-          <p className="text-gray-400 mt-2">
+          <p className="text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">
             Generate personalized content ideas using AI (1 credit per generation)
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4 sm:gap-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-lg px-4 py-2">
-              <Sparkles className="w-4 h-4 mr-2" />
+            <Badge variant="secondary" className="text-sm sm:text-lg px-3 py-1 sm:px-4 sm:py-2">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               {user?.credits || 0} Credits
             </Badge>
           </div>
-          <div className="flex items-center space-x-2 text-xs md:text-sm text-asteroid-silver">
-            <Clock className="h-4 w-4" />
+          <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-asteroid-silver">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Updated 2 hours ago</span>
             <span className="sm:hidden">Updated 2h ago</span>
           </div>
           <Button
             onClick={() => generateSuggestionsMutation.mutate()}
             disabled={generateSuggestionsMutation.isPending || !currentWorkspace?.id}
-            className="bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90 w-full sm:w-auto"
+            className="bg-gradient-to-r from-nebula-purple to-purple-600 hover:opacity-90 w-full sm:w-auto text-sm"
           >
             {generateSuggestionsMutation.isPending ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
             ) : (
-              <Zap className="w-4 h-4 mr-2" />
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             )}
             <span className="hidden sm:inline">Generate New Suggestions</span>
             <span className="sm:hidden">Generate</span>
@@ -164,12 +164,12 @@ export default function Suggestions() {
       {/* Today's Briefing */}
       <Card className="content-card holographic">
         <CardHeader>
-          <CardTitle className="text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
+          <CardTitle className="text-lg sm:text-xl lg:text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
             Today's AI Briefing
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {['trending', 'audio', 'hashtag'].map((type) => {
               const typeSuggestions = getSuggestionsByType(type);
               const latestSuggestion = typeSuggestions[0];
@@ -177,7 +177,7 @@ export default function Suggestions() {
               return (
                 <div
                   key={type}
-                  className={`p-4 rounded-lg border ${getSuggestionColor(type)}`}
+                  className={`p-3 sm:p-4 rounded-lg border ${getSuggestionColor(type)}`}
                 >
                   <div className="flex items-center space-x-2 mb-3">
                     {getSuggestionIcon(type)}

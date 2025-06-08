@@ -182,10 +182,10 @@ export default function Conversations() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Enhanced Auto DM Conversations</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Enhanced Auto DM Conversations</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             AI-powered conversation memory with 3-day contextual responses
           </p>
         </div>
@@ -194,9 +194,11 @@ export default function Conversations() {
           disabled={cleanupMutation.isPending}
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
         >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Cleanup Memory
+          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="hidden sm:inline">Cleanup Memory</span>
+          <span className="sm:hidden">Cleanup</span>
         </Button>
       </div>
 

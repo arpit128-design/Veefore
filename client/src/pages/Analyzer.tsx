@@ -138,9 +138,9 @@ export default function Analyzer() {
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-green-400">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">
                 {analytics?.changes?.views !== undefined 
                   ? `${analytics.changes.views >= 0 ? '+' : ''}${analytics.changes.views}% vs last period`
                   : 'Real-time data'
@@ -151,19 +151,19 @@ export default function Analyzer() {
         </Card>
 
         <Card className="content-card holographic">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-nebula-purple to-pink-500 flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-white" />
+          <CardContent className="p-4 sm:p-5 lg:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-nebula-purple to-pink-500 flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-nebula-purple">{analytics?.engagement ? formatNumber(analytics.engagement) : '—'}</div>
-                <div className="text-sm text-asteroid-silver">Total Engagement</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-nebula-purple">{analytics?.engagement ? formatNumber(analytics.engagement) : '—'}</div>
+                <div className="text-xs sm:text-sm text-asteroid-silver">Total Engagement</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-green-400">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">
                 {analytics?.changes?.engagement !== undefined 
                   ? `${analytics.changes.engagement >= 0 ? '+' : ''}${analytics.changes.engagement}% vs last period`
                   : 'Authentic data'
@@ -174,19 +174,19 @@ export default function Analyzer() {
         </Card>
 
         <Card className="content-card holographic">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-solar-gold to-orange-500 flex items-center justify-center">
-                <Users className="h-6 w-6 text-white" />
+          <CardContent className="p-4 sm:p-5 lg:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-solar-gold to-orange-500 flex items-center justify-center">
+                <Users className="h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-solar-gold">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
-                <div className="text-sm text-asteroid-silver">Total Reach</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-solar-gold">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
+                <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-green-400">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">
                 {analytics?.changes?.reach !== undefined 
                   ? `${analytics.changes.reach >= 0 ? '+' : ''}${analytics.changes.reach}% vs last period`
                   : 'Live Instagram data'
@@ -197,19 +197,19 @@ export default function Analyzer() {
         </Card>
 
         <Card className="content-card holographic">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-white" />
+          <CardContent className="p-4 sm:p-5 lg:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-400">{analytics?.followers ? formatNumber(analytics.followers) : '—'}</div>
-                <div className="text-sm text-asteroid-silver">Total Followers</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-400">{analytics?.followers ? formatNumber(analytics.followers) : '—'}</div>
+                <div className="text-xs sm:text-sm text-asteroid-silver">Total Followers</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-green-400">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">
                 {analytics?.changes?.followers !== undefined 
                   ? `${analytics.changes.followers >= 0 ? '+' : ''}${analytics.changes.followers}% vs last period`
                   : 'Authentic Instagram data'

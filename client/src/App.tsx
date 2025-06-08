@@ -30,6 +30,7 @@ import Pricing from "@/pages/Pricing";
 import SubscriptionEnhanced from "@/pages/SubscriptionEnhanced";
 import Auth from "@/pages/Auth";
 import OnboardingPremium from "@/pages/OnboardingPremium";
+import OnboardingDemo from "@/pages/OnboardingDemo";
 import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -54,6 +55,7 @@ function AuthenticatedApp() {
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
               <Route path="/onboarding" component={OnboardingPremium} />
+              <Route path="/demo" component={OnboardingDemo} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={Scheduler} />

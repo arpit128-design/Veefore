@@ -996,6 +996,8 @@ export class MongoStorage implements IStorage {
   async createContent(content: InsertContent): Promise<Content> {
     await this.connect();
     
+    console.log('[MONGODB DEBUG] Creating content with data:', content);
+    
     const contentData = {
       workspaceId: content.workspaceId.toString(),
       type: content.type,
@@ -1006,11 +1008,17 @@ export class MongoStorage implements IStorage {
       status: content.scheduledAt ? 'scheduled' : 'ready',
       scheduledAt: content.scheduledAt,
       creditsUsed: content.creditsUsed || 0,
-      prompt: content.prompt
+      prompt: content.prompt,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
+
+    console.log('[MONGODB DEBUG] Content data to save:', contentData);
 
     const contentDoc = new ContentModel(contentData);
     const saved = await contentDoc.save();
+    
+    console.log('[MONGODB DEBUG] Content saved successfully with ID:', saved._id.toString());
     
     return this.convertContent(saved);
   }

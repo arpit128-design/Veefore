@@ -2925,7 +2925,46 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { workspaceId } = req.params;
       
       // Get automation rules for workspace
-      const rules = await storage.getAutomationRules?.(workspaceId) || [];
+      const rawRules = await storage.getAutomationRules?.(workspaceId) || [];
+      
+      // Transform backend format to frontend format
+      const rules = rawRules.map(rule => {
+        const trigger = rule.trigger || {};
+        const action = rule.action || {};
+        
+        return {
+          id: rule.id,
+          name: rule.name || `${trigger.type === 'comment' ? 'Auto Comment' : 'Auto DM'} Rule`,
+          workspaceId: rule.workspaceId,
+          type: trigger.type || 'dm',
+          isActive: rule.isActive,
+          triggers: {
+            aiMode: trigger.aiMode || 'contextual',
+            keywords: trigger.keywords || [],
+            hashtags: trigger.hashtags || [],
+            mentions: trigger.mentions || false,
+            newFollowers: trigger.newFollowers || false,
+            postInteraction: trigger.postInteraction || false
+          },
+          responses: action.responses || [],
+          aiPersonality: action.aiPersonality || 'friendly',
+          responseLength: action.responseLength || 'medium',
+          conditions: action.conditions || {},
+          schedule: action.schedule || {},
+          aiConfig: action.aiConfig || {
+            personality: action.aiPersonality || 'friendly',
+            responseLength: action.responseLength || 'medium',
+            dailyLimit: action.aiConfig?.dailyLimit || 50,
+            responseDelay: action.aiConfig?.responseDelay || 5,
+            language: action.aiConfig?.language || 'auto',
+            contextualMode: action.aiConfig?.contextualMode !== false
+          },
+          duration: action.duration || {},
+          activeTime: action.activeTime || {},
+          createdAt: rule.createdAt,
+          updatedAt: rule.updatedAt
+        };
+      });
       
       res.json({ rules });
     } catch (error: any) {
@@ -2989,6 +3028,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   app.post('/api/automation/rules', requireAuth, async (req, res) => {
     try {
       const { 
+        name,
         workspaceId, 
         type, 
         triggers, 
@@ -2997,6 +3037,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         responseLength, 
         conditions, 
         schedule, 
+        aiConfig,
+        duration,
+        activeTime,
         isActive 
       } = req.body;
       
@@ -3024,12 +3067,23 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const action = {
         type: type, // 'dm' or 'comment'
         responses: responses || [],
-        aiPersonality: aiPersonality || 'friendly',
-        responseLength: responseLength || 'medium'
+        aiPersonality: aiPersonality || aiConfig?.personality || 'friendly',
+        responseLength: responseLength || aiConfig?.responseLength || 'medium',
+        aiConfig: aiConfig || {
+          personality: 'friendly',
+          responseLength: 'medium',
+          dailyLimit: 50,
+          responseDelay: 5,
+          language: 'auto',
+          contextualMode: true
+        },
+        conditions: conditions || {},
+        duration: duration || {},
+        activeTime: activeTime || {}
       };
 
       const rule = await storage.createAutomationRule?.({
-        name: `Instagram Auto-Reply (${type.toUpperCase()})`,
+        name: name || `${type === 'comment' ? 'Auto Comment' : 'Auto DM'} Rule`,
         workspaceId,
         description: `Automated ${type} responses with AI`,
         trigger,

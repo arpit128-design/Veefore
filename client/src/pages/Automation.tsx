@@ -17,6 +17,7 @@ import { apiRequest } from '@/lib/queryClient';
 
 interface AutomationRule {
   id: string;
+  name?: string;
   workspaceId: string;
   type: 'comment' | 'dm';
   isActive: boolean;
@@ -495,7 +496,7 @@ export default function Automation() {
                         <Send className="h-5 w-5" />
                       )}
                       <CardTitle className="text-lg">
-                        {rule.type === 'comment' ? 'Auto Comment' : 'Auto DM'}
+                        {rule.name || (rule.type === 'comment' ? 'Auto Comment' : 'Auto DM')}
                       </CardTitle>
                       {rule.isActive ? (
                         <Badge className="bg-green-100 text-green-800">Active</Badge>
@@ -541,13 +542,27 @@ export default function Automation() {
                         </div>
                       </div>
 
+                      {rule.aiConfig && (
+                        <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
+                          <Label className="text-sm font-medium text-blue-800 dark:text-blue-200">AI Configuration:</Label>
+                          <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-blue-700 dark:text-blue-300">
+                            <span>Personality: {rule.aiConfig.personality}</span>
+                            <span>Length: {rule.aiConfig.responseLength}</span>
+                            <span>Daily Limit: {rule.aiConfig.dailyLimit}</span>
+                            <span>Response Delay: {rule.aiConfig.responseDelay}min</span>
+                            <span>Language: {rule.aiConfig.language}</span>
+                            <span>Mode: {rule.aiConfig.contextualMode ? 'Contextual' : 'Standard'}</span>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Max per day: {rule.conditions?.maxPerDay || 'No limit'}</span>
+                        <span>Max per day: {rule.aiConfig?.dailyLimit || rule.conditions?.maxPerDay || 'No limit'}</span>
                         <span>
-                          Active: {rule.schedule?.activeHours?.start || '09:00'} - {rule.schedule?.activeHours?.end || '18:00'}
+                          Active: {rule.activeTime?.startTime || rule.schedule?.activeHours?.start || '09:00'} - {rule.activeTime?.endTime || rule.schedule?.activeHours?.end || '18:00'}
                         </span>
                         <span>
-                          Days: {rule.schedule?.activeDays?.map(getDayName).join(', ') || 'All days'}
+                          Days: {rule.activeTime?.activeDays?.map(getDayName).join(', ') || rule.schedule?.activeDays?.map(getDayName).join(', ') || 'All days'}
                         </span>
                       </div>
                     </div>

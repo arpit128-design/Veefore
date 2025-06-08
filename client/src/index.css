@@ -53,26 +53,30 @@
 /* Fix date and time input styling */
 input[type="date"], 
 input[type="time"] {
-  background-color: hsl(var(--background)) !important;
+  background-color: hsl(var(--card)) !important;
   color: hsl(var(--foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;
   border-radius: calc(var(--radius) - 2px) !important;
+  padding: 8px 12px !important;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+  filter: invert(0.8) brightness(1.2);
   cursor: pointer;
+  padding: 4px;
 }
 
 input[type="date"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit {
   color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
 }
 
 input[type="date"]::-webkit-datetime-edit-text,
 input[type="time"]::-webkit-datetime-edit-text {
-  color: hsl(var(--foreground)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  padding: 0 2px;
 }
 
 input[type="date"]::-webkit-datetime-edit-month-field,
@@ -82,7 +86,10 @@ input[type="time"]::-webkit-datetime-edit-hour-field,
 input[type="time"]::-webkit-datetime-edit-minute-field,
 input[type="time"]::-webkit-datetime-edit-ampm-field {
   color: hsl(var(--foreground)) !important;
-  background-color: transparent !important;
+  background-color: hsl(var(--muted)) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  margin: 0 1px !important;
 }
 
 /* Focus styles for date/time inputs */

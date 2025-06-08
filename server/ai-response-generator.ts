@@ -84,19 +84,15 @@ class AIResponseGenerator {
     } catch (error) {
       console.error('[AI RESPONSE] Error generating response:', error);
       
-      // Generate contextual fallback that understands language and personality
-      const messageAnalysis = this.analyzeMessageStyle(context.message);
-      const contextualResponse = this.generateContextualResponseFromAnalysis(messageAnalysis, context.message);
-      
-      // Use natural fallback if contextual fails
-      const naturalFallback = this.generateNaturalFallback(context.message, context.userProfile?.username);
-      const fallbackResponse = contextualResponse || naturalFallback.response;
+      // Use intelligent fallback that relies on AI understanding
+      const intelligentFallback = this.generateIntelligentFallback(context, config);
+      const fallbackResponse = intelligentFallback.response;
       
       return {
         response: fallbackResponse,
-        detectedLanguage: messageAnalysis.language,
+        detectedLanguage: intelligentFallback.language,
         confidence: 0.75,
-        reasoning: `Generated ${messageAnalysis.language} response matching ${messageAnalysis.tone} tone and ${messageAnalysis.personality} personality`
+        reasoning: `Generated ${intelligentFallback.language} response with intelligent fallback`
       };
     }
   }
@@ -203,109 +199,11 @@ class AIResponseGenerator {
   }
 
   /**
-   * Generate contextually appropriate responses based on message analysis
+   * Generate contextually appropriate responses - DEPRECATED - AI now handles this naturally
    */
   private generateContextualResponseFromAnalysis(messageAnalysis: any, originalMessage: string): string {
-    const { language, tone, personality, style, formality } = messageAnalysis;
-    const lowerMessage = originalMessage.toLowerCase();
-    
-    // Specific pattern matching for common Hindi/Hinglish phrases
-    const specificPatterns = {
-      // Wellbeing responses - "mai bhi thik hu", "main theek hun"
-      wellbeing: /(?:mai|main|mein)?\s*(?:bhi)?\s*(?:theek|thik|badhiya|acha|achha)\s*(?:hu|hoon|hun|hai)/i,
-      // Location queries - "kaha pr hai", "kahan ho"
-      location: /(?:kaha|kahan)\s*(?:pr|par|pe)?\s*(?:hai|ho|hain)/i,
-      // Status updates - "kya kar rahe ho", "kya haal"
-      status: /(?:kya|kaise)\s*(?:kar|haal|chal)\s*(?:rahe|raha|rahi)?\s*(?:ho|hai|hain)?/i,
-      // Agreement - "haan", "bilkul", "sahi"
-      agreement: /^(?:haan|han|bilkul|sahi|theek|accha|okay|ok)$/i,
-      // Thanks - "shukriya", "thanks", "dhanyawad"
-      thanks: /(?:shukriya|thanks|thank\s*you|dhanyawad)/i
-    };
-
-    // Check for specific patterns first
-    if (specificPatterns.wellbeing.test(lowerMessage)) {
-      const responses = language === 'hindi' 
-        ? ['Accha hai', 'Badhiya', 'Good to know', 'Sahi hai']
-        : language === 'hinglish'
-        ? ['Nice yaar', 'Good to hear', 'Accha hai bro', 'Cool']
-        : ['Good to hear', 'That\'s great', 'Nice', 'Awesome'];
-      return this.getRandomResponse(responses);
-    }
-    
-    if (specificPatterns.location.test(lowerMessage)) {
-      const responses = language === 'hindi' 
-        ? ['Yahan', 'Online', 'Available hu', 'Present']
-        : language === 'hinglish'
-        ? ['Yahan yaar', 'Online hi hu', 'Available bro', 'Here only']
-        : ['Here', 'Available', 'Online', 'Present'];
-      return this.getRandomResponse(responses);
-    }
-    
-    if (specificPatterns.status.test(lowerMessage)) {
-      const responses = language === 'hindi' 
-        ? ['Kuch nahi', 'Bas timepass', 'Yahi sab', 'Normal']
-        : language === 'hinglish'
-        ? ['Nothing much yaar', 'Bas chill kar raha', 'Same old bro', 'Timepass']
-        : ['Nothing much', 'Just chilling', 'Same old', 'All good'];
-      return this.getRandomResponse(responses);
-    }
-    
-    if (specificPatterns.agreement.test(lowerMessage)) {
-      const responses = language === 'hindi' 
-        ? ['Bilkul', 'Sahi', 'Haan', 'Zarur']
-        : language === 'hinglish'
-        ? ['Bilkul bro', 'Haan yaar', 'Sure thing', 'Definitely']
-        : ['Absolutely', 'Sure', 'Yes', 'Of course'];
-      return this.getRandomResponse(responses);
-    }
-    
-    if (specificPatterns.thanks.test(lowerMessage)) {
-      const responses = language === 'hindi' 
-        ? ['Koi baat nahi', 'Welcome', 'Mention not', 'Anytime']
-        : language === 'hinglish'
-        ? ['No problem yaar', 'Welcome bro', 'Anytime', 'Chill']
-        : ['You\'re welcome', 'No problem', 'Anytime', 'My pleasure'];
-      return this.getRandomResponse(responses);
-    }
-    
-    // Base response patterns by language and context
-    const responsePatterns = {
-      hindi: {
-        greeting: ['Namaste', 'Namaskar', 'Hello', 'Haan bhai'],
-        agreement: ['Haan', 'Bilkul', 'Sahi', 'Theek hai'],
-        thanks: ['Dhanyawad', 'Shukriya', 'Thanks'],
-        help: ['Madad', 'Help', 'Batao', 'Poochho'],
-        casual: ['Acha', 'Okay', 'Samjha', 'Cool']
-      },
-      hinglish: {
-        greeting: ['Hey', 'Hi bhai', 'Hello yaar', 'Kya haal'],
-        agreement: ['Haan yaar', 'Bilkul bro', 'Sure', 'Done'],
-        thanks: ['Thanks bhai', 'Shukriya yaar', 'Thank you'],
-        help: ['Bolo yaar', 'Kya chahiye', 'Help kar deta', 'Batao'],
-        casual: ['Cool', 'Nice', 'Acha', 'Okay bro']
-      },
-      english: {
-        greeting: ['Hey', 'Hello', 'Hi there', 'What\'s up'],
-        agreement: ['Yes', 'Sure', 'Absolutely', 'Of course'],
-        thanks: ['Thank you', 'Thanks', 'Appreciate it'],
-        help: ['How can I help', 'What do you need', 'Let me know'],
-        casual: ['Cool', 'Nice', 'Okay', 'Got it']
-      }
-    };
-    
-    const patterns = responsePatterns[language as keyof typeof responsePatterns] || responsePatterns.english;
-    
-    // Match response to tone and personality
-    if (tone === 'friendly' || /hi|hello|hey|namaste/i.test(originalMessage)) {
-      return this.getRandomResponse(patterns.greeting);
-    } else if (tone === 'appreciative') {
-      return this.getRandomResponse(patterns.thanks);
-    } else if (tone === 'requesting') {
-      return this.getRandomResponse(patterns.help);
-    } else {
-      return this.getRandomResponse(patterns.casual);
-    }
+    // This method is deprecated - the AI now handles contextual understanding naturally
+    return 'Nice';
   }
 
   /**
@@ -515,26 +413,33 @@ class AIResponseGenerator {
     // Analyze message intent for contextual responses
     const messageAnalysis = this.analyzeMessageIntent(context.message);
     
-    return `You are a friendly business owner responding to customer messages on Instagram. Read the customer's message carefully and provide a helpful, specific response.
+    return `You are an intelligent social media assistant responding to Instagram DMs. Your goal is to understand the message contextually and respond naturally like a real person.
+
+UNDERSTAND THE MESSAGE MEANING:
+- Read and comprehend what the person is actually saying
+- Don't rely on keyword matching - understand the context
+- For Hindi/Hinglish phrases like "mai bhi thik hu" (I am also fine), understand this means they're saying they're doing well
+- For "kya haal" understand this is asking "what's up" 
+- For wellbeing statements, respond appropriately (e.g., "achha hai", "nice yaar", "good to hear")
 
 CUSTOMER MESSAGE: "${context.message}"
-CUSTOMER USERNAME: @${context.userProfile?.username || 'user'}
-MESSAGE INTENT: ${messageAnalysis.intent}
-DETECTED LANGUAGE: ${messageAnalysis.language}
-${config.businessContext ? `BUSINESS TYPE: ${config.businessContext}` : ''}
+FROM: @${context.userProfile?.username || 'user'}
+${config.businessContext ? `BUSINESS: ${config.businessContext}` : ''}
 
-RESPONSE GUIDELINES:
-1. Address the customer's SPECIFIC question or request
-2. If they ask about price/cost: "For pricing details, please DM us! We'll share our current rates 📱"
-3. If they ask about availability: "Yes, available! DM for quick ordering 😊"
-4. If they ask about location/delivery: "We deliver! DM your location for details"
-5. If they compliment: "Thank you so much! Really appreciate it ❤️"
-6. If they want info: Provide helpful specific information
-7. Keep responses natural, friendly, and under 60 characters
-8. Use appropriate language (English/Hindi/Hinglish) matching their message
-9. Be conversational like a real person would respond
+RESPONSE REQUIREMENTS:
+- Keep under 50 characters
+- Sound completely natural and conversational  
+- Match their language (English/Hindi/Hinglish) exactly
+- Understand context, don't use templates
+- Respond as a real person would
 
-Generate ONLY the response text that directly addresses their message:`;
+EXAMPLES OF NATURAL UNDERSTANDING:
+- "mai bhi thik hu" → "achha hai" or "nice yaar" 
+- "kya haal" → "bas timepass" or "nothing much yaar"
+- "hello" → "hey" or "hi there"
+- "thanks" → "welcome" or "no problem"
+
+Generate ONE natural response that shows you understood their message:`;
   }
 
   private parseAIResponse(text: string): any {

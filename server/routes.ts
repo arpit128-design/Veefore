@@ -770,9 +770,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      // Instagram Basic Display API OAuth - using proper scopes for engagement data access
-      const scopes = 'user_profile,user_media';
-      const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+      // Instagram Business API OAuth - proper business scopes for real engagement data
+      const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {
@@ -821,8 +820,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
-      // Exchange authorization code for access token using Instagram Basic Display API
-      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram access token...`);
+      // Exchange authorization code for access token using Instagram Business API
+      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token...`);
       const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
         method: 'POST',
         headers: {
@@ -2110,24 +2109,76 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             const errorText = await mediaResponse.text();
             console.error(`[AI SUGGESTIONS] Instagram API call failed with status ${responseStatus}: ${errorText}`);
             
-            // If token is invalid (error 190), detect API limitations and guide user to proper connection
+            // If token is invalid (error 190), try to refresh it automatically
             if (responseStatus === 400 && errorText.includes('"code":190')) {
-              console.log(`[AI SUGGESTIONS] ⚠️  Instagram Basic Display API Limitation Detected for @${instagramAccount.username}`);
-              console.log(`[AI SUGGESTIONS] Basic Display API cannot access engagement metrics like comment counts and likes`);
-              console.log(`[AI SUGGESTIONS] User needs Instagram Business API access to get real engagement data (700+ comments)`);
+              console.log(`[AI SUGGESTIONS] Token expired for @${instagramAccount.username}, attempting automatic refresh...`);
               
-              // Mark account as needing business API upgrade
-              await storage.updateSocialAccount(instagramAccount.id!, {
-                lastSyncAt: new Date(),
-                // Add a flag to indicate this account needs business API upgrade
-                metadata: {
-                  needsBusinessAPI: true,
-                  limitation: 'Basic Display API cannot access engagement metrics',
-                  recommendedAction: 'Connect Instagram Business account with Facebook Page'
+              try {
+                const { InstagramTokenRefresh } = await import('./instagram-token-refresh');
+                const refreshResult = await InstagramTokenRefresh.refreshLongLivedToken(instagramAccount.accessToken);
+                
+                if (refreshResult.access_token) {
+                  console.log(`[AI SUGGESTIONS] Token refreshed successfully for @${instagramAccount.username}`);
+                  
+                  // Update token in database
+                  const newExpiresAt = new Date(Date.now() + (refreshResult.expires_in * 1000));
+                  await storage.updateSocialAccount(instagramAccount.id!, {
+                    accessToken: refreshResult.access_token,
+                    expiresAt: newExpiresAt
+                  });
+                  
+                  // Retry API call with new token
+                  console.log(`[AI SUGGESTIONS] Retrying Instagram API call with refreshed token...`);
+                  const retryApiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${refreshResult.access_token}`;
+                  console.log(`[AI SUGGESTIONS] Retry URL: ${retryApiUrl.replace(refreshResult.access_token, 'NEW_TOKEN_HIDDEN')}`);
+                  
+                  const retryResponse = await fetch(retryApiUrl);
+                  const retryStatus = retryResponse.status;
+                  console.log(`[AI SUGGESTIONS] Retry response status: ${retryStatus}`);
+                  
+                  if (retryResponse.ok) {
+                    const retryData = await retryResponse.json();
+                    const retryPosts = retryData.data || [];
+                    
+                    if (retryPosts.length > 0) {
+                      const totalLikes = retryPosts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
+                      const totalComments = retryPosts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
+                      const avgLikes = Math.round(totalLikes / retryPosts.length);
+                      const avgComments = Math.round(totalComments / retryPosts.length);
+                      
+                      console.log(`[AI SUGGESTIONS] ===== SUCCESS: REAL DATA RETRIEVED =====`);
+                      console.log(`[AI SUGGESTIONS] Posts: ${retryPosts.length}, Total Comments: ${totalComments}, Avg Comments: ${avgComments}`);
+                      
+                      // Update account with real fresh data
+                      instagramAccount = {
+                        ...instagramAccount,
+                        accessToken: refreshResult.access_token,
+                        avgLikes,
+                        avgComments,
+                        mediaCount: retryPosts.length,
+                        lastSyncAt: new Date(),
+                        expiresAt: newExpiresAt
+                      };
+                      
+                      await storage.updateSocialAccount(instagramAccount.id!, {
+                        avgLikes,
+                        avgComments,
+                        mediaCount: retryPosts.length,
+                        lastSyncAt: new Date()
+                      });
+                      
+                      console.log(`[AI SUGGESTIONS] ✅ Successfully updated with REAL current Instagram data!`);
+                    } else {
+                      console.warn(`[AI SUGGESTIONS] Retry call returned no posts - data may be empty`);
+                    }
+                  } else {
+                    const retryErrorText = await retryResponse.text();
+                    console.error(`[AI SUGGESTIONS] Retry API call failed with status ${retryStatus}: ${retryErrorText}`);
+                  }
                 }
-              });
-              
-              console.log(`[AI SUGGESTIONS] 🔄 Account marked for Business API upgrade - continuing with available data`);
+              } catch (refreshError) {
+                console.error(`[AI SUGGESTIONS] Failed to refresh Instagram token:`, refreshError);
+              }
             }
           }
         } catch (refreshError) {

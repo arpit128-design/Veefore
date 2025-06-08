@@ -14,8 +14,12 @@ interface MessageContext {
 }
 
 interface AIResponseConfig {
-  personality: string;
-  responseLength: string;
+  personality: 'friendly' | 'professional' | 'casual' | 'enthusiastic' | 'helpful' | 'humorous';
+  responseLength: 'short' | 'medium' | 'long';
+  dailyLimit: number;
+  responseDelay: number;
+  language: 'auto' | 'english' | 'hindi' | 'hinglish';
+  contextualMode: boolean;
   businessContext?: string;
 }
 
@@ -396,42 +400,59 @@ class AIResponseGenerator {
   }
 
   private buildPrompt(context: MessageContext, config: AIResponseConfig): string {
-    const personalityMap = {
-      friendly: "friendly, warm, and approachable",
-      professional: "professional, polite, and respectful",
-      casual: "casual, relaxed, and conversational",
-      enthusiastic: "enthusiastic, energetic, and excited",
-      helpful: "helpful, supportive, and solution-oriented"
+    const { personality, responseLength, language, contextualMode, businessContext } = config;
+    
+    const personalityPrompts = {
+      friendly: "You are friendly, warm, and approachable. Use welcoming language and show genuine interest in the conversation.",
+      professional: "You are professional, courteous, and helpful. Maintain a business-appropriate tone while being personable and respectful.",
+      casual: "You are relaxed, informal, and conversational. Use everyday language and be relatable, like talking to a friend.",
+      enthusiastic: "You are energetic, positive, and excited. Show enthusiasm and use upbeat language to create engaging interactions.",
+      helpful: "You are supportive, informative, and solution-oriented. Focus on being genuinely useful and constructive in your responses.",
+      humorous: "You are witty, light-hearted, and entertaining. Use appropriate humor and playful language when the situation calls for it."
     };
-
-    const lengthMap = {
-      short: "1-2 sentences maximum",
-      medium: "2-3 sentences",
-      long: "3-4 sentences with detailed response"
+    
+    const lengthPrompts = {
+      short: "Keep responses very brief (1-8 words). Be concise, direct, and impactful.",
+      medium: "Use moderate length responses (8-20 words). Be clear, natural, and conversational without being verbose.",
+      long: "Provide thoughtful responses (20-40 words). Be thorough, engaging, and detailed while maintaining natural flow."
     };
-
-    // Analyze message intent for contextual responses
+    
+    const languageInstructions = {
+      auto: "Detect the language of the message and respond in the same language naturally (English/Hindi/Hinglish).",
+      english: "Respond only in English with natural, native-level fluency and expressions.",
+      hindi: "Respond in Hindi using Devanagari script with natural Hindi expressions and cultural context.",
+      hinglish: "Respond in Hinglish (Hindi-English mix) naturally, like urban Indian conversations with mixed vocabulary."
+    };
+    
+    const contextualInstruction = contextualMode 
+      ? "Use advanced contextual understanding. Consider the user's intent, emotional state, conversation flow, and cultural nuances."
+      : "Respond directly to the message content with appropriate acknowledgment.";
+    
+    // Analyze message for better context
     const messageAnalysis = this.analyzeMessageIntent(context.message);
     
-    return `You are an intelligent social media assistant responding to Instagram DMs. Your goal is to understand the message contextually and respond naturally like a real person.
+    return `You are an intelligent social media assistant responding to Instagram DMs. ${personalityPrompts[personality]}
+
+${lengthPrompts[responseLength]}
+${languageInstructions[language]}
+${contextualInstruction}
 
 UNDERSTAND THE MESSAGE MEANING:
 - Read and comprehend what the person is actually saying
-- Don't rely on keyword matching - understand the context
-- For Hindi/Hinglish phrases like "mai bhi thik hu" (I am also fine), understand this means they're saying they're doing well
-- For "kya haal" understand this is asking "what's up" 
+- For Hindi/Hinglish phrases like "mai bhi thik hu" (I am also fine), understand this means they're doing well
+- For "kya haal" understand this is asking "what's up" or "how are things"
 - For wellbeing statements, respond appropriately (e.g., "achha hai", "nice yaar", "good to hear")
 
 CUSTOMER MESSAGE: "${context.message}"
 FROM: @${context.userProfile?.username || 'user'}
-${config.businessContext ? `BUSINESS: ${config.businessContext}` : ''}
+${businessContext ? `BUSINESS CONTEXT: ${businessContext}` : ''}
 
-RESPONSE REQUIREMENTS:
-- Keep under 50 characters
-- Sound completely natural and conversational  
+RESPONSE STYLE:
+- Sound completely natural and conversational
 - Match their language (English/Hindi/Hinglish) exactly
 - Understand context, don't use templates
-- Respond as a real person would
+- Respond as a real person would with the ${personality} personality
+- Keep within ${responseLength} length guidelines
 
 EXAMPLES OF NATURAL UNDERSTANDING:
 - "mai bhi thik hu" → "achha hai" or "nice yaar" 
@@ -439,7 +460,7 @@ EXAMPLES OF NATURAL UNDERSTANDING:
 - "hello" → "hey" or "hi there"
 - "thanks" → "welcome" or "no problem"
 
-Generate ONE natural response that shows you understood their message:`;
+Generate ONE natural response that shows you understood their message with the specified personality and length:`;
   }
 
   private parseAIResponse(text: string): any {

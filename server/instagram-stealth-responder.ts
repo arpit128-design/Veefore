@@ -154,6 +154,10 @@ export class InstagramStealthResponder {
         {
           personality: context?.aiPersonality || 'friendly',
           responseLength: 'short',
+          dailyLimit: 50,
+          responseDelay: 2,
+          language: 'auto',
+          contextualMode: true,
           businessContext: 'Instagram DM automation'
         }
       );
@@ -279,7 +283,11 @@ export class InstagramStealthResponder {
 
       const config: AIResponseConfig = {
         personality: 'casual',
-        responseLength: 'very_short'
+        responseLength: 'short',
+        dailyLimit: 50,
+        responseDelay: 2,
+        language: 'auto',
+        contextualMode: true
       };
 
       const aiResponse = await this.aiGenerator.generateContextualResponse(context, config);

@@ -431,50 +431,46 @@ export class InstagramWebhookHandler {
       if (activeTime && activeTime.enabled) {
         const { startTime, endTime, activeDays } = activeTime;
         
-        // Always use IST timezone for validation (GMT+5:30)
-        const istTime = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-        console.log(`[WEBHOOK] Using IST time for validation: ${istTime.toISOString()}`);
-        console.log(`[WEBHOOK] Current IST time: ${istTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        // Get current IST time properly
+        const now = new Date();
+        const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+        const currentHour = istTime.getHours();
+        const currentMinute = istTime.getMinutes();
+        const currentDay = istTime.getDay(); // 0=Sunday, 1=Monday, etc.
+        
+        console.log(`[WEBHOOK] Current IST time: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
+        console.log(`[WEBHOOK] Current day: ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]}`);
         
         // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
         if (activeDays && activeDays.length > 0) {
-          const currentDay = istTime.getUTCDay(); // Get IST day: 0=Sunday, 1=Monday, etc.
           const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
           
-          console.log(`[WEBHOOK] Current IST day: ${currentDay} (${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]})`);
-          console.log(`[WEBHOOK] Converted to Monday-first format: ${mondayFirst}, allowed days: ${activeDays}`);
+          console.log(`[WEBHOOK] Day check: current=${mondayFirst}, allowed=${activeDays}`);
           
           if (!activeDays.includes(mondayFirst)) {
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            console.log(`[WEBHOOK] ✗ Rule not active on ${dayNames[currentDay]} (day ${mondayFirst}, allowed: ${activeDays})`);
+            console.log(`[WEBHOOK] ✗ Rule not active on ${dayNames[currentDay]}`);
             return { canExecute: false, reason: `Rule not active on ${dayNames[currentDay]}` };
           } else {
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            console.log(`[WEBHOOK] ✓ Current day ${dayNames[currentDay]} is allowed`);
+            console.log(`[WEBHOOK] ✓ Day check passed`);
           }
         }
 
         // Check if current time is within active hours (using IST)
         if (startTime && endTime) {
-          // Create proper IST date and extract hours/minutes
-          const istDate = new Date(istTime.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-          const currentHour = istDate.getHours();
-          const currentMinute = istDate.getMinutes();
           const currentTimeMinutes = currentHour * 60 + currentMinute;
-          
           const [startHour, startMin] = startTime.split(':').map(Number);
           const [endHour, endMin] = endTime.split(':').map(Number);
           const startTimeMinutes = startHour * 60 + startMin;
           const endTimeMinutes = endHour * 60 + endMin;
           
-          console.log(`[WEBHOOK] Current IST time: ${currentHour}:${currentMinute.toString().padStart(2, '0')} (${currentTimeMinutes} minutes)`);
-          console.log(`[WEBHOOK] Active hours: ${startTime}-${endTime} (${startTimeMinutes}-${endTimeMinutes} minutes)`);
+          console.log(`[WEBHOOK] Time check: current=${currentTimeMinutes}min (${currentHour}:${currentMinute.toString().padStart(2, '0')}), allowed=${startTimeMinutes}-${endTimeMinutes}min (${startTime}-${endTime})`);
           
           if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
-            console.log(`[WEBHOOK] ✗ Current IST time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
+            console.log(`[WEBHOOK] ✗ Current time outside active hours`);
             return { canExecute: false, reason: `Rule active ${startTime}-${endTime} IST, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST` };
           } else {
-            console.log(`[WEBHOOK] ✓ Current IST time is within active hours`);
+            console.log(`[WEBHOOK] ✓ Time check passed`);
           }
         }
       }

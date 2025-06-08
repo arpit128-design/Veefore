@@ -1,5 +1,5 @@
-const { MongoDBStorage } = require('./server/mongodb-storage');
-const { InstagramAutomation } = require('./server/instagram-automation');
+import { MongoDBStorage } from './server/mongodb-storage.js';
+import { InstagramAutomation } from './server/instagram-automation.js';
 
 async function testDMResponseRate() {
   console.log('[TEST] Testing 100% DM response rate system...');

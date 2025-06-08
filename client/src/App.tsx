@@ -54,6 +54,7 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
+              <Route path="/auth" component={() => <Redirect to="/dashboard" />} />
               <Route path="/onboarding" component={OnboardingPremium} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />

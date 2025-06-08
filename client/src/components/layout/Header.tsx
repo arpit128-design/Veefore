@@ -18,7 +18,11 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Brand Logo */}
           <div className="flex items-center space-x-2 md:space-x-4">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-electric-cyan to-nebula-purple animate-pulse-glow"></div>
+            <img 
+              src="/veefore-logo.png" 
+              alt="VeeFore Logo" 
+              className="w-8 h-8 md:w-10 md:h-10 object-contain animate-pulse-glow"
+            />
             <h1 className="text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
           </div>
           

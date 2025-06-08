@@ -447,7 +447,13 @@ const Landing = () => {
           transition={{ delay: 0.3, duration: 0.8 }}
           className="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between"
         >
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
+            <motion.img
+              src="/veefore-logo.png"
+              alt="VeeFore Logo"
+              whileHover={{ scale: 1.05 }}
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+            />
             <motion.h1 
               whileHover={{ scale: 1.05 }}
               className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
@@ -1000,12 +1006,20 @@ const Landing = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-6 sm:mb-8"
           >
-            <motion.h3 
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 sm:mb-4"
-            >
-              VeeFore
-            </motion.h3>
+            <div className="flex items-center justify-center space-x-3 mb-3 sm:mb-4">
+              <motion.img
+                src="/veefore-logo.png"
+                alt="VeeFore Logo"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                whileHover={{ scale: 1.1 }}
+              />
+              <motion.h3 
+                whileHover={{ scale: 1.05 }}
+                className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              >
+                VeeFore
+              </motion.h3>
+            </div>
             <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base px-4">
               The future of AI-powered multi-platform social media automation. Transform your digital presence 
               across Instagram, YouTube, Twitter, Facebook, LinkedIn with intelligent automation.

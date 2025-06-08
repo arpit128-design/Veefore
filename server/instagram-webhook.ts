@@ -7,7 +7,8 @@ import { InstagramStealthResponder } from './instagram-stealth-responder';
 interface WebhookEntry {
   id: string;
   time: number;
-  changes: WebhookChange[];
+  changes?: WebhookChange[];
+  messaging?: any[];
 }
 
 interface WebhookChange {
@@ -171,12 +172,165 @@ export class InstagramWebhookHandler {
 
       console.log(`[WEBHOOK] Found social account: ${socialAccount.username} for workspace ${socialAccount.workspaceId}`);
 
-      // Process each change in the entry
-      for (const change of entry.changes) {
-        await this.processWebhookChange(change, socialAccount);
+      // Handle different event types
+      if (entry.changes) {
+        // Comment/mention events have changes
+        for (const change of entry.changes) {
+          await this.processWebhookChange(change, socialAccount);
+        }
+      } else if (entry.messaging) {
+        // DM events have messaging
+        for (const message of entry.messaging) {
+          await this.processDirectMessage(message, socialAccount);
+        }
       }
     } catch (error) {
       console.error('[WEBHOOK] Error processing entry:', error);
+    }
+  }
+
+  /**
+   * Process direct message events
+   */
+  private async processDirectMessage(message: any, socialAccount: any): Promise<void> {
+    try {
+      console.log(`[WEBHOOK] Processing DM event`);
+
+      // Skip echo messages (messages sent by the account itself)
+      if (message.message?.is_echo) {
+        console.log(`[WEBHOOK] Skipping echo message`);
+        return;
+      }
+
+      // Extract message details
+      const senderId = message.sender?.id;
+      const messageText = message.message?.text;
+      const timestamp = message.timestamp;
+
+      if (!senderId || !messageText) {
+        console.log(`[WEBHOOK] Invalid DM: missing sender or text`);
+        return;
+      }
+
+      console.log(`[WEBHOOK] New DM from ${senderId}: "${messageText}"`);
+
+      // Get automation rules for this workspace
+      const automationRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
+      console.log(`[WEBHOOK] Found ${automationRules.length} automation rules for workspace ${socialAccount.workspaceId}`);
+
+      // Find DM automation rules
+      const dmRules = automationRules.filter(rule => 
+        rule.isActive && 
+        rule.trigger && 
+        typeof rule.trigger === 'object' && 
+        'type' in rule.trigger && 
+        rule.trigger.type === 'dm'
+      );
+
+      for (const rule of dmRules) {
+        console.log(`[WEBHOOK] Processing DM rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);
+        
+        try {
+          await this.handleDirectMessageEvent(messageText, senderId, socialAccount, rule);
+        } catch (error) {
+          console.error(`[WEBHOOK] Error processing DM rule ${rule.id}:`, error);
+        }
+      }
+
+    } catch (error) {
+      console.error('[WEBHOOK] Error processing DM:', error);
+    }
+  }
+
+  /**
+   * Handle direct message automation event
+   */
+  private async handleDirectMessageEvent(
+    messageText: string,
+    senderId: string,
+    socialAccount: any,
+    rule: any
+  ): Promise<void> {
+    try {
+      console.log(`[WEBHOOK] Starting DM response generation for: "${messageText}"`);
+      console.log(`[WEBHOOK] Calling stealth response generator...`);
+
+      const automation = new InstagramAutomation();
+      const response = await automation.generateContextualResponse(
+        messageText,
+        rule,
+        { username: senderId }
+      );
+
+      if (response) {
+        // Send DM response
+        const dmResponse = await this.sendDirectMessage(
+          socialAccount.accessToken,
+          senderId,
+          response
+        );
+
+        if (dmResponse.success) {
+          console.log(`[WEBHOOK] ✓ DM sent successfully: "${response}"`);
+          
+          // Store interaction record
+          await this.storage.createChatPerformance({
+            workspaceId: socialAccount.workspaceId,
+            platform: 'instagram',
+            messageType: 'dm',
+            userMessage: messageText,
+            botResponse: response,
+            timestamp: new Date(),
+            success: true
+          });
+        } else {
+          console.error(`[WEBHOOK] Failed to send DM:`, dmResponse.error);
+        }
+      } else {
+        console.log(`[WEBHOOK] ✓ Stealth responder declined to respond to maintain natural patterns`);
+      }
+
+    } catch (error) {
+      console.error(`[WEBHOOK] Error handling DM event:`, error);
+    }
+  }
+
+  /**
+   * Send direct message via Instagram API
+   */
+  private async sendDirectMessage(
+    accessToken: string,
+    recipientId: string,
+    message: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const url = `https://graph.facebook.com/v18.0/me/messages`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipient: { id: recipientId },
+          message: { text: message }
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(`[INSTAGRAM API] DM sent successfully:`, data);
+        return { success: true };
+      } else {
+        console.error(`[INSTAGRAM API] DM send failed:`, data);
+        return { success: false, error: data.error?.message || 'Unknown error' };
+      }
+
+    } catch (error) {
+      console.error(`[INSTAGRAM API] Error sending DM:`, error);
+      return { success: false, error: String(error) };
     }
   }
 

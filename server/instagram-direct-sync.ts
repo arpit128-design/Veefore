@@ -126,17 +126,16 @@ export class InstagramDirectSync {
             console.log('[INSTAGRAM DIRECT] lifetime reach error:', alt1Error);
           }
           
-          // Alternative 2: Try media-level insights aggregation
+          // Alternative 2: Use media-level reach only (impressions deprecated in v22+)
           try {
             const mediaInsightsResponse = await fetch(
-              `https://graph.instagram.com/${profileData.id}/media?fields=id,insights.metric(reach,impressions)&limit=25&access_token=${accessToken}`
+              `https://graph.instagram.com/${profileData.id}/media?fields=id,insights.metric(reach)&limit=25&access_token=${accessToken}`
             );
             if (mediaInsightsResponse.ok) {
               const mediaInsightsData = await mediaInsightsResponse.json();
-              console.log('[INSTAGRAM DIRECT] Media insights response:', mediaInsightsData);
+              console.log('[INSTAGRAM DIRECT] Media reach insights response:', mediaInsightsData);
               
               let aggregatedReach = 0;
-              let aggregatedImpressions = 0;
               
               for (const media of (mediaInsightsData.data || [])) {
                 if (media.insights?.data) {
@@ -144,23 +143,17 @@ export class InstagramDirectSync {
                     if (insight.name === 'reach' && insight.values?.[0]?.value) {
                       aggregatedReach += insight.values[0].value;
                     }
-                    if (insight.name === 'impressions' && insight.values?.[0]?.value) {
-                      aggregatedImpressions += insight.values[0].value;
-                    }
                   }
                 }
               }
               
-              if (aggregatedReach > 0 || aggregatedImpressions > 0) {
+              if (aggregatedReach > 0) {
                 accountInsights.totalReach = aggregatedReach;
-                accountInsights.totalImpressions = aggregatedImpressions;
-                console.log('[INSTAGRAM DIRECT] SUCCESS - Aggregated from media insights:', {
-                  reach: aggregatedReach,
-                  impressions: aggregatedImpressions
-                });
+                console.log('[INSTAGRAM DIRECT] SUCCESS - Extracted authentic reach from media:', aggregatedReach);
               }
             } else {
-              console.log('[INSTAGRAM DIRECT] Media insights approach failed');
+              const mediaError = await mediaInsightsResponse.text();
+              console.log('[INSTAGRAM DIRECT] Media insights failed:', mediaError);
             }
           } catch (mediaError) {
             console.log('[INSTAGRAM DIRECT] Media insights error:', mediaError);

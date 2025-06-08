@@ -89,8 +89,8 @@ class AIResponseGenerator {
       const contextualResponse = this.generateContextualResponseFromAnalysis(messageAnalysis, context.message);
       
       // Use natural fallback if contextual fails
-      const fallbackResponse = contextualResponse || 
-        this.generateNaturalFallback(context.message, context.userProfile?.username).response;
+      const naturalFallback = this.generateNaturalFallback(context.message, context.userProfile?.username);
+      const fallbackResponse = contextualResponse || naturalFallback.response;
       
       return {
         response: fallbackResponse,

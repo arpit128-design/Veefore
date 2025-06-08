@@ -1878,8 +1878,231 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
     console.log(`[AI SUGGESTIONS] Analyzing @${username}: ${followersCount} followers, ${engagementPercent.toFixed(1)}% engagement`);
 
-    // Use fallback suggestions with variety for authentic account data
-    return generateFallbackSuggestions(instagramAccount);
+    // Generate personalized AI suggestions based on real account performance
+    return await generatePersonalizedSuggestions({
+      username,
+      followersCount,
+      mediaCount,
+      avgLikes,
+      avgComments,
+      engagementPercent,
+      avgReach
+    });
+  }
+
+  async function generatePersonalizedSuggestions(accountData: any) {
+    const { username, followersCount, mediaCount, avgLikes, avgComments, engagementPercent, avgReach } = accountData;
+    
+    const suggestions = [];
+    
+    // Analyze follower count and growth potential
+    if (followersCount < 100) {
+      suggestions.push({
+        type: 'growth',
+        data: {
+          suggestion: `Focus on niche content to reach your first 100 followers`,
+          reasoning: `With ${followersCount} followers, you're in the early growth phase. Consistent niche content builds a loyal foundation audience.`,
+          actionItems: [
+            'Post 3-5 times per week consistently',
+            'Use 15-20 relevant hashtags per post',
+            'Engage with accounts in your niche daily',
+            'Share your expertise or passion clearly'
+          ],
+          expectedImpact: `Potential to reach 100+ followers within 2-3 months`,
+          difficulty: 'Medium',
+          timeframe: '2-3 months'
+        },
+        confidence: 85,
+        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      });
+    } else if (followersCount < 1000) {
+      suggestions.push({
+        type: 'growth',
+        data: {
+          suggestion: `Scale content strategy to reach 1K milestone`,
+          reasoning: `With ${followersCount} followers, you have momentum. Focus on content pillars and engagement to reach 1K.`,
+          actionItems: [
+            'Develop 3-4 content pillars',
+            'Post daily with consistent timing',
+            'Create engaging captions with questions',
+            'Use Instagram Stories daily'
+          ],
+          expectedImpact: `1K followers achievable in 3-6 months with consistent strategy`,
+          difficulty: 'Medium',
+          timeframe: '3-6 months'
+        },
+        confidence: 80,
+        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Analyze engagement rate and provide specific recommendations
+    if (engagementPercent > 10) {
+      suggestions.push({
+        type: 'engagement',
+        data: {
+          suggestion: `Excellent ${engagementPercent.toFixed(1)}% engagement rate - leverage this for growth`,
+          reasoning: `Your engagement rate is exceptional (industry average is 1-3%). This shows strong audience connection.`,
+          actionItems: [
+            'Create more content similar to your top-performing posts',
+            'Ask followers to share your content in their stories',
+            'Consider Instagram Reels to reach new audiences',
+            'Collaborate with accounts in your niche'
+          ],
+          expectedImpact: `High engagement can accelerate follower growth by 200-300%`,
+          difficulty: 'Easy',
+          timeframe: '2-4 weeks'
+        },
+        confidence: 95,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    } else if (engagementPercent > 3) {
+      suggestions.push({
+        type: 'engagement',
+        data: {
+          suggestion: `Good ${engagementPercent.toFixed(1)}% engagement - optimize for higher interaction`,
+          reasoning: `Your engagement is above average. Focus on tactics to increase comments and saves.`,
+          actionItems: [
+            'End captions with clear questions',
+            'Create carousel posts that provide value',
+            'Respond to comments within 1 hour',
+            'Use polls and questions in Stories'
+          ],
+          expectedImpact: `Can improve engagement to 5-7% with consistent effort`,
+          difficulty: 'Easy',
+          timeframe: '2-3 weeks'
+        },
+        confidence: 85,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    } else if (engagementPercent > 1) {
+      suggestions.push({
+        type: 'engagement',
+        data: {
+          suggestion: `Improve ${engagementPercent.toFixed(1)}% engagement with content optimization`,
+          reasoning: `Your engagement is average. Focus on creating more engaging, valuable content for your audience.`,
+          actionItems: [
+            'Analyze your top 3 posts and replicate their style',
+            'Post when your audience is most active',
+            'Create educational or entertaining content',
+            'Use trending audio in Reels'
+          ],
+          expectedImpact: `Can reach 3-4% engagement with content improvements`,
+          difficulty: 'Medium',
+          timeframe: '4-6 weeks'
+        },
+        confidence: 75,
+        validUntil: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
+      });
+    } else {
+      suggestions.push({
+        type: 'engagement',
+        data: {
+          suggestion: `Boost low engagement rate through audience connection`,
+          reasoning: `${engagementPercent.toFixed(1)}% engagement suggests content may not resonate with your audience.`,
+          actionItems: [
+            'Survey followers about what content they want',
+            'Share more personal, authentic content',
+            'Engage actively with your followers\' content',
+            'Post at optimal times for your audience'
+          ],
+          expectedImpact: `Can double engagement rate to 2-3% with authentic connection`,
+          difficulty: 'Medium',
+          timeframe: '6-8 weeks'
+        },
+        confidence: 70,
+        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Content strategy based on post count
+    if (mediaCount < 10) {
+      suggestions.push({
+        type: 'audio',
+        data: {
+          suggestion: `Build content foundation with consistent posting`,
+          reasoning: `With ${mediaCount} posts, focus on establishing regular content rhythm first.`,
+          actionItems: [
+            'Create content calendar for next 30 days',
+            'Batch create 10-15 posts to maintain consistency',
+            'Focus on quality over quantity initially',
+            'Document your progress or expertise'
+          ],
+          expectedImpact: `Strong foundation will improve all other metrics`,
+          difficulty: 'Easy',
+          timeframe: '4-6 weeks'
+        },
+        confidence: 90,
+        validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      });
+    } else if (mediaCount > 50) {
+      suggestions.push({
+        type: 'trending',
+        data: {
+          suggestion: `Optimize existing content library for maximum reach`,
+          reasoning: `With ${mediaCount} posts, you have substantial content. Focus on leveraging what works best.`,
+          actionItems: [
+            'Identify your top 10 performing posts',
+            'Create similar content to your best performers',
+            'Repurpose top content into Reels and Stories',
+            'Update captions on older posts with better hashtags'
+          ],
+          expectedImpact: `Can increase reach by 50-100% using proven content themes`,
+          difficulty: 'Easy',
+          timeframe: '2-3 weeks'
+        },
+        confidence: 85,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Comment-to-like ratio analysis
+    const commentRatio = avgLikes > 0 ? (avgComments / avgLikes) * 100 : 0;
+    if (commentRatio > 50) {
+      suggestions.push({
+        type: 'hashtag',
+        data: {
+          suggestion: `Exceptional comment engagement - leverage for community building`,
+          reasoning: `${commentRatio.toFixed(1)}% comment-to-like ratio shows strong community connection.`,
+          actionItems: [
+            'Create posts that encourage discussion',
+            'Ask followers to share their experiences',
+            'Start a hashtag for your community',
+            'Feature follower content in your stories'
+          ],
+          expectedImpact: `Strong community can lead to viral growth and loyal following`,
+          difficulty: 'Medium',
+          timeframe: '3-4 weeks'
+        },
+        confidence: 90,
+        validUntil: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    // Ensure we have at least 3-4 suggestions
+    if (suggestions.length < 3) {
+      suggestions.push({
+        type: 'timing',
+        data: {
+          suggestion: `Optimize posting schedule for maximum visibility`,
+          reasoning: `Timing significantly impacts reach and engagement for accounts like @${username}.`,
+          actionItems: [
+            'Test posting at different times throughout the week',
+            'Use Instagram Insights to find your peak hours',
+            'Post when your audience is most active',
+            'Maintain consistent posting schedule'
+          ],
+          expectedImpact: `Optimal timing can increase engagement by 30-50%`,
+          difficulty: 'Easy',
+          timeframe: '2-3 weeks'
+        },
+        confidence: 80,
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+    }
+
+    console.log(`[AI SUGGESTIONS] Generated ${suggestions.length} suggestions based on real Instagram data`);
+    return suggestions;
   }
 
   function generateFallbackSuggestions(instagramAccount: any) {

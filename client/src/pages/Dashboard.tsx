@@ -42,7 +42,7 @@ export default function Dashboard() {
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour12: false,
-    timeZone: 'UTC',
+    timeZone: 'Asia/Kolkata',
     hour: '2-digit',
     minute: '2-digit'
   });
@@ -198,7 +198,7 @@ export default function Dashboard() {
         </div>
         <div className="text-left md:text-right">
           <div className="text-xs md:text-sm text-asteroid-silver">Current Time</div>
-          <div className="text-lg md:text-xl font-mono text-electric-cyan">{currentTime} UTC</div>
+          <div className="text-lg md:text-xl font-mono text-electric-cyan">{currentTime} IST</div>
         </div>
       </div>
 

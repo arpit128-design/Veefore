@@ -41,12 +41,12 @@ export function Header() {
             <WorkspaceSwitcher />
             
             {/* Credit Display */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-2 bg-space-gray rounded-full overflow-hidden">
-                <div className="h-full energy-bar w-3/4"></div>
+            <div className="flex items-center space-x-2 glassmorphism px-3 py-2 rounded-lg border border-electric-cyan/20 hover:border-electric-cyan/40 transition-all duration-300">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-solar-gold to-electric-cyan animate-pulse-glow flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-white"></div>
               </div>
-              <span className="text-solar-gold font-mono">{credits.toLocaleString()}</span>
-              <span className="text-xs text-asteroid-silver">credits</span>
+              <span className="text-solar-gold font-mono text-lg font-bold">{credits.toLocaleString()}</span>
+              <span className="text-xs text-electric-cyan font-medium">Credits</span>
             </div>
             
             {/* Notifications */}
@@ -82,12 +82,12 @@ export function Header() {
               <WorkspaceSwitcher />
               
               {/* Credit Display */}
-              <div className="flex items-center justify-center space-x-2">
-                <div className="w-8 h-2 bg-space-gray rounded-full overflow-hidden">
-                  <div className="h-full energy-bar w-3/4"></div>
+              <div className="flex items-center justify-center space-x-2 glassmorphism px-3 py-2 rounded-lg border border-electric-cyan/20">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-solar-gold to-electric-cyan animate-pulse-glow flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
                 </div>
-                <span className="text-solar-gold font-mono">{credits.toLocaleString()}</span>
-                <span className="text-xs text-asteroid-silver">credits</span>
+                <span className="text-solar-gold font-mono font-bold">{credits.toLocaleString()}</span>
+                <span className="text-xs text-electric-cyan font-medium">Credits</span>
               </div>
               
               {/* Notifications */}

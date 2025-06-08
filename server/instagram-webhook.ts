@@ -270,7 +270,7 @@ export class InstagramWebhookHandler {
           }
         } catch (error) {
           console.error(`[WEBHOOK] Error in automation flow:`, error);
-          console.error(`[WEBHOOK] Error stack:`, error.stack);
+          console.error(`[WEBHOOK] Error stack:`, (error as Error).stack);
         }
       }
     } catch (error) {

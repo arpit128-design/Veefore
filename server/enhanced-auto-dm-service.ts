@@ -1,14 +1,17 @@
 import { MongoStorage } from './mongodb-storage';
 import { ConversationMemoryService } from './conversation-memory-service';
+import { InstagramTokenManager } from './instagram-token-manager';
 import axios from 'axios';
 
 export class EnhancedAutoDMService {
   private storage: MongoStorage;
   private memoryService: ConversationMemoryService;
+  private tokenManager: InstagramTokenManager;
 
   constructor(storage: MongoStorage) {
     this.storage = storage;
     this.memoryService = new ConversationMemoryService(storage);
+    this.tokenManager = new InstagramTokenManager(storage);
   }
 
   // Enhanced webhook handler for Instagram DMs with memory integration
@@ -98,13 +101,26 @@ export class EnhancedAutoDMService {
           workspace?.aiPersonality
         );
 
-        // Send response via Instagram API
-        const success = await this.sendInstagramDM(
-          instagramAccount.accessToken!,
-          recipientId,
-          senderId,
-          aiResponse
-        );
+        // Get valid Instagram page access token using token manager
+        const pageTokenInfo = await this.tokenManager.getPageAccessToken(instagramAccount.workspaceId.toString());
+        
+        let success = false;
+        if (pageTokenInfo) {
+          success = await this.sendInstagramDM(
+            pageTokenInfo.accessToken,
+            pageTokenInfo.pageId,
+            senderId,
+            aiResponse
+          );
+        } else {
+          // Fallback to stored token with enhanced error handling
+          success = await this.sendInstagramDM(
+            instagramAccount.accessToken!,
+            recipientId,
+            senderId,
+            aiResponse
+          );
+        }
 
         if (success) {
           // Store AI response in conversation memory

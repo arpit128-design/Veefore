@@ -51,14 +51,19 @@ export default function Suggestions() {
     },
     onSuccess: () => {
       console.log(`[SUGGESTIONS] Generation successful, invalidating cache for workspace: ${currentWorkspace?.id}`);
-      // Invalidate all suggestion-related queries for this workspace
-      queryClient.invalidateQueries({ queryKey: ['suggestions'] });
+      // Clear and invalidate all suggestion-related queries for this workspace
+      queryClient.removeQueries({ queryKey: ['suggestions'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestions', currentWorkspace?.id] });
       
       toast({
         title: "AI Suggestions Generated!",
         description: "Fresh content ideas are now available.",
       });
-      refetch();
+      
+      // Force immediate refetch
+      setTimeout(() => {
+        refetch();
+      }, 100);
     },
     onError: (error: any) => {
       toast({

@@ -36,6 +36,8 @@ interface AutomationRule {
     maxPerDay?: number;
     excludeKeywords?: string[];
     minFollowers?: number;
+    responseDelay?: number; // seconds between responses
+    ruleDuration?: number; // days to keep rule active
   };
   schedule?: {
     timezone: string;
@@ -44,6 +46,27 @@ interface AutomationRule {
       end: string;
     };
     activeDays: number[];
+  };
+  aiConfig?: {
+    personality: 'friendly' | 'professional' | 'casual' | 'enthusiastic' | 'helpful' | 'humorous';
+    responseLength: 'short' | 'medium' | 'long';
+    dailyLimit: number;
+    responseDelay: number; // minutes
+    language: 'auto' | 'english' | 'hindi' | 'hinglish';
+    contextualMode: boolean;
+  };
+  duration?: {
+    startDate: string;
+    endDate?: string;
+    durationDays?: number;
+    autoExpire: boolean;
+  };
+  activeTime?: {
+    enabled: boolean;
+    startTime: string;
+    endTime: string;
+    timezone: string;
+    activeDays: number[]; // 0=Sunday, 1=Monday, etc.
   };
   createdAt: string;
   updatedAt: string;
@@ -88,7 +111,9 @@ export default function Automation() {
       timeDelay: 0,
       maxPerDay: 10,
       excludeKeywords: [] as string[],
-      minFollowers: 0
+      minFollowers: 0,
+      responseDelay: 30, // seconds between responses
+      ruleDuration: 30 // days to keep rule active
     },
     schedule: {
       timezone: 'UTC',
@@ -97,6 +122,26 @@ export default function Automation() {
         end: '18:00'
       },
       activeDays: [1, 2, 3, 4, 5] // Mon-Fri
+    },
+    aiConfig: {
+      personality: 'friendly' as 'friendly' | 'professional' | 'casual' | 'enthusiastic' | 'helpful' | 'humorous',
+      responseLength: 'medium' as 'short' | 'medium' | 'long',
+      dailyLimit: 50,
+      responseDelay: 2, // minutes
+      language: 'auto' as 'auto' | 'english' | 'hindi' | 'hinglish',
+      contextualMode: true
+    },
+    duration: {
+      startDate: new Date().toISOString().split('T')[0],
+      durationDays: 30,
+      autoExpire: true
+    },
+    activeTime: {
+      enabled: true,
+      startTime: '09:00',
+      endTime: '21:00',
+      timezone: 'Asia/Kolkata',
+      activeDays: [1, 2, 3, 4, 5, 6, 7] // All days
     },
     isActive: true
   });
@@ -250,7 +295,9 @@ export default function Automation() {
         timeDelay: 0,
         maxPerDay: 10,
         excludeKeywords: [],
-        minFollowers: 0
+        minFollowers: 0,
+        responseDelay: 30,
+        ruleDuration: 30
       },
       schedule: {
         timezone: 'UTC',
@@ -259,6 +306,26 @@ export default function Automation() {
           end: '18:00'
         },
         activeDays: [1, 2, 3, 4, 5]
+      },
+      aiConfig: {
+        personality: 'friendly',
+        responseLength: 'medium',
+        dailyLimit: 50,
+        responseDelay: 2,
+        language: 'auto',
+        contextualMode: true
+      },
+      duration: {
+        startDate: new Date().toISOString().split('T')[0],
+        durationDays: 30,
+        autoExpire: true
+      },
+      activeTime: {
+        enabled: true,
+        startTime: '09:00',
+        endTime: '21:00',
+        timezone: 'Asia/Kolkata',
+        activeDays: [1, 2, 3, 4, 5, 6, 7]
       },
       isActive: true
     });
@@ -834,34 +901,112 @@ export default function Automation() {
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <Label htmlFor="ai-personality" className="text-sm">AI Response Personality</Label>
-                      <select
-                        id="ai-personality"
-                        value={newRule.aiPersonality || 'friendly'}
-                        onChange={(e) => setNewRule(prev => ({ ...prev, aiPersonality: e.target.value }))}
-                        className="w-full p-2 border border-input rounded-md bg-background"
-                      >
-                        <option value="friendly">Friendly & Approachable</option>
-                        <option value="professional">Professional & Polite</option>
-                        <option value="casual">Casual & Relaxed</option>
-                        <option value="enthusiastic">Enthusiastic & Energetic</option>
-                        <option value="helpful">Helpful & Supportive</option>
-                      </select>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <Label htmlFor="response-length" className="text-sm">Response Length</Label>
-                      <select
-                        id="response-length"
-                        value={newRule.responseLength || 'medium'}
-                        onChange={(e) => setNewRule(prev => ({ ...prev, responseLength: e.target.value }))}
-                        className="w-full p-2 border border-input rounded-md bg-background"
-                      >
-                        <option value="short">Short (1-2 sentences)</option>
-                        <option value="medium">Medium (2-3 sentences)</option>
-                        <option value="long">Long (3-4 sentences)</option>
-                      </select>
+                    {/* AI Configuration Panel */}
+                    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+                      <h4 className="font-medium text-sm text-foreground">AI Response Configuration</h4>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="ai-personality" className="text-sm">AI Personality</Label>
+                          <Select 
+                            value={newRule.aiConfig?.personality || 'friendly'} 
+                            onValueChange={(value) => setNewRule(prev => ({
+                              ...prev,
+                              aiConfig: { ...prev.aiConfig!, personality: value as any }
+                            }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Choose personality" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="friendly">😊 Friendly & Warm</SelectItem>
+                              <SelectItem value="professional">💼 Professional & Polite</SelectItem>
+                              <SelectItem value="casual">😎 Casual & Relaxed</SelectItem>
+                              <SelectItem value="enthusiastic">⚡ Enthusiastic & Energetic</SelectItem>
+                              <SelectItem value="helpful">🤝 Helpful & Supportive</SelectItem>
+                              <SelectItem value="humorous">😄 Humorous & Fun</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="response-length" className="text-sm">Response Length</Label>
+                          <Select 
+                            value={newRule.aiConfig?.responseLength || 'medium'} 
+                            onValueChange={(value) => setNewRule(prev => ({
+                              ...prev,
+                              aiConfig: { ...prev.aiConfig!, responseLength: value as any }
+                            }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Choose length" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="short">📝 Short (1-2 sentences)</SelectItem>
+                              <SelectItem value="medium">📄 Medium (2-3 sentences)</SelectItem>
+                              <SelectItem value="long">📋 Long (3-4 sentences)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="daily-limit" className="text-sm">Daily Response Limit</Label>
+                          <Input
+                            id="daily-limit"
+                            type="number"
+                            min="1"
+                            max="200"
+                            value={newRule.aiConfig?.dailyLimit || 50}
+                            onChange={(e) => setNewRule(prev => ({
+                              ...prev,
+                              aiConfig: { ...prev.aiConfig!, dailyLimit: parseInt(e.target.value) || 50 }
+                            }))}
+                            placeholder="50"
+                          />
+                          <p className="text-xs text-muted-foreground">Max AI responses per day</p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="response-delay" className="text-sm">Response Delay (minutes)</Label>
+                          <Input
+                            id="response-delay"
+                            type="number"
+                            min="0"
+                            max="60"
+                            value={newRule.aiConfig?.responseDelay || 2}
+                            onChange={(e) => setNewRule(prev => ({
+                              ...prev,
+                              aiConfig: { ...prev.aiConfig!, responseDelay: parseInt(e.target.value) || 2 }
+                            }))}
+                            placeholder="2"
+                          />
+                          <p className="text-xs text-muted-foreground">Wait time before responding</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="ai-language" className="text-sm">Response Language</Label>
+                        <Select 
+                          value={newRule.aiConfig?.language || 'auto'} 
+                          onValueChange={(value) => setNewRule(prev => ({
+                            ...prev,
+                            aiConfig: { ...prev.aiConfig!, language: value as any }
+                          }))}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choose language" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="auto">🌐 Auto-detect (Recommended)</SelectItem>
+                            <SelectItem value="english">🇺🇸 English Only</SelectItem>
+                            <SelectItem value="hindi">🇮🇳 Hindi Only</SelectItem>
+                            <SelectItem value="hinglish">🔄 Hinglish Mix</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">AI will match user's language automatically</p>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -901,6 +1046,177 @@ export default function Automation() {
                     >
                       + Add Another Response
                     </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Rule Duration Settings */}
+              <div className="space-y-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div>
+                  <Label className="text-sm font-medium flex items-center">
+                    <Clock className="h-4 w-4 mr-2" />
+                    Rule Duration & Expiry
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Control how long this automation rule should stay active
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="start-date" className="text-sm">Start Date</Label>
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={newRule.duration?.startDate || new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setNewRule(prev => ({
+                        ...prev,
+                        duration: { ...prev.duration!, startDate: e.target.value }
+                      }))}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="duration-days" className="text-sm">Duration (Days)</Label>
+                    <Input
+                      id="duration-days"
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={newRule.duration?.durationDays || 30}
+                      onChange={(e) => setNewRule(prev => ({
+                        ...prev,
+                        duration: { ...prev.duration!, durationDays: parseInt(e.target.value) || 30 }
+                      }))}
+                      placeholder="30"
+                    />
+                    <p className="text-xs text-muted-foreground">How many days to keep active</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="auto-expire"
+                    checked={newRule.duration?.autoExpire ?? true}
+                    onCheckedChange={(checked) => setNewRule(prev => ({
+                      ...prev,
+                      duration: { ...prev.duration!, autoExpire: checked }
+                    }))}
+                  />
+                  <Label htmlFor="auto-expire" className="text-sm">
+                    Automatically deactivate when duration expires
+                  </Label>
+                </div>
+              </div>
+
+              {/* Active Time Controls */}
+              <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div>
+                  <Label className="text-sm font-medium flex items-center">
+                    <Activity className="h-4 w-4 mr-2" />
+                    Active Time Settings
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Set specific hours and days when AI should respond
+                  </p>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="enable-active-time"
+                    checked={newRule.activeTime?.enabled ?? true}
+                    onCheckedChange={(checked) => setNewRule(prev => ({
+                      ...prev,
+                      activeTime: { ...prev.activeTime!, enabled: checked }
+                    }))}
+                  />
+                  <Label htmlFor="enable-active-time" className="text-sm">
+                    Enable time-based restrictions
+                  </Label>
+                </div>
+                
+                {newRule.activeTime?.enabled && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="start-time" className="text-sm">Start Time</Label>
+                        <Input
+                          id="start-time"
+                          type="time"
+                          value={newRule.activeTime?.startTime || '09:00'}
+                          onChange={(e) => setNewRule(prev => ({
+                            ...prev,
+                            activeTime: { ...prev.activeTime!, startTime: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="end-time" className="text-sm">End Time</Label>
+                        <Input
+                          id="end-time"
+                          type="time"
+                          value={newRule.activeTime?.endTime || '21:00'}
+                          onChange={(e) => setNewRule(prev => ({
+                            ...prev,
+                            activeTime: { ...prev.activeTime!, endTime: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="timezone" className="text-sm">Timezone</Label>
+                        <Select 
+                          value={newRule.activeTime?.timezone || 'Asia/Kolkata'} 
+                          onValueChange={(value) => setNewRule(prev => ({
+                            ...prev,
+                            activeTime: { ...prev.activeTime!, timezone: value }
+                          }))}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select timezone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Asia/Kolkata">🇮🇳 India (IST)</SelectItem>
+                            <SelectItem value="America/New_York">🇺🇸 Eastern Time</SelectItem>
+                            <SelectItem value="America/Los_Angeles">🇺🇸 Pacific Time</SelectItem>
+                            <SelectItem value="Europe/London">🇬🇧 GMT/BST</SelectItem>
+                            <SelectItem value="UTC">🌍 UTC</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-sm">Active Days</Label>
+                      <div className="grid grid-cols-7 gap-2">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                          <label key={index} className={`flex items-center justify-center p-2 border-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                            newRule.activeTime?.activeDays?.includes(index) 
+                              ? 'border-primary bg-primary/10 text-primary' 
+                              : 'border-muted hover:border-primary/50'
+                          }`}>
+                            <input
+                              type="checkbox"
+                              checked={newRule.activeTime?.activeDays?.includes(index) ?? true}
+                              onChange={(e) => {
+                                const currentDays = newRule.activeTime?.activeDays || [1, 2, 3, 4, 5, 6, 7];
+                                const newDays = e.target.checked 
+                                  ? [...currentDays, index]
+                                  : currentDays.filter(d => d !== index);
+                                setNewRule(prev => ({
+                                  ...prev,
+                                  activeTime: { ...prev.activeTime!, activeDays: newDays }
+                                }));
+                              }}
+                              className="sr-only"
+                            />
+                            {day}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

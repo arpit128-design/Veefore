@@ -19,6 +19,7 @@ import Scheduler from "@/pages/Scheduler";
 import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
 import ContentRecommendations from "@/pages/ContentRecommendations";
+import AIFeatures from "@/pages/AIFeatures";
 import Workspaces from "@/pages/Workspaces";
 import TeamManagement from "@/pages/TeamManagement";
 import Integrations from "@/pages/Integrations";

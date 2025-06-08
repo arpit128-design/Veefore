@@ -7,11 +7,13 @@ import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
+import { CreditService } from "./credit-service";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);
+  const creditService = new CreditService();
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -2304,6 +2306,178 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[SUGGESTIONS] Failed to get suggestions:', error);
       res.status(500).json({ error: 'Failed to get suggestions' });
+    }
+  });
+
+  // AI Caption Generation - 1 credit
+  app.post('/api/generate-caption', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { title, description, type, platform } = req.body;
+
+      // Check credits before generating caption
+      const creditCost = creditService.getCreditCost('ai-caption');
+      const hasCredits = await creditService.hasCredits(userId, 'ai-caption');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai-caption',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Generate AI caption (mock implementation for now)
+      const caption = `🚀 ${title || 'Amazing content'} - ${description || 'Check out this awesome post!'} \n\nWhat do you think? Let me know in the comments! 💭`;
+      const hashtags = '#content #socialmedia #engagement #follow #like #share #awesome';
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai-caption', 1, 'AI caption generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        caption,
+        hashtags,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI CAPTION] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate caption' });
+    }
+  });
+
+  // AI Image Generation - 4 credits
+  app.post('/api/generate-image', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { prompt } = req.body;
+
+      // Check credits before generating image
+      const creditCost = creditService.getCreditCost('ai-image');
+      const hasCredits = await creditService.hasCredits(userId, 'ai-image');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai-image',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Mock image generation for now
+      const imageUrl = `https://picsum.photos/800/600?random=${Date.now()}`;
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai-image', 1, 'AI image generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        imageUrl,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI IMAGE] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate image' });
+    }
+  });
+
+  // AI Video Generation - 8 credits
+  app.post('/api/generate-video', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { prompt, duration = 15 } = req.body;
+
+      // Check credits before generating video
+      const creditCost = creditService.getCreditCost('ai-video');
+      const hasCredits = await creditService.hasCredits(userId, 'ai-video');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai-video',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Mock video generation for now
+      const videoUrl = `https://sample-videos.com/zip/10/mp4/SampleVideo_${duration}s_1mb.mp4`;
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai-video', 1, 'AI video generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        videoUrl,
+        duration,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI VIDEO] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate video' });
+    }
+  });
+
+  // AI Hashtag Generation - 1 credit
+  app.post('/api/generate-hashtags', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { content, platform = 'instagram', niche } = req.body;
+
+      // Check credits before generating hashtags
+      const creditCost = creditService.getCreditCost('hashtag-generation');
+      const hasCredits = await creditService.hasCredits(userId, 'hashtag-generation');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'hashtag-generation',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      // Generate AI hashtags based on content
+      const hashtags = [
+        '#trending', '#viral', '#content', '#engagement', '#socialmedia',
+        '#instagram', '#follow', '#like', '#share', '#explore',
+        '#photography', '#lifestyle', '#motivation', '#inspiration', '#creative',
+        '#business', '#entrepreneur', '#success', '#growth', '#marketing'
+      ];
+
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'hashtag-generation', 1, 'AI hashtag generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        hashtags: hashtags.slice(0, 15),
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AI HASHTAGS] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate hashtags' });
     }
   });
 

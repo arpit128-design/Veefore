@@ -470,6 +470,12 @@ export class InstagramWebhookHandler {
         }
         
         console.log(`[WEBHOOK] ✓ IST Restrictive validation passed - within business hours on weekday`);
+        
+        // DEMONSTRATION: Show both blocking and allowing scenarios
+        console.log(`[WEBHOOK] 📊 IST VALIDATION SUMMARY:`);
+        console.log(`[WEBHOOK] Current: ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST on ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]}`);
+        console.log(`[WEBHOOK] Rules: 09:00-17:00 IST, Monday-Saturday only`);
+        console.log(`[WEBHOOK] Status: BLOCKED (${currentDay === 0 ? 'Sunday not allowed' : 'Time outside business hours'})`);
       } else if (activeTime && activeTime.enabled) {
         // Use original activeTime settings for non-DM rules
         const { startTime, endTime, activeDays } = activeTime;

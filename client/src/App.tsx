@@ -29,7 +29,7 @@ import Settings from "@/pages/Settings";
 import Pricing from "@/pages/Pricing";
 import SubscriptionEnhanced from "@/pages/SubscriptionEnhanced";
 import Auth from "@/pages/Auth";
-import NewOnboarding from "@/pages/NewOnboarding";
+import OnboardingPremium from "@/pages/OnboardingPremium";
 import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";

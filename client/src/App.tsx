@@ -135,10 +135,19 @@ function Router() {
   
   // Check if user just completed onboarding
   const justCompleted = localStorage.getItem('onboarding_just_completed') === 'true';
+  console.log('[ROUTER] LocalStorage onboarding_just_completed:', localStorage.getItem('onboarding_just_completed'));
+  
+  // Clear any stale onboarding flags for non-onboarded users
+  if (user && !user.isOnboarded && justCompleted) {
+    console.log('[ROUTER] Clearing stale onboarding flag for non-onboarded user');
+    localStorage.removeItem('onboarding_just_completed');
+  }
   
   // If user just completed onboarding, allow dashboard access regardless of cached user state
-  if (justCompleted) {
+  if (justCompleted && user?.isOnboarded) {
     console.log('[ROUTER] User just completed onboarding, allowing dashboard access');
+    // Clear the flag since we're allowing access
+    localStorage.removeItem('onboarding_just_completed');
     return <AuthenticatedApp />;
   }
   

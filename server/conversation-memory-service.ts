@@ -148,26 +148,46 @@ export class ConversationMemoryService {
         .map(ctx => `${ctx.contextType}: ${ctx.contextValue}`)
         .join(', ');
 
-      const systemPrompt = `You are a helpful AI assistant for social media customer service. You have memory of previous conversations and should respond contextually.
+      // Analyze the conversation flow to avoid repetitive responses
+      const isFirstMessage = history.length <= 1;
+      const lastBotResponse = history.find(msg => msg.sender === 'ai');
+      const hasRepeatedGreeting = lastBotResponse?.content.includes('phir se') || lastBotResponse?.content.includes('again');
+      
+      // Extract key topics from user message for contextual relevance
+      const messageTopics = await this.extractMessageTopics(userMessage);
+      
+      const systemPrompt = `You are an intelligent social media assistant with perfect conversation memory. Respond naturally and contextually.
 
-Personality: ${workspacePersonality || 'Professional and friendly'}
+CRITICAL RULES:
+- NEVER use generic phrases like "aap phir se khe rahe hai", "aap se baat karke acha laga"
+- NEVER repeat similar greeting patterns
+- Always respond specifically to what the user actually said
+- Be direct and helpful, not overly polite
+- Match the user's language and tone
+- Give specific, relevant responses based on the actual message content
 
-Previous conversation:
+Conversation Context:
 ${conversationSummary}
 
-Context about this customer:
-${contextSummary}
+Customer Context: ${contextSummary}
 
-Current message: ${userMessage}
+Current Message Analysis:
+- User said: "${userMessage}"
+- Topics detected: ${messageTopics.join(', ')}
+- Is first interaction: ${isFirstMessage}
+- Previous greeting used: ${hasRepeatedGreeting}
 
-Instructions:
-- Remember and reference previous parts of the conversation naturally
-- Be conversational and human-like
-- Keep responses concise (1-2 sentences max)
-- Show you understand the context from previous messages
-- Be helpful and engaging
-- If greeting someone you've talked to before, acknowledge the previous conversation
-- Use emojis appropriately but sparingly`;
+Response Strategy:
+${isFirstMessage ? 
+  '- This is a new conversation, respond naturally to their specific message' : 
+  '- Continue the ongoing conversation, reference previous context appropriately'
+}
+${hasRepeatedGreeting ? 
+  '- AVOID any greeting-related phrases, focus on content' : 
+  '- Respond naturally without forced politeness'
+}
+
+Generate a relevant, specific response that directly addresses what they said, not generic conversation fillers.`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -187,6 +207,36 @@ Instructions:
       console.error(`[MEMORY ERROR] Failed to generate contextual response:`, error);
       // Fallback response
       return "Thank you for your message! How can I help you today?";
+    }
+  }
+
+  // Extract key topics from user message for better context understanding
+  private async extractMessageTopics(message: string): Promise<string[]> {
+    try {
+      const topicPrompt = `Extract 2-3 key topics from this message. Focus on specific subjects, not generic words.
+
+Message: "${message}"
+
+Return only a JSON array: ["topic1", "topic2", "topic3"]
+
+Examples:
+- "I need help with my order" → ["order", "help"]
+- "When will my delivery arrive?" → ["delivery", "timing"]
+- "Can you tell me about your services?" → ["services", "information"]`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: topicPrompt }],
+        max_tokens: 50,
+        temperature: 0.1,
+        response_format: { type: "json_object" }
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || '[]');
+      return Array.isArray(result) ? result.slice(0, 3) : [];
+    } catch (error) {
+      console.error(`[MEMORY ERROR] Failed to extract topics:`, error);
+      return [];
     }
   }
 

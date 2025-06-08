@@ -142,22 +142,26 @@ export class EnhancedAutoDMService {
     }
   }
 
-  // Send Instagram DM using Instagram Business API
+  // Send Instagram DM using Instagram Graph API
   private async sendInstagramDM(
     accessToken: string,
     pageId: string,
     recipientId: string,
     messageText: string
   ): Promise<boolean> {
-    console.log('[ENHANCED DM] Sending Instagram DM via Business API');
+    console.log('[ENHANCED DM] Sending Instagram DM via Instagram Graph API');
     
     try {
-      // Use Instagram Business API messaging endpoint
-      const url = `https://graph.instagram.com/v18.0/${pageId}/messages`;
+      // Use Instagram Graph API messaging endpoint as per documentation
+      const url = `https://graph.instagram.com/v23.0/${pageId}/messages`;
       
       const payload = {
-        recipient: { id: recipientId },
-        message: { text: messageText }
+        recipient: {
+          id: recipientId
+        },
+        message: {
+          text: messageText
+        }
       };
 
       const response = await axios.post(url, payload, {
@@ -169,14 +173,14 @@ export class EnhancedAutoDMService {
       });
 
       if (response.status === 200) {
-        console.log('[ENHANCED DM] Successfully sent Instagram Business API DM');
+        console.log('[ENHANCED DM] Successfully sent Instagram Graph API DM');
         return true;
       } else {
-        console.error('[ENHANCED DM] Instagram Business API returned non-200 status:', response.status);
+        console.error('[ENHANCED DM] Instagram Graph API returned non-200 status:', response.status);
         return false;
       }
     } catch (error: any) {
-      console.error('[ENHANCED DM ERROR] Failed to send Instagram Business API DM:', error.response?.data || error.message);
+      console.error('[ENHANCED DM ERROR] Failed to send Instagram Graph API DM:', error.response?.data || error.message);
       return false;
     }
   }

@@ -77,8 +77,8 @@ export interface IStorage {
   getAutomationRules(workspaceId: number | string): Promise<AutomationRule[]>;
   getActiveAutomationRules(): Promise<AutomationRule[]>;
   createAutomationRule(rule: InsertAutomationRule): Promise<AutomationRule>;
-  updateAutomationRule(id: number, updates: Partial<AutomationRule>): Promise<AutomationRule>;
-  deleteAutomationRule(id: number): Promise<void>;
+  updateAutomationRule(id: string, updates: Partial<AutomationRule>): Promise<AutomationRule>;
+  deleteAutomationRule(id: string): Promise<void>;
   
   // Automation logs
   getAutomationLogs(workspaceId: string | number, options?: { limit?: number; type?: string }): Promise<any[]>;

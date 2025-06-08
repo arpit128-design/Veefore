@@ -452,7 +452,7 @@ export default function Automation() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {rule.triggers.keywords && rule.triggers.keywords.length > 0 && (
+                      {rule.triggers?.keywords && rule.triggers.keywords.length > 0 && (
                         <div>
                           <Label className="text-sm text-muted-foreground">Trigger Keywords:</Label>
                           <div className="flex flex-wrap gap-1 mt-1">
@@ -466,7 +466,7 @@ export default function Automation() {
                       <div>
                         <Label className="text-sm text-muted-foreground">Responses:</Label>
                         <div className="space-y-1 mt-1">
-                          {rule.responses.map((response, index) => (
+                          {(rule.responses || []).map((response, index) => (
                             <p key={index} className="text-sm bg-muted p-2 rounded">
                               "{response}"
                             </p>
@@ -475,12 +475,12 @@ export default function Automation() {
                       </div>
 
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Max per day: {rule.conditions.maxPerDay || 'No limit'}</span>
+                        <span>Max per day: {rule.conditions?.maxPerDay || 'No limit'}</span>
                         <span>
-                          Active: {rule.schedule?.activeHours.start} - {rule.schedule?.activeHours.end}
+                          Active: {rule.schedule?.activeHours?.start || '09:00'} - {rule.schedule?.activeHours?.end || '18:00'}
                         </span>
                         <span>
-                          Days: {rule.schedule?.activeDays.map(getDayName).join(', ')}
+                          Days: {rule.schedule?.activeDays?.map(getDayName).join(', ') || 'All days'}
                         </span>
                       </div>
                     </div>

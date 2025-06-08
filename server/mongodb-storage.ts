@@ -1187,14 +1187,14 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async deleteAutomationRule(id: number): Promise<void> {
+  async deleteAutomationRule(id: string): Promise<void> {
     await this.connect();
     try {
       console.log(`[MONGODB DEBUG] Deleting automation rule: ${id}`);
       
       const collection = this.db!.collection('automation_rules');
       const result = await collection.deleteOne({ 
-        _id: new ObjectId(id.toString()) 
+        _id: new ObjectId(id) 
       });
       
       if (result.deletedCount === 0) {

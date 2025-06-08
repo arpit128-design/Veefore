@@ -38,6 +38,16 @@ export class InstagramStealthResponder {
     varyResponsePatterns: true
   };
 
+  // Separate config for DMs - more responsive but still stealth
+  private dmConfig: StealthConfig = {
+    maxDailyResponses: 50, // Higher limit for DMs
+    responseRate: 0.75, // Respond to 75% of DMs
+    minDelayMs: 30000, // Minimum 30 seconds
+    maxDelayMs: 180000, // Maximum 3 minutes
+    useTypingSimulation: true,
+    varyResponsePatterns: true
+  };
+
   // Ultra-natural response templates with maximum variation
   private stealthResponses = {
     appreciation: ['🔥', '❤️', '👍', '💯', '✨', '👌', 'nice!', 'love this', 'amazing', 'awesome work', 'so good', 'perfect'],
@@ -71,6 +81,36 @@ export class InstagramStealthResponder {
     
     // Calculate stealth delay
     const delay = this.calculateStealthDelay(comment, username);
+    
+    // Update tracking
+    this.updateResponseTracking(username);
+    
+    return {
+      response,
+      delay,
+      shouldRespond: true
+    };
+  }
+
+  /**
+   * DM-specific stealth response with higher response rate
+   */
+  async generateDMResponse(
+    message: string,
+    username: string,
+    context?: any
+  ): Promise<{ response: string; delay: number; shouldRespond: boolean }> {
+    
+    // Use DM-specific checks with higher response rate
+    if (!this.shouldAttemptDMResponse(message, username)) {
+      return { response: '', delay: 0, shouldRespond: false };
+    }
+
+    // Generate contextual DM response
+    const response = await this.createDMResponse(message, username, context);
+    
+    // Calculate shorter delay for DMs
+    const delay = this.calculateDMDelay(message, username);
     
     // Update tracking
     this.updateResponseTracking(username);

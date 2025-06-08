@@ -74,6 +74,9 @@ export default function Scheduler() {
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [mediaPreviewUrl, setMediaPreviewUrl] = useState<string>('');
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Data fetching
   const { data: scheduledContent = [], isLoading: isScheduledLoading } = useQuery({
@@ -118,6 +121,19 @@ export default function Scheduler() {
     }
   });
 
+  const updateContentMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => apiRequest('PUT', `/api/content/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/content/scheduled'] });
+      setIsEditDialogOpen(false);
+      setSelectedContent(null);
+      toast({
+        title: "Content Updated",
+        description: "The scheduled content has been updated."
+      });
+    }
+  });
+
   // Helper functions
   const resetForm = () => {
     setScheduleForm({
@@ -150,8 +166,39 @@ export default function Scheduler() {
     if (file) {
       setUploadedFile(file);
       const url = URL.createObjectURL(file);
+      setMediaPreviewUrl(url);
       setScheduleForm(prev => ({ ...prev, mediaUrl: url }));
     }
+  };
+
+  const getFileType = (file: File | string) => {
+    if (typeof file === 'string') {
+      if (file.includes('.mp4') || file.includes('.mov') || file.includes('.avi')) return 'video';
+      return 'image';
+    }
+    return file.type.startsWith('video/') ? 'video' : 'image';
+  };
+
+  const MediaPreview = ({ src, fileType }: { src: string; fileType: string }) => {
+    if (fileType === 'video') {
+      return (
+        <video 
+          src={src} 
+          controls 
+          className="w-full h-48 object-cover rounded-lg"
+          preload="metadata"
+        >
+          Your browser does not support video playback.
+        </video>
+      );
+    }
+    return (
+      <img 
+        src={src} 
+        alt="Media preview" 
+        className="w-full h-48 object-cover rounded-lg"
+      />
+    );
   };
 
   const generateAIContent = async () => {
@@ -761,27 +808,56 @@ export default function Scheduler() {
                   </Button>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-white/20 rounded-lg p-6">
-                  <input
-                    type="file"
-                    accept="image/*,video/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    ref={fileInputRef}
-                  />
-                  <div className="text-center">
-                    <Upload className="h-8 w-8 mx-auto text-asteroid-silver mb-2" />
-                    <p className="text-asteroid-silver mb-2 text-sm">
-                      {uploadedFile ? uploadedFile.name : "Click to upload or drag & drop"}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Choose File
-                    </Button>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-white/20 rounded-lg p-6">
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      ref={fileInputRef}
+                    />
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 mx-auto text-asteroid-silver mb-2" />
+                      <p className="text-asteroid-silver mb-2 text-sm">
+                        {uploadedFile ? uploadedFile.name : "Click to upload or drag & drop"}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Choose File
+                      </Button>
+                    </div>
                   </div>
+                  
+                  {/* Media Preview */}
+                  {(mediaPreviewUrl || scheduleForm.mediaUrl) && (
+                    <div className="space-y-2">
+                      <Label>Media Preview</Label>
+                      <div className="relative">
+                        <MediaPreview 
+                          src={mediaPreviewUrl || scheduleForm.mediaUrl} 
+                          fileType={uploadedFile ? getFileType(uploadedFile) : getFileType(scheduleForm.mediaUrl)}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setMediaPreviewUrl('');
+                            setUploadedFile(null);
+                            setScheduleForm(prev => ({ ...prev, mediaUrl: '' }));
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                          }}
+                          className="absolute top-2 right-2 bg-red-500/20 border-red-500 hover:bg-red-500/40"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

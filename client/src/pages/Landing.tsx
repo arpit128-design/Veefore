@@ -478,19 +478,21 @@ const Landing = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 }}
             >
-              <Button 
-                variant="ghost" 
-                className="text-white hover:bg-white/10"
-              >
-                Sign In
-              </Button>
+              <Link href="/auth">
+                <Button 
+                  variant="ghost" 
+                  className="text-white hover:bg-white/10"
+                >
+                  Sign In
+                </Button>
+              </Link>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.9 }}
             >
-              <Link href="/onboarding">
+              <Link href="/auth">
                 <Button 
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                 >
@@ -650,7 +652,7 @@ const Landing = () => {
             transition={{ delay: 1.8, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
           >
-            <Link href="/onboarding">
+            <Link href="/auth">
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
@@ -886,7 +888,7 @@ const Landing = () => {
                   ))}
                 </ul>
 
-                <Link href="/onboarding">
+                <Link href="/auth">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -939,7 +941,7 @@ const Landing = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-6 justify-center items-center"
           >
-            <Link href="/onboarding">
+            <Link href="/auth">
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
                 whileTap={{ scale: 0.95 }}

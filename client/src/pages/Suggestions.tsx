@@ -205,11 +205,53 @@ export default function Suggestions() {
                     </div>
                   </div>
                   
-                  <div className="text-sm mb-4">
-                    {suggestion.data?.suggestion || 'No description available'}
+                  <div className="space-y-4">
+                    <div className="font-medium text-sm mb-2">
+                      {suggestion.data?.suggestion || 'No description available'}
+                    </div>
+                    
+                    {suggestion.data?.reasoning && (
+                      <div className="text-xs text-asteroid-silver bg-cosmic-blue/50 p-3 rounded border-l-2 border-electric-cyan/40">
+                        <strong className="text-white">Why this works:</strong> {suggestion.data.reasoning}
+                      </div>
+                    )}
+                    
+                    {suggestion.data?.actionItems && suggestion.data.actionItems.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-white">Action Steps:</h4>
+                        <ul className="space-y-1 text-xs">
+                          {suggestion.data.actionItems.map((item: string, index: number) => (
+                            <li key={index} className="flex items-start space-x-2">
+                              <span className="text-electric-cyan font-bold">•</span>
+                              <span className="text-asteroid-silver">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {(suggestion.data?.expectedImpact || suggestion.data?.timeframe) && (
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        {suggestion.data?.expectedImpact && (
+                          <div className="bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                            Impact: {suggestion.data.expectedImpact}
+                          </div>
+                        )}
+                        {suggestion.data?.timeframe && (
+                          <div className="bg-orange-500/20 text-orange-400 px-2 py-1 rounded">
+                            Timeline: {suggestion.data.timeframe}
+                          </div>
+                        )}
+                        {suggestion.data?.difficulty && (
+                          <div className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                            Difficulty: {suggestion.data.difficulty}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mt-4 pt-3 border-t border-electric-cyan/20">
                     <div className="text-xs text-asteroid-silver">
                       {suggestion.validUntil && (
                         <>Valid until {new Date(suggestion.validUntil).toLocaleDateString()}</>

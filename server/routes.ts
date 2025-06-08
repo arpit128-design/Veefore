@@ -1890,7 +1890,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       type: 'trending',
       data: {
         suggestion: `Ask your 4 super-engaged followers to share your content - each could bring 5-10 new followers`,
-        reasoning: `Your 4 followers are extremely engaged (99 comments means they're passionate advocates). One share from each could bring 20-40 new followers immediately.`,
+        reasoning: `Your 4 followers are extremely engaged (${avgComments} comments means they're passionate advocates). One share from each could bring 20-40 new followers immediately.`,
         actionItems: [
           'Send DM to your 4 followers: "Your engagement means everything! Would you mind sharing this post?"',
           'Create content specifically asking: "If this resonates, please share in your story"',
@@ -1929,8 +1929,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     suggestions.push({
       type: 'growth',
       data: {
-        suggestion: `Create discussion threads in your comments - turn 99 comments into 200+ through back-and-forth`,
-        reasoning: `Instagram algorithm favors posts with ongoing conversations. Your 99 comments show people want to engage - create deeper discussions to boost reach further.`,
+        suggestion: `Create discussion threads in your comments - turn ${avgComments} comments into ${avgComments * 2}+ through back-and-forth`,
+        reasoning: `Instagram algorithm favors posts with ongoing conversations. Your ${avgComments} comments show people want to engage - create deeper discussions to boost reach further.`,
         actionItems: [
           'Ask follow-up questions to every commenter to start conversations',
           'Share controversial but respectful opinions that generate debate',
@@ -1949,8 +1949,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     suggestions.push({
       type: 'audio',
       data: {
-        suggestion: `Turn your comment-heavy posts into Reels - 99 comments shows viral potential`,
-        reasoning: `Posts generating 99 comments have viral elements. Reels format can amplify this 10x. Your discussion-worthy content could reach 10K+ people through Reels algorithm.`,
+        suggestion: `Turn your comment-heavy posts into Reels - ${avgComments} comments shows viral potential`,
+        reasoning: `Posts generating ${avgComments} comments have viral elements. Reels format can amplify this 10x. Your discussion-worthy content could reach 10K+ people through Reels algorithm.`,
         actionItems: [
           'Create Reels reading out the most interesting comments from your posts',
           'Film yourself responding to controversial comments to spark more discussion',
@@ -1970,7 +1970,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       type: 'hashtag',
       data: {
         suggestion: `Use hashtags that your ${avgComments} commenters follow - find where your audience discovers content`,
-        reasoning: `Your commenters found you somehow. Research their profiles to see what hashtags they use and follow. Target those same hashtags to find similar engaged audiences.`,
+        reasoning: `Your ${avgComments} commenters found you somehow. Research their profiles to see what hashtags they use and follow. Target those same hashtags to find similar engaged audiences.`,
         actionItems: [
           'Check profiles of your top 10 commenters - see what hashtags they use',
           'Use 5-8 hashtags under 100K posts in your niche for better visibility',

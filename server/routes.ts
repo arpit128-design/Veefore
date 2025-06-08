@@ -2925,7 +2925,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { workspaceId } = req.params;
       
       // Get automation rules for workspace
-      const rules = await storage.getAutomationRules?.(parseInt(workspaceId)) || [];
+      const rules = await storage.getAutomationRules?.(workspaceId) || [];
       
       res.json({ rules });
     } catch (error: any) {

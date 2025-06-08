@@ -1041,7 +1041,7 @@ export class MongoStorage implements IStorage {
     return undefined;
   }
 
-  async getAutomationRules(workspaceId: number): Promise<AutomationRule[]> {
+  async getAutomationRules(workspaceId: number | string): Promise<AutomationRule[]> {
     await this.connect();
     try {
       console.log(`[MONGODB DEBUG] getAutomationRules - workspaceId: ${workspaceId} (${typeof workspaceId})`);
@@ -1051,11 +1051,12 @@ export class MongoStorage implements IStorage {
       });
       
       console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules`);
+      console.log(`[MONGODB DEBUG] Search query workspaceId: ${workspaceId.toString()}`);
       
       return rules.map(rule => ({
         id: rule._id.toString(),
         name: rule.name || '',
-        workspaceId: parseInt(rule.workspaceId),
+        workspaceId: typeof workspaceId === 'string' ? workspaceId : parseInt(rule.workspaceId),
         description: rule.description || null,
         isActive: rule.isActive !== false,
         trigger: rule.trigger || {},

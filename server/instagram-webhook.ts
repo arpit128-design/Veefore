@@ -218,14 +218,29 @@ export class InstagramWebhookHandler {
       const automationRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
       console.log(`[WEBHOOK] Found ${automationRules.length} automation rules for workspace ${socialAccount.workspaceId}`);
 
+      // Debug: Log all automation rules
+      console.log(`[WEBHOOK] All automation rules:`, automationRules.map(rule => ({
+        id: rule.id,
+        name: rule.name,
+        isActive: rule.isActive,
+        trigger: rule.trigger,
+        action: rule.action
+      })));
+
       // Find DM automation rules
-      const dmRules = automationRules.filter(rule => 
-        rule.isActive && 
-        rule.trigger && 
-        typeof rule.trigger === 'object' && 
-        'type' in rule.trigger && 
-        rule.trigger.type === 'dm'
-      );
+      const dmRules = automationRules.filter(rule => {
+        console.log(`[WEBHOOK] Checking rule ${rule.name}: active=${rule.isActive}, trigger=`, rule.trigger);
+        
+        const isActive = rule.isActive;
+        const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
+        const isDmType = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
+        
+        console.log(`[WEBHOOK] Rule ${rule.name} filters: active=${isActive}, hasTrigger=${hasTrigger}, isDmType=${isDmType}`);
+        
+        return isActive && hasTrigger && isDmType;
+      });
+
+      console.log(`[WEBHOOK] Found ${dmRules.length} DM rules out of ${automationRules.length} total rules`);
 
       for (const rule of dmRules) {
         console.log(`[WEBHOOK] Processing DM rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);

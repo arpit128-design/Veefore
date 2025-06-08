@@ -82,7 +82,7 @@ export class EnhancedAutoDMService {
         );
 
         // Generate contextual AI response using conversation memory
-        const workspace = await this.storage.getWorkspaceById(rule.workspaceId);
+        const workspace = await this.storage.getWorkspace(rule.workspaceId);
         const aiResponse = await this.memoryService.generateContextualResponse(
           conversation.id,
           messageText,
@@ -279,7 +279,7 @@ export class EnhancedAutoDMService {
       );
 
       // Generate contextual response
-      const workspace = await this.storage.getWorkspaceById(parseInt(workspaceId));
+      const workspace = await this.storage.getWorkspace(parseInt(workspaceId));
       const response = await this.memoryService.generateContextualResponse(
         conversation.id,
         testMessage,

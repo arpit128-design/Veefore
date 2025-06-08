@@ -3420,6 +3420,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   // Start Instagram automation service
   instagramAutomation.startAutomationService().catch(console.error);
 
+  // Start memory cleanup scheduler (runs daily)
+  setInterval(async () => {
+    try {
+      console.log('[SCHEDULER] Running conversation memory cleanup');
+      await enhancedDMService.cleanupExpiredMemory();
+    } catch (error) {
+      console.error('[SCHEDULER] Memory cleanup failed:', error);
+    }
+  }, 24 * 60 * 60 * 1000); // 24 hours
+
   // Start automatic token refresh scheduler
   setInterval(async () => {
     try {

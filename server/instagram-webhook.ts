@@ -51,11 +51,13 @@ export class InstagramWebhookHandler {
   private storage: IStorage;
   private automation: InstagramAutomation;
   private appSecret: string;
+  private processedMessages: Set<string>;
 
   constructor(storage: IStorage) {
     this.storage = storage;
     this.automation = new InstagramAutomation(storage);
     this.appSecret = process.env.INSTAGRAM_APP_SECRET || '';
+    this.processedMessages = new Set<string>();
   }
 
   /**
@@ -214,23 +216,21 @@ export class InstagramWebhookHandler {
 
       console.log(`[WEBHOOK] New DM from ${senderId}: "${messageText}"`);
 
+      // Create unique message ID to prevent duplicate responses
+      const messageKey = `${senderId}_${messageText}_${timestamp}`;
+      
+      // Check if we've already processed this exact message
+      if (this.processedMessages.has(messageKey)) {
+        console.log(`[WEBHOOK] Duplicate message detected, skipping: ${messageKey}`);
+        return;
+      }
+
       // Get automation rules for this workspace
       const automationRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
       console.log(`[WEBHOOK] Found ${automationRules.length} automation rules for workspace ${socialAccount.workspaceId}`);
 
-      // Debug: Log all automation rules
-      console.log(`[WEBHOOK] All automation rules:`, automationRules.map(rule => ({
-        id: rule.id,
-        name: rule.name,
-        isActive: rule.isActive,
-        trigger: rule.trigger,
-        action: rule.action
-      })));
-
       // Find DM automation rules - check for both trigger.type and action.type
       const dmRules = automationRules.filter(rule => {
-        console.log(`[WEBHOOK] Checking rule ${rule.name}: active=${rule.isActive}, trigger=`, rule.trigger, 'action=', rule.action);
-        
         const isActive = rule.isActive;
         const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
         const hasAction = rule.action && typeof rule.action === 'object';
@@ -240,21 +240,34 @@ export class InstagramWebhookHandler {
         const isDmTypeAction = hasAction && ('type' in rule.action) && rule.action.type === 'dm';
         const isDmType = isDmTypeTrigger || isDmTypeAction;
         
-        console.log(`[WEBHOOK] Rule ${rule.name} filters: active=${isActive}, hasTrigger=${hasTrigger}, hasAction=${hasAction}, isDmType=${isDmType}`);
-        
         return isActive && (hasTrigger || hasAction) && isDmType;
       });
 
       console.log(`[WEBHOOK] Found ${dmRules.length} DM rules out of ${automationRules.length} total rules`);
 
-      for (const rule of dmRules) {
-        console.log(`[WEBHOOK] Processing DM rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);
-        
-        try {
-          await this.handleDirectMessageEvent(messageText, senderId, socialAccount, rule);
-        } catch (error) {
-          console.error(`[WEBHOOK] Error processing DM rule ${rule.id}:`, error);
-        }
+      // Only process the first active DM rule to prevent duplicates
+      const firstRule = dmRules[0];
+      if (!firstRule) {
+        console.log(`[WEBHOOK] No active DM rules found`);
+        return;
+      }
+
+      console.log(`[WEBHOOK] Processing single DM rule: ${firstRule.id}, name: ${firstRule.name}, active: ${firstRule.isActive}`);
+
+      // Mark message as processed before handling
+      this.processedMessages.add(messageKey);
+      
+      // Clean up old processed messages (keep only last 1000)
+      if (this.processedMessages.size > 1000) {
+        const messagesToDelete = Array.from(this.processedMessages).slice(0, 100);
+        messagesToDelete.forEach(msg => this.processedMessages.delete(msg));
+      }
+
+      // Process only the first rule to prevent duplicates
+      try {
+        await this.handleDirectMessageEvent(messageText, senderId, socialAccount, firstRule);
+      } catch (error) {
+        console.error(`[WEBHOOK] Error processing DM rule ${firstRule.id}:`, error);
       }
 
     } catch (error) {

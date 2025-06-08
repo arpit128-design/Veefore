@@ -2283,7 +2283,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(400).json({ error: 'Workspace ID required' });
       }
       
+      console.log(`[AI SUGGESTIONS] ===== WORKSPACE-SPECIFIC GENERATION =====`);
       console.log(`[AI SUGGESTIONS] Generating suggestions for workspace ${workspaceId}`);
+      console.log(`[AI SUGGESTIONS] User ID: ${userId}`);
+      console.log(`[AI SUGGESTIONS] Request body:`, req.body);
       
       // Clear old suggestions before generating new ones
       console.log(`[AI SUGGESTIONS] Clearing old suggestions for workspace ${workspaceId}`);
@@ -2291,8 +2294,24 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       // Get workspace and real Instagram data for AI analysis
       const workspace = await storage.getWorkspace(workspaceId);
+      console.log(`[AI SUGGESTIONS] Workspace found:`, workspace ? `"${workspace.name}"` : 'NOT FOUND');
+      
       const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      console.log(`[AI SUGGESTIONS] Social accounts in workspace ${workspaceId}:`, socialAccounts.length);
+      
       let instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      console.log(`[AI SUGGESTIONS] Instagram account found:`, instagramAccount ? `@${instagramAccount.username}` : 'NONE');
+      
+      if (instagramAccount) {
+        console.log(`[AI SUGGESTIONS] Instagram account details:`, {
+          username: instagramAccount.username,
+          accountId: instagramAccount.accountId,
+          followers: instagramAccount.followersCount,
+          avgLikes: instagramAccount.avgLikes,
+          avgComments: instagramAccount.avgComments,
+          hasToken: !!instagramAccount.accessToken
+        });
+      }
       
       // FORCE REFRESH: Fetch real current Instagram data instead of cached numbers
       if (instagramAccount?.accessToken) {

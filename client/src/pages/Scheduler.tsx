@@ -14,7 +14,8 @@ import {
   FileText,
   BarChart3,
   Settings,
-  TrendingUp
+  TrendingUp,
+  Hash
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,6 +71,8 @@ export default function Scheduler() {
     timeRemaining: ''
   });
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
+  const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   // Data fetching
@@ -173,6 +176,94 @@ export default function Scheduler() {
       });
     } finally {
       setIsGeneratingAI(false);
+    }
+  };
+
+  const generateAICaption = async () => {
+    if (!scheduleForm.title && !scheduleForm.mediaUrl) {
+      toast({
+        title: "Missing Content",
+        description: "Please provide a title or upload media to generate a caption.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingCaption(true);
+    try {
+      const response = await apiRequest('POST', '/api/ai/generate-caption', {
+        title: scheduleForm.title,
+        type: scheduleForm.type,
+        platform: scheduleForm.platform,
+        mediaUrl: scheduleForm.mediaUrl
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate caption');
+      }
+      
+      const data = await response.json();
+      setScheduleForm(prev => ({ ...prev, description: data.caption }));
+      
+      toast({
+        title: "Caption Generated",
+        description: "AI caption has been generated successfully!"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Caption Generation Failed",
+        description: error.message || "Failed to generate caption. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingCaption(false);
+    }
+  };
+
+  const generateAIHashtags = async () => {
+    if (!scheduleForm.title && !scheduleForm.description) {
+      toast({
+        title: "Missing Content",
+        description: "Please provide a title or description to generate hashtags.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingHashtags(true);
+    try {
+      const response = await apiRequest('POST', '/api/ai/generate-hashtags', {
+        title: scheduleForm.title,
+        description: scheduleForm.description,
+        type: scheduleForm.type,
+        platform: scheduleForm.platform
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate hashtags');
+      }
+      
+      const data = await response.json();
+      const hashtagText = data.hashtags.join(' ');
+      const currentDescription = scheduleForm.description;
+      const newDescription = currentDescription 
+        ? `${currentDescription}\n\n${hashtagText}`
+        : hashtagText;
+      
+      setScheduleForm(prev => ({ ...prev, description: newDescription }));
+      
+      toast({
+        title: "Hashtags Generated",
+        description: `Generated ${data.hashtags.length} relevant hashtags!`
+      });
+    } catch (error: any) {
+      toast({
+        title: "Hashtag Generation Failed",
+        description: error.message || "Failed to generate hashtags. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingHashtags(false);
     }
   };
 
@@ -697,7 +788,51 @@ export default function Scheduler() {
 
             {/* Caption */}
             <div className="space-y-2">
-              <Label>Caption</Label>
+              <div className="flex items-center justify-between">
+                <Label>Caption</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={generateAICaption}
+                    disabled={isGeneratingCaption}
+                    className="text-xs glassmorphism hover:bg-electric-cyan/20 hover:border-electric-cyan"
+                  >
+                    {isGeneratingCaption ? (
+                      <>
+                        <Zap className="h-3 w-3 mr-1 animate-pulse" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-3 w-3 mr-1" />
+                        AI Caption
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={generateAIHashtags}
+                    disabled={isGeneratingHashtags}
+                    className="text-xs glassmorphism hover:bg-nebula-purple/20 hover:border-nebula-purple"
+                  >
+                    {isGeneratingHashtags ? (
+                      <>
+                        <Hash className="h-3 w-3 mr-1 animate-pulse" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Hash className="h-3 w-3 mr-1" />
+                        AI Hashtags
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
               <Textarea
                 value={scheduleForm.description}
                 onChange={(e) => setScheduleForm(prev => ({ ...prev, description: e.target.value }))}

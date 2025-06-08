@@ -2962,6 +2962,112 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // AI Content Generation Routes
+  app.post('/api/ai/generate-caption', requireAuth, async (req, res) => {
+    try {
+      const { title, type, platform, mediaUrl } = req.body;
+      const userId = req.user!.id;
+      
+      if (!title && !mediaUrl) {
+        return res.status(400).json({ error: 'Title or media URL is required' });
+      }
+
+      // Credit check
+      const creditCost = 1;
+      const userCredits = await creditService.getUserCredits(userId);
+      if (userCredits < creditCost) {
+        return res.status(402).json({ error: 'Insufficient credits' });
+      }
+
+      // Generate caption using OpenAI
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const prompt = `Create an engaging social media caption for ${platform || 'social media'}:
+        Content Type: ${type || 'post'}
+        Title: ${title || 'Content based on uploaded media'}
+        
+        Make it engaging, authentic, and suitable for ${platform || 'social media'}. 
+        Keep it concise but compelling. Include relevant emojis if appropriate.
+        Do not include hashtags - those will be generated separately.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 200,
+        temperature: 0.7,
+      });
+
+      const caption = response.choices[0].message.content?.trim() || '';
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'ai_caption', creditCost, 'AI caption generation');
+
+      res.json({ 
+        caption,
+        creditsUsed: creditCost 
+      });
+
+    } catch (error: any) {
+      console.error('[AI CAPTION] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate caption' });
+    }
+  });
+
+  app.post('/api/ai/generate-hashtags', requireAuth, async (req, res) => {
+    try {
+      const { title, description, type, platform } = req.body;
+      const userId = req.user!.id;
+      
+      if (!title && !description) {
+        return res.status(400).json({ error: 'Title or description is required' });
+      }
+
+      // Credit check
+      const creditCost = 1;
+      const userCredits = await creditService.getUserCredits(userId);
+      if (userCredits < creditCost) {
+        return res.status(402).json({ error: 'Insufficient credits' });
+      }
+
+      // Generate hashtags using OpenAI
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const prompt = `Generate relevant hashtags for this ${platform || 'social media'} ${type || 'post'}:
+        Title: ${title || ''}
+        Description: ${description || ''}
+        
+        Generate 8-12 relevant hashtags that are:
+        - Popular but not oversaturated
+        - Relevant to the content
+        - Mix of broad and niche tags
+        - Appropriate for ${platform || 'social media'}
+        
+        Return only the hashtags with # symbols, separated by spaces.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 150,
+        temperature: 0.6,
+      });
+
+      const hashtagText = response.choices[0].message.content?.trim() || '';
+      const hashtags = hashtagText.split(/\s+/).filter(tag => tag.startsWith('#'));
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'ai_hashtags', creditCost, 'AI hashtag generation');
+
+      res.json({ 
+        hashtags,
+        creditsUsed: creditCost 
+      });
+
+    } catch (error: any) {
+      console.error('[AI HASHTAGS] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate hashtags' });
+    }
+  });
+
   // Instagram Automation Routes
   app.post('/api/automation/comment', requireAuth, async (req, res) => {
     try {

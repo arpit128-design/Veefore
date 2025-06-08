@@ -324,6 +324,7 @@ export class InstagramWebhookHandler {
   ): Promise<void> {
     try {
       console.log(`[WEBHOOK] Starting DM response generation for: "${messageText}"`);
+      console.log(`[WEBHOOK] Rule being validated:`, JSON.stringify(rule, null, 2));
       
       // Validate rule configuration before processing
       const validationResult = await this.validateRuleConfiguration(rule, socialAccount.workspaceId);
@@ -383,60 +384,93 @@ export class InstagramWebhookHandler {
   private async validateRuleConfiguration(rule: any, workspaceId: string): Promise<{ canExecute: boolean; reason?: string }> {
     try {
       const now = new Date();
-      const action = rule.action || {};
-      const aiConfig = action.aiConfig || {};
+      
+      console.log(`[WEBHOOK] Validating rule "${rule.name}" configuration:`);
+      console.log(`[WEBHOOK] Current time: ${now.toISOString()}`);
+      console.log(`[WEBHOOK] Rule structure:`, {
+        duration: rule.duration,
+        activeTime: rule.activeTime,
+        conditions: rule.conditions,
+        aiConfig: rule.aiConfig
+      });
       
       // Check if rule is active
       if (!rule.isActive) {
         return { canExecute: false, reason: 'Rule is not active' };
       }
 
-      // Check duration settings
-      if (action.duration) {
-        const { startDate, endDate } = action.duration;
-        if (startDate && new Date(startDate) > now) {
-          return { canExecute: false, reason: 'Rule start date has not been reached' };
-        }
-        if (endDate && new Date(endDate) < now) {
-          return { canExecute: false, reason: 'Rule end date has passed' };
+      // Check duration settings (rule expiry)
+      if (rule.duration && rule.duration.autoExpire) {
+        const { startDate, durationDays } = rule.duration;
+        if (startDate) {
+          const ruleStart = new Date(startDate);
+          if (ruleStart > now) {
+            console.log(`[WEBHOOK] Rule start date not reached: ${startDate}`);
+            return { canExecute: false, reason: `Rule starts on ${startDate}` };
+          }
+          
+          if (durationDays && durationDays > 0) {
+            const ruleEnd = new Date(ruleStart);
+            ruleEnd.setDate(ruleEnd.getDate() + durationDays);
+            if (ruleEnd < now) {
+              console.log(`[WEBHOOK] Rule expired after ${durationDays} days from ${startDate}`);
+              return { canExecute: false, reason: `Rule expired on ${ruleEnd.toDateString()}` };
+            }
+          }
         }
       }
 
-      // Check active time settings
-      if (action.activeTime) {
-        const { startTime, endTime, days } = action.activeTime;
+      // Check active time settings (time of day and days of week)
+      if (rule.activeTime && rule.activeTime.enabled) {
+        const { startTime, endTime, activeDays, timezone } = rule.activeTime;
         
-        // Check if current day is allowed
-        if (days && days.length > 0) {
-          const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-          const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-          const currentDayName = dayNames[currentDay];
+        // Convert current time to rule's timezone if specified
+        let checkTime = now;
+        if (timezone && timezone !== 'UTC') {
+          console.log(`[WEBHOOK] Rule timezone: ${timezone}, using server time for validation`);
+        }
+        
+        // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
+        if (activeDays && activeDays.length > 0) {
+          const currentDay = checkTime.getDay(); // 0=Sunday, 1=Monday, etc.
+          const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
           
-          if (!days.includes(currentDayName)) {
-            return { canExecute: false, reason: `Rule not active on ${currentDayName}` };
+          if (!activeDays.includes(mondayFirst)) {
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            console.log(`[WEBHOOK] Rule not active on ${dayNames[currentDay]} (day ${mondayFirst}, allowed: ${activeDays})`);
+            return { canExecute: false, reason: `Rule not active on ${dayNames[currentDay]}` };
           }
         }
 
         // Check if current time is within active hours
         if (startTime && endTime) {
-          const currentTime = now.getHours() * 100 + now.getMinutes(); // HHMM format
-          const start = parseInt(startTime.replace(':', ''));
-          const end = parseInt(endTime.replace(':', ''));
+          const currentHour = checkTime.getHours();
+          const currentMinute = checkTime.getMinutes();
+          const currentTimeMinutes = currentHour * 60 + currentMinute;
           
-          if (currentTime < start || currentTime > end) {
-            return { canExecute: false, reason: `Rule not active during current time (${startTime} - ${endTime})` };
+          const [startHour, startMin] = startTime.split(':').map(Number);
+          const [endHour, endMin] = endTime.split(':').map(Number);
+          const startTimeMinutes = startHour * 60 + startMin;
+          const endTimeMinutes = endHour * 60 + endMin;
+          
+          if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
+            console.log(`[WEBHOOK] Current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
+            return { canExecute: false, reason: `Rule active ${startTime}-${endTime}, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')}` };
           }
         }
       }
 
-      // Check daily response limit
-      if (aiConfig.dailyLimit && aiConfig.dailyLimit > 0) {
+      // Check daily response limit from conditions or aiConfig
+      const maxPerDay = rule.conditions?.maxPerDay || rule.aiConfig?.dailyLimit;
+      if (maxPerDay && maxPerDay > 0) {
         const todayCount = await this.getDailyResponseCount(rule.id, workspaceId);
-        if (todayCount >= aiConfig.dailyLimit) {
-          return { canExecute: false, reason: `Daily response limit reached (${todayCount}/${aiConfig.dailyLimit})` };
+        console.log(`[WEBHOOK] Daily response count: ${todayCount}/${maxPerDay}`);
+        if (todayCount >= maxPerDay) {
+          return { canExecute: false, reason: `Daily limit reached (${todayCount}/${maxPerDay})` };
         }
       }
 
+      console.log(`[WEBHOOK] ✓ Rule validation passed for "${rule.name}"`);
       return { canExecute: true };
     } catch (error) {
       console.error('[WEBHOOK] Error validating rule configuration:', error);

@@ -255,7 +255,7 @@ export class InstagramWebhookHandler {
       console.log(`[WEBHOOK] Starting DM response generation for: "${messageText}"`);
       console.log(`[WEBHOOK] Calling stealth response generator...`);
 
-      const automation = new InstagramAutomation();
+      const automation = new InstagramAutomation(this.storage);
       const response = await automation.generateContextualResponse(
         messageText,
         rule,
@@ -267,22 +267,15 @@ export class InstagramWebhookHandler {
         const dmResponse = await this.sendDirectMessage(
           socialAccount.accessToken,
           senderId,
-          response
+          response,
+          socialAccount
         );
 
         if (dmResponse.success) {
           console.log(`[WEBHOOK] ✓ DM sent successfully: "${response}"`);
           
-          // Store interaction record
-          await this.storage.createChatPerformance({
-            workspaceId: socialAccount.workspaceId,
-            platform: 'instagram',
-            messageType: 'dm',
-            userMessage: messageText,
-            botResponse: response,
-            timestamp: new Date(),
-            success: true
-          });
+          // Log successful DM interaction
+          console.log(`[WEBHOOK] DM interaction logged: ${messageText} -> ${response}`);
         } else {
           console.error(`[WEBHOOK] Failed to send DM:`, dmResponse.error);
         }
@@ -301,10 +294,12 @@ export class InstagramWebhookHandler {
   private async sendDirectMessage(
     accessToken: string,
     recipientId: string,
-    message: string
+    message: string,
+    socialAccount: any
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const url = `https://graph.facebook.com/v18.0/me/messages`;
+      // Use the correct Instagram Graph API endpoint for messages
+      const url = `https://graph.instagram.com/v19.0/${socialAccount.accountId}/messages`;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -313,8 +308,12 @@ export class InstagramWebhookHandler {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          recipient: { id: recipientId },
-          message: { text: message }
+          recipient: {
+            id: recipientId
+          },
+          message: {
+            text: message
+          }
         })
       });
 

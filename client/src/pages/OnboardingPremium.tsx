@@ -417,8 +417,8 @@ export default function OnboardingPremium() {
         const hasTimeframe = formData.growthTargets.timeframe !== '';
         const hasFrequency = formData.growthTargets.contentFrequency !== '';
         return hasFollowerGoal && hasCustomGoal && hasTimeframe && hasFrequency;
-      case 4: // Platforms (step 5 - optional)
-        return true; // Optional step
+      case 4: // Platforms (step 5 - required)
+        return formData.connectedPlatforms.length > 0; // At least one platform required
       case 5: // AI Personality (step 6)
         return formData.aiPersonality !== '';
       case 6: // Categories (step 7)

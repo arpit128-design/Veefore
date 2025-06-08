@@ -7,13 +7,20 @@ import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { ChatPerformance } from "@/components/dashboard/ChatPerformance";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
-import { Eye, Heart, Users, TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Eye, Heart, Users, TrendingUp, RefreshCw } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatNumber, formatEngagement } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useState } from "react";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
   const { currentWorkspace } = useWorkspaceContext();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch real analytics data with immediate cache serving
   const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
@@ -38,6 +45,35 @@ export default function Dashboard() {
     timeZone: 'UTC',
     hour: '2-digit',
     minute: '2-digit'
+  });
+
+  // Enhanced Instagram data refresh mutation
+  const refreshInstagramData = useMutation({
+    mutationFn: async () => {
+      setIsRefreshing(true);
+      // Force refresh analytics which triggers Instagram sync
+      await apiRequest('GET', `/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}&forceRefresh=true`);
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/dashboard/analytics', currentWorkspace?.id] 
+      });
+      toast({
+        title: "Instagram Data Refreshed",
+        description: "Your reach data has been updated with latest Instagram metrics",
+      });
+      setIsRefreshing(false);
+    },
+    onError: (error) => {
+      console.error('Failed to refresh Instagram data:', error);
+      toast({
+        title: "Refresh Failed",
+        description: "Unable to update Instagram data. Please try again.",
+        variant: "destructive",
+      });
+      setIsRefreshing(false);
+    }
   });
 
   // Format numbers using Indian numbering system (K, L, Cr)
@@ -212,10 +248,20 @@ export default function Dashboard() {
                 <i className="fab fa-instagram text-xl md:text-2xl text-pink-500" />
                 <h3 className="text-lg md:text-xl font-orbitron font-semibold">Instagram Analytics</h3>
               </div>
-              {isDataLoading && (
-                <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
-              )}
+              <Button
+                onClick={() => refreshInstagramData.mutate()}
+                disabled={isRefreshing || refreshInstagramData.isPending}
+                size="sm"
+                variant="outline"
+                className="border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${(isRefreshing || refreshInstagramData.isPending) ? 'animate-spin' : ''}`} />
+                {(isRefreshing || refreshInstagramData.isPending) ? 'Syncing...' : 'Refresh Data'}
+              </Button>
             </div>
+            {isDataLoading && (
+              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
+            )}
             
             <div className="space-y-4">
               <div className="flex justify-between items-center">

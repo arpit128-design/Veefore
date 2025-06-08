@@ -118,8 +118,9 @@ function Router() {
   // Check if user needs onboarding
   console.log('[ROUTER] User state:', { username: user?.username, isOnboarded: user?.isOnboarded });
   
-  if (user && !user.isOnboarded) {
-    console.log('[ROUTER] User needs onboarding, redirecting to /onboarding');
+  // Allow onboarding page access for non-onboarded users or during completion
+  if (user && !user.isOnboarded && location === '/onboarding') {
+    console.log('[ROUTER] User on onboarding page, allowing access');
     return (
       <Switch>
         <Route path="/onboarding" component={OnboardingPremium} />
@@ -128,13 +129,13 @@ function Router() {
     );
   }
   
-  console.log('[ROUTER] User is onboarded, showing authenticated app');
-
-  // Check if onboarded user is on onboarding page and redirect them
-  if (location === '/onboarding') {
-    console.log('[ROUTER] Onboarded user on /onboarding, redirecting to /dashboard');
-    return <Redirect to="/dashboard" />;
+  // Redirect non-onboarded users to onboarding
+  if (user && !user.isOnboarded) {
+    console.log('[ROUTER] User needs onboarding, redirecting to /onboarding');
+    return <Redirect to="/onboarding" />;
   }
+  
+  console.log('[ROUTER] User is onboarded, showing authenticated app');
 
   return <AuthenticatedApp />;
 }

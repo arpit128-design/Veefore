@@ -245,12 +245,7 @@ export default function OnboardingPremium() {
     enabled: !!user
   });
 
-  // Redirect if user is already onboarded (but not during completion process)
-  useEffect(() => {
-    if (userData?.isOnboarded && !isCompleting) {
-      setLocation('/dashboard');
-    }
-  }, [userData, setLocation, isCompleting]);
+  // Note: Redirect logic is handled by App.tsx route protection
 
   // Calculate progress
   useEffect(() => {
@@ -329,22 +324,25 @@ export default function OnboardingPremium() {
       
       // Mark user as onboarded
       await apiRequest('PATCH', '/api/user', { isOnboarded: true });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      
+      // Force refresh user data with proper await
+      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/user'] });
       
       toast({
         title: "🚀 Workspace Created Successfully!",
         description: "Welcome to your new AI-powered creative universe!",
       });
       
-      // Clear the completing flag and redirect immediately
+      // Clear the completing flag and redirect with longer delay
       setIsCompleting(false);
       setIsLoading(false);
       
-      // Force navigation with a delay to ensure user data is refreshed
+      // Force navigation with extended delay to ensure proper data refresh
       console.log('Redirecting to dashboard after workspace creation');
       setTimeout(() => {
         window.location.href = '/dashboard';
-      }, 1000);
+      }, 2000);
     },
     onError: (error: any) => {
       toast({

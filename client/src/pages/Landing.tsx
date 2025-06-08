@@ -434,10 +434,10 @@ const Landing = () => {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 px-4"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 px-2 sm:px-4"
         >
-          <p className="text-sm font-medium">
-            🚀 The Future of AI-Powered Multi-Platform Social Media Automation • Join 10K+ Businesses
+          <p className="text-xs sm:text-sm font-medium">
+            🚀 AI-Powered Multi-Platform Automation • Join 10K+ Businesses
           </p>
         </motion.div>
         
@@ -445,18 +445,18 @@ const Landing = () => {
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between"
+          className="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between"
         >
           <div className="flex items-center">
             <motion.h1 
               whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
             >
               VeeFore
             </motion.h1>
           </div>
           
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6">
             {["Features", "Pricing", "About", "Contact"].map((item, index) => (
               <motion.a
                 key={item}
@@ -465,23 +465,24 @@ const Landing = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
                 whileHover={{ scale: 1.1, color: "#ffffff" }}
-                className="text-gray-300 hover:text-white transition-colors"
+                className="text-gray-300 hover:text-white transition-colors text-sm"
               >
                 {item}
               </motion.a>
             ))}
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 }}
+              className="hidden sm:block"
             >
               <Link href="/auth">
                 <Button 
                   variant="ghost" 
-                  className="text-white hover:bg-white/10"
+                  className="text-white hover:bg-white/10 text-sm px-3 py-2"
                 >
                   Sign In
                 </Button>
@@ -494,7 +495,7 @@ const Landing = () => {
             >
               <Link href="/auth">
                 <Button 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-sm px-3 sm:px-4 py-2"
                 >
                   Get Started
                 </Button>
@@ -540,29 +541,30 @@ const Landing = () => {
       </div>
 
       {/* Hero Section with Enhanced Animations */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 pt-32">
+      <section className="relative min-h-screen flex items-center justify-center px-2 sm:px-4 pt-24 sm:pt-32">
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="relative z-10 text-center max-w-7xl mx-auto"
+          className="relative z-10 text-center max-w-7xl mx-auto w-full"
         >
           {/* Animated Hero Badge */}
           <motion.div
             initial={{ opacity: 0, y: -30, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 text-lg border-0 shadow-lg">
+            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg border-0 shadow-lg">
               <motion.div
                 animate={{ rotate: [0, 360] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 className="inline-block"
               >
-                <Sparkles className="w-5 h-5 mr-3" />
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
               </motion.div>
-              The Future of Multi-Platform Social Media Automation
+              <span className="hidden sm:inline">The Future of Multi-Platform Social Media Automation</span>
+              <span className="sm:hidden">AI-Powered Social Media Automation</span>
             </Badge>
           </motion.div>
 
@@ -571,7 +573,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 50, rotateX: -15 }}
             animate={{ opacity: 1, y: 0, rotateX: 0 }}
             transition={{ delay: 0.5, duration: 1, type: "spring" }}
-            className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent transform-gpu"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent transform-gpu"
             style={{ transformStyle: "preserve-3d" }}
           >
             <motion.span
@@ -594,7 +596,7 @@ const Landing = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-2xl md:text-4xl font-semibold mb-4 h-20 flex items-center justify-center"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold mb-4 h-16 sm:h-20 flex items-center justify-center px-2"
           >
             <TypewriterEffect texts={heroFeatures} speed={60} />
           </motion.div>
@@ -604,7 +606,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex justify-center gap-4 mb-12 flex-wrap"
+            className="flex justify-center gap-2 sm:gap-3 md:gap-4 mb-8 sm:mb-12 flex-wrap px-2"
           >
             {platforms.map((platform, index) => {
               const IconComponent = platform.icon;
@@ -619,14 +621,14 @@ const Landing = () => {
                     rotateY: 15,
                     boxShadow: "0 20px 40px rgba(0,0,0,0.3)"
                   }}
-                  className={`w-16 h-16 rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer transform-gpu`}
+                  className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer transform-gpu`}
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div
                     animate={{ rotateZ: [0, 5, -5, 0] }}
                     transition={{ duration: 6 + index, repeat: Infinity }}
                   >
-                    <IconComponent className="w-8 h-8 text-white" />
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                   </motion.div>
                 </motion.div>
               );
@@ -638,7 +640,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5, duration: 0.8 }}
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-5xl mx-auto leading-relaxed px-4"
           >
             Transform your entire social media presence with cutting-edge AI automation. 
             Manage Instagram, YouTube, Twitter, Facebook, LinkedIn and more from one powerful dashboard 
@@ -650,20 +652,21 @@ const Landing = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.8, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-12 sm:mb-16 px-4"
           >
             <Link href="/auth">
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg"
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg md:text-xl font-semibold rounded-full shadow-lg"
                 >
-                  <Rocket className="w-6 h-6 mr-3" />
+                  <Rocket className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                   Start Free Trial
-                  <ArrowRight className="w-6 h-6 ml-3" />
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3" />
                 </Button>
               </motion.div>
             </Link>
@@ -671,13 +674,14 @@ const Landing = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto"
             >
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
+                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg md:text-xl font-semibold rounded-full backdrop-blur-sm"
               >
-                <Play className="w-6 h-6 mr-3" />
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                 Watch Demo
               </Button>
             </motion.div>

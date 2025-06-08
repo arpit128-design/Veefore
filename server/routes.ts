@@ -3662,6 +3662,41 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   }, 24 * 60 * 60 * 1000); // 24 hours
 
+  // Update content route
+  app.put('/api/content/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+      const updates = req.body;
+
+      console.log(`[CONTENT API] Updating content ${id}:`, updates);
+
+      const updatedContent = await storage.updateContent(id, updates);
+      
+      res.json({ success: true, content: updatedContent });
+    } catch (error: any) {
+      console.error('[CONTENT API] Error updating content:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete content route
+  app.delete('/api/content/:id', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+
+      console.log(`[CONTENT API] Deleting content ${id}`);
+
+      await storage.deleteContent(id);
+      
+      res.json({ success: true, message: 'Content deleted successfully' });
+    } catch (error: any) {
+      console.error('[CONTENT API] Error deleting content:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Start automatic token refresh scheduler
   setInterval(async () => {
     try {

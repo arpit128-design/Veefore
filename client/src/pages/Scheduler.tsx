@@ -148,6 +148,52 @@ export default function Scheduler() {
       aiPrompt: ''
     });
     setUploadedFile(null);
+    setMediaPreviewUrl('');
+  };
+
+  const handleEditContent = (content: any) => {
+    setSelectedContent(content);
+    const scheduledDate = new Date(content.scheduledAt);
+    setScheduleForm({
+      title: content.title,
+      description: content.description,
+      type: content.type,
+      platform: content.platform,
+      scheduledDate: scheduledDate.toISOString().split('T')[0],
+      scheduledTime: scheduledDate.toTimeString().slice(0, 5),
+      mediaUrl: content.contentData?.mediaUrl || '',
+      useAIGenerated: content.contentData?.aiGenerated || false,
+      aiPrompt: content.contentData?.prompt || ''
+    });
+    setMediaPreviewUrl(content.contentData?.mediaUrl || '');
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteContent = (contentId: string) => {
+    if (confirm('Are you sure you want to delete this scheduled content?')) {
+      deleteContentMutation.mutate(contentId);
+    }
+  };
+
+  const handleUpdateContent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedContent) return;
+
+    const scheduledAt = new Date(`${scheduleForm.scheduledDate}T${scheduleForm.scheduledTime}`);
+    const updateData = {
+      title: scheduleForm.title,
+      description: scheduleForm.description,
+      type: scheduleForm.type,
+      platform: scheduleForm.platform,
+      scheduledAt: scheduledAt.toISOString(),
+      contentData: {
+        mediaUrl: scheduleForm.mediaUrl,
+        aiGenerated: scheduleForm.useAIGenerated,
+        prompt: scheduleForm.aiPrompt
+      }
+    };
+
+    updateContentMutation.mutate({ id: selectedContent.id, data: updateData });
   };
 
   const handleScheduleContent = (date?: Date) => {
@@ -680,14 +726,43 @@ export default function Scheduler() {
                             {content.description}
                           </p>
                         )}
+                        {/* Media Preview */}
+                        {content.contentData?.mediaUrl && (
+                          <div className="mt-2">
+                            <MediaPreview 
+                              src={content.contentData.mediaUrl} 
+                              fileType={getFileType(content.contentData.mediaUrl)}
+                            />
+                          </div>
+                        )}
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-mono text-solar-gold">
-                          {content.scheduledAt ? new Date(content.scheduledAt).toLocaleString() : 'Not scheduled'}
+                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                        <div className="text-right">
+                          <div className="text-sm font-mono text-solar-gold">
+                            {content.scheduledAt ? new Date(content.scheduledAt).toLocaleString() : 'Not scheduled'}
+                          </div>
+                          <Badge className={`text-xs mt-1 ${getStatusColor(content.status)} text-white`}>
+                            {content.status || 'scheduled'}
+                          </Badge>
                         </div>
-                        <Badge className={`text-xs mt-1 ${getStatusColor(content.status)} text-white`}>
-                          {content.status}
-                        </Badge>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditContent(content)}
+                            className="glassmorphism hover:bg-electric-cyan/20 hover:border-electric-cyan"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteContent(content.id)}
+                            className="glassmorphism hover:bg-red-500/20 hover:border-red-500"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}

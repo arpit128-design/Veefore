@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useWorkspace } from "@/hooks/useWorkspace";
+import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Flame, Music, Hash, Clock, RefreshCw, Zap } from "lucide-react";
 import { auth } from "@/lib/firebase";
 
 export default function Suggestions() {
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace } = useWorkspaceContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -19,11 +19,7 @@ export default function Suggestions() {
       console.log(`[SUGGESTIONS] Fetching suggestions for workspace: ${currentWorkspace?.id}`);
       console.log(`[SUGGESTIONS] Current workspace name: ${currentWorkspace?.name}`);
       
-      // Force correct workspace ID for cvfbf workspace
-      const workspaceId = currentWorkspace?.name === 'cvfbf' ? '68449f3852d33d75b31ce737' : currentWorkspace?.id;
-      console.log(`[SUGGESTIONS] Using corrected workspace ID: ${workspaceId}`);
-      
-      const response = await fetch(`/api/suggestions?workspaceId=${workspaceId}`, {
+      const response = await fetch(`/api/suggestions?workspaceId=${currentWorkspace?.id}`, {
         headers: {
           'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}`
         }
@@ -32,7 +28,7 @@ export default function Suggestions() {
         throw new Error('Failed to fetch suggestions');
       }
       const data = await response.json();
-      console.log(`[SUGGESTIONS] Received ${data.length} suggestions for workspace ${workspaceId}`);
+      console.log(`[SUGGESTIONS] Received ${data.length} suggestions for workspace ${currentWorkspace?.id}`);
       return data;
     },
     enabled: !!currentWorkspace?.id
@@ -47,12 +43,10 @@ export default function Suggestions() {
         throw new Error('No workspace selected');
       }
       
-      // Force correct workspace ID for cvfbf workspace
-      const workspaceId = currentWorkspace?.name === 'cvfbf' ? '68449f3852d33d75b31ce737' : currentWorkspace?.id;
-      console.log(`[SUGGESTIONS] Generating new suggestions for workspace: ${workspaceId} (${currentWorkspace.name})`);
+      console.log(`[SUGGESTIONS] Generating new suggestions for workspace: ${currentWorkspace.id} (${currentWorkspace.name})`);
       
       return apiRequest('POST', '/api/suggestions/generate', {
-        workspaceId: workspaceId
+        workspaceId: currentWorkspace.id
       });
     },
     onSuccess: () => {

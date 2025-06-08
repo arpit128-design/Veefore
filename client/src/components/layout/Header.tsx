@@ -21,7 +21,7 @@ export function Header() {
             <img 
               src="/veefore-logo.png" 
               alt="VeeFore Logo" 
-              className="w-8 h-8 md:w-10 md:h-10 object-contain animate-pulse-glow"
+              className="w-8 h-8 md:w-10 md:h-10 object-contain"
             />
             <h1 className="text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
           </div>

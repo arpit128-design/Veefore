@@ -273,21 +273,21 @@ export default function Auth() {
               scale: { duration: 3, repeat: Infinity }
             }}
           >
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center relative overflow-hidden p-4">
+            <div className="w-20 h-20 flex items-center justify-center relative">
               <img 
                 src="/veefore-logo.png" 
                 alt="VeeFore Logo" 
-                className="w-12 h-12 object-contain relative z-10"
+                className="w-16 h-16 object-contain relative z-10"
               />
               
               {/* Orbital rings */}
               <motion.div 
-                className="absolute inset-0 border-2 border-white/20 rounded-full"
+                className="absolute inset-0 border-2 border-blue-400/30 rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               />
               <motion.div 
-                className="absolute inset-2 border border-white/10 rounded-full"
+                className="absolute inset-2 border border-purple-400/20 rounded-full"
                 animate={{ rotate: -360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               />

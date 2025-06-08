@@ -387,11 +387,18 @@ export class InstagramWebhookHandler {
       
       console.log(`[WEBHOOK] Validating rule "${rule.name}" configuration:`);
       console.log(`[WEBHOOK] Current time: ${now.toISOString()}`);
+      // Extract nested configuration from rule.action
+      const action = rule.action || {};
+      const duration = action.duration;
+      const activeTime = action.activeTime;
+      const conditions = action.conditions;
+      const aiConfig = action.aiConfig;
+      
       console.log(`[WEBHOOK] Rule structure:`, {
-        duration: rule.duration,
-        activeTime: rule.activeTime,
-        conditions: rule.conditions,
-        aiConfig: rule.aiConfig
+        duration,
+        activeTime,
+        conditions,
+        aiConfig
       });
       
       // Check if rule is active
@@ -400,8 +407,8 @@ export class InstagramWebhookHandler {
       }
 
       // Check duration settings (rule expiry)
-      if (rule.duration && rule.duration.autoExpire) {
-        const { startDate, durationDays } = rule.duration;
+      if (duration && duration.autoExpire) {
+        const { startDate, durationDays } = duration;
         if (startDate) {
           const ruleStart = new Date(startDate);
           if (ruleStart > now) {
@@ -421,18 +428,16 @@ export class InstagramWebhookHandler {
       }
 
       // Check active time settings (time of day and days of week)
-      if (rule.activeTime && rule.activeTime.enabled) {
-        const { startTime, endTime, activeDays, timezone } = rule.activeTime;
+      if (activeTime && activeTime.enabled) {
+        const { startTime, endTime, activeDays } = activeTime;
         
-        // Convert current time to rule's timezone if specified
-        let checkTime = now;
-        if (timezone && timezone !== 'UTC') {
-          console.log(`[WEBHOOK] Rule timezone: ${timezone}, using server time for validation`);
-        }
+        // Use GMT timezone for all validation
+        const gmtTime = new Date(now.toISOString());
+        console.log(`[WEBHOOK] Using GMT time for validation: ${gmtTime.toISOString()}`);
         
         // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
         if (activeDays && activeDays.length > 0) {
-          const currentDay = checkTime.getDay(); // 0=Sunday, 1=Monday, etc.
+          const currentDay = gmtTime.getDay(); // 0=Sunday, 1=Monday, etc.
           const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
           
           if (!activeDays.includes(mondayFirst)) {
@@ -442,10 +447,10 @@ export class InstagramWebhookHandler {
           }
         }
 
-        // Check if current time is within active hours
+        // Check if current time is within active hours (using GMT)
         if (startTime && endTime) {
-          const currentHour = checkTime.getHours();
-          const currentMinute = checkTime.getMinutes();
+          const currentHour = gmtTime.getHours();
+          const currentMinute = gmtTime.getMinutes();
           const currentTimeMinutes = currentHour * 60 + currentMinute;
           
           const [startHour, startMin] = startTime.split(':').map(Number);
@@ -454,14 +459,14 @@ export class InstagramWebhookHandler {
           const endTimeMinutes = endHour * 60 + endMin;
           
           if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
-            console.log(`[WEBHOOK] Current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
-            return { canExecute: false, reason: `Rule active ${startTime}-${endTime}, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')}` };
+            console.log(`[WEBHOOK] Current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
+            return { canExecute: false, reason: `Rule active ${startTime}-${endTime}, current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')}` };
           }
         }
       }
 
       // Check daily response limit from conditions or aiConfig
-      const maxPerDay = rule.conditions?.maxPerDay || rule.aiConfig?.dailyLimit;
+      const maxPerDay = conditions?.maxPerDay || aiConfig?.dailyLimit;
       if (maxPerDay && maxPerDay > 0) {
         const todayCount = await this.getDailyResponseCount(rule.id, workspaceId);
         console.log(`[WEBHOOK] Daily response count: ${todayCount}/${maxPerDay}`);

@@ -76,21 +76,42 @@ export class InstagramDirectSync {
         const since = Math.floor(yesterday.getTime() / 1000);
         const until = Math.floor(Date.now() / 1000);
         
-        // Use only supported metrics for Instagram API v22+ with enhanced logging
-        console.log('[INSTAGRAM DIRECT] Attempting primary insights with params:', {
-          profileId: profileData.id,
-          since,
-          until,
-          hasAccessToken: !!accessToken
-        });
+        // Use Instagram Business API format from official documentation
+        console.log('[INSTAGRAM DIRECT] Using Instagram official documentation format for business accounts');
+        console.log('[INSTAGRAM DIRECT] Profile ID:', profileData.id, 'Account Type:', profileData.account_type);
         
-        const accountInsightsResponse = await fetch(
-          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,profile_views&period=day&since=${since}&until=${until}&access_token=${accessToken}`
+        // Try multiple Instagram Business API approaches for reach data
+        console.log('[INSTAGRAM DIRECT] Attempting official Instagram Business API format for reach data...');
+        
+        // Approach 1: Direct business insights without period (as shown in documentation)
+        let accountInsightsResponse = await fetch(
+          `https://graph.instagram.com/${profileData.id}/insights?metric=reach&access_token=${accessToken}`
         );
+        
+        // If that fails, try with period parameter
+        if (!accountInsightsResponse.ok) {
+          console.log('[INSTAGRAM DIRECT] Fallback: trying with period parameter...');
+          accountInsightsResponse = await fetch(
+            `https://graph.instagram.com/${profileData.id}/insights?metric=reach&period=day&access_token=${accessToken}`
+          );
+        }
         
         if (accountInsightsResponse.ok) {
           const accountInsightsData = await accountInsightsResponse.json();
           console.log('[INSTAGRAM DIRECT] Account insights SUCCESS:', accountInsightsData);
+          
+          // Enhanced logging for reach data extraction
+          if (accountInsightsData?.data) {
+            accountInsightsData.data.forEach((metric: any, index: number) => {
+              console.log(`[INSTAGRAM DIRECT] Metric ${index}:`, {
+                name: metric.name,
+                period: metric.period,
+                values: metric.values,
+                title: metric.title,
+                description: metric.description
+              });
+            });
+          }
           
           // Extract account-level metrics
           const data = accountInsightsData.data || [];

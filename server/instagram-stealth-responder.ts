@@ -125,18 +125,21 @@ export class InstagramStealthResponder {
   /**
    * DM-specific response check with 100% response rate
    */
-  private shouldAttemptDMResponse(message: string, username: string): boolean {
+  private shouldAttemptDMResponse(message: string, username: string, context?: any): boolean {
     // Reset daily count if new day
     this.resetDailyCountIfNeeded();
     
-    // Check daily limits (higher for DMs)
-    if (this.dailyResponseCount >= this.dmConfig.maxDailyResponses) {
-      console.log('[STEALTH] Daily DM response limit reached');
+    // Use user-configured daily limit or default
+    const userDailyLimit = context?.aiConfig?.dailyLimit || context?.dailyLimit || this.dmConfig.maxDailyResponses;
+    
+    // Check daily limits using user configuration
+    if (this.dailyResponseCount >= userDailyLimit) {
+      console.log(`[STEALTH] Daily DM response limit reached (${this.dailyResponseCount}/${userDailyLimit})`);
       return false;
     }
 
-    // 100% response rate for DMs - always respond
-    console.log('[STEALTH] DM response approved - 100% response rate');
+    // 100% response rate for DMs - always respond (as per user requirement)
+    console.log(`[STEALTH] DM response approved - 100% response rate (${this.dailyResponseCount + 1}/${userDailyLimit})`);
     return true;
   }
 
@@ -145,19 +148,27 @@ export class InstagramStealthResponder {
    */
   private async createDMResponse(message: string, username: string, context?: any): Promise<string> {
     try {
-      // Use AI generator for contextual DM responses
+      // Extract user configuration
+      const personality = context?.aiPersonality || context?.personality || 'friendly';
+      const responseLength = context?.responseLength || 'medium';
+      const language = context?.language || 'auto';
+      const contextualMode = context?.contextualMode !== false;
+      
+      console.log(`[STEALTH] Creating DM response with user config: personality=${personality}, length=${responseLength}, language=${language}`);
+      
+      // Use AI generator for contextual DM responses with user configuration
       const aiResponse = await this.aiGenerator.generateContextualResponse(
         {
           message: message,
           userProfile: { username: username }
         },
         {
-          personality: context?.aiPersonality || 'friendly',
-          responseLength: 'short',
-          dailyLimit: 50,
-          responseDelay: 2,
-          language: 'auto',
-          contextualMode: true,
+          personality: personality,
+          responseLength: responseLength,
+          dailyLimit: context?.dailyLimit || 50,
+          responseDelay: context?.responseDelay || 2,
+          language: language,
+          contextualMode: contextualMode,
           businessContext: 'Instagram DM automation'
         }
       );
@@ -172,12 +183,22 @@ export class InstagramStealthResponder {
   /**
    * Calculate delay for DM responses (shorter than comments)
    */
-  private calculateDMDelay(message: string, username: string): number {
-    const baseDelay = Math.random() * (this.dmConfig.maxDelayMs - this.dmConfig.minDelayMs) + this.dmConfig.minDelayMs;
+  private calculateDMDelay(message: string, username: string, context?: any): number {
+    // Use user-configured response delay or default
+    const userResponseDelay = context?.responseDelay || context?.aiConfig?.responseDelay || 5; // seconds
+    const userDelayMs = userResponseDelay * 1000; // convert to milliseconds
     
-    // Shorter delays for DMs to feel more responsive
+    console.log(`[STEALTH] Using user-configured response delay: ${userResponseDelay} seconds`);
+    
+    // Add some natural variation (±20%) to avoid appearing robotic
+    const variation = 0.2;
+    const minDelay = userDelayMs * (1 - variation);
+    const maxDelay = userDelayMs * (1 + variation);
+    const baseDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+    
+    // Slight adjustment based on message length for natural feel
     const messageLength = message.length;
-    const lengthMultiplier = Math.min(messageLength / 100, 1.5);
+    const lengthMultiplier = Math.min(messageLength / 200, 1.2); // reduced impact
     
     return Math.floor(baseDelay * lengthMultiplier);
   }

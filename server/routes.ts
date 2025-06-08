@@ -1864,98 +1864,140 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     const { username, followersCount, avgComments, avgLikes, engagementRate } = instagramAccount;
     const timestamp = Date.now();
     
-    // Generate different suggestions based on timestamp to ensure variety
+    // Advanced suggestions pool with specific growth strategies
     const suggestionPool = [
+      {
+        type: 'growth',
+        data: {
+          suggestion: `Audit and clean suspicious engagement patterns immediately`,
+          reasoning: `${avgComments} comments with only ${avgLikes} likes suggests bot activity or spam. Instagram penalizes accounts with fake engagement, limiting organic reach.`,
+          actionItems: [
+            'Review comment sections - delete repetitive or nonsensical comments',
+            'Block accounts posting spam or irrelevant comments',
+            'Enable "Hide inappropriate comments" in Instagram settings',
+            'Focus on creating content that attracts genuine followers',
+            'Use Instagram\'s "Restrict" feature for suspicious accounts'
+          ],
+          expectedImpact: 'Restore algorithm trust, improve organic reach by 60-80%',
+          difficulty: 'Medium',
+          timeframe: 'Start immediately - critical for account health'
+        },
+        confidence: 95
+      },
       {
         type: 'hashtag',
         data: {
-          suggestion: `Research competitor hashtags to discover new audiences for your ${avgComments}-comment content`,
-          reasoning: `Your content generates ${avgComments} comments per post - this shows strong discussion potential. Find where similar conversations happen.`,
+          suggestion: `Implement strategic hashtag research to find your ideal audience`,
+          reasoning: `With only ${followersCount} followers, discovery is crucial. Research-based hashtags can increase visibility 10-15x.`,
           actionItems: [
-            'Analyze top 5 accounts in your niche and save their hashtag combinations',
-            'Test 3-5 new hashtags per post to expand reach',
-            'Track which hashtags bring the most engaged followers',
-            'Create a branded hashtag for your community discussions'
+            'Research 20 accounts with 10K-50K followers in your niche',
+            'Save their top-performing hashtag combinations',
+            'Use mix: 5 niche tags (under 100K posts), 10 medium tags (100K-1M), 5 broad tags (1M+)',
+            'Track performance with Instagram Insights hashtag data',
+            'Create content-specific hashtag sets for different post types'
           ],
-          expectedImpact: 'Increase post reach by 40-60% through strategic hashtag research',
+          expectedImpact: 'Increase reach from 21 to 500+ per post, gain 15-30 targeted followers weekly',
           difficulty: 'Medium',
-          timeframe: '1-2 weeks'
+          timeframe: '2-3 weeks for full optimization'
         },
         confidence: 88
       },
       {
-        type: 'growth',
-        data: {
-          suggestion: `Convert your comment engagement into follower growth with strategic community building`,
-          reasoning: `${avgComments} comments per post indicates strong interest. Focus on converting commenters to loyal followers.`,
-          actionItems: [
-            'Reply to every comment within 2 hours to boost engagement velocity',
-            'Ask questions in your posts to encourage more comments',
-            'Create weekly discussion posts on trending topics in your niche',
-            'Share behind-the-scenes content to build personal connections'
-          ],
-          expectedImpact: 'Convert 15-25% of engaged commenters into followers',
-          difficulty: 'Easy',
-          timeframe: '2-3 weeks'
-        },
-        confidence: 92
-      },
-      {
         type: 'trending',
         data: {
-          suggestion: `Leverage trending audio and formats to amplify your discussion-generating content`,
-          reasoning: `Your ${avgComments} comments show content that sparks conversations. Use trending formats to reach wider audiences.`,
+          suggestion: `Create shareable content formats that naturally go viral`,
+          reasoning: `Small accounts need content that people want to share. Focus on formats with high share rates.`,
           actionItems: [
-            'Create Reels using trending audio with your discussion topics',
-            'Post carousel posts with controversial but respectful opinions',
-            'Use Instagram Stories polls and question stickers for instant engagement',
-            'Jump on trending challenges while maintaining your content style'
+            'Create "Before/After" transformation posts in your niche',
+            'Post controversial but respectful opinion pieces that spark debate',
+            'Design quote cards with valuable insights people want to save',
+            'Make "Things I wish I knew" educational carousels',
+            'Use trending audio with original content overlay'
           ],
-          expectedImpact: 'Reach 5-10x more people with trending content formats',
-          difficulty: 'Medium',
-          timeframe: '1 week'
+          expectedImpact: 'Achieve 2-5x more shares, exponential follower growth through viral content',
+          difficulty: 'Hard',
+          timeframe: '3-4 weeks to master viral formats'
         },
-        confidence: 85
+        confidence: 82
       },
       {
         type: 'engagement',
         data: {
-          suggestion: `Optimize posting schedule based on when your ${avgComments} commenters are most active`,
-          reasoning: `You have highly engaged commenters. Post when they're online to maximize initial engagement and algorithm boost.`,
+          suggestion: `Optimize posting strategy for maximum initial engagement velocity`,
+          reasoning: `Instagram shows new posts to 10% of followers first. High initial engagement triggers wider distribution.`,
           actionItems: [
-            'Check Instagram Insights to find peak activity times',
-            'Post consistently at your top 2-3 engagement windows',
-            'Use scheduling tools to maintain consistency',
-            'Test different posting times and track engagement rates'
+            'Post when your ${followersCount} followers are most active (check Insights)',
+            'Create posts that demand immediate action (polls, questions, "comment your answer")',
+            'Pre-announce posts in Stories to build anticipation',
+            'DM your most engaged followers when you post for instant likes',
+            'Use Instagram Live before posting to boost account activity'
           ],
-          expectedImpact: 'Increase average engagement by 30-50% through optimal timing',
-          difficulty: 'Easy',
-          timeframe: '1 week to test, ongoing optimization'
+          expectedImpact: 'Improve post reach by 200-400% through engagement velocity hacks',
+          difficulty: 'Medium',
+          timeframe: '1-2 weeks to implement fully'
         },
-        confidence: 90
+        confidence: 91
       },
       {
         type: 'audio',
         data: {
-          suggestion: `Create Reels addressing common questions from your ${avgComments} comments`,
-          reasoning: `High comment volume suggests people have questions about your content. Answer these in Reels for wider reach.`,
+          suggestion: `Launch a weekly Reels series to establish content authority`,
+          reasoning: `Consistent Reels series build anticipation and follower loyalty. Weekly series perform 3x better than random posts.`,
           actionItems: [
-            'Compile most frequently asked questions from comments',
-            'Create weekly Q&A Reels addressing top questions',
-            'Use trending audio with text overlays for accessibility',
-            'Pin your best Q&A Reels to highlight valuable content'
+            'Choose one topic you can talk about weekly (tips, behind-scenes, Q&A)',
+            'Film 4 episodes in one session for consistency',
+            'Use the same trending audio template but different content',
+            'Create branded intro/outro for series recognition',
+            'Cross-promote series in Stories and regular posts'
           ],
-          expectedImpact: 'Position yourself as go-to expert, gain 50-100 followers per viral Q&A Reel',
+          expectedImpact: 'Build 500-2000 followers through series loyalty, become niche authority',
+          difficulty: 'Hard',
+          timeframe: '6-8 weeks to see series impact'
+        },
+        confidence: 85
+      },
+      {
+        type: 'growth',
+        data: {
+          suggestion: `Partner with micro-influencers for authentic follower exchange`,
+          reasoning: `Accounts with 1K-10K followers have 3x better engagement than larger accounts. Partner for mutual growth.`,
+          actionItems: [
+            'Find 10 accounts in your niche with 1K-5K followers and good engagement',
+            'Propose collaboration: shout-out exchange, joint Live sessions, content swaps',
+            'Comment meaningfully on their posts to build relationships first',
+            'Create collaborative content (duets, response videos, Q&A exchanges)',
+            'Cross-promote each other\'s content in Stories'
+          ],
+          expectedImpact: 'Gain 50-200 highly targeted followers per collaboration',
           difficulty: 'Medium',
-          timeframe: '2-4 weeks'
+          timeframe: '2-4 weeks to establish partnerships'
         },
         confidence: 87
+      },
+      {
+        type: 'trending',
+        data: {
+          suggestion: `Master the 3-second hook formula for instant viewer retention`,
+          reasoning: `90% of viewers decide to stay or scroll within 3 seconds. Perfect your opening hook to stop the scroll.`,
+          actionItems: [
+            'Start every video with shocking statement, question, or preview of outcome',
+            'Use text overlay: "Wait for it...", "This changed everything", "99% don\'t know this"',
+            'Show the end result first, then explain how you got there',
+            'Test 5 different hook styles and track completion rates',
+            'Study viral videos in your niche - note their opening 3 seconds'
+          ],
+          expectedImpact: 'Increase average watch time by 150%, trigger algorithm boost for wider reach',
+          difficulty: 'Medium',
+          timeframe: '1-2 weeks to master hooks'
+        },
+        confidence: 93
       }
     ];
 
-    // Select 3-4 random suggestions to ensure variety
+    // Select 3-5 different suggestions based on timestamp for variety
     const shuffled = suggestionPool.sort(() => 0.5 - Math.random());
-    const selectedSuggestions = shuffled.slice(0, 3 + Math.floor(timestamp % 2));
+    const selectedCount = 3 + Math.floor((timestamp % 1000) / 333); // 3-5 suggestions
+    const selectedSuggestions = shuffled.slice(0, selectedCount);
 
     return selectedSuggestions.map(suggestion => ({
       ...suggestion,

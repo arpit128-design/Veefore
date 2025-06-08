@@ -229,18 +229,18 @@ export class InstagramWebhookHandler {
       const automationRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
       console.log(`[WEBHOOK] Found ${automationRules.length} automation rules for workspace ${socialAccount.workspaceId}`);
 
-      // Find DM automation rules - check for both trigger.type and action.type
-      const dmRules = automationRules.filter(rule => {
+      // Find DM automation rules - access type from trigger object
+      const dmRules = automationRules.filter((rule: any) => {
         const isActive = rule.isActive;
-        const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
-        const hasAction = rule.action && typeof rule.action === 'object';
+        const trigger = rule.trigger || {};
+        const action = rule.action || {};
         
-        // Check for DM type in either trigger or action
-        const isDmTypeTrigger = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
-        const isDmTypeAction = hasAction && ('type' in rule.action) && rule.action.type === 'dm';
-        const isDmType = isDmTypeTrigger || isDmTypeAction;
+        // Check for DM type in trigger structure (MongoDB format)
+        const isDmType = trigger.type === 'dm' || action.type === 'dm';
         
-        return isActive && (hasTrigger || hasAction) && isDmType;
+        console.log(`[WEBHOOK] Rule ${rule.name}: active=${isActive}, trigger.type=${trigger.type}, action.type=${action.type}, isDmType=${isDmType}`);
+        
+        return isActive && isDmType;
       });
 
       console.log(`[WEBHOOK] Found ${dmRules.length} DM rules out of ${automationRules.length} total rules`);
@@ -279,16 +279,13 @@ export class InstagramWebhookHandler {
       if (dmRules.length > 1) {
         // Re-fetch automation rules to get updated status
         const updatedRules = await this.storage.getAutomationRules(socialAccount.workspaceId);
-        const updatedDmRules = updatedRules.filter(rule => {
+        const updatedDmRules = updatedRules.filter((rule: any) => {
           const isActive = rule.isActive;
-          const hasTrigger = rule.trigger && typeof rule.trigger === 'object';
-          const hasAction = rule.action && typeof rule.action === 'object';
+          const trigger = rule.trigger || {};
+          const action = rule.action || {};
+          const isDmType = trigger.type === 'dm' || action.type === 'dm';
           
-          const isDmTypeTrigger = hasTrigger && ('type' in rule.trigger) && rule.trigger.type === 'dm';
-          const isDmTypeAction = hasAction && ('type' in rule.action) && rule.action.type === 'dm';
-          const isDmType = isDmTypeTrigger || isDmTypeAction;
-          
-          return isActive && (hasTrigger || hasAction) && isDmType;
+          return isActive && isDmType;
         });
         activeRules = updatedDmRules;
       }

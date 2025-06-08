@@ -419,15 +419,27 @@ export class InstagramAPI {
     } catch (error: any) {
       console.error(`[INSTAGRAM PUBLISH] Reel publish failed:`, error.response?.data || error.message);
       
-      // Check if this is a video processing failure that could be resolved with compression
+      // Import permission helper for better error handling
+      const { InstagramPermissionHelper } = await import('./instagram-permission-helper');
+      const errorInfo = InstagramPermissionHelper.getVideoPublishingError();
+      
+      // Check if this is a permissions-related error
+      const isPermissionError = error.message?.includes('permission') ||
+                               error.message?.includes('Video publishing requires advanced Instagram API permissions') ||
+                               error.response?.data?.error?.message?.includes('permission') ||
+                               error.response?.data?.error?.message?.includes('Media ID is not available');
+      
+      if (isPermissionError) {
+        throw new Error(`${errorInfo.error}: ${errorInfo.technicalReason}. Solution: ${errorInfo.solution}`);
+      }
+      
+      // For other errors, try compression if it's a local file
       const isProcessingError = error.response?.data?.error?.message?.includes('processing failed') ||
-                               error.response?.data?.error?.message?.includes('Media ID is not available') ||
                                error.response?.data?.error?.message?.includes('video could not be processed');
       
       if (isProcessingError) {
         console.log(`[INSTAGRAM PUBLISH] Detected video processing failure - attempting intelligent compression`);
         
-        // Check if this is a local file we can compress
         const isLocalFile = videoUrl.includes('/uploads/') && !videoUrl.startsWith('http');
         if (isLocalFile) {
           const localPath = path.join(process.cwd(), videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl);
@@ -455,12 +467,8 @@ export class InstagramAPI {
         }
       }
       
-      // Fall back to regular video post if Reels fail
-      try {
-        return await this.publishVideo(accessToken, videoUrl, caption);
-      } catch (fallbackError: any) {
-        throw new Error(`Instagram publish failed: ${error.response?.data?.error?.message || error.message}`);
-      }
+      // If all else fails, provide clear permission guidance
+      throw new Error(`${errorInfo.error}: ${errorInfo.technicalReason}. Solution: ${errorInfo.solution}`);
     }
   }
 
@@ -715,7 +723,11 @@ export class InstagramAPI {
                 }
               }
             }
-            throw new Error('Video processing failed on Instagram servers');
+            // Import permission helper for better error handling
+            const { InstagramPermissionHelper } = await import('./instagram-permission-helper');
+            const errorInfo = InstagramPermissionHelper.getVideoPublishingError();
+            
+            throw new Error(`${errorInfo.error}: ${errorInfo.technicalReason}. Solution: ${errorInfo.solution}`);
           }
         } catch (statusError: any) {
           console.error(`[INSTAGRAM PUBLISH] Status check error:`, statusError.response?.data || statusError.message);

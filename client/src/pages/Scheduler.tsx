@@ -849,140 +849,355 @@ export default function Scheduler() {
         </Card>
       </div>
 
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 glassmorphism p-1">
-          <TabsTrigger value="calendar" className="text-xs md:text-sm">
-            <span className="hidden md:inline">Calendar View</span>
-            <span className="md:hidden">Calendar</span>
-          </TabsTrigger>
-          <TabsTrigger value="scheduled" className="text-xs md:text-sm">
-            <span className="hidden md:inline">Scheduled Content</span>
-            <span className="md:hidden">Scheduled</span>
-          </TabsTrigger>
-          <TabsTrigger value="list" className="text-xs md:text-sm md:block">
-            <span className="hidden md:inline">List View</span>
-            <span className="md:hidden">List</span>
-          </TabsTrigger>
-          <TabsTrigger value="automation" className="text-xs md:text-sm hidden md:block">
-            Automation
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs md:text-sm hidden md:block">
-            Analytics
-          </TabsTrigger>
-        </TabsList>
+      {/* Horizontal Scrollable Tabs - Content Studio Style */}
+      <div className="relative">
+        <div className="flex overflow-x-auto scrollbar-hide space-x-2 p-1 bg-black/20 backdrop-blur-md rounded-xl border border-white/10">
+          {[
+            { id: 'calendar', label: 'Calendar View', icon: CalendarIcon, description: 'Monthly overview' },
+            { id: 'scheduled', label: 'Scheduled Posts', icon: Clock, description: 'Queued content' },
+            { id: 'list', label: 'List View', icon: BarChart3, description: 'Detailed list' },
+            { id: 'automation', label: 'Auto Rules', icon: Zap, description: 'Smart scheduling' },
+            { id: 'optimal', label: 'Best Times', icon: Clock, description: 'Peak engagement' },
+            { id: 'analytics', label: 'Performance', icon: BarChart3, description: 'Content insights' }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-shrink-0 flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg border transition-all duration-300 min-w-[100px] sm:min-w-[120px] ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-solar-gold/20 to-orange-500/20 border-solar-gold/50 text-solar-gold shadow-lg shadow-solar-gold/20'
+                    : 'bg-black/10 border-white/10 text-asteroid-silver hover:bg-white/5 hover:border-white/20'
+                }`}
+              >
+                <Icon className={`w-4 h-4 sm:w-5 sm:h-5 mb-1 sm:mb-2 ${
+                  activeTab === tab.id ? 'text-solar-gold' : 'text-asteroid-silver'
+                }`} />
+                <span className="text-xs sm:text-sm font-medium text-center">{tab.label}</span>
+                <span className="text-[10px] sm:text-xs text-center opacity-60 mt-0.5">{tab.description}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-        <TabsContent value="calendar" className="space-y-6">
-          <Calendar onScheduleContent={handleScheduleContent} />
-        </TabsContent>
+      {/* Tab Content */}
+      <div className="space-y-6">
+        {activeTab === 'calendar' && (
+          <div className="space-y-6">
+            <Calendar 
+              onScheduleContent={handleScheduleContent}
+              scheduledContent={scheduledContent || []}
+            />
+          </div>
+        )}
 
-        <TabsContent value="scheduled" className="space-y-6">
-          <Card className="content-card holographic">
-            <CardHeader>
-              <CardTitle className="text-xl font-orbitron font-semibold neon-text text-electric-cyan">
-                Scheduled Content Management
-              </CardTitle>
-              <p className="text-asteroid-silver">
-                Manage your scheduled posts - edit timing or cancel as needed
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {scheduledContent.length === 0 ? (
-                <div className="text-center py-12">
-                  <CalendarIcon className="h-12 w-12 mx-auto text-asteroid-silver mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">No Scheduled Content</h3>
-                  <p className="text-asteroid-silver">
-                    You don't have any content scheduled for publishing yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  {scheduledContent.map((content: any) => {
-                    const scheduledDate = new Date(content.scheduledAt);
-                    const timeUntil = getTimeUntilScheduled(content.scheduledAt);
-                    
-                    return (
-                      <Card key={content.id} className="content-card glassmorphism hover:border-electric-cyan/50 hover:shadow-lg hover:shadow-electric-cyan/20 transition-all duration-300 cursor-pointer group">
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-3">
-                                {getContentIcon(content.type)}
-                                <h3 className="font-semibold text-white group-hover:text-electric-cyan transition-colors">{content.title}</h3>
-                                <Badge className={`${getStatusColor(content.status)} text-white`}>
-                                  {content.status}
-                                </Badge>
-                                <Badge variant="secondary" className="text-xs">
+        {activeTab === 'scheduled' && (
+          <div className="space-y-6">
+            <Card className="content-card holographic">
+              <CardHeader>
+                <CardTitle className="text-electric-cyan">Scheduled Content Queue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isScheduledLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse bg-white/5 rounded-lg h-20"></div>
+                    ))}
+                  </div>
+                ) : scheduledContent && scheduledContent.length > 0 ? (
+                  <div className="space-y-4">
+                    {scheduledContent.map((content: any, index: number) => (
+                      <div key={index} className="p-4 bg-black/20 rounded-lg border border-white/10 hover:border-white/20 transition-all">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-start space-x-3">
+                            {getContentTypeIcon(content.type)}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-white truncate">{content.title}</h4>
+                              <p className="text-sm text-asteroid-silver mt-1 line-clamp-2">{content.description}</p>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                <Badge variant="outline" className="text-xs">
                                   {content.platform}
                                 </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {new Date(content.scheduledAt).toLocaleDateString()}
+                                </Badge>
                               </div>
-                              
-                              {content.description && (
-                                <p className="text-asteroid-silver mb-3 text-sm">
-                                  {content.description}
-                                </p>
-                              )}
-                              
-                              <div className="flex items-center gap-4 text-sm text-asteroid-silver">
-                                <div className="flex items-center gap-1">
-                                  <CalendarIcon className="h-4 w-4" />
-                                  {scheduledDate.toLocaleDateString()}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-4 w-4" />
-                                  {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <AlertCircle className="h-4 w-4" />
-                                  {timeUntil}
-                                </div>
-                              </div>
-                              
-                              {content.contentData?.mediaUrl && (
-                                <div className="mt-3">
-                                  {content.contentData.mediaUrl.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || content.type === 'video' || content.type === 'reel' ? (
-                                    <video 
-                                      src={content.contentData.mediaUrl} 
-                                      className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
-                                      muted
-                                    />
-                                  ) : (
-                                    <img 
-                                      src={content.contentData.mediaUrl} 
-                                      alt="Content preview" 
-                                      className="w-16 h-16 object-cover rounded-lg border border-cosmic-dark"
-                                    />
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center gap-2 ml-4">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEdit(content);
-                                }}
-                                className="glassmorphism hover:bg-electric-cyan/20 hover:border-electric-cyan transition-all opacity-0 group-hover:opacity-100"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(content.id);
-                                }}
-                                className="glassmorphism text-red-400 hover:text-red-300 hover:bg-red-500/20 hover:border-red-400 transition-all opacity-0 group-hover:opacity-100"
-                                disabled={deleteContentMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
                             </div>
                           </div>
+                          <div className="flex items-center space-x-2 self-start sm:self-center">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {/* Handle edit */}}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleDeleteContent(content.id)}
+                              className="h-8 w-8 p-0 hover:bg-red-500/20 hover:border-red-500/50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <CalendarIcon className="h-12 w-12 text-asteroid-silver mx-auto mb-4" />
+                    <p className="text-asteroid-silver">No scheduled content found</p>
+                    <Button 
+                      onClick={() => handleScheduleContent()}
+                      className="mt-4 bg-gradient-to-r from-solar-gold to-orange-500"
+                    >
+                      Schedule Your First Post
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'list' && (
+          <div className="space-y-6">
+            <Card className="content-card holographic">
+              <CardHeader>
+                <CardTitle className="text-electric-cyan">Content List View</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isScheduledLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="animate-pulse bg-white/5 rounded h-16"></div>
+                    ))}
+                  </div>
+                ) : scheduledContent && scheduledContent.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-white/10">
+                          <th className="text-left p-3 text-asteroid-silver text-sm">Content</th>
+                          <th className="text-left p-3 text-asteroid-silver text-sm">Platform</th>
+                          <th className="text-left p-3 text-asteroid-silver text-sm">Schedule</th>
+                          <th className="text-left p-3 text-asteroid-silver text-sm">Status</th>
+                          <th className="text-left p-3 text-asteroid-silver text-sm">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {scheduledContent.map((content: any, index: number) => (
+                          <tr key={index} className="border-b border-white/5 hover:bg-white/5">
+                            <td className="p-3">
+                              <div className="flex items-center space-x-3">
+                                {getContentTypeIcon(content.type)}
+                                <div>
+                                  <p className="font-medium text-white text-sm">{content.title}</p>
+                                  <p className="text-xs text-asteroid-silver truncate max-w-[200px]">
+                                    {content.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <Badge variant="outline" className="text-xs capitalize">
+                                {content.platform}
+                              </Badge>
+                            </td>
+                            <td className="p-3 text-sm text-asteroid-silver">
+                              {new Date(content.scheduledAt).toLocaleString()}
+                            </td>
+                            <td className="p-3">
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  content.status === 'published' 
+                                    ? 'text-green-400 border-green-400/50' 
+                                    : 'text-solar-gold border-solar-gold/50'
+                                }`}
+                              >
+                                {content.status}
+                              </Badge>
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center space-x-2">
+                                <Button size="sm" variant="outline" className="h-7 w-7 p-0">
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  onClick={() => handleDeleteContent(content.id)}
+                                  className="h-7 w-7 p-0 hover:bg-red-500/20"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <BarChart3 className="h-12 w-12 text-asteroid-silver mx-auto mb-4" />
+                    <p className="text-asteroid-silver">No content scheduled</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'automation' && (
+          <div className="space-y-6">
+            <AutomationRules />
+          </div>
+        )}
+
+        {activeTab === 'optimal' && (
+          <div className="space-y-6">
+            <OptimalTimes />
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <Card className="content-card holographic">
+              <CardHeader>
+                <CardTitle className="text-electric-cyan">Content Performance Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="p-4 bg-black/20 rounded-lg border border-white/10">
+                    <h4 className="text-sm font-medium text-asteroid-silver mb-2">Engagement Rate</h4>
+                    <p className="text-2xl font-bold text-electric-cyan">4.2%</p>
+                    <p className="text-xs text-green-400">↑ 12% vs last week</p>
+                  </div>
+                  <div className="p-4 bg-black/20 rounded-lg border border-white/10">
+                    <h4 className="text-sm font-medium text-asteroid-silver mb-2">Best Time</h4>
+                    <p className="text-2xl font-bold text-solar-gold">7:00 PM</p>
+                    <p className="text-xs text-asteroid-silver">Peak engagement</p>
+                  </div>
+                  <div className="p-4 bg-black/20 rounded-lg border border-white/10">
+                    <h4 className="text-sm font-medium text-asteroid-silver mb-2">Content Types</h4>
+                    <p className="text-2xl font-bold text-nebula-purple">Reels</p>
+                    <p className="text-xs text-asteroid-silver">Highest performing</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
+
+      {/* Schedule Content Dialog */}
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl font-semibold">Schedule Content</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => handleScheduleSubmit(false, e)} className="space-y-4 sm:space-y-6">
+            {/* Content scheduling form */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Title *</Label>
+                <Input
+                  value={scheduleForm.title}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter content title"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Platform</Label>
+                <Select
+                  value={scheduleForm.platform}
+                  onValueChange={(value) => setScheduleForm(prev => ({ ...prev, platform: value }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                value={scheduleForm.description}
+                onChange={(e) => setScheduleForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Write your caption..."
+                rows={4}
+                className="w-full"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Schedule Date</Label>
+                <Input
+                  type="date"
+                  value={scheduleForm.scheduledDate}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Schedule Time</Label>
+                <Input
+                  type="time"
+                  value={scheduleForm.scheduledTime}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsScheduleDialogOpen(false)}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="w-full sm:w-auto bg-gradient-to-r from-solar-gold to-orange-500"
+              >
+                Schedule Content
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Publishing Progress */}
+      <PublishingProgressTracker 
+        isVisible={progressState.isVisible}
+        status={progressState.status}
+        progress={progressState.progress}
+        currentStep={progressState.currentStep}
+        timeRemaining={progressState.timeRemaining}
+        onClose={() => setProgressState(prev => ({ ...prev, isVisible: false }))}
+      />
+    </div>
+  );
+}
                         </CardContent>
                       </Card>
                     );

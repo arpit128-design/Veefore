@@ -20,6 +20,7 @@ interface AutomationRule {
   type: 'comment' | 'dm';
   isActive: boolean;
   triggers: {
+    aiMode?: 'contextual' | 'keyword';
     keywords?: string[];
     hashtags?: string[];
     mentions?: boolean;
@@ -27,6 +28,8 @@ interface AutomationRule {
     postInteraction?: boolean;
   };
   responses: string[];
+  aiPersonality?: string;
+  responseLength?: string;
   conditions: {
     timeDelay?: number;
     maxPerDay?: number;
@@ -68,6 +71,7 @@ export default function Automation() {
   const [newRule, setNewRule] = useState({
     type: 'comment' as 'comment' | 'dm',
     triggers: {
+      aiMode: 'contextual' as 'contextual' | 'keyword',
       keywords: [] as string[],
       hashtags: [] as string[],
       mentions: false,
@@ -75,6 +79,8 @@ export default function Automation() {
       postInteraction: false
     },
     responses: [''],
+    aiPersonality: 'friendly',
+    responseLength: 'medium',
     conditions: {
       timeDelay: 0,
       maxPerDay: 10,
@@ -625,8 +631,8 @@ export default function Automation() {
                       className="w-4 h-4"
                     />
                     <div>
-                      <div className="font-medium">Auto Comment</div>
-                      <div className="text-xs text-muted-foreground">Reply to comments on posts</div>
+                      <div className="font-medium">AI Auto Comment</div>
+                      <div className="text-xs text-muted-foreground">Intelligent replies to all comments</div>
                     </div>
                   </label>
                   <label className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -642,8 +648,8 @@ export default function Automation() {
                       className="w-4 h-4"
                     />
                     <div>
-                      <div className="font-medium">Auto DM</div>
-                      <div className="text-xs text-muted-foreground">Send direct messages</div>
+                      <div className="font-medium">AI Auto DM</div>
+                      <div className="text-xs text-muted-foreground">Smart direct message responses</div>
                     </div>
                   </label>
                 </div>
@@ -651,89 +657,203 @@ export default function Automation() {
 
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm font-medium">Trigger Keywords</Label>
+                  <Label className="text-sm font-medium">AI Response Mode</Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Words that will trigger automated responses
+                    Choose how AI should respond to messages
                   </p>
                 </div>
                 <div className="space-y-3">
-                  <Input
-                    placeholder="Type a keyword and press Enter to add..."
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const value = e.currentTarget.value.trim();
-                        if (value) {
-                          addKeyword('triggers', value);
-                          e.currentTarget.value = '';
-                        }
-                      }
-                    }}
-                    className="w-full"
-                  />
-                  {newRule.triggers.keywords && newRule.triggers.keywords.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {newRule.triggers.keywords.map((keyword, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary" 
-                          className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                          onClick={() => removeKeyword('triggers', index)}
-                        >
-                          {keyword} ×
-                        </Badge>
-                      ))}
+                  <div className="grid grid-cols-1 gap-3">
+                    <label className={`flex items-start space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                      newRule.triggers.aiMode === 'contextual' 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-muted hover:border-primary/50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="aiMode"
+                        value="contextual"
+                        checked={newRule.triggers.aiMode === 'contextual'}
+                        onChange={(e) => setNewRule(prev => ({
+                          ...prev,
+                          triggers: { ...prev.triggers, aiMode: e.target.value }
+                        }))}
+                        className="w-4 h-4 mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">Smart Contextual AI (Recommended)</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          AI analyzes each comment/DM and generates intelligent responses in the same language (Hindi/Hinglish/English). 
+                          Understands internet slang, tone, and personality to reply naturally.
+                        </div>
+                        <div className="text-xs text-primary mt-1 font-medium">
+                          No keywords needed • Multilingual • Tone matching • Context aware
+                        </div>
+                      </div>
+                    </label>
+                    <label className={`flex items-start space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                      newRule.triggers.aiMode === 'keyword' 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-muted hover:border-primary/50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="aiMode"
+                        value="keyword"
+                        checked={newRule.triggers.aiMode === 'keyword'}
+                        onChange={(e) => setNewRule(prev => ({
+                          ...prev,
+                          triggers: { ...prev.triggers, aiMode: e.target.value }
+                        }))}
+                        className="w-4 h-4 mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">Keyword-Based Responses</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Traditional keyword matching with predefined responses
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  
+                  {newRule.triggers.aiMode === 'keyword' && (
+                    <div className="space-y-3 pt-2">
+                      <Input
+                        placeholder="Type a keyword and press Enter to add..."
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            const value = e.currentTarget.value.trim();
+                            if (value) {
+                              addKeyword('triggers', value);
+                              e.currentTarget.value = '';
+                            }
+                          }
+                        }}
+                        className="w-full"
+                      />
+                      {newRule.triggers.keywords && newRule.triggers.keywords.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {newRule.triggers.keywords.map((keyword, index) => (
+                            <Badge 
+                              key={index} 
+                              variant="secondary" 
+                              className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                              onClick={() => removeKeyword('triggers', index)}
+                            >
+                              {keyword} ×
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {(!newRule.triggers.keywords || newRule.triggers.keywords.length === 0) && (
-                    <p className="text-xs text-muted-foreground italic">No keywords added yet</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm font-medium">Automated Responses</Label>
+                  <Label className="text-sm font-medium">
+                    {newRule.triggers.aiMode === 'contextual' ? 'AI Response Settings' : 'Automated Responses'}
+                  </Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Messages that will be sent automatically. System will randomly choose from these.
+                    {newRule.triggers.aiMode === 'contextual' 
+                      ? 'Configure how AI should respond to messages'
+                      : 'Messages that will be sent automatically. System will randomly choose from these.'
+                    }
                   </p>
                 </div>
-                <div className="space-y-3">
-                  {newRule.responses.map((response, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs font-medium text-muted-foreground">
-                          Response {index + 1}
-                        </Label>
-                        {newRule.responses.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeResponse(index)}
-                            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                          >
-                            ×
-                          </Button>
-                        )}
+                
+                {newRule.triggers.aiMode === 'contextual' ? (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">Smart AI Response Engine</h4>
+                          <div className="text-xs text-muted-foreground mt-1 space-y-1">
+                            <p>• Analyzes incoming messages in any language (Hindi/Hinglish/English)</p>
+                            <p>• Understands tone, personality, and context</p>
+                            <p>• Generates natural, engaging responses</p>
+                            <p>• Matches customer's communication style and language</p>
+                            <p>• Comprehends internet slang and modern expressions</p>
+                          </div>
+                        </div>
                       </div>
-                      <Textarea
-                        value={response}
-                        onChange={(e) => updateResponse(index, e.target.value)}
-                        placeholder="Enter your automated response message..."
-                        rows={3}
-                        className="resize-none"
-                      />
                     </div>
-                  ))}
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={addResponse}
-                    className="w-full"
-                  >
-                    + Add Another Response
-                  </Button>
-                </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="ai-personality" className="text-sm">AI Response Personality</Label>
+                      <select
+                        id="ai-personality"
+                        value={newRule.aiPersonality || 'friendly'}
+                        onChange={(e) => setNewRule(prev => ({ ...prev, aiPersonality: e.target.value }))}
+                        className="w-full p-2 border border-input rounded-md bg-background"
+                      >
+                        <option value="friendly">Friendly & Approachable</option>
+                        <option value="professional">Professional & Polite</option>
+                        <option value="casual">Casual & Relaxed</option>
+                        <option value="enthusiastic">Enthusiastic & Energetic</option>
+                        <option value="helpful">Helpful & Supportive</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="response-length" className="text-sm">Response Length</Label>
+                      <select
+                        id="response-length"
+                        value={newRule.responseLength || 'medium'}
+                        onChange={(e) => setNewRule(prev => ({ ...prev, responseLength: e.target.value }))}
+                        className="w-full p-2 border border-input rounded-md bg-background"
+                      >
+                        <option value="short">Short (1-2 sentences)</option>
+                        <option value="medium">Medium (2-3 sentences)</option>
+                        <option value="long">Long (3-4 sentences)</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {newRule.responses.map((response, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Response {index + 1}
+                          </Label>
+                          {newRule.responses.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeResponse(index)}
+                              className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                            >
+                              ×
+                            </Button>
+                          )}
+                        </div>
+                        <Textarea
+                          value={response}
+                          onChange={(e) => updateResponse(index, e.target.value)}
+                          placeholder="Enter your automated response message..."
+                          rows={3}
+                          className="resize-none"
+                        />
+                      </div>
+                    ))}
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={addResponse}
+                      className="w-full"
+                    >
+                      + Add Another Response
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4">

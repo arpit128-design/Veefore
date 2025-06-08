@@ -188,10 +188,10 @@ const AnimatedFeatureCard = ({
     }}
     className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-white/10 overflow-hidden transform-gpu perspective-1000"
   >
-    {/* Animated Background Elements */}
+    {/* Optimized Background Elements */}
     <div className="absolute inset-0 overflow-hidden">
-      {[...Array(8)].map((_, i) => (
-        <FloatingOrb key={i} delay={i * 0.2} size={i % 2 === 0 ? "w-3 h-3" : "w-2 h-2"} />
+      {[...Array(3)].map((_, i) => (
+        <FloatingOrb key={i} delay={i * 0.8} size="w-2 h-2" />
       ))}
     </div>
 
@@ -442,16 +442,52 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
-      {/* Enhanced 3D Animated Background */}
+      {/* Header Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <motion.h1 
+              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.05 }}
+            >
+              VeeFore
+            </motion.h1>
+          </div>
+          
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+            <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
+            <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+            <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              className="text-white hover:bg-white/10"
+            >
+              Sign In
+            </Button>
+            <Link href="/onboarding">
+              <Button 
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Optimized Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(120,119,198,0.3),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.2),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[conic-gradient(from_90deg_at_50%_50%,transparent,rgba(120,119,198,0.15),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(120,119,198,0.2),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.15),transparent_50%)]" />
       </div>
 
-      {/* 3D Floating Particles */}
+      {/* Reduced Floating Particles */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(25)].map((_, i) => (
+        {[...Array(8)].map((_, i) => (
           <Particle3D key={i} index={i} />
         ))}
       </div>
@@ -555,15 +591,6 @@ const Landing = () => {
                     rotateY: 15,
                     rotateX: 10,
                     transition: { duration: 0.3 }
-                  }}
-                  animate-ongoing={{
-                    y: [0, -8, 0],
-                    rotateZ: [0, 2, 0]
-                  }}
-                  transition-ongoing={{
-                    duration: 3 + index * 0.3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
                   }}
                   className={`w-16 h-16 rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer transform-gpu relative overflow-hidden`}
                   style={{ transformStyle: "preserve-3d" }}
@@ -744,7 +771,7 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Features Section with 3D Cards */}
-      <section className="relative py-32 px-4">
+      <section id="features" className="relative py-32 px-4 pt-40">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -838,7 +865,7 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Pricing Section */}
-      <section className="relative py-32 px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
+      <section id="pricing" className="relative py-32 px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -924,17 +951,7 @@ const Landing = () => {
                       transition={{ delay: index * 0.2 + featureIndex * 0.1 }}
                       className="flex items-center"
                     >
-                      <motion.div
-                        animate={{ rotate: [0, 360] }}
-                        transition={{ 
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: featureIndex * 0.2
-                        }}
-                      >
-                        <Check className="w-5 h-5 mr-3 text-green-400 flex-shrink-0" />
-                      </motion.div>
+                      <Check className="w-5 h-5 mr-3 text-green-400 flex-shrink-0" />
                       <span className="text-gray-300">{feature}</span>
                     </motion.li>
                   ))}
@@ -966,7 +983,7 @@ const Landing = () => {
       </section>
 
       {/* Enhanced CTA Section */}
-      <section className="relative py-32 px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
+      <section id="about" className="relative py-32 px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -1047,7 +1064,7 @@ const Landing = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="relative border-t border-gray-800 py-16 px-4">
+      <footer id="contact" className="relative border-t border-gray-800 py-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
             <motion.h3 

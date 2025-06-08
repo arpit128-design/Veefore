@@ -431,26 +431,33 @@ export class InstagramWebhookHandler {
       if (activeTime && activeTime.enabled) {
         const { startTime, endTime, activeDays } = activeTime;
         
-        // Use GMT timezone for all validation
-        const gmtTime = new Date(now.toISOString());
+        // Always use GMT timezone for validation (current time in GMT)
+        const gmtTime = new Date();
         console.log(`[WEBHOOK] Using GMT time for validation: ${gmtTime.toISOString()}`);
+        console.log(`[WEBHOOK] IST time (GMT+5:30): ${new Date(gmtTime.getTime() + 5.5 * 60 * 60 * 1000).toISOString()}`);
         
         // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
         if (activeDays && activeDays.length > 0) {
-          const currentDay = gmtTime.getDay(); // 0=Sunday, 1=Monday, etc.
+          const currentDay = gmtTime.getUTCDay(); // Use UTC day: 0=Sunday, 1=Monday, etc.
           const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
+          
+          console.log(`[WEBHOOK] Current GMT day: ${currentDay} (${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]})`);
+          console.log(`[WEBHOOK] Converted to Monday-first format: ${mondayFirst}, allowed days: ${activeDays}`);
           
           if (!activeDays.includes(mondayFirst)) {
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            console.log(`[WEBHOOK] Rule not active on ${dayNames[currentDay]} (day ${mondayFirst}, allowed: ${activeDays})`);
+            console.log(`[WEBHOOK] ✗ Rule not active on ${dayNames[currentDay]} (day ${mondayFirst}, allowed: ${activeDays})`);
             return { canExecute: false, reason: `Rule not active on ${dayNames[currentDay]}` };
+          } else {
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            console.log(`[WEBHOOK] ✓ Current day ${dayNames[currentDay]} is allowed`);
           }
         }
 
         // Check if current time is within active hours (using GMT)
         if (startTime && endTime) {
-          const currentHour = gmtTime.getHours();
-          const currentMinute = gmtTime.getMinutes();
+          const currentHour = gmtTime.getUTCHours();
+          const currentMinute = gmtTime.getUTCMinutes();
           const currentTimeMinutes = currentHour * 60 + currentMinute;
           
           const [startHour, startMin] = startTime.split(':').map(Number);
@@ -458,9 +465,14 @@ export class InstagramWebhookHandler {
           const startTimeMinutes = startHour * 60 + startMin;
           const endTimeMinutes = endHour * 60 + endMin;
           
+          console.log(`[WEBHOOK] Current GMT time: ${currentHour}:${currentMinute.toString().padStart(2, '0')} (${currentTimeMinutes} minutes)`);
+          console.log(`[WEBHOOK] Active hours: ${startTime}-${endTime} (${startTimeMinutes}-${endTimeMinutes} minutes)`);
+          
           if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
-            console.log(`[WEBHOOK] Current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
-            return { canExecute: false, reason: `Rule active ${startTime}-${endTime}, current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')}` };
+            console.log(`[WEBHOOK] ✗ Current GMT time ${currentHour}:${currentMinute.toString().padStart(2, '0')} outside active hours ${startTime}-${endTime}`);
+            return { canExecute: false, reason: `Rule active ${startTime}-${endTime} GMT, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} GMT` };
+          } else {
+            console.log(`[WEBHOOK] ✓ Current GMT time is within active hours`);
           }
         }
       }

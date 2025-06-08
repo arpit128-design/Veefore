@@ -240,6 +240,16 @@ export default function OnboardingPremium() {
     setProgress((currentStep / (onboardingSteps.length - 1)) * 100);
   }, [currentStep]);
 
+  // Helper function for category toggle
+  const handleCategoryToggle = (categoryId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedCategories: prev.selectedCategories.includes(categoryId)
+        ? prev.selectedCategories.filter(id => id !== categoryId)
+        : [...prev.selectedCategories, categoryId]
+    }));
+  };
+
   // Mutations
   const createWorkspaceMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -291,10 +301,10 @@ export default function OnboardingPremium() {
   };
 
   const handleComplete = async () => {
-    if (!formData.workspaceName.trim()) {
+    if (!formData.businessName.trim() || !formData.workspaceName.trim()) {
       toast({
-        title: "Workspace Name Required",
-        description: "Please enter a name for your workspace",
+        title: "Required Fields Missing",
+        description: "Please complete all required fields",
         variant: "destructive",
       });
       return;
@@ -322,20 +332,15 @@ export default function OnboardingPremium() {
     
     createWorkspaceMutation.mutate({
       name: formData.workspaceName,
-      description: formData.description || `AI-powered workspace for ${formData.workspaceName}`,
+      description: formData.description || `AI-powered workspace for ${formData.businessName}`,
+      businessName: formData.businessName,
+      businessDescription: formData.businessDescription,
+      businessGoals: formData.selectedGoals,
+      connectedPlatforms: formData.connectedPlatforms,
       aiPersonality: formData.aiPersonality,
       theme: 'space',
       categories: formData.selectedCategories
     });
-  };
-
-  const handleCategoryToggle = (categoryId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedCategories: prev.selectedCategories.includes(categoryId)
-        ? prev.selectedCategories.filter(id => id !== categoryId)
-        : [...prev.selectedCategories, categoryId]
-    }));
   };
 
   const currentStepData = onboardingSteps[currentStep];
@@ -701,7 +706,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 2 && (
+                    {currentStep === 4 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -745,7 +750,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 3 && (
+                    {currentStep === 5 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="text-center mb-6">
@@ -794,7 +799,42 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 4 && (
+                    {currentStep === 6 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full max-w-md space-y-6">
+                          <div className="space-y-4">
+                            <Label htmlFor="workspace-name" className="text-white font-medium">
+                              Workspace Name *
+                            </Label>
+                            <Input
+                              id="workspace-name"
+                              type="text"
+                              placeholder="Enter your workspace name..."
+                              value={formData.workspaceName}
+                              onChange={(e) => setFormData(prev => ({ ...prev, workspaceName: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="space-y-4">
+                            <Label htmlFor="description" className="text-white font-medium">
+                              Description (Optional)
+                            </Label>
+                            <Input
+                              id="description"
+                              type="text"
+                              placeholder="Describe your workspace..."
+                              value={formData.description}
+                              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm"
+                            />
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 7 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="text-center space-y-8">
                           <motion.div
@@ -813,16 +853,19 @@ export default function OnboardingPremium() {
                           
                           <div className="space-y-4">
                             <AnimatedText 
-                              text="🎉 Setup Complete!"
+                              text="Setup Complete!"
                               className="text-3xl font-bold text-white"
                               delay={0.5}
                               stagger={0.1}
                             />
                             
-                            <div className="space-y-2 text-white/80">
-                              <p>✓ Workspace: {formData.workspaceName}</p>
+                            <div className="space-y-2 text-white/80 text-left max-w-md mx-auto">
+                              <p>✓ Business: {formData.businessName}</p>
+                              <p>✓ Goals: {formData.selectedGoals.length} selected</p>
+                              <p>✓ Platforms: {formData.connectedPlatforms.length} connected</p>
                               <p>✓ AI Personality: {personalities.find(p => p.id === formData.aiPersonality)?.name}</p>
                               <p>✓ Categories: {formData.selectedCategories.length} selected</p>
+                              <p>✓ Workspace: {formData.workspaceName}</p>
                             </div>
                           </div>
                           
@@ -882,9 +925,12 @@ export default function OnboardingPremium() {
                         glowColor={currentStepData.color}
                         className="flex items-center gap-2"
                         disabled={
-                          (currentStep === 1 && !formData.workspaceName.trim()) ||
-                          (currentStep === 2 && !formData.aiPersonality) ||
-                          (currentStep === 3 && formData.selectedCategories.length === 0)
+                          (currentStep === 1 && (!formData.businessName.trim() || !formData.businessDescription.trim())) ||
+                          (currentStep === 2 && formData.selectedGoals.length === 0) ||
+                          (currentStep === 3 && formData.connectedPlatforms.length === 0) ||
+                          (currentStep === 4 && !formData.aiPersonality) ||
+                          (currentStep === 5 && formData.selectedCategories.length === 0) ||
+                          (currentStep === 6 && !formData.workspaceName.trim())
                         }
                       >
                         Next

@@ -1859,28 +1859,30 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
     console.log(`[AI SUGGESTIONS] Analyzing @${username}: ${followersCount} followers, ${engagementPercent}% engagement`);
 
-    // ACTIONABLE GROWTH STRATEGY for @rahulc1020 (4 followers, 99 comments/post)
+    // SPAM DETECTION & AUTHENTIC ENGAGEMENT STRATEGY for @rahulc1020
     const commentToLikeRatio = avgLikes > 0 ? avgComments / avgLikes : 0;
+    const suspiciousEngagement = avgComments > 100 && avgLikes < 10;
     
-    // IMMEDIATE ACTION: Leverage comment engagement for follower acquisition
-    if (avgComments > 50) {
+    // CRITICAL ISSUE: Suspicious comment patterns detected
+    if (suspiciousEngagement) {
       suggestions.push({
         type: 'engagement',
         data: {
-          suggestion: `Turn your 99 commenters into followers - you're missing 95+ potential followers per post`,
-          reasoning: `@${username} gets 99 comments but only has 4 followers. This means ~95 people engage without following. This is your biggest growth opportunity - convert commenters to followers.`,
+          suggestion: `Address suspicious comment patterns - ${avgComments} comments vs ${avgLikes} likes indicates potential spam or bot activity`,
+          reasoning: `@${username} has ${avgComments} comments per post but only ${avgLikes} likes and 4 followers. This extreme ratio (${Math.round(commentToLikeRatio)}:1) suggests spam comments, bot engagement, or artificial inflation. Many comments from same accounts is a red flag for Instagram's algorithm.`,
           actionItems: [
-            'Reply to EVERY comment with "Thanks for engaging! Hit follow for more content like this"',
-            'Ask commenters specific questions to start conversations',
-            'Post in Instagram Stories: "Thanks to everyone commenting! Follow for daily insights"',
-            'Create a post thanking commenters and asking them to follow for exclusive content'
+            'Audit your comment section - check if multiple comments come from same accounts',
+            'Report and delete obvious spam/bot comments immediately',
+            'Use Instagram\'s "Hide inappropriate comments" feature in settings',
+            'Block accounts that repeatedly spam your content',
+            'Focus on attracting genuine followers through quality content instead of engagement manipulation'
           ],
-          expectedImpact: 'Convert 20-30 commenters to followers in next 2 weeks',
-          difficulty: 'Easy',
-          timeframe: 'Start today'
+          expectedImpact: 'Clean up engagement metrics and avoid Instagram penalties',
+          difficulty: 'Medium',
+          timeframe: 'Start immediately - this affects algorithm ranking'
         },
-        confidence: 95,
-        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        confidence: 98,
+        validUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
       });
     }
     
@@ -2030,18 +2032,69 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Get workspace and real Instagram data for AI analysis
       const workspace = await storage.getWorkspace(workspaceId);
       const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
-      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      let instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
       
-      console.log('[AI SUGGESTIONS] Instagram account data:', {
+      // FORCE REFRESH: Fetch real current Instagram data instead of cached numbers
+      if (instagramAccount?.accessToken) {
+        try {
+          console.log(`[AI SUGGESTIONS] Force refreshing Instagram data for @${instagramAccount.username} to get real current metrics`);
+          
+          // Fetch latest media with actual current engagement
+          const mediaResponse = await fetch(`https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`);
+          
+          if (mediaResponse.ok) {
+            const mediaData = await mediaResponse.json();
+            const posts = mediaData.data || [];
+            
+            if (posts.length > 0) {
+              // Calculate REAL current averages from actual posts
+              const totalLikes = posts.reduce((sum: number, post: any) => sum + (post.like_count || 0), 0);
+              const totalComments = posts.reduce((sum: number, post: any) => sum + (post.comments_count || 0), 0);
+              const avgLikes = Math.round(totalLikes / posts.length);
+              const avgComments = Math.round(totalComments / posts.length);
+              
+              console.log(`[AI SUGGESTIONS] REAL CURRENT DATA - Posts: ${posts.length}, Total Likes: ${totalLikes}, Total Comments: ${totalComments}`);
+              console.log(`[AI SUGGESTIONS] REAL AVERAGES - Avg Likes: ${avgLikes}, Avg Comments: ${avgComments} (NOT the cached 99!)`);
+              
+              // Update account with REAL fresh data
+              instagramAccount = {
+                ...instagramAccount,
+                avgLikes,
+                avgComments,
+                mediaCount: posts.length,
+                lastSyncAt: new Date()
+              };
+              
+              // Save updated real data to database
+              await storage.updateSocialAccount(instagramAccount.id!, {
+                avgLikes,
+                avgComments,
+                mediaCount: posts.length,
+                lastSyncAt: new Date()
+              });
+              
+              console.log(`[AI SUGGESTIONS] Database updated with REAL current data for @${instagramAccount.username}`);
+            }
+          } else {
+            console.warn(`[AI SUGGESTIONS] Instagram API call failed: ${mediaResponse.status}`);
+          }
+        } catch (refreshError) {
+          console.warn(`[AI SUGGESTIONS] Could not refresh Instagram data:`, refreshError);
+          // Continue with existing data if refresh fails
+        }
+      }
+      
+      console.log('[AI SUGGESTIONS] Final Instagram account data (after refresh):', {
         hasAccount: !!instagramAccount,
         username: instagramAccount?.username,
         followers: instagramAccount?.followersCount,
         engagement: instagramAccount?.engagementRate,
         avgLikes: instagramAccount?.avgLikes,
-        avgComments: instagramAccount?.avgComments
+        avgComments: instagramAccount?.avgComments,
+        posts: instagramAccount?.mediaCount
       });
       
-      // Generate AI suggestions based on real data
+      // Generate AI suggestions based on REAL current data
       const suggestions = await generateInstagramBasedSuggestions(instagramAccount);
       
       // Save suggestions to storage

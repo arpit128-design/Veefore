@@ -241,6 +241,41 @@ const UserContentHistorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// DM Conversation Memory Schemas
+const DmConversationSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  platform: { type: String, required: true },
+  participantId: { type: String, required: true },
+  participantUsername: String,
+  lastMessageAt: { type: Date, default: Date.now },
+  messageCount: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const DmMessageSchema = new mongoose.Schema({
+  conversationId: { type: mongoose.Schema.Types.Mixed, required: true },
+  messageId: String,
+  sender: { type: String, required: true, enum: ['user', 'ai'] },
+  content: { type: String, required: true },
+  messageType: { type: String, default: 'text' },
+  sentiment: String,
+  topics: [String],
+  aiResponse: { type: Boolean, default: false },
+  automationRuleId: { type: mongoose.Schema.Types.Mixed },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const ConversationContextSchema = new mongoose.Schema({
+  conversationId: { type: mongoose.Schema.Types.Mixed, required: true },
+  contextType: { type: String, required: true },
+  contextValue: { type: String, required: true },
+  confidence: { type: Number, default: 100 },
+  extractedAt: { type: Date, default: Date.now },
+  expiresAt: Date
+});
+
 const AutomationRuleSchema = new mongoose.Schema({
   name: { type: String, required: true },
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
@@ -271,6 +306,9 @@ const PaymentModel = mongoose.model('Payment', PaymentSchema);
 const AddonModel = mongoose.model('Addon', AddonSchema);
 const WorkspaceMemberModel = mongoose.model('WorkspaceMember', WorkspaceMemberSchema);
 const TeamInvitationModel = mongoose.model('TeamInvitation', TeamInvitationSchema);
+const DmConversationModel = mongoose.model('DmConversation', DmConversationSchema);
+const DmMessageModel = mongoose.model('DmMessage', DmMessageSchema);
+const ConversationContextModel = mongoose.model('ConversationContext', ConversationContextSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;

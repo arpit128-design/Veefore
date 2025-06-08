@@ -276,6 +276,45 @@ export const addons = pgTable("addons", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// DM Conversation Memory System for 3-day contextual AI responses
+export const dmConversations = pgTable("dm_conversations", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  platform: text("platform").notNull(), // instagram, twitter, etc.
+  participantId: text("participant_id").notNull(), // Instagram user ID or handle
+  participantUsername: text("participant_username"), // Display name for reference
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  messageCount: integer("message_count").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const dmMessages = pgTable("dm_messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => dmConversations.id).notNull(),
+  messageId: text("message_id"), // Platform-specific message ID
+  sender: text("sender").notNull(), // 'user' or 'ai'
+  content: text("content").notNull(),
+  messageType: text("message_type").default("text"), // text, image, sticker, etc.
+  sentiment: text("sentiment"), // positive, negative, neutral (AI analyzed)
+  topics: text("topics").array(), // Extracted topics/keywords for context
+  aiResponse: boolean("ai_response").default(false),
+  automationRuleId: integer("automation_rule_id").references(() => automationRules.id),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Enhanced conversation context for better AI responses
+export const conversationContext = pgTable("conversation_context", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => dmConversations.id).notNull(),
+  contextType: text("context_type").notNull(), // topic, preference, question, intent
+  contextValue: text("context_value").notNull(),
+  confidence: integer("confidence").default(100), // 0-100 confidence score
+  extractedAt: timestamp("extracted_at").defaultNow(),
+  expiresAt: timestamp("expires_at") // For 3-day memory cleanup
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   firebaseUid: true,
@@ -425,6 +464,33 @@ export const insertAddonSchema = createInsertSchema(addons).pick({
   metadata: true
 });
 
+export const insertDmConversationSchema = createInsertSchema(dmConversations).pick({
+  workspaceId: true,
+  platform: true,
+  participantId: true,
+  participantUsername: true
+});
+
+export const insertDmMessageSchema = createInsertSchema(dmMessages).pick({
+  conversationId: true,
+  messageId: true,
+  sender: true,
+  content: true,
+  messageType: true,
+  sentiment: true,
+  topics: true,
+  aiResponse: true,
+  automationRuleId: true
+});
+
+export const insertConversationContextSchema = createInsertSchema(conversationContext).pick({
+  conversationId: true,
+  contextType: true,
+  contextValue: true,
+  confidence: true,
+  expiresAt: true
+});
+
 // Select types
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
@@ -459,6 +525,12 @@ export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type InsertCreditPackage = z.infer<typeof insertCreditPackageSchema>;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type InsertAddon = z.infer<typeof insertAddonSchema>;
+export type DmConversation = typeof dmConversations.$inferSelect;
+export type InsertDmConversation = z.infer<typeof insertDmConversationSchema>;
+export type DmMessage = typeof dmMessages.$inferSelect;
+export type InsertDmMessage = z.infer<typeof insertDmMessageSchema>;
+export type ConversationContext = typeof conversationContext.$inferSelect;
+export type InsertConversationContext = z.infer<typeof insertConversationContextSchema>;
 
 // Content recommendations schema
 export const insertContentRecommendationSchema = createInsertSchema(contentRecommendations).pick({

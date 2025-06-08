@@ -1055,59 +1055,7 @@ export default function OnboardingPremium() {
 
 
 
-                    {currentStep === 8 && (
-                      <ScrollReveal direction="up" delay={0.3}>
-                        <div className="text-center space-y-8">
-                          <motion.div
-                            animate={{ 
-                              scale: [1, 1.1, 1],
-                              rotate: [0, 5, -5, 0]
-                            }}
-                            transition={{ 
-                              duration: 3,
-                              repeat: Infinity,
-                              ease: "easeInOut"
-                            }}
-                          >
-                            <Rocket size={80} className="mx-auto text-green-400" />
-                          </motion.div>
-                          
-                          <div className="space-y-4">
-                            <AnimatedText 
-                              text="Setup Complete!"
-                              className="text-3xl font-bold text-white"
-                              delay={0.5}
-                              stagger={0.1}
-                            />
-                            
-                            <div className="space-y-2 text-white/80 text-left max-w-md mx-auto">
-                              <p>✓ Business: {formData.businessName}</p>
-                              <p>✓ Goals: {formData.selectedGoals.length} selected</p>
-                              <p>✓ Growth Target: {formData.growthTargets.followerGoal} in {formData.growthTargets.timeframe}</p>
-                              <p>✓ Platforms: {formData.connectedPlatforms.length} connected</p>
-                              <p>✓ AI Personality: {personalities.find(p => p.id === formData.aiPersonality)?.name}</p>
-                              <p>✓ Categories: {formData.selectedCategories.length} selected</p>
-                              <p>✓ Workspace: {formData.workspaceName}</p>
-                            </div>
-                          </div>
-                          
-                          {isLoading && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="space-y-4"
-                            >
-                              <LiquidLoader progress={85} size={60} color="#10b981" />
-                              <TypewriterText 
-                                text="Creating your AI empire..."
-                                className="text-white/80"
-                                speed={80}
-                              />
-                            </motion.div>
-                          )}
-                        </div>
-                      </ScrollReveal>
-                    )}
+
                   </div>
 
                   {/* Navigation */}

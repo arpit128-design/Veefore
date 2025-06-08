@@ -3228,7 +3228,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     await webhookHandler.handleVerification(req, res);
   });
 
+  // Instagram webhook handler - supports both paths for compatibility
   app.post('/webhook/instagram', async (req, res) => {
+    await handleInstagramWebhook(req, res);
+  });
+  
+  app.post('/api/instagram/webhook', async (req, res) => {
+    await handleInstagramWebhook(req, res);
+  });
+  
+  async function handleInstagramWebhook(req: any, res: any) {
     console.log('[WEBHOOK] Instagram webhook event received');
     
     // Check if this is a DM webhook and handle with enhanced memory system
@@ -3247,7 +3256,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Handle other webhook events with existing handler
       await webhookHandler.handleWebhookEvent(req, res);
     }
-  });
+  }
 
   // Test endpoint for webhook automation demo
   app.post('/api/test-webhook-automation', async (req, res) => {

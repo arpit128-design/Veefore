@@ -372,7 +372,23 @@ export class MongoStorage implements IStorage {
     });
     
     const savedUser = await user.save();
-    return this.convertUser(savedUser);
+    const convertedUser = this.convertUser(savedUser);
+    
+    // Automatically create a default workspace for new users
+    try {
+      const defaultWorkspace = await this.createWorkspace({
+        name: "My VeeFore Workspace",
+        description: "Default workspace for social media management",
+        userId: convertedUser.id,
+        theme: "space"
+      });
+      console.log(`[USER CREATION] Created default workspace for user ${convertedUser.id}: ${defaultWorkspace.id}`);
+    } catch (error) {
+      console.error(`[USER CREATION] Failed to create default workspace for user ${convertedUser.id}:`, error);
+      // Don't fail user creation if workspace creation fails
+    }
+    
+    return convertedUser;
   }
 
   async updateUser(id: number | string, updates: Partial<User>): Promise<User> {

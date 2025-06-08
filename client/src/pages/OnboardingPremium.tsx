@@ -143,16 +143,7 @@ const onboardingSteps = [
     particles: 90,
     elements: ['sphere', 'pattern', 'cube']
   },
-  {
-    id: 'workspace',
-    title: 'Create Your Universe',
-    subtitle: 'Build Your Digital Command Center',
-    description: 'Set up your personalized workspace where creativity meets intelligence',
-    color: '#059669',
-    icon: Cpu,
-    particles: 60,
-    elements: ['cube', 'pattern', 'sphere']
-  },
+
   {
     id: 'complete',
     title: 'Launch Sequence Initiated',

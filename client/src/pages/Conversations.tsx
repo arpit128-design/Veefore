@@ -210,14 +210,14 @@ export default function Conversations() {
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-4 sm:space-y-6">
           {analyticsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {[...Array(4)].map((_, i) => (
                 <Card key={i}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-                    <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-16 sm:w-20 animate-pulse" />
+                    <div className="h-3 sm:h-4 w-3 sm:w-4 bg-gray-200 rounded animate-pulse" />
                   </CardHeader>
                   <CardContent>
                     <div className="h-8 bg-gray-200 rounded w-16 animate-pulse mb-2" />
@@ -229,14 +229,14 @@ export default function Conversations() {
           ) : analytics?.analytics ? (
             <>
               {/* Analytics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Conversations</CardTitle>
-                    <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-xs sm:text-sm font-medium">Total Conversations</CardTitle>
+                    <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics.analytics.totalConversations}</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold">{analytics.analytics.totalConversations}</div>
                     <p className="text-xs text-muted-foreground">
                       {analytics.analytics.activeConversations} active
                     </p>
@@ -245,11 +245,11 @@ export default function Conversations() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-xs sm:text-sm font-medium">Total Messages</CardTitle>
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics.analytics.totalMessages}</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold">{analytics.analytics.totalMessages}</div>
                     <p className="text-xs text-muted-foreground">
                       Avg {analytics.analytics.averageMessagesPerConversation.toFixed(1)} per conversation
                     </p>
@@ -258,11 +258,11 @@ export default function Conversations() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-xs sm:text-sm font-medium">Response Rate</CardTitle>
+                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics.analytics.responseRate}%</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold">{analytics.analytics.responseRate}%</div>
                     <p className="text-xs text-muted-foreground">
                       {analytics.analytics.activeThisWeek} active this week
                     </p>
@@ -271,11 +271,11 @@ export default function Conversations() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Memory Retention</CardTitle>
-                    <Brain className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-xs sm:text-sm font-medium">Memory Retention</CardTitle>
+                    <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics.analytics.memoryRetentionDays} days</div>
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold">{analytics.analytics.memoryRetentionDays} days</div>
                     <p className="text-xs text-muted-foreground">
                       Contextual AI responses
                     </p>
@@ -384,18 +384,18 @@ export default function Conversations() {
               ))}
             </div>
           ) : conversations?.conversations && conversations.conversations.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {conversations.conversations.map((conversation: ConversationHistory) => (
                 <Card key={conversation.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 sm:gap-4">
+                      <div className="flex-1">
+                        <CardTitle className="text-base sm:text-lg">
                           @{conversation.participant.username}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                          <Badge variant="outline">{conversation.participant.platform}</Badge>
-                          <Badge className={getSentimentColor(conversation.sentiment)}>
+                        <CardDescription className="flex flex-wrap items-center gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">{conversation.participant.platform}</Badge>
+                          <Badge className={`text-xs ${getSentimentColor(conversation.sentiment)}`}>
                             {conversation.sentiment}
                           </Badge>
                           <span className="flex items-center gap-1 text-xs">
@@ -458,31 +458,33 @@ export default function Conversations() {
         </TabsContent>
 
         {/* Test Memory Tab */}
-        <TabsContent value="test" className="space-y-4">
+        <TabsContent value="test" className="space-y-3 sm:space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Test Contextual AI Response</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">Test Contextual AI Response</CardTitle>
+              <CardDescription className="text-sm">
                 Test the conversation memory system with a sample message to see contextual AI responses in action.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Test Participant ID</label>
+                <label className="text-xs sm:text-sm font-medium mb-2 block">Test Participant ID</label>
                 <Input
                   value={testParticipant}
                   onChange={(e) => setTestParticipant(e.target.value)}
                   placeholder="test_user_123"
+                  className="text-sm"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium mb-2 block">Test Message</label>
+                <label className="text-xs sm:text-sm font-medium mb-2 block">Test Message</label>
                 <Textarea
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
                   placeholder="Hi! I'm interested in your products. Can you help me?"
                   rows={3}
+                  className="text-sm resize-none"
                 />
               </div>
               
@@ -490,33 +492,36 @@ export default function Conversations() {
                 onClick={handleTestResponse}
                 disabled={testResponseMutation.isPending || !testMessage.trim()}
                 className="w-full"
+                size="sm"
               >
-                <Send className="h-4 w-4 mr-2" />
-                {testResponseMutation.isPending ? 'Generating Response...' : 'Test Contextual Response'}
+                <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                <span className="text-xs sm:text-sm">
+                  {testResponseMutation.isPending ? 'Generating...' : 'Test Response'}
+                </span>
               </Button>
               
               {testResponseMutation.data && (
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="text-sm">Test Result</CardTitle>
+                <Card className="mt-3 sm:mt-4">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-xs sm:text-sm">Test Result</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       <div>
                         <div className="text-xs font-medium text-muted-foreground mb-1">Original Message:</div>
-                        <div className="text-sm bg-blue-50 dark:bg-blue-950 p-2 rounded">
+                        <div className="text-xs sm:text-sm bg-blue-50 dark:bg-blue-950 p-2 rounded">
                           {testResponseMutation.data.originalMessage}
                         </div>
                       </div>
                       <div>
                         <div className="text-xs font-medium text-muted-foreground mb-1">AI Response:</div>
-                        <div className="text-sm bg-gray-50 dark:bg-gray-950 p-2 rounded">
+                        <div className="text-xs sm:text-sm bg-gray-50 dark:bg-gray-950 p-2 rounded">
                           {testResponseMutation.data.contextualResponse}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline">Memory Enabled</Badge>
-                        <Badge variant="outline">{testResponseMutation.data.retentionDays} Day Retention</Badge>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">Memory Enabled</Badge>
+                        <Badge variant="outline" className="text-xs">{testResponseMutation.data.retentionDays} Day Retention</Badge>
                       </div>
                     </div>
                   </CardContent>

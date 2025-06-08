@@ -436,16 +436,17 @@ export default function Automation() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Instagram Automation</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Instagram Automation</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Automate your Instagram engagement with smart comment and DM responses
           </p>
         </div>
-        <Button onClick={() => setIsCreatingRule(true)}>
-          <Settings className="h-4 w-4 mr-2" />
-          Create Rule
+        <Button onClick={() => setIsCreatingRule(true)} className="w-full sm:w-auto">
+          <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+          <span className="hidden sm:inline">Create Rule</span>
+          <span className="sm:hidden">Create</span>
         </Button>
       </div>
 

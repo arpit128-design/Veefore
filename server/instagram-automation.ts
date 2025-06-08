@@ -361,28 +361,27 @@ export class InstagramAutomation {
     userProfile?: { username: string }
   ): Promise<string> {
     try {
-      console.log(`[AI AUTOMATION] Generating contextual response for: "${message}"`);
+      console.log(`[AI AUTOMATION] Using stealth responder for: "${message}"`);
       
-      const context: MessageContext = {
+      // Use stealth responder for ultra-human response generation
+      const stealthResult = await this.stealthResponder.generateStealthResponse(
         message,
-        userProfile
-      };
-
-      const config: AIResponseConfig = {
-        personality: (rule.action?.personality || rule.aiPersonality) || 'friendly',
-        responseLength: (rule.action?.responseLength || rule.responseLength) || 'medium'
-      };
-
-      const aiResponse = await this.aiGenerator.generateContextualResponse(context, config);
+        userProfile?.username || 'unknown',
+        { platform: 'instagram', ruleId: rule.id }
+      );
       
-      console.log(`[AI AUTOMATION] Generated response in ${aiResponse.detectedLanguage}: "${aiResponse.response}"`);
+      if (stealthResult.shouldRespond && stealthResult.response) {
+        console.log(`[AI AUTOMATION] Stealth response generated: "${stealthResult.response}"`);
+        return stealthResult.response;
+      } else {
+        console.log(`[AI AUTOMATION] Stealth responder declined to respond for natural behavior`);
+        throw new Error('Stealth responder declined to respond');
+      }
       
-      return aiResponse.response;
     } catch (error) {
-      console.error('[AI AUTOMATION] Error generating contextual response:', error);
-      // Fallback to predefined responses if AI fails
-      const fallbackResponses = rule.action?.responses || rule.responses || ['Thank you for your message!'];
-      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)] || 'Thank you for your message!';
+      console.error('[AI AUTOMATION] Stealth responder failed, skipping response:', error);
+      // Don't send any fallback - maintain stealth by not responding
+      throw new Error('No response generated to maintain natural behavior patterns');
     }
   }
 

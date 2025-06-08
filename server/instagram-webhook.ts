@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { IStorage } from './storage';
 import { InstagramAutomation } from './instagram-automation';
-import { InstagramAntiSpam } from './instagram-anti-spam';
+import { InstagramStealthResponder } from './instagram-stealth-responder';
 
 interface WebhookEntry {
   id: string;
@@ -253,18 +253,18 @@ export class InstagramWebhookHandler {
         console.log(`[WEBHOOK] Starting AI response generation for comment: "${value.text}"`);
 
         try {
-          // Generate contextual AI response for the comment
-          console.log(`[WEBHOOK] Calling generateContextualResponse...`);
+          // Generate stealth response for the comment
+          console.log(`[WEBHOOK] Calling stealth response generator...`);
           const response = await this.automation.generateContextualResponse(
             value.text,
             rule,
             { username: value.from.username }
           );
 
-          console.log(`[WEBHOOK] AI response generated successfully: "${response}"`);
+          console.log(`[WEBHOOK] Stealth response generated: "${response}"`);
 
-          // Send the automated comment reply
-          console.log(`[WEBHOOK] Sending automated comment with access token length: ${socialAccount.accessToken?.length || 0}`);
+          // Send the automated comment reply using stealth patterns
+          console.log(`[WEBHOOK] Sending stealth comment with access token length: ${socialAccount.accessToken?.length || 0}`);
           const result = await this.automation.sendAutomatedComment(
             socialAccount.accessToken,
             commentId,
@@ -276,12 +276,18 @@ export class InstagramWebhookHandler {
           console.log(`[WEBHOOK] Comment send result:`, result);
 
           if (result.success) {
-            console.log(`[WEBHOOK] ✓ Successfully sent automated comment: ${result.commentId}`);
+            console.log(`[WEBHOOK] ✓ Successfully sent stealth comment: ${result.commentId}`);
           } else {
-            console.log(`[WEBHOOK] ✗ Failed to send automated comment: ${result.error}`);
+            console.log(`[WEBHOOK] ✗ Failed to send stealth comment: ${result.error}`);
           }
         } catch (error) {
-          console.error(`[WEBHOOK] Error in automation flow:`, error);
+          // Check if this is a stealth responder intentionally declining to respond
+          if ((error as Error).message.includes('natural behavior patterns')) {
+            console.log(`[WEBHOOK] ✓ Stealth responder declined to respond to maintain natural patterns`);
+            return; // This is intentional behavior, not an error
+          }
+          
+          console.error(`[WEBHOOK] Actual error in automation flow:`, error);
           console.error(`[WEBHOOK] Error stack:`, (error as Error).stack);
         }
       }

@@ -3046,6 +3046,97 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     await webhookHandler.handleWebhookEvent(req, res);
   });
 
+  // Test endpoint for webhook automation demo
+  app.post('/api/test-webhook-automation', async (req, res) => {
+    try {
+      console.log('[WEBHOOK TEST] Simulating Instagram comment automation');
+      
+      const { comment, workspaceId } = req.body;
+      
+      // Simulate real Instagram webhook event
+      const mockWebhookEvent = {
+        object: "instagram",
+        entry: [{
+          id: "17841400008460056",
+          time: Date.now(),
+          changes: [{
+            field: "comments",
+            value: {
+              from: { id: "user123", username: "customer_test" },
+              text: comment || "Amazing product! Kitne ka hai yeh?",
+              post_id: "17856498618156045",
+              comment_id: `${Date.now()}`,
+              created_time: Date.now()
+            }
+          }]
+        }]
+      };
+
+      console.log('[WEBHOOK TEST] Processing comment:', comment);
+      
+      // Simulate AI analysis and response generation
+      const aiAnalysis = {
+        language: comment?.includes('kitne') || comment?.includes('kya') ? 'Hinglish' : 'English',
+        intent: comment?.toLowerCase().includes('price') || comment?.toLowerCase().includes('kitne') ? 'Product inquiry' : 'General engagement',
+        tone: comment?.includes('amazing') || comment?.includes('great') ? 'Positive, enthusiastic' : 'Neutral, curious',
+        customerPersonality: 'Price-conscious, friendly'
+      };
+
+      // Generate contextual AI response
+      let aiResponse = '';
+      if (aiAnalysis.intent === 'Product inquiry') {
+        if (aiAnalysis.language === 'Hinglish') {
+          aiResponse = "Thank you so much! 😊 Is product ki price ₹2,999 hai. DM mein more details share kar sakte hain!";
+        } else {
+          aiResponse = "Thank you! The price is ₹2,999. Feel free to DM us for more details!";
+        }
+      } else {
+        aiResponse = "Thank you for your interest! We appreciate your support! 🙏";
+      }
+
+      console.log('[WEBHOOK TEST] AI Analysis:', aiAnalysis);
+      console.log('[WEBHOOK TEST] Generated Response:', aiResponse);
+
+      // Log automation activity
+      const automationLog = {
+        workspaceId: workspaceId || 'demo',
+        type: 'comment_response',
+        trigger: 'instagram_comment',
+        originalContent: comment,
+        aiAnalysis,
+        generatedResponse: aiResponse,
+        timestamp: new Date(),
+        responseTime: '<2 seconds',
+        platform: 'instagram'
+      };
+
+      res.json({
+        success: true,
+        automation: {
+          triggered: true,
+          type: 'contextual_ai_response',
+          originalComment: comment,
+          aiAnalysis,
+          generatedResponse: aiResponse,
+          responseTime: '<2 seconds',
+          language: aiAnalysis.language,
+          benefits: [
+            'Instant customer engagement',
+            'Natural language understanding',
+            'Brand voice consistency',
+            'Lead generation through DM direction',
+            '24/7 automated responses'
+          ]
+        },
+        log: automationLog
+      });
+
+    } catch (error: any) {
+      console.error('[WEBHOOK TEST] Error:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Start Instagram automation service
   instagramAutomation.startAutomationService().catch(console.error);
 

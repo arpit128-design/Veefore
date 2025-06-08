@@ -60,22 +60,39 @@ export class InstagramWebhookHandler {
    * Verify webhook signature for security
    */
   private verifySignature(payload: string, signature: string): boolean {
+    // Allow development testing without proper signature
+    if (process.env.NODE_ENV === 'development' && (!signature || signature === 'sha256=test_signature')) {
+      console.log('[WEBHOOK] Development mode: allowing test signature');
+      return true;
+    }
+
     if (!this.appSecret) {
       console.warn('[WEBHOOK] Instagram App Secret not configured');
       return false;
     }
 
-    const expectedSignature = crypto
-      .createHmac('sha256', this.appSecret)
-      .update(payload)
-      .digest('hex');
+    try {
+      const expectedSignature = crypto
+        .createHmac('sha256', this.appSecret)
+        .update(payload)
+        .digest('hex');
 
-    const receivedSignature = signature.replace('sha256=', '');
-    
-    return crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, 'hex'),
-      Buffer.from(receivedSignature, 'hex')
-    );
+      const receivedSignature = signature.replace('sha256=', '');
+      
+      // Ensure both signatures have the same length
+      if (expectedSignature.length !== receivedSignature.length) {
+        console.log('[WEBHOOK] Signature length mismatch');
+        return false;
+      }
+      
+      return crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'hex'),
+        Buffer.from(receivedSignature, 'hex')
+      );
+    } catch (error) {
+      console.error('[WEBHOOK] Signature verification error:', error);
+      return false;
+    }
   }
 
   /**

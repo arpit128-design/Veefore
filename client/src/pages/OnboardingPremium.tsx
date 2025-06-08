@@ -221,8 +221,6 @@ export default function OnboardingPremium() {
       contentFrequency: ''
     },
     connectedPlatforms: [] as string[],
-    workspaceName: '',
-    description: '',
     aiPersonality: '',
     selectedCategories: [] as string[]
   });
@@ -300,25 +298,25 @@ export default function OnboardingPremium() {
     }));
   };
 
-  // Mutations
-  const createWorkspaceMutation = useMutation({
+  // Onboarding completion mutation
+  const completeOnboardingMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/workspaces', data);
+      const response = await apiRequest('PATCH', '/api/user', { 
+        isOnboarded: true,
+        onboardingData: data
+      });
       if (!response.ok) {
-        throw new Error('Failed to create workspace');
+        throw new Error('Failed to complete onboarding');
       }
       return response.json();
     },
-    onSuccess: async (workspace) => {
-      setCurrentWorkspace(workspace);
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] });
       
-      // Mark user as onboarded
-      await apiRequest('PATCH', '/api/user', { isOnboarded: true });
-      
       toast({
-        title: "🚀 Workspace Created Successfully!",
-        description: "Welcome to your new AI-powered creative universe!",
+        title: "Welcome to VeeFore!",
+        description: "Your onboarding is complete. Welcome to your AI-powered universe!",
       });
       
       // Set completion flag and immediately redirect
@@ -330,11 +328,12 @@ export default function OnboardingPremium() {
     },
     onError: (error: any) => {
       toast({
-        title: "Creation Failed",
-        description: error.message || "Failed to create workspace. Please try again.",
+        title: "Onboarding Failed",
+        description: error.message || "Failed to complete onboarding. Please try again.",
         variant: "destructive",
       });
       setIsLoading(false);
+      setIsCompleting(false);
     }
   });
 
@@ -410,10 +409,8 @@ export default function OnboardingPremium() {
         return formData.connectedPlatforms.length > 0; // At least one platform required
       case 5: // AI Personality (step 6)
         return formData.aiPersonality !== '';
-      case 6: // Categories (step 7)
+      case 6: // Categories (step 7) - Now final step
         return formData.selectedCategories.length > 0;
-      case 7: // Workspace setup (step 8)
-        return formData.workspaceName.trim().length > 0;
       default:
         return true;
     }
@@ -433,7 +430,7 @@ export default function OnboardingPremium() {
       setCurrentStep(currentStep + 1);
     } else {
       // Prevent multiple completion attempts
-      if (!createWorkspaceMutation.isPending && !isCompleting) {
+      if (!completeOnboardingMutation.isPending && !isCompleting) {
         handleComplete();
       }
     }
@@ -447,14 +444,14 @@ export default function OnboardingPremium() {
 
   const handleComplete = async () => {
     // Prevent multiple submissions
-    if (createWorkspaceMutation.isPending || isCompleting) {
+    if (completeOnboardingMutation.isPending || isCompleting) {
       return;
     }
 
-    if (!formData.businessName.trim() || !formData.workspaceName.trim()) {
+    if (!formData.businessName.trim()) {
       toast({
         title: "Required Fields Missing",
-        description: "Please complete all required fields",
+        description: "Please enter your business name",
         variant: "destructive",
       });
       return;
@@ -481,18 +478,14 @@ export default function OnboardingPremium() {
     setIsLoading(true);
     setIsCompleting(true);
     
-    createWorkspaceMutation.mutate({
-      name: formData.workspaceName,
-      description: formData.description || `AI-powered workspace for ${formData.businessName}`,
+    completeOnboardingMutation.mutate({
       businessName: formData.businessName,
       businessDescription: formData.businessDescription,
       businessGoals: formData.selectedGoals,
       growthTargets: formData.growthTargets,
       connectedPlatforms: formData.connectedPlatforms,
       aiPersonality: formData.aiPersonality,
-      theme: 'space',
-      categories: formData.selectedCategories,
-      isOnboarding: true // Mark as onboarding workspace to bypass limits
+      categories: formData.selectedCategories
     });
   };
 
@@ -1198,9 +1191,9 @@ export default function OnboardingPremium() {
                         onClick={handleComplete}
                         glowColor="#10b981"
                         className="flex items-center gap-2"
-                        disabled={createWorkspaceMutation.isPending || isCompleting || isLoading}
+                        disabled={completeOnboardingMutation.isPending || isCompleting || isLoading}
                       >
-                        {(createWorkspaceMutation.isPending || isCompleting || isLoading) ? (
+                        {(completeOnboardingMutation.isPending || isCompleting || isLoading) ? (
                           <>
                             <motion.div
                               animate={{ rotate: 360 }}
@@ -1208,7 +1201,7 @@ export default function OnboardingPremium() {
                             >
                               <Sparkles size={20} />
                             </motion.div>
-                            Creating...
+                            Completing...
                           </>
                         ) : (
                           <>

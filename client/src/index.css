@@ -122,6 +122,53 @@ input[type="time"]:focus {
   color: hsl(var(--foreground)) !important;
 }
 
+/* Glassmorphism styling for date and time inputs */
+.glassmorphism input[type="date"],
+.glassmorphism input[type="time"],
+input[type="date"].glassmorphism,
+input[type="time"].glassmorphism {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: hsl(var(--foreground)) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  padding: 8px 12px !important;
+}
+
+.glassmorphism input[type="date"]::-webkit-datetime-edit,
+.glassmorphism input[type="time"]::-webkit-datetime-edit,
+input[type="date"].glassmorphism::-webkit-datetime-edit,
+input[type="time"].glassmorphism::-webkit-datetime-edit {
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+}
+
+.glassmorphism input[type="date"]::-webkit-datetime-edit-month-field,
+.glassmorphism input[type="date"]::-webkit-datetime-edit-day-field,
+.glassmorphism input[type="date"]::-webkit-datetime-edit-year-field,
+.glassmorphism input[type="time"]::-webkit-datetime-edit-hour-field,
+.glassmorphism input[type="time"]::-webkit-datetime-edit-minute-field,
+input[type="date"].glassmorphism::-webkit-datetime-edit-month-field,
+input[type="date"].glassmorphism::-webkit-datetime-edit-day-field,
+input[type="date"].glassmorphism::-webkit-datetime-edit-year-field,
+input[type="time"].glassmorphism::-webkit-datetime-edit-hour-field,
+input[type="time"].glassmorphism::-webkit-datetime-edit-minute-field {
+  color: hsl(var(--foreground)) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  margin: 0 1px !important;
+}
+
+.glassmorphism input[type="date"]::-webkit-calendar-picker-indicator,
+.glassmorphism input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="date"].glassmorphism::-webkit-calendar-picker-indicator,
+input[type="time"].glassmorphism::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.2) !important;
+  cursor: pointer;
+  padding: 4px;
+}
+
 /* Additional space theme colors */
 :root {
   --nebula-purple: 256 71% 58%; /* #7C3AED */

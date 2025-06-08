@@ -377,6 +377,51 @@ class AIResponseGenerator {
     }
   }
 
+  private analyzeMessageIntent(message: string): { intent: string; language: string; urgency: string } {
+    const lowerMessage = message.toLowerCase();
+    
+    // Detect language
+    const hindiPatterns = /[\u0900-\u097F]|(?:hai|haan|nahi|kya|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|kitna|chahiye|price|cost)/i;
+    const hinglishPatterns = /(?:kya|hai|haan|nahi|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|kitna|chahiye)/i;
+    
+    let language = 'english';
+    if (hindiPatterns.test(message)) {
+      language = /[\u0900-\u097F]/.test(message) ? 'hindi' : 'hinglish';
+    } else if (hinglishPatterns.test(message)) {
+      language = 'hinglish';
+    }
+    
+    // Detect intent
+    let intent = 'general';
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('kitna') || lowerMessage.includes('rate')) {
+      intent = 'pricing_inquiry';
+    } else if (lowerMessage.includes('available') || lowerMessage.includes('stock') || lowerMessage.includes('mil') || lowerMessage.includes('hai kya')) {
+      intent = 'availability_check';
+    } else if (lowerMessage.includes('where') || lowerMessage.includes('location') || lowerMessage.includes('address') || lowerMessage.includes('kaha')) {
+      intent = 'location_inquiry';
+    } else if (lowerMessage.includes('how') || lowerMessage.includes('kaise') || lowerMessage.includes('order') || lowerMessage.includes('buy')) {
+      intent = 'process_inquiry';
+    } else if (lowerMessage.includes('info') || lowerMessage.includes('details') || lowerMessage.includes('tell me') || lowerMessage.includes('batao')) {
+      intent = 'information_request';
+    } else if (lowerMessage.includes('thank') || lowerMessage.includes('awesome') || lowerMessage.includes('nice') || lowerMessage.includes('good') || lowerMessage.includes('amazing')) {
+      intent = 'appreciation';
+    } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey') || lowerMessage.includes('namaste')) {
+      intent = 'greeting';
+    } else if (lowerMessage.includes('help') || lowerMessage.includes('support') || lowerMessage.includes('madad')) {
+      intent = 'help_request';
+    }
+    
+    // Detect urgency
+    let urgency = 'normal';
+    if (lowerMessage.includes('urgent') || lowerMessage.includes('asap') || lowerMessage.includes('quickly') || lowerMessage.includes('jaldi') || lowerMessage.includes('turant')) {
+      urgency = 'high';
+    } else if (lowerMessage.includes('when possible') || lowerMessage.includes('no rush') || lowerMessage.includes('jab time mile')) {
+      urgency = 'low';
+    }
+    
+    return { intent, language, urgency };
+  }
+
   private detectLanguage(text: string): string {
     const hindiPattern = /[\u0900-\u097F]/;
     const hinglishWords = ['chahiye', 'kya', 'hai', 'aur', 'kar', 'ke', 'se', 'me', 'ki', 'ka'];
@@ -405,28 +450,29 @@ class AIResponseGenerator {
       long: "3-4 sentences with detailed response"
     };
 
-    return `You are a real person managing Instagram comments. Create NATURAL responses that avoid spam detection.
+    // Analyze message intent for contextual responses
+    const messageAnalysis = this.analyzeMessageIntent(context.message);
+    
+    return `You are a friendly business owner responding to customer messages on Instagram. Read the customer's message carefully and provide a helpful, specific response.
 
-Comment: "${context.message}"
-User: @${context.userProfile?.username || 'user'}
-${context.postContext ? `Post context: ${context.postContext.caption}` : ''}
-${config.businessContext ? `Business: ${config.businessContext}` : ''}
+CUSTOMER MESSAGE: "${context.message}"
+CUSTOMER USERNAME: @${context.userProfile?.username || 'user'}
+MESSAGE INTENT: ${messageAnalysis.intent}
+DETECTED LANGUAGE: ${messageAnalysis.language}
+${config.businessContext ? `BUSINESS TYPE: ${config.businessContext}` : ''}
 
-ANTI-SPAM REQUIREMENTS:
-1. Generate UNIQUE responses - never use templates
-2. Keep under 30 characters when possible
-3. Sound conversational, not robotic
-4. Use natural language matching the comment's tone
-5. Avoid promotional language
-6. Be specific to this exact comment
-7. Use emojis sparingly (max 1)
+RESPONSE GUIDELINES:
+1. Address the customer's SPECIFIC question or request
+2. If they ask about price/cost: "For pricing details, please DM us! We'll share our current rates 📱"
+3. If they ask about availability: "Yes, available! DM for quick ordering 😊"
+4. If they ask about location/delivery: "We deliver! DM your location for details"
+5. If they compliment: "Thank you so much! Really appreciate it ❤️"
+6. If they want info: Provide helpful specific information
+7. Keep responses natural, friendly, and under 60 characters
+8. Use appropriate language (English/Hindi/Hinglish) matching their message
+9. Be conversational like a real person would respond
 
-Response style: ${lengthMap[config.responseLength as keyof typeof lengthMap] || 'short'}, ${personalityMap[config.personality as keyof typeof personalityMap] || 'friendly'}
-
-Generate ONLY the response text, nothing else:
-- For "This is so cool 🔥🔥" → Match the energy in English
-
-Generate response now:`;
+Generate ONLY the response text that directly addresses their message:`;
   }
 
   private parseAIResponse(text: string): any {

@@ -609,29 +609,37 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         console.log('[DASHBOARD] Direct sync failed, using existing data:', syncError.message);
       }
 
-      // Calculate real engagement metrics from authentic Instagram data
-      const followers = account.followersCount || account.followers || 0;
+      // Use ONLY authentic Instagram Business API data - no synthetic calculations
+      const followers = account.followersCount || 0;
       const mediaCount = account.mediaCount || 0;
-      const totalLikes = account.totalLikes || account.avgLikes * mediaCount || 0;
-      const totalComments = account.totalComments || account.avgComments * mediaCount || 0;
-      const totalReach = account.totalReach || followers * 3 || 0; // Realistic reach calculation
+      const totalLikes = account.totalLikes || 0; // Direct from Instagram API
+      const totalComments = account.totalComments || 0; // Direct from Instagram API
+      const totalReach = account.totalReach || 0; // Direct from Instagram API
       const impressions = account.impressions || totalReach || 0;
       
-      // Calculate authentic engagement rate: (likes + comments) / reach * 100
-      const totalEngagements = totalLikes + totalComments;
-      const engagementRate = totalReach > 0 ? (totalEngagements / totalReach) * 100 : 
-                           followers > 0 ? (totalEngagements / followers) * 100 : 0;
+      // Use authentic engagement rate from Instagram Business API
+      const engagementRate = account.avgEngagement || 0; // Direct from API calculation
+      
+      console.log('[DASHBOARD] Displaying authentic Instagram Business API data:', {
+        username: account.username,
+        followers,
+        mediaCount,
+        totalLikes,
+        totalComments,
+        totalReach,
+        engagementRate
+      });
       
       const analyticsData = {
         totalPosts: mediaCount,
-        totalReach: impressions,
-        engagementRate: Math.round(engagementRate * 100) / 100, // Round to 2 decimal places
+        totalReach: totalReach,
+        engagementRate: Math.round(engagementRate * 100) / 100,
         topPlatform: 'instagram',
         followers: followers,
         impressions: impressions,
         accountUsername: account.username,
-        totalLikes: totalLikes,
-        totalComments: totalComments,
+        totalLikes: totalLikes, // Authentic Instagram API data
+        totalComments: totalComments, // Authentic Instagram API data  
         mediaCount: mediaCount
       };
 

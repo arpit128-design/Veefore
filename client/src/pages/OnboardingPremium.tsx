@@ -423,9 +423,9 @@ export default function OnboardingPremium() {
         return hasFollowerGoal && hasCustomGoal && hasTimeframe && hasFrequency;
       case 4: // Platforms (step 5 - required)
         return formData.connectedPlatforms.length > 0; // At least one platform required
-      case 5: // AI Personality (step 6)
+      case 5: // AI Personality (step 6 - required)
         return formData.aiPersonality !== '';
-      case 6: // Categories (step 7) - Now final step
+      case 6: // Categories (step 7) - Final step before summary
         return formData.selectedCategories.length > 0;
       default:
         return true;
@@ -974,8 +974,6 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-
-
                     {currentStep === 5 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
@@ -1053,7 +1051,7 @@ export default function OnboardingPremium() {
                                         className="w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center"
                                         style={{
                                           background: `radial-gradient(circle, ${category.color}40 0%, ${category.color}20 100%)`,
-                                          border: `1px solid ${category.color}60`
+                                        border: `1px solid ${category.color}60`
                                         }}
                                       >
                                         <category.icon size={16} color={category.color} />
@@ -1069,7 +1067,7 @@ export default function OnboardingPremium() {
                       </ScrollReveal>
                     )}
 
-                    {currentStep === 6 && (
+                    {currentStep === 7 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full max-w-4xl mx-auto">
                           <div className="text-center mb-8">

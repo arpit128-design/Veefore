@@ -53,7 +53,7 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-64 p-3 md:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
-              <Route path="/onboarding" component={NewOnboarding} />
+              <Route path="/onboarding" component={OnboardingPremium} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={Scheduler} />
@@ -121,7 +121,7 @@ function Router() {
     console.log('[ROUTER] User needs onboarding, redirecting to /onboarding');
     return (
       <Switch>
-        <Route path="/onboarding" component={NewOnboarding} />
+        <Route path="/onboarding" component={OnboardingPremium} />
         <Route component={() => <Redirect to="/onboarding" />} />
       </Switch>
     );

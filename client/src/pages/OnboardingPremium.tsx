@@ -157,7 +157,7 @@ export default function OnboardingPremium() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { createWorkspace, setCurrentWorkspace } = useWorkspaceContext();
+  const { setCurrentWorkspace } = useWorkspaceContext();
   const queryClient = useQueryClient();
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -165,7 +165,7 @@ export default function OnboardingPremium() {
     workspaceName: '',
     description: '',
     aiPersonality: '',
-    selectedCategories: []
+    selectedCategories: [] as string[]
   });
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);

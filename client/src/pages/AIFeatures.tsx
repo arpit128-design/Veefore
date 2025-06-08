@@ -244,7 +244,7 @@ export default function AIFeatures() {
             <div className="flex items-center gap-2">
               <Image className="w-5 h-5 text-blue-500" />
               <CardTitle>AI Image Generator</CardTitle>
-              <Badge variant="outline">4 Credits</Badge>
+              <Badge variant="outline">8 Credits</Badge>
             </div>
             <CardDescription>
               Create stunning images from text descriptions
@@ -286,7 +286,7 @@ export default function AIFeatures() {
             <div className="flex items-center gap-2">
               <Video className="w-5 h-5 text-green-500" />
               <CardTitle>AI Video Generator</CardTitle>
-              <Badge variant="outline">8 Credits</Badge>
+              <Badge variant="outline">15 Credits</Badge>
             </div>
             <CardDescription>
               Generate videos and reels with AI

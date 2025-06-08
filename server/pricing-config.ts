@@ -200,17 +200,17 @@ export const CREDIT_COSTS = {
   'story-template': 1,
   'reels-script': 1,
   
-  // AI Image Generation - 4 credits
-  'ai-image': 4,
-  'ai-visual': 4,
-  'thumbnail-creation': 4,
-  'ai-carousel': 4,
+  // AI Image Generation - 8 credits
+  'ai-image': 8,
+  'ai-visual': 8,
+  'thumbnail-creation': 8,
+  'ai-carousel': 8,
   
-  // AI Video/Reel Generation - 8 credits
-  'ai-video': 8,
-  'video-generation': 8,
-  'ai-reel': 8,
-  'viral-remix': 8,
+  // AI Video/Reel Generation - 15 credits
+  'ai-video': 15,
+  'video-generation': 15,
+  'ai-reel': 15,
+  'viral-remix': 15,
   
   // Other features (unchanged)
   'trend-forecast': 4,

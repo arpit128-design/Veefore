@@ -110,16 +110,7 @@ const AnalyticsSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const AutomationRuleSchema = new mongoose.Schema({
-  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
-  name: { type: String, required: true },
-  trigger: { type: String, required: true },
-  action: { type: String, required: true },
-  conditions: mongoose.Schema.Types.Mixed,
-  isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+
 
 const SuggestionSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
@@ -250,6 +241,19 @@ const UserContentHistorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const AutomationRuleSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  description: { type: String },
+  isActive: { type: Boolean, default: true },
+  trigger: { type: mongoose.Schema.Types.Mixed, default: {} },
+  action: { type: mongoose.Schema.Types.Mixed, default: {} },
+  lastRun: { type: Date },
+  nextRun: { type: Date },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
@@ -272,7 +276,7 @@ export class MongoStorage implements IStorage {
   private isConnected = false;
 
   async connect() {
-    if (this.isConnected && mongoose.connection.db?.databaseName === 'veeforedb') return;
+    if (this.isConnected && mongoose.connection.readyState === 1 && mongoose.connection.db?.databaseName === 'veeforedb') return;
     
     try {
       // Force disconnect and reconnect to ensure correct database
@@ -283,10 +287,31 @@ export class MongoStorage implements IStorage {
       await mongoose.connect(process.env.MONGODB_URI!, {
         dbName: 'veeforedb'
       });
+      
+      // Wait for connection to be fully established
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Connection timeout')), 10000);
+        
+        if (mongoose.connection.readyState === 1) {
+          clearTimeout(timeout);
+          resolve();
+        } else {
+          mongoose.connection.once('connected', () => {
+            clearTimeout(timeout);
+            resolve();
+          });
+          mongoose.connection.once('error', (err) => {
+            clearTimeout(timeout);
+            reject(err);
+          });
+        }
+      });
+      
       this.isConnected = true;
       console.log(`Connected to MongoDB Atlas - ${mongoose.connection.db?.databaseName} database`);
     } catch (error) {
       console.error('MongoDB connection error:', error);
+      this.isConnected = false;
       throw error;
     }
   }
@@ -1079,11 +1104,9 @@ export class MongoStorage implements IStorage {
     try {
       console.log(`[MONGODB DEBUG] Creating automation rule:`, rule);
       
-      const collection = this.db!.collection('automation_rules');
-      const now = new Date();
-      
-      const ruleData = {
-        name: rule.name,
+      // Create automation rule document using Mongoose model
+      const automationRuleData = {
+        name: rule.name || 'Instagram Auto-Reply',
         workspaceId: rule.workspaceId.toString(),
         description: rule.description || null,
         isActive: rule.isActive !== false,
@@ -1091,25 +1114,26 @@ export class MongoStorage implements IStorage {
         action: rule.action || {},
         lastRun: null,
         nextRun: rule.nextRun || null,
-        createdAt: now,
-        updatedAt: now
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       
-      const result = await collection.insertOne(ruleData);
-      console.log(`[MONGODB DEBUG] Created automation rule with ID: ${result.insertedId}`);
+      const newRule = new AutomationRuleModel(automationRuleData);
+      const savedRule = await newRule.save();
+      console.log(`[MONGODB DEBUG] Created automation rule with ID: ${savedRule._id}`);
       
       return {
-        id: result.insertedId.toString(),
-        name: ruleData.name,
-        workspaceId: parseInt(ruleData.workspaceId),
-        description: ruleData.description,
-        isActive: ruleData.isActive,
-        trigger: ruleData.trigger,
-        action: ruleData.action,
-        lastRun: ruleData.lastRun,
-        nextRun: ruleData.nextRun,
-        createdAt: ruleData.createdAt,
-        updatedAt: ruleData.updatedAt
+        id: savedRule._id.toString(),
+        name: savedRule.name,
+        workspaceId: parseInt(savedRule.workspaceId),
+        description: savedRule.description,
+        isActive: savedRule.isActive,
+        trigger: savedRule.trigger,
+        action: savedRule.action,
+        lastRun: savedRule.lastRun,
+        nextRun: savedRule.nextRun,
+        createdAt: savedRule.createdAt,
+        updatedAt: savedRule.updatedAt
       };
     } catch (error: any) {
       console.error('[MONGODB DEBUG] createAutomationRule error:', error.message);

@@ -3709,7 +3709,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       });
 
       // Get user's workspace
-      const workspaces = await storage.getWorkspacesByUser(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
       const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
       
       if (!currentWorkspace) {
@@ -3758,7 +3758,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       if (!workspaceId) {
         // Get user's default workspace
-        const workspaces = await storage.getWorkspacesByUser(user.id);
+        const workspaces = await storage.getWorkspacesByUserId(user.id);
         const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
         
         if (!currentWorkspace) {
@@ -3787,7 +3787,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { workspaceId } = req.query;
 
       // Get user's workspace
-      const workspaces = await storage.getUserWorkspaces(user.id);
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
       const currentWorkspace = workspaceId 
         ? workspaces.find(w => w.id === workspaceId)
         : workspaces.find(w => w.isDefault) || workspaces[0];

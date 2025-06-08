@@ -76,7 +76,14 @@ export class InstagramDirectSync {
         const since = Math.floor(yesterday.getTime() / 1000);
         const until = Math.floor(Date.now() / 1000);
         
-        // Use only supported metrics for Instagram API v22+
+        // Use only supported metrics for Instagram API v22+ with enhanced logging
+        console.log('[INSTAGRAM DIRECT] Attempting primary insights with params:', {
+          profileId: profileData.id,
+          since,
+          until,
+          hasAccessToken: !!accessToken
+        });
+        
         const accountInsightsResponse = await fetch(
           `https://graph.instagram.com/${profileData.id}/insights?metric=reach,profile_views&period=day&since=${since}&until=${until}&access_token=${accessToken}`
         );
@@ -107,26 +114,57 @@ export class InstagramDirectSync {
           // Try alternative Instagram Business API approaches for accounts with full permissions
           console.log('[INSTAGRAM DIRECT] Attempting alternative insights endpoints for verified accounts...');
           
-          // Alternative 1: Try lifetime period for supported metrics
+          // Alternative 1: Try days_28 period for business accounts
           try {
             const alt1Response = await fetch(
-              `https://graph.instagram.com/${profileData.id}/insights?metric=reach&period=lifetime&access_token=${accessToken}`
+              `https://graph.instagram.com/${profileData.id}/insights?metric=reach,profile_views&period=days_28&access_token=${accessToken}`
             );
             if (alt1Response.ok) {
               const alt1Data = await alt1Response.json();
-              console.log('[INSTAGRAM DIRECT] Alternative lifetime reach SUCCESS:', alt1Data);
-              if (alt1Data.data?.[0]?.values?.[0]?.value) {
-                accountInsights.totalReach = alt1Data.data[0].values[0].value;
-                console.log('[INSTAGRAM DIRECT] Extracted reach from lifetime:', accountInsights.totalReach);
+              console.log('[INSTAGRAM DIRECT] Alternative days_28 reach SUCCESS:', alt1Data);
+              
+              for (const metric of (alt1Data.data || [])) {
+                if (metric.name === 'reach' && metric.values?.[0]?.value) {
+                  accountInsights.totalReach = metric.values[0].value;
+                  console.log('[INSTAGRAM DIRECT] Extracted authentic reach from days_28:', accountInsights.totalReach);
+                }
+                if (metric.name === 'profile_views' && metric.values?.[0]?.value) {
+                  accountInsights.profileViews = metric.values[0].value;
+                  console.log('[INSTAGRAM DIRECT] Extracted profile views from days_28:', accountInsights.profileViews);
+                }
               }
             } else {
-              console.log('[INSTAGRAM DIRECT] lifetime reach approach failed');
+              const alt1Error = await alt1Response.text();
+              console.log('[INSTAGRAM DIRECT] days_28 approach failed:', alt1Error);
             }
           } catch (alt1Error) {
-            console.log('[INSTAGRAM DIRECT] lifetime reach error:', alt1Error);
+            console.log('[INSTAGRAM DIRECT] days_28 approach error:', alt1Error);
           }
           
-          // Alternative 2: Use media-level reach only (impressions deprecated in v22+)
+          // Alternative 2: Try week period instead of day
+          try {
+            const alt2Response = await fetch(
+              `https://graph.instagram.com/${profileData.id}/insights?metric=reach,profile_views&period=week&access_token=${accessToken}`
+            );
+            if (alt2Response.ok) {
+              const alt2Data = await alt2Response.json();
+              console.log('[INSTAGRAM DIRECT] Alternative week period SUCCESS:', alt2Data);
+              
+              for (const metric of (alt2Data.data || [])) {
+                if (metric.name === 'reach' && metric.values?.[0]?.value) {
+                  accountInsights.totalReach = metric.values[0].value;
+                  console.log('[INSTAGRAM DIRECT] Extracted authentic reach from week period:', accountInsights.totalReach);
+                }
+              }
+            } else {
+              const alt2Error = await alt2Response.text();
+              console.log('[INSTAGRAM DIRECT] Week period approach failed:', alt2Error);
+            }
+          } catch (alt2Error) {
+            console.log('[INSTAGRAM DIRECT] Week period error:', alt2Error);
+          }
+
+          // Alternative 3: Use media-level reach aggregation (no impressions)
           try {
             const mediaInsightsResponse = await fetch(
               `https://graph.instagram.com/${profileData.id}/media?fields=id,insights.metric(reach)&limit=25&access_token=${accessToken}`
@@ -142,14 +180,15 @@ export class InstagramDirectSync {
                   for (const insight of media.insights.data) {
                     if (insight.name === 'reach' && insight.values?.[0]?.value) {
                       aggregatedReach += insight.values[0].value;
+                      console.log('[INSTAGRAM DIRECT] Media reach found:', insight.values[0].value, 'for media:', media.id);
                     }
                   }
                 }
               }
               
               if (aggregatedReach > 0) {
-                accountInsights.totalReach = aggregatedReach;
-                console.log('[INSTAGRAM DIRECT] SUCCESS - Extracted authentic reach from media:', aggregatedReach);
+                accountInsights.totalReach = Math.max(accountInsights.totalReach, aggregatedReach);
+                console.log('[INSTAGRAM DIRECT] SUCCESS - Authentic media-level reach:', aggregatedReach);
               }
             } else {
               const mediaError = await mediaInsightsResponse.text();
@@ -224,25 +263,28 @@ export class InstagramDirectSync {
         console.log(`[INSTAGRAM DIRECT] Final reach calculation - Account: ${accountInsights.totalReach}, Media: ${mediaReach}, Using: ${finalReach}`);
         console.log(`[INSTAGRAM DIRECT] Final impressions calculation - Account: ${accountInsights.totalImpressions}, Media: ${mediaImpressions}, Using: ${finalImpressions}`);
         
-        // Only include reach/impressions data if we have authentic values from Instagram Business API
-        if (finalReach > 0 || finalImpressions > 0) {
+        // Only use authentic Instagram Business API insights - reject fallback values
+        const hasAuthenticReach = finalReach > 1; // Instagram often returns 1 as fallback, not real data
+        const hasAuthenticImpressions = finalImpressions > 0;
+        
+        if (hasAuthenticReach || hasAuthenticImpressions) {
           console.log(`[INSTAGRAM DIRECT] Using authentic Instagram Business API insights: reach=${finalReach}, impressions=${finalImpressions}`);
           realEngagement = {
             totalLikes,
             totalComments,
             postsAnalyzed: posts.length,
-            totalReach: finalReach,
-            totalImpressions: finalImpressions
+            totalReach: hasAuthenticReach ? finalReach : 0,
+            totalImpressions: hasAuthenticImpressions ? finalImpressions : 0
           };
         } else {
-          console.log(`[INSTAGRAM DIRECT] No authentic insights available - Instagram Business API insights require specific permissions`);
-          console.log(`[INSTAGRAM DIRECT] Account may need Instagram Business verification or Facebook Business Manager setup`);
+          console.log(`[INSTAGRAM DIRECT] Instagram Business API insights unavailable - API v22+ restrictions prevent access`);
+          console.log(`[INSTAGRAM DIRECT] Reach data requires Instagram Business verification and specific Meta Business permissions`);
           realEngagement = {
             totalLikes,
             totalComments,
             postsAnalyzed: posts.length,
-            totalReach: 0, // Explicitly 0 to indicate insights unavailable, not unknown
-            totalImpressions: 0 // Explicitly 0 to indicate insights unavailable, not unknown
+            totalReach: 0, // Zero indicates insights restricted by Instagram API v22+
+            totalImpressions: 0 // Zero indicates insights restricted by Instagram API v22+
           };
         }
         

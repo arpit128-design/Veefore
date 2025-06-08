@@ -1034,6 +1034,107 @@ export default function Scheduler() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Content Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="glassmorphism-card border-cosmic-blue/30 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-solar-gold">Edit Scheduled Content</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdateContent} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-white">Content Title</Label>
+                <Input
+                  type="text"
+                  value={scheduleForm.title}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, title: e.target.value }))}
+                  className="glassmorphism border-space-gray/30 text-white"
+                  placeholder="Enter content title"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white">Platform</Label>
+                <Select 
+                  value={scheduleForm.platform} 
+                  onValueChange={(value) => setScheduleForm(prev => ({ ...prev, platform: value }))}
+                >
+                  <SelectTrigger className="glassmorphism border-space-gray/30 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="glassmorphism-card border-cosmic-blue/30">
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-white">Description</Label>
+              <Textarea
+                value={scheduleForm.description}
+                onChange={(e) => setScheduleForm(prev => ({ ...prev, description: e.target.value }))}
+                className="glassmorphism border-space-gray/30 text-white"
+                placeholder="Enter content description"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-white">Date</Label>
+                <Input
+                  type="date"
+                  value={scheduleForm.scheduledDate}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                  className="glassmorphism border-space-gray/30 text-white"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white">Time</Label>
+                <Input
+                  type="time"
+                  value={scheduleForm.scheduledTime}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                  className="glassmorphism border-space-gray/30 text-white"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Media Preview for Edit */}
+            {mediaPreviewUrl && (
+              <div className="space-y-2">
+                <Label className="text-white">Current Media</Label>
+                <MediaPreview src={mediaPreviewUrl} fileType={getFileType(mediaPreviewUrl)} />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="glassmorphism hover:bg-space-gray/30"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateContentMutation.isPending}
+                className="bg-gradient-to-r from-solar-gold to-electric-cyan hover:from-solar-gold/90 hover:to-electric-cyan/90"
+              >
+                {updateContentMutation.isPending ? 'Updating...' : 'Update Content'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Publishing Progress */}
       <PublishingProgressTracker 
         isVisible={progressState.isVisible}

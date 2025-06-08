@@ -2131,7 +2131,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                   // Retry API call with new token
                   console.log(`[AI SUGGESTIONS] Retrying Instagram API call with refreshed token...`);
                   const retryApiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${refreshResult.access_token}`;
+                  console.log(`[AI SUGGESTIONS] Retry URL: ${retryApiUrl.replace(refreshResult.access_token, 'NEW_TOKEN_HIDDEN')}`);
+                  
                   const retryResponse = await fetch(retryApiUrl);
+                  const retryStatus = retryResponse.status;
+                  console.log(`[AI SUGGESTIONS] Retry response status: ${retryStatus}`);
                   
                   if (retryResponse.ok) {
                     const retryData = await retryResponse.json();
@@ -2165,7 +2169,12 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
                       });
                       
                       console.log(`[AI SUGGESTIONS] ✅ Successfully updated with REAL current Instagram data!`);
+                    } else {
+                      console.warn(`[AI SUGGESTIONS] Retry call returned no posts - data may be empty`);
                     }
+                  } else {
+                    const retryErrorText = await retryResponse.text();
+                    console.error(`[AI SUGGESTIONS] Retry API call failed with status ${retryStatus}: ${retryErrorText}`);
                   }
                 }
               } catch (refreshError) {

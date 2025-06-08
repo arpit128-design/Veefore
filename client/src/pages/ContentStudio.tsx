@@ -616,6 +616,15 @@ function PostCreator() {
             </>
           )}
         </Button>
+
+        {/* Upgrade Modal */}
+        <UpgradeModal
+          isOpen={upgradeModal.isOpen}
+          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+          featureType={upgradeModal.featureType}
+          creditsRequired={upgradeModal.creditsRequired}
+          currentCredits={upgradeModal.currentCredits}
+        />
       </CardContent>
     </Card>
   );
@@ -644,30 +653,32 @@ function CaptionAI() {
 
   const captionMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Simple caption generation logic
-      const styles = {
-        engaging: "🌟 ",
-        professional: "",
-        casual: "😊 ",
-        funny: "😂 "
-      };
-      
-      const prefix = styles[data.style as keyof typeof styles] || "";
-      return { caption: `${prefix}${data.prompt} #content #socialmedia` };
+      const response = await apiRequest('POST', '/api/generate-caption', data);
+      return await response.json();
     },
     onSuccess: (response: any) => {
       setGeneratedCaption(response.caption);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Caption Generated!",
-        description: "Your AI-generated caption is ready.",
+        description: `Used ${response.creditsUsed || 2} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
       });
     },
     onError: (error: any) => {
-      toast({
-        title: "Caption Generation Failed",
-        description: "Failed to generate caption",
-        variant: "destructive",
-      });
+      if (error.status === 402 && error.upgradeModal) {
+        setUpgradeModal({
+          isOpen: true,
+          featureType: "AI Caption Generation",
+          creditsRequired: 2,
+          currentCredits: user?.credits || 0
+        });
+      } else {
+        toast({
+          title: "Caption Generation Failed",
+          description: error.message || "Failed to generate caption",
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -677,6 +688,17 @@ function CaptionAI() {
         title: "Prompt Required",
         description: "Please enter a prompt for your caption",
         variant: "destructive",
+      });
+      return;
+    }
+
+    // Check credits before generating (2 credits for caption generation)
+    if (!user?.credits || user.credits < 2) {
+      setUpgradeModal({
+        isOpen: true,
+        featureType: "AI Caption Generation",
+        creditsRequired: 2,
+        currentCredits: user?.credits || 0
       });
       return;
     }
@@ -760,6 +782,15 @@ function CaptionAI() {
             </div>
           </div>
         )}
+
+        {/* Upgrade Modal */}
+        <UpgradeModal
+          isOpen={upgradeModal.isOpen}
+          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+          featureType={upgradeModal.featureType}
+          creditsRequired={upgradeModal.creditsRequired}
+          currentCredits={upgradeModal.currentCredits}
+        />
       </CardContent>
     </Card>
   );
@@ -769,6 +800,12 @@ function CaptionAI() {
 export default function ContentStudio() {
   const { currentWorkspace } = useWorkspace();
   const [activeTab, setActiveTab] = useState("video");
+
+  // Fetch user data for credits display
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  }) as { data?: { credits?: number } };
 
   const { data: recentCreations, isLoading } = useQuery({
     queryKey: ['content', currentWorkspace?.id],

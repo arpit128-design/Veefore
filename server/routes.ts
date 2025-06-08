@@ -2316,6 +2316,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       if (!workspaceId) {
         return res.status(400).json({ error: 'Workspace ID required' });
       }
+
+      // Check credits before generating suggestions
+      const creditCost = creditService.getCreditCost('ai_suggestions');
+      const hasCredits = await creditService.hasCredits(userId, 'ai_suggestions');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai_suggestions',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
       
       console.log(`[AI SUGGESTIONS] ===== WORKSPACE-SPECIFIC GENERATION =====`);
       console.log(`[AI SUGGESTIONS] Generating suggestions for workspace ${workspaceId}`);
@@ -2530,9 +2545,17 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         savedSuggestions.push(saved);
       }
       
+      // Deduct credits after successful generation
+      await creditService.consumeCredits(userId, 'ai_suggestions', 1, 'AI growth suggestions generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+      
       console.log(`[AI SUGGESTIONS] Generated ${savedSuggestions.length} suggestions based on real Instagram data`);
+      console.log(`[AI SUGGESTIONS] Credits deducted: ${creditCost}, remaining: ${remainingCredits}`);
+      
       res.json({ 
         suggestions: savedSuggestions,
+        creditsUsed: creditCost,
+        remainingCredits: remainingCredits,
         analysisData: {
           username: instagramAccount?.username,
           followers: instagramAccount?.followersCount,

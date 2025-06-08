@@ -191,25 +191,36 @@ export const ADDONS = {
 
 // AI Feature Credit Costs
 export const CREDIT_COSTS = {
+  // AI Text and Caption Generation - 1 credit
+  'ai-caption': 1,
   'ai-text-post': 1,
-  'ai-carousel': 2,
-  'ai-visual': 3,
+  'caption-optimization': 1,
+  'hashtag-generation': 1,
+  'ai_suggestions': 1, // AI-powered content and growth suggestions
+  'story-template': 1,
+  'reels-script': 1,
+  
+  // AI Image Generation - 4 credits
+  'ai-image': 4,
+  'ai-visual': 4,
+  'thumbnail-creation': 4,
+  'ai-carousel': 4,
+  
+  // AI Video/Reel Generation - 8 credits
+  'ai-video': 8,
+  'video-generation': 8,
+  'ai-reel': 8,
+  'viral-remix': 8,
+  
+  // Other features (unchanged)
   'trend-forecast': 4,
-  'viral-remix': 3,
   'dm-auto-responder': 0.2,
   'weekly-strategy': 4,
   'brand-voice-training': 6,
-  'custom-gpt-task': 2, // base cost, can be 2-5 depending on complexity
-  'hashtag-generation': 1,
-  'caption-optimization': 1,
-  'ai_suggestions': 2, // AI-powered content and growth suggestions
+  'custom-gpt-task': 2,
   'content-analysis': 2,
   'engagement-prediction': 3,
   'competitor-analysis': 4,
-  'video-generation': 5,
-  'thumbnail-creation': 2,
-  'story-template': 1,
-  'reels-script': 2,
 };
 
 // Referral rewards

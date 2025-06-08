@@ -51,8 +51,9 @@ export interface IStorage {
   updateTeamInvitation(id: number, updates: Partial<TeamInvitation>): Promise<TeamInvitation>;
 
   // Social account operations
-  getSocialAccount(workspaceId: number, platform: string): Promise<SocialAccount | undefined>;
-  getSocialAccountsByWorkspace(workspaceId: number): Promise<SocialAccount[]>;
+  getSocialAccount(id: number | string): Promise<SocialAccount | undefined>;
+  getSocialAccountsByWorkspace(workspaceId: number | string): Promise<SocialAccount[]>;
+  getAllSocialAccounts(): Promise<SocialAccount[]>;
   getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined>;
   getSocialConnections(userId: number): Promise<SocialAccount[]>;
   createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount>;

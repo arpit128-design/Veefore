@@ -5,6 +5,7 @@ import { IStorage } from "./storage";
 import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
+import { InstagramTokenRefresh } from "./instagram-token-refresh";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -1702,6 +1703,114 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       res.status(500).json({ error: error.message || 'Failed to cancel invitation' });
     }
   });
+
+  // Instagram Token Refresh API Endpoints
+  app.post('/api/instagram/refresh-token/:accountId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { accountId } = req.params;
+      
+      console.log('[INSTAGRAM TOKEN] Manual refresh requested for account:', accountId);
+      
+      // Verify account belongs to user's workspace
+      const account = await storage.getSocialAccount(accountId);
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+      
+      // Get user's workspaces to verify access
+      const userWorkspaces = await storage.getWorkspacesByUserId(user.id);
+      const hasAccess = userWorkspaces.some(w => w.id.toString() === account.workspaceId.toString());
+      
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const success = await InstagramTokenRefresh.refreshAccountToken(accountId);
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: 'Token refreshed successfully',
+          accountId,
+          username: account.username
+        });
+      } else {
+        res.status(400).json({ error: 'Failed to refresh token' });
+      }
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM TOKEN] Manual refresh error:', error.message);
+      res.status(500).json({ error: error.message || 'Token refresh failed' });
+    }
+  });
+
+  app.post('/api/instagram/refresh-all-tokens', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      
+      console.log('[INSTAGRAM TOKEN] Auto-refresh all tokens requested by user:', user.username);
+      
+      await InstagramTokenRefresh.refreshAllAccountTokens();
+      
+      res.json({ 
+        success: true, 
+        message: 'All Instagram tokens refreshed successfully'
+      });
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM TOKEN] Auto-refresh error:', error.message);
+      res.status(500).json({ error: error.message || 'Token auto-refresh failed' });
+    }
+  });
+
+  app.get('/api/instagram/token-status', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId } = req.query;
+      
+      // Get Instagram accounts for the workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      const instagramAccounts = accounts.filter(account => account.platform === 'instagram');
+      
+      const tokenStatus = instagramAccounts.map(account => {
+        const needsRefresh = InstagramTokenRefresh.shouldRefreshToken(account.expiresAt);
+        const daysUntilExpiry = account.expiresAt ? 
+          Math.ceil((account.expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0;
+        
+        return {
+          accountId: account.id,
+          username: account.username,
+          expiresAt: account.expiresAt,
+          daysUntilExpiry,
+          needsRefresh,
+          isActive: account.isActive,
+          lastSync: account.lastSyncAt
+        };
+      });
+      
+      res.json({
+        success: true,
+        accounts: tokenStatus,
+        totalAccounts: instagramAccounts.length,
+        accountsNeedingRefresh: tokenStatus.filter(a => a.needsRefresh).length
+      });
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM TOKEN] Status check error:', error.message);
+      res.status(500).json({ error: error.message || 'Failed to check token status' });
+    }
+  });
+
+  // Start automatic token refresh scheduler
+  setInterval(async () => {
+    try {
+      console.log('[SCHEDULER] Running Instagram token auto-refresh check');
+      await InstagramTokenRefresh.refreshAllAccountTokens();
+    } catch (error: any) {
+      console.error('[SCHEDULER] Token refresh error:', error.message);
+    }
+  }, 24 * 60 * 60 * 1000); // Run daily
 
   const httpServer = createServer(app);
   return httpServer;

@@ -38,12 +38,12 @@ export class InstagramStealthResponder {
     varyResponsePatterns: true
   };
 
-  // Separate config for DMs - more responsive but still stealth
+  // Separate config for DMs - 100% response rate as requested
   private dmConfig: StealthConfig = {
-    maxDailyResponses: 50, // Higher limit for DMs
-    responseRate: 0.75, // Respond to 75% of DMs
-    minDelayMs: 30000, // Minimum 30 seconds
-    maxDelayMs: 180000, // Maximum 3 minutes
+    maxDailyResponses: 100, // Higher limit for DMs
+    responseRate: 1.0, // Respond to 100% of DMs
+    minDelayMs: 15000, // Minimum 15 seconds
+    maxDelayMs: 60000, // Maximum 1 minute
     useTypingSimulation: true,
     varyResponsePatterns: true
   };
@@ -120,6 +120,87 @@ export class InstagramStealthResponder {
       delay,
       shouldRespond: true
     };
+  }
+
+  /**
+   * DM-specific response check with 100% response rate
+   */
+  private shouldAttemptDMResponse(message: string, username: string): boolean {
+    // Reset daily count if new day
+    this.resetDailyCountIfNeeded();
+    
+    // Check daily limits (higher for DMs)
+    if (this.dailyResponseCount >= this.dmConfig.maxDailyResponses) {
+      console.log('[STEALTH] Daily DM response limit reached');
+      return false;
+    }
+
+    // 100% response rate for DMs - always respond
+    console.log('[STEALTH] DM response approved - 100% response rate');
+    return true;
+  }
+
+  /**
+   * Create contextual DM response
+   */
+  private async createDMResponse(message: string, username: string, context?: any): Promise<string> {
+    try {
+      // Use AI generator for contextual DM responses
+      const aiResponse = await this.aiGenerator.generateContextualResponse(
+        {
+          message: message,
+          userProfile: { username: username }
+        },
+        {
+          personality: context?.aiPersonality || 'friendly',
+          responseLength: 'short',
+          businessContext: 'Instagram DM automation'
+        }
+      );
+
+      return aiResponse.response || this.getRandomDMResponse(message);
+    } catch (error) {
+      console.log('[STEALTH] AI generation failed, using template response');
+      return this.getRandomDMResponse(message);
+    }
+  }
+
+  /**
+   * Calculate delay for DM responses (shorter than comments)
+   */
+  private calculateDMDelay(message: string, username: string): number {
+    const baseDelay = Math.random() * (this.dmConfig.maxDelayMs - this.dmConfig.minDelayMs) + this.dmConfig.minDelayMs;
+    
+    // Shorter delays for DMs to feel more responsive
+    const messageLength = message.length;
+    const lengthMultiplier = Math.min(messageLength / 100, 1.5);
+    
+    return Math.floor(baseDelay * lengthMultiplier);
+  }
+
+  /**
+   * Get random DM response template
+   */
+  private getRandomDMResponse(message: string): string {
+    const lowerMessage = message.toLowerCase();
+    
+    // Detect message type and respond appropriately
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('how much')) {
+      return this.getRandomFromArray(this.stealthResponses.price_inquiry);
+    } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+      return this.getRandomFromArray(['Hey! Thanks for reaching out 😊', 'Hello! How can I help you?', 'Hi there! What can I do for you?']);
+    } else if (lowerMessage.includes('thank') || lowerMessage.includes('awesome') || lowerMessage.includes('love')) {
+      return this.getRandomFromArray(this.stealthResponses.appreciation);
+    } else {
+      // General responses for other DMs
+      return this.getRandomFromArray([
+        'Thanks for your message!',
+        'Appreciate you reaching out 😊',
+        'Thanks for getting in touch!',
+        'Great to hear from you!',
+        'Thanks for the message!'
+      ]);
+    }
   }
 
   /**
@@ -324,6 +405,10 @@ export class InstagramStealthResponder {
    */
   private getRandomResponse(responses: string[]): string {
     return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  private getRandomFromArray(array: string[]): string {
+    return array[Math.floor(Math.random() * array.length)];
   }
 
   private updateResponseTracking(username: string): void {

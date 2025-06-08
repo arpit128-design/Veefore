@@ -361,26 +361,51 @@ export class InstagramAutomation {
     userProfile?: { username: string }
   ): Promise<string> {
     try {
-      console.log(`[AI AUTOMATION] Using stealth responder for: "${message}"`);
+      console.log(`[AI AUTOMATION] Processing message for rule type: ${rule.trigger?.type || rule.action?.type}`);
       
-      // Use stealth responder for ultra-human response generation
-      const stealthResult = await this.stealthResponder.generateStealthResponse(
-        message,
-        userProfile?.username || 'unknown',
-        { platform: 'instagram', ruleId: rule.id }
-      );
+      // Check if this is a DM rule - use DM-specific response with 100% rate
+      const isDMRule = (rule.trigger?.type === 'dm') || (rule.action?.type === 'dm');
       
-      if (stealthResult.shouldRespond && stealthResult.response) {
-        console.log(`[AI AUTOMATION] Stealth response generated: "${stealthResult.response}"`);
-        return stealthResult.response;
+      if (isDMRule) {
+        console.log(`[AI AUTOMATION] Using DM response generator with 100% response rate`);
+        const dmResult = await this.stealthResponder.generateDMResponse(
+          message,
+          userProfile?.username || 'unknown',
+          { 
+            platform: 'instagram', 
+            ruleId: rule.id,
+            aiPersonality: rule.action?.aiPersonality || 'friendly'
+          }
+        );
+        
+        if (dmResult.shouldRespond && dmResult.response) {
+          console.log(`[AI AUTOMATION] DM response generated: "${dmResult.response}"`);
+          return dmResult.response;
+        } else {
+          console.log(`[AI AUTOMATION] DM daily limit reached`);
+          throw new Error('DM daily limit reached');
+        }
       } else {
-        console.log(`[AI AUTOMATION] Stealth responder declined to respond for natural behavior`);
-        throw new Error('Stealth responder declined to respond');
+        console.log(`[AI AUTOMATION] Using comment stealth responder for: "${message}"`);
+        
+        // Use regular stealth responder for comments
+        const stealthResult = await this.stealthResponder.generateStealthResponse(
+          message,
+          userProfile?.username || 'unknown',
+          { platform: 'instagram', ruleId: rule.id }
+        );
+        
+        if (stealthResult.shouldRespond && stealthResult.response) {
+          console.log(`[AI AUTOMATION] Stealth response generated: "${stealthResult.response}"`);
+          return stealthResult.response;
+        } else {
+          console.log(`[AI AUTOMATION] Stealth responder declined to respond for natural behavior`);
+          throw new Error('Stealth responder declined to respond');
+        }
       }
       
     } catch (error) {
-      console.error('[AI AUTOMATION] Stealth responder failed, skipping response:', error);
-      // Don't send any fallback - maintain stealth by not responding
+      console.error('[AI AUTOMATION] Response generation failed:', error);
       throw new Error('No response generated to maintain natural behavior patterns');
     }
   }

@@ -598,12 +598,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       try {
         console.log('[DASHBOARD] Updating Instagram data with real engagement metrics for workspace:', workspaceId);
         await instagramDirectSync.updateAccountWithRealData(workspaceId);
-        // Refetch updated account data after sync
+        
+        // Force refresh of account data after sync - get fresh data from database
         const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
         const updatedAccount = updatedAccounts.find((acc: any) => acc.platform === 'instagram');
+        
         if (updatedAccount) {
-          Object.assign(account, updatedAccount);
-          console.log('[DASHBOARD] Successfully updated account with real Instagram engagement data');
+          // Replace account object entirely with fresh data from database
+          account.totalLikes = updatedAccount.totalLikes || 0;
+          account.totalComments = updatedAccount.totalComments || 0;
+          account.totalReach = updatedAccount.totalReach || 0;
+          account.avgEngagement = updatedAccount.avgEngagement || 0;
+          account.followersCount = updatedAccount.followersCount || 0;
+          account.mediaCount = updatedAccount.mediaCount || 0;
+          
+          console.log('[DASHBOARD] Fresh Instagram data from database:', {
+            totalLikes: account.totalLikes,
+            totalComments: account.totalComments,
+            totalReach: account.totalReach,
+            avgEngagement: account.avgEngagement
+          });
         }
       } catch (syncError: any) {
         console.log('[DASHBOARD] Direct sync failed, using existing data:', syncError.message);

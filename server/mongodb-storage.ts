@@ -2175,4 +2175,231 @@ export class MongoStorage implements IStorage {
     
     return this.convertUser(updatedUser);
   }
+
+  // DM Conversation Memory Methods
+  async getDmConversation(workspaceId: string, platform: string, participantId: string): Promise<any> {
+    await this.connect();
+    
+    const conversation = await DmConversationModel.findOne({
+      workspaceId,
+      platform,
+      participantId
+    });
+    
+    if (!conversation) return null;
+    
+    return {
+      id: conversation._id.toString(),
+      workspaceId: conversation.workspaceId,
+      platform: conversation.platform,
+      participantId: conversation.participantId,
+      participantUsername: conversation.participantUsername,
+      lastMessageAt: conversation.lastMessageAt,
+      messageCount: conversation.messageCount,
+      isActive: conversation.isActive,
+      createdAt: conversation.createdAt,
+      updatedAt: conversation.updatedAt
+    };
+  }
+
+  async createDmConversation(data: any): Promise<any> {
+    await this.connect();
+    
+    const conversation = new DmConversationModel(data);
+    const saved = await conversation.save();
+    
+    return {
+      id: saved._id.toString(),
+      workspaceId: saved.workspaceId,
+      platform: saved.platform,
+      participantId: saved.participantId,
+      participantUsername: saved.participantUsername,
+      lastMessageAt: saved.lastMessageAt,
+      messageCount: saved.messageCount,
+      isActive: saved.isActive,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt
+    };
+  }
+
+  async createDmMessage(data: any): Promise<any> {
+    await this.connect();
+    
+    const message = new DmMessageModel(data);
+    const saved = await message.save();
+    
+    return {
+      id: saved._id.toString(),
+      conversationId: saved.conversationId,
+      messageId: saved.messageId,
+      sender: saved.sender,
+      content: saved.content,
+      messageType: saved.messageType,
+      sentiment: saved.sentiment,
+      topics: saved.topics,
+      aiResponse: saved.aiResponse,
+      automationRuleId: saved.automationRuleId,
+      createdAt: saved.createdAt
+    };
+  }
+
+  async updateConversationLastMessage(conversationId: number): Promise<void> {
+    await this.connect();
+    
+    await DmConversationModel.findByIdAndUpdate(conversationId, {
+      lastMessageAt: new Date(),
+      $inc: { messageCount: 1 },
+      updatedAt: new Date()
+    });
+  }
+
+  async getDmMessages(conversationId: number, limit: number = 10): Promise<any[]> {
+    await this.connect();
+    
+    const messages = await DmMessageModel.find({ conversationId })
+      .sort({ createdAt: -1 })
+      .limit(limit);
+    
+    return messages.map(msg => ({
+      id: msg._id.toString(),
+      conversationId: msg.conversationId,
+      messageId: msg.messageId,
+      sender: msg.sender,
+      content: msg.content,
+      messageType: msg.messageType,
+      sentiment: msg.sentiment,
+      topics: msg.topics,
+      aiResponse: msg.aiResponse,
+      automationRuleId: msg.automationRuleId,
+      createdAt: msg.createdAt
+    })).reverse(); // Return in chronological order
+  }
+
+  async getConversationContext(conversationId: number): Promise<any[]> {
+    await this.connect();
+    
+    const context = await ConversationContextModel.find({
+      conversationId,
+      $or: [
+        { expiresAt: { $exists: false } },
+        { expiresAt: null },
+        { expiresAt: { $gt: new Date() } }
+      ]
+    }).sort({ extractedAt: -1 });
+    
+    return context.map(ctx => ({
+      id: ctx._id.toString(),
+      conversationId: ctx.conversationId,
+      contextType: ctx.contextType,
+      contextValue: ctx.contextValue,
+      confidence: ctx.confidence,
+      extractedAt: ctx.extractedAt,
+      expiresAt: ctx.expiresAt
+    }));
+  }
+
+  async createConversationContext(data: any): Promise<any> {
+    await this.connect();
+    
+    const context = new ConversationContextModel(data);
+    const saved = await context.save();
+    
+    return {
+      id: saved._id.toString(),
+      conversationId: saved.conversationId,
+      contextType: saved.contextType,
+      contextValue: saved.contextValue,
+      confidence: saved.confidence,
+      extractedAt: saved.extractedAt,
+      expiresAt: saved.expiresAt
+    };
+  }
+
+  async cleanupExpiredContext(cutoffDate: Date): Promise<void> {
+    await this.connect();
+    
+    await ConversationContextModel.deleteMany({
+      expiresAt: { $lt: cutoffDate }
+    });
+  }
+
+  async cleanupOldMessages(cutoffDate: Date): Promise<void> {
+    await this.connect();
+    
+    await DmMessageModel.deleteMany({
+      createdAt: { $lt: cutoffDate }
+    });
+  }
+
+  async getConversationStats(workspaceId: string): Promise<{
+    totalConversations: number;
+    activeConversations: number;
+    totalMessages: number;
+    averageResponseTime: number;
+  }> {
+    await this.connect();
+    
+    const totalConversations = await DmConversationModel.countDocuments({ workspaceId });
+    const activeConversations = await DmConversationModel.countDocuments({ 
+      workspaceId, 
+      isActive: true,
+      lastMessageAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+    });
+    const totalMessages = await DmMessageModel.countDocuments({
+      conversationId: { $in: await DmConversationModel.find({ workspaceId }).distinct('_id') }
+    });
+    
+    return {
+      totalConversations,
+      activeConversations,
+      totalMessages,
+      averageResponseTime: 0 // Placeholder for now
+    };
+  }
+
+  // Add missing method for getDmConversations
+  async getDmConversations(workspaceId: string, limit: number = 50): Promise<any[]> {
+    await this.connect();
+    
+    const conversations = await DmConversationModel.find({ workspaceId })
+      .sort({ lastMessageAt: -1 })
+      .limit(limit);
+    
+    return conversations.map(conv => ({
+      id: conv._id.toString(),
+      workspaceId: conv.workspaceId,
+      platform: conv.platform,
+      participantId: conv.participantId,
+      participantUsername: conv.participantUsername,
+      lastMessageAt: conv.lastMessageAt,
+      messageCount: conv.messageCount,
+      isActive: conv.isActive,
+      createdAt: conv.createdAt,
+      updatedAt: conv.updatedAt
+    }));
+  }
+
+  // Add method for getAutomationRulesByTrigger
+  async getAutomationRulesByTrigger(triggerType: string): Promise<any[]> {
+    await this.connect();
+    
+    const rules = await AutomationRuleModel.find({
+      'trigger.type': triggerType,
+      isActive: true
+    });
+    
+    return rules.map(rule => ({
+      id: rule._id.toString(),
+      name: rule.name,
+      workspaceId: rule.workspaceId,
+      description: rule.description,
+      isActive: rule.isActive,
+      trigger: rule.trigger,
+      action: rule.action,
+      lastRun: rule.lastRun,
+      nextRun: rule.nextRun,
+      createdAt: rule.createdAt,
+      updatedAt: rule.updatedAt
+    }));
+  }
 }

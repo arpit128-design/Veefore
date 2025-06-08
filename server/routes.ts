@@ -10,6 +10,7 @@ import { InstagramAutomation } from "./instagram-automation";
 import { InstagramWebhookHandler } from "./instagram-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
+import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -18,6 +19,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   const instagramAutomation = new InstagramAutomation(storage);
   const webhookHandler = new InstagramWebhookHandler(storage);
   const creditService = new CreditService();
+  const enhancedDMService = new EnhancedAutoDMService(storage as any);
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -3228,7 +3230,23 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
   app.post('/webhook/instagram', async (req, res) => {
     console.log('[WEBHOOK] Instagram webhook event received');
-    await webhookHandler.handleWebhookEvent(req, res);
+    
+    // Check if this is a DM webhook and handle with enhanced memory system
+    const isDMWebhook = req.body?.entry?.[0]?.messaging;
+    
+    if (isDMWebhook) {
+      console.log('[ENHANCED DM] Processing Instagram DM with conversation memory');
+      try {
+        await enhancedDMService.handleInstagramDMWebhook(req.body);
+        res.status(200).send('OK');
+      } catch (error) {
+        console.error('[ENHANCED DM ERROR] Failed to process DM webhook:', error);
+        res.status(500).send('Error processing DM');
+      }
+    } else {
+      // Handle other webhook events with existing handler
+      await webhookHandler.handleWebhookEvent(req, res);
+    }
   });
 
   // Test endpoint for webhook automation demo
@@ -3319,6 +3337,83 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[WEBHOOK TEST] Error:', error.message);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Enhanced Conversation Memory API Endpoints
+  
+  // Get conversation history for workspace
+  app.get('/api/conversations/:workspaceId', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.params;
+      const { limit } = req.query;
+      
+      const conversations = await enhancedDMService.getConversationHistory(
+        workspaceId, 
+        limit ? parseInt(limit as string) : 50
+      );
+      
+      res.json({ conversations });
+    } catch (error: any) {
+      console.error('[CONVERSATIONS] Get history error:', error);
+      res.status(500).json({ error: 'Failed to fetch conversation history' });
+    }
+  });
+
+  // Get conversation analytics for workspace
+  app.get('/api/conversations/:workspaceId/analytics', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId } = req.params;
+      
+      const analytics = await enhancedDMService.getConversationAnalytics(workspaceId);
+      
+      res.json({ analytics });
+    } catch (error: any) {
+      console.error('[CONVERSATIONS] Get analytics error:', error);
+      res.status(500).json({ error: 'Failed to fetch conversation analytics' });
+    }
+  });
+
+  // Test contextual response generation
+  app.post('/api/conversations/test-response', requireAuth, async (req, res) => {
+    try {
+      const { workspaceId, participantId, message } = req.body;
+      
+      if (!workspaceId || !participantId || !message) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      
+      const response = await enhancedDMService.testContextualResponse(
+        workspaceId,
+        participantId,
+        message
+      );
+      
+      res.json({ 
+        success: true,
+        originalMessage: message,
+        contextualResponse: response,
+        memoryEnabled: true,
+        retentionDays: 3
+      });
+    } catch (error: any) {
+      console.error('[CONVERSATIONS] Test response error:', error);
+      res.status(500).json({ error: 'Failed to generate test response' });
+    }
+  });
+
+  // Manual cleanup of expired conversation memory
+  app.post('/api/conversations/cleanup', requireAuth, async (req, res) => {
+    try {
+      await enhancedDMService.cleanupExpiredMemory();
+      
+      res.json({ 
+        success: true,
+        message: 'Expired conversation memory cleaned up successfully'
+      });
+    } catch (error: any) {
+      console.error('[CONVERSATIONS] Cleanup error:', error);
+      res.status(500).json({ error: 'Failed to cleanup expired memory' });
     }
   });
 

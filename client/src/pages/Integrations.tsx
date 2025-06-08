@@ -24,8 +24,10 @@ import {
   Settings,
   Unlink,
   RefreshCw,
-  Trash2
+  Trash2,
+  Clock
 } from "lucide-react";
+import InstagramTokenManager from "@/components/InstagramTokenManager";
 
 interface SocialAccount {
   id: number;
@@ -609,7 +611,10 @@ export default function Integrations() {
         })}
       </div>
 
-
+      {/* Instagram Token Management */}
+      {socialAccounts?.some((account: SocialAccount) => account.platform === 'instagram') && (
+        <InstagramTokenManager />
+      )}
 
       {/* Integration Guide */}
       <Card className="border-asteroid-gray/20 bg-space-black/50 backdrop-blur-sm">

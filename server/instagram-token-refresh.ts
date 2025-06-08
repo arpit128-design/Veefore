@@ -144,7 +144,7 @@ export class InstagramTokenRefresh {
   /**
    * Refresh token for specific account
    */
-  static async refreshAccountToken(accountId: string): Promise<boolean> {
+  static async refreshAccountToken(accountId: string | number): Promise<boolean> {
     try {
       console.log('[INSTAGRAM TOKEN] Refreshing token for account ID:', accountId);
       

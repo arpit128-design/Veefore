@@ -1168,12 +1168,18 @@ export class MongoStorage implements IStorage {
     try {
       console.log(`[MONGODB DEBUG] getAutomationRulesByType - type: ${type}`);
       
+      // Query for rules where trigger.type or action.type matches the requested type
       const rules = await AutomationRuleModel.find({ 
         isActive: true,
-        type: type
+        $or: [
+          { 'trigger.type': type },
+          { 'action.type': type },
+          { type: type } // Fallback for rules that might have type at document level
+        ]
       });
       
       console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules of type ${type}`);
+      console.log(`[MONGODB DEBUG] Query used: isActive=true AND (trigger.type='${type}' OR action.type='${type}' OR type='${type}')`);
       
       return rules.map(rule => {
         const trigger = rule.trigger || {};
@@ -1185,7 +1191,7 @@ export class MongoStorage implements IStorage {
           workspaceId: parseInt(rule.workspaceId),
           description: rule.description || null,
           isActive: rule.isActive !== false,
-          type: rule.type || type,
+          type: trigger.type || action.type || rule.type || type,
           trigger: trigger,
           action: action,
           lastRun: rule.lastRun ? new Date(rule.lastRun) : null,

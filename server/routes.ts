@@ -11,6 +11,7 @@ import { InstagramWebhookHandler } from "./instagram-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
+import { DashboardCache } from "./dashboard-cache";
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -20,6 +21,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   const webhookHandler = new InstagramWebhookHandler(storage);
   const creditService = new CreditService();
   const enhancedDMService = new EnhancedAutoDMService(storage as any);
+  const dashboardCache = new DashboardCache(storage);
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -663,73 +665,69 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         });
       }
 
-      // Use any to avoid TypeScript issues with MongoDB dynamic fields
-      const account = instagramAccount as any;
+      console.log('[DASHBOARD CACHE] Getting immediate cached data for workspace:', workspaceId);
       
-      // Update Instagram account with real engagement data using direct sync
-      try {
-        console.log('[DASHBOARD] Updating Instagram data with real engagement metrics for workspace:', workspaceId);
-        await instagramDirectSync.updateAccountWithRealData(workspaceId);
+      // Get cached data immediately for instant response
+      const cachedData = await dashboardCache.getCachedData(workspace.id.toString());
+      
+      if (cachedData) {
+        console.log('[DASHBOARD CACHE] Serving cached data instantly');
         
-        // Force refresh of account data after sync - get fresh data from database
-        const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
-        const updatedAccount = updatedAccounts.find((acc: any) => acc.platform === 'instagram');
-        
-        if (updatedAccount) {
-          // Replace account object entirely with fresh data from database
-          account.totalLikes = updatedAccount.totalLikes || 0;
-          account.totalComments = updatedAccount.totalComments || 0;
-          account.totalReach = updatedAccount.totalReach || 0;
-          account.avgEngagement = updatedAccount.avgEngagement || 0;
-          account.followersCount = updatedAccount.followersCount || 0;
-          account.mediaCount = updatedAccount.mediaCount || 0;
-          
-          console.log('[DASHBOARD] Fresh Instagram data from database:', {
-            totalLikes: account.totalLikes,
-            totalComments: account.totalComments,
-            totalReach: account.totalReach,
-            avgEngagement: account.avgEngagement
+        // Start background sync to update cache
+        instagramDirectSync.updateAccountWithRealData(workspace.id.toString())
+          .then(() => {
+            console.log('[DASHBOARD CACHE] Background sync completed');
+          })
+          .catch((error) => {
+            console.log('[DASHBOARD CACHE] Background sync error:', error.message);
           });
-        }
-      } catch (syncError: any) {
-        console.log('[DASHBOARD] Direct sync failed, using existing data:', syncError.message);
+
+        return res.json({
+          totalPosts: cachedData.totalPosts,
+          totalReach: cachedData.totalReach,
+          engagementRate: cachedData.engagementRate,
+          topPlatform: cachedData.topPlatform,
+          followers: cachedData.followers,
+          impressions: cachedData.impressions,
+          accountUsername: cachedData.accountUsername,
+          totalLikes: cachedData.totalLikes,
+          totalComments: cachedData.totalComments,
+          mediaCount: cachedData.mediaCount
+        });
       }
 
-      // Use ONLY authentic Instagram Business API data - no synthetic calculations
-      const followers = account.followersCount || 0;
-      const mediaCount = account.mediaCount || 0;
-      const totalLikes = account.totalLikes || 0; // Direct from Instagram API
-      const totalComments = account.totalComments || 0; // Direct from Instagram API
-      const totalReach = account.totalReach || 0; // Direct from Instagram API
-      const impressions = account.impressions || totalReach || 0;
+      // Fallback: if no cache, get data from database and cache it
+      console.log('[DASHBOARD CACHE] No cache found, using database data and caching for next request');
       
-      // Use authentic engagement rate from Instagram Business API
-      const engagementRate = account.avgEngagement || 0; // Direct from API calculation
+      const account = instagramAccount as any;
       
-      console.log('[DASHBOARD] Displaying authentic Instagram Business API data:', {
-        username: account.username,
-        followers,
-        mediaCount,
-        totalLikes,
-        totalComments,
-        totalReach,
-        engagementRate
-      });
-      
-      const analyticsData = {
-        totalPosts: mediaCount,
-        totalReach: totalReach,
-        engagementRate: Math.round(engagementRate * 100) / 100,
+      // Return immediate data from database
+      const responseData = {
+        totalPosts: account.mediaCount || 0,
+        totalReach: account.totalReach || 0,
+        engagementRate: Math.round((account.avgEngagement || 0) * 100) / 100,
         topPlatform: 'instagram',
-        followers: followers,
-        impressions: impressions,
-        accountUsername: account.username,
-        totalLikes: totalLikes, // Authentic Instagram API data
-        totalComments: totalComments, // Authentic Instagram API data  
-        mediaCount: mediaCount
+        followers: account.followersCount || 0,
+        impressions: account.totalReach || 0,
+        accountUsername: account.username || '',
+        totalLikes: account.totalLikes || 0,
+        totalComments: account.totalComments || 0,
+        mediaCount: account.mediaCount || 0
       };
 
-      res.json(analyticsData);
+      // Update cache with current data for next request
+      dashboardCache.updateCache(workspace.id.toString(), responseData);
+
+      // Start background sync for future requests
+      instagramDirectSync.updateAccountWithRealData(workspace.id.toString())
+        .then(() => {
+          console.log('[DASHBOARD CACHE] Background sync completed for future requests');
+        })
+        .catch((error) => {
+          console.log('[DASHBOARD CACHE] Background sync error:', error.message);
+        });
+
+      res.json(responseData);
 
     } catch (error: any) {
       console.error('Error fetching dashboard analytics:', error);

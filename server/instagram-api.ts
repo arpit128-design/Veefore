@@ -357,9 +357,40 @@ export class InstagramAPI {
       console.log(`[INSTAGRAM API] WARNING: Reel publishing requires advanced Instagram API permissions`);
       console.log(`[INSTAGRAM API] If this fails, the video will be published as a regular video post instead`);
       
-      // Step 1: Create reel media container
+      // Step 1: Create reel media container with proper URL formatting
+      let fullVideoUrl = videoUrl;
+      
+      // Ensure proper URL format for reels - handle blob URLs and malformed concatenations
+      if (!videoUrl.startsWith('http') || videoUrl.includes('blob:') || videoUrl.includes('devblob:')) {
+        // Extract the actual path from malformed URLs
+        let cleanPath = videoUrl;
+        
+        console.log(`[INSTAGRAM API] Original reel URL: ${videoUrl}`);
+        
+        // Handle various malformed URL patterns
+        if (cleanPath.includes('blob:') || cleanPath.includes('devblob:')) {
+          // Extract UUID path from malformed URLs like "...devblob:https://...dev/uuid"
+          const pathMatch = cleanPath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+          if (pathMatch) {
+            cleanPath = '/' + pathMatch[0];
+          } else {
+            // Fallback: extract everything after the last domain
+            cleanPath = cleanPath.replace(/^.*\.dev/, '').replace(/^.*\.co/, '');
+          }
+        }
+        
+        // Ensure clean path format
+        cleanPath = cleanPath.replace(/\\/g, '/');
+        const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
+        fullVideoUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        
+        console.log(`[INSTAGRAM API] Cleaned reel URL: ${fullVideoUrl}`);
+      }
+      
+      console.log(`[INSTAGRAM API] Using corrected reel video URL: ${fullVideoUrl}`);
+      
       const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
-        video_url: videoUrl,
+        video_url: fullVideoUrl,
         caption: caption,
         media_type: 'REELS',
         access_token: accessToken
@@ -596,7 +627,34 @@ export class InstagramAPI {
       }
       
       // Step 1: Create video media container - use REELS as VIDEO is deprecated
-      const fullVideoUrl = currentVideoUrl.startsWith('http') ? currentVideoUrl : `http://15a46e73-e0eb-45c2-8225-17edc84946f6-00-1dy2h828k4y1r.worf.replit.dev${currentVideoUrl}`;
+      let fullVideoUrl = currentVideoUrl;
+      
+      // Ensure proper URL format - handle blob URLs and malformed concatenations
+      if (!currentVideoUrl.startsWith('http') || currentVideoUrl.includes('blob:') || currentVideoUrl.includes('devblob:')) {
+        // Extract the actual path from malformed URLs
+        let cleanPath = currentVideoUrl;
+        
+        console.log(`[INSTAGRAM API] Original video URL: ${currentVideoUrl}`);
+        
+        // Handle various malformed URL patterns
+        if (cleanPath.includes('blob:') || cleanPath.includes('devblob:')) {
+          // Extract UUID path from malformed URLs like "...devblob:https://...dev/uuid"
+          const pathMatch = cleanPath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+          if (pathMatch) {
+            cleanPath = '/' + pathMatch[0];
+          } else {
+            // Fallback: extract everything after the last domain
+            cleanPath = cleanPath.replace(/^.*\.dev/, '').replace(/^.*\.co/, '');
+          }
+        }
+        
+        // Ensure clean path format
+        cleanPath = cleanPath.replace(/\\/g, '/');
+        const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
+        fullVideoUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        
+        console.log(`[INSTAGRAM API] Cleaned video URL: ${fullVideoUrl}`);
+      }
       
       const containerPayload = {
         video_url: fullVideoUrl,
@@ -605,7 +663,7 @@ export class InstagramAPI {
         access_token: accessToken
       };
       
-      console.log(`[INSTAGRAM API] Using video URL: ${fullVideoUrl}`);
+      console.log(`[INSTAGRAM API] Using corrected video URL: ${fullVideoUrl}`);
 
       console.log(`[INSTAGRAM API] Creating video container`);
       

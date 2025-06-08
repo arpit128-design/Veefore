@@ -30,12 +30,27 @@ class AIResponseGenerator {
   private genAI: GoogleGenerativeAI;
   private responseHistory: Set<string> = new Set();
   
-  // Natural response templates to avoid spam detection
+  // Ultra-natural response templates optimized for Instagram's spam detection
   private naturalResponses = {
-    price: ["DM me", "Check bio", "Message me", "DM for details", "Text me", "Inbox me"],
-    greeting: ["Hey!", "Hi!", "Hello", "Namaste", "What's up", "How are you"],
-    thanks: ["Thanks!", "Appreciate it", "Thank you", "Much love", "Grateful"],
-    location: ["Here!", "Present", "Available", "Around", "Online"]
+    price: [
+      "DM", "Check my story", "Inbox", "Message", "Text me", "Slide into DMs", 
+      "Link in bio", "DM me details", "Check highlights", "Story has info"
+    ],
+    greeting: [
+      "Hey", "Hi there", "Hello", "What's up", "Sup", "Yo", "Heyy", "Hiiii"
+    ],
+    thanks: [
+      "Thanks", "Ty", "Thank you", "Appreciate it", "Love", "❤️", "🙏", "Much love"
+    ],
+    location: [
+      "Here", "Online", "Available", "Present", "Around", "Active"
+    ],
+    excitement: [
+      "Amazing", "Love this", "So cool", "Nice", "Great", "Awesome", "Perfect", "Yes"
+    ],
+    question: [
+      "What", "How", "When", "Where", "Tell me more", "Info please", "Details"
+    ]
   };
 
   constructor() {
@@ -112,17 +127,17 @@ class AIResponseGenerator {
   }
 
   /**
-   * Generate natural fallback responses that avoid spam detection
+   * Generate ultra-natural responses optimized for Instagram's spam detection
    */
   private generateNaturalFallback(message: string, username?: string): { response: string; language: string } {
     const language = this.detectLanguage(message);
     const messageWords = message.toLowerCase();
     
-    // Detect intent and respond naturally
+    // Use extremely short, natural responses that real people use
     if (messageWords.includes('price') || messageWords.includes('cost') || messageWords.includes('kitna')) {
       const responses = language === 'hindi' || language === 'hinglish' 
-        ? ['DM karo', 'Message me', 'Inbox check karo', 'DM me bhai']
-        : ['DM me', 'Check messages', 'Text me', 'Message me'];
+        ? ['DM', 'Inbox', 'Message karo', 'DM me']
+        : ['DM', 'Inbox', 'Message', 'Text'];
       return {
         response: this.getRandomResponse(responses),
         language
@@ -131,8 +146,8 @@ class AIResponseGenerator {
     
     if (messageWords.includes('where') || messageWords.includes('kaha') || messageWords.includes('location')) {
       const responses = language === 'hindi' || language === 'hinglish'
-        ? ['Yahan hu!', 'Present', 'Here bhai', 'Available hu']
-        : ['Here!', 'Present', 'Available', 'Around'];
+        ? ['Yahan', 'Here', 'Available', 'Present']
+        : ['Here', 'Available', 'Around', 'Present'];
       return {
         response: this.getRandomResponse(responses),
         language
@@ -141,18 +156,28 @@ class AIResponseGenerator {
     
     if (messageWords.includes('thanks') || messageWords.includes('thank') || messageWords.includes('dhanyawad')) {
       const responses = language === 'hindi' || language === 'hinglish'
-        ? ['Welcome!', 'Koi baat nahi', 'Mention not', 'Anytime']
-        : ['Welcome!', 'Anytime', 'Sure thing', 'No problem'];
+        ? ['Welcome', 'Anytime', '❤️', '🙏']
+        : ['Welcome', 'Anytime', '❤️', 'No problem'];
       return {
         response: this.getRandomResponse(responses),
         language
       };
     }
     
-    // Default natural responses
+    if (messageWords.includes('nice') || messageWords.includes('good') || messageWords.includes('great') || messageWords.includes('amazing')) {
+      const responses = language === 'hindi' || language === 'hinglish'
+        ? ['Thanks', 'Dhanyawad', '❤️', 'Love']
+        : ['Thanks', 'Appreciate it', '❤️', 'Love'];
+      return {
+        response: this.getRandomResponse(responses),
+        language
+      };
+    }
+    
+    // Ultra-short default responses that real humans use
     const defaultResponses = language === 'hindi' || language === 'hinglish'
-      ? ['Batao!', 'Kya baat hai?', 'Haan bolo', 'Sunao', 'Yes?']
-      : ['Hey!', 'What\'s up?', 'Tell me', 'Yes?', 'Go ahead'];
+      ? ['Haan', 'Yes', 'Ok', 'Sure', 'Right']
+      : ['Yes', 'Ok', 'Sure', 'Right', 'True'];
     
     return {
       response: this.getRandomResponse(defaultResponses),

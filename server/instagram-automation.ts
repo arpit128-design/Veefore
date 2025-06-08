@@ -1,5 +1,6 @@
 import { IStorage } from './storage';
 import { AIResponseGenerator, MessageContext, AIResponseConfig } from './ai-response-generator';
+import { InstagramAntiSpam } from './instagram-anti-spam';
 
 export interface AutomationRule {
   id: string;

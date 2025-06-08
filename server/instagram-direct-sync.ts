@@ -70,9 +70,15 @@ export class InstagramDirectSync {
       let accountInsights = { totalReach: 0, totalImpressions: 0, profileViews: 0 };
       
       try {
-        // Try different Instagram Business API insights approaches for accounts with full permissions
+        // Use correct Instagram Business API insights format with full permissions
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const since = Math.floor(yesterday.getTime() / 1000);
+        const until = Math.floor(Date.now() / 1000);
+        
+        // Use only supported metrics for Instagram API v22+
         const accountInsightsResponse = await fetch(
-          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,impressions,profile_views&period=lifetime&access_token=${accessToken}`
+          `https://graph.instagram.com/${profileData.id}/insights?metric=reach,profile_views&period=day&since=${since}&until=${until}&access_token=${accessToken}`
         );
         
         if (accountInsightsResponse.ok) {
@@ -98,17 +104,69 @@ export class InstagramDirectSync {
           console.log('[INSTAGRAM DIRECT] Account insights failed - Status:', accountInsightsResponse.status);
           console.log('[INSTAGRAM DIRECT] Full error response:', errorText);
           
-          // Parse the error to understand Instagram Business API limitations
+          // Try alternative Instagram Business API approaches for accounts with full permissions
+          console.log('[INSTAGRAM DIRECT] Attempting alternative insights endpoints for verified accounts...');
+          
+          // Alternative 1: Try lifetime period for supported metrics
           try {
-            const errorData = JSON.parse(errorText);
-            console.log('[INSTAGRAM DIRECT] Parsed error data:', JSON.stringify(errorData, null, 2));
-            if (errorData.error?.code === 100) {
-              console.log('[INSTAGRAM DIRECT] Instagram Business API Error Code 100: Invalid request parameters or endpoint');
-              console.log('[INSTAGRAM DIRECT] This indicates wrong API endpoint format or parameter structure');
+            const alt1Response = await fetch(
+              `https://graph.instagram.com/${profileData.id}/insights?metric=reach&period=lifetime&access_token=${accessToken}`
+            );
+            if (alt1Response.ok) {
+              const alt1Data = await alt1Response.json();
+              console.log('[INSTAGRAM DIRECT] Alternative lifetime reach SUCCESS:', alt1Data);
+              if (alt1Data.data?.[0]?.values?.[0]?.value) {
+                accountInsights.totalReach = alt1Data.data[0].values[0].value;
+                console.log('[INSTAGRAM DIRECT] Extracted reach from lifetime:', accountInsights.totalReach);
+              }
+            } else {
+              console.log('[INSTAGRAM DIRECT] lifetime reach approach failed');
             }
-          } catch (parseError) {
-            console.log('[INSTAGRAM DIRECT] Could not parse insights error response:', parseError.message);
+          } catch (alt1Error) {
+            console.log('[INSTAGRAM DIRECT] lifetime reach error:', alt1Error);
           }
+          
+          // Alternative 2: Try media-level insights aggregation
+          try {
+            const mediaInsightsResponse = await fetch(
+              `https://graph.instagram.com/${profileData.id}/media?fields=id,insights.metric(reach,impressions)&limit=25&access_token=${accessToken}`
+            );
+            if (mediaInsightsResponse.ok) {
+              const mediaInsightsData = await mediaInsightsResponse.json();
+              console.log('[INSTAGRAM DIRECT] Media insights response:', mediaInsightsData);
+              
+              let aggregatedReach = 0;
+              let aggregatedImpressions = 0;
+              
+              for (const media of (mediaInsightsData.data || [])) {
+                if (media.insights?.data) {
+                  for (const insight of media.insights.data) {
+                    if (insight.name === 'reach' && insight.values?.[0]?.value) {
+                      aggregatedReach += insight.values[0].value;
+                    }
+                    if (insight.name === 'impressions' && insight.values?.[0]?.value) {
+                      aggregatedImpressions += insight.values[0].value;
+                    }
+                  }
+                }
+              }
+              
+              if (aggregatedReach > 0 || aggregatedImpressions > 0) {
+                accountInsights.totalReach = aggregatedReach;
+                accountInsights.totalImpressions = aggregatedImpressions;
+                console.log('[INSTAGRAM DIRECT] SUCCESS - Aggregated from media insights:', {
+                  reach: aggregatedReach,
+                  impressions: aggregatedImpressions
+                });
+              }
+            } else {
+              console.log('[INSTAGRAM DIRECT] Media insights approach failed');
+            }
+          } catch (mediaError) {
+            console.log('[INSTAGRAM DIRECT] Media insights error:', mediaError);
+          }
+          
+          console.log('[INSTAGRAM DIRECT] Final insights after all attempts:', accountInsights);
         }
       } catch (accountError) {
         console.log('[INSTAGRAM DIRECT] Account insights error:', accountError);

@@ -2934,20 +2934,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
   app.post('/api/automation/rules', requireAuth, async (req, res) => {
     try {
-      const { workspaceId, type, triggers, responses, conditions, schedule, isActive } = req.body;
+      const { 
+        workspaceId, 
+        type, 
+        triggers, 
+        responses, 
+        aiPersonality, 
+        responseLength, 
+        conditions, 
+        schedule, 
+        isActive 
+      } = req.body;
       
-      if (!workspaceId || !type || !triggers || !responses) {
+      if (!workspaceId || !type || !triggers) {
         return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // For contextual AI mode, responses array can be empty since AI generates them
+      // For keyword mode, responses are required
+      if (triggers.aiMode === 'keyword' && (!responses || responses.length === 0)) {
+        return res.status(400).json({ error: 'Responses required for keyword mode' });
       }
 
       const rule = await storage.createAutomationRule?.({
         workspaceId,
         type,
         triggers,
-        responses,
+        responses: responses || [],
+        aiPersonality: aiPersonality || 'friendly',
+        responseLength: responseLength || 'medium',
         conditions: conditions || {},
         schedule: schedule || null,
-        isActive: isActive || true
+        isActive: isActive !== undefined ? isActive : true
       });
 
       res.json({ rule });

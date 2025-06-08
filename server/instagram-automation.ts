@@ -51,10 +51,12 @@ export interface AutomationLog {
 
 export class InstagramAutomation {
   private aiGenerator: AIResponseGenerator;
+  private antiSpam: InstagramAntiSpam;
   private processedComments = new Set<string>();
 
   constructor(private storage: IStorage) {
     this.aiGenerator = new AIResponseGenerator();
+    this.antiSpam = new InstagramAntiSpam();
   }
 
   /**
@@ -315,6 +317,17 @@ export class InstagramAutomation {
           continue;
         }
 
+        // Check anti-spam rules first
+        const shouldRespond = this.antiSpam.shouldRespond(
+          caption,
+          mention.username || 'unknown'
+        );
+        
+        if (!shouldRespond) {
+          console.log(`[ANTI-SPAM] Skipping response due to anti-spam rules`);
+          continue;
+        }
+        
         // Check if rule conditions are met
         const shouldTrigger = this.shouldTriggerRule(rule, caption);
         
@@ -326,30 +339,21 @@ export class InstagramAutomation {
             continue;
           }
 
-          // Generate response based on mode
-          let response: string;
+          // Generate anti-spam response with human-like patterns
+          const antiSpamResponse = await this.antiSpam.generateAntiSpamResponse(
+            caption,
+            mention.username || 'unknown',
+            rule.triggers.aiMode || 'contextual',
+            rule.aiPersonality || 'friendly',
+            rule.responseLength || 'medium'
+          );
           
-          if (rule.triggers.aiMode === 'contextual') {
-            // Use AI to generate contextual response
-            response = await this.generateContextualResponse(
-              caption, 
-              rule, 
-              { username: mention.username || 'unknown' }
-            );
-          } else {
-            // Use predefined responses for keyword mode
-            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
-          }
+          console.log(`[ANTI-SPAM] Generated human-like response: "${antiSpamResponse.response}" (delay: ${antiSpamResponse.delay}ms)`);
           
-          // Add delay if specified
-          if (rule.conditions.timeDelay) {
-            console.log(`[AUTOMATION] Delaying response by ${rule.conditions.timeDelay} minutes`);
-            setTimeout(async () => {
-              await this.sendAutomatedComment(accessToken, mention.id, response, workspaceId, rule.id);
-            }, rule.conditions.timeDelay * 60 * 1000);
-          } else {
-            await this.sendAutomatedComment(accessToken, mention.id, response, workspaceId, rule.id);
-          }
+          // Apply human-like delay before responding
+          setTimeout(async () => {
+            await this.sendAutomatedComment(accessToken, mention.id, antiSpamResponse.response, workspaceId, rule.id);
+          }, antiSpamResponse.delay);
         }
       }
     } catch (error) {

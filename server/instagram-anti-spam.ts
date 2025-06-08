@@ -52,7 +52,9 @@ export class InstagramAntiSpam {
   async generateAntiSpamResponse(
     comment: string, 
     username: string, 
-    workspacePersonality: string = 'casual'
+    aiMode: string = 'contextual',
+    personality: string = 'friendly',
+    responseLength: string = 'medium'
   ): Promise<{ response: string; delay: number; shouldRespond: boolean }> {
     
     // Check daily limits (humans don't respond to everything)
@@ -164,7 +166,7 @@ export class InstagramAntiSpam {
 
     // Remove emojis sometimes to be more natural
     if (patterns.removeEmoji) {
-      humanized = humanized.replace(/[\u{1F600}-\u{1F64F}]/gu, '');
+      humanized = humanized.replace(/😀|😁|😂|😃|😄|😅|😆|😇|😈|😉|😊|😋|😌|😍|😎|😏/g, '');
     }
 
     // Use short forms

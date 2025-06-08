@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { IStorage } from './storage';
 import { InstagramAutomation } from './instagram-automation';
+import { InstagramAntiSpam } from './instagram-anti-spam';
 
 interface WebhookEntry {
   id: string;

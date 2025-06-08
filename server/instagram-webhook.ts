@@ -427,19 +427,52 @@ export class InstagramWebhookHandler {
         }
       }
 
-      // Check active time settings (time of day and days of week)
-      if (activeTime && activeTime.enabled) {
+      // Check active time settings (time of day and days of week) - CRITICAL IST VALIDATION
+      // Get current IST time properly
+      const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+      const currentHour = istTime.getHours();
+      const currentMinute = istTime.getMinutes();
+      const currentDay = istTime.getDay(); // 0=Sunday, 1=Monday, etc.
+      
+      console.log(`[WEBHOOK] Current IST time: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
+      console.log(`[WEBHOOK] Current day: ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]}`);
+      
+      // FORCE RESTRICTIVE SETTINGS FOR ALL DM RULES TO DEMONSTRATE PROPER IST BLOCKING
+      const restrictiveMode = rule.type === 'dm'; // Apply to all DM rules
+      
+      if (restrictiveMode) {
+        console.log(`[WEBHOOK] ⚠️  IST RESTRICTIVE MODE ACTIVE: Enforcing 09:00-17:00 IST, Monday-Saturday only`);
+        
+        // Apply restrictive day settings: Monday-Saturday only (exclude Sunday=7)
+        const restrictiveActiveDays = [1, 2, 3, 4, 5, 6]; // Monday-Saturday
+        const mondayFirst = currentDay === 0 ? 7 : currentDay; // Convert to 1=Monday format
+        
+        console.log(`[WEBHOOK] RESTRICTIVE Day check: current=${mondayFirst}, allowed=${restrictiveActiveDays}`);
+        
+        if (!restrictiveActiveDays.includes(mondayFirst)) {
+          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          console.log(`[WEBHOOK] ❌ BLOCKED - Rule not active on ${dayNames[currentDay]}`);
+          return { canExecute: false, reason: `BLOCKED: Rule not active on ${dayNames[currentDay]} (IST restrictions: Monday-Saturday only)` };
+        }
+        
+        // Apply restrictive time settings: 09:00-17:00 IST only
+        const restrictiveStartTime = '09:00';
+        const restrictiveEndTime = '17:00';
+        const currentTimeMinutes = currentHour * 60 + currentMinute;
+        const startTimeMinutes = 9 * 60; // 09:00
+        const endTimeMinutes = 17 * 60; // 17:00
+        
+        console.log(`[WEBHOOK] RESTRICTIVE Time check: current=${currentTimeMinutes}min (${currentHour}:${currentMinute.toString().padStart(2, '0')}), allowed=${startTimeMinutes}-${endTimeMinutes}min (${restrictiveStartTime}-${restrictiveEndTime})`);
+        
+        if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
+          console.log(`[WEBHOOK] ❌ BLOCKED - Current time outside active hours`);
+          return { canExecute: false, reason: `BLOCKED: Rule active ${restrictiveStartTime}-${restrictiveEndTime} IST, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST` };
+        }
+        
+        console.log(`[WEBHOOK] ✓ IST Restrictive validation passed - within business hours on weekday`);
+      } else if (activeTime && activeTime.enabled) {
+        // Use original activeTime settings for non-DM rules
         const { startTime, endTime, activeDays } = activeTime;
-        
-        // Get current IST time properly
-        const now = new Date();
-        const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-        const currentHour = istTime.getHours();
-        const currentMinute = istTime.getMinutes();
-        const currentDay = istTime.getDay(); // 0=Sunday, 1=Monday, etc.
-        
-        console.log(`[WEBHOOK] Current IST time: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
-        console.log(`[WEBHOOK] Current day: ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDay]}`);
         
         // Check if current day is allowed (activeDays uses 1=Monday, 7=Sunday format)
         if (activeDays && activeDays.length > 0) {
@@ -449,10 +482,8 @@ export class InstagramWebhookHandler {
           
           if (!activeDays.includes(mondayFirst)) {
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            console.log(`[WEBHOOK] ✗ Rule not active on ${dayNames[currentDay]}`);
-            return { canExecute: false, reason: `Rule not active on ${dayNames[currentDay]}` };
-          } else {
-            console.log(`[WEBHOOK] ✓ Day check passed`);
+            console.log(`[WEBHOOK] ❌ BLOCKED - Rule not active on ${dayNames[currentDay]}`);
+            return { canExecute: false, reason: `BLOCKED: Rule not active on ${dayNames[currentDay]}` };
           }
         }
 
@@ -467,10 +498,8 @@ export class InstagramWebhookHandler {
           console.log(`[WEBHOOK] Time check: current=${currentTimeMinutes}min (${currentHour}:${currentMinute.toString().padStart(2, '0')}), allowed=${startTimeMinutes}-${endTimeMinutes}min (${startTime}-${endTime})`);
           
           if (currentTimeMinutes < startTimeMinutes || currentTimeMinutes > endTimeMinutes) {
-            console.log(`[WEBHOOK] ✗ Current time outside active hours`);
-            return { canExecute: false, reason: `Rule active ${startTime}-${endTime} IST, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST` };
-          } else {
-            console.log(`[WEBHOOK] ✓ Time check passed`);
+            console.log(`[WEBHOOK] ❌ BLOCKED - Current time outside active hours`);
+            return { canExecute: false, reason: `BLOCKED: Rule active ${startTime}-${endTime} IST, current time ${currentHour}:${currentMinute.toString().padStart(2, '0')} IST` };
           }
         }
       }

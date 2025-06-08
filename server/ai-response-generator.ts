@@ -84,13 +84,19 @@ class AIResponseGenerator {
     } catch (error) {
       console.error('[AI RESPONSE] Error generating response:', error);
       
-      // Generate natural fallback that avoids spam detection
-      const fallbackResponse = this.generateNaturalFallback(context.message, context.userProfile?.username);
+      // Generate contextual fallback that understands language and personality
+      const messageAnalysis = this.analyzeMessageStyle(context.message);
+      const contextualResponse = this.generateContextualResponseFromAnalysis(messageAnalysis, context.message);
+      
+      // Use natural fallback if contextual fails
+      const fallbackResponse = contextualResponse || 
+        this.generateNaturalFallback(context.message, context.userProfile?.username).response;
+      
       return {
-        response: fallbackResponse.response,
-        detectedLanguage: fallbackResponse.language,
+        response: fallbackResponse,
+        detectedLanguage: messageAnalysis.language,
         confidence: 0.75,
-        reasoning: "Generated using natural fallback to avoid spam detection"
+        reasoning: `Generated ${messageAnalysis.language} response matching ${messageAnalysis.tone} tone and ${messageAnalysis.personality} personality`
       };
     }
   }
@@ -115,7 +121,9 @@ class AIResponseGenerator {
     this.responseHistory.add(response);
     if (this.responseHistory.size > 100) {
       const firstItem = this.responseHistory.values().next().value;
-      this.responseHistory.delete(firstItem);
+      if (firstItem !== undefined) {
+        this.responseHistory.delete(firstItem);
+      }
     }
     
     // Ensure response is short and natural
@@ -124,6 +132,119 @@ class AIResponseGenerator {
     }
     
     return response;
+  }
+
+  /**
+   * Analyze message language, tone, and personality for contextual responses
+   */
+  private analyzeMessageStyle(message: string): {
+    language: string;
+    tone: string;
+    personality: string;
+    style: string;
+    formality: string;
+  } {
+    const lowerMessage = message.toLowerCase();
+    
+    // Advanced language detection with regional patterns
+    let language = 'english';
+    const hindiPatterns = /[\u0900-\u097F]|(?:hai|haan|nahi|kya|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi)/i;
+    const hinglishPatterns = /(?:kya|hai|haan|nahi|acha|theek|bhai|yaar|dost|kar|raha|rahe|rahi|kaise|kahan|kab|kyu|kyun|dekho|sunna|bolna|samjha|samjhi|bro|yaar)/i;
+    
+    if (hindiPatterns.test(message)) {
+      language = /[\u0900-\u097F]/.test(message) ? 'hindi' : 'hinglish';
+    } else if (hinglishPatterns.test(message)) {
+      language = 'hinglish';
+    }
+    
+    // Advanced tone detection
+    let tone = 'neutral';
+    if (/[!]{2,}|[?]{2,}|wow|amazing|awesome|great|love|best|fantastic|incredible|super|perfect/i.test(message)) {
+      tone = 'excited';
+    } else if (/thanks|thank you|appreciate|grateful|shukriya|dhanyawad/i.test(message)) {
+      tone = 'appreciative';
+    } else if (/help|please|request|need|want|madad|zarurat/i.test(message)) {
+      tone = 'requesting';
+    } else if (/hi|hello|hey|good morning|good evening|namaste|namaskar/i.test(message)) {
+      tone = 'friendly';
+    } else if (/angry|upset|disappointed|bad|worst|terrible|bakwas/i.test(message)) {
+      tone = 'negative';
+    }
+    
+    // Personality detection with cultural context
+    let personality = 'casual';
+    if (/bro|bhai|yaar|dude|buddy|mate|boss/i.test(message)) {
+      personality = 'informal';
+    } else if (/sir|madam|please|kindly|would you|could you|sahab|ji/i.test(message)) {
+      personality = 'formal';
+    } else if (/haha|lol|😂|😄|😊|😜|funny|joke|mazak/i.test(message)) {
+      personality = 'humorous';
+    } else if (/urgent|asap|quickly|jaldi|turant/i.test(message)) {
+      personality = 'urgent';
+    }
+    
+    // Communication style detection
+    let style = 'standard';
+    if (message.length < 10) {
+      style = 'brief';
+    } else if (message.length > 50) {
+      style = 'detailed';
+    }
+    
+    // Formality level
+    let formality = 'neutral';
+    if (/sir|madam|please|kindly|would you|could you|sahab|ji|aap/i.test(message)) {
+      formality = 'formal';
+    } else if (/bro|bhai|yaar|dude|buddy|tu|tum/i.test(message)) {
+      formality = 'informal';
+    }
+    
+    return { language, tone, personality, style, formality };
+  }
+
+  /**
+   * Generate contextually appropriate responses based on message analysis
+   */
+  private generateContextualResponseFromAnalysis(messageAnalysis: any, originalMessage: string): string {
+    const { language, tone, personality, style, formality } = messageAnalysis;
+    
+    // Base response patterns by language and context
+    const responsePatterns = {
+      hindi: {
+        greeting: ['Namaste', 'Namaskar', 'Hello', 'Haan bhai'],
+        agreement: ['Haan', 'Bilkul', 'Sahi', 'Theek hai'],
+        thanks: ['Dhanyawad', 'Shukriya', 'Thanks'],
+        help: ['Madad', 'Help', 'Batao', 'Poochho'],
+        casual: ['Acha', 'Okay', 'Samjha', 'Cool']
+      },
+      hinglish: {
+        greeting: ['Hey', 'Hi bhai', 'Hello yaar', 'Kya haal'],
+        agreement: ['Haan yaar', 'Bilkul bro', 'Sure', 'Done'],
+        thanks: ['Thanks bhai', 'Shukriya yaar', 'Thank you'],
+        help: ['Bolo yaar', 'Kya chahiye', 'Help kar deta', 'Batao'],
+        casual: ['Cool', 'Nice', 'Acha', 'Okay bro']
+      },
+      english: {
+        greeting: ['Hey', 'Hello', 'Hi there', 'What\'s up'],
+        agreement: ['Yes', 'Sure', 'Absolutely', 'Of course'],
+        thanks: ['Thank you', 'Thanks', 'Appreciate it'],
+        help: ['How can I help', 'What do you need', 'Let me know'],
+        casual: ['Cool', 'Nice', 'Okay', 'Got it']
+      }
+    };
+    
+    const patterns = responsePatterns[language as keyof typeof responsePatterns] || responsePatterns.english;
+    
+    // Match response to tone and personality
+    if (tone === 'friendly' || /hi|hello|hey|namaste/i.test(originalMessage)) {
+      return this.getRandomResponse(patterns.greeting);
+    } else if (tone === 'appreciative') {
+      return this.getRandomResponse(patterns.thanks);
+    } else if (tone === 'requesting') {
+      return this.getRandomResponse(patterns.help);
+    } else {
+      return this.getRandomResponse(patterns.casual);
+    }
   }
 
   /**

@@ -223,6 +223,12 @@ export default function OnboardingPremium() {
     businessName: '',
     businessDescription: '',
     selectedGoals: [] as string[],
+    growthTargets: {
+      followerGoal: '',
+      timeframe: '6-months',
+      engagementGoal: '',
+      contentFrequency: 'daily'
+    },
     connectedPlatforms: [] as string[],
     workspaceName: '',
     description: '',
@@ -446,6 +452,7 @@ export default function OnboardingPremium() {
       businessName: formData.businessName,
       businessDescription: formData.businessDescription,
       businessGoals: formData.selectedGoals,
+      growthTargets: formData.growthTargets,
       connectedPlatforms: formData.connectedPlatforms,
       aiPersonality: formData.aiPersonality,
       theme: 'space',
@@ -748,6 +755,95 @@ export default function OnboardingPremium() {
 
                     {currentStep === 3 && (
                       <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full max-w-2xl mx-auto">
+                          <div className="space-y-6">
+                            {/* Follower Goal */}
+                            <div className="glassmorphism p-6 rounded-xl border border-white/20">
+                              <Label className="text-white/90 text-lg font-semibold mb-4 block">
+                                Follower Growth Target
+                              </Label>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {['1K', '5K', '10K', '50K', '100K', 'Custom'].map((target) => (
+                                  <motion.button
+                                    key={target}
+                                    className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                      formData.growthTargets.followerGoal === target
+                                        ? 'border-electric-cyan bg-electric-cyan/20 text-electric-cyan'
+                                        : 'border-white/30 bg-white/5 text-white/70 hover:border-white/50'
+                                    }`}
+                                    onClick={() => setFormData(prev => ({
+                                      ...prev,
+                                      growthTargets: { ...prev.growthTargets, followerGoal: target }
+                                    }))}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    {target}
+                                  </motion.button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Timeframe */}
+                            <div className="glassmorphism p-6 rounded-xl border border-white/20">
+                              <Label className="text-white/90 text-lg font-semibold mb-4 block">
+                                Target Timeframe
+                              </Label>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {['3-months', '6-months', '1-year', '2-years'].map((timeframe) => (
+                                  <motion.button
+                                    key={timeframe}
+                                    className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                      formData.growthTargets.timeframe === timeframe
+                                        ? 'border-electric-cyan bg-electric-cyan/20 text-electric-cyan'
+                                        : 'border-white/30 bg-white/5 text-white/70 hover:border-white/50'
+                                    }`}
+                                    onClick={() => setFormData(prev => ({
+                                      ...prev,
+                                      growthTargets: { ...prev.growthTargets, timeframe }
+                                    }))}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    {timeframe.replace('-', ' ')}
+                                  </motion.button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Content Frequency */}
+                            <div className="glassmorphism p-6 rounded-xl border border-white/20">
+                              <Label className="text-white/90 text-lg font-semibold mb-4 block">
+                                Posting Frequency Goal
+                              </Label>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {['daily', 'every-2-days', 'weekly', 'bi-weekly'].map((frequency) => (
+                                  <motion.button
+                                    key={frequency}
+                                    className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                      formData.growthTargets.contentFrequency === frequency
+                                        ? 'border-electric-cyan bg-electric-cyan/20 text-electric-cyan'
+                                        : 'border-white/30 bg-white/5 text-white/70 hover:border-white/50'
+                                    }`}
+                                    onClick={() => setFormData(prev => ({
+                                      ...prev,
+                                      growthTargets: { ...prev.growthTargets, contentFrequency: frequency }
+                                    }))}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    {frequency.replace('-', ' ')}
+                                  </motion.button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 4 && (
+                      <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="text-center mb-6">
                             <p className="text-white/80 mb-4">
@@ -855,6 +951,50 @@ export default function OnboardingPremium() {
                     )}
 
                     {currentStep === 5 && (
+                      <ScrollReveal direction="up" delay={0.3}>
+                        <div className="w-full">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {personalities.map((personality, index) => (
+                              <motion.div
+                                key={personality.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <MagneticElement strength={10}>
+                                  <motion.div
+                                    className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                                      formData.aiPersonality === personality.id
+                                        ? 'border-white/60 bg-white/10'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                    }`}
+                                    onClick={() => setFormData(prev => ({ ...prev, aiPersonality: personality.id }))}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                  >
+                                    <div className="text-center">
+                                      <div 
+                                        className="w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center"
+                                        style={{
+                                          background: `radial-gradient(circle, ${personality.color}40 0%, ${personality.color}20 100%)`,
+                                          border: `1px solid ${personality.color}60`
+                                        }}
+                                      >
+                                        <personality.icon size={20} color={personality.color} />
+                                      </div>
+                                      <h3 className="font-semibold text-white mb-2">{personality.name}</h3>
+                                      <p className="text-sm text-white/60">{personality.description}</p>
+                                    </div>
+                                  </motion.div>
+                                </MagneticElement>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </ScrollReveal>
+                    )}
+
+                    {currentStep === 6 && (
                       <ScrollReveal direction="up" delay={0.3}>
                         <div className="w-full">
                           <div className="text-center mb-6">
@@ -966,6 +1106,7 @@ export default function OnboardingPremium() {
                             <div className="space-y-2 text-white/80 text-left max-w-md mx-auto">
                               <p>✓ Business: {formData.businessName}</p>
                               <p>✓ Goals: {formData.selectedGoals.length} selected</p>
+                              <p>✓ Growth Target: {formData.growthTargets.followerGoal} in {formData.growthTargets.timeframe}</p>
                               <p>✓ Platforms: {formData.connectedPlatforms.length} connected</p>
                               <p>✓ AI Personality: {personalities.find(p => p.id === formData.aiPersonality)?.name}</p>
                               <p>✓ Categories: {formData.selectedCategories.length} selected</p>

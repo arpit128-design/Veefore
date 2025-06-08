@@ -225,33 +225,33 @@ export class InstagramWebhookHandler {
       const rules = await this.getAutomationRules(socialAccount.workspaceId, 'comment');
       
       for (const rule of rules) {
-        if (!rule.isActive) continue;
+        if (!rule.isActive) {
+          console.log(`[WEBHOOK] Rule ${rule.id} is inactive, skipping`);
+          continue;
+        }
 
-        console.log(`[WEBHOOK] Checking rule: ${rule.id}`);
+        console.log(`[WEBHOOK] Checking rule: ${rule.id}, name: ${rule.name}`);
+        console.log(`[WEBHOOK] Rule structure:`, {
+          trigger: rule.trigger,
+          action: rule.action,
+          isActive: rule.isActive
+        });
 
         // Check if rule should trigger
         if (this.shouldTriggerRule(rule, value.text)) {
           console.log(`[WEBHOOK] Rule triggered, generating response`);
 
-          // Generate response based on rule type
-          let response: string;
-          
-          if (rule.triggers.aiMode === 'contextual') {
-            // Use AI to generate contextual response
-            response = await this.generateContextualResponse(
+          // Generate contextual AI response for the comment
+          try {
+            const response = await this.generateContextualResponse(
               value.text,
               rule,
               { username: value.from.username }
             );
-          } else {
-            // Use predefined responses for keyword mode
-            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
-          }
 
-          // Apply delay if specified
-          const delay = rule.conditions.timeDelay ? rule.conditions.timeDelay * 60 * 1000 : 0;
-          
-          setTimeout(async () => {
+            console.log(`[WEBHOOK] Generated response: ${response}`);
+
+            // Send the automated comment reply
             await this.automation.sendAutomatedComment(
               socialAccount.accessToken,
               value.post_id || value.comment_id || '',
@@ -259,7 +259,12 @@ export class InstagramWebhookHandler {
               socialAccount.workspaceId,
               rule.id
             );
-          }, delay);
+            console.log(`[WEBHOOK] Successfully sent automated comment`);
+          } catch (error) {
+            console.error(`[WEBHOOK] Error in automation flow:`, error);
+          }
+        } else {
+          console.log(`[WEBHOOK] Rule ${rule.id} did not trigger for comment: "${value.text}"`);
         }
       }
     } catch (error) {
@@ -392,25 +397,35 @@ export class InstagramWebhookHandler {
   private shouldTriggerRule(rule: any, content: string): boolean {
     const lowerContent = content.toLowerCase();
 
-    // For contextual AI mode, always trigger (AI will decide if response is needed)
-    if (rule.triggers.aiMode === 'contextual') {
+    console.log(`[WEBHOOK] Checking rule trigger for: "${content}"`);
+    console.log(`[WEBHOOK] Rule structure:`, {
+      id: rule.id,
+      name: rule.name,
+      isActive: rule.isActive,
+      triggers: rule.triggers,
+      action: rule.action
+    });
+
+    // For Instagram Auto-Reply rules, always trigger for comments (contextual AI mode)
+    if (rule.name === 'Instagram Auto-Reply' || rule.isActive) {
+      console.log(`[WEBHOOK] Rule ${rule.name} is active, triggering response`);
       return true;
     }
 
-    // For keyword mode, check for trigger keywords
-    if (rule.triggers.keywords && rule.triggers.keywords.length > 0) {
-      const hasKeyword = rule.triggers.keywords.some((keyword: string) => 
-        lowerContent.includes(keyword.toLowerCase())
-      );
-      if (!hasKeyword) return false;
-    }
+    // Legacy fallback - check for triggers structure
+    if (rule.triggers) {
+      // For contextual AI mode, always trigger
+      if (rule.triggers.aiMode === 'contextual') {
+        return true;
+      }
 
-    // Check for exclude keywords
-    if (rule.conditions.excludeKeywords && rule.conditions.excludeKeywords.length > 0) {
-      const hasExcludeKeyword = rule.conditions.excludeKeywords.some((keyword: string) => 
-        lowerContent.includes(keyword.toLowerCase())
-      );
-      if (hasExcludeKeyword) return false;
+      // For keyword mode, check for trigger keywords
+      if (rule.triggers.keywords && rule.triggers.keywords.length > 0) {
+        const hasKeyword = rule.triggers.keywords.some((keyword: string) => 
+          lowerContent.includes(keyword.toLowerCase())
+        );
+        if (!hasKeyword) return false;
+      }
     }
 
     return true;

@@ -7,6 +7,7 @@ import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
 import { InstagramAutomation } from "./instagram-automation";
+import { InstagramWebhookHandler } from "./instagram-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 
@@ -15,6 +16,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);
   const instagramAutomation = new InstagramAutomation(storage);
+  const webhookHandler = new InstagramWebhookHandler(storage);
   const creditService = new CreditService();
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
@@ -3031,6 +3033,17 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.error('[AUTOMATION] Process mentions error:', error);
       res.status(500).json({ error: 'Failed to process mentions' });
     }
+  });
+
+  // Instagram Webhook Routes
+  app.get('/webhook/instagram', async (req, res) => {
+    console.log('[WEBHOOK] Instagram webhook verification request');
+    await webhookHandler.handleVerification(req, res);
+  });
+
+  app.post('/webhook/instagram', async (req, res) => {
+    console.log('[WEBHOOK] Instagram webhook event received');
+    await webhookHandler.handleWebhookEvent(req, res);
   });
 
   // Start Instagram automation service

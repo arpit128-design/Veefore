@@ -75,10 +75,18 @@ export interface IStorage {
 
   // Automation rules
   getAutomationRules(workspaceId: number): Promise<AutomationRule[]>;
+  getAutomationRulesByWorkspace(workspaceId: string | number): Promise<AutomationRule[]>;
   getActiveAutomationRules(): Promise<AutomationRule[]>;
   createAutomationRule(rule: InsertAutomationRule): Promise<AutomationRule>;
   updateAutomationRule(id: number, updates: Partial<AutomationRule>): Promise<AutomationRule>;
   deleteAutomationRule(id: number): Promise<void>;
+  
+  // Automation logs
+  getAutomationLogs(workspaceId: string | number, options?: { limit?: number; type?: string }): Promise<any[]>;
+  createAutomationLog(log: any): Promise<any>;
+  
+  // Social accounts
+  getAllSocialAccounts(): Promise<SocialAccount[]>;
 
   // Suggestions
   getSuggestions(workspaceId: number, type?: string): Promise<Suggestion[]>;
@@ -581,6 +589,27 @@ export class MemStorage implements IStorage {
 
   async deleteAutomationRule(id: number): Promise<void> {
     this.automationRules.delete(id);
+  }
+
+  async getAutomationRulesByWorkspace(workspaceId: string | number): Promise<AutomationRule[]> {
+    const wsId = typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId;
+    return Array.from(this.automationRules.values())
+      .filter(rule => rule.workspaceId === wsId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getAutomationLogs(workspaceId: string | number, options?: { limit?: number; type?: string }): Promise<any[]> {
+    // For now, return empty array - logs would be stored separately in a real implementation
+    return [];
+  }
+
+  async createAutomationLog(log: any): Promise<any> {
+    // For now, just return the log - in a real implementation, this would store to database
+    return { ...log, id: Date.now(), createdAt: new Date() };
+  }
+
+  async getAllSocialAccounts(): Promise<SocialAccount[]> {
+    return Array.from(this.socialAccounts.values());
   }
 
   // Suggestions

@@ -1,0 +1,395 @@
+import { Request, Response } from 'express';
+import crypto from 'crypto';
+import { IStorage } from './storage';
+import { InstagramAutomation } from './instagram-automation';
+
+interface WebhookEntry {
+  id: string;
+  time: number;
+  changes: WebhookChange[];
+}
+
+interface WebhookChange {
+  field: string;
+  value: {
+    from?: {
+      id: string;
+      username: string;
+    };
+    post_id?: string;
+    comment_id?: string;
+    parent_id?: string;
+    created_time?: number;
+    text?: string;
+    media?: {
+      id: string;
+      media_product_type: string;
+    };
+    recipient?: {
+      id: string;
+    };
+    sender?: {
+      id: string;
+      username: string;
+    };
+    message?: {
+      mid: string;
+      text: string;
+      timestamp: number;
+    };
+  };
+}
+
+interface WebhookPayload {
+  object: string;
+  entry: WebhookEntry[];
+}
+
+export class InstagramWebhookHandler {
+  private storage: IStorage;
+  private automation: InstagramAutomation;
+  private appSecret: string;
+
+  constructor(storage: IStorage) {
+    this.storage = storage;
+    this.automation = new InstagramAutomation(storage);
+    this.appSecret = process.env.INSTAGRAM_APP_SECRET || '';
+  }
+
+  /**
+   * Verify webhook signature for security
+   */
+  private verifySignature(payload: string, signature: string): boolean {
+    if (!this.appSecret) {
+      console.warn('[WEBHOOK] Instagram App Secret not configured');
+      return false;
+    }
+
+    const expectedSignature = crypto
+      .createHmac('sha256', this.appSecret)
+      .update(payload)
+      .digest('hex');
+
+    const receivedSignature = signature.replace('sha256=', '');
+    
+    return crypto.timingSafeEqual(
+      Buffer.from(expectedSignature, 'hex'),
+      Buffer.from(receivedSignature, 'hex')
+    );
+  }
+
+  /**
+   * Handle webhook verification (GET request)
+   */
+  async handleVerification(req: Request, res: Response): Promise<void> {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    console.log('[WEBHOOK] Verification request:', { mode, token });
+
+    if (mode === 'subscribe' && token === process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN) {
+      console.log('[WEBHOOK] Webhook verified successfully');
+      res.status(200).send(challenge);
+    } else {
+      console.log('[WEBHOOK] Webhook verification failed');
+      res.sendStatus(403);
+    }
+  }
+
+  /**
+   * Handle incoming webhook events (POST request)
+   */
+  async handleWebhookEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const signature = req.headers['x-hub-signature-256'] as string;
+      const payload = JSON.stringify(req.body);
+
+      // Verify webhook signature for security
+      if (!this.verifySignature(payload, signature)) {
+        console.error('[WEBHOOK] Invalid signature');
+        return res.sendStatus(401);
+      }
+
+      const webhookData: WebhookPayload = req.body;
+      
+      console.log('[WEBHOOK] Received event:', JSON.stringify(webhookData, null, 2));
+
+      // Process each entry in the webhook
+      for (const entry of webhookData.entry) {
+        await this.processWebhookEntry(entry);
+      }
+
+      res.status(200).send('EVENT_RECEIVED');
+    } catch (error) {
+      console.error('[WEBHOOK] Error processing webhook:', error);
+      res.status(500).send('ERROR');
+    }
+  }
+
+  /**
+   * Process individual webhook entry
+   */
+  private async processWebhookEntry(entry: WebhookEntry): Promise<void> {
+    try {
+      const pageId = entry.id;
+      console.log(`[WEBHOOK] Processing entry for page ${pageId}`);
+
+      // Find workspace and social account for this Instagram page
+      const socialAccount = await this.findSocialAccountByPageId(pageId);
+      if (!socialAccount) {
+        console.log(`[WEBHOOK] No social account found for page ${pageId}`);
+        return;
+      }
+
+      console.log(`[WEBHOOK] Found social account: ${socialAccount.username} for workspace ${socialAccount.workspaceId}`);
+
+      // Process each change in the entry
+      for (const change of entry.changes) {
+        await this.processWebhookChange(change, socialAccount);
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error processing entry:', error);
+    }
+  }
+
+  /**
+   * Process individual webhook change
+   */
+  private async processWebhookChange(change: WebhookChange, socialAccount: any): Promise<void> {
+    try {
+      console.log(`[WEBHOOK] Processing change: ${change.field}`);
+
+      switch (change.field) {
+        case 'comments':
+          await this.handleCommentEvent(change, socialAccount);
+          break;
+        
+        case 'messages':
+          await this.handleMessageEvent(change, socialAccount);
+          break;
+        
+        case 'mentions':
+          await this.handleMentionEvent(change, socialAccount);
+          break;
+        
+        default:
+          console.log(`[WEBHOOK] Unhandled field: ${change.field}`);
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error processing change:', error);
+    }
+  }
+
+  /**
+   * Handle comment events (new comments on posts)
+   */
+  private async handleCommentEvent(change: WebhookChange, socialAccount: any): Promise<void> {
+    try {
+      const { value } = change;
+      
+      if (!value.text || !value.from) {
+        console.log('[WEBHOOK] Incomplete comment data');
+        return;
+      }
+
+      console.log(`[WEBHOOK] New comment from @${value.from.username}: "${value.text}"`);
+
+      // Get automation rules for this workspace
+      const rules = await this.getAutomationRules(socialAccount.workspaceId, 'comment');
+      
+      for (const rule of rules) {
+        if (!rule.isActive) continue;
+
+        console.log(`[WEBHOOK] Checking rule: ${rule.id}`);
+
+        // Check if rule should trigger
+        if (this.shouldTriggerRule(rule, value.text)) {
+          console.log(`[WEBHOOK] Rule triggered, generating response`);
+
+          // Generate response based on rule type
+          let response: string;
+          
+          if (rule.triggers.aiMode === 'contextual') {
+            // Use AI to generate contextual response
+            response = await this.generateContextualResponse(
+              value.text,
+              rule,
+              { username: value.from.username }
+            );
+          } else {
+            // Use predefined responses for keyword mode
+            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+          }
+
+          // Apply delay if specified
+          const delay = rule.conditions.timeDelay ? rule.conditions.timeDelay * 60 * 1000 : 0;
+          
+          setTimeout(async () => {
+            await this.automation.sendAutomatedComment(
+              socialAccount.accessToken,
+              value.post_id || value.comment_id || '',
+              response,
+              socialAccount.workspaceId,
+              rule.id
+            );
+          }, delay);
+        }
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error handling comment event:', error);
+    }
+  }
+
+  /**
+   * Handle direct message events
+   */
+  private async handleMessageEvent(change: WebhookChange, socialAccount: any): Promise<void> {
+    try {
+      const { value } = change;
+      
+      if (!value.message?.text || !value.sender) {
+        console.log('[WEBHOOK] Incomplete message data');
+        return;
+      }
+
+      console.log(`[WEBHOOK] New DM from @${value.sender.username}: "${value.message.text}"`);
+
+      // Get automation rules for this workspace
+      const rules = await this.getAutomationRules(socialAccount.workspaceId, 'dm');
+      
+      for (const rule of rules) {
+        if (!rule.isActive) continue;
+
+        // Check if rule should trigger
+        if (this.shouldTriggerRule(rule, value.message.text)) {
+          console.log(`[WEBHOOK] DM rule triggered, generating response`);
+
+          // Generate response based on rule type
+          let response: string;
+          
+          if (rule.triggers.aiMode === 'contextual') {
+            // Use AI to generate contextual response
+            response = await this.generateContextualResponse(
+              value.message.text,
+              rule,
+              { username: value.sender.username }
+            );
+          } else {
+            // Use predefined responses for keyword mode
+            response = rule.responses[Math.floor(Math.random() * rule.responses.length)];
+          }
+
+          // Apply delay if specified
+          const delay = rule.conditions.timeDelay ? rule.conditions.timeDelay * 60 * 1000 : 0;
+          
+          setTimeout(async () => {
+            await this.automation.sendAutomatedDM(
+              socialAccount.accessToken,
+              value.sender.id,
+              response,
+              socialAccount.workspaceId,
+              rule.id
+            );
+          }, delay);
+        }
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error handling message event:', error);
+    }
+  }
+
+  /**
+   * Handle mention events (when account is mentioned in posts/stories)
+   */
+  private async handleMentionEvent(change: WebhookChange, socialAccount: any): Promise<void> {
+    try {
+      const { value } = change;
+      console.log(`[WEBHOOK] New mention detected`);
+
+      // Process mention similar to comment
+      await this.handleCommentEvent(change, socialAccount);
+    } catch (error) {
+      console.error('[WEBHOOK] Error handling mention event:', error);
+    }
+  }
+
+  /**
+   * Find social account by Instagram page ID
+   */
+  private async findSocialAccountByPageId(pageId: string): Promise<any> {
+    try {
+      // This would need to be implemented in the storage layer
+      // For now, we'll use a placeholder that searches by account ID
+      const accounts = await this.storage.getAllSocialAccounts?.() || [];
+      return accounts.find(account => 
+        account.platform === 'instagram' && 
+        account.accountId === pageId
+      );
+    } catch (error) {
+      console.error('[WEBHOOK] Error finding social account:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get automation rules for workspace and type
+   */
+  private async getAutomationRules(workspaceId: string, type?: string): Promise<any[]> {
+    try {
+      const allRules = await this.storage.getAutomationRulesByWorkspace?.(workspaceId) || [];
+      return type ? allRules.filter(rule => rule.type === type) : allRules;
+    } catch (error) {
+      console.error('[WEBHOOK] Error getting automation rules:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if automation rule should trigger
+   */
+  private shouldTriggerRule(rule: any, content: string): boolean {
+    const lowerContent = content.toLowerCase();
+
+    // For contextual AI mode, always trigger (AI will decide if response is needed)
+    if (rule.triggers.aiMode === 'contextual') {
+      return true;
+    }
+
+    // For keyword mode, check for trigger keywords
+    if (rule.triggers.keywords && rule.triggers.keywords.length > 0) {
+      const hasKeyword = rule.triggers.keywords.some((keyword: string) => 
+        lowerContent.includes(keyword.toLowerCase())
+      );
+      if (!hasKeyword) return false;
+    }
+
+    // Check for exclude keywords
+    if (rule.conditions.excludeKeywords && rule.conditions.excludeKeywords.length > 0) {
+      const hasExcludeKeyword = rule.conditions.excludeKeywords.some((keyword: string) => 
+        lowerContent.includes(keyword.toLowerCase())
+      );
+      if (hasExcludeKeyword) return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Generate contextual AI response (delegated to automation class)
+   */
+  private async generateContextualResponse(
+    message: string,
+    rule: any,
+    userProfile?: { username: string }
+  ): Promise<string> {
+    try {
+      // This would use the AI response generator from the automation class
+      return await (this.automation as any).generateContextualResponse(message, rule, userProfile);
+    } catch (error) {
+      console.error('[WEBHOOK] Error generating contextual response:', error);
+      // Fallback to predefined response
+      return rule.responses[Math.floor(Math.random() * rule.responses.length)] || 'Thank you for your message!';
+    }
+  }
+}

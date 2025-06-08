@@ -129,6 +129,17 @@ function VideoGenerator() {
       return;
     }
 
+    // Check credits before generating (2 credits for caption generation)
+    if (!user?.credits || user.credits < 2) {
+      setUpgradeModal({
+        isOpen: true,
+        featureType: "AI Caption Generation",
+        creditsRequired: 2,
+        currentCredits: user?.credits || 0
+      });
+      return;
+    }
+
     scriptMutation.mutate({
       description: prompt.trim(),
       platform: platform,
@@ -142,6 +153,17 @@ function VideoGenerator() {
         title: "Script Required",
         description: "Please generate a script first",
         variant: "destructive",
+      });
+      return;
+    }
+
+    // Check credits before generating (8 credits for video generation)
+    if (!user?.credits || user.credits < 8) {
+      setUpgradeModal({
+        isOpen: true,
+        featureType: "AI Video Generation",
+        creditsRequired: 8,
+        currentCredits: user?.credits || 0
       });
       return;
     }
@@ -364,10 +386,22 @@ function PostCreator() {
   const [imagePrompt, setImagePrompt] = useState("");
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    featureType: "",
+    creditsRequired: 0,
+    currentCredits: 0
+  });
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch user data for credits
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  }) as { data?: { credits?: number } };
 
   const createPostMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -396,21 +430,33 @@ function PostCreator() {
   const generateImageMutation = useMutation({
     mutationFn: async (prompt: string) => {
       const response = await apiRequest('POST', '/api/generate-image', { prompt });
-      return response.json();
+      return await response.json();
     },
     onSuccess: (response: any) => {
       setGeneratedImage(response.imageUrl);
+      setIsGeneratingImage(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Image Generated!",
-        description: "AI-powered image created successfully.",
+        description: `Used ${response.creditsUsed || 4} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
       });
     },
     onError: (error: any) => {
-      toast({
-        title: "Image Generation Failed",
-        description: error.message || "Failed to generate image",
-        variant: "destructive",
-      });
+      setIsGeneratingImage(false);
+      if (error.status === 402 && error.upgradeModal) {
+        setUpgradeModal({
+          isOpen: true,
+          featureType: "AI Image Generation",
+          creditsRequired: 4,
+          currentCredits: user?.credits || 0
+        });
+      } else {
+        toast({
+          title: "Image Generation Failed",
+          description: error.message || "Failed to generate image",
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -423,6 +469,18 @@ function PostCreator() {
       });
       return;
     }
+
+    // Check credits before generating (4 credits for image generation)
+    if (!user?.credits || user.credits < 4) {
+      setUpgradeModal({
+        isOpen: true,
+        featureType: "AI Image Generation",
+        creditsRequired: 4,
+        currentCredits: user?.credits || 0
+      });
+      return;
+    }
+
     setIsGeneratingImage(true);
     generateImageMutation.mutate(imagePrompt);
   };
@@ -568,8 +626,21 @@ function CaptionAI() {
   const [captionPrompt, setCaptionPrompt] = useState("");
   const [captionStyle, setCaptionStyle] = useState("engaging");
   const [generatedCaption, setGeneratedCaption] = useState("");
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    featureType: "",
+    creditsRequired: 0,
+    currentCredits: 0
+  });
   
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch user data for credits
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  }) as { data?: { credits?: number } };
 
   const captionMutation = useMutation({
     mutationFn: async (data: any) => {

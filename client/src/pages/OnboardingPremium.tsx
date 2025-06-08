@@ -237,6 +237,7 @@ export default function OnboardingPremium() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   // Security check - only show onboarding for new users during registration
   const { data: userData } = useQuery({
@@ -244,12 +245,12 @@ export default function OnboardingPremium() {
     enabled: !!user
   });
 
-  // Redirect if user is already onboarded
+  // Redirect if user is already onboarded (but not during completion process)
   useEffect(() => {
-    if (userData?.isOnboarded) {
+    if (userData?.isOnboarded && !isCompleting) {
       setLocation('/dashboard');
     }
-  }, [userData, setLocation]);
+  }, [userData, setLocation, isCompleting]);
 
   // Calculate progress
   useEffect(() => {
@@ -335,9 +336,12 @@ export default function OnboardingPremium() {
         description: "Welcome to your new AI-powered creative universe!",
       });
       
-      setTimeout(() => {
-        setLocation('/dashboard');
-      }, 2000);
+      // Clear the completing flag and redirect immediately
+      setIsCompleting(false);
+      setIsLoading(false);
+      
+      // Immediate redirect without delay to prevent conflicts
+      setLocation('/dashboard');
     },
     onError: (error: any) => {
       toast({
@@ -482,6 +486,7 @@ export default function OnboardingPremium() {
     }
 
     setIsLoading(true);
+    setIsCompleting(true);
     
     createWorkspaceMutation.mutate({
       name: formData.workspaceName,

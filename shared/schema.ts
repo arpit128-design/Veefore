@@ -93,6 +93,11 @@ export const socialAccounts = pgTable("social_accounts", {
   avgComments: integer("avg_comments"),
   avgReach: integer("avg_reach"),
   engagementRate: integer("engagement_rate"), // stored as percentage * 100 (e.g., 3.45% = 345)
+  // Instagram Business API engagement totals
+  totalLikes: integer("total_likes"),
+  totalComments: integer("total_comments"),
+  totalReach: integer("total_reach"),
+  avgEngagement: integer("avg_engagement"), // stored as percentage * 100
   lastSyncAt: timestamp("last_sync_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()

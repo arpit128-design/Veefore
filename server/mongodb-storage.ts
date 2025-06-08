@@ -69,6 +69,11 @@ const SocialAccountSchema = new mongoose.Schema({
   avgComments: { type: Number, default: 0 },
   avgReach: { type: Number, default: 0 },
   engagementRate: { type: Number, default: 0 },
+  // Instagram Business API engagement totals
+  totalLikes: { type: Number, default: 0 },
+  totalComments: { type: Number, default: 0 },
+  totalReach: { type: Number, default: 0 },
+  avgEngagement: { type: Number, default: 0 },
   lastSyncAt: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -582,6 +587,11 @@ export class MongoStorage implements IStorage {
       avgComments: mongoAccount.avgComments ?? null,
       avgReach: mongoAccount.avgReach ?? null,
       engagementRate: mongoAccount.engagementRate ?? null,
+      // Critical Instagram Business API engagement fields
+      totalLikes: mongoAccount.totalLikes ?? null,
+      totalComments: mongoAccount.totalComments ?? null,
+      totalReach: mongoAccount.totalReach ?? null,
+      avgEngagement: mongoAccount.avgEngagement ?? null,
       lastSyncAt: mongoAccount.lastSyncAt ?? null,
       createdAt: mongoAccount.createdAt || new Date(),
       updatedAt: mongoAccount.updatedAt || new Date()

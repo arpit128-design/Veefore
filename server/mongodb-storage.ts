@@ -1141,12 +1141,11 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async updateAutomationRule(id: number, updates: Partial<AutomationRule>): Promise<AutomationRule> {
+  async updateAutomationRule(id: string, updates: Partial<AutomationRule>): Promise<AutomationRule> {
     await this.connect();
     try {
       console.log(`[MONGODB DEBUG] Updating automation rule ${id}:`, updates);
       
-      const collection = this.db!.collection('automation_rules');
       const updateData = {
         ...updates,
         updatedAt: new Date()
@@ -1156,10 +1155,10 @@ export class MongoStorage implements IStorage {
       delete updateData.id;
       delete updateData.createdAt;
       
-      const result = await collection.findOneAndUpdate(
-        { _id: new ObjectId(id.toString()) },
-        { $set: updateData },
-        { returnDocument: 'after' }
+      const result = await AutomationRuleModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
       );
       
       if (!result) {
@@ -1191,22 +1190,14 @@ export class MongoStorage implements IStorage {
     await this.connect();
     try {
       console.log(`[MONGODB DEBUG] Deleting automation rule: ${id}`);
-      console.log(`[MONGODB DEBUG] Database connection status:`, this.db ? 'Connected' : 'Not connected');
       
-      if (!this.db) {
-        throw new Error('Database connection not established');
-      }
+      const result = await AutomationRuleModel.findByIdAndDelete(id);
       
-      const collection = this.db.collection('automation_rules');
-      const result = await collection.deleteOne({ 
-        _id: new ObjectId(id) 
-      });
-      
-      if (result.deletedCount === 0) {
+      if (!result) {
         throw new Error('Automation rule not found');
       }
       
-      console.log(`[MONGODB DEBUG] Deleted automation rule: ${id}`);
+      console.log(`[MONGODB DEBUG] Successfully deleted automation rule: ${id}`);
     } catch (error: any) {
       console.error('[MONGODB DEBUG] deleteAutomationRule error:', error.message);
       throw new Error(`Failed to delete automation rule: ${error.message}`);

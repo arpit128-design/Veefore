@@ -49,6 +49,27 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 
+// Performance optimized particles
+const Particle3D = ({ index }: { index: number }) => (
+  <motion.div
+    className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-40"
+    initial={{
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+    }}
+    animate={{
+      y: [null, -20, 20, -10, 0],
+      x: [null, Math.random() * 50 - 25, Math.random() * 30 - 15],
+      opacity: [0.4, 0.8, 0.2, 0.6, 0.4],
+    }}
+    transition={{
+      duration: 8 + index * 2,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  />
+);
+
 // Optimized Animation Components
 const AnimatedCounter = ({ end, suffix = "" }: { end: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
@@ -102,7 +123,13 @@ const TypewriterEffect = ({ texts, speed = 100 }: { texts: string[]; speed?: num
   return (
     <span className="min-h-[1em] inline-block">
       {currentText}
-      <span className="ml-1 animate-pulse">|</span>
+      <motion.span 
+        animate={{ opacity: [0, 1, 0] }}
+        transition={{ duration: 1, repeat: Infinity }}
+        className="ml-1"
+      >
+        |
+      </motion.span>
     </span>
   );
 };
@@ -112,54 +139,108 @@ const OptimizedFeatureCard = ({
   title, 
   description, 
   gradient, 
-  visualElements
+  visualElements,
+  index
 }: any) => (
-  <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-white/10 overflow-hidden hover:scale-105 transition-transform duration-300">
-    {/* Simple Background Elements */}
+  <motion.div 
+    initial={{ opacity: 0, y: 50, rotateX: -10 }}
+    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+    viewport={{ once: true }}
+    transition={{ delay: index * 0.1, duration: 0.8, type: "spring" }}
+    whileHover={{ scale: 1.05, rotateY: 5 }}
+    className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-white/10 overflow-hidden transform-gpu"
+    style={{ transformStyle: "preserve-3d" }}
+  >
+    {/* Animated Background Elements */}
     <div className="absolute inset-0 overflow-hidden">
-      {[...Array(2)].map((_, i) => (
-        <div
+      {[...Array(3)].map((_, i) => (
+        <motion.div
           key={i}
           className="absolute w-2 h-2 bg-blue-400 rounded-full opacity-20"
+          animate={{
+            x: [0, 100, -50, 0],
+            y: [0, -50, 100, 0],
+            scale: [1, 1.5, 0.8, 1],
+            opacity: [0.2, 0.6, 0.1, 0.2]
+          }}
+          transition={{
+            duration: 8 + i * 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           style={{
-            left: `${20 + i * 60}%`,
-            top: `${30 + i * 40}%`,
-            animation: `float ${4 + i}s ease-in-out infinite`
+            left: `${20 + i * 30}%`,
+            top: `${30 + i * 20}%`,
           }}
         />
       ))}
     </div>
 
-    {/* Icon Container */}
-    <div className={`relative w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6 shadow-2xl`}>
-      <Icon size={32} className="text-white relative z-10" />
-    </div>
+    {/* Animated Icon Container */}
+    <motion.div 
+      className={`relative w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6 shadow-2xl`}
+      whileHover={{ rotateY: 15, scale: 1.1 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <motion.div
+        animate={{ rotateZ: [0, 5, -5, 0] }}
+        transition={{ duration: 4, repeat: Infinity }}
+      >
+        <Icon size={32} className="text-white relative z-10" />
+      </motion.div>
+    </motion.div>
 
-    <h3 className="text-2xl font-bold mb-4 text-white">{title}</h3>
-    <p className="text-gray-300 leading-relaxed mb-6">{description}</p>
+    <motion.h3 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="text-2xl font-bold mb-4 text-white"
+    >
+      {title}
+    </motion.h3>
+    
+    <motion.p 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ delay: 0.4 }}
+      className="text-gray-300 leading-relaxed mb-6"
+    >
+      {description}
+    </motion.p>
 
-    {/* Visual Elements Grid */}
+    {/* Enhanced Visual Elements Grid */}
     <div className="grid grid-cols-2 gap-3">
-      {visualElements.map((element: any, index: number) => {
+      {visualElements.map((element: any, idx: number) => {
         const ElementIcon = element.icon;
         return (
-          <div
-            key={index}
-            className={`p-3 rounded-xl ${element.color} flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform duration-200`}
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.1, rotateZ: 5 }}
+            transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
+            className={`p-3 rounded-xl ${element.color} flex flex-col items-center gap-2 cursor-pointer`}
           >
-            <ElementIcon className="w-6 h-6 text-white" />
+            <motion.div
+              animate={{ rotateY: [0, 360] }}
+              transition={{ duration: 10 + idx * 2, repeat: Infinity, ease: "linear" }}
+            >
+              <ElementIcon className="w-6 h-6 text-white" />
+            </motion.div>
             <span className="text-white text-xs font-medium">{element.name}</span>
             <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white rounded-full transition-all duration-1000"
-                style={{ width: `${60 + Math.random() * 40}%` }}
+              <motion.div
+                className="h-full bg-white rounded-full"
+                initial={{ width: "0%" }}
+                whileInView={{ width: `${60 + Math.random() * 40}%` }}
+                transition={{ duration: 2, delay: 0.7 + idx * 0.1 }}
               />
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>
-  </div>
+  </motion.div>
 );
 
 const Landing = () => {
@@ -349,174 +430,337 @@ const Landing = () => {
       {/* Header Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/10">
         {/* Top Banner */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 px-4">
+        <motion.div 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 px-4"
+        >
           <p className="text-sm font-medium">
             🚀 The Future of AI-Powered Multi-Platform Social Media Automation • Join 10K+ Businesses
           </p>
-        </div>
+        </motion.div>
         
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <motion.div 
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between"
+        >
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <motion.h1 
+              whileHover={{ scale: 1.05 }}
+              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+            >
               VeeFore
-            </h1>
+            </motion.h1>
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
-            <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-            <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+            {["Features", "Pricing", "About", "Contact"].map((item, index) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+                whileHover={{ scale: 1.1, color: "#ffffff" }}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                {item}
+              </motion.a>
+            ))}
           </nav>
 
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              className="text-white hover:bg-white/10"
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
             >
-              Sign In
-            </Button>
-            <Link href="/onboarding">
               <Button 
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                variant="ghost" 
+                className="text-white hover:bg-white/10"
               >
-                Get Started
+                Sign In
               </Button>
-            </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              <Link href="/onboarding">
+                <Button 
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                >
+                  Get Started
+                </Button>
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </header>
 
-      {/* Optimized Background */}
+      {/* Enhanced Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(120,119,198,0.2),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.15),transparent_50%)]" />
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(120,119,198,0.2),transparent_50%)]"
+          animate={{
+            background: [
+              "radial-gradient(circle at 30% 30%, rgba(120,119,198,0.2), transparent 50%)",
+              "radial-gradient(circle at 70% 60%, rgba(120,119,198,0.3), transparent 50%)",
+              "radial-gradient(circle at 40% 80%, rgba(120,119,198,0.2), transparent 50%)",
+              "radial-gradient(circle at 30% 30%, rgba(120,119,198,0.2), transparent 50%)"
+            ]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.15),transparent_50%)]"
+          animate={{
+            background: [
+              "radial-gradient(circle at 70% 70%, rgba(168,85,247,0.15), transparent 50%)",
+              "radial-gradient(circle at 20% 40%, rgba(168,85,247,0.2), transparent 50%)",
+              "radial-gradient(circle at 80% 20%, rgba(168,85,247,0.15), transparent 50%)",
+              "radial-gradient(circle at 70% 70%, rgba(168,85,247,0.15), transparent 50%)"
+            ]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
-      {/* Minimal Floating Particles */}
+      {/* Optimized Floating Particles */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-30"
-            style={{
-              left: `${20 + i * 30}%`,
-              top: `${20 + i * 20}%`,
-              animation: `float ${4 + i}s ease-in-out infinite`
-            }}
-          />
+        {[...Array(6)].map((_, i) => (
+          <Particle3D key={i} index={i} />
         ))}
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section with Enhanced Animations */}
       <section className="relative min-h-screen flex items-center justify-center px-4 pt-32">
-        <div className="relative z-10 text-center max-w-7xl mx-auto animate-[fadeInUp_0.8s_ease-out]">
-          {/* Hero Badge */}
-          <div className="mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="relative z-10 text-center max-w-7xl mx-auto"
+        >
+          {/* Animated Hero Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -30, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            className="mb-8"
+          >
             <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 text-lg border-0 shadow-lg">
-              <Sparkles className="w-5 h-5 mr-3" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                className="inline-block"
+              >
+                <Sparkles className="w-5 h-5 mr-3" />
+              </motion.div>
               The Future of Multi-Platform Social Media Automation
             </Badge>
-          </div>
+          </motion.div>
 
-          {/* Headline */}
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            VeeFore
-          </h1>
+          {/* 3D Animated Headline */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 50, rotateX: -15 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ delay: 0.5, duration: 1, type: "spring" }}
+            className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent transform-gpu"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <motion.span
+              animate={{ 
+                scale: [1, 1.02, 1],
+                textShadow: [
+                  "0 0 20px rgba(147, 51, 234, 0.5)",
+                  "0 0 40px rgba(147, 51, 234, 0.8)",
+                  "0 0 20px rgba(147, 51, 234, 0.5)"
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              VeeFore
+            </motion.span>
+          </motion.h1>
 
-          {/* Typewriter */}
-          <div className="text-2xl md:text-4xl font-semibold mb-4 h-20 flex items-center justify-center">
+          {/* Enhanced Typewriter */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-2xl md:text-4xl font-semibold mb-4 h-20 flex items-center justify-center"
+          >
             <TypewriterEffect texts={heroFeatures} speed={60} />
-          </div>
+          </motion.div>
 
-          {/* Platform Icons */}
-          <div className="flex justify-center gap-4 mb-12 flex-wrap">
+          {/* Animated Platform Icons */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="flex justify-center gap-4 mb-12 flex-wrap"
+          >
             {platforms.map((platform, index) => {
               const IconComponent = platform.icon;
               return (
-                <div
+                <motion.div
                   key={platform.name}
-                  className={`w-16 h-16 rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 transition-transform duration-300`}
+                  initial={{ opacity: 0, scale: 0.5, rotateY: -90 }}
+                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                  transition={{ delay: 1.2 + index * 0.1, type: "spring" }}
+                  whileHover={{ 
+                    scale: 1.2, 
+                    rotateY: 15,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.3)"
+                  }}
+                  className={`w-16 h-16 rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer transform-gpu`}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
-                  <IconComponent className="w-8 h-8 text-white" />
-                </div>
+                  <motion.div
+                    animate={{ rotateZ: [0, 5, -5, 0] }}
+                    transition={{ duration: 6 + index, repeat: Infinity }}
+                  >
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </motion.div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
-          {/* Description */}
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed">
+          {/* Enhanced Description */}
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5, duration: 0.8 }}
+            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-5xl mx-auto leading-relaxed"
+          >
             Transform your entire social media presence with cutting-edge AI automation. 
             Manage Instagram, YouTube, Twitter, Facebook, LinkedIn and more from one powerful dashboard 
             with intelligent content generation and 100% automated engagement.
-          </p>
+          </motion.p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+          {/* Enhanced CTA Buttons */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.8 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+          >
             <Link href="/onboarding">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg hover:scale-105 transition-transform duration-300"
+              <motion.div
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Rocket className="w-6 h-6 mr-3" />
-                Start Free Trial
-                <ArrowRight className="w-6 h-6 ml-3" />
-              </Button>
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg"
+                >
+                  <Rocket className="w-6 h-6 mr-3" />
+                  Start Free Trial
+                  <ArrowRight className="w-6 h-6 ml-3" />
+                </Button>
+              </motion.div>
             </Link>
             
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm hover:scale-105 transition-transform duration-300"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Play className="w-6 h-6 mr-3" />
-              Watch Demo
-            </Button>
-          </div>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
+              >
+                <Play className="w-6 h-6 mr-3" />
+                Watch Demo
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          {/* Enhanced Stats */}
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2, duration: 0.8 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
+          >
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-                <div key={index} className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 2.2 + index * 0.1 }}
+                  whileHover={{ scale: 1.1, rotateY: 10 }}
+                  className="text-center transform-gpu"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <motion.div 
+                    className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/20 mb-4"
+                    animate={{ rotateY: [0, 360] }}
+                    transition={{ duration: 20 + index * 5, repeat: Infinity, ease: "linear" }}
+                  >
                     <IconComponent className="w-8 h-8 text-blue-400" />
-                  </div>
+                  </motion.div>
                   <div className="text-3xl font-bold text-white mb-2">
                     <AnimatedCounter end={parseInt(stat.value.replace(/[^\d]/g, ''))} suffix={stat.value.replace(/[\d]/g, '')} />
                   </div>
                   <div className="text-gray-400 text-sm">{stat.label}</div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <div className="flex flex-col items-center text-white/60">
+          {/* Enhanced Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.5 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          >
+            <motion.div
+              animate={{ y: [0, 15, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className="flex flex-col items-center text-white/60"
+            >
               <span className="text-sm mb-2">Explore Features</span>
-              <ChevronDown className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
+              <motion.div
+                animate={{ rotate: [0, 180, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <ChevronDown className="w-6 h-6" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* Features Section */}
+      {/* Enhanced Features Section */}
       <section id="features" className="relative py-32 px-4 pt-40">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Revolutionary Features
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Advanced AI-powered tools designed to dominate every social media platform
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8 mb-20">
             {features.map((feature, index) => (
-              <OptimizedFeatureCard key={index} {...feature} />
+              <OptimizedFeatureCard key={index} {...feature} index={index} />
             ))}
           </div>
 
@@ -525,67 +769,103 @@ const Landing = () => {
             {advancedFeatures.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 overflow-hidden hover:scale-105 transition-transform duration-300"
+                  initial={{ opacity: 0, y: 50, rotateX: -10 }}
+                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2, duration: 0.8 }}
+                  whileHover={{ scale: 1.05, rotateY: 5 }}
+                  className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 overflow-hidden transform-gpu"
+                  style={{ transformStyle: "preserve-3d" }}
                 >
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-xl`}>
+                  <motion.div 
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-xl`}
+                    whileHover={{ rotateY: 15, scale: 1.1 }}
+                  >
                     <IconComponent size={24} className="text-white" />
-                  </div>
+                  </motion.div>
                   <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
                   <p className="text-gray-300 mb-4 text-sm">{feature.description}</p>
                   <div className="space-y-2">
                     {feature.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-400">
+                      <motion.div 
+                        key={idx} 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * idx }}
+                        className="flex items-center text-sm text-gray-400"
+                      >
                         <Check className="w-4 h-4 mr-2 text-green-400" />
                         {feat}
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Enhanced Pricing Section */}
       <section id="pricing" className="relative py-32 px-4 bg-gradient-to-br from-blue-900/10 to-purple-900/10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Choose Your Plan
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Scale your social media automation from startup to enterprise
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <div 
+              <motion.div 
                 key={index}
+                initial={{ opacity: 0, y: 50, rotateX: -10 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2, duration: 0.8 }}
+                whileHover={{ scale: 1.05, rotateY: 5 }}
                 className={`relative p-8 bg-gradient-to-br from-gray-900/50 to-black/50 rounded-3xl border ${
                   plan.popular 
                     ? 'border-blue-500/50 scale-105' 
                     : 'border-gray-800'
-                } backdrop-blur-sm h-full hover:scale-105 transition-transform duration-300`}
+                } backdrop-blur-sm h-full transform-gpu`}
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="absolute -top-4 left-1/2 transform -translate-x-1/2"
+                  >
                     <Badge className={`bg-gradient-to-r ${plan.gradient} text-white px-6 py-2 border-0`}>
                       <Crown className="w-4 h-4 mr-2" />
                       Most Popular
                     </Badge>
-                  </div>
+                  </motion.div>
                 )}
 
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <div className="mb-4">
-                    <span className={`text-4xl font-bold bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}>
+                    <motion.span 
+                      className={`text-4xl font-bold bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    >
                       {plan.price}
-                    </span>
+                    </motion.span>
                     <span className="text-gray-400">{plan.period}</span>
                   </div>
                   <p className="text-gray-400">{plan.description}</p>
@@ -593,86 +873,146 @@ const Landing = () => {
 
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
+                    <motion.li 
+                      key={featureIndex} 
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * featureIndex }}
+                      className="flex items-center"
+                    >
                       <Check className="w-5 h-5 mr-3 text-green-400 flex-shrink-0" />
                       <span className="text-gray-300">{feature}</span>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
 
                 <Link href="/onboarding">
-                  <Button 
-                    className={`w-full py-4 font-semibold rounded-xl transition-all duration-300 ${
-                      plan.popular
-                        ? `bg-gradient-to-r ${plan.gradient} hover:shadow-lg text-white`
-                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
-                    }`}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {plan.name === 'Free Explorer' ? 'Get Started Free' : 'Start Free Trial'}
-                  </Button>
+                    <Button 
+                      className={`w-full py-4 font-semibold rounded-xl transition-all duration-300 ${
+                        plan.popular
+                          ? `bg-gradient-to-r ${plan.gradient} hover:shadow-lg text-white`
+                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                      }`}
+                    >
+                      {plan.name === 'Free Explorer' ? 'Get Started Free' : 'Start Free Trial'}
+                    </Button>
+                  </motion.div>
                 </Link>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Enhanced CTA Section */}
       <section id="about" className="relative py-32 px-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <motion.h2 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
+          >
             Ready to Dominate All Social Media?
-          </h2>
+          </motion.h2>
           
-          <p className="text-xl text-gray-300 mb-12 leading-relaxed">
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-xl text-gray-300 mb-12 leading-relaxed"
+          >
             Join thousands of businesses already using VeeFore to automate Instagram, YouTube, Twitter, 
             Facebook, LinkedIn and drive real growth with AI-powered cross-platform strategies.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+          >
             <Link href="/onboarding">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg hover:scale-105 transition-transform duration-300"
+              <motion.div
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(147, 51, 234, 0.4)" }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Rocket className="w-6 h-6 mr-3" />
-                Start Your Free Trial
-                <ArrowRight className="w-6 h-6 ml-3" />
-              </Button>
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-4 text-xl font-semibold rounded-full shadow-lg"
+                >
+                  <Rocket className="w-6 h-6 mr-3" />
+                  Start Your Free Trial
+                  <ArrowRight className="w-6 h-6 ml-3" />
+                </Button>
+              </motion.div>
             </Link>
             
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm hover:scale-105 transition-transform duration-300"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <MessageCircle className="w-6 h-6 mr-3" />
-              Contact Sales
-            </Button>
-          </div>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-xl font-semibold rounded-full backdrop-blur-sm"
+              >
+                <MessageCircle className="w-6 h-6 mr-3" />
+                Contact Sales
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          <p className="text-gray-400 mt-8">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+            className="text-gray-400 mt-8"
+          >
             No credit card required • 14-day free trial • Cancel anytime
-          </p>
+          </motion.p>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Enhanced Footer */}
       <footer id="contact" className="relative border-t border-gray-800 py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8"
+          >
+            <motion.h3 
+              whileHover={{ scale: 1.05 }}
+              className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4"
+            >
               VeeFore
-            </h3>
+            </motion.h3>
             <p className="text-gray-400 max-w-2xl mx-auto">
               The future of AI-powered multi-platform social media automation. Transform your digital presence 
               across Instagram, YouTube, Twitter, Facebook, LinkedIn with intelligent automation.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="text-center text-gray-500">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-center text-gray-500"
+          >
             <p>&copy; 2025 VeeFore. All rights reserved. | Made with ❤️ for the future of social media automation.</p>
-          </div>
+          </motion.div>
         </div>
       </footer>
     </div>

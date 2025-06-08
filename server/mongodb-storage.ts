@@ -1046,10 +1046,9 @@ export class MongoStorage implements IStorage {
     try {
       console.log(`[MONGODB DEBUG] getAutomationRules - workspaceId: ${workspaceId} (${typeof workspaceId})`);
       
-      const collection = this.db!.collection('automation_rules');
-      const rules = await collection.find({ 
+      const rules = await AutomationRuleModel.find({ 
         workspaceId: workspaceId.toString() 
-      }).toArray();
+      });
       
       console.log(`[MONGODB DEBUG] Found ${rules.length} automation rules`);
       

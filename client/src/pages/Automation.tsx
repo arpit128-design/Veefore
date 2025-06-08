@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MessageSquare, Send, Settings, Activity, Clock, Users, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkspaceContext } from '@/hooks/useWorkspace';
@@ -598,88 +599,139 @@ export default function Automation() {
         </TabsContent>
       </Tabs>
 
-      {/* Create Rule Modal/Dialog would go here */}
-      {isCreatingRule && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <CardTitle>Create Automation Rule</CardTitle>
-              <CardDescription>
-                Set up automated responses for Instagram engagement
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label>Rule Type</Label>
-                <div className="flex space-x-4 mt-2">
-                  <label className="flex items-center space-x-2">
+      {/* Create Rule Dialog */}
+      <Dialog open={isCreatingRule} onOpenChange={setIsCreatingRule}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">Create Automation Rule</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Set up automated responses for Instagram engagement
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-6">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Rule Type</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                    newRule.type === 'comment' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-muted hover:border-primary/50'
+                  }`}>
                     <input
                       type="radio"
                       value="comment"
                       checked={newRule.type === 'comment'}
                       onChange={(e) => setNewRule(prev => ({ ...prev, type: e.target.value as 'comment' | 'dm' }))}
+                      className="w-4 h-4"
                     />
-                    <span>Auto Comment</span>
+                    <div>
+                      <div className="font-medium">Auto Comment</div>
+                      <div className="text-xs text-muted-foreground">Reply to comments on posts</div>
+                    </div>
                   </label>
-                  <label className="flex items-center space-x-2">
+                  <label className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                    newRule.type === 'dm' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-muted hover:border-primary/50'
+                  }`}>
                     <input
                       type="radio"
                       value="dm"
                       checked={newRule.type === 'dm'}
                       onChange={(e) => setNewRule(prev => ({ ...prev, type: e.target.value as 'comment' | 'dm' }))}
+                      className="w-4 h-4"
                     />
-                    <span>Auto DM</span>
+                    <div>
+                      <div className="font-medium">Auto DM</div>
+                      <div className="text-xs text-muted-foreground">Send direct messages</div>
+                    </div>
                   </label>
                 </div>
               </div>
 
-              <div>
-                <Label>Trigger Keywords</Label>
-                <div className="space-y-2 mt-2">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">Trigger Keywords</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Words that will trigger automated responses
+                  </p>
+                </div>
+                <div className="space-y-3">
                   <Input
-                    placeholder="Add keyword and press Enter"
+                    placeholder="Type a keyword and press Enter to add..."
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        addKeyword('triggers', e.currentTarget.value);
-                        e.currentTarget.value = '';
+                        const value = e.currentTarget.value.trim();
+                        if (value) {
+                          addKeyword('triggers', value);
+                          e.currentTarget.value = '';
+                        }
                       }
                     }}
+                    className="w-full"
                   />
-                  <div className="flex flex-wrap gap-1">
-                    {newRule.triggers.keywords?.map((keyword, index) => (
-                      <Badge key={index} variant="outline" className="cursor-pointer" onClick={() => removeKeyword('triggers', index)}>
-                        {keyword} ×
-                      </Badge>
-                    ))}
-                  </div>
+                  {newRule.triggers.keywords && newRule.triggers.keywords.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {newRule.triggers.keywords.map((keyword, index) => (
+                        <Badge 
+                          key={index} 
+                          variant="secondary" 
+                          className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                          onClick={() => removeKeyword('triggers', index)}
+                        >
+                          {keyword} ×
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  {(!newRule.triggers.keywords || newRule.triggers.keywords.length === 0) && (
+                    <p className="text-xs text-muted-foreground italic">No keywords added yet</p>
+                  )}
                 </div>
               </div>
 
-              <div>
-                <Label>Responses</Label>
-                <div className="space-y-2 mt-2">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">Automated Responses</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Messages that will be sent automatically. System will randomly choose from these.
+                  </p>
+                </div>
+                <div className="space-y-3">
                   {newRule.responses.map((response, index) => (
-                    <div key={index} className="flex gap-2">
+                    <div key={index} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs font-medium text-muted-foreground">
+                          Response {index + 1}
+                        </Label>
+                        {newRule.responses.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeResponse(index)}
+                            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                          >
+                            ×
+                          </Button>
+                        )}
+                      </div>
                       <Textarea
                         value={response}
                         onChange={(e) => updateResponse(index, e.target.value)}
-                        placeholder="Enter response message..."
-                        rows={2}
+                        placeholder="Enter your automated response message..."
+                        rows={3}
+                        className="resize-none"
                       />
-                      {newRule.responses.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeResponse(index)}
-                        >
-                          ×
-                        </Button>
-                      )}
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addResponse}>
-                    Add Response
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={addResponse}
+                    className="w-full"
+                  >
+                    + Add Another Response
                   </Button>
                 </div>
               </div>
@@ -711,21 +763,20 @@ export default function Automation() {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsCreatingRule(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => createRuleMutation.mutate(newRule)}
-                  disabled={createRuleMutation.isPending}
-                >
-                  {createRuleMutation.isPending ? 'Creating...' : 'Create Rule'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setIsCreatingRule(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => createRuleMutation.mutate(newRule)}
+                disabled={createRuleMutation.isPending}
+              >
+                {createRuleMutation.isPending ? 'Creating...' : 'Create Rule'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

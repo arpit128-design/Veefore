@@ -5804,6 +5804,152 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Instagram Publishing API Endpoint
+  app.post('/api/instagram/publish', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { mediaType, mediaUrl, caption, workspaceId } = req.body;
+
+      console.log('[INSTAGRAM PUBLISH] Request:', { userId: user.id, mediaType, workspaceId });
+
+      if (!mediaUrl) {
+        return res.status(400).json({ error: 'Media URL is required for Instagram publishing' });
+      }
+
+      const targetWorkspaceId = workspaceId || user.defaultWorkspaceId;
+
+      // Get Instagram account for this workspace
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(targetWorkspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      if (!instagramAccount) {
+        return res.status(400).json({ 
+          error: 'No Instagram account connected. Please connect your Instagram account first.',
+          requiresConnection: true
+        });
+      }
+
+      if (!instagramAccount.accessToken) {
+        return res.status(400).json({ 
+          error: 'Instagram access token expired. Please reconnect your Instagram account.',
+          requiresReconnection: true
+        });
+      }
+
+      // Determine Instagram publishing endpoint based on media type
+      let publishEndpoint = '';
+      let publishData: any = {
+        access_token: instagramAccount.accessToken
+      };
+
+      switch (mediaType) {
+        case 'video':
+        case 'reel':
+          // For video/reel publishing
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishData = {
+            ...publishData,
+            media_type: 'VIDEO',
+            video_url: mediaUrl,
+            caption: caption || ''
+          };
+          break;
+        case 'story':
+          // For story publishing
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishData = {
+            ...publishData,
+            media_type: 'STORIES',
+            video_url: mediaUrl
+          };
+          break;
+        default:
+          return res.status(400).json({ error: 'Invalid media type. Supported types: video, reel, story' });
+      }
+
+      console.log('[INSTAGRAM PUBLISH] Publishing to Instagram API:', publishEndpoint);
+
+      // Step 1: Create media container
+      const containerResponse = await fetch(publishEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(publishData)
+      });
+
+      if (!containerResponse.ok) {
+        const errorData = await containerResponse.json();
+        console.error('[INSTAGRAM PUBLISH] Container creation failed:', errorData);
+        return res.status(400).json({ 
+          error: 'Failed to create Instagram media container',
+          details: errorData.error?.message || 'Unknown Instagram API error'
+        });
+      }
+
+      const containerData = await containerResponse.json();
+      const containerId = containerData.id;
+
+      console.log('[INSTAGRAM PUBLISH] Media container created:', containerId);
+
+      // Step 2: Publish the media container
+      const publishResponse = await fetch(`https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media_publish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          creation_id: containerId,
+          access_token: instagramAccount.accessToken
+        })
+      });
+
+      if (!publishResponse.ok) {
+        const errorData = await publishResponse.json();
+        console.error('[INSTAGRAM PUBLISH] Publishing failed:', errorData);
+        return res.status(400).json({ 
+          error: 'Failed to publish to Instagram',
+          details: errorData.error?.message || 'Unknown Instagram API error'
+        });
+      }
+
+      const publishData_result = await publishResponse.json();
+      const mediaId = publishData_result.id;
+
+      console.log('[INSTAGRAM PUBLISH] Successfully published to Instagram:', mediaId);
+
+      // Save publishing record
+      await storage.createContent({
+        workspaceId: targetWorkspaceId,
+        title: `Instagram ${mediaType} - ${new Date().toLocaleDateString()}`,
+        type: mediaType,
+        platform: 'instagram',
+        status: 'published',
+        contentData: {
+          mediaUrl,
+          caption,
+          instagramMediaId: mediaId,
+          publishedAt: new Date().toISOString()
+        },
+        creditsUsed: 0,
+        description: `Published ${mediaType} to Instagram`
+      });
+
+      res.json({
+        success: true,
+        mediaId,
+        mediaType,
+        platform: 'instagram',
+        publishedAt: new Date().toISOString(),
+        message: `Successfully published ${mediaType} to Instagram`
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM PUBLISH] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to publish to Instagram' });
+    }
+  });
+
   // Endpoint to serve generated content files
   app.get('/api/generated-content/:filename', async (req: any, res: Response) => {
     try {

@@ -665,6 +665,35 @@ function AIReelGenerator() {
     }
   });
 
+  const publishMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/instagram/publish', data);
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      toast({
+        title: "Reel Published!",
+        description: `Successfully published to Instagram as ${response.mediaType}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Publishing Failed",
+        description: error.message || "Failed to publish to Instagram",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const publishToInstagram = (mediaUrl: string, mediaType: string, caption?: string) => {
+    publishMutation.mutate({
+      mediaUrl,
+      mediaType,
+      caption,
+      workspaceId: currentWorkspace?.id
+    });
+  };
+
   const generateReel = () => {
     if (!prompt.trim()) {
       toast({
@@ -821,10 +850,41 @@ function AIReelGenerator() {
               </div>
             )}
 
-            <Button className="w-full">
-              <Share className="mr-2 h-4 w-4" />
-              Publish Reel
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon",
+                    description: "Direct publishing will be available soon",
+                  });
+                }}
+              >
+                <Share className="mr-2 h-4 w-4" />
+                Share to Platform
+              </Button>
+              
+              {platform === 'instagram' && generatedReel.videoUrl && (
+                <Button 
+                  className="flex-1"
+                  onClick={() => publishToInstagram(generatedReel.videoUrl, 'reel', generatedReel.caption)}
+                  disabled={publishMutation.isPending}
+                >
+                  {publishMutation.isPending ? (
+                    <>
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Instagram className="mr-2 h-4 w-4" />
+                      Publish to Instagram
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -858,6 +918,35 @@ function AIImageGenerator() {
       });
     }
   });
+
+  const publishMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/instagram/publish', data);
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      toast({
+        title: "Image Published!",
+        description: `Successfully published to Instagram as ${response.mediaType}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Publishing Failed",
+        description: error.message || "Failed to publish to Instagram",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const publishToInstagram = (mediaUrl: string, mediaType: string, caption?: string) => {
+    publishMutation.mutate({
+      mediaUrl,
+      mediaType,
+      caption,
+      workspaceId: currentWorkspace?.id
+    });
+  };
 
   const generateImage = () => {
     if (!prompt.trim()) {
@@ -1046,14 +1135,44 @@ function AIImageGenerator() {
               </div>
             )}
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-2">
               <Button variant="outline" className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
                 Download
               </Button>
-              <Button className="flex-1">
+              
+              {platform === 'instagram' && generatedImage.imageUrl && (
+                <Button 
+                  className="flex-1"
+                  onClick={() => publishToInstagram(generatedImage.imageUrl, contentType, generatedImage.caption)}
+                  disabled={publishMutation.isPending}
+                >
+                  {publishMutation.isPending ? (
+                    <>
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Instagram className="mr-2 h-4 w-4" />
+                      Publish to Instagram
+                    </>
+                  )}
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon",
+                    description: "Direct publishing will be available soon",
+                  });
+                }}
+              >
                 <Share className="mr-2 h-4 w-4" />
-                Publish Image
+                Share to Platform
               </Button>
             </div>
           </CardContent>
@@ -1097,6 +1216,35 @@ function VideoShortener() {
       });
     }
   });
+
+  const publishMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/instagram/publish', data);
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      toast({
+        title: "Video Published!",
+        description: `Successfully published to Instagram as ${response.mediaType}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Publishing Failed",
+        description: error.message || "Failed to publish to Instagram",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const publishToInstagram = (mediaUrl: string, mediaType: string, caption?: string) => {
+    publishMutation.mutate({
+      mediaUrl,
+      mediaType,
+      caption,
+      workspaceId: currentWorkspace?.id
+    });
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

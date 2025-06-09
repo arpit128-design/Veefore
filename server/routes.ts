@@ -4400,7 +4400,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         {
           workspaceId: workspaceId,
           participantId: 'demo_user_001',
-          participantUsername: 'tech_enthusiast_99',
+          participantUsername: 'rahulc1020',
           platform: 'instagram',
           messageCount: 5,
           lastMessageAt: new Date(),
@@ -4410,7 +4410,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         {
           workspaceId: workspaceId,
           participantId: 'demo_user_002',
-          participantUsername: 'creative_mind_2024',
+          participantUsername: 'choudharyarpit977',
           platform: 'instagram',
           messageCount: 8,
           lastMessageAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
@@ -4420,7 +4420,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         {
           workspaceId: workspaceId,
           participantId: 'demo_user_003',
-          participantUsername: 'startup_founder',
+          participantUsername: 'authentic_instagram_user',
           platform: 'instagram',
           messageCount: 12,
           lastMessageAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago

@@ -6,10 +6,10 @@
 const mongoose = require('mongoose');
 
 // MongoDB connection string from environment
-const DATABASE_URL = process.env.DATABASE_URL;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL environment variable not found');
+if (!MONGODB_URI) {
+  console.error('❌ MONGODB_URI environment variable not found');
   process.exit(1);
 }
 
@@ -75,7 +75,7 @@ async function cleanupDuplicateWorkspaces() {
   
   try {
     // Connect to MongoDB
-    await mongoose.connect(DATABASE_URL);
+    await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
     
     const User = mongoose.model('User', UserSchema);

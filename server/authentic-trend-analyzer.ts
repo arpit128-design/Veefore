@@ -109,6 +109,11 @@ export class AuthenticTrendAnalyzer {
         : `What are the TOP 10 most viral hashtags trending RIGHT NOW in the ${category} niche on Instagram, TikTok, and Twitter? Include exact hashtag names, engagement metrics, and platforms.`;
 
       console.log('[AUTHENTIC TRENDS] Perplexity query:', query);
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
@@ -137,13 +142,14 @@ export class AuthenticTrendAnalyzer {
       
       if (response.ok) {
         const data = await response.json();
-        console.log(`[AUTHENTIC TRENDS] Perplexity response data:`, JSON.stringify(data, null, 2));
+        console.log(`[AUTHENTIC TRENDS] Perplexity response received successfully`);
         const content = data.choices?.[0]?.message?.content || '';
-        console.log(`[AUTHENTIC TRENDS] Perplexity content:`, content);
+        console.log(`[AUTHENTIC TRENDS] Perplexity content length: ${content.length} characters`);
+        console.log(`[AUTHENTIC TRENDS] Content preview: ${content.substring(0, 200)}...`);
         
         // Extract hashtags from the response
         const hashtagMatches = content.match(/#[\w\d]+/g) || [];
-        console.log(`[AUTHENTIC TRENDS] Hashtag matches found:`, hashtagMatches);
+        console.log(`[AUTHENTIC TRENDS] Raw hashtag matches:`, hashtagMatches);
         const uniqueHashtags = [...new Set(hashtagMatches)];
 
         uniqueHashtags.slice(0, 10).forEach((hashtag, index) => {
@@ -164,7 +170,8 @@ export class AuthenticTrendAnalyzer {
           });
         });
 
-        console.log(`[AUTHENTIC TRENDS] Retrieved ${uniqueHashtags.length} trending hashtags from Perplexity`);
+        console.log(`[AUTHENTIC TRENDS] Successfully processed ${uniqueHashtags.length} trending hashtags from Perplexity`);
+        console.log(`[AUTHENTIC TRENDS] Added ${uniqueHashtags.slice(0, 10).length} hashtags to trends array`);
       } else {
         console.error(`[AUTHENTIC TRENDS] Perplexity API error: ${response.status} ${response.statusText}`);
         const errorText = await response.text();
@@ -173,6 +180,8 @@ export class AuthenticTrendAnalyzer {
     } catch (error) {
       console.error('[AUTHENTIC TRENDS] Perplexity API error:', error);
     }
+    
+    console.log(`[AUTHENTIC TRENDS] Perplexity API call completed. Trends array now has ${trends.length} items`);
   }
 
   private async getYouTubeTrends(category: string, trends: AuthenticTrend[]): Promise<void> {

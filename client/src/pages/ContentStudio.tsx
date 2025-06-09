@@ -1717,9 +1717,9 @@ function VideoShortener() {
             )}
 
             <div className="aspect-[9/16] bg-black rounded-lg flex items-center justify-center max-w-sm mx-auto">
-              {shortenedVideo.videoUrl ? (
+              {(shortenedVideo.downloadUrl || shortenedVideo.shortenedVideoUrl) ? (
                 <video
-                  src={shortenedVideo.videoUrl}
+                  src={shortenedVideo.downloadUrl || shortenedVideo.shortenedVideoUrl}
                   controls
                   className="w-full h-full rounded-lg"
                 />
@@ -1774,10 +1774,10 @@ function VideoShortener() {
                 Download
               </Button>
               
-              {platform === 'instagram' && shortenedVideo.videoUrl && (
+              {platform === 'instagram' && (shortenedVideo.downloadUrl || shortenedVideo.shortenedVideoUrl) && (
                 <Button 
                   className="flex-1"
-                  onClick={() => publishToInstagram(shortenedVideo.videoUrl, 'reel')}
+                  onClick={() => publishToInstagram(shortenedVideo.downloadUrl || shortenedVideo.shortenedVideoUrl, 'reel')}
                   disabled={publishMutation.isPending}
                 >
                   {publishMutation.isPending ? (

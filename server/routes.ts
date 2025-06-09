@@ -5714,7 +5714,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       }
 
       // Check user credits
-      const creditCost = 5; // 5 credits for video shortening
+      const creditCost = 7; // 7 credits for real video processing
       const currentCredits = await storage.getUserCredits(user.id);
       
       if (currentCredits < creditCost) {
@@ -5739,24 +5739,104 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         userPreferences
       };
 
-      // Process video URL with AI analysis
-      const result = await videoShortenerAI.processVideoUrl(videoUrl, config);
+      // Import real video processor
+      const { RealVideoProcessor } = await import('./real-video-processor');
+      const processor = new RealVideoProcessor();
+
+      let inputVideoPath: string;
+      let cleanupFiles: string[] = [];
+
+      // Download video from URL
+      console.log('[REAL VIDEO] Downloading from URL:', videoUrl);
+      inputVideoPath = await processor.downloadFromURL(videoUrl);
+      cleanupFiles.push(inputVideoPath);
+
+      // Get video metadata
+      console.log('[REAL VIDEO] Extracting metadata');
+      const metadata = await processor.getVideoMetadata(inputVideoPath);
+      
+      // Analyze video content with AI
+      console.log('[REAL VIDEO] Analyzing content');
+      const aiAnalysis = await processor.analyzeVideoContent(inputVideoPath, metadata);
+      
+      // Select best segment
+      const bestSegment = aiAnalysis.bestSegments?.[0] || {
+        startTime: Math.max(0, metadata.duration * 0.1),
+        endTime: Math.min(metadata.duration, metadata.duration * 0.1 + targetDuration),
+        reason: 'Auto-selected segment',
+        engagementScore: 75
+      };
+
+      // Create short video
+      console.log('[REAL VIDEO] Creating short video');
+      const shortVideoPath = await processor.createShortVideo(
+        inputVideoPath,
+        bestSegment.startTime,
+        bestSegment.endTime,
+        config.aspectRatio as '9:16' | '16:9' | '1:1'
+      );
+      
+      // Generate thumbnail
+      console.log('[REAL VIDEO] Generating thumbnail');
+      const thumbnailPath = await processor.generateThumbnail(
+        shortVideoPath,
+        (bestSegment.endTime - bestSegment.startTime) / 2
+      );
+
+      // Generate file URLs
+      const videoFileName = path.basename(shortVideoPath);
+      const thumbnailFileName = path.basename(thumbnailPath);
 
       // Create structured response for storage
       const shortenedVideoResult = {
         originalVideoUrl: videoUrl,
-        shortenedVideoUrl: result.downloadUrl,
-        thumbnailUrl: `/api/generated-content/thumb_${Date.now()}.jpg`,
-        duration: targetDuration,
-        dimensions: platform === 'youtube' ? { width: 1920, height: 1080, ratio: "16:9" } : { width: 1080, height: 1920, ratio: "9:16" },
-        analysis: result.analysis,
-        shortVideo: result.shortVideo,
+        shortenedVideoUrl: `/api/generated-content/${videoFileName}`,
+        downloadUrl: `/api/generated-content/${videoFileName}`,
+        thumbnailUrl: `/api/generated-content/${thumbnailFileName}`,
+        duration: bestSegment.endTime - bestSegment.startTime,
+        dimensions: config.aspectRatio === '9:16' ? { width: 720, height: 1280, ratio: "9:16" } : 
+                   config.aspectRatio === '1:1' ? { width: 720, height: 720, ratio: "1:1" } :
+                   { width: 1280, height: 720, ratio: "16:9" },
+        analysis: {
+          title: metadata.title || 'Processed Video',
+          totalDuration: metadata.duration,
+          bestSegments: aiAnalysis.bestSegments || [bestSegment],
+          themes: aiAnalysis.overallTheme ? [aiAnalysis.overallTheme] : ['Auto-processed'],
+          mood: 'Dynamic',
+          pacing: 'medium' as const,
+          recommendedStyle: aiAnalysis.recommendedStyle || 'viral'
+        },
+        shortVideo: {
+          startTime: bestSegment.startTime,
+          endTime: bestSegment.endTime,
+          duration: bestSegment.endTime - bestSegment.startTime,
+          score: bestSegment.engagementScore || 75,
+          content: bestSegment.reason || 'AI-selected best segment',
+          highlights: bestSegment.highlights || ['Engaging content'],
+          engagement_factors: ['Visual appeal', 'Optimal timing'],
+          viral_potential: bestSegment.engagementScore || 75,
+          selectedSegment: {
+            content: bestSegment.reason || 'AI-selected best segment'
+          }
+        },
         platform,
         contentType: 'video-short',
-        provider: 'ai-analysis',
+        provider: 'real-video-processing',
         status: 'completed',
-        processingMessage: 'AI video analysis and shortening completed successfully.'
+        processingMessage: 'Real video processing completed successfully.',
+        metadata: {
+          originalDuration: metadata.duration,
+          shortDuration: bestSegment.endTime - bestSegment.startTime,
+          compressionRatio: ((metadata.duration - (bestSegment.endTime - bestSegment.startTime)) / metadata.duration * 100).toFixed(1),
+          originalFormat: metadata.format,
+          resolution: `${metadata.width}x${metadata.height}`
+        }
       };
+
+      // Clean up temporary files after delay
+      setTimeout(async () => {
+        await processor.cleanup(cleanupFiles);
+      }, 300000);
 
       // Save to content storage
       await storage.createContent({

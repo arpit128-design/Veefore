@@ -22,12 +22,7 @@ export function TrendingHashtags() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const { currentWorkspace } = useWorkspaceContext();
 
-  const { data: hashtags, isLoading, refetch } = useQuery({
-    queryKey: ['/api/hashtags/trending', selectedCategory, currentWorkspace?.id],
-    queryFn: () => apiRequest('GET', `/api/hashtags/trending?category=${selectedCategory}&workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
-    enabled: !!currentWorkspace?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  const { data: hashtags, isLoading } = useInstantHashtags();
 
   const categories = [
     { value: 'all', label: 'All' },
@@ -122,7 +117,7 @@ export function TrendingHashtags() {
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => refetch()}
+              onClick={() => window.location.reload()}
               className="text-white hover:bg-white/10"
             >
               <RefreshCw className="h-4 w-4" />

@@ -1,7 +1,6 @@
 import { MessageCircle, Users, TrendingUp, Clock } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useInstantChatPerformance } from "@/hooks/useInstantData";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
-import { apiRequest } from "@/lib/queryClient";
 
 interface ChatMetric {
   platform: string;
@@ -16,14 +15,8 @@ interface ChatMetric {
 export function ChatPerformance() {
   const { currentWorkspace } = useWorkspaceContext();
 
-  // Fetch chat performance data
-  const { data: chatData, isLoading } = useQuery({
-    queryKey: ['/api/chat-performance', currentWorkspace?.id],
-    queryFn: () => apiRequest('GET', `/api/chat-performance?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
-    enabled: !!currentWorkspace?.id,
-    staleTime: 30000, // Data is fresh for 30 seconds
-    refetchInterval: 30000 // Refetch every 30 seconds
-  });
+  // Use instant chat performance data
+  const { data: chatData, isLoading } = useInstantChatPerformance();
 
   const defaultMetrics: ChatMetric[] = [
     {

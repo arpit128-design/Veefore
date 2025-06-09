@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   displayName: String,
   avatar: String,
-  credits: { type: Number, default: 50 },
+  credits: { type: Number, default: 0 },
   plan: { type: String, default: 'Free' },
   stripeCustomerId: String,
   stripeSubscriptionId: String,

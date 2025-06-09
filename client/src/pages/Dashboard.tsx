@@ -14,7 +14,7 @@ import { formatNumber, formatEngagement } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
@@ -22,6 +22,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Initialize instant data prefetching
   useInstantData();
@@ -29,7 +30,16 @@ export default function Dashboard() {
   // Use instant analytics hook for immediate data loading
   const { data: analyticsData, isLoading: analyticsLoading, error } = useInstantAnalytics();
 
-  const currentTime = new Date().toLocaleTimeString('en-US', {
+  // Live clock that updates every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = currentTime.toLocaleTimeString('en-US', {
     hour12: false,
     timeZone: 'Asia/Kolkata',
     hour: '2-digit',
@@ -187,7 +197,7 @@ export default function Dashboard() {
         </div>
         <div className="text-left sm:text-right">
           <div className="text-xs sm:text-sm text-asteroid-silver">Current Time</div>
-          <div className="text-base sm:text-lg md:text-xl font-mono text-electric-cyan">{currentTime} IST</div>
+          <div className="text-base sm:text-lg md:text-xl font-mono text-electric-cyan">{formattedTime} IST</div>
         </div>
       </div>
 

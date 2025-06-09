@@ -161,59 +161,7 @@ export default function Suggestions() {
         </div>
       </div>
 
-      {/* AI Briefing Cards */}
-      <Card className="content-card holographic">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            {['trending', 'audio', 'hashtag'].map((type) => {
-              const typeSuggestions = getSuggestionsByType(type);
-              const latestSuggestion = typeSuggestions[0];
-              
-              return (
-                <div
-                  key={type}
-                  className={`p-3 sm:p-4 rounded-lg border ${getSuggestionColor(type)}`}
-                >
-                  <div className="flex items-center space-x-2 mb-3">
-                    {getSuggestionIcon(type)}
-                    <span className="font-medium capitalize">
-                      {type === 'hashtag' ? 'Hashtag Strategy' : 
-                       type === 'audio' ? 'Audio Trending' : 
-                       'Trending Content'}
-                    </span>
-                  </div>
-                  
-                  {latestSuggestion ? (
-                    <div className="space-y-3">
-                      <div className="text-sm font-medium">
-                        {latestSuggestion.data?.suggestion?.substring(0, 120)}...
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <Badge variant="outline" className="text-xs">
-                          {latestSuggestion.confidence}% confidence
-                        </Badge>
-                        <span className="text-xs text-asteroid-silver">
-                          {new Date(latestSuggestion.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <Button size="sm" variant="outline" className="w-full">
-                        Use This Suggestion
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="text-center py-4">
-                      <div className="text-asteroid-silver text-sm mb-2">No suggestions available</div>
-                      <Button size="sm" variant="ghost" className="text-xs">
-                        Generate Ideas
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      
 
       {/* All Suggestions */}
       <Card className="content-card holographic">

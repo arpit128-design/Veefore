@@ -1257,46 +1257,37 @@ function VideoShortener() {
     }
   });
 
-  const publishToInstagram = (mediaUrl: string, mediaType: string, caption?: string) => {
-    publishMutation.mutate({
-      mediaUrl,
-      mediaType,
-      caption,
-      workspaceId: currentWorkspace?.id
-    });
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.type.startsWith('video/')) {
-        setVideoFile(file);
-        setStep('configure');
-      } else {
-        toast({
-          title: "Invalid File Type",
-          description: "Please upload a video file",
-          variant: "destructive",
-        });
-      }
-    }
-  };
-
-  const shortenVideo = () => {
-    if (!videoFile) {
+  const analyzeVideo = () => {
+    if (!videoUrl.trim()) {
       toast({
-        title: "Video Required",
-        description: "Please upload a video file first",
+        title: "Video URL Required",
+        description: "Please enter a valid video URL",
         variant: "destructive",
       });
       return;
     }
 
+    analyzeMutation.mutate({
+      videoUrl: videoUrl.trim(),
+      workspaceId: currentWorkspace?.id
+    });
+  };
+
+  const shortenVideo = () => {
     shortenMutation.mutate({
-      videoFile,
+      videoUrl: videoUrl.trim(),
+      targetDuration: parseInt(duration),
       platform,
-      duration: parseInt(duration),
       style,
+      userPreferences,
+      workspaceId: currentWorkspace?.id
+    });
+  };
+
+  const publishToInstagram = (mediaUrl: string, mediaType: string) => {
+    publishMutation.mutate({
+      mediaUrl,
+      mediaType,
       workspaceId: currentWorkspace?.id
     });
   };
@@ -1304,69 +1295,36 @@ function VideoShortener() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
-        <Scissors className="h-5 w-5 text-green-500" />
-        <h3 className="text-lg font-semibold">Long to Short Video Converter</h3>
-        <Badge variant="secondary" className="bg-green-100 text-green-700">
-          AI Analysis
+        <Scissors className="h-5 w-5 text-red-500" />
+        <h3 className="text-lg font-semibold">AI Video Shortener</h3>
+        <Badge variant="secondary" className="bg-red-100 text-red-700">
+          URL Analysis
         </Badge>
       </div>
 
-      {step === 'upload' && (
+      {step === 'input' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Upload className="h-5 w-5" />
-              <span>Upload Long Video</span>
+              <Youtube className="h-5 w-5" />
+              <span>Video URL Analysis</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div 
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-lg font-medium mb-2">Upload your long video</p>
-              <p className="text-sm text-gray-600">
-                Supports MP4, MOV, AVI files up to 500MB
+            <div>
+              <Label htmlFor="videoUrl">Video URL</Label>
+              <Input
+                id="videoUrl"
+                placeholder="Paste YouTube, Vimeo, or other video URL..."
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Supports YouTube, Vimeo, and most video platforms
               </p>
-              <Button className="mt-4">
-                Choose Video File
-              </Button>
-            </div>
-            
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="video/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {step === 'configure' && videoFile && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Scissors className="h-5 w-5" />
-                <span>Configure Shortening</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setStep('upload')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-3 bg-muted/50 rounded-lg">
-              <p className="text-sm font-medium">Selected Video</p>
-              <p className="text-xs text-muted-foreground">{videoFile.name}</p>
-              <p className="text-xs text-muted-foreground">Size: {(videoFile.size / (1024 * 1024)).toFixed(2)} MB</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="platform">Target Platform</Label>
                 <Select value={platform} onValueChange={setPlatform}>
@@ -1382,7 +1340,7 @@ function VideoShortener() {
               </div>
 
               <div>
-                <Label htmlFor="duration">Short Video Length</Label>
+                <Label htmlFor="duration">Duration (seconds)</Label>
                 <Select value={duration} onValueChange={setDuration}>
                   <SelectTrigger>
                     <SelectValue />
@@ -1394,30 +1352,192 @@ function VideoShortener() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div>
+                <Label htmlFor="style">Content Style</Label>
+                <Select value={style} onValueChange={setStyle}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="viral">Viral Potential</SelectItem>
+                    <SelectItem value="highlights">Best Highlights</SelectItem>
+                    <SelectItem value="tutorial">Tutorial Focus</SelectItem>
+                    <SelectItem value="story">Story Mode</SelectItem>
+                    <SelectItem value="educational">Educational</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div>
-              <Label htmlFor="style">Extraction Style</Label>
-              <Select value={style} onValueChange={setStyle}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="highlights">Best Highlights</SelectItem>
-                  <SelectItem value="action">Action Moments</SelectItem>
-                  <SelectItem value="emotional">Emotional Peaks</SelectItem>
-                  <SelectItem value="informative">Key Information</SelectItem>
-                  <SelectItem value="entertaining">Most Entertaining</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>User Preferences</Label>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={userPreferences.focusOnAction}
+                    onChange={(e) => setUserPreferences(prev => ({
+                      ...prev,
+                      focusOnAction: e.target.checked
+                    }))}
+                    className="rounded"
+                  />
+                  <span className="text-sm">Focus on Action</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={userPreferences.includeDialogue}
+                    onChange={(e) => setUserPreferences(prev => ({
+                      ...prev,
+                      includeDialogue: e.target.checked
+                    }))}
+                    className="rounded"
+                  />
+                  <span className="text-sm">Include Dialogue</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={userPreferences.preferBeginning}
+                    onChange={(e) => setUserPreferences(prev => ({
+                      ...prev,
+                      preferBeginning: e.target.checked
+                    }))}
+                    className="rounded"
+                  />
+                  <span className="text-sm">Prefer Beginning</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={userPreferences.avoidSilence}
+                    onChange={(e) => setUserPreferences(prev => ({
+                      ...prev,
+                      avoidSilence: e.target.checked
+                    }))}
+                    className="rounded"
+                  />
+                  <span className="text-sm">Avoid Silence</span>
+                </label>
+              </div>
             </div>
 
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm font-medium text-blue-800">AI Analysis</p>
-              <p className="text-xs text-blue-600">
-                Our AI will analyze your video and extract the most engaging {duration}-second clips optimized for {platform}
-              </p>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={analyzeVideo} 
+                disabled={analyzeMutation.isPending || !videoUrl.trim()}
+                variant="outline"
+                className="flex-1"
+              >
+                {analyzeMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Bot className="mr-2 h-4 w-4" />
+                    Analyze Video (2 credits)
+                  </>
+                )}
+              </Button>
+
+              <Button 
+                onClick={shortenVideo} 
+                disabled={shortenMutation.isPending || !videoUrl.trim()}
+                className="flex-1"
+              >
+                {shortenMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                    Creating Short...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="mr-2 h-4 w-4" />
+                    Create Short (5 credits)
+                  </>
+                )}
+              </Button>
             </div>
+
+            {user?.credits !== undefined && (
+              <p className="text-xs text-gray-500 text-center">
+                Available credits: {user.credits}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 'analyze' && analysis && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Bot className="h-5 w-5" />
+                <span>Video Analysis Results</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('input')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Video Title</Label>
+                <p className="text-sm font-medium">{analysis.title}</p>
+              </div>
+              <div>
+                <Label>Duration</Label>
+                <p className="text-sm">{Math.floor(analysis.totalDuration / 60)}:{(analysis.totalDuration % 60).toString().padStart(2, '0')}</p>
+              </div>
+              <div>
+                <Label>Mood</Label>
+                <Badge variant="secondary">{analysis.mood}</Badge>
+              </div>
+              <div>
+                <Label>Pacing</Label>
+                <Badge variant="outline">{analysis.pacing}</Badge>
+              </div>
+            </div>
+
+            {analysis.themes && (
+              <div>
+                <Label>Key Themes</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {analysis.themes.map((theme: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      {theme}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {analysis.bestSegments && (
+              <div>
+                <Label>Best Segments for Shorts</Label>
+                <div className="space-y-2 mt-2">
+                  {analysis.bestSegments.slice(0, 3).map((segment: any, index: number) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-sm font-medium">
+                          {Math.floor(segment.startTime / 60)}:{(segment.startTime % 60).toString().padStart(2, '0')} - 
+                          {Math.floor(segment.endTime / 60)}:{(segment.endTime % 60).toString().padStart(2, '0')}
+                        </span>
+                        <Badge variant="outline">Score: {segment.score}/10</Badge>
+                      </div>
+                      <p className="text-xs text-gray-600">{segment.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Button 
               onClick={shortenVideo} 
@@ -1427,12 +1547,12 @@ function VideoShortener() {
               {shortenMutation.isPending ? (
                 <>
                   <LoadingSpinner className="mr-2 h-4 w-4" />
-                  Analyzing & Shortening...
+                  Creating Short...
                 </>
               ) : (
                 <>
                   <Zap className="mr-2 h-4 w-4" />
-                  AI Shorten Video
+                  Create Short Video (5 credits)
                 </>
               )}
             </Button>
@@ -1445,16 +1565,35 @@ function VideoShortener() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5" />
-                <span>Shortened Video Preview</span>
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span>Short Video Created</span>
               </div>
-              <Button variant="outline" size="sm" onClick={() => setStep('configure')}>
+              <Button variant="outline" size="sm" onClick={() => setStep('input')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {shortenedVideo.analysis && (
+              <div className="p-3 bg-blue-50 rounded-lg mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-blue-800">Selected Segment</span>
+                  <Badge variant="outline">
+                    Viral Score: {shortenedVideo.selectedSegment?.viralPotential || 'N/A'}/10
+                  </Badge>
+                </div>
+                <p className="text-xs text-blue-600">
+                  {shortenedVideo.analysis.selectedSegment?.content || 'AI-optimized segment selected'}
+                </p>
+                {shortenedVideo.selectedSegment && (
+                  <p className="text-xs text-blue-500 mt-1">
+                    Duration: {shortenedVideo.selectedSegment.startTime}s - {shortenedVideo.selectedSegment.endTime}s
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="aspect-[9/16] bg-black rounded-lg flex items-center justify-center max-w-sm mx-auto">
               {shortenedVideo.videoUrl ? (
                 <video
@@ -1465,27 +1604,42 @@ function VideoShortener() {
               ) : (
                 <div className="text-white text-center">
                   <Video className="h-12 w-12 mx-auto mb-2" />
-                  <p>Shortened Video</p>
+                  <p>AI Short Video</p>
+                  <p className="text-xs opacity-75">Ready for {platform}</p>
                 </div>
               )}
             </div>
 
-            {shortenedVideo.caption && (
+            {shortenedVideo.script && (
               <div>
-                <Label>AI Generated Caption</Label>
+                <Label>Optimized Script</Label>
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm">{shortenedVideo.caption}</p>
+                  <p className="text-sm">{shortenedVideo.script}</p>
                 </div>
               </div>
             )}
 
-            {shortenedVideo.hashtags && (
+            {shortenedVideo.editingInstructions && (
               <div>
-                <Label>Optimized Hashtags</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {shortenedVideo.hashtags.map((tag: string, index: number) => (
-                    <Badge key={index} variant="secondary">
-                      #{tag}
+                <Label>AI Editing Guidelines</Label>
+                <div className="space-y-1">
+                  {shortenedVideo.editingInstructions.slice(0, 3).map((instruction: string, index: number) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <p className="text-xs text-gray-600">{instruction}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {shortenedVideo.platformOptimizations && (
+              <div>
+                <Label>Platform Optimizations</Label>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {shortenedVideo.platformOptimizations.slice(0, 4).map((opt: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {opt}
                     </Badge>
                   ))}
                 </div>
@@ -1501,7 +1655,7 @@ function VideoShortener() {
               {platform === 'instagram' && shortenedVideo.videoUrl && (
                 <Button 
                   className="flex-1"
-                  onClick={() => publishToInstagram(shortenedVideo.videoUrl, 'reel', shortenedVideo.caption)}
+                  onClick={() => publishToInstagram(shortenedVideo.videoUrl, 'reel')}
                   disabled={publishMutation.isPending}
                 >
                   {publishMutation.isPending ? (
@@ -1512,7 +1666,7 @@ function VideoShortener() {
                   ) : (
                     <>
                       <Instagram className="mr-2 h-4 w-4" />
-                      Publish to Instagram
+                      Publish Reel
                     </>
                   )}
                 </Button>
@@ -1520,18 +1674,20 @@ function VideoShortener() {
               
               <Button 
                 variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon",
-                    description: "Direct publishing will be available soon",
-                  });
-                }}
+                onClick={() => setStep('input')}
               >
-                <Share className="mr-2 h-4 w-4" />
-                Share to Platform
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Create Another
               </Button>
             </div>
+
+            {shortenedVideo.expectedViews && (
+              <div className="text-center pt-2">
+                <p className="text-xs text-gray-500">
+                  Expected engagement: ~{shortenedVideo.expectedViews} views
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

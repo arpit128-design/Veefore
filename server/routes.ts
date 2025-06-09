@@ -1059,19 +1059,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             } catch (refreshErr) {
               console.log('[TOKEN REFRESH] Token refresh error:', refreshErr);
             }
-            
-            // If refresh failed, use account metrics to generate content structure
-            if (!mediaResponse.ok) {
-              console.log('[CONTENT API] Using account metrics after token refresh attempt failed');
-              
-              // Generate content based on authentic account data with time filtering
-            const accountBasedContent = [];
-            const totalPosts = instagramAccount.mediaCount || 15;
-            const avgLikes = Math.round((instagramAccount.totalLikes || 29) / totalPosts);
-            const avgComments = Math.round((instagramAccount.totalComments || 2) / totalPosts);
-            
-            // Calculate time filter boundaries
-            const now = Date.now();
+          }
+          
+          // If refresh failed, log error and return empty array - no synthetic data
+          if (!mediaResponse.ok) {
+            const errorData = await mediaResponse.json().catch(() => ({}));
+            console.log('[CONTENT API] Instagram API still failed after token refresh:', errorData);
+            console.log('[CONTENT API] Returning empty array - no synthetic data allowed');
+            return res.json([]);
+          }
+        }
             const timeRangeMs = {
               '7': 7 * 24 * 60 * 60 * 1000,     // 7 days
               '30': 30 * 24 * 60 * 60 * 1000,   // 30 days

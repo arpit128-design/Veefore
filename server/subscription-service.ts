@@ -303,7 +303,7 @@ export class SubscriptionService {
       subscriptionStatus: 'active',
       currentPeriodStart: currentDate,
       currentPeriodEnd: nextBillingDate,
-      credits: PLAN_LIMITS[planId].monthlyCredits,
+      credits: 0,
     });
   }
 
@@ -312,18 +312,14 @@ export class SubscriptionService {
       plan: 'free',
       subscriptionStatus: 'canceled',
       currentPeriodEnd: new Date(),
-      credits: PLAN_LIMITS.free.monthlyCredits,
+      credits: 0,
     });
   }
 
   static async refreshCredits(userId: string): Promise<void> {
-    const user = await storage.getUser(parseInt(userId));
-    if (!user) return;
-
-    const plan = user.plan || 'free';
-    const credits = PLAN_LIMITS[plan].monthlyCredits;
-
-    await storage.updateUserCredits(parseInt(userId), credits);
+    // Credit refresh disabled - users must purchase credits manually
+    console.log(`[SUBSCRIPTION] Credit refresh disabled for user ${userId}`);
+    return;
   }
 
   static async getUserSubscriptionStatus(userId: string): Promise<{

@@ -8,12 +8,19 @@ const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 
 export function AnalyticsChart() {
   const { data: analyticsData, isLoading } = useInstantAnalytics();
+  
+  // Debug logging to see what data we're receiving
+  React.useEffect(() => {
+    if (analyticsData) {
+      console.log('[ANALYTICS CHART] Raw data received:', analyticsData);
+    }
+  }, [analyticsData]);
 
   // Generate engagement trend data based on real analytics
   const engagementTrend = React.useMemo(() => {
     if (!analyticsData) return [];
     
-    const baseEngagement = analyticsData.engagementRate || 0;
+    const baseEngagement = analyticsData.engagement || 0;
     return [
       { name: 'Mon', engagement: Math.max(0, baseEngagement * 0.8), reach: analyticsData.totalReach * 0.7 },
       { name: 'Tue', engagement: Math.max(0, baseEngagement * 0.9), reach: analyticsData.totalReach * 0.8 },
@@ -188,7 +195,7 @@ export function AnalyticsChart() {
                   <span className="text-sm text-white/80">Followers</span>
                 </div>
                 <span className="text-white font-medium">
-                  {analyticsData?.newFollowers?.toLocaleString() || '0'}
+                  {analyticsData?.newFollowers?.toLocaleString() || analyticsData?.followers?.toLocaleString() || '0'}
                 </span>
               </div>
               

@@ -1,5 +1,6 @@
 import type { Express, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { getAuthenticHashtags } from "./authentic-hashtags";
 import { IStorage } from "./storage";
 import { MongoStorage } from "./mongodb-storage";
@@ -12,6 +13,7 @@ import { InstagramWebhookHandler } from "./instagram-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 import { videoShortenerAI } from './video-shortener-ai';
+import { RealVideoProcessor } from './real-video-processor';
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import OpenAI from "openai";
@@ -5847,18 +5849,15 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         status: 'completed',
         contentData: shortenedVideoResult,
         creditsUsed: creditCost,
-        description: `Shortened video for ${platform} (${targetDuration}s) - ${result.shortVideo.selectedSegment.content}`
+        description: `Shortened video for ${platform} (${targetDuration}s) - ${shortenedVideoResult.shortVideo.selectedSegment.content}`
       });
 
-      console.log('[AI SHORTEN] Analysis complete:', result.shortVideo.selectedSegment.content);
+      console.log('[REAL VIDEO] Processing complete:', shortenedVideoResult.shortVideo.selectedSegment.content);
 
       res.json({
         success: true,
         creditsUsed: creditCost,
         remainingCredits: currentCredits - creditCost,
-        analysis: result.analysis,
-        shortVideo: result.shortVideo,
-        downloadUrl: result.downloadUrl,
         ...shortenedVideoResult
       });
 

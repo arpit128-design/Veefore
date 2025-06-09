@@ -31,12 +31,31 @@ export function TrendAnalyzer() {
     queryFn: async () => {
       console.log('[CLIENT DEBUG] Fetching trends for workspace:', currentWorkspace?.id);
       
-      // Directly fetch the cached trending data
-      const response = await apiRequest('GET', `/api/analytics/refresh-trends?category=all`);
-      console.log('[CLIENT DEBUG] Trend API response:', response);
-      console.log('[CLIENT DEBUG] Response keys:', Object.keys(response || {}));
-      console.log('[CLIENT DEBUG] Hashtags count:', response?.hashtags?.length || 0);
-      return response;
+      // Directly fetch the cached trending data with proper error handling
+      try {
+        const response = await apiRequest('GET', `/api/analytics/refresh-trends?category=all`);
+        console.log('[CLIENT DEBUG] Raw response:', response);
+        
+        // Check if response is already parsed JSON or needs parsing
+        let jsonData;
+        if (response && typeof response === 'object' && !response.json) {
+          // Already parsed JSON
+          jsonData = response;
+        } else {
+          // Need to parse JSON
+          jsonData = await response.json();
+        }
+        
+        console.log('[CLIENT DEBUG] Parsed JSON data:', jsonData);
+        console.log('[CLIENT DEBUG] Success status:', jsonData?.success);
+        console.log('[CLIENT DEBUG] Hashtags array:', jsonData?.hashtags);
+        console.log('[CLIENT DEBUG] Hashtags count:', jsonData?.hashtags?.length || 0);
+        
+        return jsonData;
+      } catch (error) {
+        console.error('[CLIENT DEBUG] Error fetching trends:', error);
+        throw error;
+      }
     },
     enabled: !!currentWorkspace?.id,
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
@@ -93,10 +112,11 @@ export function TrendAnalyzer() {
     })) || [];
 
   console.log('TrendAnalyzer Debug:', {
-    authenticTrendsLength: finalHashtags.length,
-    hasHashtags: finalHashtags.length > 0,
-    trendDataStructure: Object.keys(trendData || {}),
-    firstHashtag: finalHashtags[0]
+    trendData: trendData,
+    hashtagsFromResponse: (trendData as any)?.hashtags?.length || 0,
+    firstHashtag: (trendData as any)?.hashtags?.[0],
+    responseKeys: Object.keys(trendData || {}),
+    success: (trendData as any)?.success
   });
 
   // Fallback data only when API is loading

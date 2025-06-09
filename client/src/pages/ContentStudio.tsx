@@ -1274,7 +1274,7 @@ function VideoShortener() {
   const shortenMutation = useMutation({
     mutationFn: async (data: any) => {
       if (data.videoFile) {
-        // Handle file upload with FormData
+        // Handle file upload with FormData using proper authentication
         const formData = new FormData();
         formData.append('videoFile', data.videoFile);
         formData.append('targetDuration', data.targetDuration.toString());
@@ -1283,13 +1283,31 @@ function VideoShortener() {
         formData.append('userPreferences', JSON.stringify(data.userPreferences));
         formData.append('workspaceId', data.workspaceId);
         
+        // Get proper Firebase JWT token
+        let token = localStorage.getItem('veefore_auth_token');
+        
+        // Validate and refresh token if needed
+        if (!token || token.split('.').length !== 3) {
+          const { auth } = await import('@/lib/firebase');
+          if (auth?.currentUser) {
+            token = await auth.currentUser.getIdToken(true);
+            localStorage.setItem('veefore_auth_token', token);
+          }
+        }
+        
         const response = await fetch('/api/ai/shorten-video', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Authorization': `Bearer ${token}`,
           },
           body: formData
         });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to process video');
+        }
+        
         return await response.json();
       } else {
         // Handle URL with JSON

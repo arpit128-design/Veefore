@@ -12,14 +12,39 @@ export function ContentPerformance() {
   const { token } = useAuth();
   const [timeRange, setTimeRange] = useState("7");
 
-  const { data: content } = useQuery({
-    queryKey: ['content', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/content?workspaceId=${currentWorkspace?.id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+  const { data: content, error, isLoading, refetch } = useQuery({
+    queryKey: ['content', currentWorkspace?.id, token],
+    queryFn: async () => {
+      console.log('[CONTENT DEBUG] Making API call with workspace:', currentWorkspace?.id, 'token exists:', !!token);
+      
+      const response = await fetch(`/api/content?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('[CONTENT DEBUG] API response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('[CONTENT DEBUG] API error:', errorData);
+        throw new Error(`API error: ${response.status}`);
       }
-    }).then(res => res.json()),
-    enabled: !!currentWorkspace?.id && !!token
+      
+      const data = await response.json();
+      console.log('[CONTENT DEBUG] API response data:', data);
+      return data;
+    },
+    enabled: !!currentWorkspace?.id && !!token,
+    retry: 1
+  });
+
+  console.log('[CONTENT DEBUG] Component state:', {
+    hasWorkspace: !!currentWorkspace?.id,
+    hasToken: !!token,
+    contentData: content,
+    isLoading,
+    error
   });
 
   const getIconForType = (type: string) => {

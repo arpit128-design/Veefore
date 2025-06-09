@@ -39,6 +39,7 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
       'ai-video': 'AI Video Generation',
       'ai-reel': 'AI Reel Creation',
       'video-generation': 'Video Generation',
+      'reels-script': 'AI Script Generation',
     };
     return names[type] || 'AI Feature';
   };

@@ -198,7 +198,7 @@ export const CREDIT_COSTS = {
   'hashtag-generation': 1,
   'ai_suggestions': 1, // AI-powered content and growth suggestions
   'story-template': 1,
-  'reels-script': 1,
+  'reels-script': 2, // AI script generation - 2 credits
   
   // AI Image Generation - 8 credits
   'ai-image': 8,

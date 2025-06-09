@@ -70,7 +70,7 @@ function VideoGenerator() {
       if (error.status === 402 && error.upgradeModal) {
         setUpgradeModal({
           isOpen: true,
-          featureType: "AI Caption Generation",
+          featureType: "reels-script",
           creditsRequired: 2,
           currentCredits: user?.credits || 0
         });

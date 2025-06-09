@@ -2909,14 +2909,14 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[BODY DEBUG] Content-Length:', req.headers['content-length']);
 
       // Check credits before generating script
-      const creditCost = creditService.getCreditCost('ai-caption'); // 2 credits
-      const hasCredits = await creditService.hasCredits(userId, 'ai-caption');
+      const creditCost = creditService.getCreditCost('reels-script'); // 2 credits
+      const hasCredits = await creditService.hasCredits(userId, 'reels-script');
       
       if (!hasCredits) {
         const currentCredits = await creditService.getUserCredits(userId);
         return res.status(402).json({ 
           error: 'Insufficient credits',
-          featureType: 'ai-caption',
+          featureType: 'reels-script',
           required: creditCost,
           current: currentCredits,
           upgradeModal: true
@@ -2936,7 +2936,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       };
 
       // Deduct credits after successful generation
-      await creditService.consumeCredits(userId, 'ai-caption', 1, 'AI script generation');
+      await creditService.consumeCredits(userId, 'reels-script', 1, 'AI script generation');
       const remainingCredits = await creditService.getUserCredits(userId);
 
       res.json({

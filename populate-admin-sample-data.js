@@ -1,44 +1,14 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import { MongoStorage } from './server/mongodb-storage.js';
 
-dotenv.config();
-
-const uri = process.env.DATABASE_URL;
-if (!uri) {
-  console.error('DATABASE_URL not found');
-  process.exit(1);
-}
-
-// Define simple schemas for this script
-const ContentSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  type: String,
-  platform: String,
-  status: String,
-  workspaceId: Number,
-  scheduledFor: Date,
-  caption: String,
-  createdAt: { type: Date, default: Date.now }
-});
-
-const NotificationSchema = new mongoose.Schema({
-  title: String,
-  message: String,
-  type: String,
-  isActive: Boolean,
-  targetUsers: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
-
-const ContentModel = mongoose.model('Content', ContentSchema);
-const NotificationModel = mongoose.model('Notification', NotificationSchema);
-
-async function populateAdminData() {
+async function populateAdminSampleData() {
+  const storage = new MongoStorage();
+  
   try {
-    await mongoose.connect(uri);
-    console.log('[ADMIN DATA] Connected to MongoDB');
+    await storage.connect();
+    console.log('[ADMIN DATA] Connected to database');
+    
+    // Get the MongoDB connection from storage
+    const db = storage.db;
     
     // Create sample notifications
     const notifications = [
@@ -71,9 +41,9 @@ async function populateAdminData() {
       }
     ];
     
-    // Insert notifications using Mongoose
-    const notifResult = await NotificationModel.insertMany(notifications);
-    console.log(`[ADMIN DATA] Created ${notifResult.length} notifications`);
+    // Insert notifications
+    const notifResult = await db.collection('notifications').insertMany(notifications);
+    console.log(`[ADMIN DATA] Created ${notifResult.insertedCount} notifications`);
     
     // Create sample content entries
     const content = [
@@ -85,7 +55,8 @@ async function populateAdminData() {
         status: 'published',
         workspaceId: 1,
         scheduledFor: null,
-        caption: 'Exploring the future of technology #TechTrends #AI #Innovation'
+        caption: 'Exploring the future of technology #TechTrends #AI #Innovation',
+        createdAt: new Date()
       },
       {
         title: 'LinkedIn Article: Business Growth',
@@ -95,7 +66,8 @@ async function populateAdminData() {
         status: 'scheduled',
         workspaceId: 2,
         scheduledFor: new Date(Date.now() + 86400000),
-        caption: 'Key strategies for sustainable business growth in 2025'
+        caption: 'Key strategies for sustainable business growth in 2025',
+        createdAt: new Date(Date.now() - 3600000)
       },
       {
         title: 'Twitter Thread: Marketing Tips',
@@ -105,7 +77,8 @@ async function populateAdminData() {
         status: 'draft',
         workspaceId: 1,
         scheduledFor: null,
-        caption: 'Essential marketing tips every startup should know'
+        caption: 'Essential marketing tips every startup should know',
+        createdAt: new Date(Date.now() - 7200000)
       },
       {
         title: 'YouTube Short: Product Demo',
@@ -115,21 +88,22 @@ async function populateAdminData() {
         status: 'published',
         workspaceId: 3,
         scheduledFor: null,
-        caption: 'Quick demo of our latest features #ProductDemo #SaaS'
+        caption: 'Quick demo of our latest features #ProductDemo #SaaS',
+        createdAt: new Date(Date.now() - 10800000)
       }
     ];
     
-    // Insert content using Mongoose
-    const contentResult = await ContentModel.insertMany(content);
-    console.log(`[ADMIN DATA] Created ${contentResult.length} content items`);
+    // Insert content
+    const contentResult = await db.collection('content').insertMany(content);
+    console.log(`[ADMIN DATA] Created ${contentResult.insertedCount} content items`);
     
     console.log('[ADMIN DATA] Successfully populated admin panel data');
     
   } catch (error) {
     console.error('[ADMIN DATA] Error:', error);
   } finally {
-    await client.close();
+    process.exit(0);
   }
 }
 
-populateAdminData();
+populateAdminSampleData();

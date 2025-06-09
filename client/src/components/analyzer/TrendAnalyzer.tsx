@@ -63,17 +63,45 @@ export function TrendAnalyzer() {
   });
 
   const refreshTrendsMutation = useMutation({
-    mutationFn: () => apiRequest('POST', '/api/analytics/refresh-trends', {
-      workspaceId: currentWorkspace?.id
-    }),
+    mutationFn: async () => {
+      console.log('[REFRESH TRENDS] Starting credit-based refresh with workspace:', currentWorkspace?.id);
+      
+      // Get fresh Firebase token before making the request
+      let token = localStorage.getItem('veefore_auth_token');
+      
+      // Validate token format and refresh if needed
+      if (!token || token.split('.').length !== 3) {
+        console.log('[REFRESH TRENDS] Invalid token detected, refreshing...');
+        try {
+          const { auth } = await import('@/lib/firebase');
+          if (auth?.currentUser) {
+            const freshToken = await auth.currentUser.getIdToken(true);
+            if (freshToken && freshToken.split('.').length === 3) {
+              localStorage.setItem('veefore_auth_token', freshToken);
+              token = freshToken;
+              console.log('[REFRESH TRENDS] Token refreshed successfully');
+            }
+          }
+        } catch (error) {
+          console.error('[REFRESH TRENDS] Token refresh failed:', error);
+        }
+      }
+      
+      return apiRequest('POST', '/api/analytics/refresh-trends', {
+        workspaceId: currentWorkspace?.id
+      });
+    },
     onSuccess: () => {
       toast({
         title: "Trends Updated!",
         description: "Latest trend data has been fetched from social platforms.",
       });
       refetch();
+      // Force refresh workspace data to update credits display
+      queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] });
     },
     onError: (error: any) => {
+      console.error('[REFRESH TRENDS] Error:', error);
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update trend data",

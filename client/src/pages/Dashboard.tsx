@@ -4,7 +4,7 @@ import { ContentStudio } from "@/components/dashboard/ContentStudio";
 import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
-import { ChatPerformance } from "@/components/dashboard/ChatPerformance";
+import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useInstantData, useInstantAnalytics } from "@/hooks/useInstantData";
@@ -337,8 +337,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Chat Performance */}
-      <ChatPerformance />
+      {/* Analytics Chart */}
+      <AnalyticsChart />
 
       {/* AI Content Studio Quick Access */}
       <ContentStudio />

@@ -997,36 +997,29 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const workspaceIdStr = workspace.id.toString();
       console.log('[DASHBOARD INSTANT] Zero-wait response for workspace:', workspaceIdStr);
       
-      // Check cache synchronously - NO database calls in main thread
-      const cachedData = dashboardCache.getCachedDataSync(workspaceIdStr);
+      // TEMPORARILY BYPASS CACHE - Use fresh Instagram data instead of stale cache
+      console.log('[DASHBOARD FIX] Bypassing stale cache to show fresh Instagram data');
       
-      if (cachedData) {
-        console.log('[DASHBOARD INSTANT] Cache hit - responding in <10ms');
-        
-        // Background sync without blocking
-        setImmediate(() => {
-          instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
-            .then(() => console.log('[DASHBOARD INSTANT] Background update completed'))
-            .catch((error) => console.log('[DASHBOARD INSTANT] Background update error:', error.message));
-        });
+      // Force background sync to update data
+      setImmediate(() => {
+        instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
+          .then(() => console.log('[DASHBOARD INSTANT] Background update completed'))
+          .catch((error) => console.log('[DASHBOARD INSTANT] Background update error:', error.message));
+      });
 
-        return res.json({
-          totalPosts: cachedData.totalPosts,
-          totalReach: cachedData.totalReach,
-          engagementRate: cachedData.engagementRate,
-          topPlatform: cachedData.topPlatform,
-          followers: cachedData.followers,
-          impressions: cachedData.impressions,
-          accountUsername: cachedData.accountUsername,
-          totalLikes: cachedData.totalLikes,
-          totalComments: cachedData.totalComments,
-          mediaCount: cachedData.mediaCount
-        });
-      }
-
-      // Cache miss - use existing account data and populate cache
-      console.log('[DASHBOARD INSTANT] Cache miss - using current account data');
+      // Use fresh Instagram account data directly - bypass all cache
+      console.log('[DASHBOARD FIX] Using fresh Instagram account data');
       const account = instagramAccount as any;
+      
+      console.log('[DASHBOARD DATA] Raw Instagram account data:', {
+        totalPosts: account.totalPosts,
+        totalReach: account.totalReach, 
+        totalLikes: account.totalLikes,
+        totalComments: account.totalComments,
+        followerCount: account.followerCount,
+        mediaCount: account.mediaCount,
+        username: account.username
+      });
       
       // ENGAGEMENT RATE CALCULATION - Authentic Instagram Data
       let engagementRate = 0;

@@ -98,6 +98,18 @@ export class DashboardCache {
     console.log('[CACHE] Updated dashboard cache for workspace:', workspaceId);
   }
 
+  // Clear all cache to force fresh data
+  clearCache(): void {
+    this.cache.clear();
+    console.log('[CACHE] All dashboard cache cleared');
+  }
+
+  // Clear cache for specific workspace
+  clearWorkspaceCache(workspaceId: string): void {
+    this.cache.delete(workspaceId);
+    console.log('[CACHE] Cleared cache for workspace:', workspaceId);
+  }
+
   // Check if cache is still valid
   private isCacheValid(lastUpdated: Date): boolean {
     const now = new Date().getTime();

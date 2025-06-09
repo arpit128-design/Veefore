@@ -1758,7 +1758,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.log('[CREDIT PURCHASE] Credits added successfully');
           
           await storage.createCreditTransaction({
-            userId: parseInt(user.id),
+            userId: user.id,
             type: 'purchase',
             amount: packageData.totalCredits,
             description: `Credit purchase: ${packageData.name}`,

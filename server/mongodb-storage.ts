@@ -2243,26 +2243,52 @@ export class MongoStorage implements IStorage {
 
   async addCreditsToUser(userId: number | string, credits: number): Promise<User> {
     await this.connect();
-    const userIdStr = userId.toString();
+    console.log(`[CREDIT ADD] Looking for user with ID: ${userId} (type: ${typeof userId})`);
     
-    const user = await UserModel.findOne({ id: userIdStr });
+    let user;
+    try {
+      // Try by MongoDB _id first (ObjectId format)
+      user = await UserModel.findById(userId);
+      console.log(`[CREDIT ADD] Find by _id result:`, user ? 'Found' : 'Not found');
+    } catch (objectIdError) {
+      console.log(`[CREDIT ADD] ObjectId lookup failed, trying by 'id' field`);
+      
+      // If ObjectId fails, try by the 'id' field
+      const userIdStr = userId.toString();
+      user = await UserModel.findOne({ id: userIdStr });
+      console.log(`[CREDIT ADD] Find by id field result:`, user ? 'Found' : 'Not found');
+    }
+    
     if (!user) {
       throw new Error(`User with id ${userId} not found`);
     }
     
     const currentCredits = user.credits || 0;
     const newCredits = currentCredits + credits;
+    console.log(`[CREDIT ADD] Current credits: ${currentCredits}, adding: ${credits}, new total: ${newCredits}`);
     
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { id: userIdStr },
-      { credits: newCredits, updatedAt: new Date() },
-      { new: true }
-    );
+    let updatedUser;
+    try {
+      // Try updating by MongoDB _id first
+      updatedUser = await UserModel.findByIdAndUpdate(
+        user._id,
+        { credits: newCredits, updatedAt: new Date() },
+        { new: true }
+      );
+    } catch (error) {
+      // Fallback to updating by id field
+      updatedUser = await UserModel.findOneAndUpdate(
+        { id: user.id },
+        { credits: newCredits, updatedAt: new Date() },
+        { new: true }
+      );
+    }
     
     if (!updatedUser) {
       throw new Error(`Failed to update credits for user ${userId}`);
     }
     
+    console.log(`[CREDIT ADD] Successfully updated user ${userId} credits to ${newCredits}`);
     return this.convertUser(updatedUser);
   }
 

@@ -432,7 +432,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         audio: trendingData.trends.audio.length,
         formats: trendingData.trends.formats.length,
         creditsUsed: 1,
-        remainingCredits: currentWorkspace.credits - 1
+        remainingCredits: currentCredits - 1
       });
       
       // Return personalized response with credit info
@@ -440,7 +440,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         success: true,
         message: 'Trends refreshed successfully',
         creditsUsed: 1,
-        remainingCredits: currentWorkspace.credits - 1,
+        remainingCredits: currentCredits - 1,
         trendingTags: personalizedHashtags.length,
         viralAudio: trendingData.viralAudio,
         contentFormats: trendingData.contentFormats,

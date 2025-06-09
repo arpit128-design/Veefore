@@ -44,7 +44,8 @@ import {
   Palette,
   TrendingUp,
   Target,
-  Bot
+  Bot,
+  Link as LinkIcon
 } from "lucide-react";
 
 // Platform dimensions configuration

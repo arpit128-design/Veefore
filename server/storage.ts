@@ -202,7 +202,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
-      credits: 50,
+      credits: 0,
       plan: "free",
       stripeCustomerId: null,
       stripeSubscriptionId: null,
@@ -941,7 +941,7 @@ export class MemStorage implements IStorage {
           name: "Cosmic Explorer",
           description: "Perfect for getting started in the social universe",
           price: "Free",
-          credits: 50,
+          credits: 0,
           features: [
             "Up to 2 social accounts",
             "Basic analytics dashboard",

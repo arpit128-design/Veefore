@@ -44,7 +44,7 @@ export const PLAN_PRICING = {
 
 export const PLAN_LIMITS: Record<string, PlanLimits> = {
   free: {
-    monthlyCredits: 50,
+    monthlyCredits: 0,
     maxWorkspaces: 1,
     maxSocialAccounts: 1,
     maxScheduledPosts: 5,

@@ -115,17 +115,13 @@ export class SchedulerService {
         return;
       }
 
-      // Publish to Instagram using adaptive strategy to handle changing requirements
-      let publishResult;
+      // Publish to Instagram using simple, reliable approach
       const caption = `${content.title}\n\n${content.description || ''}`;
       const mediaUrl = content.contentData.mediaUrl;
       
-      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram using adaptive strategy`);
+      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram`);
       
-      // Use the adaptive publisher that handles Instagram's changing requirements
-      const { AdaptiveInstagramPublisher } = await import('./adaptive-instagram-publisher');
-      
-      // Determine content type for adaptive publisher
+      // Determine content type
       let contentType: 'video' | 'photo' | 'reel' | 'story' = 'photo';
       
       if (content.type === 'story') {
@@ -143,36 +139,27 @@ export class SchedulerService {
       
       console.log(`[SCHEDULER] Detected content type: ${contentType} for URL: ${mediaUrl}`);
       
-      // Convert URL for Instagram compatibility first
-      const { InstagramURLConverter } = await import('./instagram-url-converter');
-      const urlPreparation = await InstagramURLConverter.prepareForInstagramPublishing(
-        mediaUrl,
-        contentType as 'video' | 'photo' | 'reel'
-      );
+      // Use direct publisher approach that works with current permissions
+      const { InstagramDirectPublisher } = await import('./instagram-direct-publisher');
       
-      console.log(`[SCHEDULER] URL conversion: ${urlPreparation.isOptimized ? 'optimized' : 'unchanged'}`);
-      console.log(`[SCHEDULER] Optimized URL: ${urlPreparation.url}`);
-      
-      // Use adaptive publisher with optimized URL
-      const adaptiveResult = await AdaptiveInstagramPublisher.publishWithAdaptiveStrategy(
+      console.log(`[SCHEDULER] Using direct publisher for permission-compatible publishing`);
+      const directResult = await InstagramDirectPublisher.publishContent(
         instagramAccount.accessToken,
-        urlPreparation.url,
+        mediaUrl,
         caption,
         contentType
       );
       
-      if (adaptiveResult.success) {
-        console.log(`[SCHEDULER] ✓ Adaptive publishing succeeded using method: ${adaptiveResult.method}`);
-        publishResult = { id: adaptiveResult.id };
+      if (directResult.success) {
+        console.log(`[SCHEDULER] ✓ Publishing succeeded using ${directResult.approach}: ${directResult.id}`);
+        console.log(`[SCHEDULER] Successfully published ${content.type || 'post'} content ${content.id} to Instagram:`, directResult.id);
+        
+        // Update content status
+        await this.updateContentStatus(content.id, 'published', '', directResult.id);
       } else {
-        console.error(`[SCHEDULER] ✗ Adaptive publishing failed: ${adaptiveResult.error}`);
-        throw new Error(adaptiveResult.error || 'Adaptive publishing failed');
+        console.error(`[SCHEDULER] ✗ Publishing failed with ${directResult.approach}: ${directResult.error}`);
+        throw new Error(directResult.error || 'Publishing failed');
       }
-
-      console.log(`[SCHEDULER] Successfully published ${content.type || 'post'} content ${content.id} to Instagram:`, publishResult.id);
-
-      // Update content status
-      await this.updateContentStatus(content.id, 'published', null, publishResult.id);
 
     } catch (error: any) {
       console.error(`[SCHEDULER] Failed to publish content ${content.id}:`, error);

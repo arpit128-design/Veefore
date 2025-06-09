@@ -5878,6 +5878,9 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       }
 
       console.log('[INSTAGRAM PUBLISH] Publishing to Instagram API:', publishEndpoint);
+      console.log('[INSTAGRAM PUBLISH] Account ID:', instagramAccount.accountId);
+      console.log('[INSTAGRAM PUBLISH] Access Token (first 20 chars):', instagramAccount.accessToken?.substring(0, 20) + '...');
+      console.log('[INSTAGRAM PUBLISH] Publish data payload:', JSON.stringify(publishData, null, 2));
 
       // Step 1: Create media container
       const containerResponse = await fetch(publishEndpoint, {
@@ -5887,6 +5890,8 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         },
         body: JSON.stringify(publishData)
       });
+
+      console.log('[INSTAGRAM PUBLISH] Container response status:', containerResponse.status, containerResponse.statusText);
 
       if (!containerResponse.ok) {
         const errorData = await containerResponse.json();
@@ -5900,19 +5905,28 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const containerData = await containerResponse.json();
       const containerId = containerData.id;
 
-      console.log('[INSTAGRAM PUBLISH] Media container created:', containerId);
+      console.log('[INSTAGRAM PUBLISH] Media container created successfully:', containerId);
+      console.log('[INSTAGRAM PUBLISH] Container response data:', JSON.stringify(containerData, null, 2));
 
       // Step 2: Publish the media container
-      const publishResponse = await fetch(`https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media_publish`, {
+      const publishEndpointFinal = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media_publish`;
+      const publishPayload = {
+        creation_id: containerId,
+        access_token: instagramAccount.accessToken
+      };
+
+      console.log('[INSTAGRAM PUBLISH] Final publish endpoint:', publishEndpointFinal);
+      console.log('[INSTAGRAM PUBLISH] Final publish payload:', JSON.stringify(publishPayload, null, 2));
+
+      const publishResponse = await fetch(publishEndpointFinal, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          creation_id: containerId,
-          access_token: instagramAccount.accessToken
-        })
+        body: JSON.stringify(publishPayload)
       });
+
+      console.log('[INSTAGRAM PUBLISH] Final publish response status:', publishResponse.status, publishResponse.statusText);
 
       if (!publishResponse.ok) {
         const errorData = await publishResponse.json();
@@ -5926,7 +5940,8 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const publishData_result = await publishResponse.json();
       const mediaId = publishData_result.id;
 
-      console.log('[INSTAGRAM PUBLISH] Successfully published to Instagram:', mediaId);
+      console.log('[INSTAGRAM PUBLISH] Successfully published to Instagram with media ID:', mediaId);
+      console.log('[INSTAGRAM PUBLISH] Full publish response:', JSON.stringify(publishData_result, null, 2));
 
       // Save publishing record
       await storage.createContent({

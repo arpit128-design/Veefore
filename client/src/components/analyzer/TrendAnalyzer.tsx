@@ -64,14 +64,18 @@ export function TrendAnalyzer() {
 
   const refreshTrendsMutation = useMutation({
     mutationFn: async () => {
-      console.log('[REFRESH TRENDS] Starting credit-based refresh with workspace:', currentWorkspace?.id);
+      console.log('[REFRESH TRENDS MUTATION] Starting credit-based refresh with workspace:', currentWorkspace?.id);
+      
+      if (!currentWorkspace?.id) {
+        throw new Error('No workspace selected');
+      }
       
       // Get fresh Firebase token before making the request
       let token = localStorage.getItem('veefore_auth_token');
       
       // Validate token format and refresh if needed
       if (!token || token.split('.').length !== 3) {
-        console.log('[REFRESH TRENDS] Invalid token detected, refreshing...');
+        console.log('[REFRESH TRENDS MUTATION] Invalid token detected, refreshing...');
         try {
           const { auth } = await import('@/lib/firebase');
           if (auth?.currentUser) {
@@ -79,17 +83,21 @@ export function TrendAnalyzer() {
             if (freshToken && freshToken.split('.').length === 3) {
               localStorage.setItem('veefore_auth_token', freshToken);
               token = freshToken;
-              console.log('[REFRESH TRENDS] Token refreshed successfully');
+              console.log('[REFRESH TRENDS MUTATION] Token refreshed successfully');
             }
           }
         } catch (error) {
-          console.error('[REFRESH TRENDS] Token refresh failed:', error);
+          console.error('[REFRESH TRENDS MUTATION] Token refresh failed:', error);
         }
       }
       
-      return apiRequest('POST', '/api/analytics/refresh-trends', {
-        workspaceId: currentWorkspace?.id
+      console.log('[REFRESH TRENDS MUTATION] Making POST request to /api/analytics/refresh-trends');
+      const response = await apiRequest('POST', '/api/analytics/refresh-trends', {
+        workspaceId: currentWorkspace.id
       });
+      
+      console.log('[REFRESH TRENDS MUTATION] POST response:', response);
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -322,7 +330,34 @@ export function TrendAnalyzer() {
           Trend Intelligence Center
         </CardTitle>
         <Button
-          onClick={() => refreshTrendsMutation.mutate()}
+          onClick={() => {
+            console.log('[REFRESH BUTTON] Button clicked, workspace:', currentWorkspace);
+            
+            if (!currentWorkspace) {
+              console.log('[REFRESH BUTTON] No workspace selected');
+              toast({
+                title: "No Workspace Selected",
+                description: "Please select a workspace to refresh trends.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            console.log('[REFRESH BUTTON] Current workspace credits:', currentWorkspace.credits);
+            
+            if (currentWorkspace.credits !== null && currentWorkspace.credits <= 0) {
+              console.log('[REFRESH BUTTON] Insufficient credits');
+              toast({
+                title: "Insufficient Credits",
+                description: "You need at least 1 credit to refresh trends.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            console.log('[REFRESH BUTTON] Triggering refresh trends mutation...');
+            refreshTrendsMutation.mutate();
+          }}
           disabled={refreshTrendsMutation.isPending || isLoading}
           variant="outline"
           className="glassmorphism"

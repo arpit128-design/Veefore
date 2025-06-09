@@ -65,11 +65,15 @@ export class SimpleInstagramPublisher {
   static cleanURLForInstagram(inputUrl: string): string {
     console.log(`[URL CLEANER] Processing: ${inputUrl}`);
     
+    // Get the current domain from environment or default
+    const currentDomain = process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+    const baseUrl = currentDomain.includes('localhost') ? `http://${currentDomain}` : `https://${currentDomain}`;
+    
     // Handle blob URLs
     if (inputUrl.startsWith('blob:')) {
       const parts = inputUrl.split('/');
       const mediaId = parts[parts.length - 1];
-      const cleanUrl = `https://workspace.brandboost09.repl.co/uploads/${mediaId}`;
+      const cleanUrl = `${baseUrl}/uploads/${mediaId}`;
       console.log(`[URL CLEANER] Blob converted: ${cleanUrl}`);
       return cleanUrl;
     }
@@ -77,20 +81,20 @@ export class SimpleInstagramPublisher {
     // Handle malformed URLs with nested domains
     if (inputUrl.includes('replit.dev') && inputUrl.includes('/uploads/')) {
       const uploadsPart = inputUrl.substring(inputUrl.indexOf('/uploads/'));
-      const cleanUrl = `https://workspace.brandboost09.repl.co${uploadsPart}`;
+      const cleanUrl = `${baseUrl}${uploadsPart}`;
       console.log(`[URL CLEANER] Nested domain fixed: ${cleanUrl}`);
       return cleanUrl;
     }
     
-    // Handle already clean URLs
-    if (inputUrl.startsWith('https://workspace.brandboost09.repl.co')) {
+    // Handle already proper URLs with current domain
+    if (inputUrl.startsWith(baseUrl)) {
       console.log(`[URL CLEANER] URL already clean: ${inputUrl}`);
       return inputUrl;
     }
     
     // Extract filename and create clean URL
     const filename = inputUrl.split('/').pop() || 'media';
-    const cleanUrl = `https://workspace.brandboost09.repl.co/uploads/${filename}`;
+    const cleanUrl = `${baseUrl}/uploads/${filename}`;
     console.log(`[URL CLEANER] Generic clean: ${cleanUrl}`);
     return cleanUrl;
   }

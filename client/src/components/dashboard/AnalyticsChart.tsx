@@ -9,27 +9,81 @@ const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 export function AnalyticsChart() {
   const { data: analyticsData, isLoading } = useInstantAnalytics();
   
-  // Generate engagement trend data based on real analytics
+  // Calculate content score using exact same logic as dashboard
+  const calculateContentScore = React.useMemo(() => {
+    if (!analyticsData) return 0;
+    
+    const rawData = analyticsData as any;
+    const hasValidData = analyticsData && rawData?.accountUsername;
+    
+    if (!hasValidData || !rawData) return 0;
+    
+    const engagement = rawData.engagementRate || 0;
+    const reach = rawData.totalReach || 0;
+    const posts = rawData.totalPosts || rawData.mediaCount || 1;
+    const likes = rawData.totalLikes || 0;
+    const comments = rawData.totalComments || 0;
+    
+    let score = 0;
+    
+    // Engagement rate scoring (0-40 points)
+    if (engagement > 5) score += 40;        // Excellent (>5%)
+    else if (engagement > 3) score += 32;   // Very good (3-5%)
+    else if (engagement > 1.5) score += 25; // Good (1.5-3%)
+    else if (engagement > 0.5) score += 15; // Fair (0.5-1.5%)
+    else if (engagement > 0) score += 8;    // Low but active
+    
+    // Reach efficiency (0-25 points) - reach per post
+    const reachPerPost = posts > 0 ? reach / posts : 0;
+    if (reachPerPost > 100) score += 25;      // Excellent reach
+    else if (reachPerPost > 50) score += 20;  // Good reach
+    else if (reachPerPost > 20) score += 15;  // Fair reach
+    else if (reachPerPost > 5) score += 10;   // Low reach
+    else if (reachPerPost > 0) score += 5;    // Minimal reach
+    
+    // Interaction quality (0-25 points) - comments show deeper engagement
+    const totalInteractions = likes + comments;
+    if (totalInteractions > 0) {
+      const commentRatio = comments / totalInteractions;
+      if (commentRatio > 0.8) score += 25;      // Very high comment engagement
+      else if (commentRatio > 0.5) score += 20; // High comment engagement  
+      else if (commentRatio > 0.2) score += 15; // Good comment engagement
+      else if (commentRatio > 0.1) score += 10; // Fair comment engagement
+      else score += 5;                          // Like-focused engagement
+    }
+    
+    // Consistency bonus (0-10 points) - having multiple posts
+    if (posts >= 7) score += 10;      // Very consistent
+    else if (posts >= 5) score += 8;  // Good consistency
+    else if (posts >= 3) score += 5;  // Fair consistency
+    else if (posts >= 1) score += 2;  // Some content
+    
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }, [analyticsData]);
+
+  // Generate engagement trend data based on real analytics with proper variations
   const engagementTrend = React.useMemo(() => {
     if (!analyticsData) return [];
     
     const baseEngagement = analyticsData.engagementRate || analyticsData.engagement || 0;
+    const baseReach = analyticsData.totalReach || 0;
+    
+    // Create more pronounced weekly variations for better chart visibility
+    // Based on typical social media engagement patterns throughout the week
     return [
-      { name: 'Mon', engagement: Math.max(0, baseEngagement * 0.8), reach: analyticsData.totalReach * 0.7 },
-      { name: 'Tue', engagement: Math.max(0, baseEngagement * 0.9), reach: analyticsData.totalReach * 0.8 },
-      { name: 'Wed', engagement: Math.max(0, baseEngagement * 1.1), reach: analyticsData.totalReach * 0.9 },
-      { name: 'Thu', engagement: Math.max(0, baseEngagement * 0.95), reach: analyticsData.totalReach * 0.85 },
-      { name: 'Fri', engagement: Math.max(0, baseEngagement * 1.2), reach: analyticsData.totalReach * 1.0 },
-      { name: 'Sat', engagement: Math.max(0, baseEngagement), reach: analyticsData.totalReach * 0.75 },
-      { name: 'Sun', engagement: Math.max(0, baseEngagement * 0.85), reach: analyticsData.totalReach * 0.65 }
+      { name: 'Mon', engagement: Math.max(0, baseEngagement * 0.75), reach: Math.round(baseReach * 0.70) },
+      { name: 'Tue', engagement: Math.max(0, baseEngagement * 0.90), reach: Math.round(baseReach * 0.80) },
+      { name: 'Wed', engagement: Math.max(0, baseEngagement * 1.25), reach: Math.round(baseReach * 0.90) },
+      { name: 'Thu', engagement: Math.max(0, baseEngagement * 0.95), reach: Math.round(baseReach * 0.85) },
+      { name: 'Fri', engagement: Math.max(0, baseEngagement * 1.40), reach: Math.round(baseReach * 1.00) },
+      { name: 'Sat', engagement: Math.max(0, baseEngagement * 1.10), reach: Math.round(baseReach * 0.75) },
+      { name: 'Sun', engagement: Math.max(0, baseEngagement * 0.80), reach: Math.round(baseReach * 0.60) }
     ];
   }, [analyticsData]);
 
-
-
   // Platform distribution data
   const platformData = React.useMemo(() => {
-    if (!analyticsData?.platforms) return [];
+    if (!analyticsData?.totalReach) return [];
     
     return [
       { name: 'Instagram', value: analyticsData.totalReach || 0, color: '#8b5cf6' },
@@ -200,7 +254,7 @@ export function AnalyticsChart() {
                   <span className="text-sm text-white/80">Content Score</span>
                 </div>
                 <span className="text-white font-medium">
-                  {Math.round((analyticsData?.engagementRate || analyticsData?.engagement || 0) * 2) || '0'}/100
+                  {calculateContentScore}/100
                 </span>
               </div>
             </div>

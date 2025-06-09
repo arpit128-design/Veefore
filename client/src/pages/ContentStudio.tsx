@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { 
@@ -22,29 +27,71 @@ import {
   CheckCircle,
   ArrowLeft,
   Zap,
-  Sparkles
+  Sparkles,
+  Upload,
+  Scissors,
+  Instagram,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Hash,
+  Type,
+  Eye,
+  Share,
+  Wand2,
+  Film,
+  Camera,
+  Palette,
+  TrendingUp,
+  Target,
+  Bot
 } from "lucide-react";
 
+// Platform dimensions configuration
+const PLATFORM_DIMENSIONS = {
+  instagram: {
+    reel: { width: 1080, height: 1920, ratio: "9:16" },
+    post: { width: 1080, height: 1080, ratio: "1:1" },
+    story: { width: 1080, height: 1920, ratio: "9:16" }
+  },
+  youtube: {
+    short: { width: 1080, height: 1920, ratio: "9:16" },
+    video: { width: 1920, height: 1080, ratio: "16:9" },
+    thumbnail: { width: 1280, height: 720, ratio: "16:9" }
+  },
+  tiktok: {
+    video: { width: 1080, height: 1920, ratio: "9:16" }
+  },
+  facebook: {
+    post: { width: 1200, height: 630, ratio: "1.91:1" },
+    story: { width: 1080, height: 1920, ratio: "9:16" }
+  },
+  twitter: {
+    post: { width: 1200, height: 675, ratio: "16:9" }
+  },
+  linkedin: {
+    post: { width: 1200, height: 627, ratio: "1.91:1" }
+  }
+};
+
 // AI Video Generator Component
-function VideoGenerator() {
+function AIVideoGenerator() {
   const [prompt, setPrompt] = useState("");
-  const [title, setTitle] = useState("");
   const [platform, setPlatform] = useState("youtube");
+  const [contentType, setContentType] = useState("video");
+  const [style, setStyle] = useState("modern");
+  const [duration, setDuration] = useState("30");
+  const [script, setScript] = useState("");
   const [generatedScript, setGeneratedScript] = useState<any>(null);
   const [generatedVideo, setGeneratedVideo] = useState<any>(null);
   const [step, setStep] = useState('input');
-  const [upgradeModal, setUpgradeModal] = useState({
-    isOpen: false,
-    featureType: "",
-    creditsRequired: 0,
-    currentCredits: 0
-  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch user data for credits
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
     refetchInterval: 30000
@@ -52,893 +99,1232 @@ function VideoGenerator() {
 
   const scriptMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/content/generate-script', data);
+      const response = await apiRequest('POST', '/api/ai/generate-script', data);
       return await response.json();
     },
     onSuccess: (response: any) => {
-      console.log('[SCRIPT] Response received:', response);
-      setGeneratedScript(response.script);
-      setStep('script');
+      setGeneratedScript(response);
+      setScript(response.script);
+      setStep('script-review');
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
-        title: "Script Generated!",
-        description: `Used ${response.creditsUsed || 1} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
+        title: "AI Script Generated!",
+        description: `Professional script created. Used ${response.creditsUsed || 2} credits.`,
       });
     },
     onError: (error: any) => {
-      console.error('[SCRIPT] Error:', error);
-      if (error.status === 402 && error.upgradeModal) {
-        setUpgradeModal({
-          isOpen: true,
-          featureType: "reels-script",
-          creditsRequired: 1,
-          currentCredits: user?.credits || 0
-        });
-      } else {
-        toast({
-          title: "Script Generation Failed",
-          description: error.message || "Failed to generate video script",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Script Generation Failed",
+        description: error.message || "Failed to generate video script",
+        variant: "destructive",
+      });
     }
   });
 
   const videoMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/content/generate-video', data);
-      return await response.json();
+      setIsGenerating(true);
+      setProgress(0);
+      
+      // Simulate progress for better UX
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 2000);
+
+      try {
+        const response = await apiRequest('POST', '/api/ai/generate-video', data);
+        clearInterval(progressInterval);
+        setProgress(100);
+        return await response.json();
+      } catch (error) {
+        clearInterval(progressInterval);
+        throw error;
+      } finally {
+        setIsGenerating(false);
+      }
     },
     onSuccess: (response: any) => {
-      console.log('[VIDEO] Response received:', response);
-      setGeneratedVideo(response.video);
-      setStep('video');
+      setGeneratedVideo(response);
+      setStep('video-preview');
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
-        title: "Video Generated Successfully!",
-        description: `Used ${response.creditsUsed || 8} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
+        title: "AI Video Generated Successfully!",
+        description: `High-quality video created. Used ${response.creditsUsed || 10} credits.`,
       });
-      queryClient.invalidateQueries({ queryKey: ['content'] });
     },
     onError: (error: any) => {
-      console.error('[VIDEO] Error:', error);
-      if (error.status === 402 && error.upgradeModal) {
-        setUpgradeModal({
-          isOpen: true,
-          featureType: "AI Video Generation",
-          creditsRequired: 8,
-          currentCredits: user?.credits || 0
-        });
-      } else {
-        toast({
-          title: "Video Generation Failed", 
-          description: error.message || "Failed to generate video content",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Video Generation Failed",
+        description: error.message || "Failed to generate video",
+        variant: "destructive",
+      });
     }
   });
 
-  const handleGenerateScript = () => {
+  const publishMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/content/publish', data);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Video Published Successfully!",
+        description: "Your AI-generated video is now live on your selected platform.",
+      });
+      resetGenerator();
+    }
+  });
+
+  const generateScript = () => {
     if (!prompt.trim()) {
       toast({
-        title: "Description Required",
+        title: "Prompt Required",
         description: "Please enter a description for your video",
         variant: "destructive",
       });
       return;
     }
 
-    // Check credits before generating (1 credit for script generation)
-    if (!user?.credits || user.credits < 1) {
-      setUpgradeModal({
-        isOpen: true,
-        featureType: "reels-script",
-        creditsRequired: 1,
-        currentCredits: user?.credits || 0
-      });
-      return;
-    }
-
+    const dimensions = PLATFORM_DIMENSIONS[platform]?.[contentType] || PLATFORM_DIMENSIONS.youtube.video;
+    
     scriptMutation.mutate({
-      description: prompt.trim(),
-      platform: platform,
-      title: title.trim()
+      prompt: prompt.trim(),
+      platform,
+      contentType,
+      style,
+      duration: parseInt(duration),
+      workspaceId: currentWorkspace?.id,
+      dimensions
     });
   };
 
-  const handleGenerateVideo = () => {
-    if (!generatedScript) {
+  const generateVideo = () => {
+    if (!script.trim()) {
       toast({
-        title: "Script Required",
-        description: "Please generate a script first",
+        title: "Script Required", 
+        description: "Please review and confirm the script before generating video",
         variant: "destructive",
       });
       return;
     }
 
-    // Check credits before generating (15 credits for video generation)
-    if (!user?.credits || user.credits < 15) {
-      setUpgradeModal({
-        isOpen: true,
-        featureType: "AI Video Generation",
-        creditsRequired: 15,
-        currentCredits: user?.credits || 0
-      });
-      return;
-    }
+    const dimensions = PLATFORM_DIMENSIONS[platform]?.[contentType] || PLATFORM_DIMENSIONS.youtube.video;
 
     videoMutation.mutate({
-      description: prompt.trim(),
-      platform: platform,
-      title: title.trim() || generatedScript.title,
+      script: script.trim(),
+      platform,
+      contentType,
+      style,
+      duration: parseInt(duration),
+      workspaceId: currentWorkspace?.id,
+      dimensions,
+      caption: generatedScript?.caption || "",
+      hashtags: generatedScript?.hashtags || []
+    });
+  };
+
+  const publishVideo = () => {
+    publishMutation.mutate({
+      type: 'video',
+      platform,
+      contentType,
+      videoUrl: generatedVideo.videoUrl,
+      thumbnailUrl: generatedVideo.thumbnailUrl,
+      caption: generatedVideo.caption,
+      hashtags: generatedVideo.hashtags,
       workspaceId: currentWorkspace?.id
     });
   };
 
-  const handleReset = () => {
-    setStep('input');
+  const resetGenerator = () => {
+    setPrompt("");
+    setScript("");
     setGeneratedScript(null);
     setGeneratedVideo(null);
-    setPrompt("");
-    setTitle("");
-    setPlatform("youtube");
+    setStep('input');
+    setProgress(0);
+  };
+
+  const getDimensionsText = () => {
+    const dimensions = PLATFORM_DIMENSIONS[platform]?.[contentType];
+    return dimensions ? `${dimensions.width}x${dimensions.height} (${dimensions.ratio})` : "Auto";
   };
 
   return (
-    <Card className="content-card holographic">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-stellar-gold">
-          <Video className="w-5 h-5" />
-          <div>
-            <div>AI Video Generator</div>
-            <p className="text-asteroid-silver text-sm">Create engaging videos with AI-powered scenes and effects</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Step 1: Input */}
-        {step === 'input' && (
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="video-title" className="text-white mb-2 block text-sm font-medium">
-                Video Title (Optional)
-              </label>
-              <input
-                type="text"
-                id="video-title"
-                placeholder="Enter video title..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                style={{ pointerEvents: 'auto', userSelect: 'text' }}
-              />
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <Bot className="h-5 w-5 text-purple-500" />
+        <h3 className="text-lg font-semibold">AI Video Generator</h3>
+        <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+          Advanced AI
+        </Badge>
+      </div>
+
+      {step === 'input' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Video className="h-5 w-5" />
+              <span>Create AI Video</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="platform">Platform</Label>
+                <Select value={platform} onValueChange={setPlatform}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="youtube">
+                      <div className="flex items-center space-x-2">
+                        <Youtube className="h-4 w-4" />
+                        <span>YouTube</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="instagram">
+                      <div className="flex items-center space-x-2">
+                        <Instagram className="h-4 w-4" />
+                        <span>Instagram</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="tiktok">
+                      <div className="flex items-center space-x-2">
+                        <Video className="h-4 w-4" />
+                        <span>TikTok</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="contentType">Content Type</Label>
+                <Select value={contentType} onValueChange={setContentType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {platform === 'youtube' && (
+                      <>
+                        <SelectItem value="video">Long Video (16:9)</SelectItem>
+                        <SelectItem value="short">YouTube Shorts (9:16)</SelectItem>
+                      </>
+                    )}
+                    {platform === 'instagram' && (
+                      <>
+                        <SelectItem value="reel">Instagram Reel (9:16)</SelectItem>
+                        <SelectItem value="post">Instagram Post (1:1)</SelectItem>
+                        <SelectItem value="story">Instagram Story (9:16)</SelectItem>
+                      </>
+                    )}
+                    {platform === 'tiktok' && (
+                      <SelectItem value="video">TikTok Video (9:16)</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="style">Video Style</Label>
+                <Select value={style} onValueChange={setStyle}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="modern">Modern & Clean</SelectItem>
+                    <SelectItem value="cinematic">Cinematic</SelectItem>
+                    <SelectItem value="energetic">Energetic & Dynamic</SelectItem>
+                    <SelectItem value="minimalist">Minimalist</SelectItem>
+                    <SelectItem value="vibrant">Vibrant & Colorful</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="duration">Duration (seconds)</Label>
+                <Select value={duration} onValueChange={setDuration}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 seconds</SelectItem>
+                    <SelectItem value="30">30 seconds</SelectItem>
+                    <SelectItem value="60">1 minute</SelectItem>
+                    <SelectItem value="120">2 minutes</SelectItem>
+                    <SelectItem value="300">5 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="platform-select" className="text-white mb-2 block text-sm font-medium">
-                Target Platform
-              </label>
-              <select
-                id="platform-select"
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white focus:border-blue-500 focus:outline-none"
-                style={{ pointerEvents: 'auto' }}
-              >
-                <option value="youtube">YouTube</option>
-                <option value="instagram">Instagram</option>
-                <option value="tiktok">TikTok</option>
-                <option value="twitter">X (Twitter)</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="video-prompt" className="text-white mb-2 block text-sm font-medium">
-                Video Description
-              </label>
-              <textarea
-                id="video-prompt"
-                placeholder="Describe the video you want to create..."
+              <Label htmlFor="prompt">Video Description</Label>
+              <Textarea
+                id="prompt"
+                placeholder="Describe your video content (e.g., 'A product demo showing the benefits of our new fitness app with testimonials')"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="w-full h-24 p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
-                rows={4}
-                style={{ pointerEvents: 'auto', userSelect: 'text' }}
+                rows={3}
               />
             </div>
 
-            <div className="text-center">
-              <Button 
-                onClick={handleGenerateScript}
-                disabled={scriptMutation.isPending || !prompt.trim()}
-                className="cosmic-btn w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {scriptMutation.isPending ? (
-                  <>
-                    <LoadingSpinner className="w-4 h-4 mr-2" />
-                    Generating Script...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Generate Script
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Script Review */}
-        {step === 'script' && generatedScript && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-stellar-gold flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Generated Script
-              </h3>
-              <Button variant="outline" onClick={handleReset} size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Edit Description
-              </Button>
-            </div>
-            
-            <div className="bg-gray-800 p-4 rounded-lg space-y-3 border border-gray-600">
-              <h4 className="font-medium text-stellar-gold">{generatedScript.title}</h4>
-              <div className="text-sm text-asteroid-silver">
-                <p><strong>Platform:</strong> {generatedScript.target_platform}</p>
-                <p><strong>Duration:</strong> {generatedScript.total_duration} seconds</p>
-                <p><strong>Theme:</strong> {generatedScript.theme}</p>
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium">Output Dimensions</p>
+                <p className="text-xs text-gray-600">{getDimensionsText()}</p>
               </div>
-              
-              <div className="space-y-2">
-                <h5 className="font-medium text-white">Scenes:</h5>
-                {generatedScript.scenes?.map((scene: any, index: number) => (
-                  <div key={scene.id} className="border-l-2 border-blue-500 pl-3 text-sm">
-                    <p className="text-stellar-gold">Scene {index + 1} ({scene.duration}s)</p>
-                    <p className="text-white">{scene.description}</p>
-                    <p className="text-asteroid-silver text-xs">{scene.visuals}</p>
-                  </div>
-                ))}
+              <div>
+                <p className="text-sm font-medium">Credits Required</p>
+                <p className="text-xs text-gray-600">Script: 2 | Video: 10</p>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <Button 
-                onClick={handleGenerateVideo}
-                disabled={videoMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white flex-1"
-              >
-                {videoMutation.isPending ? (
-                  <>
-                    <LoadingSpinner className="w-4 h-4 mr-2" />
-                    Creating Video...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 mr-2" />
-                    Create Video
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
+            <Button 
+              onClick={generateScript} 
+              disabled={scriptMutation.isPending || !prompt.trim()}
+              className="w-full"
+            >
+              {scriptMutation.isPending ? (
+                <>
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
+                  Generating Script...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate AI Script
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Step 3: Video Result */}
-        {step === 'video' && generatedVideo && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-stellar-gold flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Video Generated Successfully!
-              </h3>
-              <Button variant="outline" onClick={handleReset} size="sm">
-                Create New Video
+      {step === 'script-review' && generatedScript && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-5 w-5" />
+                <span>Review Generated Script</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('input')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
               </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="script">Script Content</Label>
+              <Textarea
+                id="script"
+                value={script}
+                onChange={(e) => setScript(e.target.value)}
+                rows={8}
+                className="mt-2"
+              />
             </div>
-            
-            <div className="bg-gray-800 p-4 rounded-lg space-y-3 border border-gray-600">
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-                <div className="text-center text-asteroid-silver">
-                  <Video className="w-16 h-16 mx-auto mb-2" />
-                  <p>Video Preview</p>
-                  <p className="text-sm">{generatedVideo.duration}s • {generatedVideo.format}</p>
+
+            {generatedScript.caption && (
+              <div>
+                <Label>Generated Caption</Label>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm">{generatedScript.caption}</p>
                 </div>
               </div>
-              
-              <div className="flex gap-3">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white flex-1">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Video
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  <Play className="w-4 h-4 mr-2" />
-                  Preview
-                </Button>
+            )}
+
+            {generatedScript.hashtags && generatedScript.hashtags.length > 0 && (
+              <div>
+                <Label>Trending Hashtags</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {generatedScript.hashtags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        <div className="flex items-center justify-between p-4 rounded-lg bg-blue-900 border border-blue-600">
-          <div>
-            <div className="font-medium text-blue-300">Generation Cost</div>
-            <div className="text-sm text-gray-400">15 credits per video</div>
-          </div>
-          <div className="text-right">
-            <div className="text-lg font-bold text-yellow-400">
-              15 Credits
+            <div className="flex space-x-3">
+              <Button onClick={generateScript} variant="outline" className="flex-1">
+                <Wand2 className="mr-2 h-4 w-4" />
+                Regenerate Script
+              </Button>
+              <Button onClick={generateVideo} disabled={videoMutation.isPending} className="flex-1">
+                {videoMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                    Generating Video...
+                  </>
+                ) : (
+                  <>
+                    <Video className="mr-2 h-4 w-4" />
+                    Generate AI Video
+                  </>
+                )}
+              </Button>
             </div>
-            <div className="text-xs text-gray-400">required for video</div>
-          </div>
-        </div>
 
-        {/* Upgrade Modal */}
-        <UpgradeModal
-          isOpen={upgradeModal.isOpen}
-          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
-          featureType={upgradeModal.featureType}
-          creditsRequired={upgradeModal.creditsRequired}
-          currentCredits={upgradeModal.currentCredits}
-        />
-      </CardContent>
-    </Card>
+            {isGenerating && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Generating video...</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="w-full" />
+                <p className="text-xs text-gray-600 text-center">
+                  This may take 2-3 minutes for high-quality results
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 'video-preview' && generatedVideo && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Play className="h-5 w-5" />
+                <span>Video Preview</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('script-review')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Script
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="aspect-video bg-black rounded-lg flex items-center justify-center">
+              {generatedVideo.videoUrl ? (
+                <video
+                  src={generatedVideo.videoUrl}
+                  controls
+                  className="w-full h-full rounded-lg"
+                  poster={generatedVideo.thumbnailUrl}
+                />
+              ) : (
+                <div className="text-white text-center">
+                  <Video className="h-12 w-12 mx-auto mb-2" />
+                  <p>Video Preview</p>
+                </div>
+              )}
+            </div>
+
+            {generatedVideo.caption && (
+              <div>
+                <Label>Caption</Label>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm">{generatedVideo.caption}</p>
+                </div>
+              </div>
+            )}
+
+            {generatedVideo.hashtags && generatedVideo.hashtags.length > 0 && (
+              <div>
+                <Label>Hashtags</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {generatedVideo.hashtags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex space-x-3">
+              <Button onClick={() => setStep('script-review')} variant="outline" className="flex-1">
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Script
+              </Button>
+              <Button onClick={publishVideo} disabled={publishMutation.isPending} className="flex-1">
+                {publishMutation.isPending ? (
+                  <>
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Share className="mr-2 h-4 w-4" />
+                    Publish Video
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
 
-// Post Creator Component
-function PostCreator() {
-  const [postText, setPostText] = useState("");
-  const [postPlatform, setPostPlatform] = useState("instagram");
-  const [imagePrompt, setImagePrompt] = useState("");
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [upgradeModal, setUpgradeModal] = useState({
-    isOpen: false,
-    featureType: "",
-    creditsRequired: 0,
-    currentCredits: 0
-  });
+// AI Reel Generator Component
+function AIReelGenerator() {
+  const [prompt, setPrompt] = useState("");
+  const [platform, setPlatform] = useState("instagram");
+  const [style, setStyle] = useState("trendy");
+  const [generatedReel, setGeneratedReel] = useState<any>(null);
+  const [step, setStep] = useState('input');
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch user data for credits
-  const { data: user } = useQuery({
-    queryKey: ["/api/user"],
-    refetchInterval: 30000
-  }) as { data?: { credits?: number } };
-
-  const createPostMutation = useMutation({
+  const reelMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/content', data);
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Post Created!",
-        description: "Your social media post has been created successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ['content'] });
-      setPostText("");
-      setImagePrompt("");
-      setGeneratedImage(null);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Post Creation Failed",
-        description: error.message || "Failed to create post",
-        variant: "destructive",
-      });
-    }
-  });
-
-  const generateImageMutation = useMutation({
-    mutationFn: async (prompt: string) => {
-      const response = await apiRequest('POST', '/api/generate-image', { prompt });
+      const response = await apiRequest('POST', '/api/ai/generate-reel', data);
       return await response.json();
     },
     onSuccess: (response: any) => {
-      setGeneratedImage(response.imageUrl);
-      setIsGeneratingImage(false);
+      setGeneratedReel(response);
+      setStep('preview');
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
-        title: "Image Generated!",
-        description: `Used ${response.creditsUsed || 4} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
+        title: "AI Reel Generated!",
+        description: `Viral-ready reel created. Used ${response.creditsUsed || 8} credits.`,
       });
-    },
-    onError: (error: any) => {
-      setIsGeneratingImage(false);
-      if (error.status === 402 && error.upgradeModal) {
-        setUpgradeModal({
-          isOpen: true,
-          featureType: "AI Image Generation",
-          creditsRequired: 4,
-          currentCredits: user?.credits || 0
-        });
-      } else {
-        toast({
-          title: "Image Generation Failed",
-          description: error.message || "Failed to generate image",
-          variant: "destructive",
-        });
-      }
     }
   });
 
-  const handleGenerateImage = () => {
-    if (!imagePrompt.trim()) {
+  const generateReel = () => {
+    if (!prompt.trim()) {
       toast({
-        title: "Missing Prompt",
-        description: "Please enter an image description",
+        title: "Prompt Required",
+        description: "Please describe your reel content",
         variant: "destructive",
       });
       return;
     }
 
-    // Check credits before generating (8 credits for image generation)
-    if (!user?.credits || user.credits < 8) {
-      setUpgradeModal({
-        isOpen: true,
-        featureType: "AI Image Generation",
-        creditsRequired: 8,
-        currentCredits: user?.credits || 0
-      });
-      return;
-    }
+    const dimensions = PLATFORM_DIMENSIONS[platform]?.reel || PLATFORM_DIMENSIONS.instagram.reel;
 
-    setIsGeneratingImage(true);
-    generateImageMutation.mutate(imagePrompt);
-  };
-
-  const handleCreatePost = () => {
-    if (!postText.trim()) {
-      toast({
-        title: "Post Text Required",
-        description: "Please enter text for your post",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    createPostMutation.mutate({
+    reelMutation.mutate({
+      prompt: prompt.trim(),
+      platform,
+      style,
       workspaceId: currentWorkspace?.id,
-      type: 'post',
-      title: `${postPlatform} Post`,
-      description: postText,
-      platform: postPlatform,
-      contentData: {
-        text: postText,
-        imageUrl: generatedImage,
-        imagePrompt: imagePrompt
-      }
+      dimensions
     });
   };
 
   return (
-    <Card className="content-card holographic">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-stellar-gold">
-          <ImageIcon className="w-5 h-5" />
-          <div>
-            <div>Post Creator</div>
-            <p className="text-asteroid-silver text-sm">Create engaging social media posts</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <label htmlFor="post-platform" className="text-white mb-2 block text-sm font-medium">
-            Platform
-          </label>
-          <select
-            id="post-platform"
-            value={postPlatform}
-            onChange={(e) => setPostPlatform(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white focus:border-blue-500 focus:outline-none"
-            style={{ pointerEvents: 'auto' }}
-          >
-            <option value="instagram">Instagram</option>
-            <option value="facebook">Facebook</option>
-            <option value="twitter">X (Twitter)</option>
-            <option value="linkedin">LinkedIn</option>
-          </select>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <Film className="h-5 w-5 text-pink-500" />
+        <h3 className="text-lg font-semibold">AI Reel Generator</h3>
+        <Badge variant="secondary" className="bg-pink-100 text-pink-700">
+          Viral Content
+        </Badge>
+      </div>
 
-        <div>
-          <label htmlFor="post-text" className="text-white mb-2 block text-sm font-medium">
-            Post Text
-          </label>
-          <textarea
-            id="post-text"
-            placeholder="What's on your mind?"
-            value={postText}
-            onChange={(e) => setPostText(e.target.value)}
-            className="w-full h-32 p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
-            rows={6}
-            style={{ pointerEvents: 'auto', userSelect: 'text' }}
-          />
-        </div>
+      {step === 'input' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Film className="h-5 w-5" />
+              <span>Create Viral Reel</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="platform">Platform</Label>
+                <Select value={platform} onValueChange={setPlatform}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram Reels</SelectItem>
+                    <SelectItem value="tiktok">TikTok</SelectItem>
+                    <SelectItem value="youtube">YouTube Shorts</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-        <div>
-          <label htmlFor="image-prompt" className="text-white mb-2 block text-sm font-medium">
-            AI Image Generation (Optional)
-          </label>
-          <div className="space-y-3">
-            <input
-              id="image-prompt"
-              type="text"
-              placeholder="Describe the image you want to generate..."
-              value={imagePrompt}
-              onChange={(e) => setImagePrompt(e.target.value)}
-              className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-              style={{ pointerEvents: 'auto', userSelect: 'text' }}
-            />
+              <div>
+                <Label htmlFor="style">Reel Style</Label>
+                <Select value={style} onValueChange={setStyle}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="trendy">Trendy & Viral</SelectItem>
+                    <SelectItem value="educational">Educational</SelectItem>
+                    <SelectItem value="entertaining">Entertaining</SelectItem>
+                    <SelectItem value="inspirational">Inspirational</SelectItem>
+                    <SelectItem value="behind-scenes">Behind the Scenes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="prompt">Reel Concept</Label>
+              <Textarea
+                id="prompt"
+                placeholder="Describe your reel idea (e.g., 'Quick cooking tips for busy professionals')"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={3}
+              />
+            </div>
+
             <Button 
-              onClick={handleGenerateImage}
-              disabled={generateImageMutation.isPending || !imagePrompt.trim()}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={generateReel} 
+              disabled={reelMutation.isPending || !prompt.trim()}
+              className="w-full"
             >
-              {generateImageMutation.isPending ? (
+              {reelMutation.isPending ? (
                 <>
-                  <LoadingSpinner className="w-4 h-4 mr-2" />
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
+                  Generating Reel...
+                </>
+              ) : (
+                <>
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Generate AI Reel
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 'preview' && generatedReel && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Play className="h-5 w-5" />
+                <span>Reel Preview</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('input')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="aspect-[9/16] bg-black rounded-lg flex items-center justify-center max-w-sm mx-auto">
+              {generatedReel.videoUrl ? (
+                <video
+                  src={generatedReel.videoUrl}
+                  controls
+                  className="w-full h-full rounded-lg"
+                />
+              ) : (
+                <div className="text-white text-center">
+                  <Film className="h-12 w-12 mx-auto mb-2" />
+                  <p>Reel Preview</p>
+                </div>
+              )}
+            </div>
+
+            {generatedReel.caption && (
+              <div>
+                <Label>Caption</Label>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm">{generatedReel.caption}</p>
+                </div>
+              </div>
+            )}
+
+            {generatedReel.hashtags && (
+              <div>
+                <Label>Trending Hashtags</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {generatedReel.hashtags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <Button className="w-full">
+              <Share className="mr-2 h-4 w-4" />
+              Publish Reel
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// AI Image Generator Component
+function AIImageGenerator() {
+  const [prompt, setPrompt] = useState("");
+  const [platform, setPlatform] = useState("instagram");
+  const [contentType, setContentType] = useState("post");
+  const [style, setStyle] = useState("photorealistic");
+  const [generatedImage, setGeneratedImage] = useState<any>(null);
+  const [step, setStep] = useState('input');
+  
+  const { currentWorkspace } = useWorkspace();
+  const { toast } = useToast();
+
+  const imageMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/ai/generate-image', data);
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      setGeneratedImage(response);
+      setStep('preview');
+      toast({
+        title: "AI Image Generated!",
+        description: `High-quality image created. Used ${response.creditsUsed || 3} credits.`,
+      });
+    }
+  });
+
+  const generateImage = () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "Prompt Required",
+        description: "Please describe your image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const dimensions = PLATFORM_DIMENSIONS[platform]?.[contentType] || PLATFORM_DIMENSIONS.instagram.post;
+
+    imageMutation.mutate({
+      prompt: prompt.trim(),
+      platform,
+      contentType,
+      style,
+      workspaceId: currentWorkspace?.id,
+      dimensions
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <ImageIcon className="h-5 w-5 text-blue-500" />
+        <h3 className="text-lg font-semibold">AI Image Generator</h3>
+        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+          Creative AI
+        </Badge>
+      </div>
+
+      {step === 'input' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <ImageIcon className="h-5 w-5" />
+              <span>Create AI Image</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="platform">Platform</Label>
+                <Select value={platform} onValueChange={setPlatform}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="contentType">Image Type</Label>
+                <Select value={contentType} onValueChange={setContentType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {platform === 'instagram' && (
+                      <>
+                        <SelectItem value="post">Post (1:1)</SelectItem>
+                        <SelectItem value="story">Story (9:16)</SelectItem>
+                      </>
+                    )}
+                    {platform === 'facebook' && (
+                      <>
+                        <SelectItem value="post">Post (1.91:1)</SelectItem>
+                        <SelectItem value="story">Story (9:16)</SelectItem>
+                      </>
+                    )}
+                    {platform === 'twitter' && (
+                      <SelectItem value="post">Tweet Image (16:9)</SelectItem>
+                    )}
+                    {platform === 'linkedin' && (
+                      <SelectItem value="post">LinkedIn Post (1.91:1)</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="style">Image Style</Label>
+              <Select value={style} onValueChange={setStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="photorealistic">Photorealistic</SelectItem>
+                  <SelectItem value="illustration">Digital Illustration</SelectItem>
+                  <SelectItem value="minimalist">Minimalist</SelectItem>
+                  <SelectItem value="vintage">Vintage</SelectItem>
+                  <SelectItem value="modern">Modern & Clean</SelectItem>
+                  <SelectItem value="artistic">Artistic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="prompt">Image Description</Label>
+              <Textarea
+                id="prompt"
+                placeholder="Describe your image (e.g., 'A professional workspace with laptop, coffee, and plants in natural lighting')"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            <Button 
+              onClick={generateImage} 
+              disabled={imageMutation.isPending || !prompt.trim()}
+              className="w-full"
+            >
+              {imageMutation.isPending ? (
+                <>
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
                   Generating Image...
                 </>
               ) : (
                 <>
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Generate Image with AI
+                  <Palette className="mr-2 h-4 w-4" />
+                  Generate AI Image
                 </>
               )}
             </Button>
-          </div>
-          
-          {generatedImage && (
-            <div className="mt-3 p-3 border border-gray-600 rounded-md bg-gray-800">
-              <img 
-                src={generatedImage} 
-                alt="AI Generated content" 
-                className="w-full h-48 object-cover rounded-md"
-              />
-              <p className="text-sm text-gray-400 mt-2">AI-generated image ready for your post</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 'preview' && generatedImage && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Eye className="h-5 w-5" />
+                <span>Image Preview</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('input')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-gray-100 rounded-lg p-4">
+              {generatedImage.imageUrl ? (
+                <img
+                  src={generatedImage.imageUrl}
+                  alt="Generated content"
+                  className="w-full h-auto rounded-lg"
+                />
+              ) : (
+                <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <Button 
-          onClick={handleCreatePost}
-          disabled={createPostMutation.isPending || !postText.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {createPostMutation.isPending ? (
-            <>
-              <LoadingSpinner className="w-4 h-4 mr-2" />
-              Creating Post...
-            </>
-          ) : (
-            <>
-              <ImageIcon className="w-4 h-4 mr-2" />
-              Create Post
-            </>
-          )}
-        </Button>
+            {generatedImage.caption && (
+              <div>
+                <Label>Generated Caption</Label>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm">{generatedImage.caption}</p>
+                </div>
+              </div>
+            )}
 
-        {/* Upgrade Modal */}
-        <UpgradeModal
-          isOpen={upgradeModal.isOpen}
-          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
-          featureType={upgradeModal.featureType}
-          creditsRequired={upgradeModal.creditsRequired}
-          currentCredits={upgradeModal.currentCredits}
-        />
-      </CardContent>
-    </Card>
+            {generatedImage.hashtags && (
+              <div>
+                <Label>Relevant Hashtags</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {generatedImage.hashtags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex space-x-3">
+              <Button variant="outline" className="flex-1">
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+              <Button className="flex-1">
+                <Share className="mr-2 h-4 w-4" />
+                Publish Image
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
 
-// Caption AI Component
-function CaptionAI() {
-  const [captionPrompt, setCaptionPrompt] = useState("");
-  const [captionStyle, setCaptionStyle] = useState("engaging");
-  const [generatedCaption, setGeneratedCaption] = useState("");
-  const [upgradeModal, setUpgradeModal] = useState({
-    isOpen: false,
-    featureType: "",
-    creditsRequired: 0,
-    currentCredits: 0
-  });
+// Long to Short Video Converter Component
+function VideoShortener() {
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [platform, setPlatform] = useState("youtube");
+  const [duration, setDuration] = useState("30");
+  const [style, setStyle] = useState("highlights");
+  const [shortenedVideo, setShortenedVideo] = useState<any>(null);
+  const [step, setStep] = useState('upload');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
+  const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  // Fetch user data for credits
-  const { data: user } = useQuery({
-    queryKey: ["/api/user"],
-    refetchInterval: 30000
-  }) as { data?: { credits?: number } };
-
-  const captionMutation = useMutation({
+  const shortenMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/generate-caption', data);
+      const formData = new FormData();
+      formData.append('video', data.videoFile);
+      formData.append('platform', data.platform);
+      formData.append('duration', data.duration);
+      formData.append('style', data.style);
+      formData.append('workspaceId', data.workspaceId);
+      
+      const response = await apiRequest('POST', '/api/ai/shorten-video', formData);
       return await response.json();
     },
     onSuccess: (response: any) => {
-      setGeneratedCaption(response.caption);
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setShortenedVideo(response);
+      setStep('preview');
       toast({
-        title: "Caption Generated!",
-        description: `Used ${response.creditsUsed || 2} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
+        title: "Video Shortened Successfully!",
+        description: `AI extracted the best moments. Used ${response.creditsUsed || 15} credits.`,
       });
-    },
-    onError: (error: any) => {
-      if (error.status === 402 && error.upgradeModal) {
-        setUpgradeModal({
-          isOpen: true,
-          featureType: "AI Caption Generation",
-          creditsRequired: 2,
-          currentCredits: user?.credits || 0
-        });
+    }
+  });
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('video/')) {
+        setVideoFile(file);
+        setStep('configure');
       } else {
         toast({
-          title: "Caption Generation Failed",
-          description: error.message || "Failed to generate caption",
+          title: "Invalid File Type",
+          description: "Please upload a video file",
           variant: "destructive",
         });
       }
     }
-  });
+  };
 
-  const handleGenerateCaption = () => {
-    if (!captionPrompt.trim()) {
+  const shortenVideo = () => {
+    if (!videoFile) {
       toast({
-        title: "Prompt Required",
-        description: "Please enter a prompt for your caption",
+        title: "Video Required",
+        description: "Please upload a video file first",
         variant: "destructive",
       });
       return;
     }
 
-    // Check credits before generating (2 credits for caption generation)
-    if (!user?.credits || user.credits < 2) {
-      setUpgradeModal({
-        isOpen: true,
-        featureType: "AI Caption Generation",
-        creditsRequired: 2,
-        currentCredits: user?.credits || 0
-      });
-      return;
-    }
-
-    captionMutation.mutate({
-      prompt: captionPrompt,
-      style: captionStyle
+    shortenMutation.mutate({
+      videoFile,
+      platform,
+      duration: parseInt(duration),
+      style,
+      workspaceId: currentWorkspace?.id
     });
   };
 
   return (
-    <Card className="content-card holographic">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-stellar-gold">
-          <Edit className="w-5 h-5" />
-          <div>
-            <div>Caption AI</div>
-            <p className="text-asteroid-silver text-sm">Generate engaging captions with AI</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <label htmlFor="caption-style" className="text-white mb-2 block text-sm font-medium">
-            Caption Style
-          </label>
-          <select
-            id="caption-style"
-            value={captionStyle}
-            onChange={(e) => setCaptionStyle(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-600 bg-gray-800 text-white focus:border-blue-500 focus:outline-none"
-            style={{ pointerEvents: 'auto' }}
-          >
-            <option value="engaging">Engaging</option>
-            <option value="professional">Professional</option>
-            <option value="casual">Casual</option>
-            <option value="funny">Funny</option>
-          </select>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <Scissors className="h-5 w-5 text-green-500" />
+        <h3 className="text-lg font-semibold">Long to Short Video Converter</h3>
+        <Badge variant="secondary" className="bg-green-100 text-green-700">
+          AI Analysis
+        </Badge>
+      </div>
 
-        <div>
-          <label htmlFor="caption-prompt" className="text-white mb-2 block text-sm font-medium">
-            Caption Prompt
-          </label>
-          <textarea
-            id="caption-prompt"
-            placeholder="Describe what you want the caption to be about..."
-            value={captionPrompt}
-            onChange={(e) => setCaptionPrompt(e.target.value)}
-            className="w-full h-24 p-3 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
-            rows={4}
-            style={{ pointerEvents: 'auto', userSelect: 'text' }}
-          />
-        </div>
-
-        <Button 
-          onClick={handleGenerateCaption}
-          disabled={captionMutation.isPending || !captionPrompt.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {captionMutation.isPending ? (
-            <>
-              <LoadingSpinner className="w-4 h-4 mr-2" />
-              Generating Caption...
-            </>
-          ) : (
-            <>
-              <Zap className="w-4 h-4 mr-2" />
-              Generate Caption
-            </>
-          )}
-        </Button>
-
-        {generatedCaption && (
-          <div className="mt-4">
-            <label className="text-white mb-2 block text-sm font-medium">
-              Generated Caption
-            </label>
-            <div className="p-3 rounded-md border border-gray-600 bg-gray-800 text-white">
-              {generatedCaption}
+      {step === 'upload' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Upload className="h-5 w-5" />
+              <span>Upload Long Video</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div 
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+              <p className="text-lg font-medium mb-2">Upload your long video</p>
+              <p className="text-sm text-gray-600">
+                Supports MP4, MOV, AVI files up to 500MB
+              </p>
+              <Button className="mt-4">
+                Choose Video File
+              </Button>
             </div>
-          </div>
-        )}
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Upgrade Modal */}
-        <UpgradeModal
-          isOpen={upgradeModal.isOpen}
-          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
-          featureType={upgradeModal.featureType}
-          creditsRequired={upgradeModal.creditsRequired}
-          currentCredits={upgradeModal.currentCredits}
-        />
-      </CardContent>
-    </Card>
+      {step === 'configure' && videoFile && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Scissors className="h-5 w-5" />
+                <span>Configure Shortening</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('upload')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium">Selected Video</p>
+              <p className="text-xs text-gray-600">{videoFile.name}</p>
+              <p className="text-xs text-gray-600">Size: {(videoFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="platform">Target Platform</Label>
+                <Select value={platform} onValueChange={setPlatform}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="youtube">YouTube Shorts</SelectItem>
+                    <SelectItem value="instagram">Instagram Reels</SelectItem>
+                    <SelectItem value="tiktok">TikTok</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="duration">Short Video Length</Label>
+                <Select value={duration} onValueChange={setDuration}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 seconds</SelectItem>
+                    <SelectItem value="30">30 seconds</SelectItem>
+                    <SelectItem value="60">60 seconds</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="style">Extraction Style</Label>
+              <Select value={style} onValueChange={setStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="highlights">Best Highlights</SelectItem>
+                  <SelectItem value="action">Action Moments</SelectItem>
+                  <SelectItem value="emotional">Emotional Peaks</SelectItem>
+                  <SelectItem value="informative">Key Information</SelectItem>
+                  <SelectItem value="entertaining">Most Entertaining</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm font-medium text-blue-800">AI Analysis</p>
+              <p className="text-xs text-blue-600">
+                Our AI will analyze your video and extract the most engaging {duration}-second clips optimized for {platform}
+              </p>
+            </div>
+
+            <Button 
+              onClick={shortenVideo} 
+              disabled={shortenMutation.isPending}
+              className="w-full"
+            >
+              {shortenMutation.isPending ? (
+                <>
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
+                  Analyzing & Shortening...
+                </>
+              ) : (
+                <>
+                  <Zap className="mr-2 h-4 w-4" />
+                  AI Shorten Video
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 'preview' && shortenedVideo && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>Shortened Video Preview</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStep('configure')}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="aspect-[9/16] bg-black rounded-lg flex items-center justify-center max-w-sm mx-auto">
+              {shortenedVideo.videoUrl ? (
+                <video
+                  src={shortenedVideo.videoUrl}
+                  controls
+                  className="w-full h-full rounded-lg"
+                />
+              ) : (
+                <div className="text-white text-center">
+                  <Video className="h-12 w-12 mx-auto mb-2" />
+                  <p>Shortened Video</p>
+                </div>
+              )}
+            </div>
+
+            {shortenedVideo.caption && (
+              <div>
+                <Label>AI Generated Caption</Label>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm">{shortenedVideo.caption}</p>
+                </div>
+              </div>
+            )}
+
+            {shortenedVideo.hashtags && (
+              <div>
+                <Label>Optimized Hashtags</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {shortenedVideo.hashtags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary">
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex space-x-3">
+              <Button variant="outline" className="flex-1">
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+              <Button className="flex-1">
+                <Share className="mr-2 h-4 w-4" />
+                Publish Short
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
 
 // Main Content Studio Component
 export default function ContentStudio() {
+  const [activeTab, setActiveTab] = useState("video-generator");
   const { currentWorkspace } = useWorkspace();
-  const [activeTab, setActiveTab] = useState("video");
-
-  // Fetch user data for credits display
-  const { data: user } = useQuery({
-    queryKey: ["/api/user"],
-    refetchInterval: 30000
-  }) as { data?: { credits?: number } };
-
-  const { data: recentCreations, isLoading } = useQuery({
-    queryKey: ['content', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/content?workspaceId=${currentWorkspace?.id}`).then(res => res.json()),
-    enabled: !!currentWorkspace?.id
-  });
-
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case 'video': return <Video className="h-4 w-4" />;
-      case 'reel': return <Play className="h-4 w-4" />;
-      case 'post': return <ImageIcon className="h-4 w-4" />;
-      case 'caption': return <Edit className="h-4 w-4" />;
-      default: return <ImageIcon className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'published': return 'bg-green-500';
-      case 'scheduled': return 'bg-yellow-500';
-      case 'ready': return 'bg-blue-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">Content Studio</h1>
-          <p className="text-gray-400 text-sm md:text-base">Create, generate, and manage your content</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            AI Content Studio
+          </h1>
+          <p className="text-gray-600">
+            Create professional content with advanced AI technology
+          </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 text-left md:text-right">
-          <div className="text-center sm:text-right">
-            <div className="text-xs md:text-sm text-gray-400">Available Credits</div>
-            <div className="text-stellar-gold font-bold text-lg md:text-xl">
-              {user?.credits || 0}
-            </div>
-          </div>
-          <div className="text-center sm:text-right">
-            <div className="text-xs md:text-sm text-gray-400">Active Workspace</div>
-            <div className="text-white font-medium text-sm md:text-base">{currentWorkspace?.name}</div>
-          </div>
-        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+            <TabsTrigger value="video-generator" className="flex items-center space-x-2">
+              <Video className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Video</span>
+            </TabsTrigger>
+            <TabsTrigger value="reel-generator" className="flex items-center space-x-2">
+              <Film className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Reels</span>
+            </TabsTrigger>
+            <TabsTrigger value="image-generator" className="flex items-center space-x-2">
+              <ImageIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">AI Images</span>
+            </TabsTrigger>
+            <TabsTrigger value="video-shortener" className="flex items-center space-x-2">
+              <Scissors className="h-4 w-4" />
+              <span className="hidden sm:inline">Video Shortener</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="video-generator">
+            <AIVideoGenerator />
+          </TabsContent>
+
+          <TabsContent value="reel-generator">
+            <AIReelGenerator />
+          </TabsContent>
+
+          <TabsContent value="image-generator">
+            <AIImageGenerator />
+          </TabsContent>
+
+          <TabsContent value="video-shortener">
+            <VideoShortener />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* Content Creation Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-800 border border-gray-600 gap-1 p-1">
-          <TabsTrigger value="video" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
-            <Video className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Video Generator</span>
-            <span className="sm:hidden">Video</span>
-          </TabsTrigger>
-          <TabsTrigger value="post" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
-            <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Post Creator</span>
-            <span className="sm:hidden">Post</span>
-          </TabsTrigger>
-          <TabsTrigger value="caption" className="text-white data-[state=active]:bg-blue-600 text-xs sm:text-sm p-2 sm:p-3">
-            <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Caption AI</span>
-            <span className="sm:hidden">Caption</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="video" className="mt-4 sm:mt-6">
-          <VideoGenerator />
-        </TabsContent>
-
-        <TabsContent value="post" className="mt-4 sm:mt-6">
-          <PostCreator />
-        </TabsContent>
-
-        <TabsContent value="caption" className="mt-6">
-          <CaptionAI />
-        </TabsContent>
-      </Tabs>
-
-      {/* Recent Creations */}
-      <Card className="bg-gray-800 border-gray-600">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Recent Creations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <LoadingSpinner className="w-6 h-6" />
-              <span className="ml-2 text-gray-400">Loading content...</span>
-            </div>
-          ) : recentCreations && recentCreations.length > 0 ? (
-            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {recentCreations.slice(0, 6).map((item: any) => (
-                <div key={item.id} className="p-3 md:p-4 bg-gray-700 rounded-lg border border-gray-600">
-                  <div className="flex items-start justify-between mb-2 gap-2">
-                    <div className="flex items-center gap-2 text-white min-w-0 flex-1">
-                      {getIconForType(item.type)}
-                      <span className="font-medium text-sm md:text-base truncate">{item.title}</span>
-                    </div>
-                    <Badge className={`${getStatusColor(item.status)} text-white text-xs flex-shrink-0`}>
-                      {item.status}
-                    </Badge>
-                  </div>
-                  <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{item.description}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span className="truncate">{item.platform}</span>
-                    <span className="text-xs">{new Date(item.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-400">
-              <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No content created yet. Start by creating your first piece of content!</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -4,10 +4,12 @@ import {
   User, Workspace, SocialAccount, Content, Analytics, AutomationRule,
   Suggestion, CreditTransaction, Referral, Subscription, Payment, Addon,
   WorkspaceMember, TeamInvitation, ContentRecommendation, UserContentHistory,
+  Admin, AdminSession, Notification, Popup, AppSetting, AuditLog, FeedbackMessage,
   InsertUser, InsertWorkspace, InsertSocialAccount, InsertContent,
   InsertAutomationRule, InsertAnalytics, InsertSuggestion,
   InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon,
-  InsertWorkspaceMember, InsertTeamInvitation, InsertContentRecommendation, InsertUserContentHistory
+  InsertWorkspaceMember, InsertTeamInvitation, InsertContentRecommendation, InsertUserContentHistory,
+  InsertAdmin, InsertAdminSession, InsertNotification, InsertPopup, InsertAppSetting, InsertAuditLog, InsertFeedbackMessage
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -289,6 +291,94 @@ const AutomationRuleSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Admin schemas
+const AdminSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, required: true, enum: ['admin', 'superadmin'], default: 'admin' },
+  isActive: { type: Boolean, default: true },
+  lastLogin: { type: Date },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AdminSessionSchema = new mongoose.Schema({
+  adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true },
+  token: { type: String, required: true, unique: true },
+  ipAddress: String,
+  userAgent: String,
+  expiresAt: { type: Date, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const NotificationSchema = new mongoose.Schema({
+  userId: { type: Number },
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  type: { type: String, required: true },
+  priority: { type: String, default: 'medium' },
+  isRead: { type: Boolean, default: false },
+  actionUrl: String,
+  data: { type: mongoose.Schema.Types.Mixed },
+  expiresAt: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const PopupSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  type: { type: String, required: true },
+  priority: { type: String, default: 'medium' },
+  isActive: { type: Boolean, default: true },
+  targetUserType: String,
+  displayConditions: { type: mongoose.Schema.Types.Mixed },
+  actionButton: { type: mongoose.Schema.Types.Mixed },
+  startDate: Date,
+  endDate: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AppSettingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: String, required: true },
+  description: String,
+  category: String,
+  isPublic: { type: Boolean, default: false },
+  updatedBy: Number,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AuditLogSchema = new mongoose.Schema({
+  adminId: { type: Number, required: true },
+  action: { type: String, required: true },
+  resource: { type: String, required: true },
+  resourceId: String,
+  oldValues: { type: mongoose.Schema.Types.Mixed },
+  newValues: { type: mongoose.Schema.Types.Mixed },
+  ipAddress: String,
+  userAgent: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const FeedbackMessageSchema = new mongoose.Schema({
+  userId: Number,
+  name: String,
+  email: String,
+  subject: { type: String, required: true },
+  message: { type: String, required: true },
+  type: { type: String, required: true },
+  status: { type: String, default: 'pending' },
+  adminResponse: String,
+  respondedBy: Number,
+  respondedAt: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
@@ -309,6 +399,15 @@ const TeamInvitationModel = mongoose.model('TeamInvitation', TeamInvitationSchem
 const DmConversationModel = mongoose.model('DmConversation', DmConversationSchema);
 const DmMessageModel = mongoose.model('DmMessage', DmMessageSchema);
 const ConversationContextModel = mongoose.model('ConversationContext', ConversationContextSchema);
+
+// Admin Models
+const AdminModel = mongoose.model('Admin', AdminSchema);
+const AdminSessionModel = mongoose.model('AdminSession', AdminSessionSchema);
+const NotificationModel = mongoose.model('Notification', NotificationSchema);
+const PopupModel = mongoose.model('Popup', PopupSchema);
+const AppSettingModel = mongoose.model('AppSetting', AppSettingSchema);
+const AuditLogModel = mongoose.model('AuditLog', AuditLogSchema);
+const FeedbackMessageModel = mongoose.model('FeedbackMessage', FeedbackMessageSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;
@@ -2761,5 +2860,408 @@ export class MongoStorage implements IStorage {
       createdAt: rule.createdAt,
       updatedAt: rule.updatedAt
     }));
+  }
+
+  // Admin operations
+  async getAdmin(id: number): Promise<Admin | undefined> {
+    await this.connect();
+    try {
+      const admin = await AdminModel.findById(id);
+      return admin ? this.convertAdmin(admin) : undefined;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  async getAdminByEmail(email: string): Promise<Admin | undefined> {
+    await this.connect();
+    const admin = await AdminModel.findOne({ email });
+    return admin ? this.convertAdmin(admin) : undefined;
+  }
+
+  async getAdminByUsername(username: string): Promise<Admin | undefined> {
+    await this.connect();
+    const admin = await AdminModel.findOne({ username });
+    return admin ? this.convertAdmin(admin) : undefined;
+  }
+
+  async getAllAdmins(): Promise<Admin[]> {
+    await this.connect();
+    const admins = await AdminModel.find({ isActive: true });
+    return admins.map(admin => this.convertAdmin(admin));
+  }
+
+  async createAdmin(admin: InsertAdmin): Promise<Admin> {
+    await this.connect();
+    const newAdmin = new AdminModel({
+      email: admin.email,
+      username: admin.username,
+      password: admin.password,
+      role: admin.role || 'admin',
+      isActive: true
+    });
+    const savedAdmin = await newAdmin.save();
+    return this.convertAdmin(savedAdmin);
+  }
+
+  async updateAdmin(id: number, updates: Partial<Admin>): Promise<Admin> {
+    await this.connect();
+    const admin = await AdminModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!admin) throw new Error('Admin not found');
+    return this.convertAdmin(admin);
+  }
+
+  async deleteAdmin(id: number): Promise<void> {
+    await this.connect();
+    await AdminModel.findByIdAndUpdate(id, { isActive: false });
+  }
+
+  // Admin session operations
+  async createAdminSession(session: any): Promise<any> {
+    await this.connect();
+    const newSession = new AdminSessionModel({
+      adminId: session.adminId,
+      token: session.token,
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      expiresAt: session.expiresAt
+    });
+    const savedSession = await newSession.save();
+    return this.convertAdminSession(savedSession);
+  }
+
+  async getAdminSession(token: string): Promise<any | undefined> {
+    await this.connect();
+    const session = await AdminSessionModel.findOne({ 
+      token, 
+      expiresAt: { $gt: new Date() } 
+    }).populate('adminId');
+    return session ? this.convertAdminSession(session) : undefined;
+  }
+
+  async deleteAdminSession(token: string): Promise<void> {
+    await this.connect();
+    await AdminSessionModel.deleteOne({ token });
+  }
+
+  async cleanupExpiredSessions(): Promise<void> {
+    await this.connect();
+    await AdminSessionModel.deleteMany({ expiresAt: { $lt: new Date() } });
+  }
+
+  // Notification operations
+  async createNotification(notification: any): Promise<any> {
+    await this.connect();
+    const newNotification = new NotificationModel(notification);
+    const savedNotification = await newNotification.save();
+    return this.convertNotification(savedNotification);
+  }
+
+  async getNotifications(userId?: number): Promise<any[]> {
+    await this.connect();
+    const query = userId ? { userId } : {};
+    const notifications = await NotificationModel.find(query).sort({ createdAt: -1 });
+    return notifications.map(notif => this.convertNotification(notif));
+  }
+
+  async updateNotification(id: number, updates: Partial<any>): Promise<any> {
+    await this.connect();
+    const notification = await NotificationModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!notification) throw new Error('Notification not found');
+    return this.convertNotification(notification);
+  }
+
+  async deleteNotification(id: number): Promise<void> {
+    await this.connect();
+    await NotificationModel.findByIdAndDelete(id);
+  }
+
+  async markNotificationRead(id: number): Promise<void> {
+    await this.connect();
+    await NotificationModel.findByIdAndUpdate(id, { isRead: true });
+  }
+
+  // Popup operations
+  async createPopup(popup: any): Promise<any> {
+    await this.connect();
+    const newPopup = new PopupModel(popup);
+    const savedPopup = await newPopup.save();
+    return this.convertPopup(savedPopup);
+  }
+
+  async getActivePopups(): Promise<any[]> {
+    await this.connect();
+    const popups = await PopupModel.find({ 
+      isActive: true,
+      $or: [
+        { startDate: { $exists: false } },
+        { startDate: { $lte: new Date() } }
+      ],
+      $or: [
+        { endDate: { $exists: false } },
+        { endDate: { $gte: new Date() } }
+      ]
+    });
+    return popups.map(popup => this.convertPopup(popup));
+  }
+
+  async getPopup(id: number): Promise<any | undefined> {
+    await this.connect();
+    const popup = await PopupModel.findById(id);
+    return popup ? this.convertPopup(popup) : undefined;
+  }
+
+  async updatePopup(id: number, updates: Partial<any>): Promise<any> {
+    await this.connect();
+    const popup = await PopupModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!popup) throw new Error('Popup not found');
+    return this.convertPopup(popup);
+  }
+
+  async deletePopup(id: number): Promise<void> {
+    await this.connect();
+    await PopupModel.findByIdAndDelete(id);
+  }
+
+  // App settings operations
+  async createAppSetting(setting: any): Promise<any> {
+    await this.connect();
+    const newSetting = new AppSettingModel(setting);
+    const savedSetting = await newSetting.save();
+    return this.convertAppSetting(savedSetting);
+  }
+
+  async getAppSetting(key: string): Promise<any | undefined> {
+    await this.connect();
+    const setting = await AppSettingModel.findOne({ key });
+    return setting ? this.convertAppSetting(setting) : undefined;
+  }
+
+  async getAllAppSettings(): Promise<any[]> {
+    await this.connect();
+    const settings = await AppSettingModel.find({});
+    return settings.map(setting => this.convertAppSetting(setting));
+  }
+
+  async getPublicAppSettings(): Promise<any[]> {
+    await this.connect();
+    const settings = await AppSettingModel.find({ isPublic: true });
+    return settings.map(setting => this.convertAppSetting(setting));
+  }
+
+  async updateAppSetting(key: string, value: string, updatedBy?: number): Promise<any> {
+    await this.connect();
+    const setting = await AppSettingModel.findOneAndUpdate(
+      { key },
+      { value, updatedBy, updatedAt: new Date() },
+      { new: true, upsert: true }
+    );
+    return this.convertAppSetting(setting);
+  }
+
+  async deleteAppSetting(key: string): Promise<void> {
+    await this.connect();
+    await AppSettingModel.deleteOne({ key });
+  }
+
+  // Audit log operations
+  async createAuditLog(log: any): Promise<any> {
+    await this.connect();
+    const newLog = new AuditLogModel(log);
+    const savedLog = await newLog.save();
+    return this.convertAuditLog(savedLog);
+  }
+
+  async getAuditLogs(limit?: number, adminId?: number): Promise<any[]> {
+    await this.connect();
+    const query = adminId ? { adminId } : {};
+    const logs = await AuditLogModel.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit || 100);
+    return logs.map(log => this.convertAuditLog(log));
+  }
+
+  // Feedback operations
+  async createFeedbackMessage(feedback: any): Promise<any> {
+    await this.connect();
+    const newFeedback = new FeedbackMessageModel(feedback);
+    const savedFeedback = await newFeedback.save();
+    return this.convertFeedbackMessage(savedFeedback);
+  }
+
+  async getFeedbackMessages(status?: string): Promise<any[]> {
+    await this.connect();
+    const query = status ? { status } : {};
+    const messages = await FeedbackMessageModel.find(query).sort({ createdAt: -1 });
+    return messages.map(msg => this.convertFeedbackMessage(msg));
+  }
+
+  async updateFeedbackMessage(id: number, updates: Partial<any>): Promise<any> {
+    await this.connect();
+    const message = await FeedbackMessageModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!message) throw new Error('Feedback message not found');
+    return this.convertFeedbackMessage(message);
+  }
+
+  async deleteFeedbackMessage(id: number): Promise<void> {
+    await this.connect();
+    await FeedbackMessageModel.findByIdAndDelete(id);
+  }
+
+  // Missing automation log methods
+  async getAutomationLogs(limit?: number): Promise<any[]> {
+    await this.connect();
+    // Return empty array for now as automation logs schema not defined
+    return [];
+  }
+
+  async createAutomationLog(log: any): Promise<any> {
+    await this.connect();
+    // Return the log object for now as automation logs schema not defined
+    return { id: Date.now(), ...log, createdAt: new Date() };
+  }
+
+  // Admin stats method
+  async getAdminStats(): Promise<any> {
+    await this.connect();
+    
+    const [userCount, workspaceCount, contentCount] = await Promise.all([
+      UserModel.countDocuments({}),
+      WorkspaceModel.countDocuments({}),
+      ContentModel.countDocuments({})
+    ]);
+
+    return {
+      totalUsers: userCount,
+      totalWorkspaces: workspaceCount,
+      totalContent: contentCount,
+      totalCreditsUsed: 0,
+      revenueThisMonth: 0,
+      activeUsers: userCount
+    };
+  }
+
+  // Converter methods for admin entities
+  private convertAdmin(mongoAdmin: any): any {
+    return {
+      id: mongoAdmin._id.toString(),
+      email: mongoAdmin.email,
+      username: mongoAdmin.username,
+      role: mongoAdmin.role,
+      isActive: mongoAdmin.isActive,
+      lastLogin: mongoAdmin.lastLogin,
+      createdAt: mongoAdmin.createdAt,
+      updatedAt: mongoAdmin.updatedAt
+    };
+  }
+
+  private convertAdminSession(mongoSession: any): any {
+    return {
+      id: mongoSession._id.toString(),
+      adminId: mongoSession.adminId,
+      token: mongoSession.token,
+      ipAddress: mongoSession.ipAddress,
+      userAgent: mongoSession.userAgent,
+      expiresAt: mongoSession.expiresAt,
+      createdAt: mongoSession.createdAt
+    };
+  }
+
+  private convertNotification(mongoNotification: any): any {
+    return {
+      id: mongoNotification._id.toString(),
+      userId: mongoNotification.userId,
+      title: mongoNotification.title,
+      message: mongoNotification.message,
+      type: mongoNotification.type,
+      priority: mongoNotification.priority,
+      isRead: mongoNotification.isRead,
+      actionUrl: mongoNotification.actionUrl,
+      data: mongoNotification.data,
+      expiresAt: mongoNotification.expiresAt,
+      createdAt: mongoNotification.createdAt,
+      updatedAt: mongoNotification.updatedAt
+    };
+  }
+
+  private convertPopup(mongoPopup: any): any {
+    return {
+      id: mongoPopup._id.toString(),
+      title: mongoPopup.title,
+      content: mongoPopup.content,
+      type: mongoPopup.type,
+      priority: mongoPopup.priority,
+      isActive: mongoPopup.isActive,
+      targetUserType: mongoPopup.targetUserType,
+      displayConditions: mongoPopup.displayConditions,
+      actionButton: mongoPopup.actionButton,
+      startDate: mongoPopup.startDate,
+      endDate: mongoPopup.endDate,
+      createdAt: mongoPopup.createdAt,
+      updatedAt: mongoPopup.updatedAt
+    };
+  }
+
+  private convertAppSetting(mongoSetting: any): any {
+    return {
+      id: mongoSetting._id.toString(),
+      key: mongoSetting.key,
+      value: mongoSetting.value,
+      description: mongoSetting.description,
+      category: mongoSetting.category,
+      isPublic: mongoSetting.isPublic,
+      updatedBy: mongoSetting.updatedBy,
+      createdAt: mongoSetting.createdAt,
+      updatedAt: mongoSetting.updatedAt
+    };
+  }
+
+  private convertAuditLog(mongoLog: any): any {
+    return {
+      id: mongoLog._id.toString(),
+      adminId: mongoLog.adminId,
+      action: mongoLog.action,
+      resource: mongoLog.resource,
+      resourceId: mongoLog.resourceId,
+      oldValues: mongoLog.oldValues,
+      newValues: mongoLog.newValues,
+      ipAddress: mongoLog.ipAddress,
+      userAgent: mongoLog.userAgent,
+      createdAt: mongoLog.createdAt
+    };
+  }
+
+  private convertFeedbackMessage(mongoMessage: any): any {
+    return {
+      id: mongoMessage._id.toString(),
+      userId: mongoMessage.userId,
+      name: mongoMessage.name,
+      email: mongoMessage.email,
+      subject: mongoMessage.subject,
+      message: mongoMessage.message,
+      type: mongoMessage.type,
+      status: mongoMessage.status,
+      adminResponse: mongoMessage.adminResponse,
+      respondedBy: mongoMessage.respondedBy,
+      respondedAt: mongoMessage.respondedAt,
+      createdAt: mongoMessage.createdAt,
+      updatedAt: mongoMessage.updatedAt
+    };
   }
 }

@@ -1236,12 +1236,30 @@ function VideoShortener() {
     },
     onSuccess: (response: any) => {
       console.log('[VIDEO SHORTENER] Analysis response:', response);
-      setAnalysis(response.analysis);
-      setStep('analyze');
-      toast({
-        title: "Video Analysis Complete!",
-        description: `AI analyzed the video content. Used ${response.creditsUsed || 2} credits.`,
-      });
+      console.log('[VIDEO SHORTENER] Analysis data:', response.analysis);
+      
+      if (response.success && response.analysis) {
+        // Force a state update by setting analysis first, then step
+        setTimeout(() => {
+          setAnalysis(response.analysis);
+          setTimeout(() => {
+            setStep('analyze');
+            console.log('[VIDEO SHORTENER] State updated - step: analyze, analysis set');
+          }, 100);
+        }, 50);
+        
+        toast({
+          title: "Video Analysis Complete!",
+          description: `AI analyzed the video content. Used ${response.creditsUsed || 2} credits.`,
+        });
+      } else {
+        console.error('[VIDEO SHORTENER] Invalid response or no analysis data:', response);
+        toast({
+          title: "Analysis Failed",
+          description: response.error || "Video analysis could not be completed",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: any) => {
       console.error('[VIDEO SHORTENER] Analysis error:', error);
@@ -1435,6 +1453,11 @@ function VideoShortener() {
         <Badge variant="secondary" className="bg-red-100 text-red-700">
           URL Analysis
         </Badge>
+      </div>
+      
+      {/* Debug Info */}
+      <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+        Step: {step} | Analysis: {analysis ? 'Present' : 'None'} | Analysis Keys: {analysis ? Object.keys(analysis).join(', ') : 'N/A'}
       </div>
 
       {step === 'input' && (

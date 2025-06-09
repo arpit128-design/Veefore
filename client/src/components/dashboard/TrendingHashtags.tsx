@@ -104,48 +104,50 @@ export function TrendingHashtags() {
 
   return (
     <Card className="bg-white/5 backdrop-blur-sm border-white/10">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Hash className="h-5 w-5" />
-            Viral Hashtags Analysis
-            <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
+      <CardHeader className="pb-3 sm:pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white text-sm sm:text-base">
+              <Hash className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <span className="truncate">Viral Hashtags Analysis</span>
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30 w-fit">
               Live Data
             </Badge>
-          </CardTitle>
-          <div className="flex gap-2">
+          </div>
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
             <Button
               size="sm"
               variant="ghost"
               onClick={() => window.location.reload()}
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10 p-1 sm:p-2"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
             <Button
               size="sm"
               variant="ghost"
               onClick={copyAllHashtags}
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10 p-1 sm:p-2"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
         
-        <p className="text-sm text-white/70 mt-2">
+        <p className="text-xs sm:text-sm text-white/70 mt-2 leading-relaxed">
           Real-time analysis across Instagram, Twitter/X, YouTube, Reddit, and trending news
         </p>
         
         {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mt-4">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mt-3 sm:mt-4">
           {categories.map((category) => (
             <Button
               key={category.value}
               size="sm"
               variant={selectedCategory === category.value ? "default" : "ghost"}
               onClick={() => setSelectedCategory(category.value)}
-              className={`text-xs ${
+              className={`text-xs px-2 py-1 sm:px-3 sm:py-1.5 ${
                 selectedCategory === category.value
                   ? 'bg-cyan-500 text-white'
                   : 'text-white hover:bg-white/10'
@@ -157,40 +159,40 @@ export function TrendingHashtags() {
         </div>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="px-3 sm:px-6">
         {hashtags && hashtags.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {hashtags.map((hashtag: Hashtag, index: number) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group gap-2 sm:gap-3"
                 onClick={() => copyHashtags([hashtag.tag])}
               >
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-cyan-400 font-mono">#{hashtag.tag}</span>
-                    <Badge variant="secondary" className="text-xs bg-white/10 text-white border-white/20">
+                <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                  <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+                    <span className="text-cyan-400 font-mono text-sm sm:text-base truncate">#{hashtag.tag}</span>
+                    <Badge variant="secondary" className="text-xs bg-white/10 text-white border-white/20 flex-shrink-0">
                       {hashtag.category}
                     </Badge>
                   </div>
                   
                   {/* Platform indicators */}
-                  <div className="flex gap-1">
-                    {hashtag.platforms?.slice(0, 4).map((platform, idx) => (
+                  <div className="flex gap-1 flex-shrink-0">
+                    {hashtag.platforms?.slice(0, 3).map((platform, idx) => (
                       <span key={idx} className="text-xs" title={platform}>
                         {getPlatformIcon(platform)}
                       </span>
                     ))}
-                    {hashtag.platforms?.length > 4 && (
-                      <span className="text-xs text-white/50" title={`+${hashtag.platforms.length - 4} more platforms`}>
-                        +{hashtag.platforms.length - 4}
+                    {hashtag.platforms?.length > 3 && (
+                      <span className="text-xs text-white/50" title={`+${hashtag.platforms.length - 3} more platforms`}>
+                        +{hashtag.platforms.length - 3}
                       </span>
                     )}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-sm text-white/70">
+                <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70">
                     <TrendingUp className="h-3 w-3" />
                     <span>{hashtag.engagement}</span>
                   </div>
@@ -199,7 +201,7 @@ export function TrendingHashtags() {
                     <span className={`text-xs font-semibold ${getGrowthColor(hashtag.growthPotential)}`}>
                       {hashtag.growthPotential}%
                     </span>
-                    <div className="w-12 h-2 rounded-full bg-white/20 overflow-hidden">
+                    <div className="w-8 sm:w-12 h-2 rounded-full bg-white/20 overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${getPopularityColor(hashtag.popularity)}`}
                         style={{ width: `${hashtag.popularity}%` }}
@@ -207,7 +209,7 @@ export function TrendingHashtags() {
                     </div>
                   </div>
                   
-                  <Copy className="h-4 w-4 text-white/50 group-hover:text-white transition-colors" />
+                  <Copy className="h-3 w-3 sm:h-4 sm:w-4 text-white/50 group-hover:text-white transition-colors flex-shrink-0" />
                 </div>
               </div>
             ))}
@@ -221,13 +223,13 @@ export function TrendingHashtags() {
         )}
         
         {hashtags && hashtags.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-white/10">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
             <Button
               onClick={copyAllHashtags}
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white text-xs sm:text-sm"
               size="sm"
             >
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Copy All Hashtags ({hashtags.length})
             </Button>
           </div>

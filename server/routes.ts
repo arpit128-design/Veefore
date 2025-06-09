@@ -1028,25 +1028,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[DASHBOARD INSTANT] Cache miss - using current account data');
       const account = instagramAccount as any;
       
-      // FIXED: Calculate proper engagement rate as percentage (0-100%)
+      // ENGAGEMENT RATE CALCULATION - Authentic Instagram Data
       let engagementRate = 0;
+      let rawEngagementRate = 0;
       const totalEngagements = (account.totalLikes || 0) + (account.totalComments || 0);
       const totalReach = account.totalReach || 0;
       
       if (totalReach > 0 && totalEngagements > 0) {
-        engagementRate = (totalEngagements / totalReach) * 100;
-        // Cap at reasonable maximum of 50% to prevent unrealistic values
-        engagementRate = Math.min(engagementRate, 50);
-        engagementRate = Math.round(engagementRate * 10) / 10; // Round to 1 decimal place
+        rawEngagementRate = (totalEngagements / totalReach) * 100;
+        engagementRate = Math.round(rawEngagementRate * 10) / 10; // Show actual rate
       }
 
-      console.log('[DASHBOARD ANALYTICS] Engagement calculation:', {
+      console.log('[ENGAGEMENT ANALYSIS] Authentic Instagram Data:', {
         totalLikes: account.totalLikes,
         totalComments: account.totalComments,
         totalEngagements,
         totalReach,
-        calculatedRate: engagementRate,
-        originalAvgEngagement: account.avgEngagement
+        rawEngagementRate: rawEngagementRate,
+        displayedRate: engagementRate,
+        isHighEngagement: rawEngagementRate > 100,
+        possibleViralContent: rawEngagementRate > 200
       });
 
       const responseData = {

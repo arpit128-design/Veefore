@@ -7,8 +7,9 @@ import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { ChatPerformance } from "@/components/dashboard/ChatPerformance";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
+import { useInstantData, useInstantAnalytics } from "@/hooks/useInstantData";
 import { Eye, Heart, Users, TrendingUp, RefreshCw } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatNumber, formatEngagement } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -22,23 +23,11 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Fetch real analytics data with immediate cache serving
-  const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
-    queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }).then(res => res.json()),
-    enabled: !!user && !!currentWorkspace && !!token,
-    staleTime: 60000, // Data is fresh for 1 minute
-    gcTime: 600000, // Keep in cache for 10 minutes
-    refetchInterval: 60000, // Refetch every minute
-    retry: 1, // Reduced retry for faster response
-    retryDelay: 500,
-    refetchOnWindowFocus: false, // Prevent unnecessary refetches
-    networkMode: 'always' // Always try to fetch even with cached data
-  });
+  // Initialize instant data prefetching
+  useInstantData();
+
+  // Use instant analytics hook for immediate data loading
+  const { data: analyticsData, isLoading: analyticsLoading, error } = useInstantAnalytics();
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour12: false,

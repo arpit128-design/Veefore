@@ -2,6 +2,7 @@ import type { Express, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { getAuthenticHashtags } from "./authentic-hashtags";
 import { IStorage } from "./storage";
+import { MongoStorage } from "./mongodb-storage";
 import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
@@ -4041,18 +4042,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       console.log(`[AUTHENTIC CONVERSATIONS] Getting real Instagram DM data for workspace: ${workspaceId}`);
       
-      // Access real MongoDB conversations directly
-      await storage.connect();
-      const mongoose = require('mongoose');
-      
-      // Get authentic Instagram DM conversations
-      const DmConversation = mongoose.model('DmConversation');
-      const DmMessage = mongoose.model('DmMessage');
-      
-      const conversations = await DmConversation.find({ workspaceId })
-        .sort({ createdAt: -1 })
-        .limit(limit ? parseInt(limit as string) : 50)
-        .lean();
+      // Use storage interface to access real MongoDB conversations directly
+      const conversations = await storage.getDmConversations(workspaceId, limit ? parseInt(limit as string) : 50);
       
       console.log(`[AUTHENTIC CONVERSATIONS] Found ${conversations.length} real Instagram conversations`);
       
@@ -4060,12 +4051,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       for (const conversation of conversations) {
         // Get real messages for this conversation
-        const messages = await DmMessage.find({ conversationId: conversation._id })
-          .sort({ createdAt: -1 })
-          .limit(5)
-          .lean();
+        const messages = await storage.getDmMessages(conversation.id, 5);
         
-        console.log(`[AUTHENTIC CONVERSATIONS] Conversation ${conversation._id}: ${messages.length} messages`);
+        console.log(`[AUTHENTIC CONVERSATIONS] Conversation ${conversation.id}: ${messages.length} messages`);
         if (messages.length > 0) {
           console.log(`[AUTHENTIC CONVERSATIONS] Latest message: "${messages[0].content}" from ${messages[0].sender}`);
         }
@@ -4082,7 +4070,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         } : null;
         
         conversationHistory.push({
-          id: conversation._id.toString(),
+          id: conversation.id.toString(),
           participant: {
             id: participantId,
             username: participantUsername,
@@ -4091,7 +4079,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           lastMessage,
           messageCount: conversation.messageCount || messages.length,
           lastActive: conversation.lastMessageAt || conversation.createdAt,
-          recentMessages: messages.slice(0, 3).map(msg => ({
+          recentMessages: messages.slice(0, 3).map((msg: any) => ({
             content: msg.content,
             sender: msg.sender,
             timestamp: msg.createdAt,

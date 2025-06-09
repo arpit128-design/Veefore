@@ -145,6 +145,8 @@ export interface IStorage {
   createDmMessage(message: any): Promise<any>;
   createConversationContext(context: any): Promise<any>;
   clearWorkspaceConversations(workspaceId: string): Promise<void>;
+  getDmConversations(workspaceId: string, limit?: number): Promise<any[]>;
+  getDmMessages(conversationId: number | string, limit?: number): Promise<any[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -1075,6 +1077,18 @@ export class MemStorage implements IStorage {
   async clearWorkspaceConversations(workspaceId: string): Promise<void> {
     // This is a stub - real implementation uses MongoDB
     console.log(`[MEM STORAGE] Stub: Clear conversations for workspace ${workspaceId}`);
+  }
+
+  async getDmConversations(workspaceId: string, limit: number = 50): Promise<any[]> {
+    // This is a stub - real implementation uses MongoDB
+    console.log(`[MEM STORAGE] Stub: Get DM conversations for workspace ${workspaceId}`);
+    return [];
+  }
+
+  async getDmMessages(conversationId: number | string, limit: number = 10): Promise<any[]> {
+    // This is a stub - real implementation uses MongoDB
+    console.log(`[MEM STORAGE] Stub: Get DM messages for conversation ${conversationId}`);
+    return [];
   }
 }
 

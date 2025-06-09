@@ -1239,6 +1239,31 @@ function VideoShortener() {
         title: "Video Shortened Successfully!",
         description: `AI extracted the best moments. Used ${response.creditsUsed} credits.`,
       });
+    },
+    onError: (error: any) => {
+      const errorMessage = error.message || 'Failed to process video';
+      
+      if (errorMessage.includes('YouTube access restricted') || errorMessage.includes('403: Forbidden')) {
+        toast({
+          title: "YouTube Access Restricted",
+          description: "This video is restricted by YouTube. Please try uploading the video file directly.",
+          variant: "destructive",
+        });
+        // Switch to upload mode automatically
+        setInputType('upload');
+      } else if (errorMessage.includes('Private video') || errorMessage.includes('members-only')) {
+        toast({
+          title: "Video Not Accessible",
+          description: "This video is private or restricted. Please use a public video or upload directly.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Processing Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -1409,9 +1434,15 @@ function VideoShortener() {
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Supports YouTube, Vimeo, and most video platforms
-                </p>
+                <div className="mt-1 space-y-1">
+                  <p className="text-xs text-gray-500">
+                    Supports YouTube, Vimeo, and most video platforms
+                  </p>
+                  <div className="flex items-center gap-1 text-xs text-amber-600">
+                    <span>⚠️</span>
+                    <span>Some YouTube videos may be restricted. Use file upload if URL fails.</span>
+                  </div>
+                </div>
               </div>
             ) : (
               <div>

@@ -51,15 +51,28 @@ export class RealVideoProcessor {
       
       console.log('[REAL VIDEO] Downloading video from URL:', videoUrl);
       
-      // Use yt-dlp to download video
+      // Enhanced yt-dlp with anti-restriction measures
       const ytDlp = spawn('yt-dlp', [
-        '--format', 'best[height<=720]',
+        '--format', 'best[height<=720]/best',
         '--output', outputPath,
         '--no-playlist',
+        '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        '--extractor-retries', '3',
+        '--fragment-retries', '3',
+        '--retry-sleep', '1',
+        '--no-check-certificate',
+        '--prefer-free-formats',
+        '--merge-output-format', 'mp4',
         videoUrl
       ]);
 
       let stderr = '';
+      let stdout = '';
+      
+      ytDlp.stdout.on('data', (data) => {
+        stdout += data.toString();
+        console.log('[YT-DLP]', data.toString().trim());
+      });
       
       ytDlp.stderr.on('data', (data) => {
         stderr += data.toString();
@@ -81,7 +94,17 @@ export class RealVideoProcessor {
           }
         } else {
           console.error('[YT-DLP] Error:', stderr);
-          reject(new Error(`Download failed: ${stderr}`));
+          
+          // Provide specific error messages for common issues
+          if (stderr.includes('403: Forbidden') || stderr.includes('nsig extraction failed')) {
+            reject(new Error('YouTube access restricted. Try a different video or use file upload instead.'));
+          } else if (stderr.includes('Private video') || stderr.includes('members-only')) {
+            reject(new Error('This video is private or restricted. Please use a public video.'));
+          } else if (stderr.includes('Video unavailable')) {
+            reject(new Error('Video not available. Please check the URL and try again.'));
+          } else {
+            reject(new Error(`Download failed: ${stderr.substring(0, 200)}...`));
+          }
         }
       });
     });

@@ -129,12 +129,12 @@ function VideoGenerator() {
       return;
     }
 
-    // Check credits before generating (2 credits for caption generation)
-    if (!user?.credits || user.credits < 2) {
+    // Check credits before generating (1 credit for script generation)
+    if (!user?.credits || user.credits < 1) {
       setUpgradeModal({
         isOpen: true,
-        featureType: "AI Caption Generation",
-        creditsRequired: 2,
+        featureType: "reels-script",
+        creditsRequired: 1,
         currentCredits: user?.credits || 0
       });
       return;

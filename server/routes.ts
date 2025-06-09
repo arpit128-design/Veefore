@@ -2911,7 +2911,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[BODY DEBUG] Content-Length:', req.headers['content-length']);
 
       // Check credits before generating script
-      const creditCost = creditService.getCreditCost('reels-script'); // 2 credits
+      const creditCost = creditService.getCreditCost('reels-script'); // 1 credit
       const hasCredits = await creditService.hasCredits(userId, 'reels-script');
       
       if (!hasCredits) {

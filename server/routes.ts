@@ -4879,6 +4879,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   }, 24 * 60 * 60 * 1000); // Run daily
 
+  // Register admin routes
+  const { registerAdminRoutes } = await import('./admin-routes');
+  registerAdminRoutes(app);
+
   const httpServer = createServer(app);
   return httpServer;
 }

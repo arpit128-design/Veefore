@@ -37,6 +37,8 @@ import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import NotFound from "@/pages/not-found";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
 
 function AuthenticatedApp() {
   return (
@@ -125,6 +127,8 @@ function Router() {
         <OptimizedSpaceBackground />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/admin/login" component={AdminLogin} />
+          <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/" component={Landing} />

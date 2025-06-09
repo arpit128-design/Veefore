@@ -3402,6 +3402,13 @@ export class MongoStorage implements IStorage {
     return { id: Date.now(), ...log, createdAt: new Date() };
   }
 
+  // Get all users method for cleanup operations
+  async getAllUsers(): Promise<any[]> {
+    await this.connect();
+    const users = await UserModel.find({}).lean();
+    return users.map(user => this.convertUser(user));
+  }
+
   // Admin stats method
   async getAdminStats(): Promise<any> {
     await this.connect();

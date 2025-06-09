@@ -5007,6 +5007,107 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   }, 24 * 60 * 60 * 1000); // Run daily
 
+  // Global workspace cleanup endpoint for fixing database duplicates
+  app.post('/api/admin/cleanup-duplicate-workspaces', async (req: any, res: Response) => {
+    try {
+      console.log('🔧 Starting global workspace cleanup...');
+      
+      const cleanupResults = {
+        usersProcessed: 0,
+        duplicatesRemoved: 0,
+        errors: []
+      };
+
+      // Get all users from MongoDB storage
+      const mongoStorage = storage as any;
+      if (!mongoStorage.getAllUsers) {
+        throw new Error('getAllUsers method not available in storage');
+      }
+
+      const allUsers = await mongoStorage.getAllUsers();
+      console.log(`📊 Found ${allUsers.length} users to process`);
+      
+      for (const user of allUsers) {
+        try {
+          const workspaces = await storage.getWorkspacesByUserId(user.id);
+          
+          if (workspaces.length > 1) {
+            console.log(`👤 User ${user.email || user.username} has ${workspaces.length} workspaces`);
+            
+            // Keep the oldest workspace (first created)
+            const sortedWorkspaces = workspaces.sort((a, b) => 
+              new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+            );
+            const keepWorkspace = sortedWorkspaces[0];
+            const duplicateWorkspaces = sortedWorkspaces.slice(1);
+            
+            console.log(`   ✅ Keeping workspace: ${keepWorkspace.name} (${keepWorkspace.id})`);
+            
+            for (const duplicateWorkspace of duplicateWorkspaces) {
+              console.log(`   🔄 Removing duplicate: ${duplicateWorkspace.name} (${duplicateWorkspace.id})`);
+              
+              try {
+                // Migrate social accounts
+                const socialAccounts = await storage.getSocialAccountsByWorkspace(duplicateWorkspace.id);
+                for (const account of socialAccounts) {
+                  await storage.updateSocialAccount(account.id, { workspaceId: keepWorkspace.id });
+                }
+                console.log(`      📱 Migrated ${socialAccounts.length} social accounts`);
+                
+                // Migrate content
+                const content = await storage.getContentByWorkspace(duplicateWorkspace.id);
+                for (const item of content) {
+                  await storage.updateContent(item.id, { workspaceId: keepWorkspace.id });
+                }
+                console.log(`      📝 Migrated ${content.length} content items`);
+                
+                // Migrate automation rules
+                const rules = await storage.getAutomationRulesByWorkspace(duplicateWorkspace.id);
+                for (const rule of rules) {
+                  await storage.updateAutomationRule(rule.id, { workspaceId: keepWorkspace.id });
+                }
+                console.log(`      🤖 Migrated ${rules.length} automation rules`);
+                
+                // Delete the duplicate workspace
+                await storage.deleteWorkspace(duplicateWorkspace.id);
+                console.log(`      🗑️ Deleted duplicate workspace`);
+                
+                cleanupResults.duplicatesRemoved++;
+              } catch (migrationError: any) {
+                console.error(`      ❌ Migration error for workspace ${duplicateWorkspace.id}:`, migrationError);
+                cleanupResults.errors.push(`Workspace ${duplicateWorkspace.id}: ${migrationError.message}`);
+              }
+            }
+            
+            // Ensure the kept workspace is marked as default
+            await storage.updateWorkspace(keepWorkspace.id, { isDefault: true });
+          }
+          
+          cleanupResults.usersProcessed++;
+        } catch (userError: any) {
+          console.error(`❌ Error processing user ${user.id}:`, userError);
+          cleanupResults.errors.push(`User ${user.id}: ${userError.message}`);
+        }
+      }
+      
+      console.log(`\n🎉 Global cleanup completed!`);
+      console.log(`📊 Summary: ${cleanupResults.usersProcessed} users processed, ${cleanupResults.duplicatesRemoved} duplicates removed`);
+      
+      res.json({
+        success: true,
+        message: 'Global workspace cleanup completed',
+        results: cleanupResults
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Global cleanup error:', error);
+      res.status(500).json({ 
+        error: 'Failed to cleanup duplicate workspaces',
+        details: error.message 
+      });
+    }
+  });
+
   // Register admin routes
   const { registerAdminRoutes } = await import('./admin-routes');
   registerAdminRoutes(app);

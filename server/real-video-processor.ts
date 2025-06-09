@@ -298,7 +298,7 @@ Return JSON with this structure:
     const timestamp = Date.now();
     const outputPath = path.join(this.outputDir, `short_${timestamp}.mp4`);
     
-    console.log('[REAL VIDEO] Creating short video:', { startTime, endTime, aspectRatio });
+    console.log('[REAL VIDEO] Creating short video:', { startTime, endTime, aspectRatio, inputPath, outputPath });
 
     return new Promise((resolve, reject) => {
       let ffmpegArgs = [
@@ -307,33 +307,66 @@ Return JSON with this structure:
         '-t', (endTime - startTime).toString(),
         '-c:v', 'libx264',
         '-c:a', 'aac',
-        '-preset', 'fast'
+        '-preset', 'fast',
+        '-crf', '23',
+        '-movflags', '+faststart'
       ];
 
-      // Apply aspect ratio transformations
+      // Apply aspect ratio transformations with proper scaling
       if (aspectRatio === '9:16') {
-        ffmpegArgs.push('-vf', 'scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280');
+        ffmpegArgs.push('-vf', 'scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,format=yuv420p');
       } else if (aspectRatio === '1:1') {
-        ffmpegArgs.push('-vf', 'scale=720:720:force_original_aspect_ratio=increase,crop=720:720');
+        ffmpegArgs.push('-vf', 'scale=720:720:force_original_aspect_ratio=increase,crop=720:720,format=yuv420p');
+      } else {
+        ffmpegArgs.push('-vf', 'scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,format=yuv420p');
       }
 
       ffmpegArgs.push('-y', outputPath);
 
+      console.log('[REAL VIDEO] FFmpeg command:', ffmpegArgs.join(' '));
+
       const ffmpeg = spawn('ffmpeg', ffmpegArgs);
 
       let stderr = '';
+      let stdout = '';
+      
       ffmpeg.stderr.on('data', (data) => {
         stderr += data.toString();
+        console.log('[REAL VIDEO] FFmpeg progress:', data.toString().trim());
       });
 
-      ffmpeg.on('close', (code) => {
+      ffmpeg.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      ffmpeg.on('close', async (code) => {
+        console.log('[REAL VIDEO] FFmpeg finished with code:', code);
+        
         if (code === 0) {
-          console.log('[REAL VIDEO] Short video created:', outputPath);
-          resolve(outputPath);
+          try {
+            // Verify the output file was created and has content
+            const stats = await fs.stat(outputPath);
+            console.log('[REAL VIDEO] Output file size:', stats.size, 'bytes');
+            
+            if (stats.size > 1000) { // Minimum reasonable file size
+              console.log('[REAL VIDEO] Short video created successfully:', outputPath);
+              resolve(outputPath);
+            } else {
+              reject(new Error(`Generated video file is too small (${stats.size} bytes)`));
+            }
+          } catch (error) {
+            reject(new Error(`Failed to verify output file: ${error.message}`));
+          }
         } else {
-          console.error('[REAL VIDEO] FFmpeg error:', stderr);
-          reject(new Error(`Video processing failed: ${stderr}`));
+          console.error('[REAL VIDEO] FFmpeg failed with code:', code);
+          console.error('[REAL VIDEO] FFmpeg stderr:', stderr);
+          reject(new Error(`Video processing failed (code ${code}): ${stderr.substring(0, 500)}`));
         }
+      });
+
+      ffmpeg.on('error', (error) => {
+        console.error('[REAL VIDEO] FFmpeg process error:', error);
+        reject(new Error(`FFmpeg process failed: ${error.message}`));
       });
     });
   }

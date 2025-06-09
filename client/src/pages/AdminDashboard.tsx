@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import AdminSettings from "./AdminSettings";
 import { 
   Users, 
   DollarSign, 
@@ -642,19 +643,7 @@ const AdminDashboard = () => {
 
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
-            <Card className="bg-black/40 backdrop-blur-lg border-purple-500/20">
-              <CardHeader>
-                <CardTitle className="text-white">System Settings</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Configure platform settings and security options
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-gray-400">
-                  System settings features coming soon...
-                </div>
-              </CardContent>
-            </Card>
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </div>

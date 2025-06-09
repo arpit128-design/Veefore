@@ -92,12 +92,7 @@ export function registerAdminRoutes(app: Express) {
       const limitNum = parseInt(limit as string);
       
       // Get users from MongoDB with pagination and search
-      const result = await storage.getAdminUsers({
-        page: pageNum,
-        limit: limitNum,
-        search: search as string,
-        filter: filter as string
-      });
+      const result = await storage.getAdminUsers(pageNum, limitNum, search as string);
       
       res.json(result);
     } catch (error) {
@@ -143,12 +138,8 @@ export function registerAdminRoutes(app: Express) {
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limit as string);
       
-      const result = await storage.getAdminContent({
-        page: pageNum,
-        limit: limitNum,
-        search: search as string,
-        filter: filter as string
-      });
+      const filters = filter !== 'all' ? { status: filter } : {};
+      const result = await storage.getAdminContent(pageNum, limitNum, filters);
       
       res.json(result);
     } catch (error) {
@@ -223,11 +214,7 @@ export function registerAdminRoutes(app: Express) {
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limit as string);
       
-      const result = await storage.getAdminNotifications({
-        page: pageNum,
-        limit: limitNum,
-        type: type as string
-      });
+      const result = await storage.getAdminNotifications(pageNum, limitNum, type as string);
       
       res.json(result);
     } catch (error) {

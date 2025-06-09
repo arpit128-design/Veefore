@@ -13,9 +13,9 @@ export function ContentPerformance() {
   const [timeRange, setTimeRange] = useState("7");
 
   const { data: content, error, isLoading } = useQuery({
-    queryKey: ['content', currentWorkspace?.id, token],
+    queryKey: ['content', currentWorkspace?.id, token, timeRange],
     queryFn: async () => {
-      const response = await fetch(`/api/content?workspaceId=${currentWorkspace?.id}`, {
+      const response = await fetch(`/api/content?workspaceId=${currentWorkspace?.id}&timeRange=${timeRange}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -121,7 +121,7 @@ export function ContentPerformance() {
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  <div className="font-medium text-sm truncate">
+                  <div className="font-medium text-sm truncate text-white">
                     {item.caption || item.title || 'Instagram Content'}
                   </div>
                   <div className="flex justify-between text-xs text-asteroid-silver">

@@ -1246,8 +1246,29 @@ function VideoShortener() {
 
   const shortenMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/ai/shorten-video', data);
-      return await response.json();
+      if (data.videoFile) {
+        // Handle file upload with FormData
+        const formData = new FormData();
+        formData.append('videoFile', data.videoFile);
+        formData.append('targetDuration', data.targetDuration.toString());
+        formData.append('platform', data.platform);
+        formData.append('style', data.style);
+        formData.append('userPreferences', JSON.stringify(data.userPreferences));
+        formData.append('workspaceId', data.workspaceId);
+        
+        const response = await fetch('/api/ai/shorten-video', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          },
+          body: formData
+        });
+        return await response.json();
+      } else {
+        // Handle URL with JSON
+        const response = await apiRequest('POST', '/api/ai/shorten-video', data);
+        return await response.json();
+      }
     },
     onSuccess: (response: any) => {
       setShortenedVideo(response);

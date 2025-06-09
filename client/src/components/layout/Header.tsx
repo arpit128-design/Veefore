@@ -55,12 +55,7 @@ export function Header() {
             </div>
             
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative glassmorphism hover:bg-opacity-80">
-              <Satellite className="h-5 w-5 text-electric-cyan" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-solar-gold text-xs p-0 flex items-center justify-center">
-                3
-              </Badge>
-            </Button>
+            <NotificationBell />
             
             {/* User Avatar */}
             <Avatar className="w-10 h-10 border-2 border-electric-cyan animate-float">

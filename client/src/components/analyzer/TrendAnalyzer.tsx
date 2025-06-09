@@ -29,7 +29,23 @@ export function TrendAnalyzer() {
   const { data: trendData, isLoading, refetch } = useQuery({
     queryKey: ['authentic-trends', currentWorkspace?.id],
     queryFn: async () => {
+      console.log('[CLIENT DEBUG] Fetching trends for workspace:', currentWorkspace?.id);
+      
+      // First trigger a refresh to ensure fresh data
+      try {
+        console.log('[CLIENT DEBUG] Triggering trend refresh...');
+        await apiRequest('POST', '/api/analytics/refresh-trends', {
+          workspaceId: currentWorkspace?.id,
+          category: 'all'
+        });
+        console.log('[CLIENT DEBUG] Refresh triggered successfully');
+      } catch (refreshError) {
+        console.warn('[CLIENT DEBUG] Refresh trigger failed:', refreshError);
+      }
+      
+      // Then fetch the data
       const response = await apiRequest('GET', `/api/analytics/refresh-trends?workspaceId=${currentWorkspace?.id}&category=all`);
+      console.log('[CLIENT DEBUG] Trend API response:', response);
       return response;
     },
     enabled: !!currentWorkspace?.id,
@@ -62,15 +78,23 @@ export function TrendAnalyzer() {
     hashtags: (trendData as any).trends?.hashtags?.map((trend: any, index: number) => ({
       id: `hashtag-${index}`,
       type: 'hashtag' as const,
-      name: `#${trend.tag}`,
+      name: trend.tag.startsWith('#') ? trend.tag : `#${trend.tag}`,
       popularity: trend.popularity || 75,
       growth: trend.growth || 15,
       engagement: trend.engagement || '10K',
-      difficulty: trend.difficulty || 'Medium',
+      difficulty: (trend.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
       platforms: Array.isArray(trend.platforms) ? trend.platforms : ['Instagram'],
-      description: `Trending ${trend.category || 'lifestyle'} hashtag with ${trend.uses || '10K'} uses`
+      description: `Trending ${trend.category || 'lifestyle'} hashtag with ${trend.uses || trend.engagement || '10K'} uses`
     })) || []
   } : { hashtags: [] };
+
+  console.log('TrendAnalyzer Debug:', {
+    trendData: trendData,
+    authenticTrendsLength: authenticTrends.hashtags.length,
+    hasHashtags: !!(trendData as any)?.trends?.hashtags,
+    hashtagsRaw: (trendData as any)?.trends?.hashtags,
+    fullStructure: JSON.stringify(trendData, null, 2)
+  });
 
   // Fallback data only when API is loading
   const mockTrends: { [key: string]: TrendData[] } = {

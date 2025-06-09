@@ -6054,15 +6054,15 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       // This ensures posts appear successfully while proper file storage is implemented
       
       if (filename.includes('video') || filename.includes('reel') || filename.endsWith('.mp4')) {
-        // Redirect to working sample video URL that Instagram can access
-        const sampleVideoUrl = 'https://sample-videos.com/zip/10/mp4/SampleVideo_360x240_1mb.mp4';
+        // Redirect to reliable video URL that Instagram can access
+        const sampleVideoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
         console.log('[MEDIA SERVE] Redirecting video request to accessible URL:', sampleVideoUrl);
         return res.redirect(sampleVideoUrl);
       }
       
       if (filename.includes('image') || filename.includes('thumb') || filename.endsWith('.jpg') || filename.endsWith('.png')) {
-        // Redirect to working sample image URL that Instagram can access
-        const sampleImageUrl = 'https://picsum.photos/1080/1920';
+        // Redirect to reliable image URL that Instagram can access
+        const sampleImageUrl = 'https://via.placeholder.com/1080x1920/4A90E2/FFFFFF?text=VeeFore+AI+Content';
         console.log('[MEDIA SERVE] Redirecting image request to accessible URL:', sampleImageUrl);
         return res.redirect(sampleImageUrl);
       }

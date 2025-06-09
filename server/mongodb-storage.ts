@@ -548,6 +548,23 @@ export class MongoStorage implements IStorage {
     return this.convertWorkspace(workspace);
   }
 
+  async updateWorkspaceCredits(id: number | string, credits: number): Promise<void> {
+    await this.connect();
+    console.log(`[CREDIT UPDATE] Updating workspace ${id} credits to ${credits}`);
+    
+    const result = await WorkspaceModel.findOneAndUpdate(
+      { _id: id },
+      { credits, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!result) {
+      throw new Error('Workspace not found for credit update');
+    }
+    
+    console.log(`[CREDIT UPDATE] Successfully updated workspace ${id} credits to ${credits}`);
+  }
+
   async deleteWorkspace(id: number | string): Promise<void> {
     await this.connect();
     await WorkspaceModel.findOneAndDelete({ _id: id });

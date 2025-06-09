@@ -32,6 +32,7 @@ export interface IStorage {
   getWorkspaceByInviteCode(inviteCode: string): Promise<Workspace | undefined>;
   createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
   updateWorkspace(id: number | string, updates: Partial<Workspace>): Promise<Workspace>;
+  updateWorkspaceCredits(id: number | string, credits: number): Promise<void>;
   deleteWorkspace(id: number | string): Promise<void>;
   setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void>;
 
@@ -273,6 +274,15 @@ export class MemStorage implements IStorage {
     const updatedWorkspace = { ...workspace, ...updates, updatedAt: new Date() };
     this.workspaces.set(id, updatedWorkspace);
     return updatedWorkspace;
+  }
+
+  async updateWorkspaceCredits(id: number | string, credits: number): Promise<void> {
+    const numericId = typeof id === 'string' ? parseInt(id) : id;
+    const workspace = this.workspaces.get(numericId);
+    if (!workspace) throw new Error("Workspace not found");
+    
+    const updatedWorkspace = { ...workspace, credits, updatedAt: new Date() };
+    this.workspaces.set(numericId, updatedWorkspace);
   }
 
   async deleteWorkspace(id: number): Promise<void> {

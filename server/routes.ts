@@ -279,32 +279,117 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // POST endpoint to refresh/trigger new trend data fetching
+  // POST endpoint to refresh/trigger new trend data fetching with credit system
   app.post("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
     try {
       const { category = 'all', workspaceId } = req.body;
+      const userId = req.user.id;
+      
       console.log(`[TREND INTELLIGENCE POST] Refreshing authentic trending data for category: ${category}, workspace: ${workspaceId}`);
+      
+      // Get current workspace to check credits
+      const workspaces = await storage.getWorkspacesByUserId(userId);
+      const currentWorkspace = workspaceId 
+        ? workspaces.find(w => w.id === workspaceId)
+        : workspaces.find(w => w.isDefault) || workspaces[0];
+      
+      if (!currentWorkspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+      
+      // Check if workspace has enough credits (minimum 1 credit required)
+      const currentCredits = currentWorkspace.credits || 0;
+      if (currentCredits < 1) {
+        return res.status(400).json({ 
+          error: 'Insufficient credits. You need 1 credit to refresh trends.',
+          creditsRequired: 1,
+          currentCredits: currentCredits
+        });
+      }
+      
+      // Deduct 1 credit for trend refresh
+      await storage.updateWorkspaceCredits(currentWorkspace.id, currentCredits - 1);
+      console.log(`[CREDIT DEDUCTION] Deducted 1 credit for trend refresh. Remaining: ${currentCredits - 1}`);
       
       const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
       const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
       
-      // Force refresh the cache
-      await authenticTrendAnalyzer.refreshTrends(category);
+      // Force refresh the cache to get completely new trends
+      await authenticTrendAnalyzer.refreshTrends(category, true); // Force new data
       
-      // Get fresh data
-      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
+      // Get fresh data with different query to ensure variety
+      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category, true);
+      
+      // Get user preferences for personalization
+      const user = await storage.getUser(userId);
+      const userPreferences = user?.preferences || {};
+      
+      // Personalize hashtags based on user onboarding data
+      let personalizedHashtags = trendingData.trends.hashtags;
+      
+      if (userPreferences.interests || userPreferences.contentType || userPreferences.industry) {
+        console.log(`[TREND INTELLIGENCE POST] Personalizing refreshed hashtags based on user interests`);
+        // Filter and prioritize hashtags based on user preferences
+        const matchingHashtags = personalizedHashtags.filter(hashtag => {
+          const category = hashtag.category?.toLowerCase() || '';
+          const tag = hashtag.tag?.toLowerCase() || '';
+          
+          // Check if hashtag matches user's interests
+          if (userPreferences.interests && Array.isArray(userPreferences.interests)) {
+            return userPreferences.interests.some((interest: string) => 
+              category.includes(interest.toLowerCase()) || tag.includes(interest.toLowerCase())
+            );
+          }
+          
+          // Check if hashtag matches user's content type
+          if (userPreferences.contentType) {
+            return category.includes(userPreferences.contentType.toLowerCase()) || 
+                   tag.includes(userPreferences.contentType.toLowerCase());
+          }
+          
+          return true;
+        });
+        
+        // Mix personalized with trending for variety
+        if (matchingHashtags.length >= 5) {
+          const remaining = personalizedHashtags.filter(h => !matchingHashtags.includes(h));
+          personalizedHashtags = [...matchingHashtags.slice(0, 8), ...remaining.slice(0, 7)];
+        }
+      }
       
       console.log(`[TREND INTELLIGENCE POST] Refreshed authentic trends:`, {
-        hashtags: trendingData.trends.hashtags.length,
+        hashtags: personalizedHashtags.length,
         audio: trendingData.trends.audio.length,
-        formats: trendingData.trends.formats.length
+        formats: trendingData.trends.formats.length,
+        creditsUsed: 1,
+        remainingCredits: currentWorkspace.credits - 1
       });
       
-      res.json({
+      // Return personalized response with credit info
+      const response = {
         success: true,
         message: 'Trends refreshed successfully',
+        creditsUsed: 1,
+        remainingCredits: currentWorkspace.credits - 1,
+        trendingTags: personalizedHashtags.length,
+        viralAudio: trendingData.viralAudio,
+        contentFormats: trendingData.contentFormats,
+        accuracyRate: trendingData.accuracyRate,
+        hashtags: personalizedHashtags.map((hashtag, index) => ({
+          id: `refreshed-hashtag-${Date.now()}-${index}`,
+          tag: hashtag.tag,
+          popularity: hashtag.popularity,
+          growth: hashtag.growth,
+          engagement: hashtag.engagement,
+          difficulty: hashtag.difficulty,
+          platforms: hashtag.platforms,
+          category: hashtag.category,
+          uses: hashtag.uses
+        })),
         data: trendingData
-      });
+      };
+      
+      res.json(response);
     } catch (error: any) {
       console.error('[TREND INTELLIGENCE POST] Error refreshing authentic trends:', error);
       res.status(500).json({ error: error.message });

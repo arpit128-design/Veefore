@@ -1005,10 +1005,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       try {
         let accessToken = instagramAccount.accessToken;
         
-        // First, try with current token
-        let mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=20&access_token=${accessToken}`;
+        // First, try with current token to get real media content
+        let mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
         
-        console.log('[CONTENT API] Fetching Instagram media for account:', instagramAccount.username);
+        console.log('[CONTENT API] Fetching real Instagram media for account:', instagramAccount.username);
         
         let mediaResponse = await fetch(mediaUrl);
         
@@ -1018,9 +1018,53 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.log('[CONTENT API] Instagram API error:', mediaResponse.status, JSON.stringify(errorData));
           
           if (errorData.error?.code === 190) { // Invalid access token
-            console.log('[CONTENT API] Access token invalid - using account metrics to generate content structure');
+            console.log('[CONTENT API] Access token invalid - attempting automatic refresh');
             
-            // Generate content based on authentic account data with time filtering
+            // Try to refresh the token using Instagram's long-lived token exchange
+            try {
+              const refreshUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.INSTAGRAM_APP_ID}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&fb_exchange_token=${accessToken}`;
+              
+              console.log('[TOKEN REFRESH] Attempting to refresh Instagram access token');
+              const refreshResponse = await fetch(refreshUrl);
+              
+              if (refreshResponse.ok) {
+                const refreshData = await refreshResponse.json();
+                if (refreshData.access_token) {
+                  console.log('[TOKEN REFRESH] Successfully refreshed Instagram token');
+                  
+                  // Update the account with new token
+                  await storage.updateSocialAccount(instagramAccount.id, {
+                    accessToken: refreshData.access_token,
+                    expiresAt: refreshData.expires_in ? new Date(Date.now() + refreshData.expires_in * 1000) : null
+                  });
+                  
+                  // Retry media fetch with new token
+                  accessToken = refreshData.access_token;
+                  mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
+                  mediaResponse = await fetch(mediaUrl);
+                  
+                  if (mediaResponse.ok) {
+                    console.log('[TOKEN REFRESH] Media fetch successful with refreshed token');
+                    // Continue with successful media processing
+                  } else {
+                    console.log('[TOKEN REFRESH] Media fetch still failed after token refresh');
+                  }
+                } else {
+                  console.log('[TOKEN REFRESH] No access_token in refresh response');
+                }
+              } else {
+                const refreshError = await refreshResponse.text();
+                console.log('[TOKEN REFRESH] Token refresh failed:', refreshError);
+              }
+            } catch (refreshErr) {
+              console.log('[TOKEN REFRESH] Token refresh error:', refreshErr);
+            }
+            
+            // If refresh failed, use account metrics to generate content structure
+            if (!mediaResponse.ok) {
+              console.log('[CONTENT API] Using account metrics after token refresh attempt failed');
+              
+              // Generate content based on authentic account data with time filtering
             const accountBasedContent = [];
             const totalPosts = instagramAccount.mediaCount || 15;
             const avgLikes = Math.round((instagramAccount.totalLikes || 29) / totalPosts);
@@ -1090,13 +1134,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             
             console.log('[CONTENT API] Generated', accountBasedContent.length, 'content items from account metrics');
             return res.json(accountBasedContent);
-          }
-          
-          if (!mediaResponse.ok) {
-            console.log('[CONTENT API] Instagram media fetch failed even after token refresh attempt');
-            const finalError = await mediaResponse.text();
-            console.log('[CONTENT API] Final error:', finalError);
-            return res.json([]);
+            }
           }
         }
 
@@ -1144,11 +1182,6 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         console.error('[CONTENT API] Error fetching Instagram media:', error);
         res.json([]);
       }
-
-    } catch (error: any) {
-      console.error('[CONTENT API] Error:', error);
-      res.status(500).json({ error: error.message });
-    }
   });
 
   // Instagram sync endpoint for real-time data updates

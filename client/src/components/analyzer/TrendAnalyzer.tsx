@@ -63,36 +63,14 @@ export function TrendAnalyzer() {
       id: `hashtag-${index}`,
       type: 'hashtag' as const,
       name: `#${trend.tag}`,
-      popularity: trend.popularity,
-      growth: trend.growth,
-      engagement: typeof trend.engagement === 'string' ? parseFloat(trend.engagement.replace(/[^0-9.]/g, '')) : trend.engagement,
+      popularity: trend.popularity || 75,
+      growth: trend.growth || 15,
+      engagement: trend.engagement || '10K',
       difficulty: trend.difficulty || 'Medium',
       platforms: Array.isArray(trend.platforms) ? trend.platforms : ['Instagram'],
-      description: `Trending ${trend.category} hashtag with ${trend.uses} uses`
-    })) || [],
-    audio: (trendData as any).trends?.audio?.map((trend: any, index: number) => ({
-      id: `audio-${index}`,
-      type: 'audio' as const,
-      name: trend.name,
-      popularity: trend.popularity,
-      growth: trend.growth,
-      engagement: trend.engagement,
-      difficulty: trend.difficulty,
-      platforms: trend.platforms,
-      description: trend.description
-    })) || [],
-    content: (trendData as any).trends?.formats?.map((trend: any, index: number) => ({
-      id: `format-${index}`,
-      type: 'content' as const,
-      name: trend.name,
-      popularity: trend.popularity,
-      growth: trend.growth,
-      engagement: trend.engagement,
-      difficulty: trend.difficulty,
-      platforms: trend.platforms,
-      description: trend.description
+      description: `Trending ${trend.category || 'lifestyle'} hashtag with ${trend.uses || '10K'} uses`
     })) || []
-  } : { hashtags: [], audio: [], content: [] };
+  } : { hashtags: [] };
 
   // Fallback data only when API is loading
   const mockTrends: { [key: string]: TrendData[] } = {
@@ -199,8 +177,6 @@ export function TrendAnalyzer() {
   const getIconForType = (type: string) => {
     switch (type) {
       case 'hashtag': return <Hash className="h-5 w-5" />;
-      case 'audio': return <Music className="h-5 w-5" />;
-      case 'content': return <Video className="h-5 w-5" />;
       default: return <TrendingUp className="h-5 w-5" />;
     }
   };

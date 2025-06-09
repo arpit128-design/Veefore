@@ -3163,6 +3163,7 @@ export class MongoStorage implements IStorage {
       id: mongoAdmin._id.toString(),
       email: mongoAdmin.email,
       username: mongoAdmin.username,
+      password: mongoAdmin.password, // Include password for authentication
       role: mongoAdmin.role,
       isActive: mongoAdmin.isActive,
       lastLogin: mongoAdmin.lastLogin,

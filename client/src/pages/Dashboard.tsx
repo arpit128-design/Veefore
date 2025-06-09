@@ -7,9 +7,9 @@ import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
-import { useInstantData, useInstantAnalytics } from "@/hooks/useInstantData";
+import { useInstantData } from "@/hooks/useInstantData";
 import { Eye, Heart, Users, TrendingUp, RefreshCw } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { formatNumber, formatEngagement } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -27,8 +27,33 @@ export default function Dashboard() {
   // Initialize instant data prefetching
   useInstantData();
 
-  // Use instant analytics hook for immediate data loading
-  const { data: analyticsData, isLoading: analyticsLoading, error } = useInstantAnalytics();
+  // Real-time analytics query - always fetch fresh data with cache busting
+  const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
+    queryKey: ['dashboard-analytics-realtime', currentWorkspace?.id],
+    queryFn: async () => {
+      const timestamp = Date.now();
+      const response = await fetch(`/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}&_cacheBust=${timestamp}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!currentWorkspace?.id && !!token,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the result
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true
+  });
 
   // Live clock that updates every second
   useEffect(() => {

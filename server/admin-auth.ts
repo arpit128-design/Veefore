@@ -67,7 +67,7 @@ export async function requireAdminAuth(req: AdminRequest, res: Response, next: N
     }
 
     // Check if admin exists and is active
-    const admin = await storage.getAdminById(decoded.id);
+    const admin = await storage.getAdmin(decoded.id);
     if (!admin || !admin.isActive) {
       return res.status(401).json({ error: 'Admin not found or inactive' });
     }

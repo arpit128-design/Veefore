@@ -5843,6 +5843,16 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       };
 
       switch (mediaType) {
+        case 'image':
+        case 'post':
+          // For image/post publishing
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishData = {
+            ...publishData,
+            image_url: mediaUrl,
+            caption: caption || ''
+          };
+          break;
         case 'video':
         case 'reel':
           // For video/reel publishing
@@ -5864,7 +5874,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
           };
           break;
         default:
-          return res.status(400).json({ error: 'Invalid media type. Supported types: video, reel, story' });
+          return res.status(400).json({ error: 'Invalid media type. Supported types: image, post, video, reel, story' });
       }
 
       console.log('[INSTAGRAM PUBLISH] Publishing to Instagram API:', publishEndpoint);

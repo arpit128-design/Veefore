@@ -1144,7 +1144,7 @@ function AIImageGenerator() {
               {platform === 'instagram' && generatedImage.imageUrl && (
                 <Button 
                   className="flex-1"
-                  onClick={() => publishToInstagram(generatedImage.imageUrl, contentType, generatedImage.caption)}
+                  onClick={() => publishToInstagram(generatedImage.imageUrl, 'image', generatedImage.caption)}
                   disabled={publishMutation.isPending}
                 >
                   {publishMutation.isPending ? (

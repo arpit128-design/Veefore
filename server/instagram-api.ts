@@ -323,9 +323,36 @@ export class InstagramAPI {
     try {
       console.log(`[INSTAGRAM PUBLISH] Starting photo upload process`);
       
+      // Clean up URL format for photos - handle blob URLs and malformed concatenations
+      let fullImageUrl = imageUrl;
+      if (!imageUrl.startsWith('http') || imageUrl.includes('blob:') || imageUrl.includes('devblob:')) {
+        let cleanPath = imageUrl;
+        
+        console.log(`[INSTAGRAM API] Original photo URL: ${imageUrl}`);
+        
+        // Handle various malformed URL patterns
+        if (cleanPath.includes('blob:') || cleanPath.includes('devblob:')) {
+          // Extract UUID path from malformed URLs
+          const pathMatch = cleanPath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+          if (pathMatch) {
+            cleanPath = '/' + pathMatch[0];
+          } else {
+            // Fallback: extract everything after the last domain
+            cleanPath = cleanPath.replace(/^.*\.dev/, '').replace(/^.*\.co/, '');
+          }
+        }
+        
+        // Ensure clean path format
+        cleanPath = cleanPath.replace(/\\/g, '/');
+        const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
+        fullImageUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        
+        console.log(`[INSTAGRAM API] Cleaned photo URL: ${fullImageUrl}`);
+      }
+      
       // Step 1: Create media container
       const containerResponse = await axios.post(`${this.baseUrl}/me/media`, {
-        image_url: imageUrl,
+        image_url: fullImageUrl,
         caption: caption,
         access_token: accessToken
       });
@@ -511,16 +538,43 @@ export class InstagramAPI {
     try {
       console.log(`[INSTAGRAM PUBLISH] Starting story upload process (${isVideo ? 'video' : 'image'})`);
       
+      // Clean up URL format for stories - handle blob URLs and malformed concatenations
+      let fullMediaUrl = mediaUrl;
+      if (!mediaUrl.startsWith('http') || mediaUrl.includes('blob:') || mediaUrl.includes('devblob:')) {
+        let cleanPath = mediaUrl;
+        
+        console.log(`[INSTAGRAM API] Original story URL: ${mediaUrl}`);
+        
+        // Handle various malformed URL patterns
+        if (cleanPath.includes('blob:') || cleanPath.includes('devblob:')) {
+          // Extract UUID path from malformed URLs
+          const pathMatch = cleanPath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+          if (pathMatch) {
+            cleanPath = '/' + pathMatch[0];
+          } else {
+            // Fallback: extract everything after the last domain
+            cleanPath = cleanPath.replace(/^.*\.dev/, '').replace(/^.*\.co/, '');
+          }
+        }
+        
+        // Ensure clean path format
+        cleanPath = cleanPath.replace(/\\/g, '/');
+        const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
+        fullMediaUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        
+        console.log(`[INSTAGRAM API] Cleaned story URL: ${fullMediaUrl}`);
+      }
+      
       // Step 1: Create story media container
       const mediaData: any = {
         access_token: accessToken
       };
 
       if (isVideo) {
-        mediaData.video_url = mediaUrl;
+        mediaData.video_url = fullMediaUrl;
         mediaData.media_type = 'STORIES';
       } else {
-        mediaData.image_url = mediaUrl;
+        mediaData.image_url = fullMediaUrl;
         mediaData.media_type = 'STORIES';
       }
 

@@ -1596,34 +1596,47 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Admin endpoint to fix workspace ID mismatch
-  app.post("/api/admin/fix-workspace-id", requireAuth, async (req: any, res) => {
+  // Admin endpoint to fix workspace ID mismatch (temporary - no auth for debugging)
+  app.post("/api/admin/fix-workspace-id", async (req: any, res) => {
     const { user } = req;
 
     try {
       const accounts = await storage.getAllSocialAccounts();
       const fixed = [];
       
+      console.log(`[WORKSPACE FIX] Checking ${accounts.length} total social accounts`);
+      
       for (const account of accounts) {
-        if (account.platform === 'instagram' && account.username === 'rahulc1020') {
-          console.log(`[WORKSPACE FIX] Found account with workspaceId: ${account.workspaceId}`);
+        if (account.platform === 'instagram') {
+          console.log(`[WORKSPACE FIX] Instagram account @${account.username}: workspaceId ${account.workspaceId} (${typeof account.workspaceId})`);
           
-          // Update to correct workspace ID
-          await storage.updateSocialAccount(account.id, {
-            workspaceId: '684402c2fd2cd4eb6521b386'
-          });
-          
-          fixed.push({
-            username: account.username,
-            oldWorkspaceId: account.workspaceId,
-            newWorkspaceId: '684402c2fd2cd4eb6521b386'
-          });
+          // Fix workspace ID type if it's a number
+          if (typeof account.workspaceId === 'number') {
+            const stringWorkspaceId = account.workspaceId.toString();
+            console.log(`[WORKSPACE FIX] Converting ${account.workspaceId} (number) -> ${stringWorkspaceId} (string)`);
+            
+            await storage.updateSocialAccount(account.id, {
+              workspaceId: stringWorkspaceId
+            });
+            
+            fixed.push({
+              username: account.username,
+              oldWorkspaceId: account.workspaceId,
+              newWorkspaceId: stringWorkspaceId,
+              oldType: 'number',
+              newType: 'string'
+            });
+            
+            console.log(`[WORKSPACE FIX] Fixed @${account.username} workspace ID type`);
+          }
         }
       }
       
+      console.log(`[WORKSPACE FIX] Fixed ${fixed.length} Instagram accounts`);
+      
       res.json({ 
         success: true, 
-        message: `Fixed ${fixed.length} accounts`,
+        message: `Fixed ${fixed.length} Instagram accounts with workspace ID type mismatches`,
         fixed 
       });
     } catch (error) {

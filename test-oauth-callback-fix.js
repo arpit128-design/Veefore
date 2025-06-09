@@ -9,7 +9,7 @@
  * to maintain type consistency between save and query operations.
  */
 
-import { MongodbStorage } from './server/mongodb-storage.js';
+import { MongodbStorage } from './server/mongodb-storage.ts';
 
 async function testOAuthCallbackFix() {
   console.log('\n=== Testing OAuth Callback Fix ===\n');

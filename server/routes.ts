@@ -4065,6 +4065,30 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Clear all conversation data and reset to empty state
+  app.post('/api/conversations/clear-all', requireAuth, async (req, res) => {
+    try {
+      console.log('[CLEAR CONVERSATIONS] Removing all conversation data...');
+      
+      const workspaceId = req.user.workspaces?.[0]?.id || '684402c2fd2cd4eb6521b386';
+      
+      // Clear all conversations, messages, and context for this workspace
+      await storage.clearWorkspaceConversations(workspaceId);
+      
+      console.log('[CLEAR CONVERSATIONS] ✅ All conversation data cleared');
+      
+      res.json({
+        success: true,
+        message: 'All conversation data cleared successfully',
+        workspaceId: workspaceId
+      });
+      
+    } catch (error: any) {
+      console.error('[CLEAR CONVERSATIONS] Error:', error);
+      res.status(500).json({ error: 'Failed to clear conversation data' });
+    }
+  });
+
   // Create sample conversation data for demonstration
   app.post('/api/conversations/create-samples', requireAuth, async (req, res) => {
     try {

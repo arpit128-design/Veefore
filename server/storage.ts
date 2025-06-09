@@ -139,6 +139,12 @@ export interface IStorage {
   getPricingData(): Promise<any>;
   updateUserSubscription(userId: number | string, planId: string): Promise<User>;
   addCreditsToUser(userId: number | string, credits: number): Promise<User>;
+
+  // Conversation management operations
+  createDmConversation(conversation: any): Promise<any>;
+  createDmMessage(message: any): Promise<any>;
+  createConversationContext(context: any): Promise<any>;
+  clearWorkspaceConversations(workspaceId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {

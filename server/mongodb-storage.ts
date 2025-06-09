@@ -1358,6 +1358,120 @@ export class MongoStorage implements IStorage {
     }
   }
 
+  // Conversation Management Methods
+  async createDmConversation(conversation: any): Promise<any> {
+    await this.connect();
+    
+    const ConversationModel = mongoose.models.DmConversation || mongoose.model('DmConversation', new mongoose.Schema({
+      workspaceId: String,
+      participantId: String,
+      participantUsername: String,
+      platform: String,
+      messageCount: { type: Number, default: 0 },
+      lastMessageAt: Date,
+      createdAt: { type: Date, default: Date.now },
+      updatedAt: { type: Date, default: Date.now }
+    }));
+    
+    const newConversation = new ConversationModel(conversation);
+    const saved = await newConversation.save();
+    
+    return {
+      id: saved._id.toString(),
+      workspaceId: saved.workspaceId,
+      participantId: saved.participantId,
+      participantUsername: saved.participantUsername,
+      platform: saved.platform,
+      messageCount: saved.messageCount,
+      lastMessageAt: saved.lastMessageAt,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt
+    };
+  }
+
+  async createDmMessage(message: any): Promise<any> {
+    await this.connect();
+    
+    const MessageModel = mongoose.models.DmMessage || mongoose.model('DmMessage', new mongoose.Schema({
+      conversationId: String,
+      messageId: String,
+      sender: String,
+      content: String,
+      messageType: String,
+      sentiment: String,
+      topics: [String],
+      aiResponse: Boolean,
+      createdAt: { type: Date, default: Date.now }
+    }));
+    
+    const newMessage = new MessageModel(message);
+    const saved = await newMessage.save();
+    
+    return {
+      id: saved._id.toString(),
+      conversationId: saved.conversationId,
+      messageId: saved.messageId,
+      sender: saved.sender,
+      content: saved.content,
+      messageType: saved.messageType,
+      sentiment: saved.sentiment,
+      topics: saved.topics,
+      aiResponse: saved.aiResponse,
+      createdAt: saved.createdAt
+    };
+  }
+
+  async createConversationContext(context: any): Promise<any> {
+    await this.connect();
+    
+    const ContextModel = mongoose.models.ConversationContext || mongoose.model('ConversationContext', new mongoose.Schema({
+      conversationId: String,
+      contextType: String,
+      contextValue: String,
+      confidence: Number,
+      extractedAt: Date,
+      expiresAt: Date
+    }));
+    
+    const newContext = new ContextModel(context);
+    const saved = await newContext.save();
+    
+    return {
+      id: saved._id.toString(),
+      conversationId: saved.conversationId,
+      contextType: saved.contextType,
+      contextValue: saved.contextValue,
+      confidence: saved.confidence,
+      extractedAt: saved.extractedAt,
+      expiresAt: saved.expiresAt
+    };
+  }
+
+  async clearWorkspaceConversations(workspaceId: string): Promise<void> {
+    await this.connect();
+    
+    const ConversationModel = mongoose.models.DmConversation;
+    const MessageModel = mongoose.models.DmMessage;
+    const ContextModel = mongoose.models.ConversationContext;
+    
+    if (ConversationModel) {
+      // Get conversation IDs to clean up related data
+      const conversations = await ConversationModel.find({ workspaceId });
+      const conversationIds = conversations.map(c => c._id.toString());
+      
+      // Delete messages and context for these conversations
+      if (MessageModel) {
+        await MessageModel.deleteMany({ conversationId: { $in: conversationIds } });
+      }
+      if (ContextModel) {
+        await ContextModel.deleteMany({ conversationId: { $in: conversationIds } });
+      }
+      
+      // Delete conversations
+      await ConversationModel.deleteMany({ workspaceId });
+    }
+  }
+
   async getSuggestions(workspaceId: number, type?: string): Promise<Suggestion[]> {
     await this.connect();
     

@@ -1614,11 +1614,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         key_secret: process.env.RAZORPAY_KEY_SECRET,
       });
 
-      // Get package details from pricing config
-      const pricingData = await storage.getPricingData();
-      const packageData = pricingData.creditPackages.find(pkg => pkg.id === packageId);
+      // Import credit packages from pricing config
+      const { CREDIT_PACKAGES } = await import('./pricing-config');
+      console.log(`[CREDIT PURCHASE] Available packages:`, CREDIT_PACKAGES.map(p => p.id));
+      console.log(`[CREDIT PURCHASE] Requested package ID: ${packageId}`);
+      const packageData = CREDIT_PACKAGES.find((pkg: any) => pkg.id === packageId);
       
       if (!packageData) {
+        console.error(`[CREDIT PURCHASE] Invalid package ID: ${packageId}`);
+        console.error(`[CREDIT PURCHASE] Available package IDs:`, CREDIT_PACKAGES.map(p => p.id));
         return res.status(400).json({ error: 'Invalid package ID' });
       }
 
@@ -1633,6 +1637,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         },
       };
 
+      console.log(`[CREDIT PURCHASE] Creating order for package ${packageId}: ${packageData.totalCredits} credits, ₹${packageData.price}`);
       const order = await rzp.orders.create(options);
 
       res.json({

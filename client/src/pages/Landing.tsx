@@ -49,23 +49,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 
-// Performance optimized particles
-const Particle3D = ({ index }: { index: number }) => (
-  <motion.div
-    className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-40"
-    initial={{
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-    }}
-    animate={{
-      y: [null, -20, 20, -10, 0],
-      x: [null, Math.random() * 50 - 25, Math.random() * 30 - 15],
-      opacity: [0.4, 0.8, 0.2, 0.6, 0.4],
-    }}
-    transition={{
-      duration: 8 + index * 2,
-      repeat: Infinity,
-      ease: "easeInOut",
+// Static decorative elements (no animations)
+const StaticParticle = ({ index }: { index: number }) => (
+  <div
+    className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-30"
+    style={{
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
     }}
   />
 );
@@ -542,7 +532,7 @@ const Landing = () => {
       {/* Optimized Floating Particles */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(6)].map((_, i) => (
-          <Particle3D key={i} index={i} />
+          <StaticParticle key={i} index={i} />
         ))}
       </div>
 

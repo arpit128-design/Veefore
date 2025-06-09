@@ -123,7 +123,7 @@ export const OptimizedSpaceBackground = () => {
         style={{ 
           zIndex: -1,
           willChange: 'auto',
-          imageRendering: 'optimizeSpeed'
+          imageRendering: 'pixelated'
         }}
       />
       

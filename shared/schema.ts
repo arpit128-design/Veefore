@@ -563,3 +563,174 @@ export type InsertContentRecommendation = z.infer<typeof insertContentRecommenda
 
 export type UserContentHistory = typeof userContentHistory.$inferSelect;
 export type InsertUserContentHistory = z.infer<typeof insertUserContentHistorySchema>;
+
+// Admin Panel Tables
+export const admins = pgTable("admins", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").default("admin"), // admin, superadmin
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const adminSessions = pgTable("admin_sessions", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").references(() => admins.id).notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").default("info"), // info, success, warning, error
+  isRead: boolean("is_read").default(false),
+  targetUsers: text("target_users").array(), // "all", specific user IDs, or criteria
+  scheduledFor: timestamp("scheduled_for"),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const popups = pgTable("popups", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").default("announcement"), // announcement, promotion, update
+  buttonText: text("button_text"),
+  buttonLink: text("button_link"),
+  isActive: boolean("is_active").default(true),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  targetPages: text("target_pages").array(), // pages where popup should show
+  frequency: text("frequency").default("once"), // once, daily, session
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const appSettings = pgTable("app_settings", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  type: text("type").default("string"), // string, boolean, number, json
+  category: text("category").default("general"), // general, features, branding, email
+  description: text("description"),
+  isPublic: boolean("is_public").default(false), // can be accessed by frontend
+  updatedBy: integer("updated_by").references(() => admins.id),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").references(() => admins.id),
+  action: text("action").notNull(),
+  entity: text("entity"), // user, setting, notification, etc.
+  entityId: text("entity_id"),
+  oldValues: json("old_values"),
+  newValues: json("new_values"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const feedbackMessages = pgTable("feedback_messages", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  category: text("category").default("general"), // bug, feature, general, billing
+  priority: text("priority").default("medium"), // low, medium, high, urgent
+  status: text("status").default("open"), // open, in_progress, resolved, closed
+  adminNotes: text("admin_notes"),
+  assignedTo: integer("assigned_to").references(() => admins.id),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Admin Insert Schemas
+export const insertAdminSchema = createInsertSchema(admins).pick({
+  email: true,
+  username: true,
+  password: true,
+  role: true,
+  isActive: true
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  userId: true,
+  title: true,
+  message: true,
+  type: true,
+  targetUsers: true,
+  scheduledFor: true
+});
+
+export const insertPopupSchema = createInsertSchema(popups).pick({
+  title: true,
+  content: true,
+  type: true,
+  buttonText: true,
+  buttonLink: true,
+  isActive: true,
+  startDate: true,
+  endDate: true,
+  targetPages: true,
+  frequency: true
+});
+
+export const insertAppSettingSchema = createInsertSchema(appSettings).pick({
+  key: true,
+  value: true,
+  type: true,
+  category: true,
+  description: true,
+  isPublic: true,
+  updatedBy: true
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).pick({
+  adminId: true,
+  action: true,
+  entity: true,
+  entityId: true,
+  oldValues: true,
+  newValues: true,
+  ipAddress: true,
+  userAgent: true
+});
+
+export const insertFeedbackMessageSchema = createInsertSchema(feedbackMessages).pick({
+  userId: true,
+  subject: true,
+  message: true,
+  category: true,
+  priority: true,
+  status: true,
+  adminNotes: true,
+  assignedTo: true
+});
+
+// Admin Types
+export type Admin = typeof admins.$inferSelect;
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type Popup = typeof popups.$inferSelect;
+export type AppSetting = typeof appSettings.$inferSelect;
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type FeedbackMessage = typeof feedbackMessages.$inferSelect;
+
+export type InsertAdmin = z.infer<typeof insertAdminSchema>;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type InsertPopup = z.infer<typeof insertPopupSchema>;
+export type InsertAppSetting = z.infer<typeof insertAppSettingSchema>;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type InsertFeedbackMessage = z.infer<typeof insertFeedbackMessageSchema>;

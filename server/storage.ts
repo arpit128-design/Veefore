@@ -2,15 +2,18 @@ import {
   users, workspaces, workspaceMembers, teamInvitations, socialAccounts, content, analytics, 
   automationRules, suggestions, creditTransactions, referrals,
   subscriptions, payments, addons, contentRecommendations, userContentHistory,
+  admins, adminSessions, notifications, popups, appSettings, auditLogs, feedbackMessages,
   type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
   type Payment, type Addon, type ContentRecommendation, type UserContentHistory,
+  type Admin, type AdminSession, type Notification, type Popup, type AppSetting, type AuditLog, type FeedbackMessage,
   type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
   type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
   type InsertSubscription, type InsertPayment, type InsertAddon,
-  type InsertContentRecommendation, type InsertUserContentHistory
+  type InsertContentRecommendation, type InsertUserContentHistory,
+  type InsertAdmin, type InsertNotification, type InsertPopup, type InsertAppSetting, type InsertAuditLog, type InsertFeedbackMessage
 } from "@shared/schema";
 
 export interface IStorage {
@@ -147,6 +150,63 @@ export interface IStorage {
   clearWorkspaceConversations(workspaceId: string): Promise<void>;
   getDmConversations(workspaceId: string, limit?: number): Promise<any[]>;
   getDmMessages(conversationId: number | string, limit?: number): Promise<any[]>;
+
+  // Admin operations
+  getAdmin(id: number): Promise<Admin | undefined>;
+  getAdminByEmail(email: string): Promise<Admin | undefined>;
+  getAdminByUsername(username: string): Promise<Admin | undefined>;
+  getAllAdmins(): Promise<Admin[]>;
+  createAdmin(admin: InsertAdmin): Promise<Admin>;
+  updateAdmin(id: number, updates: Partial<Admin>): Promise<Admin>;
+  deleteAdmin(id: number): Promise<void>;
+
+  // Admin session operations
+  createAdminSession(session: Partial<AdminSession>): Promise<AdminSession>;
+  getAdminSession(token: string): Promise<AdminSession | undefined>;
+  deleteAdminSession(token: string): Promise<void>;
+  cleanupExpiredSessions(): Promise<void>;
+
+  // Notification operations
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  getNotifications(userId?: number): Promise<Notification[]>;
+  updateNotification(id: number, updates: Partial<Notification>): Promise<Notification>;
+  deleteNotification(id: number): Promise<void>;
+  markNotificationRead(id: number): Promise<void>;
+
+  // Popup operations
+  createPopup(popup: InsertPopup): Promise<Popup>;
+  getActivePopups(): Promise<Popup[]>;
+  getPopup(id: number): Promise<Popup | undefined>;
+  updatePopup(id: number, updates: Partial<Popup>): Promise<Popup>;
+  deletePopup(id: number): Promise<void>;
+
+  // App settings operations
+  createAppSetting(setting: InsertAppSetting): Promise<AppSetting>;
+  getAppSetting(key: string): Promise<AppSetting | undefined>;
+  getAllAppSettings(): Promise<AppSetting[]>;
+  getPublicAppSettings(): Promise<AppSetting[]>;
+  updateAppSetting(key: string, value: string, updatedBy?: number): Promise<AppSetting>;
+  deleteAppSetting(key: string): Promise<void>;
+
+  // Audit log operations
+  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+  getAuditLogs(limit?: number, adminId?: number): Promise<AuditLog[]>;
+
+  // Feedback operations
+  createFeedbackMessage(feedback: InsertFeedbackMessage): Promise<FeedbackMessage>;
+  getFeedbackMessages(status?: string): Promise<FeedbackMessage[]>;
+  updateFeedbackMessage(id: number, updates: Partial<FeedbackMessage>): Promise<FeedbackMessage>;
+  deleteFeedbackMessage(id: number): Promise<void>;
+
+  // Admin analytics
+  getAdminStats(): Promise<{
+    totalUsers: number;
+    totalWorkspaces: number;
+    totalContent: number;
+    totalCreditsUsed: number;
+    revenueThisMonth: number;
+    activeUsers: number;
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -1089,6 +1149,184 @@ export class MemStorage implements IStorage {
     // This is a stub - real implementation uses MongoDB
     console.log(`[MEM STORAGE] Stub: Get DM messages for conversation ${conversationId}`);
     return [];
+  }
+
+  // Admin operations (stub implementations - MongoDB is used for real admin data)
+  async getAdmin(id: number): Promise<Admin | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async getAdminByEmail(email: string): Promise<Admin | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async getAdminByUsername(username: string): Promise<Admin | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async getAllAdmins(): Promise<Admin[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async createAdmin(admin: InsertAdmin): Promise<Admin> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async updateAdmin(id: number, updates: Partial<Admin>): Promise<Admin> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async deleteAdmin(id: number): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async createAdminSession(session: Partial<AdminSession>): Promise<AdminSession> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getAdminSession(token: string): Promise<AdminSession | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async deleteAdminSession(token: string): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async cleanupExpiredSessions(): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getNotifications(userId?: number): Promise<Notification[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async updateNotification(id: number, updates: Partial<Notification>): Promise<Notification> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async deleteNotification(id: number): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async markNotificationRead(id: number): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async createPopup(popup: InsertPopup): Promise<Popup> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getActivePopups(): Promise<Popup[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async getPopup(id: number): Promise<Popup | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async updatePopup(id: number, updates: Partial<Popup>): Promise<Popup> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async deletePopup(id: number): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async createAppSetting(setting: InsertAppSetting): Promise<AppSetting> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getAppSetting(key: string): Promise<AppSetting | undefined> {
+    // This is a stub - real implementation uses MongoDB
+    return undefined;
+  }
+
+  async getAllAppSettings(): Promise<AppSetting[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async getPublicAppSettings(): Promise<AppSetting[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async updateAppSetting(key: string, value: string, updatedBy?: number): Promise<AppSetting> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async deleteAppSetting(key: string): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async createAuditLog(log: InsertAuditLog): Promise<AuditLog> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getAuditLogs(limit?: number, adminId?: number): Promise<AuditLog[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async createFeedbackMessage(feedback: InsertFeedbackMessage): Promise<FeedbackMessage> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async getFeedbackMessages(status?: string): Promise<FeedbackMessage[]> {
+    // This is a stub - real implementation uses MongoDB
+    return [];
+  }
+
+  async updateFeedbackMessage(id: number, updates: Partial<FeedbackMessage>): Promise<FeedbackMessage> {
+    // This is a stub - real implementation uses MongoDB
+    throw new Error("Admin operations require MongoDB");
+  }
+
+  async deleteFeedbackMessage(id: number): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+  }
+
+  async getAdminStats(): Promise<{
+    totalUsers: number;
+    totalWorkspaces: number;
+    totalContent: number;
+    totalCreditsUsed: number;
+    revenueThisMonth: number;
+    activeUsers: number;
+  }> {
+    // This is a stub - real implementation uses MongoDB
+    return {
+      totalUsers: this.users.size,
+      totalWorkspaces: this.workspaces.size,
+      totalContent: this.content.size,
+      totalCreditsUsed: 0,
+      revenueThisMonth: 0,
+      activeUsers: 0
+    };
   }
 }
 

@@ -95,17 +95,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           user = await storage.createUser(userData);
           console.log(`[AUTH] Created user with ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
           
-          // Create default workspace for new users
-          try {
-            const workspace = await storage.createWorkspace({
-              userId: user.id,
-              name: 'My VeeFore Workspace',
-              description: 'Default workspace for social media management'
-            });
-            console.log(`[USER CREATION] Created default workspace for user ${user.id}: ${workspace.id}`);
-          } catch (workspaceError) {
-            console.error('Failed to create default workspace:', workspaceError);
-          }
+          // Note: Default workspace creation is handled by createUser method in storage layer
         } catch (error) {
           console.error('[AUTH] Failed to create user:', error);
           return res.status(500).json({ error: 'Failed to create user account' });

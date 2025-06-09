@@ -8,11 +8,13 @@ import { DashboardCache } from './dashboard-cache';
 
 class AutoSyncService {
   private storage: IStorage;
+  private dashboardCache: DashboardCache;
   private syncInterval: NodeJS.Timeout | null = null;
   private readonly SYNC_INTERVAL_MS = 60 * 1000; // Sync every 1 minute
 
   constructor(storage: IStorage) {
     this.storage = storage;
+    this.dashboardCache = new DashboardCache(storage);
   }
 
   start() {
@@ -82,7 +84,7 @@ class AutoSyncService {
         });
 
         // Clear cache to force refresh on next request
-        dashboardCache.clearCache();
+        this.dashboardCache.clearCache();
 
         console.log(`[AUTO SYNC] Successfully updated @${account.username} with followers: ${data.followers_count}`);
       } else {

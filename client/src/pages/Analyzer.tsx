@@ -17,9 +17,10 @@ export default function Analyzer() {
 
   // Fetch real-time analytics data
   const { data: realtimeAnalytics, refetch: refetchRealtime, isLoading: realtimeLoading } = useQuery({
-    queryKey: ['analytics-realtime', currentWorkspace?.id, timeRange],
+    queryKey: ['analytics-realtime', currentWorkspace?.id, timeRange, Date.now()],
     queryFn: async () => {
-      const response = await fetch(`/api/analytics/realtime?workspaceId=${currentWorkspace?.id}&days=${timeRange}`, {
+      const timestamp = Date.now();
+      const response = await fetch(`/api/analytics/realtime?workspaceId=${currentWorkspace?.id}&days=${timeRange}&_refresh=${timestamp}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -32,8 +33,8 @@ export default function Analyzer() {
       return response.json();
     },
     enabled: !!currentWorkspace?.id && !!token,
-    refetchInterval: 30000, // Refresh every 30 seconds for real-time updates
-    staleTime: 25000 // Consider data stale after 25 seconds
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
+    staleTime: 0 // Always fetch fresh data
   });
 
   // Fetch dashboard analytics as fallback

@@ -22,12 +22,10 @@ interface OptimalTimingData {
 interface AnalyticsResult {
   engagementRate: number;
   growthVelocity: number;
-  optimalTime: {
-    hour: string;
-    peakHours: string;
-    bestDays: string[];
-    audienceActive: number;
-  };
+  optimalHour: number;
+  peakHours: string;
+  bestDays: string[];
+  audienceActive: number;
   trendsData: {
     weeklyGrowth: number;
     engagementTrend: number;
@@ -79,7 +77,7 @@ export class AnalyticsEngine {
       return {
         engagementRate,
         growthVelocity,
-        optimalHour: optimalTime.hour,
+        optimalHour: parseInt(optimalTime.hour),
         peakHours: optimalTime.peakHours,
         bestDays: optimalTime.bestDays,
         audienceActive: optimalTime.audienceActive,

@@ -1154,8 +1154,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[REALTIME ANALYTICS] Calculated authentic analytics:', {
         engagementRate: realTimeAnalytics.engagementRate,
         growthVelocity: realTimeAnalytics.growthVelocity,
-        optimalHour: realTimeAnalytics.optimalTime.hour,
-        bestDays: realTimeAnalytics.optimalTime.bestDays
+        optimalHour: realTimeAnalytics.optimalHour,
+        bestDays: realTimeAnalytics.bestDays
       });
 
       res.json(realTimeAnalytics);

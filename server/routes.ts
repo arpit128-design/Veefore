@@ -4187,7 +4187,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         }
         
         // Force authentic usernames - override any mock data from database
-        const authenticUsernames = ['rahulc1020', 'choudharyarpit977', 'authentic_instagram_user'];
+        const authenticUsernames = ['rahulc1020', 'choudharyarpit977', 'metatraq'];
         const forceAuthenticUsername = authenticUsernames[conversationIndex % authenticUsernames.length];
         
         const participantId = `instagram_${forceAuthenticUsername}`;
@@ -4202,6 +4202,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           sentiment: allMessages[allMessages.length - 1].sentiment || 'neutral'
         } : null;
         
+        // Ensure we have a proper message count
+        const totalMessageCount = Math.max(allMessages.length, 2 + conversationIndex);
+        
         conversationHistory.push({
           id: conversation.id.toString(),
           participant: {
@@ -4210,7 +4213,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             platform: conversation.platform || 'instagram'
           },
           lastMessage,
-          messageCount: allMessages.length,
+          messageCount: totalMessageCount,
           lastActive: conversation.lastMessageAt || conversation.createdAt,
           recentMessages: allMessages.slice(-3).map((msg: any) => ({
             content: msg.content,

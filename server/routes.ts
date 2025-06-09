@@ -1001,59 +1001,51 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.json([]);
       }
 
-      // Fetch real Instagram media with current engagement
+      // Try to refresh token if needed and fetch real Instagram media
       try {
-        const mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=20&access_token=${instagramAccount.accessToken}`;
+        let accessToken = instagramAccount.accessToken;
+        
+        // First, try with current token
+        let mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=20&access_token=${accessToken}`;
         
         console.log('[CONTENT API] Fetching Instagram media for account:', instagramAccount.username);
         
-        const mediaResponse = await fetch(mediaUrl);
+        let mediaResponse = await fetch(mediaUrl);
+        
+        // If token is invalid, try to refresh it
         if (!mediaResponse.ok) {
-          const errorText = await mediaResponse.text();
-          console.log('[CONTENT API] Instagram API error:', mediaResponse.status, errorText);
+          const errorData = await mediaResponse.json();
+          console.log('[CONTENT API] Instagram API error:', mediaResponse.status, JSON.stringify(errorData));
           
-          // Provide sample data based on account metrics while API issues are resolved
-          const sampleContent = [
-            {
-              id: `${instagramAccount.accountId}_1`,
-              title: "Latest Instagram Post - Growth Strategy",
-              platform: 'instagram',
-              type: 'post',
-              status: 'published',
-              publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-              engagement: {
-                likes: Math.round(instagramAccount.avgLikes || 5),
-                comments: Math.round(instagramAccount.avgComments || 1),
-                shares: 0,
-                reach: Math.round((instagramAccount.totalReach || 100) / 5)
-              },
-              performance: {
-                impressions: Math.round((instagramAccount.totalReach || 100) / 3),
-                engagementRate: ((instagramAccount.avgEngagement || 5) / 2).toFixed(1)
+          if (errorData.error?.code === 190) { // Invalid access token
+            console.log('[CONTENT API] Attempting to refresh Instagram access token...');
+            
+            try {
+              const refreshUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.INSTAGRAM_APP_ID}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&fb_exchange_token=${accessToken}`;
+              
+              const refreshResponse = await fetch(refreshUrl);
+              const refreshData = await refreshResponse.json();
+              
+              if (refreshData.access_token) {
+                accessToken = refreshData.access_token;
+                console.log('[CONTENT API] Successfully refreshed Instagram access token');
+                
+                // Update stored token
+                await storage.updateSocialAccount(instagramAccount.id, { accessToken });
+                
+                // Retry with new token
+                mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=20&access_token=${accessToken}`;
+                mediaResponse = await fetch(mediaUrl);
               }
-            },
-            {
-              id: `${instagramAccount.accountId}_2`,
-              title: "Business Update - Professional Content",
-              platform: 'instagram',
-              type: 'reel',
-              status: 'published',
-              publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-              engagement: {
-                likes: Math.round((instagramAccount.avgLikes || 5) * 1.5),
-                comments: Math.round((instagramAccount.avgComments || 1) * 2),
-                shares: 0,
-                reach: Math.round((instagramAccount.totalReach || 100) / 3)
-              },
-              performance: {
-                impressions: Math.round((instagramAccount.totalReach || 100) / 2),
-                engagementRate: (instagramAccount.avgEngagement || 5).toFixed(1)
-              }
+            } catch (refreshError) {
+              console.log('[CONTENT API] Token refresh failed:', refreshError);
             }
-          ];
+          }
           
-          console.log('[CONTENT API] Using sample data based on account metrics while API issues are resolved');
-          return res.json(sampleContent);
+          if (!mediaResponse.ok) {
+            console.log('[CONTENT API] Instagram API access requires valid credentials - returning empty content array');
+            return res.json([]);
+          }
         }
 
         const mediaData = await mediaResponse.json();
@@ -1066,27 +1058,31 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         const posts = mediaData.data || [];
         console.log('[CONTENT API] Successfully fetched', posts.length, 'Instagram posts');
 
-        // Transform Instagram media to content format
+        // Transform Instagram media to content format with proper thumbnails and captions
         const content = posts.map((post: any) => ({
           id: post.id,
-          title: post.caption ? post.caption.substring(0, 50) + '...' : 'Instagram Post',
+          title: post.caption ? (post.caption.length > 60 ? post.caption.substring(0, 60) + '...' : post.caption) : 'Instagram Content',
+          caption: post.caption || '',
           platform: 'instagram',
-          type: post.media_type?.toLowerCase() || 'image',
+          type: post.media_type?.toLowerCase() === 'video' ? 'video' : 
+                post.media_type?.toLowerCase() === 'carousel_album' ? 'carousel' : 'post',
           status: 'published',
           publishedAt: post.timestamp,
+          createdAt: post.timestamp,
+          mediaUrl: post.media_url,
+          thumbnailUrl: post.media_url, // Use media URL as thumbnail
+          permalink: post.permalink,
           engagement: {
             likes: post.like_count || 0,
             comments: post.comments_count || 0,
             shares: 0,
-            reach: Math.round((post.like_count + post.comments_count) * 12.5) // Estimated based on engagement
+            reach: Math.round((post.like_count + post.comments_count) * 12.5)
           },
           performance: {
             impressions: Math.round((post.like_count + post.comments_count) * 15),
             engagementRate: instagramAccount.followersCount > 0 ? 
               ((post.like_count + post.comments_count) / instagramAccount.followersCount * 100).toFixed(1) : '0.0'
-          },
-          mediaUrl: post.media_url,
-          permalink: post.permalink
+          }
         }));
 
         console.log('[CONTENT API] Returning', content.length, 'published content items');

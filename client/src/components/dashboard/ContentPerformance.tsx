@@ -97,7 +97,23 @@ export function ContentPerformance() {
                 className="p-4 rounded-lg bg-cosmic-blue hover:bg-space-gray transition-all group cursor-pointer"
               >
                 <div className={`aspect-video bg-gradient-to-br ${gradient} rounded-lg mb-3 relative overflow-hidden`}>
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  {item.thumbnailUrl || item.mediaUrl ? (
+                    <img 
+                      src={item.thumbnailUrl || item.mediaUrl} 
+                      alt={item.caption || item.title || 'Content thumbnail'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to icon if image fails to load
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div className="absolute inset-0 flex items-center justify-center" style={{display: (item.thumbnailUrl || item.mediaUrl) ? 'none' : 'flex'}}>
                     <IconComponent className="h-8 w-8 text-white opacity-70" />
                   </div>
                   <Badge className="absolute top-2 right-2 bg-black/50 text-white">
@@ -105,19 +121,28 @@ export function ContentPerformance() {
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  <div className="font-medium text-sm truncate">{item.title}</div>
+                  <div className="font-medium text-sm truncate">
+                    {item.caption || item.title || 'Instagram Content'}
+                  </div>
                   <div className="flex justify-between text-xs text-asteroid-silver">
-                    <span>{item.platform || 'Multi-platform'}</span>
-                    <span>{formatDate(item.createdAt)}</span>
+                    <span>{item.platform || 'Instagram'}</span>
+                    <span>{formatDate(item.publishedAt || item.createdAt)}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-green-400">
-                      {item.contentData?.views ? `${item.contentData.views} views` : 'Ready'}
+                      {item.engagement?.likes ? `${item.engagement.likes} likes` : 
+                       item.contentData?.views ? `${item.contentData.views} views` : 'Published'}
                     </span>
                     <span className="text-electric-cyan">
                       {item.status === 'published' ? 'Live' : item.status}
                     </span>
                   </div>
+                  {item.engagement && (
+                    <div className="flex justify-between text-xs text-cosmic-gray">
+                      <span>{item.engagement.comments > 0 ? `${item.engagement.comments} comments` : ''}</span>
+                      <span>{item.performance?.engagementRate ? `${item.performance.engagementRate}% rate` : ''}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );

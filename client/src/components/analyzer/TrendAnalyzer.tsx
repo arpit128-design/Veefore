@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Hash, Music, Video, Image, RefreshCw, Target, Zap, Eye } from "lucide-react";
+import { TrendingUp, Hash, RefreshCw, Target, Zap, Eye } from "lucide-react";
 
 interface TrendData {
   id: string;
@@ -282,97 +281,53 @@ export function TrendAnalyzer() {
         </Button>
       </CardHeader>
       <CardContent>
-        {/* Trend Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* Trending Hashtags Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="p-4 rounded-lg bg-electric-cyan/10 border border-electric-cyan/30 text-center">
             <TrendingUp className="h-8 w-8 text-electric-cyan mx-auto mb-2" />
             <div className="text-2xl font-bold text-electric-cyan">
               {isLoading ? '...' : authenticTrends.hashtags.length || '0'}
             </div>
-            <div className="text-sm text-asteroid-silver">Trending Tags</div>
+            <div className="text-sm text-asteroid-silver">Trending Hashtags</div>
           </div>
           <div className="p-4 rounded-lg bg-nebula-purple/10 border border-nebula-purple/30 text-center">
-            <Music className="h-8 w-8 text-nebula-purple mx-auto mb-2" />
+            <Hash className="h-8 w-8 text-nebula-purple mx-auto mb-2" />
             <div className="text-2xl font-bold text-nebula-purple">
-              {isLoading ? '...' : authenticTrends.audio.length || '0'}
+              {isLoading ? '...' : authenticTrends.hashtags.filter((h: any) => h.popularity >= 80).length || '0'}
             </div>
-            <div className="text-sm text-asteroid-silver">Viral Audio</div>
-          </div>
-          <div className="p-4 rounded-lg bg-solar-gold/10 border border-solar-gold/30 text-center">
-            <Video className="h-8 w-8 text-solar-gold mx-auto mb-2" />
-            <div className="text-2xl font-bold text-solar-gold">
-              {isLoading ? '...' : authenticTrends.content.length || '0'}
-            </div>
-            <div className="text-sm text-asteroid-silver">Content Formats</div>
+            <div className="text-sm text-asteroid-silver">High Potential</div>
           </div>
           <div className="p-4 rounded-lg bg-green-400/10 border border-green-400/30 text-center">
             <Eye className="h-8 w-8 text-green-400 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-400">
               {(trendData as any)?.accuracy || '98%'}
             </div>
-            <div className="text-sm text-asteroid-silver">Accuracy Rate</div>
+            <div className="text-sm text-asteroid-silver">Data Accuracy</div>
           </div>
         </div>
 
-        {/* Trend Categories */}
-        <Tabs defaultValue="hashtags" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 glassmorphism">
-            <TabsTrigger value="hashtags">Trending Hashtags</TabsTrigger>
-            <TabsTrigger value="audio">Viral Audio</TabsTrigger>
-            <TabsTrigger value="content">Content Formats</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="hashtags" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {isLoading ? (
-                <div className="col-span-full text-center py-8">
-                  <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4" />
-                  <p className="text-asteroid-silver">Loading authentic trending hashtags...</p>
-                </div>
-              ) : authenticTrends.hashtags.length > 0 ? (
-                authenticTrends.hashtags.map(renderTrendCard)
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <p className="text-asteroid-silver">No trending hashtags available. Click refresh to fetch latest data.</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="audio" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {isLoading ? (
-                <div className="col-span-full text-center py-8">
-                  <div className="animate-spin w-8 h-8 border-4 border-nebula-purple border-t-transparent rounded-full mx-auto mb-4" />
-                  <p className="text-asteroid-silver">Loading authentic viral audio trends...</p>
-                </div>
-              ) : authenticTrends.audio.length > 0 ? (
-                authenticTrends.audio.map(renderTrendCard)
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <p className="text-asteroid-silver">No viral audio trends available. Click refresh to fetch latest data.</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="content" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {isLoading ? (
-                <div className="col-span-full text-center py-8">
-                  <div className="animate-spin w-8 h-8 border-4 border-solar-gold border-t-transparent rounded-full mx-auto mb-4" />
-                  <p className="text-asteroid-silver">Loading authentic content format trends...</p>
-                </div>
-              ) : authenticTrends.content.length > 0 ? (
-                authenticTrends.content.map(renderTrendCard)
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <p className="text-asteroid-silver">No content format trends available. Click refresh to fetch latest data.</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+        {/* Trending Hashtags Content */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-white">Trending Hashtags</h3>
+            <span className="text-sm text-asteroid-silver">Real-time data from social platforms</span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {isLoading ? (
+              <div className="col-span-full text-center py-8">
+                <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4" />
+                <p className="text-asteroid-silver">Loading authentic trending hashtags...</p>
+              </div>
+            ) : authenticTrends.hashtags.length > 0 ? (
+              authenticTrends.hashtags.map(renderTrendCard)
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-asteroid-silver">No trending hashtags available. Click refresh to fetch latest data.</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* AI Insights */}
         <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-electric-cyan/10 to-nebula-purple/10 border border-electric-cyan/30">

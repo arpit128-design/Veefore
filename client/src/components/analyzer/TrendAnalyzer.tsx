@@ -29,11 +29,11 @@ export function TrendAnalyzer() {
   const { data: trendData, isLoading, refetch } = useQuery({
     queryKey: ['authentic-trends', currentWorkspace?.id],
     queryFn: async () => {
-      console.log('[CLIENT DEBUG] Fetching trends for workspace:', currentWorkspace?.id);
+      console.log('[CLIENT DEBUG] Fetching cached trends for workspace:', currentWorkspace?.id);
       
-      // Directly fetch the cached trending data with proper error handling
+      // Fetch cached trending data (free) - no credit deduction
       try {
-        const response = await apiRequest('GET', `/api/analytics/refresh-trends?category=all`);
+        const response = await apiRequest('GET', `/api/analytics/trends-cache?category=all`);
         console.log('[CLIENT DEBUG] Raw response:', response);
         
         // Check if response is already parsed JSON or needs parsing

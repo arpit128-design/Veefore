@@ -182,7 +182,81 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Trend Intelligence Center - Authentic trending data endpoint with personalization
+  // FREE: Get cached trending data (no credit deduction)
+  app.get("/api/analytics/trends-cache", requireAuth, async (req: any, res: any) => {
+    try {
+      const { category = 'all' } = req.query;
+      const userId = req.user.id;
+      console.log(`[TRENDS CACHE] Fetching cached trending data for category: ${category}, user: ${userId}`);
+      
+      const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
+      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
+      
+      // Get user onboarding preferences for personalization
+      const user = await storage.getUser(userId);
+      const userPreferences = user?.preferences || {};
+      
+      console.log(`[TRENDS CACHE] User preferences:`, userPreferences);
+      console.log(`[TRENDS CACHE] Retrieved cached trends:`, {
+        hashtags: trendingData.trends.hashtags.length,
+        audio: trendingData.trends.audio.length,
+        formats: trendingData.trends.formats.length,
+        totalTrends: trendingData.trendingTags
+      });
+      
+      // Personalize hashtags based on user onboarding data
+      let personalizedHashtags = trendingData.trends.hashtags;
+      
+      if (userPreferences.interests || userPreferences.contentType || userPreferences.industry) {
+        console.log(`[TRENDS CACHE] Personalizing hashtags based on user interests`);
+        // Filter and prioritize hashtags based on user preferences
+        const matchingHashtags = personalizedHashtags.filter(hashtag => {
+          const category = hashtag.category?.toLowerCase() || '';
+          const interests = userPreferences.interests || [];
+          const contentType = userPreferences.contentType?.toLowerCase() || '';
+          const industry = userPreferences.industry?.toLowerCase() || '';
+          
+          return interests.some((interest: string) => category.includes(interest.toLowerCase())) ||
+                 category.includes(contentType) ||
+                 category.includes(industry);
+        });
+        
+        // If we have matches, prioritize them; otherwise use all hashtags
+        if (matchingHashtags.length > 0) {
+          personalizedHashtags = [...matchingHashtags, ...personalizedHashtags.filter(h => !matchingHashtags.includes(h))];
+        }
+      }
+      
+      const response = {
+        success: true,
+        cached: true,
+        trendingTags: personalizedHashtags.length,
+        viralAudio: trendingData.viralAudio,
+        contentFormats: trendingData.contentFormats,
+        accuracyRate: trendingData.accuracyRate,
+        hashtags: personalizedHashtags.map((hashtag, index) => ({
+          id: `cached-hashtag-${index}`,
+          tag: hashtag.tag,
+          popularity: hashtag.popularity,
+          growth: hashtag.growth,
+          engagement: hashtag.engagement,
+          difficulty: hashtag.difficulty,
+          platforms: hashtag.platforms,
+          category: hashtag.category,
+          uses: hashtag.uses
+        })),
+        data: trendingData
+      };
+      
+      res.json(response);
+    } catch (error: any) {
+      console.error('[TRENDS CACHE] Error fetching cached trends:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // LEGACY: Trend Intelligence Center - Authentic trending data endpoint with personalization
   app.get("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
     try {
       const { category = 'all' } = req.query;

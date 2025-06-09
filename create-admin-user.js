@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.DATABASE_URL;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function createAdminUser() {
   console.log('🔐 Creating admin user for VeeFore admin panel...');

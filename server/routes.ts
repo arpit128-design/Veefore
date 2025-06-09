@@ -968,6 +968,89 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Content endpoint for ContentPerformance component
+  app.get('/api/content', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId } = req.query;
+
+      console.log('[CONTENT API] Getting published content for user:', user.id, 'workspace:', workspaceId);
+
+      // Get user's workspace
+      let workspace;
+      if (workspaceId) {
+        workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace || workspace.userId !== user.id) {
+          return res.status(403).json({ error: 'Workspace not found or access denied' });
+        }
+      } else {
+        const workspaces = await storage.getWorkspacesByUserId(user.id);
+        workspace = workspaces.find(w => w.isDefault) || workspaces[0];
+      }
+
+      if (!workspace) {
+        return res.json([]);
+      }
+
+      // Get Instagram account to fetch real published media
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
+
+      if (!instagramAccount) {
+        console.log('[CONTENT API] No Instagram account connected');
+        return res.json([]);
+      }
+
+      // Fetch real Instagram media with current engagement
+      try {
+        const mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,permalink&limit=20&access_token=${instagramAccount.accessToken}`;
+        
+        const mediaResponse = await fetch(mediaUrl);
+        if (!mediaResponse.ok) {
+          console.log('[CONTENT API] Instagram API error:', mediaResponse.status);
+          return res.json([]);
+        }
+
+        const mediaData = await mediaResponse.json();
+        const posts = mediaData.data || [];
+
+        // Transform Instagram media to content format
+        const content = posts.map((post: any) => ({
+          id: post.id,
+          title: post.caption ? post.caption.substring(0, 50) + '...' : 'Instagram Post',
+          platform: 'instagram',
+          type: post.media_type?.toLowerCase() || 'image',
+          status: 'published',
+          publishedAt: post.timestamp,
+          engagement: {
+            likes: post.like_count || 0,
+            comments: post.comments_count || 0,
+            shares: 0,
+            reach: Math.round((post.like_count + post.comments_count) * 12.5) // Estimated based on engagement
+          },
+          performance: {
+            impressions: Math.round((post.like_count + post.comments_count) * 15),
+            engagementRate: instagramAccount.followersCount > 0 ? 
+              ((post.like_count + post.comments_count) / instagramAccount.followersCount * 100).toFixed(1) : '0.0'
+          },
+          mediaUrl: post.media_url,
+          permalink: post.permalink
+        }));
+
+        console.log('[CONTENT API] Returning', content.length, 'published content items');
+        res.json(content);
+
+      } catch (error: any) {
+        console.error('[CONTENT API] Error fetching Instagram media:', error);
+        res.json([]);
+      }
+
+    } catch (error: any) {
+      console.error('[CONTENT API] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Instagram sync endpoint for real-time data updates
   app.post("/api/instagram/sync", requireAuth, async (req: any, res: any) => {
     try {

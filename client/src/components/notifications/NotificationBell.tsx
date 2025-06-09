@@ -25,7 +25,7 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isLoading } = useQuery({
+  const { data: notifications, isLoading } = useQuery({
     queryKey: ['/api/notifications'],
     refetchInterval: 30000, // Refetch every 30 seconds
   });
@@ -38,7 +38,9 @@ export function NotificationBell() {
     },
   });
 
-  const unreadCount = notifications.filter((n: Notification) => !n.isRead).length;
+  // Safely handle notifications data with proper type checking
+  const notificationArray = Array.isArray(notifications) ? notifications : [];
+  const unreadCount = notificationArray.filter((n: any) => !n.isRead).length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -97,12 +99,12 @@ export function NotificationBell() {
             <div className="p-4 text-center text-slate-400">
               Loading notifications...
             </div>
-          ) : notifications.length === 0 ? (
+          ) : notificationArray.length === 0 ? (
             <div className="p-4 text-center text-slate-400">
               No notifications yet
             </div>
           ) : (
-            notifications.map((notification: Notification) => (
+            notificationArray.map((notification: any) => (
               <Card
                 key={notification.id}
                 className={`m-2 border-0 ${
@@ -148,7 +150,7 @@ export function NotificationBell() {
           )}
         </div>
 
-        {notifications.length > 0 && (
+        {notificationArray.length > 0 && (
           <div className="p-3 border-t border-slate-700 text-center">
             <Button
               variant="ghost"

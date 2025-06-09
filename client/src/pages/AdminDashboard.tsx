@@ -25,7 +25,11 @@ import {
   Globe,
   MessageSquare,
   FileText,
-  AlertTriangle
+  AlertTriangle,
+  Eye,
+  Edit,
+  Trash2,
+  Plus
 } from "lucide-react";
 
 interface AdminStats {
@@ -56,6 +60,9 @@ const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [userSearch, setUserSearch] = useState("");
   const [userFilter, setUserFilter] = useState("all");
+  const [contentSearch, setContentSearch] = useState("");
+  const [contentFilter, setContentFilter] = useState("all");
+  const [notificationFilter, setNotificationFilter] = useState("all");
 
   const adminUser = JSON.parse(localStorage.getItem("admin_user") || "{}");
   const adminToken = localStorage.getItem("admin_token");
@@ -419,14 +426,104 @@ const AdminDashboard = () => {
           <TabsContent value="content" className="space-y-6">
             <Card className="bg-black/40 backdrop-blur-lg border-purple-500/20">
               <CardHeader>
-                <CardTitle className="text-white">Content Management</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Monitor and manage AI-generated content across the platform
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white">Content Management</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Monitor and manage AI-generated content across the platform
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-400">
-                  Content management features coming soon...
+                <div className="space-y-4">
+                  {/* Search and Filter */}
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Search content..."
+                        value={contentSearch}
+                        onChange={(e) => setContentSearch(e.target.value)}
+                        className="bg-black/40 border-purple-500/20 text-white placeholder-gray-400"
+                      />
+                    </div>
+                    <Select value={contentFilter} onValueChange={setContentFilter}>
+                      <SelectTrigger className="w-[200px] bg-black/40 border-purple-500/20 text-white">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-black border-purple-500/20">
+                        <SelectItem value="all">All Content</SelectItem>
+                        <SelectItem value="published">Published</SelectItem>
+                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Content Table */}
+                  <div className="rounded-md border border-purple-500/20 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-purple-500/20 hover:bg-purple-500/5">
+                          <TableHead className="text-gray-300">Title</TableHead>
+                          <TableHead className="text-gray-300">Type</TableHead>
+                          <TableHead className="text-gray-300">Platform</TableHead>
+                          <TableHead className="text-gray-300">Status</TableHead>
+                          <TableHead className="text-gray-300">Created</TableHead>
+                          <TableHead className="text-gray-300">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {contentLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                              Loading content...
+                            </TableCell>
+                          </TableRow>
+                        ) : contentData?.content?.length > 0 ? (
+                          contentData.content.map((content: any) => (
+                            <TableRow key={content.id} className="border-purple-500/20 hover:bg-purple-500/5">
+                              <TableCell className="text-white font-medium">{content.title}</TableCell>
+                              <TableCell className="text-gray-300">{content.type}</TableCell>
+                              <TableCell className="text-gray-300">{content.platform}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={content.status === 'published' ? 'default' : 
+                                          content.status === 'scheduled' ? 'secondary' : 'outline'}
+                                  className="capitalize"
+                                >
+                                  {content.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-gray-300">
+                                {new Date(content.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-purple-400 hover:bg-purple-500/20">
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-blue-400 hover:bg-blue-500/20">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/20">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                              No content found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -436,14 +533,108 @@ const AdminDashboard = () => {
           <TabsContent value="notifications" className="space-y-6">
             <Card className="bg-black/40 backdrop-blur-lg border-purple-500/20">
               <CardHeader>
-                <CardTitle className="text-white">System Notifications</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Manage platform-wide notifications and announcements
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white">System Notifications</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Manage platform-wide notifications and announcements
+                    </CardDescription>
+                  </div>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Notification
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-400">
-                  Notification management features coming soon...
+                <div className="space-y-4">
+                  {/* Filter */}
+                  <div className="flex gap-4">
+                    <Select value={notificationFilter} onValueChange={setNotificationFilter}>
+                      <SelectTrigger className="w-[200px] bg-black/40 border-purple-500/20 text-white">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-black border-purple-500/20">
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="system">System</SelectItem>
+                        <SelectItem value="announcement">Announcement</SelectItem>
+                        <SelectItem value="alert">Alert</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Notifications Table */}
+                  <div className="rounded-md border border-purple-500/20 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-purple-500/20 hover:bg-purple-500/5">
+                          <TableHead className="text-gray-300">Title</TableHead>
+                          <TableHead className="text-gray-300">Type</TableHead>
+                          <TableHead className="text-gray-300">Status</TableHead>
+                          <TableHead className="text-gray-300">Target</TableHead>
+                          <TableHead className="text-gray-300">Created</TableHead>
+                          <TableHead className="text-gray-300">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {notificationsLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                              Loading notifications...
+                            </TableCell>
+                          </TableRow>
+                        ) : notificationsData?.notifications?.length > 0 ? (
+                          notificationsData.notifications.map((notification: any) => (
+                            <TableRow key={notification.id} className="border-purple-500/20 hover:bg-purple-500/5">
+                              <TableCell className="text-white font-medium">{notification.title}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={notification.type === 'alert' ? 'destructive' : 
+                                          notification.type === 'announcement' ? 'default' : 'secondary'}
+                                  className="capitalize"
+                                >
+                                  {notification.type}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={notification.isActive ? 'default' : 'outline'}
+                                  className="capitalize"
+                                >
+                                  {notification.isActive ? 'Active' : 'Inactive'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-gray-300">{notification.targetAudience || 'All Users'}</TableCell>
+                              <TableCell className="text-gray-300">
+                                {new Date(notification.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-purple-400 hover:bg-purple-500/20">
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-blue-400 hover:bg-blue-500/20">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/20">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                              No notifications found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </CardContent>
             </Card>

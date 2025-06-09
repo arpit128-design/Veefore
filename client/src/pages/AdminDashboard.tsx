@@ -710,6 +710,143 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Create Notification Dialog */}
+      <Dialog open={isNotificationDialogOpen} onOpenChange={setIsNotificationDialogOpen}>
+        <DialogContent className="bg-black/95 backdrop-blur-lg border-purple-500/20 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-purple-400">Create New Notification</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Send a notification to users across the platform
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...notificationForm}>
+            <form onSubmit={notificationForm.handleSubmit(handleCreateNotification)} className="space-y-4">
+              <FormField
+                control={notificationForm.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Title</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        placeholder="Enter notification title"
+                        className="bg-black/40 border-purple-500/20 text-white placeholder:text-gray-400"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={notificationForm.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Message</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Enter notification message"
+                        className="bg-black/40 border-purple-500/20 text-white placeholder:text-gray-400 min-h-[80px]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={notificationForm.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-black/40 border-purple-500/20 text-white">
+                          <SelectValue placeholder="Select notification type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-black border-purple-500/20">
+                        <SelectItem value="info">Info</SelectItem>
+                        <SelectItem value="success">Success</SelectItem>
+                        <SelectItem value="warning">Warning</SelectItem>
+                        <SelectItem value="error">Error</SelectItem>
+                        <SelectItem value="announcement">Announcement</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={notificationForm.control}
+                name="targetUsers"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Target Users</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-black/40 border-purple-500/20 text-white">
+                          <SelectValue placeholder="Select target users" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-black border-purple-500/20">
+                        <SelectItem value="all">All Users</SelectItem>
+                        <SelectItem value="premium">Premium Users</SelectItem>
+                        <SelectItem value="free">Free Users</SelectItem>
+                        <SelectItem value="active">Active Users</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={notificationForm.control}
+                name="scheduledFor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Schedule For (Optional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        type="datetime-local"
+                        className="bg-black/40 border-purple-500/20 text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsNotificationDialogOpen(false)}
+                  className="border-purple-500/20 text-gray-300 hover:bg-purple-500/10"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={createNotificationMutation.isPending}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {createNotificationMutation.isPending ? "Creating..." : "Create Notification"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -182,6 +182,33 @@ function AIVideoGenerator() {
     }
   });
 
+  const instagramPublishMutation = useMutation({
+    mutationFn: async (publishType: 'video' | 'reel' | 'story') => {
+      if (!generatedVideo) return;
+      const response = await apiRequest('POST', '/api/instagram/publish', {
+        mediaType: publishType,
+        mediaUrl: generatedVideo.videoUrl,
+        caption: generatedVideo.caption || '',
+        workspaceId: currentWorkspace?.id
+      });
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      toast({
+        title: "Posted to Instagram!",
+        description: `Your video has been published to Instagram successfully.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/content"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Instagram Publishing Failed",
+        description: "Failed to publish to Instagram. Please check your Instagram connection.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const generateScript = () => {
     if (!prompt.trim()) {
       toast({
@@ -241,6 +268,10 @@ function AIVideoGenerator() {
       hashtags: generatedVideo.hashtags,
       workspaceId: currentWorkspace?.id
     });
+  };
+
+  const publishToInstagram = (publishType: 'video' | 'reel' | 'story') => {
+    instagramPublishMutation.mutate(publishType);
   };
 
   const resetGenerator = () => {
@@ -548,24 +579,56 @@ function AIVideoGenerator() {
               </div>
             )}
 
-            <div className="flex space-x-3">
-              <Button onClick={() => setStep('script-review')} variant="outline" className="flex-1">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Script
-              </Button>
-              <Button onClick={publishVideo} disabled={publishMutation.isPending} className="flex-1">
-                {publishMutation.isPending ? (
-                  <>
+            <div className="space-y-3">
+              <div className="flex space-x-3">
+                <Button onClick={() => setStep('script-review')} variant="outline" className="flex-1">
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Script
+                </Button>
+                <Button onClick={publishVideo} disabled={publishMutation.isPending} className="flex-1">
+                  {publishMutation.isPending ? (
+                    <>
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Share className="mr-2 h-4 w-4" />
+                      Publish Video
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {/* Instagram Publishing Options */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  onClick={() => publishToInstagram('video')} 
+                  disabled={instagramPublishMutation.isPending}
+                  variant="outline"
+                  className="flex items-center justify-center"
+                >
+                  {instagramPublishMutation.isPending ? (
                     <LoadingSpinner className="mr-2 h-4 w-4" />
-                    Publishing...
-                  </>
-                ) : (
-                  <>
-                    <Share className="mr-2 h-4 w-4" />
-                    Publish Video
-                  </>
-                )}
-              </Button>
+                  ) : (
+                    <Instagram className="mr-2 h-4 w-4" />
+                  )}
+                  Post to Instagram
+                </Button>
+                <Button 
+                  onClick={() => publishToInstagram('reel')} 
+                  disabled={instagramPublishMutation.isPending}
+                  variant="outline"
+                  className="flex items-center justify-center"
+                >
+                  {instagramPublishMutation.isPending ? (
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Video className="mr-2 h-4 w-4" />
+                  )}
+                  Post as Reel
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

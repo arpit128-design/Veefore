@@ -143,10 +143,20 @@ export class SchedulerService {
       
       console.log(`[SCHEDULER] Detected content type: ${contentType} for URL: ${mediaUrl}`);
       
-      // Use adaptive publisher with multiple fallback strategies
+      // Convert URL for Instagram compatibility first
+      const { InstagramURLConverter } = await import('./instagram-url-converter');
+      const urlPreparation = await InstagramURLConverter.prepareForInstagramPublishing(
+        mediaUrl,
+        contentType as 'video' | 'photo' | 'reel'
+      );
+      
+      console.log(`[SCHEDULER] URL conversion: ${urlPreparation.isOptimized ? 'optimized' : 'unchanged'}`);
+      console.log(`[SCHEDULER] Optimized URL: ${urlPreparation.url}`);
+      
+      // Use adaptive publisher with optimized URL
       const adaptiveResult = await AdaptiveInstagramPublisher.publishWithAdaptiveStrategy(
         instagramAccount.accessToken,
-        mediaUrl,
+        urlPreparation.url,
         caption,
         contentType
       );

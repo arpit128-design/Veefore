@@ -1997,6 +1997,38 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Test endpoint for adding credits (no auth required)
+  app.post('/api/test-add-credits', async (req: any, res: Response) => {
+    try {
+      const { username, amount } = req.body;
+      
+      if (!username || !amount) {
+        return res.status(400).json({ error: 'Username and amount required' });
+      }
+
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const currentCredits = user.credits || 0;
+      const newCredits = currentCredits + amount;
+      
+      await storage.updateUserCredits(user.id, newCredits);
+      
+      res.json({ 
+        success: true, 
+        username,
+        previousCredits: currentCredits,
+        newCredits,
+        added: amount
+      });
+    } catch (error: any) {
+      console.error('[TEST ADD CREDITS] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Test addon creation logic (debugging endpoint)
   app.post('/api/test-addon-creation', requireAuth, async (req: any, res: Response) => {
     try {

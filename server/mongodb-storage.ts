@@ -3446,4 +3446,75 @@ export class MongoStorage implements IStorage {
       updatedAt: mongoMessage.updatedAt
     };
   }
+
+  // Admin-specific operations - Missing methods implementation
+  async getAdminUsers(page: number = 1, limit: number = 10, search?: string): Promise<{ users: User[], total: number }> {
+    await this.connect();
+    
+    const skip = (page - 1) * limit;
+    let query = {};
+    
+    if (search) {
+      query = {
+        $or: [
+          { username: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { displayName: { $regex: search, $options: 'i' } }
+        ]
+      };
+    }
+    
+    const [users, total] = await Promise.all([
+      UserModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      UserModel.countDocuments(query)
+    ]);
+    
+    return {
+      users: users.map(user => this.convertUser(user)),
+      total
+    };
+  }
+
+  async getAdminContent(page: number = 1, limit: number = 10, filters?: any): Promise<{ content: Content[], total: number }> {
+    await this.connect();
+    
+    const skip = (page - 1) * limit;
+    let query = {};
+    
+    if (filters?.platform) {
+      query['platform'] = filters.platform;
+    }
+    if (filters?.status) {
+      query['status'] = filters.status;
+    }
+    if (filters?.type) {
+      query['type'] = filters.type;
+    }
+    
+    const [content, total] = await Promise.all([
+      ContentModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      ContentModel.countDocuments(query)
+    ]);
+    
+    return {
+      content: content.map(item => this.convertContent(item)),
+      total
+    };
+  }
+
+  async getAdminNotifications(page: number = 1, limit: number = 10): Promise<{ notifications: Notification[], total: number }> {
+    await this.connect();
+    
+    const skip = (page - 1) * limit;
+    
+    const [notifications, total] = await Promise.all([
+      NotificationModel.find({}).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      NotificationModel.countDocuments({})
+    ]);
+    
+    return {
+      notifications: notifications.map(notif => this.convertNotification(notif)),
+      total
+    };
+  }
 }

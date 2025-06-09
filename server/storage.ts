@@ -198,6 +198,11 @@ export interface IStorage {
   updateFeedbackMessage(id: number, updates: Partial<FeedbackMessage>): Promise<FeedbackMessage>;
   deleteFeedbackMessage(id: number): Promise<void>;
 
+  // Admin-specific operations
+  getAdminUsers(page?: number, limit?: number, search?: string): Promise<{ users: User[], total: number }>;
+  getAdminContent(page?: number, limit?: number, filters?: any): Promise<{ content: Content[], total: number }>;
+  getAdminNotifications(page?: number, limit?: number): Promise<{ notifications: Notification[], total: number }>;
+
   // Admin analytics
   getAdminStats(): Promise<{
     totalUsers: number;
@@ -1326,6 +1331,62 @@ export class MemStorage implements IStorage {
       totalCreditsUsed: 0,
       revenueThisMonth: 0,
       activeUsers: 0
+    };
+  }
+
+  // Missing admin methods for interface compatibility
+  async getAdminUsers(page: number = 1, limit: number = 10, search?: string): Promise<{ users: User[], total: number }> {
+    const allUsers = Array.from(this.users.values());
+    let filteredUsers = allUsers;
+    
+    if (search) {
+      filteredUsers = allUsers.filter(user => 
+        user.username.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()) ||
+        (user.displayName && user.displayName.toLowerCase().includes(search.toLowerCase()))
+      );
+    }
+    
+    const startIndex = (page - 1) * limit;
+    const paginatedUsers = filteredUsers.slice(startIndex, startIndex + limit);
+    
+    return {
+      users: paginatedUsers,
+      total: filteredUsers.length
+    };
+  }
+
+  async getAdminContent(page: number = 1, limit: number = 10, filters?: any): Promise<{ content: Content[], total: number }> {
+    const allContent = Array.from(this.content.values());
+    let filteredContent = allContent;
+    
+    if (filters?.platform) {
+      filteredContent = filteredContent.filter(item => item.platform === filters.platform);
+    }
+    if (filters?.status) {
+      filteredContent = filteredContent.filter(item => item.status === filters.status);
+    }
+    if (filters?.type) {
+      filteredContent = filteredContent.filter(item => item.type === filters.type);
+    }
+    
+    const startIndex = (page - 1) * limit;
+    const paginatedContent = filteredContent.slice(startIndex, startIndex + limit);
+    
+    return {
+      content: paginatedContent,
+      total: filteredContent.length
+    };
+  }
+
+  async getAdminNotifications(page: number = 1, limit: number = 10): Promise<{ notifications: Notification[], total: number }> {
+    const allNotifications = Array.from(this.notifications.values());
+    const startIndex = (page - 1) * limit;
+    const paginatedNotifications = allNotifications.slice(startIndex, startIndex + limit);
+    
+    return {
+      notifications: paginatedNotifications,
+      total: allNotifications.length
     };
   }
 }

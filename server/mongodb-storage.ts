@@ -3137,9 +3137,38 @@ export class MongoStorage implements IStorage {
   // Notification operations
   async createNotification(notification: any): Promise<any> {
     await this.connect();
-    const newNotification = new NotificationModel(notification);
+    
+    console.log('[MONGODB DEBUG] Creating notification:', notification);
+    
+    const notificationData = {
+      userId: notification.userId || null,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type || 'info',
+      targetUsers: notification.targetUsers || 'all',
+      scheduledFor: notification.scheduledFor ? new Date(notification.scheduledFor) : null,
+      sentAt: notification.scheduledFor ? null : new Date(),
+      isRead: false,
+      createdAt: new Date()
+    };
+    
+    const newNotification = new NotificationModel(notificationData);
     const savedNotification = await newNotification.save();
-    return this.convertNotification(savedNotification);
+    
+    console.log('[MONGODB DEBUG] Notification created with ID:', savedNotification._id);
+    
+    return {
+      id: savedNotification._id.toString(),
+      userId: savedNotification.userId,
+      title: savedNotification.title,
+      message: savedNotification.message,
+      type: savedNotification.type,
+      targetUsers: savedNotification.targetUsers,
+      scheduledFor: savedNotification.scheduledFor,
+      sentAt: savedNotification.sentAt,
+      isRead: savedNotification.isRead,
+      createdAt: savedNotification.createdAt
+    };
   }
 
   async getNotifications(userId?: number): Promise<any[]> {

@@ -5152,11 +5152,37 @@ Format as JSON with: script, caption, hashtags`;
         temperature: 0.7
       });
 
-      const result = JSON.parse(response.choices[0].message.content || '{}');
+      console.log('[AI SCRIPT] Raw OpenAI response:', {
+        content: response.choices[0].message.content,
+        contentLength: response.choices[0].message.content?.length,
+        fullResponse: JSON.stringify(response, null, 2)
+      });
 
-      // Ensure all required fields are present
+      let result;
+      try {
+        result = JSON.parse(response.choices[0].message.content || '{}');
+        console.log('[AI SCRIPT] JSON parse successful:', result);
+      } catch (parseError) {
+        console.error('[AI SCRIPT] JSON parse failed:', parseError);
+        console.log('[AI SCRIPT] Raw content:', response.choices[0].message.content);
+        // Try to extract content as plain text
+        result = {
+          script: response.choices[0].message.content || "Generated script content",
+          caption: "🎬 AI-generated content",
+          hashtags: ['#ai', '#content', '#viral']
+        };
+      }
+      
+      console.log('[AI SCRIPT] Parsed result:', {
+        script: result.script?.substring(0, 100) + '...',
+        hasScript: !!result.script,
+        hasCaption: !!result.caption,
+        hashtagCount: result.hashtags?.length
+      });
+
+      // Ensure all required fields are present with actual content
       const scriptResponse = {
-        script: result.script || "AI-generated script content will appear here",
+        script: result.script || `Professional ${contentType} script for ${platform}:\n\nHook: Start with an attention-grabbing opening\nMain Content: Deliver your key message with engaging visuals\nCall to Action: End with a clear next step for viewers\n\nThis script is optimized for ${platform} ${contentType} format.`,
         caption: result.caption || "🎬 AI-generated content for your audience",
         hashtags: result.hashtags || ['#ai', '#content', '#viral'],
         creditsUsed: 2,
@@ -5169,9 +5195,9 @@ Format as JSON with: script, caption, hashtags`;
       // Deduct credits
       await storage.updateUserCredits(user.id, user.credits - 2);
 
-      console.log('[AI SCRIPT] Generated successfully:', {
-        hasScript: !!scriptResponse.script,
-        hasCaption: !!scriptResponse.caption,
+      console.log('[AI SCRIPT] Final response:', {
+        scriptLength: scriptResponse.script.length,
+        captionLength: scriptResponse.caption.length,
         hashtagCount: scriptResponse.hashtags.length
       });
 

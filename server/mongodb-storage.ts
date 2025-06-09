@@ -586,6 +586,27 @@ export class MongoStorage implements IStorage {
     );
   }
 
+  async updateWorkspaceCredits(workspaceId: string | number, credits: number): Promise<void> {
+    await this.connect();
+    
+    console.log(`[MONGODB] Updating workspace ${workspaceId} to ${credits} credits`);
+    
+    const result = await WorkspaceModel.findByIdAndUpdate(
+      workspaceId.toString(),
+      { 
+        credits: credits,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!result) {
+      throw new Error(`Workspace ${workspaceId} not found`);
+    }
+    
+    console.log(`[MONGODB] Successfully updated workspace ${workspaceId} to ${credits} credits`);
+  }
+
   // Helper methods for data conversion
   private convertUser(mongoUser: any): User {
     console.log(`[USER CONVERT] Raw MongoDB user isOnboarded:`, mongoUser.isOnboarded, `(type: ${typeof mongoUser.isOnboarded})`);

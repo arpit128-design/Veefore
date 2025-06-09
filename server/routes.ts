@@ -506,6 +506,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Update workspace credits - fix for credit system issues
+  app.patch('/api/workspaces/:id/credits', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { credits } = req.body;
+      const workspaceId = req.params.id;
+      
+      console.log(`[CREDITS FIX] Updating workspace ${workspaceId} to ${credits} credits`);
+      
+      // Direct MongoDB update since storage might have issues
+      const { storage: mongoStorage } = await import('./mongodb-storage');
+      const result = await mongoStorage.updateWorkspaceCredits(workspaceId, credits);
+      
+      console.log(`[CREDITS FIX] Successfully updated workspace to ${credits} credits`);
+      res.json({ success: true, credits, workspaceId });
+    } catch (error: any) {
+      console.error('[CREDITS FIX] Error updating workspace credits:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Create workspace with plan restrictions and addon benefits
   app.post('/api/workspaces', requireAuth, async (req: any, res: Response) => {
     try {

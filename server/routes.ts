@@ -1069,71 +1069,6 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             return res.json([]);
           }
         }
-            const timeRangeMs = {
-              '7': 7 * 24 * 60 * 60 * 1000,     // 7 days
-              '30': 30 * 24 * 60 * 60 * 1000,   // 30 days
-              '90': 90 * 24 * 60 * 60 * 1000    // 3 months
-            };
-            
-            const filterDays = parseInt(timeRange as string) || 7;
-            const cutoffTime = now - (timeRangeMs[timeRange as keyof typeof timeRangeMs] || timeRangeMs['7']);
-            
-            // Content types and captions based on account data
-            const contentTypes = ['post', 'video', 'reel', 'post'];
-            const realCaptions = [
-              `Latest Instagram update from @${instagramAccount.username}`,
-              `New content: Check out what's happening! #instagram #content`,
-              `Behind the scenes with @${instagramAccount.username}`,
-              `Sharing moments that matter ✨`,
-              `Today's inspiration from ${instagramAccount.username}`,
-              `Content creation in progress 🎬`,
-              `Authentic moments captured`,
-              `Building community one post at a time`
-            ];
-            
-            // Create content items within time filter
-            let postsInRange = 0;
-            for (let i = 0; i < Math.min(totalPosts, 12); i++) {
-              const daysAgo = Math.floor(Math.random() * filterDays) + 1;
-              const postTime = now - (daysAgo * 24 * 60 * 60 * 1000);
-              
-              // Only include posts within the selected time range
-              if (postTime >= cutoffTime) {
-                const variationFactor = 0.8 + (Math.random() * 0.4); // 0.8 to 1.2 variation
-                const contentType = contentTypes[i % contentTypes.length];
-                
-                accountBasedContent.push({
-                  id: `${instagramAccount.accountId}_post_${i + 1}`,
-                  title: `@${instagramAccount.username} - ${contentType === 'video' ? 'Video' : 'Post'}`,
-                  caption: realCaptions[i % realCaptions.length],
-                  platform: 'instagram',
-                  type: contentType,
-                  status: 'published',
-                  publishedAt: new Date(postTime).toISOString(),
-                  createdAt: new Date(postTime).toISOString(),
-                  mediaUrl: contentType === 'video' ? 'https://instagram.com/placeholder-video' : null,
-                  thumbnailUrl: 'https://instagram.com/placeholder-thumbnail',
-                  permalink: `https://instagram.com/p/${instagramAccount.username}_${i + 1}/`,
-                  engagement: {
-                    likes: Math.round(avgLikes * variationFactor),
-                    comments: Math.round(avgComments * variationFactor),
-                    shares: 0,
-                    reach: Math.round((instagramAccount.totalReach || 641) / totalPosts * variationFactor)
-                  },
-                  performance: {
-                    impressions: Math.round((instagramAccount.totalReach || 641) / totalPosts * variationFactor * 1.3),
-                    engagementRate: ((instagramAccount.avgEngagement || 22.96) * variationFactor).toFixed(1)
-                  }
-                });
-                postsInRange++;
-              }
-            }
-            
-            console.log('[CONTENT API] Generated', accountBasedContent.length, 'content items from account metrics');
-            return res.json(accountBasedContent);
-            }
-          }
-        }
 
         // Process successful media response
         const mediaData = await mediaResponse.json();
@@ -1168,8 +1103,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           },
           performance: {
             impressions: Math.round((post.like_count + post.comments_count) * 15),
-            engagementRate: instagramAccount.followersCount > 0 ? 
-              ((post.like_count + post.comments_count) / instagramAccount.followersCount * 100).toFixed(1) : '0.0'
+            engagementRate: (instagramAccount.followersCount || 0) > 0 ? 
+              ((post.like_count + post.comments_count) / (instagramAccount.followersCount || 1) * 100).toFixed(1) : '0.0'
           }
         }));
 

@@ -1,7 +1,7 @@
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { PlatformAnalytics } from "@/components/dashboard/PlatformAnalytics";
 import { ContentStudio } from "@/components/dashboard/ContentStudio";
-import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
+
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
@@ -343,8 +343,7 @@ export default function Dashboard() {
       {/* AI Content Studio Quick Access */}
       <ContentStudio />
 
-      {/* Daily AI Suggestions */}
-      <DailySuggestions />
+
 
       {/* Trending Hashtags */}
       <TrendingHashtags />

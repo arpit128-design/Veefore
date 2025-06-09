@@ -70,8 +70,8 @@ const ShootingStar = ({ delay = 0 }: any) => (
 );
 
 export function SpaceBackground() {
-  // Generate random positions for stars
-  const stars = Array.from({ length: 100 }, (_, i) => ({
+  // Generate random positions for stars (reduced for performance)
+  const stars = Array.from({ length: 50 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
@@ -79,8 +79,8 @@ export function SpaceBackground() {
     delay: Math.random() * 3,
   }));
 
-  // Generate nebula clouds
-  const nebulae = Array.from({ length: 6 }, (_, i) => ({
+  // Generate nebula clouds (reduced for performance)
+  const nebulae = Array.from({ length: 3 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,

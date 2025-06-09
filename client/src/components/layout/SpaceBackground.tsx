@@ -30,7 +30,7 @@ export function SpaceBackground() {
 
     const createStars = () => {
       stars.length = 0;
-      const count = 300; // More stars for better visibility
+      const count = 150; // Reduced for better performance
       for (let i = 0; i < count; i++) {
         stars.push({
           x: Math.random() * canvas.width,
@@ -43,7 +43,15 @@ export function SpaceBackground() {
       console.log('[SPACE] Created', count, 'stars at canvas size:', canvas.width, 'x', canvas.height);
     };
 
-    const animate = () => {
+    let lastTime = 0;
+    const animate = (currentTime: number) => {
+      // Throttle to 30fps for better performance
+      if (currentTime - lastTime < 33) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+      lastTime = currentTime;
+      
       time += 0.016;
       
       // Set canvas to full size and clear
@@ -52,8 +60,8 @@ export function SpaceBackground() {
 
       // Draw bright, visible stars
       stars.forEach((star, index) => {
-        // Enhanced twinkling effect
-        star.twinkle += 0.03;
+        // Enhanced twinkling effect (reduced calculation frequency)
+        star.twinkle += 0.02;
         const twinkleOpacity = Math.max(0.6, star.opacity * (0.7 + 0.3 * Math.sin(star.twinkle)));
 
         // Main bright white star
@@ -62,24 +70,19 @@ export function SpaceBackground() {
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Add glow effect
-        ctx.fillStyle = `rgba(255, 255, 255, ${twinkleOpacity * 0.3})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size * 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Colored accent stars
-        if (index % 4 === 0) {
-          ctx.fillStyle = `rgba(6, 182, 212, ${twinkleOpacity * 0.8})`;
+        // Simplified glow effect (only for larger stars)
+        if (star.size > 3) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${twinkleOpacity * 0.2})`;
           ctx.beginPath();
-          ctx.arc(star.x, star.y, star.size * 0.7, 0, Math.PI * 2);
+          ctx.arc(star.x, star.y, star.size * 1.5, 0, Math.PI * 2);
           ctx.fill();
         }
 
+        // Reduced colored accent stars
         if (index % 6 === 0) {
-          ctx.fillStyle = `rgba(251, 191, 36, ${twinkleOpacity * 0.7})`;
+          ctx.fillStyle = `rgba(6, 182, 212, ${twinkleOpacity * 0.6})`;
           ctx.beginPath();
-          ctx.arc(star.x, star.y, star.size * 0.5, 0, Math.PI * 2);
+          ctx.arc(star.x, star.y, star.size * 0.7, 0, Math.PI * 2);
           ctx.fill();
         }
 
@@ -96,7 +99,7 @@ export function SpaceBackground() {
     };
 
     resize();
-    animate();
+    animate(0);
     console.log('[SPACE] Animation started');
 
     window.addEventListener('resize', resize);
@@ -120,7 +123,7 @@ export function SpaceBackground() {
 
       {/* White Starfield - Small Moving Stars */}
       <div className="space-stars fixed inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {Array.from({ length: 200 }, (_, i) => {
+        {Array.from({ length: 100 }, (_, i) => {
           const sizes = ['w-px h-px', 'w-0.5 h-0.5', 'w-1 h-1'];
           const animations = ['animate-starlight', 'animate-starlight-fast', 'animate-starlight-slow', 'animate-stellar-pulse', 'animate-cosmic-drift'];
           const size = sizes[i % sizes.length];

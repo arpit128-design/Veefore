@@ -221,6 +221,25 @@ input[type="time"].glassmorphism::-webkit-calendar-picker-indicator {
   contain: layout style paint;
 }
 
+/* Performance optimizations for space animations */
+.space-stars {
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+.space-stars > div {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  contain: style;
+}
+
+canvas {
+  will-change: auto;
+  transform: translateZ(0);
+  image-rendering: optimizeSpeed;
+}
+
 /* Space background star animations */
 @keyframes drift {
   0% { transform: translate(0, 0) rotate(0deg); }

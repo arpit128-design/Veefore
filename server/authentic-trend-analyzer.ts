@@ -24,6 +24,16 @@ export class AuthenticTrendAnalyzer {
     return AuthenticTrendAnalyzer.instance;
   }
 
+  async refreshTrends(category: string = 'all'): Promise<void> {
+    console.log(`[AUTHENTIC TRENDS] Force refreshing cache for category: ${category}`);
+    const cacheKey = `trends_${category}`;
+    
+    // Clear the cache to force fresh data
+    this.trendCache.delete(cacheKey);
+    
+    console.log(`[AUTHENTIC TRENDS] Cache cleared, will fetch fresh data on next request`);
+  }
+
   async getAuthenticTrendingData(category: string = 'all'): Promise<{
     trendingTags: number;
     viralAudio: number;
@@ -56,14 +66,34 @@ export class AuthenticTrendAnalyzer {
     // 3. Analyze Google Trends data
     await this.getGoogleTrends(category, allTrends);
 
+    // Ensure we have authentic data before caching
+    console.log(`[AUTHENTIC TRENDS] Total authentic trends collected before caching: ${allTrends.length}`);
+    
+    if (allTrends.length === 0) {
+      console.log('[AUTHENTIC TRENDS] Warning: No authentic trends collected from APIs, checking API status');
+      // This should only happen if all APIs fail - investigate API keys
+      return {
+        trendingTags: 0,
+        viralAudio: 0,
+        contentFormats: 0,
+        accuracyRate: 0,
+        trends: { hashtags: [], audio: [], formats: [] }
+      };
+    }
+
     // Cache the results
     this.trendCache.set(cacheKey, {
       data: allTrends,
       timestamp: Date.now()
     });
 
-    console.log(`[AUTHENTIC TRENDS] Retrieved ${allTrends.length} authentic trending items`);
-    return this.formatTrendResponse(allTrends);
+    const response = this.formatTrendResponse(allTrends);
+    console.log(`[AUTHENTIC TRENDS] Formatted response with ${response.trendingTags} hashtags:`, {
+      firstHashtag: response.trends?.hashtags?.[0]?.tag || 'none',
+      totalHashtags: response.trends?.hashtags?.length || 0
+    });
+    
+    return response;
   }
 
   private async getPerplexityTrends(category: string, trends: AuthenticTrend[]): Promise<void> {

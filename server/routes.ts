@@ -186,20 +186,53 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
   app.get("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
     try {
       const { category = 'all' } = req.query;
-      console.log(`[TREND INTELLIGENCE] Fetching authentic trending data for category: ${category}`);
+      console.log(`[TREND INTELLIGENCE GET] Fetching authentic trending data for category: ${category}`);
       
-      const { authenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
       const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
       
-      console.log(`[TREND INTELLIGENCE] Retrieved authentic trends:`, {
+      console.log(`[TREND INTELLIGENCE GET] Retrieved authentic trends:`, {
         hashtags: trendingData.trends.hashtags.length,
         audio: trendingData.trends.audio.length,
         formats: trendingData.trends.formats.length
       });
       
+      console.log(`[TREND INTELLIGENCE GET] Sending response:`, JSON.stringify(trendingData, null, 2));
       res.json(trendingData);
     } catch (error: any) {
-      console.error('[TREND INTELLIGENCE] Error fetching authentic trends:', error);
+      console.error('[TREND INTELLIGENCE GET] Error fetching authentic trends:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // POST endpoint to refresh/trigger new trend data fetching
+  app.post("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
+    try {
+      const { category = 'all', workspaceId } = req.body;
+      console.log(`[TREND INTELLIGENCE POST] Refreshing authentic trending data for category: ${category}, workspace: ${workspaceId}`);
+      
+      const { authenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      
+      // Force refresh the cache
+      await authenticTrendAnalyzer.refreshTrends(category);
+      
+      // Get fresh data
+      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
+      
+      console.log(`[TREND INTELLIGENCE POST] Refreshed authentic trends:`, {
+        hashtags: trendingData.trends.hashtags.length,
+        audio: trendingData.trends.audio.length,
+        formats: trendingData.trends.formats.length
+      });
+      
+      res.json({
+        success: true,
+        message: 'Trends refreshed successfully',
+        data: trendingData
+      });
+    } catch (error: any) {
+      console.error('[TREND INTELLIGENCE POST] Error refreshing authentic trends:', error);
       res.status(500).json({ error: error.message });
     }
   });

@@ -617,7 +617,7 @@ export class MongoStorage implements IStorage {
       username: mongoUser.username,
       displayName: mongoUser.displayName || null,
       avatar: mongoUser.avatar || null,
-      credits: mongoUser.credits || 50,
+      credits: mongoUser.credits ?? 0, // SECURITY FIX: No automatic credit allocation - use exact database value
       plan: mongoUser.plan || 'Free',
       stripeCustomerId: mongoUser.stripeCustomerId || null,
       stripeSubscriptionId: mongoUser.stripeSubscriptionId || null,
@@ -631,6 +631,7 @@ export class MongoStorage implements IStorage {
       updatedAt: mongoUser.updatedAt
     };
     console.log(`[USER CONVERT] Converted user isOnboarded:`, converted.isOnboarded);
+    console.log(`[CREDIT SECURITY] User ${converted.id} credits: ${converted.credits} (exact database value - no automatic allocation)`);
     return converted;
   }
 

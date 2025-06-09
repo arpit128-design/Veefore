@@ -190,7 +190,6 @@ export default function Suggestions() {
                   
                   {latestSuggestion ? (
                     <div className="space-y-3">
-                      <div className="text-sm text-asteroid-silver">AI Recommendation:</div>
                       <div className="text-sm font-medium">
                         {latestSuggestion.data?.suggestion?.substring(0, 120)}...
                       </div>

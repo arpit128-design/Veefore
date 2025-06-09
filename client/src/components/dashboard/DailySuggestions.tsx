@@ -102,7 +102,6 @@ export function DailySuggestions() {
                   </div>
                   
                   <div className="space-y-2 text-sm">
-                    <div className="text-asteroid-silver">AI Recommendation:</div>
                     <div className={`${color} font-medium leading-relaxed`}>
                       {suggestion.data?.suggestion?.substring(0, 120)}...
                     </div>

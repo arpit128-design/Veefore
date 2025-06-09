@@ -115,87 +115,48 @@ export class SchedulerService {
         return;
       }
 
-      // Publish to Instagram based on content type
+      // Publish to Instagram using adaptive strategy to handle changing requirements
       let publishResult;
       const caption = `${content.title}\n\n${content.description || ''}`;
       const mediaUrl = content.contentData.mediaUrl;
       
-      // Auto-detect if media is video or image
-      const isVideo = mediaUrl?.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || 
-                     mediaUrl?.includes('video') || 
-                     content.type === 'reel' || 
-                     content.type === 'video';
+      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram using adaptive strategy`);
       
-      console.log(`[SCHEDULER] Publishing ${content.type || 'post'} content to Instagram (${isVideo ? 'video' : 'image'})`);
+      // Use the adaptive publisher that handles Instagram's changing requirements
+      const { AdaptiveInstagramPublisher } = await import('./adaptive-instagram-publisher');
       
-      switch (content.type) {
-        case 'story':
-          publishResult = await instagramAPI.publishStory(
-            instagramAccount.accessToken,
-            mediaUrl,
-            isVideo
-          );
-          break;
-        case 'reel':
-          try {
-            publishResult = await instagramAPI.publishReel(
-              instagramAccount.accessToken,
-              mediaUrl,
-              caption
-            );
-          } catch (reelError: any) {
-            console.log(`[SCHEDULER] Reel publish failed, trying with intelligent compression`);
-            const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
-            publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
-              instagramAccount.accessToken,
-              mediaUrl,
-              caption
-            );
-          }
-          break;
-        case 'video':
-          try {
-            publishResult = await instagramAPI.publishVideo(
-              instagramAccount.accessToken,
-              mediaUrl,
-              caption
-            );
-          } catch (videoError: any) {
-            console.log(`[SCHEDULER] Video publish failed, trying with intelligent compression`);
-            const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
-            publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
-              instagramAccount.accessToken,
-              mediaUrl,
-              caption
-            );
-          }
-          break;
-        case 'post':
-        default:
-          if (isVideo) {
-            try {
-              publishResult = await instagramAPI.publishVideo(
-                instagramAccount.accessToken,
-                mediaUrl,
-                caption
-              );
-            } catch (videoError: any) {
-              console.log(`[SCHEDULER] Default video publish failed, trying with intelligent compression`);
-              const { DirectInstagramPublisher } = await import('./direct-instagram-publisher');
-              publishResult = await DirectInstagramPublisher.publishVideoWithIntelligentCompression(
-                instagramAccount.accessToken,
-                mediaUrl,
-                caption
-              );
-            }
-          } else {
-            publishResult = await instagramAPI.publishPhoto(
-              instagramAccount.accessToken,
-              mediaUrl,
-              caption
-            );
-          }
-          break;
+      // Determine content type for adaptive publisher
+      let contentType: 'video' | 'photo' | 'reel' | 'story' = 'photo';
+      
+      if (content.type === 'story') {
+        contentType = 'story';
+      } else if (content.type === 'reel') {
+        contentType = 'reel';
+      } else if (content.type === 'video') {
+        contentType = 'video';
+      } else {
+        // Auto-detect for posts
+        const isVideo = mediaUrl?.match(/\.(mp4|mov|avi|mkv|webm|3gp|m4v)$/i) || 
+                       mediaUrl?.includes('video');
+        contentType = isVideo ? 'video' : 'photo';
+      }
+      
+      console.log(`[SCHEDULER] Detected content type: ${contentType} for URL: ${mediaUrl}`);
+      
+      // Use adaptive publisher with multiple fallback strategies
+      const adaptiveResult = await AdaptiveInstagramPublisher.publishWithAdaptiveStrategy(
+        instagramAccount.accessToken,
+        mediaUrl,
+        caption,
+        contentType
+      );
+      
+      if (adaptiveResult.success) {
+        console.log(`[SCHEDULER] ✓ Adaptive publishing succeeded using method: ${adaptiveResult.method}`);
+        publishResult = { id: adaptiveResult.id };
+      } else {
+        console.error(`[SCHEDULER] ✗ Adaptive publishing failed: ${adaptiveResult.error}`);
+        throw new Error(adaptiveResult.error || 'Adaptive publishing failed');
       }
 
       console.log(`[SCHEDULER] Successfully published ${content.type || 'post'} content ${content.id} to Instagram:`, publishResult.id);

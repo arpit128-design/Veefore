@@ -1055,6 +1055,27 @@ export class MemStorage implements IStorage {
     const newCredits = (user.credits || 0) + credits;
     return this.updateUser(numId, { credits: newCredits });
   }
+
+  // Conversation management methods (stub implementation - MongoDB is used for real data)
+  async createDmConversation(conversation: any): Promise<any> {
+    // This is a stub - real implementation uses MongoDB
+    return conversation;
+  }
+
+  async createDmMessage(message: any): Promise<any> {
+    // This is a stub - real implementation uses MongoDB
+    return message;
+  }
+
+  async createConversationContext(context: any): Promise<any> {
+    // This is a stub - real implementation uses MongoDB
+    return context;
+  }
+
+  async clearWorkspaceConversations(workspaceId: string): Promise<void> {
+    // This is a stub - real implementation uses MongoDB
+    console.log(`[MEM STORAGE] Stub: Clear conversations for workspace ${workspaceId}`);
+  }
 }
 
 import { MongoStorage } from './mongodb-storage';

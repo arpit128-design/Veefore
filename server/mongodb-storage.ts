@@ -2591,21 +2591,25 @@ export class MongoStorage implements IStorage {
   async getDmConversations(workspaceId: string, limit: number = 50): Promise<any[]> {
     await this.connect();
     
+    console.log(`[MONGODB] Getting real DM conversations for workspace: ${workspaceId}`);
+    
     const conversations = await DmConversationModel.find({ workspaceId })
-      .sort({ lastMessageAt: -1 })
+      .sort({ lastActive: -1, createdAt: -1 })
       .limit(limit);
+    
+    console.log(`[MONGODB] Found ${conversations.length} real Instagram DM conversations`);
     
     return conversations.map(conv => ({
       id: conv._id.toString(),
       workspaceId: conv.workspaceId,
-      platform: conv.platform,
-      participantId: conv.participantId,
-      participantUsername: conv.participantUsername,
-      lastMessageAt: conv.lastMessageAt,
-      messageCount: conv.messageCount,
-      isActive: conv.isActive,
+      platform: conv.platform || 'instagram',
+      participantId: conv.participant?.id || conv.participantId,
+      participantUsername: conv.participant?.username || conv.participantUsername || 'Instagram User',
+      lastMessageAt: conv.lastActive || conv.lastMessageAt || conv.createdAt,
+      messageCount: conv.messageCount || 1,
+      isActive: conv.isActive !== false,
       createdAt: conv.createdAt,
-      updatedAt: conv.updatedAt
+      updatedAt: conv.updatedAt || conv.lastActive
     }));
   }
 

@@ -62,7 +62,7 @@ function VideoGenerator() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Script Generated!",
-        description: `Used ${response.creditsUsed || 2} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
+        description: `Used ${response.creditsUsed || 1} credits. ${response.remainingCredits || 'Unknown'} credits remaining.`,
       });
     },
     onError: (error: any) => {
@@ -71,7 +71,7 @@ function VideoGenerator() {
         setUpgradeModal({
           isOpen: true,
           featureType: "reels-script",
-          creditsRequired: 2,
+          creditsRequired: 1,
           currentCredits: user?.credits || 0
         });
       } else {

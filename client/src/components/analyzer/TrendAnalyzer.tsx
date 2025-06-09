@@ -60,7 +60,7 @@ export function TrendAnalyzer() {
 
   // Process authentic trending data from APIs
   const authenticTrends = trendData ? {
-    hashtags: trendData.trends?.hashtags?.map((trend: any, index: number) => ({
+    hashtags: (trendData as any).trends?.hashtags?.map((trend: any, index: number) => ({
       id: `hashtag-${index}`,
       type: 'hashtag' as const,
       name: `#${trend.tag}`,
@@ -71,7 +71,7 @@ export function TrendAnalyzer() {
       platforms: Array.isArray(trend.platforms) ? trend.platforms : ['Instagram'],
       description: `Trending ${trend.category} hashtag with ${trend.uses} uses`
     })) || [],
-    audio: trendData.trends?.audio?.map((trend: any, index: number) => ({
+    audio: (trendData as any).trends?.audio?.map((trend: any, index: number) => ({
       id: `audio-${index}`,
       type: 'audio' as const,
       name: trend.name,
@@ -82,7 +82,7 @@ export function TrendAnalyzer() {
       platforms: trend.platforms,
       description: trend.description
     })) || [],
-    content: trendData.trends?.formats?.map((trend: any, index: number) => ({
+    content: (trendData as any).trends?.formats?.map((trend: any, index: number) => ({
       id: `format-${index}`,
       type: 'content' as const,
       name: trend.name,
@@ -308,7 +308,7 @@ export function TrendAnalyzer() {
           <div className="p-4 rounded-lg bg-green-400/10 border border-green-400/30 text-center">
             <Eye className="h-8 w-8 text-green-400 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-400">
-              {trendData?.accuracy || '98%'}
+              {(trendData as any)?.accuracy || '98%'}
             </div>
             <div className="text-sm text-asteroid-silver">Accuracy Rate</div>
           </div>

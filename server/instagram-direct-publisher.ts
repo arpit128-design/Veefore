@@ -43,30 +43,41 @@ export class InstagramDirectPublisher {
       }
     }
     
-    // Strategy 2: For videos/reels, create text post with video description
+    // Strategy 2: For videos/reels, try to publish as photo first, then fallback
     if (contentType === 'video' || contentType === 'reel') {
-      console.log(`[DIRECT PUBLISHER] Converting ${contentType} to text post`);
+      console.log(`[DIRECT PUBLISHER] Attempting to publish ${contentType} as photo`);
       
-      const textCaption = `🎬 ${caption}\n\n📹 Video content ready for viewing\n🔗 Link in bio for full video`;
-      
-      // Use a simple colored background image for text posts
-      const textPostUrl = this.createTextPostImage(caption.substring(0, 50));
-      
+      // First try: Use the actual video URL as photo (Instagram sometimes accepts video files as images)
       try {
-        const result = await instagramAPI.publishPhoto(accessToken, textPostUrl, textCaption);
-        console.log(`[DIRECT PUBLISHER] ✓ Video as text post: ${result.id}`);
+        const result = await instagramAPI.publishPhoto(accessToken, cleanUrl, caption);
+        console.log(`[DIRECT PUBLISHER] ✓ Video published as photo: ${result.id}`);
         return { 
           success: true, 
           id: result.id, 
-          approach: 'video_to_text' 
+          approach: 'video_as_photo' 
         };
       } catch (error: any) {
-        console.log(`[DIRECT PUBLISHER] Text post failed: ${error.message}`);
-        return { 
-          success: false, 
-          error: `Text post failed: ${error.message}`,
-          approach: 'video_to_text'
-        };
+        console.log(`[DIRECT PUBLISHER] Video as photo failed: ${error.message}`);
+        
+        // Fallback: Use the clean URL directly with enhanced caption
+        const enhancedCaption = `${caption}\n\n🎬 Video content | 📱 Check our stories for more`;
+        
+        try {
+          const fallbackResult = await instagramAPI.publishPhoto(accessToken, cleanUrl, enhancedCaption);
+          console.log(`[DIRECT PUBLISHER] ✓ Fallback published: ${fallbackResult.id}`);
+          return { 
+            success: true, 
+            id: fallbackResult.id, 
+            approach: 'video_fallback' 
+          };
+        } catch (fallbackError: any) {
+          console.log(`[DIRECT PUBLISHER] All video publishing attempts failed: ${fallbackError.message}`);
+          return { 
+            success: false, 
+            error: `Video publishing failed: ${fallbackError.message}`,
+            approach: 'video_failed'
+          };
+        }
       }
     }
     

@@ -4033,18 +4033,79 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
   // Enhanced Conversation Memory API Endpoints
   
-  // Get conversation history for workspace
+  // Get conversation history for workspace - AUTHENTIC DATA ONLY
   app.get('/api/conversations/:workspaceId', requireAuth, async (req, res) => {
     try {
       const { workspaceId } = req.params;
       const { limit } = req.query;
       
-      const conversations = await enhancedDMService.getConversationHistory(
-        workspaceId, 
-        limit ? parseInt(limit as string) : 50
-      );
+      console.log(`[AUTHENTIC CONVERSATIONS] Getting real Instagram DM data for workspace: ${workspaceId}`);
       
-      res.json({ conversations });
+      // Access real MongoDB conversations directly
+      await storage.connect();
+      const mongoose = require('mongoose');
+      
+      // Get authentic Instagram DM conversations
+      const DmConversation = mongoose.model('DmConversation');
+      const DmMessage = mongoose.model('DmMessage');
+      
+      const conversations = await DmConversation.find({ workspaceId })
+        .sort({ createdAt: -1 })
+        .limit(limit ? parseInt(limit as string) : 50)
+        .lean();
+      
+      console.log(`[AUTHENTIC CONVERSATIONS] Found ${conversations.length} real Instagram conversations`);
+      
+      const conversationHistory = [];
+      
+      for (const conversation of conversations) {
+        // Get real messages for this conversation
+        const messages = await DmMessage.find({ conversationId: conversation._id })
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .lean();
+        
+        console.log(`[AUTHENTIC CONVERSATIONS] Conversation ${conversation._id}: ${messages.length} messages`);
+        if (messages.length > 0) {
+          console.log(`[AUTHENTIC CONVERSATIONS] Latest message: "${messages[0].content}" from ${messages[0].sender}`);
+        }
+        
+        // Extract authentic participant info
+        const participantId = conversation.participantId || 'unknown';
+        const participantUsername = conversation.participantUsername || `InstagramUser_${participantId.slice(-4)}`;
+        
+        const lastMessage = messages.length > 0 ? {
+          content: messages[0].content,
+          sender: messages[0].sender,
+          timestamp: messages[0].createdAt,
+          sentiment: messages[0].sentiment || 'neutral'
+        } : null;
+        
+        conversationHistory.push({
+          id: conversation._id.toString(),
+          participant: {
+            id: participantId,
+            username: participantUsername,
+            platform: conversation.platform || 'instagram'
+          },
+          lastMessage,
+          messageCount: conversation.messageCount || messages.length,
+          lastActive: conversation.lastMessageAt || conversation.createdAt,
+          recentMessages: messages.slice(0, 3).map(msg => ({
+            content: msg.content,
+            sender: msg.sender,
+            timestamp: msg.createdAt,
+            sentiment: msg.sentiment || 'neutral'
+          })),
+          context: [],
+          sentiment: 'neutral',
+          topics: []
+        });
+      }
+      
+      console.log(`[AUTHENTIC CONVERSATIONS] Returning ${conversationHistory.length} authentic conversations`);
+      
+      res.json({ conversations: conversationHistory });
     } catch (error: any) {
       console.error('[CONVERSATIONS] Get history error:', error);
       res.status(500).json({ error: 'Failed to fetch conversation history' });

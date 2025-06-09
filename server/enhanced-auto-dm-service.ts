@@ -217,42 +217,137 @@ export class EnhancedAutoDMService {
 
   // Get conversation history for dashboard display
   async getConversationHistory(workspaceId: string, limit: number = 50): Promise<any[]> {
-    console.log(`[ENHANCED DM] Getting conversation history for workspace ${workspaceId}`);
+    console.log(`[ENHANCED DM] Getting authentic conversation history for workspace ${workspaceId}`);
     
     try {
-      // Get all conversations for workspace
-      const conversations = await this.storage.getDmConversations(workspaceId, limit);
-      
-      const conversationHistory = [];
-      
-      for (const conversation of conversations) {
-        const messages = await this.memoryService.getConversationHistory(conversation.id, 5);
-        const context = await this.memoryService.getConversationContext(conversation.id);
+      // Use storage interface to get real MongoDB conversations and messages
+      if (this.storage instanceof require('./mongodb-storage').MongoStorage) {
+        await this.storage.connect();
         
-        conversationHistory.push({
-          id: conversation.id,
-          participant: {
-            id: conversation.participantId,
-            username: conversation.participantUsername,
-            platform: conversation.platform
-          },
-          lastMessage: messages[messages.length - 1] || null,
-          messageCount: conversation.messageCount,
-          lastActive: conversation.lastMessageAt,
-          recentMessages: messages.slice(-3), // Last 3 messages for preview
-          context: context.slice(0, 5), // Top 5 context items
-          sentiment: this.extractOverallSentiment(context),
-          topics: this.extractTopics(context)
-        });
+        // Access MongoDB models directly from storage
+        const mongoose = require('mongoose');
+        
+        // Get real conversations from MongoDB
+        const DmConversation = mongoose.model('DmConversation');
+        const DmMessage = mongoose.model('DmMessage');
+        
+        const conversations = await DmConversation.find({ workspaceId })
+          .sort({ createdAt: -1 })
+          .limit(limit)
+          .lean();
+        
+        console.log(`[ENHANCED DM] Found ${conversations.length} authentic Instagram conversations`);
+        
+        const conversationHistory = [];
+        
+        for (const conversation of conversations) {
+          // Get authentic messages for this conversation
+          const messages = await DmMessage.find({ conversationId: conversation._id })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+          
+          console.log(`[ENHANCED DM] Conversation ${conversation._id}: ${messages.length} messages`);
+          
+          // Extract real participant info
+          const participantId = conversation.participant?.id || conversation.participantId || 'unknown';
+          const participantUsername = conversation.participant?.username || 
+            conversation.participantUsername || 
+            `InstagramUser_${participantId.slice(-4)}`;
+          
+          const lastMessage = messages.length > 0 ? {
+            content: messages[0].content,
+            sender: messages[0].sender,
+            timestamp: messages[0].createdAt,
+            sentiment: messages[0].sentiment || 'neutral'
+          } : null;
+          
+          console.log(`[ENHANCED DM] Last message for ${participantUsername}: ${lastMessage?.content}`);
+          
+          conversationHistory.push({
+            id: conversation._id.toString(),
+            participant: {
+              id: participantId,
+              username: participantUsername,
+              platform: conversation.platform || 'instagram'
+            },
+            lastMessage,
+            messageCount: conversation.messageCount || messages.length,
+            lastActive: conversation.lastMessageAt || conversation.createdAt,
+            recentMessages: messages.slice(0, 3).map(msg => ({
+              content: msg.content,
+              sender: msg.sender,
+              timestamp: msg.createdAt,
+              sentiment: msg.sentiment || 'neutral'
+            })),
+            context: [],
+            sentiment: this.extractSentimentFromMessages(messages),
+            topics: this.extractTopicsFromMessages(messages)
+          });
+        }
+        
+        return conversationHistory.sort((a, b) => 
+          new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime()
+        );
       }
       
-      return conversationHistory.sort((a, b) => 
-        new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime()
-      );
+      // Fallback: use storage interface method
+      const conversations = await this.storage.getDmConversations(workspaceId, limit);
+      console.log(`[ENHANCED DM] Storage fallback: Found ${conversations.length} conversations`);
+      
+      return conversations.map(conv => ({
+        id: conv.id,
+        participant: {
+          id: conv.participantId,
+          username: conv.participantUsername || `User_${conv.participantId?.slice(-4)}`,
+          platform: conv.platform
+        },
+        lastMessage: null,
+        messageCount: conv.messageCount,
+        lastActive: conv.lastMessageAt,
+        recentMessages: [],
+        context: [],
+        sentiment: 'neutral',
+        topics: []
+      }));
+      
     } catch (error) {
-      console.error('[ENHANCED DM ERROR] Failed to get conversation history:', error);
+      console.error('[ENHANCED DM ERROR] Failed to get authentic conversation history:', error);
       return [];
     }
+  }
+
+  // Helper method to extract sentiment from messages
+  private extractSentimentFromMessages(messages: any[]): string {
+    if (messages.length === 0) return 'neutral';
+    
+    const sentiments = messages.map(msg => msg.sentiment || 'neutral');
+    const posCount = sentiments.filter(s => s === 'positive').length;
+    const negCount = sentiments.filter(s => s === 'negative').length;
+    
+    if (posCount > negCount) return 'positive';
+    if (negCount > posCount) return 'negative';
+    return 'neutral';
+  }
+
+  // Helper method to extract topics from messages
+  private extractTopicsFromMessages(messages: any[]): string[] {
+    const topics = new Set<string>();
+    
+    messages.forEach(msg => {
+      if (msg.topics && Array.isArray(msg.topics)) {
+        msg.topics.forEach(topic => topics.add(topic));
+      }
+      
+      // Extract basic topics from content
+      const content = msg.content?.toLowerCase() || '';
+      if (content.includes('automation') || content.includes('ai')) topics.add('AI & Automation');
+      if (content.includes('content') || content.includes('post')) topics.add('Content Strategy');
+      if (content.includes('business') || content.includes('growth')) topics.add('Business Growth');
+      if (content.includes('social') || content.includes('media')) topics.add('Social Media');
+    });
+    
+    return Array.from(topics).slice(0, 3); // Return top 3 topics
   }
 
   // Get conversation statistics for analytics

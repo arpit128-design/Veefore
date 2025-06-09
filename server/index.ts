@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
+import { AutoSyncService } from "./auto-sync-service";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -100,6 +101,10 @@ app.use((req, res, next) => {
   
   // Start the background scheduler service
   startSchedulerService(storage);
+  
+  // Start the automatic Instagram sync service
+  const autoSyncService = new AutoSyncService(storage);
+  autoSyncService.start();
   
   const server = await registerRoutes(app, storage, upload);
 

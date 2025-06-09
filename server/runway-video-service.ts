@@ -151,15 +151,70 @@ class RunwayVideoService {
       await new Promise(resolve => setTimeout(resolve, pollInterval));
     }
 
-    throw new Error('Video generation timed out');
+    throw new Error('Video generation timeout');
   }
 
   /**
-   * Generate video and wait for completion in one call
+   * Generate video and wait for completion
    */
   async generateVideoComplete(request: RunwayVideoRequest): Promise<RunwayVideoResponse> {
-    const task = await this.generateVideo(request);
-    return await this.waitForCompletion(task.taskId);
+    console.log('[RUNWAY] Starting complete video generation process...');
+    
+    // Start video generation
+    const initialResponse = await this.generateVideo(request);
+    
+    // Wait for completion
+    const completedResponse = await this.waitForCompletion(initialResponse.taskId);
+    
+    // Download and save the video file locally
+    if (completedResponse.videoUrl) {
+      const localVideoPath = await this.downloadVideo(completedResponse.videoUrl, initialResponse.taskId);
+      completedResponse.videoUrl = localVideoPath;
+    }
+    
+    return completedResponse;
+  }
+
+  /**
+   * Download video from RunwayML and save locally
+   */
+  async downloadVideo(videoUrl: string, taskId: string): Promise<string> {
+    try {
+      console.log('[RUNWAY] Downloading video from:', videoUrl);
+      
+      const response = await fetch(videoUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download video: ${response.status}`);
+      }
+
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      // Create unique filename
+      const filename = `runway_video_${taskId}_${Date.now()}.mp4`;
+      const filepath = path.join('uploads', filename);
+      
+      // Ensure uploads directory exists
+      try {
+        await fs.access('uploads');
+      } catch {
+        await fs.mkdir('uploads', { recursive: true });
+      }
+      
+      // Download and save video
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      await fs.writeFile(filepath, buffer);
+      
+      console.log('[RUNWAY] Video saved to:', filepath);
+      
+      // Return relative URL for client access
+      return `/uploads/${filename}`;
+      
+    } catch (error: any) {
+      console.error('[RUNWAY] Failed to download video:', error);
+      throw new Error(`Failed to save video: ${error.message}`);
+    }
   }
 
   /**
@@ -168,35 +223,24 @@ class RunwayVideoService {
   private optimizePromptForPlatform(prompt: string, platform: string, style?: string): string {
     let optimized = prompt;
 
-    // Add platform-specific optimization
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        optimized = `Vertical mobile-friendly ${optimized}. Bright, engaging, social media optimized.`;
-        break;
-      case 'youtube':
-        optimized = `High-quality ${optimized}. Cinematic, professional, YouTube-ready content.`;
-        break;
-      case 'tiktok':
-        optimized = `Dynamic, fast-paced ${optimized}. TikTok viral style, engaging transitions.`;
-        break;
+    // Platform-specific optimizations
+    if (platform === 'instagram') {
+      optimized += ' Vertical format, engaging visuals, trending style.';
+    } else if (platform === 'youtube') {
+      optimized += ' Cinematic quality, horizontal format, professional production.';
+    } else if (platform === 'tiktok') {
+      optimized += ' Dynamic, fast-paced, vertical format, trendy aesthetics.';
     }
 
-    // Add style-specific optimization
-    if (style) {
-      switch (style.toLowerCase()) {
-        case 'professional':
-          optimized = `Professional, clean, corporate style. ${optimized}`;
-          break;
-        case 'casual':
-          optimized = `Casual, relaxed, everyday style. ${optimized}`;
-          break;
-        case 'creative':
-          optimized = `Creative, artistic, innovative style. ${optimized}`;
-          break;
-        case 'minimal':
-          optimized = `Minimalist, clean, simple style. ${optimized}`;
-          break;
-      }
+    // Style enhancements
+    if (style === 'cinematic') {
+      optimized += ' Film-like quality, dramatic lighting, smooth camera movements.';
+    } else if (style === 'modern') {
+      optimized += ' Clean, contemporary design, minimalist aesthetic.';
+    } else if (style === 'creative') {
+      optimized += ' Artistic, unique visual effects, creative transitions.';
+    } else if (style === 'professional') {
+      optimized += ' Business-appropriate, polished, high-quality production.';
     }
 
     // Ensure high quality

@@ -1020,11 +1020,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           if (errorData.error?.code === 190) { // Invalid access token
             console.log('[CONTENT API] Access token invalid - attempting automatic refresh');
             
-            // Try to refresh the token using Instagram's long-lived token exchange
+            // Try to refresh the token using Instagram Business API
             try {
-              const refreshUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.INSTAGRAM_APP_ID}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&fb_exchange_token=${accessToken}`;
+              const refreshUrl = `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${accessToken}`;
               
-              console.log('[TOKEN REFRESH] Attempting to refresh Instagram access token');
+              console.log('[TOKEN REFRESH] Attempting to refresh Instagram access token via Instagram Business API');
               const refreshResponse = await fetch(refreshUrl);
               
               if (refreshResponse.ok) {

@@ -103,10 +103,12 @@ export class AuthenticTrendAnalyzer {
     }
 
     try {
+      console.log('[AUTHENTIC TRENDS] Starting Perplexity API call...');
       const query = category === 'all' 
         ? "What are the TOP 10 most viral hashtags trending RIGHT NOW on Instagram, TikTok, and Twitter? Include exact hashtag names, engagement metrics, and which platforms they're trending on."
         : `What are the TOP 10 most viral hashtags trending RIGHT NOW in the ${category} niche on Instagram, TikTok, and Twitter? Include exact hashtag names, engagement metrics, and platforms.`;
 
+      console.log('[AUTHENTIC TRENDS] Perplexity query:', query);
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
@@ -131,12 +133,17 @@ export class AuthenticTrendAnalyzer {
         })
       });
 
+      console.log(`[AUTHENTIC TRENDS] Perplexity response status: ${response.status}`);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log(`[AUTHENTIC TRENDS] Perplexity response data:`, JSON.stringify(data, null, 2));
         const content = data.choices?.[0]?.message?.content || '';
+        console.log(`[AUTHENTIC TRENDS] Perplexity content:`, content);
         
         // Extract hashtags from the response
         const hashtagMatches = content.match(/#[\w\d]+/g) || [];
+        console.log(`[AUTHENTIC TRENDS] Hashtag matches found:`, hashtagMatches);
         const uniqueHashtags = [...new Set(hashtagMatches)];
 
         uniqueHashtags.slice(0, 10).forEach((hashtag, index) => {
@@ -158,6 +165,10 @@ export class AuthenticTrendAnalyzer {
         });
 
         console.log(`[AUTHENTIC TRENDS] Retrieved ${uniqueHashtags.length} trending hashtags from Perplexity`);
+      } else {
+        console.error(`[AUTHENTIC TRENDS] Perplexity API error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`[AUTHENTIC TRENDS] Perplexity error details:`, errorText);
       }
     } catch (error) {
       console.error('[AUTHENTIC TRENDS] Perplexity API error:', error);

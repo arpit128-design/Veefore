@@ -212,7 +212,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { category = 'all', workspaceId } = req.body;
       console.log(`[TREND INTELLIGENCE POST] Refreshing authentic trending data for category: ${category}, workspace: ${workspaceId}`);
       
-      const { authenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
       
       // Force refresh the cache
       await authenticTrendAnalyzer.refreshTrends(category);

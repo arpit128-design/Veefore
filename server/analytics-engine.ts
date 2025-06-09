@@ -77,7 +77,7 @@ export class AnalyticsEngine {
       return {
         engagementRate,
         growthVelocity,
-        optimalHour: parseInt(optimalTime.hour),
+        optimalHour: bestHour, // Return the numeric hour directly
         peakHours: optimalTime.peakHours,
         bestDays: optimalTime.bestDays,
         audienceActive: optimalTime.audienceActive,

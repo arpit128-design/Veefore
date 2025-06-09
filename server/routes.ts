@@ -2936,7 +2936,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       };
 
       // Deduct credits after successful generation
-      await creditService.consumeCredits(userId, 'reels-script', 1, 'AI script generation');
+      await creditService.consumeCredits(userId, 'reels-script', creditCost, 'AI script generation');
       const remainingCredits = await creditService.getUserCredits(userId);
 
       res.json({

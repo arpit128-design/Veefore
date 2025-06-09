@@ -225,7 +225,17 @@ export function registerAdminRoutes(app: Express) {
 
   app.post("/api/admin/notifications", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
     try {
-      const validatedData = insertNotificationSchema.parse(req.body);
+      // Custom validation schema to handle frontend data format
+      const notificationSchema = z.object({
+        title: z.string().min(1, "Title is required"),
+        message: z.string().min(1, "Message is required"),
+        type: z.string().default("info"),
+        targetUsers: z.string().default("all").transform((val) => [val]), // Transform string to array
+        scheduledFor: z.string().optional().transform((val) => val ? new Date(val) : undefined), // Transform string to Date
+        userId: z.number().optional()
+      });
+
+      const validatedData = notificationSchema.parse(req.body);
       const notification = await storage.createNotification(validatedData);
 
       await logAdminAction(

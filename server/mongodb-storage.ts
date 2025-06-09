@@ -3145,8 +3145,8 @@ export class MongoStorage implements IStorage {
       title: notification.title,
       message: notification.message,
       type: notification.type || 'info',
-      targetUsers: notification.targetUsers || 'all',
-      scheduledFor: notification.scheduledFor ? new Date(notification.scheduledFor) : null,
+      targetUsers: Array.isArray(notification.targetUsers) ? notification.targetUsers : [notification.targetUsers || 'all'],
+      scheduledFor: notification.scheduledFor || null,
       sentAt: notification.scheduledFor ? null : new Date(),
       isRead: false,
       createdAt: new Date()

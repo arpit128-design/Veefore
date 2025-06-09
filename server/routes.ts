@@ -1280,8 +1280,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     try {
       console.log('[FORCE SYNC] Starting real-time Instagram data sync...');
       
-      const workspaceId = req.user.currentWorkspaceId;
+      // Get workspaceId from request body or user's current workspace
+      const workspaceId = req.body.workspaceId || req.user.currentWorkspaceId;
       console.log('[FORCE SYNC] Workspace ID:', workspaceId);
+      console.log('[FORCE SYNC] Request body:', req.body);
 
       // Get the Instagram account for this workspace
       const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);

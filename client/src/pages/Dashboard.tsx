@@ -51,14 +51,16 @@ export default function Dashboard() {
     mutationFn: async () => {
       setIsRefreshing(true);
       console.log('[DASHBOARD] Starting real-time Instagram sync...');
+      console.log('[DASHBOARD] Current workspace:', currentWorkspace?.id);
       
       // Force real-time Instagram API sync to get current follower count
-      const syncResult = await apiRequest('POST', '/api/instagram/force-sync');
+      const syncResult = await apiRequest('POST', '/api/instagram/force-sync', {
+        workspaceId: currentWorkspace?.id
+      });
       console.log('[DASHBOARD] Real-time sync result:', syncResult);
       
       // Clear cache and refresh analytics
       await apiRequest('POST', '/api/admin/clear-dashboard-cache');
-      await apiRequest('GET', `/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}&timestamp=${Date.now()}`);
       
       return syncResult;
     },

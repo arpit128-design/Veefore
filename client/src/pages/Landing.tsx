@@ -623,12 +623,14 @@ const Landing = () => {
                   animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                   transition={{ delay: 1.2 + index * 0.1, type: "spring" }}
                   whileHover={{ 
-                    scale: 1.2, 
-                    rotateY: 15,
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.3)"
+                    scale: 1.1, 
+                    rotateY: 10
                   }}
                   className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl ${platform.color} flex items-center justify-center shadow-2xl cursor-pointer transform-gpu`}
-                  style={{ transformStyle: "preserve-3d" }}
+                  style={{ 
+                    transformStyle: "preserve-3d",
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.2)" 
+                  }}
                 >
                   <motion.div
                     animate={{ rotateZ: [0, 5, -5, 0] }}

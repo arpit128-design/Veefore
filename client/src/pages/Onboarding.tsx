@@ -390,9 +390,9 @@ export default function Onboarding() {
             transition={{ delay: 1.2 + index * 0.2 }}
             whileHover={{ 
               scale: 1.05, 
-              rotateY: 5,
-              boxShadow: "0 20px 40px rgba(255, 255, 255, 0.1)"
+              rotateY: 5
             }}
+            style={{ boxShadow: "0 20px 40px rgba(255, 255, 255, 0.1)" }}
             className="relative"
           >
             <Card className="bg-transparent backdrop-blur-md border-white/20 text-white overflow-hidden group">
@@ -1162,13 +1162,10 @@ export default function Onboarding() {
                     <motion.div 
                       className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mx-auto relative`}
                       animate={{ 
-                        boxShadow: [
-                          "0 0 15px rgba(255, 255, 255, 0.1)",
-                          "0 0 25px rgba(255, 255, 255, 0.2)",
-                          "0 0 15px rgba(255, 255, 255, 0.1)"
-                        ]
+                        scale: [1, 1.05, 1]
                       }}
                       transition={{ duration: 3, repeat: Infinity, delay: index * 0.5 }}
+                      style={{ boxShadow: "0 0 20px rgba(255, 255, 255, 0.15)" }}
                     >
                       <Icon className="w-6 h-6 text-white" />
                     </motion.div>

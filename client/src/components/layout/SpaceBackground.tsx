@@ -22,10 +22,20 @@ export function SpaceBackground() {
     const stars: Star[] = [];
     let time = 0;
 
+    let resizeTimeout: NodeJS.Timeout;
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      createStars();
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+        
+        // Only resize if dimensions changed significantly to prevent excessive recreations
+        if (Math.abs(canvas.width - newWidth) > 50 || Math.abs(canvas.height - newHeight) > 50) {
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+          createStars();
+        }
+      }, 150);
     };
 
     const createStars = () => {

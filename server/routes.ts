@@ -1138,6 +1138,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           }
         }
 
+        // Process successful media response
         const mediaData = await mediaResponse.json();
         
         if (mediaData.error) {
@@ -1182,6 +1183,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         console.error('[CONTENT API] Error fetching Instagram media:', error);
         res.json([]);
       }
+    } catch (error: any) {
+      console.error('[CONTENT API] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Instagram sync endpoint for real-time data updates

@@ -5174,7 +5174,7 @@ Format as JSON with: script, caption, hashtags`;
       }
       
       console.log('[AI SCRIPT] Parsed result:', {
-        script: result.script?.substring(0, 100) + '...',
+        script: typeof result.script === 'string' ? result.script.substring(0, 100) + '...' : result.script,
         hasScript: !!result.script,
         hasCaption: !!result.caption,
         hashtagCount: result.hashtags?.length

@@ -2483,26 +2483,92 @@ export class MongoStorage implements IStorage {
     });
   }
 
-  async getDmMessages(conversationId: number, limit: number = 10): Promise<any[]> {
+  async getDmMessages(conversationId: number | string, limit: number = 10): Promise<any[]> {
     await this.connect();
     
-    const messages = await DmMessageModel.find({ conversationId })
-      .sort({ createdAt: -1 })
-      .limit(limit);
+    console.log(`[MONGODB] Getting authentic DM messages for conversation: ${conversationId}`);
     
-    return messages.map(msg => ({
+    // Try multiple message models and collections
+    const messageModels = ['DmMessage', 'Message', 'InstagramMessage', 'ConversationMessage'];
+    let allMessages = [];
+    
+    for (const modelName of messageModels) {
+      try {
+        const Model = mongoose.models[modelName];
+        if (Model) {
+          const messages = await Model.find({
+            $or: [
+              { conversationId: conversationId },
+              { conversationId: conversationId.toString() },
+              { conversation: conversationId },
+              { conversation: conversationId.toString() }
+            ]
+          }).sort({ createdAt: -1 });
+          
+          console.log(`[MONGODB] Found ${messages.length} messages in ${modelName} for conversation ${conversationId}`);
+          allMessages.push(...messages);
+        }
+      } catch (error) {
+        console.log(`[MONGODB] Error accessing ${modelName}: ${error.message}`);
+      }
+    }
+    
+    // Also search generic message collections
+    try {
+      const db = mongoose.connection.db;
+      const collections = await db.listCollections().toArray();
+      
+      for (const collection of collections) {
+        if (collection.name.toLowerCase().includes('message') || 
+            collection.name.toLowerCase().includes('dm')) {
+          try {
+            const docs = await db.collection(collection.name).find({
+              $or: [
+                { conversationId: conversationId },
+                { conversationId: conversationId.toString() },
+                { conversation: conversationId },
+                { conversation: conversationId.toString() }
+              ]
+            }).limit(20).toArray();
+            
+            if (docs.length > 0) {
+              console.log(`[MONGODB] Collection ${collection.name} has ${docs.length} messages for conversation ${conversationId}`);
+              allMessages.push(...docs.map(doc => ({
+                ...doc,
+                _id: doc._id,
+                collectionSource: collection.name
+              })));
+            }
+          } catch (err) {
+            console.log(`[MONGODB] Error querying ${collection.name}: ${err.message}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.log(`[MONGODB] Error listing collections: ${error.message}`);
+    }
+    
+    // Sort by creation date and limit
+    const sortedMessages = allMessages
+      .sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime())
+      .slice(0, limit);
+    
+    console.log(`[MONGODB] Returning ${sortedMessages.length} authentic messages for conversation ${conversationId}`);
+    
+    return sortedMessages.map(msg => ({
       id: msg._id.toString(),
-      conversationId: msg.conversationId,
-      messageId: msg.messageId,
-      sender: msg.sender,
-      content: msg.content,
-      messageType: msg.messageType,
-      sentiment: msg.sentiment,
-      topics: msg.topics,
+      conversationId: msg.conversationId || msg.conversation,
+      messageId: msg.messageId || msg.id,
+      sender: msg.sender || msg.from || 'user',
+      content: msg.content || msg.message || msg.text,
+      messageType: msg.messageType || msg.type || 'text',
+      sentiment: msg.sentiment || 'neutral',
+      topics: msg.topics || [],
       aiResponse: msg.aiResponse,
       automationRuleId: msg.automationRuleId,
-      createdAt: msg.createdAt
-    })).reverse(); // Return in chronological order
+      createdAt: msg.createdAt,
+      collectionSource: msg.collectionSource
+    }));
   }
 
   async getConversationContext(conversationId: number): Promise<any[]> {
@@ -2591,25 +2657,85 @@ export class MongoStorage implements IStorage {
   async getDmConversations(workspaceId: string, limit: number = 50): Promise<any[]> {
     await this.connect();
     
-    console.log(`[MONGODB] Getting real DM conversations for workspace: ${workspaceId}`);
+    console.log(`[MONGODB] Getting authentic Instagram DM conversations for workspace: ${workspaceId}`);
     
-    const conversations = await DmConversationModel.find({ workspaceId })
-      .sort({ lastActive: -1, createdAt: -1 })
-      .limit(limit);
+    // Access all DM conversation models to find authentic data
+    const models = ['DmConversation', 'Conversation', 'InstagramConversation'];
+    let allConversations = [];
     
-    console.log(`[MONGODB] Found ${conversations.length} real Instagram DM conversations`);
+    for (const modelName of models) {
+      try {
+        const Model = mongoose.models[modelName];
+        if (Model) {
+          const conversations = await Model.find({ 
+            $or: [
+              { workspaceId: workspaceId },
+              { workspaceId: workspaceId.toString() }
+            ]
+          }).sort({ createdAt: -1 });
+          
+          console.log(`[MONGODB] Found ${conversations.length} conversations in ${modelName}`);
+          allConversations.push(...conversations);
+        }
+      } catch (error) {
+        console.log(`[MONGODB] Error accessing ${modelName}: ${error.message}`);
+      }
+    }
     
-    return conversations.map(conv => ({
+    // Also check generic collections that might contain authentic Instagram DMs
+    try {
+      const db = mongoose.connection.db;
+      const collections = await db.listCollections().toArray();
+      
+      for (const collection of collections) {
+        if (collection.name.toLowerCase().includes('conversation') || 
+            collection.name.toLowerCase().includes('message')) {
+          console.log(`[MONGODB] Found collection: ${collection.name}`);
+          
+          try {
+            const docs = await db.collection(collection.name).find({
+              $or: [
+                { workspaceId: workspaceId },
+                { workspaceId: workspaceId.toString() }
+              ]
+            }).limit(10).toArray();
+            
+            if (docs.length > 0) {
+              console.log(`[MONGODB] Collection ${collection.name} has ${docs.length} relevant documents`);
+              allConversations.push(...docs.map(doc => ({
+                ...doc,
+                _id: doc._id,
+                collectionSource: collection.name
+              })));
+            }
+          } catch (err) {
+            console.log(`[MONGODB] Error querying ${collection.name}: ${err.message}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.log(`[MONGODB] Error listing collections: ${error.message}`);
+    }
+    
+    console.log(`[MONGODB] Total conversations found across all sources: ${allConversations.length}`);
+    
+    // Sort and limit results
+    const sortedConversations = allConversations
+      .sort((a, b) => new Date(b.createdAt || b.lastActive || 0).getTime() - new Date(a.createdAt || a.lastActive || 0).getTime())
+      .slice(0, limit);
+    
+    return sortedConversations.map(conv => ({
       id: conv._id.toString(),
       workspaceId: conv.workspaceId,
       platform: conv.platform || 'instagram',
-      participantId: conv.participant?.id || conv.participantId,
+      participantId: conv.participant?.id || conv.participantId || 'unknown_user',
       participantUsername: conv.participant?.username || conv.participantUsername || 'Instagram User',
       lastMessageAt: conv.lastActive || conv.lastMessageAt || conv.createdAt,
       messageCount: conv.messageCount || 1,
       isActive: conv.isActive !== false,
       createdAt: conv.createdAt,
-      updatedAt: conv.updatedAt || conv.lastActive
+      updatedAt: conv.updatedAt || conv.lastActive,
+      collectionSource: conv.collectionSource
     }));
   }
 

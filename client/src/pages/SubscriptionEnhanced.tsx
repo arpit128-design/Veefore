@@ -296,13 +296,40 @@ export default function SubscriptionEnhanced() {
         name: 'VeeFore',
         description: data.description,
         order_id: data.orderId,
-        handler: function (response: any) {
-          toast({
-            title: "Payment Successful!",
-            description: "Your subscription has been activated.",
-          });
-          queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+        handler: async function (response: any) {
+          try {
+            console.log('[PAYMENT SUCCESS] Verifying payment:', response);
+            
+            // Verify payment on backend
+            const verifyResponse = await apiRequest('POST', '/api/razorpay/verify-payment', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              type: data.type || 'credits', // subscription or credits
+              planId: data.planId,
+              packageId: data.packageId
+            });
+
+            if (verifyResponse.ok) {
+              toast({
+                title: "Payment Successful!",
+                description: data.type === 'subscription' ? "Your subscription has been activated." : "Credits have been added to your account!",
+              });
+              queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+            } else {
+              const errorData = await verifyResponse.json();
+              throw new Error(errorData.error || 'Payment verification failed');
+            }
+          } catch (error: any) {
+            console.error('[PAYMENT ERROR]', error);
+            toast({
+              title: "Payment Verification Failed",
+              description: error.message || "Please contact support if payment was deducted.",
+              variant: "destructive",
+            });
+          }
         },
         prefill: {
           name: '',

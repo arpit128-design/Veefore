@@ -1645,6 +1645,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         amount: order.amount,
         currency: order.currency,
         description: `${packageData.name} - ${packageData.totalCredits} Credits`,
+        type: 'credits',
+        packageId: packageId
       });
     } catch (error: any) {
       console.error('[CREDIT PURCHASE] Error:', error);
@@ -1697,6 +1699,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         amount: order.amount,
         currency: order.currency,
         description: `${planData.name} Subscription - ₹${planData.price}/month`,
+        type: 'subscription',
+        planId: planId
       });
     } catch (error: any) {
       console.error('[SUBSCRIPTION PURCHASE] Error:', error);
@@ -1739,12 +1743,20 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Update user subscription
         await storage.updateUserSubscription(user.id, planId);
       } else if (type === 'credits' && packageId) {
+        console.log('[CREDIT PURCHASE] Processing credit purchase:', { packageId, userId: user.id });
+        
         // Add credits to user account using pricing config
         const { CREDIT_PACKAGES } = await import('./pricing-config');
+        console.log('[CREDIT PURCHASE] Available packages:', CREDIT_PACKAGES.map(p => p.id));
         const packageData = CREDIT_PACKAGES.find((pkg: any) => pkg.id === packageId);
         
         if (packageData) {
+          console.log('[CREDIT PURCHASE] Found package:', packageData);
+          console.log('[CREDIT PURCHASE] Adding credits to user:', user.id, 'credits:', packageData.totalCredits);
+          
           await storage.addCreditsToUser(user.id, packageData.totalCredits);
+          console.log('[CREDIT PURCHASE] Credits added successfully');
+          
           await storage.createCreditTransaction({
             userId: parseInt(user.id),
             type: 'purchase',
@@ -1753,6 +1765,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             workspaceId: null,
             referenceId: razorpay_payment_id
           });
+          console.log('[CREDIT PURCHASE] Transaction record created');
+        } else {
+          console.log('[CREDIT PURCHASE] Package not found:', packageId);
         }
       } else if (type === 'addon' && packageId) {
         console.log('[PAYMENT VERIFICATION] Processing addon purchase:', { type, packageId });

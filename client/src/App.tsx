@@ -112,6 +112,20 @@ function Router() {
     }
   }, [user?.isOnboarded]);
 
+  // Handle admin routes independently of user authentication
+  if (location?.startsWith('/admin')) {
+    return (
+      <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
+        <OptimizedSpaceBackground />
+        <Switch>
+          <Route path="/admin/login" component={AdminLogin} />
+          <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route component={() => <Redirect to="/admin/login" />} />
+        </Switch>
+      </div>
+    );
+  }
+
   if (loading || showLoader) {
     return (
       <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
@@ -127,8 +141,6 @@ function Router() {
         <OptimizedSpaceBackground />
         <Switch>
           <Route path="/auth" component={Auth} />
-          <Route path="/admin/login" component={AdminLogin} />
-          <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/" component={Landing} />

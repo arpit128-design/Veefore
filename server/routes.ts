@@ -1521,7 +1521,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       const socialAccountData = {
         username: profile.username,
-        workspaceId: parseInt(workspaceId),
+        workspaceId: workspaceId.toString(),
         platform: 'instagram',
         accountId: profile.id,
         accessToken: longLivedToken.access_token,
@@ -1531,7 +1531,34 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       };
 
       console.log(`[INSTAGRAM CALLBACK] Saving social account for workspace ${workspaceId}...`);
-      await storage.createSocialAccount(socialAccountData);
+      console.log(`[INSTAGRAM CALLBACK] Social account data:`, {
+        username: socialAccountData.username,
+        workspaceId: socialAccountData.workspaceId,
+        workspaceIdType: typeof socialAccountData.workspaceId,
+        platform: socialAccountData.platform,
+        accountId: socialAccountData.accountId,
+        hasAccessToken: !!socialAccountData.accessToken
+      });
+      
+      // Check if account already exists
+      try {
+        const existingAccounts = await storage.getSocialAccountsByWorkspace(workspaceId.toString());
+        const existingInstagram = existingAccounts.find(acc => acc.platform === 'instagram' && acc.accountId === profile.id);
+        
+        if (existingInstagram) {
+          console.log(`[INSTAGRAM CALLBACK] Updating existing account ID: ${existingInstagram.id}`);
+          await storage.updateSocialAccount(existingInstagram.id, socialAccountData);
+          console.log(`[INSTAGRAM CALLBACK] Updated existing Instagram account: @${profile.username}`);
+        } else {
+          console.log(`[INSTAGRAM CALLBACK] Creating new Instagram account`);
+          const newAccount = await storage.createSocialAccount(socialAccountData);
+          console.log(`[INSTAGRAM CALLBACK] Created new account: @${profile.username} (ID: ${newAccount.id})`);
+        }
+      } catch (accountError: any) {
+        console.error(`[INSTAGRAM CALLBACK] Error saving account:`, accountError);
+        throw accountError;
+      }
+      
       console.log(`[INSTAGRAM CALLBACK] Social account saved successfully`);
       
       const redirectPage = stateData.source === 'onboarding' ? 'onboarding' : 'integrations';

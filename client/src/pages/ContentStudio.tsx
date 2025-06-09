@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useToast } from "@/hooks/use-toast";
+import { getValidFirebaseToken } from "@/lib/firebase";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { 
@@ -1283,16 +1284,11 @@ function VideoShortener() {
         formData.append('userPreferences', JSON.stringify(data.userPreferences));
         formData.append('workspaceId', data.workspaceId);
         
-        // Get proper Firebase JWT token
-        let token = localStorage.getItem('veefore_auth_token');
+        // Get valid Firebase JWT token using utility function
+        const token = await getValidFirebaseToken();
         
-        // Validate and refresh token if needed
-        if (!token || token.split('.').length !== 3) {
-          const { auth } = await import('@/lib/firebase');
-          if (auth?.currentUser) {
-            token = await auth.currentUser.getIdToken(true);
-            localStorage.setItem('veefore_auth_token', token);
-          }
+        if (!token) {
+          throw new Error('Authentication failed. Please log in again.');
         }
         
         const response = await fetch('/api/ai/shorten-video', {

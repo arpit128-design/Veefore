@@ -51,6 +51,34 @@ if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.projectId && fireb
   console.warn('Firebase configuration incomplete - authentication will use demo mode');
 }
 
+// Utility function to get valid Firebase JWT token
+export const getValidFirebaseToken = async (): Promise<string | null> => {
+  try {
+    if (!auth?.currentUser) {
+      console.error('[FIREBASE] No authenticated user found');
+      return null;
+    }
+
+    // Get fresh ID token
+    const token = await auth.currentUser.getIdToken(true);
+    
+    // Validate token format (should be 3-part JWT)
+    if (!token || token.split('.').length !== 3) {
+      console.error('[FIREBASE] Invalid token format received');
+      return null;
+    }
+
+    // Store the valid token
+    localStorage.setItem('veefore_auth_token', token);
+    console.log('[FIREBASE] Valid JWT token obtained and stored');
+    
+    return token;
+  } catch (error) {
+    console.error('[FIREBASE] Error getting auth token:', error);
+    return null;
+  }
+};
+
 export { auth };
 
 export async function loginWithGoogle() {

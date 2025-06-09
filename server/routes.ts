@@ -5846,7 +5846,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         case 'image':
         case 'post':
           // For image/post publishing
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             image_url: mediaUrl,
@@ -5856,7 +5856,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         case 'video':
         case 'reel':
           // For video/reel publishing
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             media_type: 'VIDEO',
@@ -5866,7 +5866,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
           break;
         case 'story':
           // For story publishing
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             media_type: 'STORIES',
@@ -5903,7 +5903,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.log('[INSTAGRAM PUBLISH] Media container created:', containerId);
 
       // Step 2: Publish the media container
-      const publishResponse = await fetch(`https://graph.instagram.com/v21.0/${instagramAccount.platformUserId}/media_publish`, {
+      const publishResponse = await fetch(`https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media_publish`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

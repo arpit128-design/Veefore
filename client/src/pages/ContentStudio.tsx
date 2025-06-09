@@ -45,7 +45,8 @@ import {
   TrendingUp,
   Target,
   Bot,
-  Link as LinkIcon
+  Link as LinkIcon,
+  RotateCcw
 } from "lucide-react";
 
 // Platform dimensions configuration

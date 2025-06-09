@@ -82,18 +82,18 @@ export function TrendAnalyzer() {
     }
   });
 
-  // Process authentic trending data from APIs
+  // Process authentic trending data from Perplexity API
   const authenticTrends = trendData ? {
-    hashtags: (trendData as any).trends?.hashtags?.map((trend: any, index: number) => ({
-      id: `hashtag-${index}`,
+    hashtags: (trendData as any).hashtags?.map((trend: any, index: number) => ({
+      id: trend.id || `hashtag-${index}`,
       type: 'hashtag' as const,
-      name: trend.tag.startsWith('#') ? trend.tag : `#${trend.tag}`,
+      name: trend.tag?.startsWith('#') ? trend.tag : `#${trend.tag}`,
       popularity: trend.popularity || 75,
       growth: trend.growth || 15,
-      engagement: trend.engagement || '10K',
+      engagement: typeof trend.engagement === 'string' ? parseInt(trend.engagement.replace(/K|M/g, '')) || 85 : trend.engagement || 85,
       difficulty: (trend.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
       platforms: Array.isArray(trend.platforms) ? trend.platforms : ['Instagram'],
-      description: `Trending ${trend.category || 'lifestyle'} hashtag with ${trend.uses || trend.engagement || '10K'} uses`
+      description: `Authentic trending hashtag with ${trend.engagement || '10K'} engagement - personalized for ${trend.category || 'lifestyle'} content`
     })) || []
   } : { hashtags: [] };
 

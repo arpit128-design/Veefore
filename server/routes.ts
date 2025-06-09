@@ -1275,6 +1275,65 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Force real-time Instagram sync endpoint
+  app.post("/api/instagram/force-sync", requireAuth, async (req: any, res: any) => {
+    try {
+      console.log('[FORCE SYNC] Starting real-time Instagram data sync...');
+      
+      const workspaceId = req.user.currentWorkspaceId;
+      console.log('[FORCE SYNC] Workspace ID:', workspaceId);
+
+      // Get the Instagram account for this workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram' && acc.isActive);
+      
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        return res.status(400).json({ error: "No connected Instagram account found" });
+      }
+
+      console.log('[FORCE SYNC] Found Instagram account:', instagramAccount.username);
+      console.log('[FORCE SYNC] Access token available:', !!instagramAccount.accessToken);
+
+      // Direct Instagram Business API call to get current data
+      const apiUrl = `https://graph.instagram.com/me?fields=account_type,followers_count,media_count&access_token=${instagramAccount.accessToken}`;
+      
+      console.log('[FORCE SYNC] Making direct Instagram API call...');
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      
+      if (response.ok && data.followers_count !== undefined) {
+        console.log('[FORCE SYNC] Live Instagram data received:', data);
+        
+        // Clear cache and update database with fresh data
+        dashboardCache.clearCache();
+        
+        // Update the stored account data with current values
+        await storage.updateSocialAccount(instagramAccount.id, {
+          followers: data.followers_count,
+          mediaCount: data.media_count,
+          lastSyncAt: new Date(),
+          updatedAt: new Date()
+        });
+
+        console.log('[FORCE SYNC] Database updated with live follower count:', data.followers_count);
+        
+        res.json({ 
+          success: true, 
+          followers: data.followers_count,
+          mediaCount: data.media_count,
+          message: "Real-time Instagram data synced successfully" 
+        });
+      } else {
+        console.error('[FORCE SYNC] Instagram API error:', data);
+        res.status(400).json({ error: data.error?.message || "Failed to fetch Instagram data" });
+      }
+      
+    } catch (error: any) {
+      console.error('[FORCE SYNC] Error during force sync:', error);
+      res.status(500).json({ error: 'Failed to sync Instagram data' });
+    }
+  });
+
   // Instagram sync endpoint for real-time data updates
   app.post("/api/instagram/sync", requireAuth, async (req: any, res: any) => {
     try {

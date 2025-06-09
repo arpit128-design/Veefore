@@ -46,29 +46,40 @@ export default function Dashboard() {
     minute: '2-digit'
   });
 
-  // Enhanced Instagram data refresh mutation
+  // Real-time Instagram data sync mutation
   const refreshInstagramData = useMutation({
     mutationFn: async () => {
       setIsRefreshing(true);
-      // Force refresh analytics which triggers Instagram sync
-      await apiRequest('GET', `/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}&forceRefresh=true`);
-      return true;
+      console.log('[DASHBOARD] Starting real-time Instagram sync...');
+      
+      // Force real-time Instagram API sync to get current follower count
+      const syncResult = await apiRequest('POST', '/api/instagram/force-sync');
+      console.log('[DASHBOARD] Real-time sync result:', syncResult);
+      
+      // Clear cache and refresh analytics
+      await apiRequest('POST', '/api/admin/clear-dashboard-cache');
+      await apiRequest('GET', `/api/dashboard/analytics?workspaceId=${currentWorkspace?.id}&timestamp=${Date.now()}`);
+      
+      return syncResult;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      // Invalidate all dashboard queries to force refresh
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/dashboard/analytics', currentWorkspace?.id] 
+        queryKey: ['/api/dashboard/analytics'] 
       });
+      
+      const followerCount = data?.followers || 'current';
       toast({
-        title: "Instagram Data Refreshed",
-        description: "Your reach data has been updated with latest Instagram metrics",
+        title: "Live Instagram Data Synced",
+        description: `Real-time follower count: ${followerCount}. Dashboard updated with live metrics.`,
       });
       setIsRefreshing(false);
     },
-    onError: (error) => {
-      console.error('Failed to refresh Instagram data:', error);
+    onError: (error: any) => {
+      console.error('Failed to sync Instagram data:', error);
       toast({
-        title: "Refresh Failed",
-        description: "Unable to update Instagram data. Please try again.",
+        title: "Sync Failed",
+        description: error?.message || "Unable to fetch live Instagram data. Please try again.",
         variant: "destructive",
       });
       setIsRefreshing(false);

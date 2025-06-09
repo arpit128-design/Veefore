@@ -61,6 +61,7 @@ function AuthenticatedApp() {
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={Scheduler} />
               <Route path="/analyzer" component={Analyzer} />
+              <Route path="/trends" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/automation" component={Automation} />

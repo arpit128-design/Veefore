@@ -386,7 +386,7 @@ export default function Conversations() {
           ) : conversations?.conversations && conversations.conversations.length > 0 ? (
             <div className="space-y-3 sm:space-y-4">
               {conversations.conversations.map((conversation: ConversationHistory, index: number) => (
-                <Card key={`conversation-${conversation.id}-${index}`}>
+                <Card key={`conv-${conversation.id}-${conversation.participant.username}-${index}-${Date.now()}`}>
                   <CardHeader className="pb-3 sm:pb-6">
                     <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 sm:gap-4">
                       <div className="flex-1">

@@ -5,9 +5,10 @@
  * instead of placeholder content, fixing the core issue.
  */
 
-const { RealVideoProcessor } = require('./server/real-video-processor.ts');
-const path = require('path');
-const fs = require('fs').promises;
+import { RealVideoProcessor } from './server/real-video-processor.ts';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { spawn } from 'child_process';
 
 async function testRealVideoGeneration() {
   console.log('=== TESTING REAL VIDEO GENERATION ===');
@@ -40,7 +41,6 @@ async function testRealVideoGeneration() {
     
     // Test 2: Verify FFmpeg availability
     console.log('\n2. Testing FFmpeg availability...');
-    const { spawn } = require('child_process');
     
     const ffmpegTest = spawn('ffmpeg', ['-version']);
     

@@ -4744,6 +4744,27 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Clear dashboard cache endpoint - force fresh Instagram data
+  app.post('/api/admin/clear-dashboard-cache', async (req: any, res: Response) => {
+    try {
+      console.log('[CACHE CLEAR] Clearing all dashboard cache to force fresh Instagram data');
+      
+      // Clear the dashboard cache completely
+      dashboardCache.clearCache();
+      
+      console.log('[CACHE CLEAR] Dashboard cache cleared successfully');
+      
+      res.json({
+        success: true,
+        message: 'Dashboard cache cleared - fresh Instagram data will be displayed'
+      });
+      
+    } catch (error: any) {
+      console.error('[CACHE CLEAR] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Start Instagram automation service
   instagramAutomation.startAutomationService().catch(console.error);
 

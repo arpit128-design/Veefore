@@ -52,7 +52,7 @@ export class DashboardCache {
           totalReach: account.totalReach || 0,
           engagementRate: account.avgEngagement || 0,
           topPlatform: 'instagram',
-          followers: account.followersCount || 0,
+          followers: account.followersCount || account.followers || 0,
           impressions: account.totalReach || 0,
           accountUsername: account.username || '',
           totalLikes: account.totalLikes || 0,
@@ -115,11 +115,6 @@ export class DashboardCache {
     const now = new Date().getTime();
     const cacheTime = lastUpdated.getTime();
     return (now - cacheTime) < this.CACHE_DURATION;
-  }
-
-  // Clear cache for workspace
-  clearCache(workspaceId: string): void {
-    this.cache.delete(workspaceId);
   }
 
   // Get minimal placeholder data for immediate response

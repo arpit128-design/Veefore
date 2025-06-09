@@ -1235,11 +1235,20 @@ function VideoShortener() {
       }
     },
     onSuccess: (response: any) => {
+      console.log('[VIDEO SHORTENER] Analysis response:', response);
       setAnalysis(response.analysis);
       setStep('analyze');
       toast({
         title: "Video Analysis Complete!",
-        description: `AI analyzed the video content. Used ${response.creditsUsed} credits.`,
+        description: `AI analyzed the video content. Used ${response.creditsUsed || 2} credits.`,
+      });
+    },
+    onError: (error: any) => {
+      console.error('[VIDEO SHORTENER] Analysis error:', error);
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Failed to analyze video",
+        variant: "destructive",
       });
     }
   });

@@ -371,6 +371,7 @@ export const insertContentSchema = createInsertSchema(content).pick({
   contentData: true,
   prompt: true,
   platform: true,
+  status: true,
   creditsUsed: true,
   scheduledAt: true
 }).extend({

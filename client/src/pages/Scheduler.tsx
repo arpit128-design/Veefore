@@ -101,10 +101,12 @@ export default function Scheduler() {
         description: "Your content has been scheduled successfully!"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('[SCHEDULE ERROR]', error);
+      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to schedule content. Please try again.';
       toast({
         title: "Error",
-        description: "Failed to schedule content. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -363,6 +365,8 @@ export default function Scheduler() {
   const handleScheduleSubmit = async (publishNow: boolean, e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('[CLIENT DEBUG] Starting schedule submit with form:', scheduleForm);
+    
     if (!scheduleForm.title || !scheduleForm.description) {
       toast({
         title: "Missing Information",
@@ -389,6 +393,7 @@ export default function Scheduler() {
       }
     };
 
+    console.log('[CLIENT DEBUG] Submitting content data:', contentData);
     createContentMutation.mutate(contentData);
   };
 

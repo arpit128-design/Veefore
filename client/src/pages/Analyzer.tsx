@@ -15,14 +15,16 @@ export default function Analyzer() {
   const { token } = useAuth();
   const [timeRange, setTimeRange] = useState("30");
 
-  // Fetch real-time analytics data
+  // Fetch real-time analytics data with forced refresh
   const { data: realtimeAnalytics, refetch: refetchRealtime, isLoading: realtimeLoading } = useQuery({
-    queryKey: ['analytics-realtime', currentWorkspace?.id, timeRange, Date.now()],
+    queryKey: ['analytics-realtime-fresh', currentWorkspace?.id, timeRange],
     queryFn: async () => {
       const timestamp = Date.now();
-      const response = await fetch(`/api/analytics/realtime?workspaceId=${currentWorkspace?.id}&days=${timeRange}&_refresh=${timestamp}`, {
+      const response = await fetch(`/api/analytics/realtime?workspaceId=${currentWorkspace?.id}&days=${timeRange}&_cacheBust=${timestamp}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
       
@@ -33,8 +35,11 @@ export default function Analyzer() {
       return response.json();
     },
     enabled: !!currentWorkspace?.id && !!token,
-    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
-    staleTime: 0 // Always fetch fresh data
+    refetchInterval: 10000, // Refresh every 10 seconds
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the result (React Query v5)
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   // Fetch dashboard analytics as fallback

@@ -74,10 +74,23 @@ export class AnalyticsEngine {
       // Calculate trend data
       const trendsData = this.calculateTrends(engagementData);
 
+      // Extract numeric hour from the formatted time string (e.g., "6:00 AM" -> 6)
+      const extractHour = (timeStr: string): number => {
+        if (timeStr.includes("AM")) {
+          const hour = parseInt(timeStr.split(":")[0]);
+          return hour === 12 ? 0 : hour;
+        } else {
+          const hour = parseInt(timeStr.split(":")[0]);
+          return hour === 12 ? 12 : hour + 12;
+        }
+      };
+
+      const optimalHourNumeric = extractHour(optimalTime.hour);
+
       return {
         engagementRate,
         growthVelocity,
-        optimalHour: bestHour, // Return the numeric hour directly
+        optimalHour: optimalHourNumeric,
         peakHours: optimalTime.peakHours,
         bestDays: optimalTime.bestDays,
         audienceActive: optimalTime.audienceActive,

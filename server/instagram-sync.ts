@@ -105,13 +105,28 @@ export class InstagramSyncService {
       }
     });
 
-    // Calculate engagement rate as percentage
-    const avgEngagement = totalReach > 0 ? (totalEngagements / totalReach) * 100 : 0;
+    // FIXED: Calculate engagement rate as proper percentage (0-100%)
+    // Formula: (Total Engagements / Total Reach) * 100
+    let avgEngagement = 0;
+    if (totalReach > 0) {
+      avgEngagement = (totalEngagements / totalReach) * 100;
+      // Cap at reasonable maximum of 50% to prevent unrealistic values
+      avgEngagement = Math.min(avgEngagement, 50);
+    }
+
+    console.log('[ENGAGEMENT CALCULATION] Debug:', {
+      totalEngagements,
+      totalReach,
+      calculatedRate: avgEngagement,
+      totalLikes,
+      totalComments,
+      postsCount: mediaData.length
+    });
 
     return {
       totalLikes,
       totalComments,
-      avgEngagement: Math.round(avgEngagement * 100) / 100,
+      avgEngagement: Math.round(avgEngagement * 10) / 10, // Round to 1 decimal place
       totalReach,
       impressions: totalImpressions || totalReach,
       avgLikes: Math.round(totalLikes / mediaData.length),

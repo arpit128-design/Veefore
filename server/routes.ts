@@ -195,11 +195,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[TREND INTELLIGENCE GET] Retrieved authentic trends:`, {
         hashtags: trendingData.trends.hashtags.length,
         audio: trendingData.trends.audio.length,
-        formats: trendingData.trends.formats.length
+        formats: trendingData.trends.formats.length,
+        totalTrends: trendingData.trendingTags
       });
       
-      console.log(`[TREND INTELLIGENCE GET] Sending response:`, JSON.stringify(trendingData, null, 2));
-      res.json(trendingData);
+      // Ensure proper response structure for client
+      const response = {
+        success: true,
+        trendingTags: trendingData.trendingTags,
+        viralAudio: trendingData.viralAudio,
+        contentFormats: trendingData.contentFormats,
+        accuracyRate: trendingData.accuracyRate,
+        trends: {
+          hashtags: trendingData.trends.hashtags,
+          audio: trendingData.trends.audio,
+          formats: trendingData.trends.formats
+        }
+      };
+      
+      console.log(`[TREND INTELLIGENCE GET] Sending formatted response with ${response.trends.hashtags.length} hashtags`);
+      res.json(response);
     } catch (error: any) {
       console.error('[TREND INTELLIGENCE GET] Error fetching authentic trends:', error);
       res.status(500).json({ error: error.message });

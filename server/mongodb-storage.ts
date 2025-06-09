@@ -322,6 +322,9 @@ const NotificationSchema = new mongoose.Schema({
   actionUrl: String,
   data: { type: mongoose.Schema.Types.Mixed },
   expiresAt: Date,
+  targetUsers: { type: mongoose.Schema.Types.Mixed, default: 'all' },
+  scheduledFor: Date,
+  sentAt: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -3177,12 +3180,9 @@ export class MongoStorage implements IStorage {
     console.log('[NOTIFICATIONS] Fetching notifications for user:', userId);
     
     // Find notifications targeted to this user or to all users
+    // Note: We exclude userId field check since admin notifications use targetUsers field
     const notifications = await NotificationModel.find({
-      $or: [
-        { userId: userId },
-        { targetUsers: 'all' },
-        { targetUsers: { $in: [userId] } }
-      ]
+      targetUsers: 'all'
     }).sort({ createdAt: -1 }).limit(50);
     
     console.log('[NOTIFICATIONS] Found notifications:', notifications.length);
@@ -3210,7 +3210,6 @@ export class MongoStorage implements IStorage {
       { 
         _id: notificationId,
         $or: [
-          { userId: userId },
           { targetUsers: 'all' },
           { targetUsers: { $in: [userId] } }
         ]

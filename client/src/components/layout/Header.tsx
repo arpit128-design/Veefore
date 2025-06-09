@@ -27,20 +27,6 @@ export function Header() {
             <h1 className="text-base sm:text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
           </div>
           
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden glassmorphism"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-5 w-5 text-electric-cyan" />
-            ) : (
-              <Menu className="h-5 w-5 text-electric-cyan" />
-            )}
-          </Button>
-          
           {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
             <WorkspaceSwitcher />
@@ -66,13 +52,33 @@ export function Header() {
             </Avatar>
           </div>
 
-          {/* Mobile User Avatar */}
-          <Avatar className="w-8 h-8 md:hidden border-2 border-electric-cyan">
-            <AvatarImage src={user?.avatar || ""} alt={user?.username || ""} />
-            <AvatarFallback className="bg-gradient-to-r from-electric-cyan to-nebula-purple text-xs">
-              {user?.username?.charAt(0).toUpperCase() || "U"}
-            </AvatarFallback>
-          </Avatar>
+          {/* Mobile Controls */}
+          <div className="flex md:hidden items-center space-x-2">
+            {/* Mobile Notifications */}
+            <NotificationBell />
+            
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="glassmorphism p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-4 w-4 text-electric-cyan" />
+              ) : (
+                <Menu className="h-4 w-4 text-electric-cyan" />
+              )}
+            </Button>
+            
+            {/* Mobile User Avatar */}
+            <Avatar className="w-8 h-8 border-2 border-electric-cyan">
+              <AvatarImage src={user?.avatar || ""} alt={user?.username || ""} />
+              <AvatarFallback className="bg-gradient-to-r from-electric-cyan to-nebula-purple text-xs">
+                {user?.username?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -90,15 +96,7 @@ export function Header() {
                 <span className="text-xs text-electric-cyan font-medium">Credits</span>
               </div>
               
-              {/* Notifications */}
-              <div className="flex justify-center">
-                <Button variant="ghost" size="icon" className="relative glassmorphism hover:bg-opacity-80">
-                  <Satellite className="h-5 w-5 text-electric-cyan" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-solar-gold text-xs p-0 flex items-center justify-center">
-                    3
-                  </Badge>
-                </Button>
-              </div>
+
             </div>
           </div>
         )}

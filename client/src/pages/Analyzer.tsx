@@ -370,7 +370,7 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-2xl font-bold text-solar-gold mb-2">
-                {realtimeAnalytics?.optimalTime?.hour || '6:00 PM'}
+                {realtimeAnalytics?.optimalHour || '6:00 PM'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Analyzed from your posting history' : 'Best time to post based on your audience'}
@@ -378,17 +378,17 @@ export default function Analyzer() {
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span>Peak hours</span>
-                  <span className="text-solar-gold">{realtimeAnalytics?.optimalTime?.peakHours || '6-8 PM'}</span>
+                  <span className="text-solar-gold">{realtimeAnalytics?.peakHours || '6-8 PM'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Best days</span>
                   <span className="text-electric-cyan">
-                    {realtimeAnalytics?.optimalTime?.bestDays?.join(', ') || 'Tue, Thu'}
+                    {realtimeAnalytics?.bestDays?.join(', ') || 'Tue, Thu'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Audience active</span>
-                  <span className="text-green-400">{formatNumber(realtimeAnalytics?.optimalTime?.audienceActive || 89)}%</span>
+                  <span className="text-green-400">{formatNumber(realtimeAnalytics?.audienceActive || 89)}%</span>
                 </div>
               </div>
             </div>

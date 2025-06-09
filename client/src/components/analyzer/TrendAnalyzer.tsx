@@ -343,17 +343,8 @@ export function TrendAnalyzer() {
               return;
             }
 
-            console.log('[REFRESH BUTTON] Current workspace credits:', currentWorkspace.credits);
-            
-            if (currentWorkspace.credits !== null && currentWorkspace.credits <= 0) {
-              console.log('[REFRESH BUTTON] Insufficient credits');
-              toast({
-                title: "Insufficient Credits",
-                description: "You need at least 1 credit to refresh trends.",
-                variant: "destructive",
-              });
-              return;
-            }
+            // Note: Credits are now user-based, not workspace-specific
+            // The system will check user credits on the server side
 
             console.log('[REFRESH BUTTON] Triggering refresh trends mutation...');
             refreshTrendsMutation.mutate();

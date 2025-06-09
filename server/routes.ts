@@ -361,25 +361,14 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       console.log(`[TREND INTELLIGENCE POST] Refreshing authentic trending data for category: ${category}, workspace: ${workspaceId}`);
       
-      // Get current workspace to check credits
-      const workspaces = await storage.getWorkspacesByUserId(userId);
-      const currentWorkspace = workspaceId 
-        ? workspaces.find(w => w.id === workspaceId)
-        : workspaces.find(w => w.isDefault) || workspaces[0];
-      
-      if (!currentWorkspace) {
-        return res.status(400).json({ error: 'No workspace found' });
+      // Get user to check credits (credits are now user-based, not workspace-specific)
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(400).json({ error: 'User not found' });
       }
       
-      // Check if workspace has enough credits (minimum 1 credit required)
-      let currentCredits = currentWorkspace.credits || 0;
-      
-      // TEMPORARY FIX: If credits show as 0 but UI shows 2, reset to 2
-      if (currentCredits === 0) {
-        console.log(`[CREDIT SYNC FIX] Detected credit synchronization issue. Resetting workspace ${currentWorkspace.id} credits to 2`);
-        await storage.updateWorkspaceCredits(currentWorkspace.id, 2);
-        currentCredits = 2;
-      }
+      // Check if user has enough credits (minimum 1 credit required)
+      let currentCredits = user.credits || 0;
       
       if (currentCredits < 1) {
         return res.status(400).json({ 
@@ -390,8 +379,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
       
       // Deduct 1 credit for trend refresh
-      await storage.updateWorkspaceCredits(currentWorkspace.id, currentCredits - 1);
-      console.log(`[CREDIT DEDUCTION] Deducted 1 credit for trend refresh. Remaining: ${currentCredits - 1}`);
+      await storage.updateUserCredits(userId, currentCredits - 1);
+      console.log(`[CREDIT DEDUCTION] Deducted 1 credit for trend refresh. User remaining: ${currentCredits - 1}`);
       
       const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
       const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
@@ -402,8 +391,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Get fresh data with different query to ensure variety
       const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category, true);
       
-      // Get user preferences for personalization
-      const user = await storage.getUser(userId);
+      // Get user preferences for personalization (user already fetched above)
       const userPreferences = user?.preferences || {};
       
       // Personalize hashtags based on user onboarding data
@@ -506,22 +494,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Update workspace credits - fix for credit system issues
-  app.patch('/api/workspaces/:id/credits', requireAuth, async (req: any, res: Response) => {
+  // Update user credits - credits are user-based, not workspace-specific
+  app.patch('/api/user/credits', requireAuth, async (req: any, res: Response) => {
     try {
       const { credits } = req.body;
-      const workspaceId = req.params.id;
+      const userId = req.user.id;
       
-      console.log(`[CREDITS FIX] Updating workspace ${workspaceId} to ${credits} credits`);
+      console.log(`[CREDITS FIX] Updating user ${userId} to ${credits} credits`);
       
-      // Direct MongoDB update since storage might have issues
-      const { storage: mongoStorage } = await import('./mongodb-storage');
-      const result = await mongoStorage.updateWorkspaceCredits(workspaceId, credits);
+      // Update user credits directly
+      const updatedUser = await storage.updateUserCredits(userId, credits);
       
-      console.log(`[CREDITS FIX] Successfully updated workspace to ${credits} credits`);
-      res.json({ success: true, credits, workspaceId });
+      console.log(`[CREDITS FIX] Successfully updated user ${userId} to ${credits} credits`);
+      res.json({ success: true, credits, user: updatedUser });
     } catch (error: any) {
-      console.error('[CREDITS FIX] Error updating workspace credits:', error);
+      console.error('[CREDITS FIX] Error updating user credits:', error);
       res.status(500).json({ error: error.message });
     }
   });

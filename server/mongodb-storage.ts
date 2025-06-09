@@ -295,7 +295,7 @@ const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
 const ContentRecommendationModel = mongoose.model('ContentRecommendation', ContentRecommendationSchema);
 const UserContentHistoryModel = mongoose.model('UserContentHistory', UserContentHistorySchema);
 const SocialAccountModel = mongoose.model('SocialAccount', SocialAccountSchema, 'socialaccounts');
-const ContentModel = mongoose.model('Content', ContentSchema);
+const ContentModel = mongoose.model('Content', ContentSchema, 'contents');
 const AnalyticsModel = mongoose.model('Analytics', AnalyticsSchema);
 const AutomationRuleModel = mongoose.model('AutomationRule', AutomationRuleSchema);
 const SuggestionModel = mongoose.model('Suggestion', SuggestionSchema);
@@ -1005,7 +1005,7 @@ export class MongoStorage implements IStorage {
       description: content.description,
       contentData: content.contentData || {},
       platform: content.platform,
-      status: content.scheduledAt ? 'scheduled' : 'ready',
+      status: content.status || (content.scheduledAt ? 'scheduled' : 'ready'),
       scheduledAt: content.scheduledAt,
       creditsUsed: content.creditsUsed || 0,
       prompt: content.prompt,

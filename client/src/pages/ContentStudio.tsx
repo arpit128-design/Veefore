@@ -199,7 +199,7 @@ function AIVideoGenerator() {
   };
 
   const generateVideo = () => {
-    if (!script.trim()) {
+    if (!script || typeof script !== 'string' || !script.trim()) {
       toast({
         title: "Script Required", 
         description: "Please review and confirm the script before generating video",

@@ -69,6 +69,9 @@ export class SimpleInstagramPublisher {
     const currentDomain = process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
     const baseUrl = currentDomain.includes('localhost') ? `http://${currentDomain}` : `https://${currentDomain}`;
     
+    console.log(`[URL CLEANER] Current domain: ${currentDomain}`);
+    console.log(`[URL CLEANER] Base URL: ${baseUrl}`);
+    
     // Handle blob URLs
     if (inputUrl.startsWith('blob:')) {
       const parts = inputUrl.split('/');

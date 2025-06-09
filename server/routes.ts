@@ -1739,9 +1739,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Update user subscription
         await storage.updateUserSubscription(user.id, planId);
       } else if (type === 'credits' && packageId) {
-        // Add credits to user account
-        const pricingData = await storage.getPricingData();
-        const packageData = pricingData.creditPackages.find(pkg => pkg.id === packageId);
+        // Add credits to user account using pricing config
+        const { CREDIT_PACKAGES } = await import('./pricing-config');
+        const packageData = CREDIT_PACKAGES.find((pkg: any) => pkg.id === packageId);
         
         if (packageData) {
           await storage.addCreditsToUser(user.id, packageData.totalCredits);

@@ -665,6 +665,14 @@ export const insertAdminSchema = createInsertSchema(admins).pick({
   isActive: true
 });
 
+export const insertAdminSessionSchema = createInsertSchema(adminSessions).pick({
+  adminId: true,
+  token: true,
+  ipAddress: true,
+  userAgent: true,
+  expiresAt: true
+});
+
 export const insertNotificationSchema = createInsertSchema(notifications).pick({
   userId: true,
   title: true,
@@ -729,6 +737,7 @@ export type AuditLog = typeof auditLogs.$inferSelect;
 export type FeedbackMessage = typeof feedbackMessages.$inferSelect;
 
 export type InsertAdmin = z.infer<typeof insertAdminSchema>;
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type InsertPopup = z.infer<typeof insertPopupSchema>;
 export type InsertAppSetting = z.infer<typeof insertAppSettingSchema>;

@@ -13,7 +13,8 @@
 
 const { MongoClient } = require('mongodb');
 
-const MONGODB_URI = process.env.DATABASE_URL;
+// Use the same MongoDB connection string as the application
+const MONGODB_URI = 'mongodb+srv://veeforedb:veeforedb@cluster0.fhcru.mongodb.net/veeforedb?retryWrites=true&w=majority&appName=Cluster0';
 
 async function fixDuplicateWorkspaces() {
   const client = new MongoClient(MONGODB_URI);

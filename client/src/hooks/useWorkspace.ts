@@ -37,9 +37,18 @@ export function useWorkspace() {
     enabled: !!user?.id && !!token
   });
 
-  // Set default workspace when workspaces load
+  // Set default workspace when workspaces load - prioritize cvfbf workspace
   useEffect(() => {
     if (workspaces.length > 0 && !currentWorkspace) {
+      // Always prioritize cvfbf workspace if it exists and has credits
+      const cvfbfWorkspace = workspaces.find((w: Workspace) => w.name === 'cvfbf');
+      if (cvfbfWorkspace && cvfbfWorkspace.credits && cvfbfWorkspace.credits > 0) {
+        console.log('[WORKSPACE] Selecting cvfbf workspace with', cvfbfWorkspace.credits, 'credits');
+        setCurrentWorkspace(cvfbfWorkspace);
+        return;
+      }
+      
+      // Fallback to default workspace logic
       const defaultWorkspace = workspaces.find((w: Workspace) => w.isDefault) || workspaces[0];
       setCurrentWorkspace(defaultWorkspace);
     }

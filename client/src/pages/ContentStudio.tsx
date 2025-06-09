@@ -1214,8 +1214,25 @@ function VideoShortener() {
 
   const analyzeMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/ai/analyze-video', data);
-      return await response.json();
+      if (data.videoFile) {
+        // Handle file upload with FormData
+        const formData = new FormData();
+        formData.append('videoFile', data.videoFile);
+        formData.append('workspaceId', data.workspaceId);
+        
+        const response = await fetch('/api/ai/analyze-video', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          },
+          body: formData
+        });
+        return await response.json();
+      } else {
+        // Handle URL with JSON
+        const response = await apiRequest('POST', '/api/ai/analyze-video', data);
+        return await response.json();
+      }
     },
     onSuccess: (response: any) => {
       setAnalysis(response.analysis);
@@ -1580,7 +1597,7 @@ function VideoShortener() {
             <div className="flex space-x-2">
               <Button 
                 onClick={analyzeVideo} 
-                disabled={analyzeMutation.isPending || !videoUrl.trim()}
+                disabled={analyzeMutation.isPending || (inputType === 'url' ? !videoUrl.trim() : !videoFile)}
                 variant="outline"
                 className="flex-1"
               >
@@ -1599,7 +1616,7 @@ function VideoShortener() {
 
               <Button 
                 onClick={shortenVideo} 
-                disabled={shortenMutation.isPending || !videoUrl.trim()}
+                disabled={shortenMutation.isPending || (inputType === 'url' ? !videoUrl.trim() : !videoFile)}
                 className="flex-1"
               >
                 {shortenMutation.isPending ? (

@@ -5709,10 +5709,11 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { user } = req;
       const { videoUrl, targetDuration = 30, platform = 'youtube', style = 'viral', userPreferences = {}, workspaceId } = req.body;
 
-      console.log('[AI SHORTEN] Request:', { userId: user.id, videoUrl, platform, style });
+      console.log('[AI SHORTEN] Request:', { userId: user.id, videoUrl, platform, style, hasFile: !!req.file });
 
-      if (!videoUrl) {
-        return res.status(400).json({ error: 'Video URL is required' });
+      // Validate input - either URL or file upload required
+      if (!videoUrl && !req.file) {
+        return res.status(400).json({ error: 'Video URL or file upload is required' });
       }
 
       // Check user credits
@@ -5748,10 +5749,18 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       let inputVideoPath: string;
       let cleanupFiles: string[] = [];
 
-      // Download video from URL
-      console.log('[REAL VIDEO] Downloading from URL:', videoUrl);
-      inputVideoPath = await processor.downloadFromURL(videoUrl);
-      cleanupFiles.push(inputVideoPath);
+      // Handle both URL and file upload inputs
+      if (req.file) {
+        // Process uploaded file
+        console.log('[REAL VIDEO] Processing uploaded file:', req.file.originalname);
+        inputVideoPath = req.file.path;
+        cleanupFiles.push(inputVideoPath);
+      } else {
+        // Download video from URL
+        console.log('[REAL VIDEO] Downloading from URL:', videoUrl);
+        inputVideoPath = await processor.downloadFromURL(videoUrl);
+        cleanupFiles.push(inputVideoPath);
+      }
 
       // Get video metadata
       console.log('[REAL VIDEO] Extracting metadata');
@@ -5873,10 +5882,11 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { user } = req;
       const { videoUrl } = req.body;
 
-      console.log('[VIDEO ANALYZE] Request:', { userId: user.id, videoUrl });
+      console.log('[VIDEO ANALYZE] Request:', { userId: user.id, videoUrl, hasFile: !!req.file });
 
-      if (!videoUrl) {
-        return res.status(400).json({ error: 'Video URL is required' });
+      // Validate input - either URL or file upload required
+      if (!videoUrl && !req.file) {
+        return res.status(400).json({ error: 'Video URL or file upload is required' });
       }
 
       // Check user credits

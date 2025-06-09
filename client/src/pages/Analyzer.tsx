@@ -376,7 +376,9 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-2xl font-bold text-solar-gold mb-2">
-                {realtimeAnalytics?.optimalHour || '6:00 PM'}
+                {realtimeAnalytics?.optimalHour ? 
+                  `${realtimeAnalytics.optimalHour === 0 ? 12 : realtimeAnalytics.optimalHour > 12 ? realtimeAnalytics.optimalHour - 12 : realtimeAnalytics.optimalHour}:00 ${realtimeAnalytics.optimalHour >= 12 ? 'PM' : 'AM'}` 
+                  : '6:00 PM'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Analyzed from your posting history' : 'Best time to post based on your audience'}

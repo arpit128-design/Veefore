@@ -2920,6 +2920,187 @@ export class MongoStorage implements IStorage {
     await AdminModel.findByIdAndUpdate(id, { isActive: false });
   }
 
+  async getAdminUsers(options: {
+    page: number;
+    limit: number;
+    search?: string;
+    filter?: string;
+  }): Promise<any> {
+    await this.connect();
+    
+    const { page, limit, search, filter } = options;
+    const skip = (page - 1) * limit;
+    
+    // Build query
+    let query: any = {};
+    
+    if (search) {
+      query.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { displayName: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (filter && filter !== 'all') {
+      switch (filter) {
+        case 'active':
+          query.lastLogin = { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
+          break;
+        case 'premium':
+          query.plan = { $ne: null, $ne: 'free' };
+          break;
+        case 'free':
+          query.$or = [{ plan: 'free' }, { plan: null }];
+          break;
+      }
+    }
+    
+    const [users, total] = await Promise.all([
+      UserModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      UserModel.countDocuments(query)
+    ]);
+    
+    const formattedUsers = users.map(user => ({
+      id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      displayName: user.displayName,
+      plan: user.plan || 'free',
+      credits: user.credits || 0,
+      lastLogin: user.lastLogin,
+      status: user.isActive !== false ? 'active' : 'inactive',
+      createdAt: user.createdAt,
+      totalWorkspaces: 0 // Will be calculated separately if needed
+    }));
+    
+    return {
+      users: formattedUsers,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async getAdminContent(options: {
+    page: number;
+    limit: number;
+    search?: string;
+    filter?: string;
+  }): Promise<any> {
+    await this.connect();
+    
+    const { page, limit, search, filter } = options;
+    const skip = (page - 1) * limit;
+    
+    // Build query for content
+    let query: any = {};
+    
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { caption: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (filter && filter !== 'all') {
+      switch (filter) {
+        case 'published':
+          query.status = 'published';
+          break;
+        case 'scheduled':
+          query.status = 'scheduled';
+          break;
+        case 'draft':
+          query.status = 'draft';
+          break;
+      }
+    }
+    
+    const [content, total] = await Promise.all([
+      ContentModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ContentModel.countDocuments(query)
+    ]);
+    
+    const formattedContent = content.map(item => ({
+      id: item._id.toString(),
+      title: item.title || 'Untitled',
+      type: item.type,
+      platform: item.platform,
+      status: item.status,
+      scheduledFor: item.scheduledFor,
+      createdAt: item.createdAt,
+      workspaceId: item.workspaceId
+    }));
+    
+    return {
+      content: formattedContent,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async getAdminNotifications(options: {
+    page: number;
+    limit: number;
+    type?: string;
+  }): Promise<any> {
+    await this.connect();
+    
+    const { page, limit, type } = options;
+    const skip = (page - 1) * limit;
+    
+    let query: any = {};
+    if (type && type !== 'all') {
+      query.type = type;
+    }
+    
+    const [notifications, total] = await Promise.all([
+      NotificationModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      NotificationModel.countDocuments(query)
+    ]);
+    
+    const formattedNotifications = notifications.map(notif => ({
+      id: notif._id.toString(),
+      title: notif.title,
+      message: notif.message,
+      type: notif.type,
+      isActive: notif.isActive,
+      createdAt: notif.createdAt,
+      targetUsers: notif.targetUsers || 'all'
+    }));
+    
+    return {
+      notifications: formattedNotifications,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  }
+
   // Admin session operations
   async createAdminSession(session: any): Promise<any> {
     await this.connect();

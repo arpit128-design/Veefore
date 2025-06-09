@@ -87,20 +87,19 @@ export function registerAdminRoutes(app: Express) {
   // User Management
   app.get("/api/admin/users", requireAdminAuth, async (req: AdminRequest, res) => {
     try {
-      const { page = 1, limit = 10, search } = req.query;
+      const { page = 1, limit = 10, search, filter } = req.query;
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
       
-      // For now, get all users - in production, implement pagination
-      const users = []; // This would be implemented in MongoStorage
-      
-      res.json({
-        users,
-        pagination: {
-          page: parseInt(page as string),
-          limit: parseInt(limit as string),
-          total: 0,
-          pages: 0
-        }
+      // Get users from MongoDB with pagination and search
+      const result = await storage.getAdminUsers({
+        page: pageNum,
+        limit: limitNum,
+        search: search as string,
+        filter: filter as string
       });
+      
+      res.json(result);
     } catch (error) {
       console.error('[ADMIN USERS] Error:', error);
       res.status(500).json({ error: "Failed to fetch users" });
@@ -137,11 +136,100 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Content Management
+  app.get("/api/admin/content", requireAdminAuth, async (req: AdminRequest, res) => {
+    try {
+      const { page = 1, limit = 10, search, filter } = req.query;
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      
+      const result = await storage.getAdminContent({
+        page: pageNum,
+        limit: limitNum,
+        search: search as string,
+        filter: filter as string
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('[ADMIN CONTENT] Error:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  app.patch("/api/admin/content/:id", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+
+      const oldContent = await storage.getContent(parseInt(id));
+      if (!oldContent) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+
+      const updatedContent = await storage.updateContent(parseInt(id), updates);
+
+      await logAdminAction(
+        req.admin!.id,
+        "UPDATE_CONTENT",
+        "content",
+        id,
+        oldContent,
+        updates,
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json(updatedContent);
+    } catch (error) {
+      console.error('[ADMIN UPDATE CONTENT] Error:', error);
+      res.status(500).json({ error: "Failed to update content" });
+    }
+  });
+
+  app.delete("/api/admin/content/:id", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+
+      const content = await storage.getContent(parseInt(id));
+      if (!content) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+
+      await storage.deleteContent(parseInt(id));
+
+      await logAdminAction(
+        req.admin!.id,
+        "DELETE_CONTENT",
+        "content",
+        id,
+        content,
+        undefined,
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "Content deleted successfully" });
+    } catch (error) {
+      console.error('[ADMIN DELETE CONTENT] Error:', error);
+      res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
+
   // Notifications Management
   app.get("/api/admin/notifications", requireAdminAuth, async (req: AdminRequest, res) => {
     try {
-      const notifications = await storage.getNotifications();
-      res.json(notifications);
+      const { page = 1, limit = 10, type } = req.query;
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      
+      const result = await storage.getAdminNotifications({
+        page: pageNum,
+        limit: limitNum,
+        type: type as string
+      });
+      
+      res.json(result);
     } catch (error) {
       console.error('[ADMIN NOTIFICATIONS] Error:', error);
       res.status(500).json({ error: "Failed to fetch notifications" });

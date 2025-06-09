@@ -100,6 +100,43 @@ const AdminDashboard = () => {
     enabled: !!adminToken && selectedTab === "users"
   });
 
+  // Content Query
+  const { data: contentData, isLoading: contentLoading } = useQuery({
+    queryKey: ["admin", "content", contentSearch, contentFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (contentSearch) params.append("search", contentSearch);
+      if (contentFilter !== "all") params.append("filter", contentFilter);
+      
+      const response = await fetch(`/api/admin/content?${params}`, {
+        headers: {
+          "Authorization": `Bearer ${adminToken}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch content");
+      return response.json();
+    },
+    enabled: !!adminToken && selectedTab === "content"
+  });
+
+  // Notifications Query
+  const { data: notificationsData, isLoading: notificationsLoading } = useQuery({
+    queryKey: ["admin", "notifications", notificationFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (notificationFilter !== "all") params.append("type", notificationFilter);
+      
+      const response = await fetch(`/api/admin/notifications?${params}`, {
+        headers: {
+          "Authorization": `Bearer ${adminToken}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch notifications");
+      return response.json();
+    },
+    enabled: !!adminToken && selectedTab === "notifications"
+  });
+
   // Logout Mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {

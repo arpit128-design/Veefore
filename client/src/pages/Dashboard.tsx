@@ -206,9 +206,21 @@ export default function Dashboard() {
             Welcome back, <span className="text-solar-gold font-medium">{user?.displayName || user?.username}</span>
           </p>
         </div>
-        <div className="text-left sm:text-right">
-          <div className="text-xs sm:text-sm text-asteroid-silver">Current Time</div>
-          <div className="text-base sm:text-lg md:text-xl font-mono text-electric-cyan">{formattedTime} IST</div>
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={() => refreshInstagramData.mutate()}
+            disabled={isRefreshing || refreshInstagramData.isPending}
+            variant="outline"
+            size="sm"
+            className="bg-cosmic-void/50 border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10 hover:border-electric-cyan/50 transition-all duration-300"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${(isRefreshing || refreshInstagramData.isPending) ? 'animate-spin' : ''}`} />
+            {(isRefreshing || refreshInstagramData.isPending) ? 'Syncing...' : 'Live Sync'}
+          </Button>
+          <div className="text-left sm:text-right">
+            <div className="text-xs sm:text-sm text-asteroid-silver">Current Time</div>
+            <div className="text-base sm:text-lg md:text-xl font-mono text-electric-cyan">{formattedTime} IST</div>
+          </div>
         </div>
       </div>
 

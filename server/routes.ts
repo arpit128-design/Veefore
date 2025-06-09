@@ -1309,7 +1309,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         
         // Update the stored account data with current values
         await storage.updateSocialAccount(instagramAccount.id, {
-          followers: data.followers_count,
+          followersCount: data.followers_count,
           mediaCount: data.media_count,
           lastSyncAt: new Date(),
           updatedAt: new Date()

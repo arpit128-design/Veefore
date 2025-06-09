@@ -11,6 +11,7 @@ import { InstagramAutomation } from "./instagram-automation";
 import { InstagramWebhookHandler } from "./instagram-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
+import { videoShortenerAI } from './video-shortener-ai';
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import OpenAI from "openai";
@@ -5700,107 +5701,135 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
-  // AI Video Shortener - Convert long videos to shorts using AI
+  // AI Video Shortener with URL Analysis - Convert long videos to shorts using AI
   app.post('/api/ai/shorten-video', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const { videoUrl, targetDuration, platform, workspaceId } = req.body;
+      const { videoUrl, targetDuration = 30, platform = 'youtube', style = 'viral', userPreferences = {}, workspaceId } = req.body;
 
-      console.log('[AI SHORTEN] Request:', { userId: user.id, platform, targetDuration });
+      console.log('[AI SHORTEN] Request:', { userId: user.id, videoUrl, platform, style });
 
-      // Check credits
-      if (user.credits < 5) {
-        return res.status(402).json({ 
+      if (!videoUrl) {
+        return res.status(400).json({ error: 'Video URL is required' });
+      }
+
+      // Check user credits
+      const creditCost = 5; // 5 credits for video shortening
+      const currentCredits = await storage.getUserCredits(user.id);
+      
+      if (currentCredits < creditCost) {
+        return res.status(400).json({ 
           error: 'Insufficient credits. Video shortening requires 5 credits.',
-          upgradeModal: true 
+          creditsRequired: creditCost,
+          creditsAvailable: currentCredits,
+          upgradeModal: true
         });
       }
 
-      // For video shortening, we'll use a combination of AI analysis and video processing
-      const openaiApiKey = process.env.OPENAI_API_KEY;
-      if (!openaiApiKey) {
-        return res.status(500).json({ 
-          error: 'OpenAI API key not configured. Please contact support to enable AI video shortening.',
-          requiresSetup: true 
-        });
-      }
+      // Deduct credits immediately
+      await storage.updateUserCredits(user.id, currentCredits - creditCost);
 
-      try {
-        const openai = new (await import('openai')).default({
-          apiKey: openaiApiKey
-        });
+      // Create configuration for video shortener
+      const config = {
+        targetDuration,
+        platform,
+        style,
+        includeSubtitles: true,
+        aspectRatio: platform === 'youtube' ? '16:9' : '9:16',
+        userPreferences
+      };
 
-        // Analyze video content to find the best segments
-        const analysisPrompt = `Analyze this video URL: ${videoUrl}
-        
-        Create a ${targetDuration}-second short video by identifying the most engaging segments.
-        Focus on:
-        1. High-energy moments
-        2. Key talking points
-        3. Visual highlights
-        4. Hook potential
-        
-        Return optimal start and end timestamps for the best short video segments.`;
+      // Process video URL with AI analysis
+      const result = await videoShortenerAI.processVideoUrl(videoUrl, config);
 
-        const analysisResponse = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            { role: "system", content: "You are a video editing expert specializing in creating viral short-form content." },
-            { role: "user", content: analysisPrompt }
-          ],
-          max_tokens: 1000
-        });
+      // Create structured response for storage
+      const shortenedVideoResult = {
+        originalVideoUrl: videoUrl,
+        shortenedVideoUrl: result.downloadUrl,
+        thumbnailUrl: `/api/generated-content/thumb_${Date.now()}.jpg`,
+        duration: targetDuration,
+        dimensions: platform === 'youtube' ? { width: 1920, height: 1080, ratio: "16:9" } : { width: 1080, height: 1920, ratio: "9:16" },
+        analysis: result.analysis,
+        shortVideo: result.shortVideo,
+        platform,
+        contentType: 'video-short',
+        provider: 'ai-analysis',
+        status: 'completed',
+        processingMessage: 'AI video analysis and shortening completed successfully.'
+      };
 
-        const analysis = analysisResponse.choices[0].message.content;
+      // Save to content storage
+      await storage.createContent({
+        workspaceId: workspaceId || user.defaultWorkspaceId,
+        title: `AI Shortened Video - ${platform}`,
+        type: 'video',
+        platform,
+        status: 'completed',
+        contentData: shortenedVideoResult,
+        creditsUsed: creditCost,
+        description: `Shortened video for ${platform} (${targetDuration}s) - ${result.shortVideo.selectedSegment.content}`
+      });
 
-        const shortenedVideoResult = {
-          originalVideoUrl: videoUrl,
-          shortenedVideoUrl: `/api/generated-content/shortened_${Date.now()}.mp4`, // Would be processed video
-          thumbnailUrl: `/api/generated-content/thumb_${Date.now()}.jpg`,
-          duration: parseInt(targetDuration),
-          dimensions: platform === 'youtube' ? { width: 1920, height: 1080, ratio: "16:9" } : { width: 1080, height: 1920, ratio: "9:16" },
-          analysis,
-          platform,
-          contentType: 'video-short',
-          provider: 'ai-analysis',
-          status: 'processing',
-          processingMessage: 'AI video analysis and shortening in progress. This may take 3-7 minutes.'
-        };
+      console.log('[AI SHORTEN] Analysis complete:', result.shortVideo.selectedSegment.content);
 
-        // Save to content storage
-        await storage.createContent({
-          workspaceId: workspaceId || user.defaultWorkspaceId,
-          title: `AI Shortened Video - ${platform}`,
-          type: 'video',
-          platform,
-          status: 'processing',
-          contentData: shortenedVideoResult,
-          creditsUsed: 5,
-          description: `Shortened video for ${platform} (${targetDuration}s)`
-        });
-
-        // Deduct credits
-        await storage.updateUserCredits(user.id, user.credits - 5);
-
-        console.log('[AI SHORTEN] Video analysis completed, processing started');
-
-        res.json({
-          ...shortenedVideoResult,
-          creditsUsed: 5,
-          remainingCredits: user.credits - 5
-        });
-
-      } catch (fetchError) {
-        console.error('[AI SHORTEN] Network error calling OpenAI:', fetchError);
-        return res.status(500).json({ 
-          error: 'Unable to connect to video analysis service. Please check your internet connection and try again.',
-          networkError: true 
-        });
-      }
+      res.json({
+        success: true,
+        creditsUsed: creditCost,
+        remainingCredits: currentCredits - creditCost,
+        analysis: result.analysis,
+        shortVideo: result.shortVideo,
+        downloadUrl: result.downloadUrl,
+        ...shortenedVideoResult
+      });
 
     } catch (error: any) {
       console.error('[AI SHORTEN] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to shorten video' });
+    }
+  });
+
+  // Video URL Analysis endpoint (without shortening)
+  app.post('/api/ai/analyze-video', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { videoUrl } = req.body;
+
+      console.log('[VIDEO ANALYZE] Request:', { userId: user.id, videoUrl });
+
+      if (!videoUrl) {
+        return res.status(400).json({ error: 'Video URL is required' });
+      }
+
+      // Check user credits
+      const creditCost = 2; // 2 credits for video analysis only
+      const currentCredits = await storage.getUserCredits(user.id);
+      
+      if (currentCredits < creditCost) {
+        return res.status(400).json({ 
+          error: 'Insufficient credits. Video analysis requires 2 credits.',
+          creditsRequired: creditCost,
+          creditsAvailable: currentCredits
+        });
+      }
+
+      // Deduct credits
+      await storage.updateUserCredits(user.id, currentCredits - creditCost);
+
+      // Analyze video content only
+      const analysis = await videoShortenerAI.analyzeVideoContent(videoUrl);
+
+      console.log('[VIDEO ANALYZE] Analysis complete:', analysis.title);
+
+      res.json({
+        success: true,
+        creditsUsed: creditCost,
+        remainingCredits: currentCredits - creditCost,
+        analysis: analysis
+      });
+
+    } catch (error: any) {
+      console.error('[VIDEO ANALYZE] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to analyze video' });
     }
   });
 

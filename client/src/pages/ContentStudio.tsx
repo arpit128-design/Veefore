@@ -1182,29 +1182,49 @@ function AIImageGenerator() {
   );
 }
 
-// Long to Short Video Converter Component
+// AI Video Shortener with URL Analysis Component
 function VideoShortener() {
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [platform, setPlatform] = useState("youtube");
   const [duration, setDuration] = useState("30");
-  const [style, setStyle] = useState("highlights");
+  const [style, setStyle] = useState("viral");
   const [shortenedVideo, setShortenedVideo] = useState<any>(null);
-  const [step, setStep] = useState('upload');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [step, setStep] = useState('input');
+  const [userPreferences, setUserPreferences] = useState({
+    focusOnAction: true,
+    includeDialogue: true,
+    preferBeginning: false,
+    preferEnding: false,
+    avoidSilence: true
+  });
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
 
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  }) as { data?: { credits?: number } };
+
+  const analyzeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/ai/analyze-video', data);
+      return await response.json();
+    },
+    onSuccess: (response: any) => {
+      setAnalysis(response.analysis);
+      setStep('analyze');
+      toast({
+        title: "Video Analysis Complete!",
+        description: `AI analyzed the video content. Used ${response.creditsUsed} credits.`,
+      });
+    }
+  });
+
   const shortenMutation = useMutation({
     mutationFn: async (data: any) => {
-      const formData = new FormData();
-      formData.append('video', data.videoFile);
-      formData.append('platform', data.platform);
-      formData.append('duration', data.duration);
-      formData.append('style', data.style);
-      formData.append('workspaceId', data.workspaceId);
-      
-      const response = await apiRequest('POST', '/api/ai/shorten-video', formData);
+      const response = await apiRequest('POST', '/api/ai/shorten-video', data);
       return await response.json();
     },
     onSuccess: (response: any) => {
@@ -1212,7 +1232,7 @@ function VideoShortener() {
       setStep('preview');
       toast({
         title: "Video Shortened Successfully!",
-        description: `AI extracted the best moments. Used ${response.creditsUsed || 15} credits.`,
+        description: `AI extracted the best moments. Used ${response.creditsUsed} credits.`,
       });
     }
   });

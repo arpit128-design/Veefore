@@ -201,28 +201,8 @@ export class AdaptiveInstagramPublisher {
       }
     }
     
-    // If video conversion fails, try a text-only post approach
-    try {
-      console.log(`[ADAPTIVE PUBLISHER] Attempting text-only fallback post`);
-      
-      // Create a simple text post with video description
-      const textOnlyCaption = `📹 ${caption}\n\n🎥 Video content will be shared separately due to current platform limitations.`;
-      
-      // Use a placeholder image or create a simple graphic
-      const placeholderImageUrl = 'https://via.placeholder.com/1080x1080/4F46E5/FFFFFF?text=Video+Content';
-      
-      try {
-        const result = await instagramAPI.publishPhoto(accessToken, placeholderImageUrl, textOnlyCaption);
-        console.log(`[ADAPTIVE PUBLISHER] Strategy 3 SUCCESS with text-only post: ${result.id}`);
-        return { success: true, id: result.id, method: 'text_only_fallback' };
-        
-      } catch (textOnlyError: any) {
-        console.log(`[ADAPTIVE PUBLISHER] Text-only fallback failed: ${textOnlyError.message}`);
-      }
-      
-    } catch (textError: any) {
-      console.log(`[ADAPTIVE PUBLISHER] Text-only approach failed: ${textError.message}`);
-    }
+    // Placeholder content is disabled - Instagram rejects them
+    console.log(`[ADAPTIVE PUBLISHER] Skipping text-only fallback - placeholder images are not allowed`);
     
     return { 
       success: false, 
@@ -262,8 +242,8 @@ export class AdaptiveInstagramPublisher {
           case 'photo':
             result = await instagramAPI.publishPhoto(accessToken, mediaUrl, caption);
             break;
-          case 'story':
-            result = await instagramAPI.publishStory(accessToken, mediaUrl, contentType === 'video');
+          default:
+            result = await instagramAPI.publishPost(accessToken, mediaUrl, contentType);
             break;
         }
         
@@ -271,13 +251,16 @@ export class AdaptiveInstagramPublisher {
         return { success: true, id: result.id, method: `url_retry_${i + 1}` };
         
       } catch (retryError: any) {
-        console.log(`[ADAPTIVE PUBLISHER] URL retry ${i + 1} failed: ${retryError.message}`);
+        console.log(`[ADAPTIVE PUBLISHER] Retry ${i + 1} failed: ${retryError.message}`);
       }
     }
     
-    return { success: false, error: 'URL accessibility issues could not be resolved after retries' };
+    return { 
+      success: false, 
+      error: `URL accessibility failed after ${maxRetries} retries` 
+    };
   }
-  
+
   /**
    * Strategy 5: Generic retry with intelligent delay
    */
@@ -289,11 +272,11 @@ export class AdaptiveInstagramPublisher {
     originalError: Error
   ): Promise<PublishResult> {
     
-    console.log(`[ADAPTIVE PUBLISHER] Strategy 5: Generic intelligent retry`);
+    console.log(`[ADAPTIVE PUBLISHER] Strategy 5: Generic retry with intelligent delay`);
+    console.log(`[ADAPTIVE PUBLISHER] Original error: ${originalError.message}`);
     
-    // Wait longer for Instagram's internal processing
-    console.log(`[ADAPTIVE PUBLISHER] Waiting 15 seconds for Instagram processing...`);
-    await new Promise(resolve => setTimeout(resolve, 15000));
+    // Intelligent retry with exponential backoff
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
     try {
       let result;
@@ -307,19 +290,19 @@ export class AdaptiveInstagramPublisher {
         case 'photo':
           result = await instagramAPI.publishPhoto(accessToken, mediaUrl, caption);
           break;
-        case 'story':
-          result = await instagramAPI.publishStory(accessToken, mediaUrl, contentType === 'video');
+        default:
+          result = await instagramAPI.publishPost(accessToken, mediaUrl, contentType);
           break;
       }
       
-      console.log(`[ADAPTIVE PUBLISHER] Strategy 5 SUCCESS after delay: ${result.id}`);
-      return { success: true, id: result.id, method: 'delayed_retry' };
+      console.log(`[ADAPTIVE PUBLISHER] Strategy 5 SUCCESS: ${result.id}`);
+      return { success: true, id: result.id, method: 'generic_retry' };
       
     } catch (finalError: any) {
-      console.log(`[ADAPTIVE PUBLISHER] All strategies exhausted. Final error: ${finalError.message}`);
+      console.log(`[ADAPTIVE PUBLISHER] Final retry failed: ${finalError.message}`);
       return { 
         success: false, 
-        error: `Publishing failed after all strategies. Original: ${originalError.message}, Final: ${finalError.message}` 
+        error: `All strategies failed. Final error: ${finalError.message}` 
       };
     }
   }

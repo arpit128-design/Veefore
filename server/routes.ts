@@ -915,52 +915,14 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Dashboard analytics endpoint - OPTIMIZED FOR INSTANT LOADING
+  // Dashboard analytics endpoint - REAL-TIME DATA FROM DATABASE
   app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.query.workspaceId;
       
-      // STEP 1: Try cache first with most likely workspace ID
-      let targetWorkspaceId = workspaceId;
-      if (!targetWorkspaceId) {
-        // Use cached workspaces or quick lookup for default
-        const workspaces = await storage.getWorkspacesByUserId(user.id);
-        const defaultWorkspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
-        targetWorkspaceId = defaultWorkspace?.id;
-      }
-      
-      if (targetWorkspaceId) {
-        const workspaceIdStr = targetWorkspaceId.toString();
-        console.log('[DASHBOARD INSTANT] Checking cache first for workspace:', workspaceIdStr);
-        
-        // Check cache synchronously - NO database waits
-        const cachedData = dashboardCache.getCachedDataSync(workspaceIdStr);
-        
-        if (cachedData) {
-          console.log('[DASHBOARD INSTANT] Cache hit - responding instantly (<10ms)');
-          
-          // Background sync without blocking response
-          setImmediate(() => {
-            instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
-              .then(() => console.log('[DASHBOARD INSTANT] Background update completed'))
-              .catch((error) => console.log('[DASHBOARD INSTANT] Background update error:', error.message));
-          });
-
-          return res.json({
-            totalPosts: cachedData.totalPosts,
-            totalReach: cachedData.totalReach,
-            engagementRate: cachedData.engagementRate,
-            topPlatform: cachedData.topPlatform,
-            followers: cachedData.followers,
-            impressions: cachedData.impressions,
-            accountUsername: cachedData.accountUsername,
-            totalLikes: cachedData.totalLikes,
-            totalComments: cachedData.totalComments,
-            mediaCount: cachedData.mediaCount
-          });
-        }
-      }
+      console.log('[DASHBOARD REALTIME] NEW ENDPOINT LOGIC - Bypassing all cache for real-time data');
+      console.log('[DASHBOARD REALTIME] User:', user.id, 'WorkspaceId:', workspaceId);
 
       // STEP 2: Cache miss - verify workspace access
       console.log('[DASHBOARD INSTANT] Cache miss - doing workspace verification');
@@ -997,19 +959,29 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const workspaceIdStr = workspace.id.toString();
       console.log('[DASHBOARD INSTANT] Zero-wait response for workspace:', workspaceIdStr);
       
-      // TEMPORARILY BYPASS CACHE - Use fresh Instagram data instead of stale cache
-      console.log('[DASHBOARD FIX] Bypassing stale cache to show fresh Instagram data');
+      // Get fresh Instagram account data directly from database
+      console.log('[DASHBOARD REALTIME] Fetching latest synchronized data from database');
       
-      // Force background sync to update data
-      setImmediate(() => {
-        instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
-          .then(() => console.log('[DASHBOARD INSTANT] Background update completed'))
-          .catch((error) => console.log('[DASHBOARD INSTANT] Background update error:', error.message));
-      });
+      // Refresh account data to get the most recent synchronized values
+      const freshSocialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      const freshInstagramAccount = freshSocialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
+      
+      if (!freshInstagramAccount) {
+        return res.json({ 
+          totalPosts: 0, 
+          totalReach: 0, 
+          engagementRate: 0, 
+          topPlatform: 'none',
+          message: 'No Instagram account connected'
+        });
+      }
 
-      // Use fresh Instagram account data directly - bypass all cache
-      console.log('[DASHBOARD FIX] Using fresh Instagram account data');
-      const account = instagramAccount as any;
+      const account = freshInstagramAccount as any;
+      console.log('[DASHBOARD REALTIME] Fresh account data retrieved:', {
+        followersCount: account.followersCount,
+        mediaCount: account.mediaCount,
+        lastSyncAt: account.lastSyncAt
+      });
       
       console.log('[DASHBOARD DATA] Raw Instagram account data:', {
         totalPosts: account.totalPosts,
@@ -1048,13 +1020,15 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         totalReach: totalReach,
         engagementRate: engagementRate,
         topPlatform: 'instagram',
-        followers: account.followersCount || 0,
+        followers: account.followersCount || 0, // Use fresh synchronized follower count
         impressions: totalReach,
         accountUsername: account.username || '',
         totalLikes: account.totalLikes || 0,
         totalComments: account.totalComments || 0,
         mediaCount: account.mediaCount || 0
       };
+
+      console.log('[DASHBOARD REALTIME] Returning fresh data - followers:', account.followersCount, 'mediaCount:', account.mediaCount);
 
       // Cache for next request
       dashboardCache.updateCache(workspaceIdStr, responseData);

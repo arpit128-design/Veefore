@@ -117,11 +117,10 @@ export class InstagramDirectPublisher {
   
   /**
    * Create a simple text post image URL
+   * DISABLED: Never use placeholder images as Instagram rejects them
    */
   static createTextPostImage(text: string): string {
-    // Create a simple colored background with text overlay
-    const encodedText = encodeURIComponent(text.substring(0, 30));
-    return `https://via.placeholder.com/1080x1080/4F46E5/FFFFFF?text=${encodedText}`;
+    throw new Error('Placeholder images are not allowed. Please provide a real media URL.');
   }
   
   /**

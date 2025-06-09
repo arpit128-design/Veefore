@@ -112,17 +112,8 @@ export class InstagramPermissionHelper {
       };
     }
     
-    // Strategy 3: Use placeholder image with content description
-    if (permissions.canPublishPhotos) {
-      const placeholderCaption = `📱 ${caption}\n\n🎯 Content scheduled and ready for publishing`;
-      
-      return {
-        strategy: 'placeholder',
-        method: 'placeholder_post',
-        processedUrl: 'https://via.placeholder.com/1080x1080/4F46E5/FFFFFF?text=Scheduled+Content',
-        processedCaption: placeholderCaption
-      };
-    }
+    // Strategy 3: Skip placeholder images - require actual media
+    // Never use placeholder images as Instagram rejects them
     
     // Strategy 4: Skip if no permissions available
     return {

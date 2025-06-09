@@ -3739,6 +3739,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         istTime: new Date(scheduledDate.getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
       });
 
+      // Validate media URL - prevent placeholder URLs
+      if (contentData && contentData.mediaUrl) {
+        if (contentData.mediaUrl.includes('via.placeholder.com') || 
+            contentData.mediaUrl.includes('placeholder') ||
+            contentData.mediaUrl.startsWith('blob:')) {
+          return res.status(400).json({ 
+            error: 'Invalid media URL. Please upload a real image or video file.' 
+          });
+        }
+      } else if (type !== 'text') {
+        return res.status(400).json({ 
+          error: 'Media URL is required for non-text content types.' 
+        });
+      }
+
       // Create scheduled content with proper structure
       const contentToSave = {
         title,

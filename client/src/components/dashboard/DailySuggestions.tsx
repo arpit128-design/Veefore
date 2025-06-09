@@ -5,9 +5,11 @@ import { Flame, Music, Hash, Clock } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { useLocation } from "wouter";
 
 export function DailySuggestions() {
   const { currentWorkspace } = useWorkspace();
+  const [, setLocation] = useLocation();
 
   const { data: suggestions, refetch } = useQuery({
     queryKey: ['suggestions', currentWorkspace?.id],
@@ -116,6 +118,7 @@ export function DailySuggestions() {
                     <Button
                       size="sm"
                       className="w-full mt-3 bg-electric-cyan/10 border-electric-cyan/30 hover:bg-electric-cyan/20 transition-colors"
+                      onClick={() => setLocation('/ai-suggestions')}
                     >
                       View Details
                     </Button>

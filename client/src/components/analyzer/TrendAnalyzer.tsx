@@ -31,21 +31,11 @@ export function TrendAnalyzer() {
     queryFn: async () => {
       console.log('[CLIENT DEBUG] Fetching trends for workspace:', currentWorkspace?.id);
       
-      // First trigger a refresh to ensure fresh data
-      try {
-        console.log('[CLIENT DEBUG] Triggering trend refresh...');
-        await apiRequest('POST', '/api/analytics/refresh-trends', {
-          workspaceId: currentWorkspace?.id,
-          category: 'all'
-        });
-        console.log('[CLIENT DEBUG] Refresh triggered successfully');
-      } catch (refreshError) {
-        console.warn('[CLIENT DEBUG] Refresh trigger failed:', refreshError);
-      }
-      
-      // Then fetch the data
-      const response = await apiRequest('GET', `/api/analytics/refresh-trends?workspaceId=${currentWorkspace?.id}&category=all`);
+      // Directly fetch the cached trending data
+      const response = await apiRequest('GET', `/api/analytics/refresh-trends?category=all`);
       console.log('[CLIENT DEBUG] Trend API response:', response);
+      console.log('[CLIENT DEBUG] Response keys:', Object.keys(response || {}));
+      console.log('[CLIENT DEBUG] Hashtags count:', response?.hashtags?.length || 0);
       return response;
     },
     enabled: !!currentWorkspace?.id,
@@ -88,12 +78,25 @@ export function TrendAnalyzer() {
     })) || []
   } : { hashtags: [] };
 
+  // Extract hashtags from response - check multiple possible locations
+  const finalHashtags = authenticTrends.hashtags.length > 0 ? authenticTrends.hashtags : 
+    (trendData as any)?.hashtags?.map((trend: any, index: number) => ({
+      id: trend.id || `hashtag-${index}`,
+      type: 'hashtag' as const,
+      name: trend.tag?.startsWith('#') ? trend.tag : `#${trend.tag || trend.name}`,
+      popularity: trend.popularity || 75,
+      growth: trend.growth || 15,
+      engagement: trend.engagement || trend.uses || '10K',
+      difficulty: (trend.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
+      platforms: Array.isArray(trend.platforms) ? trend.platforms : ['Instagram'],
+      description: `Trending ${trend.category || 'lifestyle'} hashtag with ${trend.uses || trend.engagement || '10K'} uses`
+    })) || [];
+
   console.log('TrendAnalyzer Debug:', {
-    trendData: trendData,
-    authenticTrendsLength: authenticTrends.hashtags.length,
-    hasHashtags: !!(trendData as any)?.trends?.hashtags,
-    hashtagsRaw: (trendData as any)?.trends?.hashtags,
-    fullStructure: JSON.stringify(trendData, null, 2)
+    authenticTrendsLength: finalHashtags.length,
+    hasHashtags: finalHashtags.length > 0,
+    trendDataStructure: Object.keys(trendData || {}),
+    firstHashtag: finalHashtags[0]
   });
 
   // Fallback data only when API is loading

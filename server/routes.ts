@@ -182,16 +182,22 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Trend Intelligence Center - Authentic trending data endpoint
+  // Trend Intelligence Center - Authentic trending data endpoint with personalization
   app.get("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
     try {
       const { category = 'all' } = req.query;
-      console.log(`[TREND INTELLIGENCE GET] Fetching authentic trending data for category: ${category}`);
+      const userId = req.user.id;
+      console.log(`[TREND INTELLIGENCE GET] Fetching authentic trending data for category: ${category}, user: ${userId}`);
       
       const { AuthenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
       const authenticTrendAnalyzer = AuthenticTrendAnalyzer.getInstance();
       const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
       
+      // Get user onboarding preferences for personalization
+      const user = await storage.getUser(userId);
+      const userPreferences = user?.preferences || {};
+      
+      console.log(`[TREND INTELLIGENCE GET] User preferences:`, userPreferences);
       console.log(`[TREND INTELLIGENCE GET] Retrieved authentic trends:`, {
         hashtags: trendingData.trends.hashtags.length,
         audio: trendingData.trends.audio.length,
@@ -199,21 +205,73 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         totalTrends: trendingData.trendingTags
       });
       
-      // Ensure proper response structure for client
+      // Personalize hashtags based on user onboarding data
+      let personalizedHashtags = trendingData.trends.hashtags;
+      
+      if (userPreferences.interests || userPreferences.contentType || userPreferences.industry) {
+        console.log(`[TREND INTELLIGENCE GET] Personalizing hashtags based on user interests`);
+        
+        // Filter hashtags based on user interests
+        const userInterests = userPreferences.interests || [];
+        const contentType = userPreferences.contentType || '';
+        const industry = userPreferences.industry || '';
+        
+        personalizedHashtags = trendingData.trends.hashtags.filter(hashtag => {
+          const tag = hashtag.tag.toLowerCase();
+          const category = hashtag.category?.toLowerCase() || '';
+          
+          // Match user interests
+          const matchesInterests = userInterests.some((interest: string) => 
+            tag.includes(interest.toLowerCase()) || 
+            category.includes(interest.toLowerCase())
+          );
+          
+          // Match content type
+          const matchesContentType = contentType && 
+            (tag.includes(contentType.toLowerCase()) || category.includes(contentType.toLowerCase()));
+          
+          // Match industry
+          const matchesIndustry = industry && 
+            (tag.includes(industry.toLowerCase()) || category.includes(industry.toLowerCase()));
+          
+          return matchesInterests || matchesContentType || matchesIndustry;
+        });
+        
+        // If too few personalized results, add top trending ones
+        if (personalizedHashtags.length < 10) {
+          const remaining = trendingData.trends.hashtags
+            .filter(h => !personalizedHashtags.includes(h))
+            .slice(0, 10 - personalizedHashtags.length);
+          personalizedHashtags = [...personalizedHashtags, ...remaining];
+        }
+      }
+      
+      // Ensure proper response structure for client - send hashtags in root level
       const response = {
         success: true,
-        trendingTags: trendingData.trendingTags,
+        trendingTags: personalizedHashtags.length,
         viralAudio: trendingData.viralAudio,
         contentFormats: trendingData.contentFormats,
         accuracyRate: trendingData.accuracyRate,
+        hashtags: personalizedHashtags.map((hashtag, index) => ({
+          id: `hashtag-${index}`,
+          tag: hashtag.tag,
+          popularity: hashtag.popularity,
+          growth: hashtag.growth,
+          engagement: hashtag.engagement,
+          difficulty: hashtag.difficulty,
+          platforms: hashtag.platforms,
+          category: hashtag.category,
+          uses: hashtag.uses
+        })),
         trends: {
-          hashtags: trendingData.trends.hashtags,
+          hashtags: personalizedHashtags,
           audio: trendingData.trends.audio,
           formats: trendingData.trends.formats
         }
       };
       
-      console.log(`[TREND INTELLIGENCE GET] Sending formatted response with ${response.trends.hashtags.length} hashtags`);
+      console.log(`[TREND INTELLIGENCE GET] Sending personalized response with ${response.hashtags.length} hashtags`);
       res.json(response);
     } catch (error: any) {
       console.error('[TREND INTELLIGENCE GET] Error fetching authentic trends:', error);

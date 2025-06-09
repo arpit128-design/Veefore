@@ -5913,33 +5913,37 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       switch (mediaType) {
         case 'image':
         case 'post':
-          // For image/post publishing
+          // For image/post publishing - Instagram Basic Display API format
           publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             image_url: mediaUrl,
-            caption: caption || ''
+            caption: caption || '',
+            media_type: 'IMAGE'
           };
           break;
         case 'video':
         case 'reel':
-          // For video/reel publishing
+          // For video/reel publishing - Instagram Basic Display API format
           publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
-            media_type: 'VIDEO',
             video_url: mediaUrl,
-            caption: caption || ''
+            caption: caption || '',
+            media_type: 'VIDEO'
           };
           break;
         case 'story':
-          // For story publishing
+          // For story publishing - Instagram Stories API format
           publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
-            media_type: 'STORIES',
-            video_url: mediaUrl
+            image_url: mediaUrl.includes('video') || mediaUrl.endsWith('.mp4') ? undefined : mediaUrl,
+            video_url: mediaUrl.includes('video') || mediaUrl.endsWith('.mp4') ? mediaUrl : undefined,
+            media_type: 'STORIES'
           };
+          // Remove undefined properties
+          Object.keys(publishData).forEach(key => publishData[key] === undefined && delete publishData[key]);
           break;
         default:
           return res.status(400).json({ error: 'Invalid media type. Supported types: image, post, video, reel, story' });
@@ -5950,7 +5954,31 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.log('[INSTAGRAM PUBLISH] Access Token (first 20 chars):', instagramAccount.accessToken?.substring(0, 20) + '...');
       console.log('[INSTAGRAM PUBLISH] Publish data payload:', JSON.stringify(publishData, null, 2));
 
+      // Validate media URL accessibility before publishing
+      console.log('[INSTAGRAM PUBLISH] Validating media URL accessibility...');
+      try {
+        const mediaCheckResponse = await fetch(mediaUrl, { method: 'HEAD' });
+        console.log('[INSTAGRAM PUBLISH] Media URL check status:', mediaCheckResponse.status);
+        
+        if (!mediaCheckResponse.ok) {
+          console.error('[INSTAGRAM PUBLISH] Media URL not accessible:', mediaUrl);
+          return res.status(400).json({ 
+            error: 'Media URL is not accessible to Instagram',
+            details: `URL returned ${mediaCheckResponse.status}: ${mediaCheckResponse.statusText}`,
+            mediaUrl
+          });
+        }
+      } catch (mediaError) {
+        console.error('[INSTAGRAM PUBLISH] Failed to validate media URL:', mediaError);
+        return res.status(400).json({ 
+          error: 'Unable to validate media URL accessibility',
+          details: 'Media URL must be publicly accessible for Instagram publishing',
+          mediaUrl
+        });
+      }
+
       // Step 1: Create media container
+      console.log('[INSTAGRAM PUBLISH] Creating media container...');
       const containerResponse = await fetch(publishEndpoint, {
         method: 'POST',
         headers: {
@@ -5964,9 +5992,28 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       if (!containerResponse.ok) {
         const errorData = await containerResponse.json();
         console.error('[INSTAGRAM PUBLISH] Container creation failed:', errorData);
+        
+        // Enhanced error handling with specific Instagram error codes
+        let errorMessage = 'Failed to create Instagram media container';
+        let errorDetails = errorData.error?.message || 'Unknown Instagram API error';
+        
+        if (errorData.error?.code === 190) {
+          errorMessage = 'Instagram access token expired';
+          errorDetails = 'Please reconnect your Instagram account to refresh the access token';
+        } else if (errorData.error?.code === 100) {
+          errorMessage = 'Invalid Instagram API parameters';
+          errorDetails = 'The media URL or caption format is not supported by Instagram';
+        } else if (errorData.error?.code === 200) {
+          errorMessage = 'Instagram permissions insufficient';
+          errorDetails = 'Your Instagram account does not have publishing permissions';
+        }
+        
         return res.status(400).json({ 
-          error: 'Failed to create Instagram media container',
-          details: errorData.error?.message || 'Unknown Instagram API error'
+          error: errorMessage,
+          details: errorDetails,
+          instagramError: errorData.error,
+          mediaUrl,
+          accountId: instagramAccount.accountId
         });
       }
 

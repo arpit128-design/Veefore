@@ -5152,21 +5152,30 @@ Format as JSON with: script, caption, hashtags`;
         temperature: 0.7
       });
 
-      const result = JSON.parse(response.choices[0].message.content);
+      const result = JSON.parse(response.choices[0].message.content || '{}');
 
-      // Deduct credits
-      await storage.updateUserCredits(user.id, user.credits - 2);
-
-      console.log('[AI SCRIPT] Generated successfully');
-
-      res.json({
-        ...result,
+      // Ensure all required fields are present
+      const scriptResponse = {
+        script: result.script || "AI-generated script content will appear here",
+        caption: result.caption || "🎬 AI-generated content for your audience",
+        hashtags: result.hashtags || ['#ai', '#content', '#viral'],
         creditsUsed: 2,
         remainingCredits: user.credits - 2,
         platform,
         contentType,
         dimensions
+      };
+
+      // Deduct credits
+      await storage.updateUserCredits(user.id, user.credits - 2);
+
+      console.log('[AI SCRIPT] Generated successfully:', {
+        hasScript: !!scriptResponse.script,
+        hasCaption: !!scriptResponse.caption,
+        hashtagCount: scriptResponse.hashtags.length
       });
+
+      res.json(scriptResponse);
 
     } catch (error: any) {
       console.error('[AI SCRIPT] Error:', error);

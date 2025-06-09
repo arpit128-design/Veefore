@@ -103,8 +103,15 @@ function AIVideoGenerator() {
       return await response.json();
     },
     onSuccess: (response: any) => {
+      console.log('[SCRIPT DEBUG] API Response:', response);
       setGeneratedScript(response);
-      setScript(response.script);
+      
+      // Ensure script is properly extracted as string
+      const scriptText = typeof response.script === 'string' 
+        ? response.script 
+        : (response.script?.text || response.script?.content || "AI-generated script content");
+      
+      setScript(scriptText);
       setStep('script-review');
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({

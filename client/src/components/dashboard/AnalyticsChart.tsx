@@ -9,18 +9,11 @@ const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 export function AnalyticsChart() {
   const { data: analyticsData, isLoading } = useInstantAnalytics();
   
-  // Debug logging to see what data we're receiving
-  React.useEffect(() => {
-    if (analyticsData) {
-      console.log('[ANALYTICS CHART] Raw data received:', analyticsData);
-    }
-  }, [analyticsData]);
-
   // Generate engagement trend data based on real analytics
   const engagementTrend = React.useMemo(() => {
     if (!analyticsData) return [];
     
-    const baseEngagement = analyticsData.engagement || 0;
+    const baseEngagement = analyticsData.engagementRate || analyticsData.engagement || 0;
     return [
       { name: 'Mon', engagement: Math.max(0, baseEngagement * 0.8), reach: analyticsData.totalReach * 0.7 },
       { name: 'Tue', engagement: Math.max(0, baseEngagement * 0.9), reach: analyticsData.totalReach * 0.8 },
@@ -31,6 +24,8 @@ export function AnalyticsChart() {
       { name: 'Sun', engagement: Math.max(0, baseEngagement * 0.85), reach: analyticsData.totalReach * 0.65 }
     ];
   }, [analyticsData]);
+
+
 
   // Platform distribution data
   const platformData = React.useMemo(() => {
@@ -185,7 +180,7 @@ export function AnalyticsChart() {
                   <span className="text-sm text-white/80">Engagement Rate</span>
                 </div>
                 <span className="text-white font-medium">
-                  {analyticsData?.engagement?.toFixed(1) || '0'}%
+                  {(analyticsData?.engagementRate || analyticsData?.engagement || 0).toFixed(1)}%
                 </span>
               </div>
               
@@ -205,7 +200,7 @@ export function AnalyticsChart() {
                   <span className="text-sm text-white/80">Content Score</span>
                 </div>
                 <span className="text-white font-medium">
-                  {analyticsData?.contentScore || '0'}/100
+                  {Math.round((analyticsData?.engagementRate || analyticsData?.engagement || 0) * 2) || '0'}/100
                 </span>
               </div>
             </div>

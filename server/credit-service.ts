@@ -94,18 +94,12 @@ export class CreditService {
     });
   }
 
-  // Reset monthly credits based on subscription
+  // Reset monthly credits based on subscription - DISABLED FOR SECURITY
   async resetMonthlyCredits(userId: number | string): Promise<void> {
-    const subscription = await storage.getSubscription(userId);
-
-    if (!subscription) {
-      // Free plan gets 60 credits
-      await this.addCredits(userId, 60, 'earned', 'Monthly free credits reset', 'monthly_reset');
-      return;
-    }
-
-    const monthlyCredits = subscription.monthlyCredits || 60;
-    await this.addCredits(userId, monthlyCredits, 'earned', `Monthly ${subscription.plan} credits reset`, 'monthly_reset');
+    // SECURITY: Automatic credit allocation disabled to prevent credit loopholes
+    // Users must purchase credits manually through payment system
+    console.log(`[CREDIT SECURITY] Automatic credit reset disabled for user ${userId} - credits must be purchased`);
+    return;
   }
 
   // Handle referral rewards

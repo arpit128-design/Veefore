@@ -317,8 +317,9 @@ export class SubscriptionService {
   }
 
   static async refreshCredits(userId: string): Promise<void> {
-    // Credit refresh disabled - users must purchase credits manually
-    console.log(`[SUBSCRIPTION] Credit refresh disabled for user ${userId}`);
+    // SECURITY: Automatic credit refresh completely disabled to prevent loopholes
+    // All credits must be purchased through authenticated payment system
+    console.log(`[SUBSCRIPTION SECURITY] Automatic credit refresh blocked for user ${userId} - purchase required`);
     return;
   }
 

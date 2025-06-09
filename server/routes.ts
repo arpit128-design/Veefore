@@ -182,13 +182,39 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Trend Intelligence Center - Authentic trending data endpoint
+  app.get("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
+    try {
+      const { category = 'all' } = req.query;
+      console.log(`[TREND INTELLIGENCE] Fetching authentic trending data for category: ${category}`);
+      
+      const { authenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
+      
+      console.log(`[TREND INTELLIGENCE] Retrieved authentic trends:`, {
+        hashtags: trendingData.trends.hashtags.length,
+        audio: trendingData.trends.audio.length,
+        formats: trendingData.trends.formats.length
+      });
+      
+      res.json(trendingData);
+    } catch (error: any) {
+      console.error('[TREND INTELLIGENCE] Error fetching authentic trends:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Real-time viral hashtag analysis using authentic data sources
   app.get("/api/hashtags/trending", requireAuth, async (req: any, res: any) => {
     try {
       const { category = 'all' } = req.query;
-      console.log(`[VIRAL HASHTAGS] Analyzing real-time trending hashtags for category: ${category}`);
+      console.log(`[AUTHENTIC HASHTAGS] Analyzing real-time trending hashtags for category: ${category}`);
       
-      const viralHashtags = new Map();
+      const { authenticTrendAnalyzer } = await import('./authentic-trend-analyzer');
+      const trendingData = await authenticTrendAnalyzer.getAuthenticTrendingData(category);
+      
+      console.log(`[AUTHENTIC HASHTAGS] Retrieved ${trendingData.trends.hashtags.length} authentic trending hashtags`);
+      res.json(trendingData.trends.hashtags);
       
       // 1. Get trending hashtags from YouTube API
       if (process.env.YOUTUBE_API_KEY) {

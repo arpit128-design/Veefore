@@ -28,16 +28,14 @@ export function TrendAnalyzer() {
   const queryClient = useQueryClient();
 
   const { data: trendData, isLoading, refetch } = useQuery({
-    queryKey: ['trends', currentWorkspace?.id],
+    queryKey: ['authentic-trends', currentWorkspace?.id],
     queryFn: async () => {
-      // Fetch real trend data from APIs
-      const response = await fetch(`/api/analytics?workspaceId=${currentWorkspace?.id}&type=trends`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch trend data');
-      }
-      return response.json();
+      const response = await apiRequest('GET', `/api/analytics/refresh-trends?workspaceId=${currentWorkspace?.id}&category=all`);
+      return response;
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id,
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+    staleTime: 2 * 60 * 1000 // Consider data stale after 2 minutes
   });
 
   const refreshTrendsMutation = useMutation({

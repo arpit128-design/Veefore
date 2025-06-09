@@ -339,24 +339,45 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           const popularity = Math.min(100, Math.round((data.count * 8) + (platformCount * 15)));
           const growthPotential = Math.min(100, popularity + Math.round(platformCount * 10));
           
-          // Categorize hashtags based on content
+          // Categorize hashtags based on content with comprehensive keyword matching
           let hashtagCategory = 'general';
           const lowerTag = tag.toLowerCase();
           
-          if (['fitness', 'workout', 'gym', 'health', 'training', 'wellness', 'exercise'].some(w => lowerTag.includes(w))) {
+          // Fitness category
+          if (['fitness', 'workout', 'gym', 'health', 'training', 'wellness', 'exercise', 'sport', 'athlete', 'bodybuilding', 'yoga', 'pilates', 'running', 'marathon', 'cycling', 'swimming', 'crossfit'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'fitness';
-          } else if (['food', 'recipe', 'cooking', 'foodie', 'delicious', 'chef', 'meal'].some(w => lowerTag.includes(w))) {
+          } 
+          // Food category
+          else if (['food', 'recipe', 'cooking', 'foodie', 'delicious', 'chef', 'meal', 'restaurant', 'cuisine', 'baking', 'dessert', 'lunch', 'dinner', 'breakfast', 'eat', 'taste', 'kitchen', 'culinary'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'food';
-          } else if (['travel', 'vacation', 'adventure', 'explore', 'wanderlust', 'trip'].some(w => lowerTag.includes(w))) {
+          } 
+          // Travel category
+          else if (['travel', 'vacation', 'adventure', 'explore', 'wanderlust', 'trip', 'journey', 'tourism', 'destination', 'beach', 'mountain', 'city', 'hotel', 'flight', 'backpack', 'solo', 'roadtrip'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'travel';
-          } else if (['fashion', 'style', 'ootd', 'outfit', 'trendy', 'beauty', 'makeup'].some(w => lowerTag.includes(w))) {
+          } 
+          // Fashion category
+          else if (['fashion', 'style', 'ootd', 'outfit', 'trendy', 'beauty', 'makeup', 'clothing', 'dress', 'shoes', 'accessories', 'model', 'designer', 'vintage', 'streetstyle', 'luxury', 'brand'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'fashion';
-          } else if (['business', 'entrepreneur', 'startup', 'leadership', 'networking', 'success'].some(w => lowerTag.includes(w))) {
+          } 
+          // Business category
+          else if (['business', 'entrepreneur', 'startup', 'leadership', 'networking', 'success', 'marketing', 'sales', 'finance', 'investment', 'ceo', 'company', 'corporate', 'professional', 'career', 'money', 'profit', 'growth'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'business';
-          } else if (['tech', 'technology', 'ai', 'coding', 'innovation', 'digital', 'app'].some(w => lowerTag.includes(w))) {
+          } 
+          // Technology category
+          else if (['tech', 'technology', 'ai', 'coding', 'innovation', 'digital', 'app', 'software', 'computer', 'internet', 'data', 'programming', 'developer', 'startup', 'gadget', 'mobile', 'web', 'cyber'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'technology';
-          } else if (['lifestyle', 'life', 'daily', 'mindfulness', 'selfcare', 'motivation'].some(w => lowerTag.includes(w))) {
+          } 
+          // Lifestyle category
+          else if (['lifestyle', 'life', 'daily', 'mindfulness', 'selfcare', 'motivation', 'inspiration', 'happiness', 'love', 'family', 'home', 'personal', 'growth', 'positivity', 'wellness', 'balance'].some(w => lowerTag.includes(w))) {
             hashtagCategory = 'lifestyle';
+          }
+          // Sports-specific categorization
+          else if (['sports', 'sport', 'game', 'team', 'player', 'match', 'championship', 'league', 'tournament', 'winner', 'football', 'basketball', 'soccer', 'tennis', 'baseball', 'hockey', 'racing', 'olympics'].some(w => lowerTag.includes(w))) {
+            hashtagCategory = 'fitness'; // Sports falls under fitness
+          }
+          // Entertainment/General
+          else if (['music', 'artist', 'song', 'concert', 'album', 'entertainment', 'movie', 'film', 'tv', 'celebrity', 'actor', 'actress', 'show', 'performance', 'art', 'creative'].some(w => lowerTag.includes(w))) {
+            hashtagCategory = 'lifestyle'; // Entertainment falls under lifestyle
           }
           
           // Filter by category if specified

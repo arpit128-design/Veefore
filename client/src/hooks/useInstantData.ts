@@ -109,19 +109,19 @@ export function useInstantSocialAccounts() {
   });
 }
 
-// Instant hashtags hook
-export function useInstantHashtags() {
+// Instant hashtags hook with category filtering
+export function useInstantHashtags(category: string = 'all') {
   const { token } = useAuth();
   const { currentWorkspace } = useWorkspaceContext();
 
   return useQuery({
-    queryKey: ['/api/hashtags/trending', currentWorkspace?.id],
-    queryFn: () => fetch(`/api/hashtags/trending?category=all&workspaceId=${currentWorkspace?.id}`, {
+    queryKey: ['/api/hashtags/trending', currentWorkspace?.id, category],
+    queryFn: () => fetch(`/api/hashtags/trending?category=${category}&workspaceId=${currentWorkspace?.id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     }).then(res => res.json()),
     enabled: !!currentWorkspace && !!token,
-    staleTime: 300000,
-    gcTime: 1800000,
+    staleTime: 60000, // 1 minute for category changes
+    gcTime: 300000, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData,

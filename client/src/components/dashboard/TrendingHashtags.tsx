@@ -22,7 +22,7 @@ export function TrendingHashtags() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const { currentWorkspace } = useWorkspaceContext();
 
-  const { data: hashtags, isLoading } = useInstantHashtags();
+  const { data: hashtags, isLoading } = useInstantHashtags(selectedCategory);
 
   const categories = [
     { value: 'all', label: 'All' },

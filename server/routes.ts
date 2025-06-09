@@ -1997,20 +1997,12 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
-  // Test endpoint for adding credits (no auth required)
-  app.post('/api/test-add-credits', async (req: any, res: Response) => {
+  // Test endpoint for adding credits to current user
+  app.post('/api/test-add-credits', requireAuth, async (req: any, res: Response) => {
     try {
-      const { username, amount } = req.body;
+      const { user } = req;
+      const { amount = 50 } = req.body;
       
-      if (!username || !amount) {
-        return res.status(400).json({ error: 'Username and amount required' });
-      }
-
-      const user = await storage.getUserByUsername(username);
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
       const currentCredits = user.credits || 0;
       const newCredits = currentCredits + amount;
       
@@ -2018,7 +2010,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       res.json({ 
         success: true, 
-        username,
+        username: user.username,
         previousCredits: currentCredits,
         newCredits,
         added: amount

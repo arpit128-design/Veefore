@@ -1184,7 +1184,9 @@ function AIImageGenerator() {
 
 // AI Video Shortener with URL Analysis Component
 function VideoShortener() {
+  const [inputType, setInputType] = useState<'url' | 'upload'>('url');
   const [videoUrl, setVideoUrl] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [platform, setPlatform] = useState("youtube");
   const [duration, setDuration] = useState("30");
   const [style, setStyle] = useState("viral");
@@ -1201,6 +1203,7 @@ function VideoShortener() {
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
@@ -1257,8 +1260,27 @@ function VideoShortener() {
     }
   });
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('video/')) {
+        setVideoFile(file);
+        toast({
+          title: "Video Uploaded",
+          description: `Selected: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`,
+        });
+      } else {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a video file",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const analyzeVideo = () => {
-    if (!videoUrl.trim()) {
+    if (inputType === 'url' && !videoUrl.trim()) {
       toast({
         title: "Video URL Required",
         description: "Please enter a valid video URL",
@@ -1267,21 +1289,60 @@ function VideoShortener() {
       return;
     }
 
-    analyzeMutation.mutate({
-      videoUrl: videoUrl.trim(),
-      workspaceId: currentWorkspace?.id
-    });
+    if (inputType === 'upload' && !videoFile) {
+      toast({
+        title: "Video File Required",
+        description: "Please upload a video file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const data = inputType === 'url' 
+      ? { videoUrl: videoUrl.trim(), workspaceId: currentWorkspace?.id }
+      : { videoFile, workspaceId: currentWorkspace?.id };
+
+    analyzeMutation.mutate(data);
   };
 
   const shortenVideo = () => {
-    shortenMutation.mutate({
-      videoUrl: videoUrl.trim(),
-      targetDuration: parseInt(duration),
-      platform,
-      style,
-      userPreferences,
-      workspaceId: currentWorkspace?.id
-    });
+    if (inputType === 'url' && !videoUrl.trim()) {
+      toast({
+        title: "Video URL Required",
+        description: "Please enter a valid video URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (inputType === 'upload' && !videoFile) {
+      toast({
+        title: "Video File Required",
+        description: "Please upload a video file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const data = inputType === 'url' 
+      ? {
+          videoUrl: videoUrl.trim(),
+          targetDuration: parseInt(duration),
+          platform,
+          style,
+          userPreferences,
+          workspaceId: currentWorkspace?.id
+        }
+      : {
+          videoFile,
+          targetDuration: parseInt(duration),
+          platform,
+          style,
+          userPreferences,
+          workspaceId: currentWorkspace?.id
+        };
+
+    shortenMutation.mutate(data);
   };
 
   const publishToInstagram = (mediaUrl: string, mediaType: string) => {
@@ -1311,18 +1372,77 @@ function VideoShortener() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Input Type Selection */}
             <div>
-              <Label htmlFor="videoUrl">Video URL</Label>
-              <Input
-                id="videoUrl"
-                placeholder="Paste YouTube, Vimeo, or other video URL..."
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Supports YouTube, Vimeo, and most video platforms
-              </p>
+              <Label className="text-sm font-medium mb-3 block">Video Input Method</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={inputType === 'url' ? 'default' : 'outline'}
+                  onClick={() => setInputType('url')}
+                  className="flex-1"
+                >
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  URL Input
+                </Button>
+                <Button
+                  type="button"
+                  variant={inputType === 'upload' ? 'default' : 'outline'}
+                  onClick={() => setInputType('upload')}
+                  className="flex-1"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  File Upload
+                </Button>
+              </div>
             </div>
+
+            {/* Conditional Input Fields */}
+            {inputType === 'url' ? (
+              <div>
+                <Label htmlFor="videoUrl">Video URL</Label>
+                <Input
+                  id="videoUrl"
+                  placeholder="Paste YouTube, Vimeo, or other video URL..."
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supports YouTube, Vimeo, and most video platforms
+                </p>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="videoFile" className="text-sm font-medium mb-2 block">
+                  Upload Video File
+                </Label>
+                <div 
+                  className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    {videoFile ? (
+                      <span className="text-foreground font-medium">
+                        {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                      </span>
+                    ) : (
+                      "Click to upload or drag and drop your video file"
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Supports MP4, MOV, AVI, MKV and other video formats
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>

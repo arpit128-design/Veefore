@@ -26,6 +26,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number | string, updates: Partial<User>): Promise<User>;
   updateUserCredits(id: number | string, credits: number): Promise<User>;
+  getUserCredits(userId: number | string): Promise<number>;
   updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
 
   // Workspace operations

@@ -580,6 +580,11 @@ export class MongoStorage implements IStorage {
     return this.updateUser(id, { credits });
   }
 
+  async getUserCredits(userId: number | string): Promise<number> {
+    const user = await this.getUser(userId);
+    return user ? user.credits : 0;
+  }
+
   async updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User> {
     return this.updateUser(id, { stripeCustomerId, stripeSubscriptionId });
   }

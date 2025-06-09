@@ -1104,6 +1104,71 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Real-time analytics endpoint with authentic Instagram data analysis
+  app.get('/api/analytics/realtime', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.query.workspaceId;
+      
+      console.log('[REALTIME ANALYTICS] Request for user:', user.id, 'workspace:', workspaceId);
+      
+      // Get target workspace
+      let targetWorkspace;
+      if (workspaceId && workspaceId !== 'undefined') {
+        targetWorkspace = await storage.getWorkspace(workspaceId.toString());
+        if (!targetWorkspace || targetWorkspace.userId.toString() !== user.id.toString()) {
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      } else {
+        targetWorkspace = await storage.getDefaultWorkspace(user.id);
+      }
+      
+      if (!targetWorkspace) {
+        return res.status(404).json({ error: 'No workspace found' });
+      }
+
+      // Get Instagram account with access token
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(targetWorkspace.id);
+      const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
+      
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        console.log('[REALTIME ANALYTICS] No Instagram account connected');
+        return res.status(400).json({ 
+          error: 'Instagram account not connected',
+          message: 'Connect your Instagram account to view real-time analytics'
+        });
+      }
+
+      console.log('[REALTIME ANALYTICS] Analyzing Instagram account:', instagramAccount.username);
+
+      // Import and use analytics engine for authentic data analysis
+      const { AnalyticsEngine } = await import('./analytics-engine');
+      const analyticsEngine = new AnalyticsEngine(storage);
+
+      // Calculate real-time analytics from authentic Instagram data
+      const realTimeAnalytics = await analyticsEngine.calculateRealTimeAnalytics(
+        instagramAccount.accessToken, 
+        targetWorkspace.id
+      );
+
+      console.log('[REALTIME ANALYTICS] Calculated authentic analytics:', {
+        engagementRate: realTimeAnalytics.engagementRate,
+        growthVelocity: realTimeAnalytics.growthVelocity,
+        optimalHour: realTimeAnalytics.optimalTime.hour,
+        bestDays: realTimeAnalytics.optimalTime.bestDays
+      });
+
+      res.json(realTimeAnalytics);
+
+    } catch (error: any) {
+      console.error('[REALTIME ANALYTICS] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to calculate real-time analytics',
+        details: error.message 
+      });
+    }
+  });
+
   // Instagram sync endpoint for real-time data updates
   app.post("/api/instagram/sync", requireAuth, async (req: any, res: any) => {
     try {

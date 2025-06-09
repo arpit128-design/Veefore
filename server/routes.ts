@@ -3716,6 +3716,29 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(400).json({ error: 'No workspace found for user' });
       }
 
+      // Fix timezone conversion - handle IST to UTC properly
+      let scheduledDate;
+      if (typeof scheduledAt === 'string') {
+        // Check if the date includes timezone info
+        if (scheduledAt.includes('T') && (scheduledAt.includes('+') || scheduledAt.includes('Z'))) {
+          // Already has timezone info, use as-is
+          scheduledDate = new Date(scheduledAt);
+        } else {
+          // Assume IST and convert to UTC
+          const istDate = new Date(scheduledAt);
+          // IST is UTC+5:30, so subtract 5.5 hours to get UTC
+          scheduledDate = new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000));
+        }
+      } else {
+        scheduledDate = new Date(scheduledAt);
+      }
+
+      console.log('[CONTENT SCHEDULE] Timezone conversion:', {
+        original: scheduledAt,
+        converted: scheduledDate.toISOString(),
+        istTime: new Date(scheduledDate.getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+      });
+
       // Create scheduled content with proper structure
       const contentToSave = {
         title,
@@ -3723,7 +3746,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         type,
         platform,
         status: 'scheduled',
-        scheduledAt: new Date(scheduledAt),
+        scheduledAt: scheduledDate,
         workspaceId: currentWorkspace.id,
         creditsUsed: 0,
         contentData: contentData || {},

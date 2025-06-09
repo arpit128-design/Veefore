@@ -41,7 +41,7 @@ async function fixDuplicateWorkspaces() {
     
     // Check each user for multiple workspaces
     for (const user of users) {
-      const workspaces = await workspacesCollection.find({ userId: user._id }).sort({ createdAt: 1 }).toArray();
+      const workspaces = await WorkspaceModel.find({ userId: user._id }).sort({ createdAt: 1 }).lean();
       if (workspaces.length > 1) {
         usersWithDuplicates.push({
           user,
@@ -64,7 +64,7 @@ async function fixDuplicateWorkspaces() {
       console.log(`❌ Removing: ${duplicateWorkspaces.map(w => `${w.name} (${w._id})`).join(', ')}`);
       
       // Update the kept workspace to be default
-      await workspacesCollection.updateOne(
+      await WorkspaceModel.updateOne(
         { _id: keepWorkspace._id },
         { 
           $set: { 
@@ -78,7 +78,7 @@ async function fixDuplicateWorkspaces() {
       for (const duplicateWorkspace of duplicateWorkspaces) {
         try {
           // Move social accounts
-          const socialAccountsResult = await socialAccountsCollection.updateMany(
+          const socialAccountsResult = await SocialAccountModel.updateMany(
             { workspaceId: duplicateWorkspace._id.toString() },
             { 
               $set: { 
@@ -90,7 +90,7 @@ async function fixDuplicateWorkspaces() {
           console.log(`  📱 Moved ${socialAccountsResult.modifiedCount} social accounts`);
           
           // Move content
-          const contentResult = await contentCollection.updateMany(
+          const contentResult = await ContentModel.updateMany(
             { workspaceId: duplicateWorkspace._id.toString() },
             {
               $set: {
@@ -102,7 +102,7 @@ async function fixDuplicateWorkspaces() {
           console.log(`  📝 Moved ${contentResult.modifiedCount} content items`);
           
           // Move automation rules
-          const automationResult = await automationRulesCollection.updateMany(
+          const automationResult = await AutomationRuleModel.updateMany(
             { workspaceId: duplicateWorkspace._id.toString() },
             {
               $set: {
@@ -114,7 +114,7 @@ async function fixDuplicateWorkspaces() {
           console.log(`  🤖 Moved ${automationResult.modifiedCount} automation rules`);
           
           // Delete the duplicate workspace
-          await workspacesCollection.deleteOne({ _id: duplicateWorkspace._id });
+          await WorkspaceModel.deleteOne({ _id: duplicateWorkspace._id });
           console.log(`🗑️ Deleted duplicate workspace: ${duplicateWorkspace.name}`);
           
         } catch (error) {
@@ -128,7 +128,7 @@ async function fixDuplicateWorkspaces() {
     // Final verification
     console.log('\n📋 FINAL VERIFICATION:');
     for (const user of users) {
-      const finalWorkspaces = await workspacesCollection.find({ userId: user._id }).toArray();
+      const finalWorkspaces = await WorkspaceModel.find({ userId: user._id }).lean();
       console.log(`${user.email}: ${finalWorkspaces.length} workspace${finalWorkspaces.length !== 1 ? 's' : ''}`);
     }
     
@@ -137,7 +137,8 @@ async function fixDuplicateWorkspaces() {
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
-    await client.close();
+    await mongoose.disconnect();
+    console.log('📋 Database connection closed');
   }
 }
 

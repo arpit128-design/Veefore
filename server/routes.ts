@@ -6157,6 +6157,39 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Video content serving endpoint for AI-generated videos
+  app.get('/api/generated-content/:filename', async (req: Request, res: Response) => {
+    try {
+      const { filename } = req.params;
+      
+      console.log('[VIDEO SERVE] Serving video file:', filename);
+      
+      // For demo purposes, serve a sample video URL that can be accessed
+      // In production, this would serve actual generated video files
+      if (filename.startsWith('short_') && filename.endsWith('.mp4')) {
+        // Redirect to a sample video URL for preview
+        const sampleVideoUrl = 'https://sample-videos.com/zip/10/mp4/480/BigBuckBunny_10s_1MB.mp4';
+        
+        console.log('[VIDEO SERVE] Redirecting to sample video for preview:', sampleVideoUrl);
+        return res.redirect(sampleVideoUrl);
+      }
+      
+      if (filename.startsWith('thumb_') && filename.endsWith('.jpg')) {
+        // Serve a sample thumbnail
+        const sampleThumbnail = 'https://via.placeholder.com/480x854/000000/FFFFFF?text=AI+Short+Video';
+        
+        console.log('[VIDEO SERVE] Redirecting to sample thumbnail:', sampleThumbnail);
+        return res.redirect(sampleThumbnail);
+      }
+      
+      res.status(404).json({ error: 'Video file not found' });
+      
+    } catch (error: any) {
+      console.error('[VIDEO SERVE] Error serving video:', error);
+      res.status(500).json({ error: 'Failed to serve video content' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

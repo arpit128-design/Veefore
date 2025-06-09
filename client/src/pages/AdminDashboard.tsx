@@ -9,8 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import AdminSettings from "./AdminSettings";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { 
   Users, 
   DollarSign, 
@@ -64,9 +70,63 @@ const AdminDashboard = () => {
   const [contentSearch, setContentSearch] = useState("");
   const [contentFilter, setContentFilter] = useState("all");
   const [notificationFilter, setNotificationFilter] = useState("all");
+  const [isNotificationDialogOpen, setIsNotificationDialogOpen] = useState(false);
+
+  // Notification form schema
+  const notificationSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    message: z.string().min(1, "Message is required"),
+    type: z.enum(["info", "success", "warning", "error", "announcement"]),
+    targetUsers: z.string().default("all"),
+    scheduledFor: z.string().optional()
+  });
+
+  const notificationForm = useForm<z.infer<typeof notificationSchema>>({
+    resolver: zodResolver(notificationSchema),
+    defaultValues: {
+      title: "",
+      message: "",
+      type: "info",
+      targetUsers: "all",
+      scheduledFor: ""
+    }
+  });
 
   const adminUser = JSON.parse(localStorage.getItem("admin_user") || "{}");
   const adminToken = localStorage.getItem("admin_token");
+
+  // Create notification mutation
+  const createNotificationMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof notificationSchema>) => {
+      const response = await fetch("/api/admin/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error("Failed to create notification");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Notification created successfully" });
+      setIsNotificationDialogOpen(false);
+      notificationForm.reset();
+      queryClient.invalidateQueries({ queryKey: ["admin", "notifications"] });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to create notification",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleCreateNotification = async (data: z.infer<typeof notificationSchema>) => {
+    createNotificationMutation.mutate(data);
+  };
 
   useEffect(() => {
     if (!adminToken) {
@@ -541,7 +601,10 @@ const AdminDashboard = () => {
                       Manage platform-wide notifications and announcements
                     </CardDescription>
                   </div>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button 
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => setIsNotificationDialogOpen(true)}
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Create Notification
                   </Button>

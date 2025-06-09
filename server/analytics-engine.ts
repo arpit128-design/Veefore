@@ -218,17 +218,54 @@ export class AnalyticsEngine {
         });
       });
 
-      // Find optimal hour based on authentic engagement rates
+      // Debug: Log all timing data for analysis
+      console.log('[ANALYTICS ENGINE] Timing data from Instagram posts:', timingData.map(t => ({
+        timestamp: t.timestamp,
+        hour: t.hour,
+        day: t.day,
+        engagement: t.engagement,
+        reach: t.reach
+      })));
+
+      console.log('[ANALYTICS ENGINE] Hourly stats:', Array.from(hourlyStats.entries()).map(([hour, stats]) => ({
+        hour,
+        ...stats,
+        engagementRate: stats.totalReach > 0 ? ((stats.totalEngagement / stats.totalReach) * 100).toFixed(2) : 0
+      })));
+
+      // Find optimal hour based on multiple factors: engagement rate, total engagement, and posting frequency
       let bestHour = 18;
-      let bestEngagementRate = 0;
+      let bestScore = 0;
 
       hourlyStats.forEach((stats, hour) => {
         const engagementRate = stats.totalReach > 0 ? (stats.totalEngagement / stats.totalReach) * 100 : 0;
-        if (engagementRate > bestEngagementRate && stats.postCount > 0) {
-          bestEngagementRate = engagementRate;
+        const totalEngagement = stats.totalEngagement;
+        const postFrequency = stats.postCount;
+        
+        // Combined scoring: engagement rate (40%) + total engagement (40%) + posting frequency (20%)
+        const score = (engagementRate * 0.4) + (totalEngagement * 0.4) + (postFrequency * 20);
+        
+        console.log('[ANALYTICS ENGINE] Hour', hour, 'score:', score.toFixed(2), 
+          'engagementRate:', engagementRate.toFixed(2), 
+          'totalEngagement:', totalEngagement, 
+          'postCount:', postFrequency);
+        
+        if (score > bestScore && stats.postCount > 0) {
+          bestScore = score;
           bestHour = hour;
         }
       });
+
+      // If no clear winner, find the hour with most posts (your preferred posting time)
+      if (bestScore === 0) {
+        let maxPosts = 0;
+        hourlyStats.forEach((stats, hour) => {
+          if (stats.postCount > maxPosts) {
+            maxPosts = stats.postCount;
+            bestHour = hour;
+          }
+        });
+      }
 
       // Calculate peak hours from authentic data
       const avgEngagementRate = Array.from(hourlyStats.values())
@@ -277,11 +314,13 @@ export class AnalyticsEngine {
         formatHour(peakHours[0]) :
         "6-8 PM";
 
-      console.log('[ANALYTICS ENGINE] Calculated authentic optimal timing from', timingData.length, 'Instagram posts:', {
+      console.log('[ANALYTICS ENGINE] Final optimal timing calculation:', {
         bestHour: formatHour(bestHour),
+        bestScore: bestScore.toFixed(2),
         peakHours: peakHoursRange,
         bestDays: bestDaysData,
-        audienceActive
+        audienceActive,
+        totalPosts: timingData.length
       });
 
       return {

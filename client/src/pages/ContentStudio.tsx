@@ -1472,14 +1472,44 @@ function VideoShortener() {
               </div>
             )}
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-2">
               <Button variant="outline" className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
                 Download
               </Button>
-              <Button className="flex-1">
+              
+              {platform === 'instagram' && shortenedVideo.videoUrl && (
+                <Button 
+                  className="flex-1"
+                  onClick={() => publishToInstagram(shortenedVideo.videoUrl, 'reel', shortenedVideo.caption)}
+                  disabled={publishMutation.isPending}
+                >
+                  {publishMutation.isPending ? (
+                    <>
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Instagram className="mr-2 h-4 w-4" />
+                      Publish to Instagram
+                    </>
+                  )}
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  toast({
+                    title: "Coming Soon",
+                    description: "Direct publishing will be available soon",
+                  });
+                }}
+              >
                 <Share className="mr-2 h-4 w-4" />
-                Publish Short
+                Share to Platform
               </Button>
             </div>
           </CardContent>

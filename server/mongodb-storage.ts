@@ -3171,6 +3171,54 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  async getUserNotifications(userId: string): Promise<any[]> {
+    await this.connect();
+    
+    console.log('[NOTIFICATIONS] Fetching notifications for user:', userId);
+    
+    // Find notifications targeted to this user or to all users
+    const notifications = await NotificationModel.find({
+      $or: [
+        { userId: userId },
+        { targetUsers: 'all' },
+        { targetUsers: { $in: [userId] } }
+      ]
+    }).sort({ createdAt: -1 }).limit(50);
+    
+    console.log('[NOTIFICATIONS] Found notifications:', notifications.length);
+    
+    return notifications.map(notification => ({
+      id: notification._id.toString(),
+      userId: notification.userId,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      targetUsers: notification.targetUsers,
+      scheduledFor: notification.scheduledFor,
+      sentAt: notification.sentAt,
+      isRead: notification.isRead,
+      createdAt: notification.createdAt
+    }));
+  }
+
+  async markNotificationAsRead(notificationId: string, userId: string): Promise<void> {
+    await this.connect();
+    
+    console.log('[NOTIFICATIONS] Marking notification as read:', notificationId, 'for user:', userId);
+    
+    await NotificationModel.updateOne(
+      { 
+        _id: notificationId,
+        $or: [
+          { userId: userId },
+          { targetUsers: 'all' },
+          { targetUsers: { $in: [userId] } }
+        ]
+      },
+      { $set: { isRead: true } }
+    );
+  }
+
   async getNotifications(userId?: number): Promise<any[]> {
     await this.connect();
     const query = userId ? { userId } : {};

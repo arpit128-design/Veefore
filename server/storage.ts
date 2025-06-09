@@ -169,6 +169,8 @@ export interface IStorage {
   // Notification operations
   createNotification(notification: InsertNotification): Promise<Notification>;
   getNotifications(userId?: number): Promise<Notification[]>;
+  getUserNotifications(userId: string): Promise<any[]>;
+  markNotificationAsRead(notificationId: string, userId: string): Promise<void>;
   updateNotification(id: number, updates: Partial<Notification>): Promise<Notification>;
   deleteNotification(id: number): Promise<void>;
   markNotificationRead(id: number): Promise<void>;

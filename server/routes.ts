@@ -4662,6 +4662,33 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // User notifications endpoints
+  app.get('/api/notifications', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      console.log('[NOTIFICATIONS] Fetching notifications for user:', user.id);
+      
+      const notifications = await storage.getUserNotifications(user.id);
+      res.json(notifications);
+    } catch (error: any) {
+      console.error('[NOTIFICATIONS] Error fetching notifications:', error);
+      res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+  });
+
+  app.patch('/api/notifications/:id/read', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+      
+      await storage.markNotificationAsRead(id, user.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[NOTIFICATIONS] Error marking notification as read:', error);
+      res.status(500).json({ error: 'Failed to mark notification as read' });
+    }
+  });
+
   // Start Instagram automation service
   instagramAutomation.startAutomationService().catch(console.error);
 

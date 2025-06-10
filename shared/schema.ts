@@ -18,6 +18,9 @@ export const users = pgTable("users", {
   totalReferrals: integer("total_referrals").default(0),
   totalEarned: integer("total_earned").default(0),
   isOnboarded: boolean("is_onboarded").default(false),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  emailVerificationCode: text("email_verification_code"),
+  emailVerificationExpiry: timestamp("email_verification_expiry"),
   preferences: json("preferences"), // User preferences for AI personalization
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()

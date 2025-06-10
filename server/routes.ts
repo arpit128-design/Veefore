@@ -5171,6 +5171,160 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
   // ===== AI CONTENT GENERATION ROUTES =====
   
+  // AI Image Generator - Real DALL-E Integration with Authentic Captions
+  app.post('/api/ai/generate-image', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { prompt, platform, contentType, style, workspaceId, dimensions } = req.body;
+
+      console.log('[AI IMAGE] Request:', { userId: user.id, platform, contentType, style });
+
+      // Check credits
+      if (user.credits < 3) {
+        return res.status(402).json({ 
+          error: 'Insufficient credits. Image generation requires 3 credits.',
+          upgradeModal: true 
+        });
+      }
+
+      // Use OpenAI DALL-E for image generation
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        return res.status(500).json({ 
+          error: 'OpenAI API key not configured. Please contact support to enable AI image generation.',
+          requiresSetup: true 
+        });
+      }
+
+      try {
+        const openai = new (await import('openai')).default({
+          apiKey: openaiApiKey
+        });
+
+        // Generate image with DALL-E 3
+        const imageResponse = await openai.images.generate({
+          model: "dall-e-3",
+          prompt: prompt,
+          n: 1,
+          size: platform === 'instagram' ? "1024x1024" : "1792x1024",
+          quality: "hd",
+          style: style === 'realistic' ? 'natural' : 'vivid'
+        });
+
+        const imageUrl = imageResponse.data[0]?.url;
+        if (!imageUrl) {
+          throw new Error('No image URL returned from DALL-E');
+        }
+
+        // Generate authentic AI caption using OpenAI GPT-4o
+        const captionResponse = await openai.chat.completions.create({
+          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [
+            {
+              role: "system",
+              content: `You are a professional social media content creator. Generate engaging, authentic captions for ${platform} ${contentType || 'posts'}. 
+              
+              Guidelines:
+              - Create captivating, authentic captions that drive engagement
+              - Include relevant emojis naturally within the text
+              - Ask engaging questions to encourage comments
+              - Write in a conversational, relatable tone
+              - Keep it concise but compelling
+              - Do NOT include hashtags (they will be generated separately)
+              - Focus on storytelling and value for the audience`
+            },
+            {
+              role: "user",
+              content: `Generate an engaging caption for this ${platform} ${contentType || 'post'} about: ${prompt}
+              
+              Style: ${style || 'professional'}
+              Platform: ${platform || 'instagram'}
+              
+              Make it authentic and engaging without using hashtags.`
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.7
+        });
+
+        const caption = captionResponse.choices[0]?.message?.content?.trim() || 'Amazing content created with AI! What do you think? 💭';
+
+        // Generate relevant hashtags using OpenAI
+        const hashtagResponse = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: `Generate relevant, trending hashtags for ${platform} posts. Return 8-12 hashtags that are:
+              - Popular but not oversaturated
+              - Relevant to the content
+              - Mix of broad and niche tags
+              - Include # symbol
+              - Separate with spaces`
+            },
+            {
+              role: "user",
+              content: `Generate hashtags for: ${prompt}\nPlatform: ${platform}\nStyle: ${style}`
+            }
+          ],
+          max_tokens: 100,
+          temperature: 0.6
+        });
+
+        const hashtagText = hashtagResponse.choices[0]?.message?.content?.trim() || '';
+        const hashtags = hashtagText.split(/\s+/).filter(tag => tag.startsWith('#')).slice(0, 12);
+
+        // Deduct credits
+        await storage.updateUser(user.id, { 
+          credits: user.credits - 3 
+        });
+
+        // Save to content storage if workspaceId provided
+        if (workspaceId) {
+          await storage.createContent({
+            title: `AI Generated Image: ${prompt.substring(0, 50)}...`,
+            description: caption,
+            type: 'image',
+            platform: platform || null,
+            status: 'ready',
+            workspaceId: parseInt(workspaceId),
+            creditsUsed: 3,
+            contentData: {
+              imageUrl,
+              caption,
+              hashtags,
+              prompt,
+              style,
+              dimensions: dimensions || { width: 1024, height: 1024 }
+            }
+          });
+        }
+
+        console.log('[AI IMAGE] Successfully generated image and caption');
+
+        res.json({
+          success: true,
+          imageUrl,
+          caption,
+          hashtags,
+          creditsUsed: 3,
+          remainingCredits: user.credits - 3
+        });
+
+      } catch (aiError: any) {
+        console.error('[AI IMAGE] OpenAI API error:', aiError);
+        return res.status(500).json({ 
+          error: 'AI generation failed. Please try again.',
+          details: aiError.message 
+        });
+      }
+
+    } catch (error: any) {
+      console.error('[AI IMAGE] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate image' });
+    }
+  });
+  
   // AI Script Generator - Generate professional scripts for videos
   app.post('/api/ai/generate-script', requireAuth, async (req: any, res: Response) => {
     try {

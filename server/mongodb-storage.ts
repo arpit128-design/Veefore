@@ -3008,117 +3008,9 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  async getAdminContent(options: {
-    page: number;
-    limit: number;
-    search?: string;
-    filter?: string;
-  }): Promise<any> {
-    await this.connect();
-    
-    const { page, limit, search, filter } = options;
-    const skip = (page - 1) * limit;
-    
-    // Build query for content
-    let query: any = {};
-    
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { caption: { $regex: search, $options: 'i' } }
-      ];
-    }
-    
-    if (filter && filter !== 'all') {
-      switch (filter) {
-        case 'published':
-          query.status = 'published';
-          break;
-        case 'scheduled':
-          query.status = 'scheduled';
-          break;
-        case 'draft':
-          query.status = 'draft';
-          break;
-      }
-    }
-    
-    const [content, total] = await Promise.all([
-      ContentModel.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      ContentModel.countDocuments(query)
-    ]);
-    
-    const formattedContent = content.map(item => ({
-      id: item._id.toString(),
-      title: item.title || 'Untitled',
-      type: item.type,
-      platform: item.platform,
-      status: item.status,
-      scheduledFor: item.scheduledFor,
-      createdAt: item.createdAt,
-      workspaceId: item.workspaceId
-    }));
-    
-    return {
-      content: formattedContent,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    };
-  }
 
-  async getAdminNotifications(options: {
-    page: number;
-    limit: number;
-    type?: string;
-  }): Promise<any> {
-    await this.connect();
-    
-    const { page, limit, type } = options;
-    const skip = (page - 1) * limit;
-    
-    let query: any = {};
-    if (type && type !== 'all') {
-      query.type = type;
-    }
-    
-    const [notifications, total] = await Promise.all([
-      NotificationModel.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      NotificationModel.countDocuments(query)
-    ]);
-    
-    const formattedNotifications = notifications.map(notif => ({
-      id: notif._id.toString(),
-      title: notif.title,
-      message: notif.message,
-      type: notif.type,
-      isActive: notif.isActive,
-      createdAt: notif.createdAt,
-      targetUsers: notif.targetUsers || 'all'
-    }));
-    
-    return {
-      notifications: formattedNotifications,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    };
-  }
+
+
 
   // Admin session operations
   async createAdminSession(session: any): Promise<any> {
@@ -3546,74 +3438,60 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  // Admin-specific operations - Missing methods implementation
-  async getAdminUsers(page: number = 1, limit: number = 10, search?: string): Promise<{ users: User[], total: number }> {
+  // Email verification methods
+  async storeEmailVerificationCode(email: string, code: string, expiry: Date): Promise<void> {
     await this.connect();
-    
-    const skip = (page - 1) * limit;
-    let query = {};
-    
-    if (search) {
-      query = {
-        $or: [
-          { username: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-          { displayName: { $regex: search, $options: 'i' } }
-        ]
-      };
-    }
-    
-    const [users, total] = await Promise.all([
-      UserModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
-      UserModel.countDocuments(query)
-    ]);
-    
-    return {
-      users: users.map(user => this.convertUser(user)),
-      total
-    };
+    await UserModel.updateOne(
+      { email },
+      { 
+        emailVerificationCode: code,
+        emailVerificationExpiry: expiry,
+        updatedAt: new Date()
+      }
+    );
   }
 
-  async getAdminContent(page: number = 1, limit: number = 10, filters?: any): Promise<{ content: Content[], total: number }> {
+  async verifyEmailCode(email: string, code: string): Promise<boolean> {
     await this.connect();
-    
-    const skip = (page - 1) * limit;
-    let query = {};
-    
-    if (filters?.platform) {
-      query['platform'] = filters.platform;
+    const user = await UserModel.findOne({
+      email,
+      emailVerificationCode: code,
+      emailVerificationExpiry: { $gt: new Date() }
+    });
+
+    if (user) {
+      // Mark email as verified and clear verification data
+      await UserModel.updateOne(
+        { email },
+        {
+          isEmailVerified: true,
+          emailVerificationCode: null,
+          emailVerificationExpiry: null,
+          updatedAt: new Date()
+        }
+      );
+      return true;
     }
-    if (filters?.status) {
-      query['status'] = filters.status;
-    }
-    if (filters?.type) {
-      query['type'] = filters.type;
-    }
-    
-    const [content, total] = await Promise.all([
-      ContentModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
-      ContentModel.countDocuments(query)
-    ]);
-    
-    return {
-      content: content.map(item => this.convertContent(item)),
-      total
-    };
+    return false;
   }
 
-  async getAdminNotifications(page: number = 1, limit: number = 10): Promise<{ notifications: Notification[], total: number }> {
+  async clearEmailVerificationCode(email: string): Promise<void> {
     await this.connect();
-    
-    const skip = (page - 1) * limit;
-    
-    const [notifications, total] = await Promise.all([
-      NotificationModel.find({}).skip(skip).limit(limit).sort({ createdAt: -1 }),
-      NotificationModel.countDocuments({})
-    ]);
-    
-    return {
-      notifications: notifications.map(notif => this.convertNotification(notif)),
-      total
-    };
+    await UserModel.updateOne(
+      { email },
+      {
+        emailVerificationCode: null,
+        emailVerificationExpiry: null,
+        updatedAt: new Date()
+      }
+    );
   }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    await this.connect();
+    const user = await UserModel.findOne({ email });
+    return user ? this.convertUser(user) : undefined;
+  }
+
+
 }

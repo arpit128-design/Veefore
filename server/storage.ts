@@ -28,6 +28,11 @@ export interface IStorage {
   updateUserCredits(id: number | string, credits: number): Promise<User>;
   getUserCredits(userId: number | string): Promise<number>;
   updateUserStripeInfo(id: number | string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
+  
+  // Email verification operations
+  createUnverifiedUser(data: { email: string; firstName: string; emailVerificationCode: string; emailVerificationExpiry: Date; isEmailVerified: boolean }): Promise<User>;
+  updateUserEmailVerification(id: number | string, token: string, expires: Date): Promise<User>;
+  verifyUserEmail(id: number | string, data: { password?: string; firstName?: string; lastName?: string }): Promise<User>;
 
   // Workspace operations
   getWorkspace(id: number | string): Promise<Workspace | undefined>;

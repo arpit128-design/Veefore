@@ -29,6 +29,9 @@ const UserSchema = new mongoose.Schema({
   referredBy: String,
   preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
   isOnboarded: { type: Boolean, default: false },
+  isEmailVerified: { type: Boolean, default: false },
+  emailVerificationCode: String,
+  emailVerificationExpiry: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

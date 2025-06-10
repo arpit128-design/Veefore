@@ -5170,6 +5170,158 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // ===== EMAIL VERIFICATION ROUTES =====
+  
+  // Send verification email for manual signup
+  app.post('/api/auth/send-verification-email', async (req: any, res: Response) => {
+    try {
+      const { email, firstName } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser && existingUser.isEmailVerified) {
+        return res.status(400).json({ message: 'User already exists and is verified' });
+      }
+
+      // Generate OTP and expiry
+      const otp = emailService.generateOTP();
+      const otpExpiry = emailService.generateExpiry();
+
+      // Store or update verification data
+      if (existingUser) {
+        await storage.updateUserEmailVerification(existingUser.id, otp, otpExpiry);
+      } else {
+        // Create temporary user record with verification data
+        await storage.createUnverifiedUser({
+          email,
+          firstName: firstName || '',
+          emailVerificationCode: otp,
+          emailVerificationExpiry: otpExpiry,
+          isEmailVerified: false
+        });
+      }
+
+      // Send verification email
+      const emailSent = await emailService.sendVerificationEmail(email, otp, firstName);
+      
+      if (!emailSent) {
+        console.error('[EMAIL] Failed to send verification email to:', email);
+        return res.status(500).json({ message: 'Failed to send verification email' });
+      }
+
+      console.log(`[EMAIL] Verification email sent to ${email} with OTP: ${otp}`);
+      res.json({ 
+        message: 'Verification email sent successfully',
+        email: email
+      });
+
+    } catch (error: any) {
+      console.error('[EMAIL] Send verification error:', error);
+      res.status(500).json({ message: 'Error sending verification email: ' + error.message });
+    }
+  });
+
+  // Verify email with OTP
+  app.post('/api/auth/verify-email', async (req: any, res: Response) => {
+    try {
+      const { email, otp, password, firstName, lastName } = req.body;
+
+      if (!email || !otp) {
+        return res.status(400).json({ message: 'Email and verification code are required' });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+
+      // Check if already verified
+      if (user.isEmailVerified) {
+        return res.status(400).json({ message: 'Email already verified' });
+      }
+
+      // Verify OTP and expiry
+      if (user.emailVerificationCode !== otp) {
+        return res.status(400).json({ message: 'Invalid verification code' });
+      }
+
+      if (user.emailVerificationExpiry && new Date() > user.emailVerificationExpiry) {
+        return res.status(400).json({ message: 'Verification code has expired' });
+      }
+
+      // Complete user registration
+      const updatedUser = await storage.verifyUserEmail(user.id, {
+        password: password || undefined,
+        firstName: firstName || user.firstName,
+        lastName: lastName || undefined
+      });
+
+      // Send welcome email
+      await emailService.sendWelcomeEmail(email, firstName || user.firstName);
+
+      console.log(`[EMAIL] User ${email} successfully verified and activated`);
+      res.json({ 
+        message: 'Email verified successfully',
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          firstName: updatedUser.firstName,
+          isEmailVerified: true
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[EMAIL] Verify email error:', error);
+      res.status(500).json({ message: 'Error verifying email: ' + error.message });
+    }
+  });
+
+  // Resend verification email
+  app.post('/api/auth/resend-verification', async (req: any, res: Response) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+
+      if (user.isEmailVerified) {
+        return res.status(400).json({ message: 'Email already verified' });
+      }
+
+      // Generate new OTP
+      const otp = emailService.generateOTP();
+      const otpExpiry = emailService.generateExpiry();
+
+      // Update verification data
+      await storage.updateUserEmailVerification(user.id, otp, otpExpiry);
+
+      // Send new verification email
+      const emailSent = await emailService.sendVerificationEmail(email, otp, user.firstName);
+      
+      if (!emailSent) {
+        return res.status(500).json({ message: 'Failed to send verification email' });
+      }
+
+      console.log(`[EMAIL] Resent verification email to ${email} with new OTP: ${otp}`);
+      res.json({ message: 'Verification email resent successfully' });
+
+    } catch (error: any) {
+      console.error('[EMAIL] Resend verification error:', error);
+      res.status(500).json({ message: 'Error resending verification email: ' + error.message });
+    }
+  });
+
   // ===== AI CONTENT GENERATION ROUTES =====
   
   // AI Image Generator - Real DALL-E Integration with Authentic Captions

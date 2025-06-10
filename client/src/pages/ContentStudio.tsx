@@ -833,22 +833,28 @@ function AIReelGenerator() {
 
             {generatedReel.caption && (
               <div>
-                <Label>Caption</Label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm">{generatedReel.caption}</p>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Generated Caption</Label>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{generatedReel.caption}</p>
                 </div>
               </div>
             )}
 
-            {generatedReel.hashtags && (
+            {generatedReel.hashtags && generatedReel.hashtags.length > 0 && (
               <div>
-                <Label>Trending Hashtags</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {generatedReel.hashtags.map((tag: string, index: number) => (
-                    <Badge key={index} variant="secondary">
-                      #{tag}
-                    </Badge>
-                  ))}
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Trending Hashtags</Label>
+                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <div className="flex flex-wrap gap-2">
+                    {generatedReel.hashtags.map((tag: string, index: number) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="bg-purple-100 text-purple-800 hover:bg-purple-200 text-xs px-2 py-1"
+                      >
+                        #{tag.replace(/^#+/, '')}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1118,22 +1124,28 @@ function AIImageGenerator() {
 
             {generatedImage.caption && (
               <div>
-                <Label>Generated Caption</Label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm">{generatedImage.caption}</p>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Generated Caption</Label>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{generatedImage.caption}</p>
                 </div>
               </div>
             )}
 
-            {generatedImage.hashtags && (
+            {generatedImage.hashtags && generatedImage.hashtags.length > 0 && (
               <div>
-                <Label>Relevant Hashtags</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {generatedImage.hashtags.map((tag: string, index: number) => (
-                    <Badge key={index} variant="secondary">
-                      #{tag}
-                    </Badge>
-                  ))}
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Relevant Hashtags</Label>
+                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <div className="flex flex-wrap gap-2">
+                    {generatedImage.hashtags.map((tag: string, index: number) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs px-2 py-1"
+                      >
+                        #{tag.replace(/^#+/, '')}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1849,9 +1861,9 @@ function VideoShortener() {
 
             {shortenedVideo.script && (
               <div>
-                <Label>Optimized Script</Label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm">{shortenedVideo.script}</p>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Optimized Script</Label>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{shortenedVideo.script}</p>
                 </div>
               </div>
             )}
@@ -1870,15 +1882,21 @@ function VideoShortener() {
               </div>
             )}
 
-            {shortenedVideo.platformOptimizations && (
+            {shortenedVideo.platformOptimizations && shortenedVideo.platformOptimizations.length > 0 && (
               <div>
-                <Label>Platform Optimizations</Label>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {shortenedVideo.platformOptimizations.slice(0, 4).map((opt: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {opt}
-                    </Badge>
-                  ))}
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">Platform Optimizations</Label>
+                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <div className="flex flex-wrap gap-2">
+                    {shortenedVideo.platformOptimizations.slice(0, 4).map((opt: string, index: number) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="bg-green-100 text-green-800 hover:bg-green-200 text-xs px-2 py-1"
+                      >
+                        {opt}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

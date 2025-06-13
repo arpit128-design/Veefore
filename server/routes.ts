@@ -5246,11 +5246,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       }
 
       // Verify OTP and expiry
-      console.log(`[EMAIL VERIFY] Comparing codes - User: "${user.emailVerificationCode}" vs Input: "${otp}"`);
-      console.log(`[EMAIL VERIFY] User code type: ${typeof user.emailVerificationCode}, Input type: ${typeof otp}`);
-      
       if (user.emailVerificationCode !== otp) {
-        console.log(`[EMAIL VERIFY] Code mismatch - stored: "${user.emailVerificationCode}", provided: "${otp}"`);
         return res.status(400).json({ message: 'Invalid verification code' });
       }
 

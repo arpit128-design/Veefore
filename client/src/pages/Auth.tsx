@@ -22,7 +22,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithCustomToken } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
@@ -246,11 +246,26 @@ export default function Auth() {
         description: "Your account has been created successfully. Welcome to VeeFore!"
       });
 
-      // Reset states and redirect to login
-      setShowVerification(false);
-      setSignupData(null);
-      setVerificationCode('');
-      setIsSignUp(false);
+      // If we received a custom token, sign in with Firebase
+      if (result.customToken) {
+        try {
+          await signInWithCustomToken(auth, result.customToken);
+          // User will be automatically redirected to onboarding by the routing logic
+        } catch (firebaseError: any) {
+          console.error('[FIREBASE] Custom token sign-in failed:', firebaseError);
+          // Fallback: redirect to sign-in page
+          setShowVerification(false);
+          setSignupData(null);
+          setVerificationCode('');
+          setIsSignUp(false);
+        }
+      } else {
+        // No custom token, redirect to sign-in page
+        setShowVerification(false);
+        setSignupData(null);
+        setVerificationCode('');
+        setIsSignUp(false);
+      }
 
     } catch (error: any) {
       toast({

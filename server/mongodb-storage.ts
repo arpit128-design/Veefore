@@ -3493,5 +3493,86 @@ export class MongoStorage implements IStorage {
     return user ? this.convertUser(user) : undefined;
   }
 
+  // Create unverified user for email verification flow
+  async createUnverifiedUser(data: { 
+    email: string; 
+    firstName: string; 
+    emailVerificationCode: string; 
+    emailVerificationExpiry: Date; 
+    isEmailVerified: boolean 
+  }): Promise<User> {
+    await this.connect();
+    
+    const userData = {
+      email: data.email,
+      displayName: data.firstName,
+      username: data.email.split('@')[0] + '_' + Date.now(), // Generate unique username
+      isEmailVerified: data.isEmailVerified,
+      emailVerificationCode: data.emailVerificationCode,
+      emailVerificationExpiry: data.emailVerificationExpiry,
+      isOnboarded: false,
+      credits: 10, // Initial credits for new users
+      referralCode: this.generateReferralCode(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const user = new UserModel(userData);
+    const savedUser = await user.save();
+    return this.convertUser(savedUser);
+  }
+
+  // Generate unique referral code
+  private generateReferralCode(): string {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  }
+
+  // Email verification helper methods
+  async updateUserEmailVerification(id: number | string, token: string, expires: Date): Promise<User> {
+    await this.connect();
+    
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      {
+        emailVerificationCode: token,
+        emailVerificationExpiry: expires,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return this.convertUser(user);
+  }
+
+  async verifyUserEmail(id: number | string, data: { password?: string; firstName?: string; lastName?: string }): Promise<User> {
+    await this.connect();
+    
+    const updateData: any = {
+      isEmailVerified: true,
+      emailVerificationCode: null,
+      emailVerificationExpiry: null,
+      updatedAt: new Date()
+    };
+
+    if (data.firstName) updateData.displayName = data.firstName;
+    if (data.password) updateData.passwordHash = data.password; // Should be hashed before calling this
+
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return this.convertUser(user);
+  }
+
 
 }

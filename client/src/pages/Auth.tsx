@@ -246,26 +246,17 @@ export default function Auth() {
         description: "Your account has been created successfully. Welcome to VeeFore!"
       });
 
-      // If we received a custom token, sign in with Firebase
-      if (result.customToken) {
-        try {
-          await signInWithCustomToken(auth, result.customToken);
-          // User will be automatically redirected to onboarding by the routing logic
-        } catch (firebaseError: any) {
-          console.error('[FIREBASE] Custom token sign-in failed:', firebaseError);
-          // Fallback: redirect to sign-in page
-          setShowVerification(false);
-          setSignupData(null);
-          setVerificationCode('');
-          setIsSignUp(false);
-        }
-      } else {
-        // No custom token, redirect to sign-in page
-        setShowVerification(false);
-        setSignupData(null);
-        setVerificationCode('');
-        setIsSignUp(false);
-      }
+      // Email verified successfully - redirect to sign-in
+      setShowVerification(false);
+      setSignupData(null);
+      setVerificationCode('');
+      setIsSignUp(false);
+      
+      // Show success message with instructions
+      toast({
+        title: "Account Created Successfully!",
+        description: "Please sign in with your email and password to continue."
+      });
 
     } catch (error: any) {
       toast({

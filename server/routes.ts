@@ -5278,11 +5278,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           isEmailVerified: true,
           isOnboarded: false
         },
-        requiresOnboarding: true,
-        credentials: {
-          email: updatedUser.email,
-          password: password // Return the password for automatic sign-in
-        }
+        requiresOnboarding: true
       });
 
     } catch (error: any) {

@@ -143,6 +143,9 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [signupData, setSignupData] = useState<SignUpForm | null>(null);
+  const [verificationCode, setVerificationCode] = useState('');
   const { toast } = useToast();
 
   const signInForm = useForm<SignInForm>({
@@ -163,11 +166,35 @@ export default function Auth() {
     try {
       if (isSignUp) {
         const signUpData = data as SignUpForm;
-        await createUserWithEmailAndPassword(auth, signUpData.email, signUpData.password);
-        toast({
-          title: "Account Created!",
-          description: "Welcome to VeeFore. Setting up your account..."
+        
+        // Send verification email using our custom endpoint
+        const response = await fetch('/api/auth/send-verification-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: signUpData.email,
+            firstName: signUpData.firstName,
+            lastName: signUpData.lastName,
+            password: signUpData.password
+          }),
         });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to send verification email');
+        }
+
+        toast({
+          title: "Verification Email Sent!",
+          description: "Please check your email and enter the verification code to complete signup."
+        });
+
+        // Store signup data for verification step
+        setSignupData(signUpData);
+        setShowVerification(true);
+        
       } else {
         const signInData = data as SignInForm;
         await signInWithEmailAndPassword(auth, signInData.email, signInData.password);
@@ -180,6 +207,55 @@ export default function Auth() {
       toast({
         title: "Authentication Error",
         description: error.message || "Failed to authenticate. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle email verification
+  const handleVerification = async () => {
+    if (!signupData || !verificationCode) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: signupData.email,
+          otp: verificationCode,
+          password: signupData.password,
+          firstName: signupData.firstName,
+          lastName: signupData.lastName
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Verification failed');
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: "Email Verified!",
+        description: "Your account has been created successfully. Welcome to VeeFore!"
+      });
+
+      // Reset states and redirect to login
+      setShowVerification(false);
+      setSignupData(null);
+      setVerificationCode('');
+      setIsSignUp(false);
+
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid verification code. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -313,15 +389,78 @@ export default function Auth() {
         {/* Auth Form */}
         <AuthCard>
           <AnimatePresence mode="wait">
-            <motion.div
-              key={isSignUp ? 'signup' : 'signin'}
-              initial={{ opacity: 0, x: isSignUp ? 100 : -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isSignUp ? -100 : 100 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="space-y-6">
-                {/* Toggle buttons */}
+            {showVerification ? (
+              <motion.div
+                key="verification"
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      Verify Your Email
+                    </h3>
+                    <p className="text-white/70 text-sm">
+                      We've sent a 6-digit verification code to {signupData?.email}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-white/80">Verification Code</label>
+                      <Input
+                        type="text"
+                        placeholder="000000"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                        className="text-center text-2xl tracking-widest bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-blue-400 focus:bg-white/10 transition-all duration-300"
+                      />
+                    </div>
+
+                    <Button
+                      onClick={handleVerification}
+                      disabled={isLoading || verificationCode.length !== 6}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          <span>Verifying...</span>
+                        </div>
+                      ) : (
+                        'Verify Email'
+                      )}
+                    </Button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowVerification(false);
+                        setSignupData(null);
+                        setVerificationCode('');
+                      }}
+                      className="w-full text-white/70 hover:text-white text-sm transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4 inline mr-1" />
+                      Back to Sign Up
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={isSignUp ? 'signup' : 'signin'}
+                initial={{ opacity: 0, x: isSignUp ? 100 : -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: isSignUp ? -100 : 100 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="space-y-6">
+                  {/* Toggle buttons */}
                 <div className="flex bg-white/5 rounded-lg p-1">
                   <button
                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
@@ -489,6 +628,7 @@ export default function Auth() {
                 </div>
               </div>
             </motion.div>
+            )}
           </AnimatePresence>
         </AuthCard>
 

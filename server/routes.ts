@@ -18,6 +18,7 @@ import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import { emailService } from "./email-service";
 import OpenAI from "openai";
+import { admin } from './firebase-admin';
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -5261,27 +5262,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         lastName: lastName || undefined
       });
 
-      // Create Firebase custom token for automatic sign-in
-      let customToken = null;
-      try {
-        if (updatedUser.firebaseUid) {
-          // User already has Firebase UID, create token
-          customToken = await admin.auth().createCustomToken(updatedUser.firebaseUid);
-        } else {
-          // Create Firebase user and get custom token
-          const firebaseUser = await admin.auth().createUser({
-            email: updatedUser.email,
-            displayName: updatedUser.firstName || updatedUser.username
-          });
-          
-          // Update user with Firebase UID
-          await storage.updateUserFirebaseUid(updatedUser.id, firebaseUser.uid);
-          customToken = await admin.auth().createCustomToken(firebaseUser.uid);
-        }
-      } catch (firebaseError: any) {
-        console.error('[FIREBASE] Error creating custom token:', firebaseError);
-        // Continue without token - user can sign in manually
-      }
+      // For email verification, we'll let the frontend handle Firebase authentication
+      // The user will need to sign in manually after verification
 
       // Send welcome email
       await emailService.sendWelcomeEmail(email, firstName || user.firstName);
@@ -5296,8 +5278,11 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           isEmailVerified: true,
           isOnboarded: false
         },
-        customToken: customToken,
-        requiresOnboarding: true
+        requiresOnboarding: true,
+        credentials: {
+          email: updatedUser.email,
+          password: password // Return the password for automatic sign-in
+        }
       });
 
     } catch (error: any) {

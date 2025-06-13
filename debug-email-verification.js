@@ -11,7 +11,7 @@ async function debugEmailVerification() {
     await storage.connect();
     
     // Find user by email
-    const user = await storage.getUserByEmail('test@example.com');
+    const user = await storage.getUserByEmail('test2@example.com');
     
     if (user) {
       console.log('[DEBUG] User found:');

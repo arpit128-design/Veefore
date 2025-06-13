@@ -745,6 +745,9 @@ export class MongoStorage implements IStorage {
       referredBy: mongoUser.referredBy || null,
       preferences: mongoUser.preferences || {},
       isOnboarded: mongoUser.isOnboarded === true,
+      isEmailVerified: mongoUser.isEmailVerified || false,
+      emailVerificationCode: mongoUser.emailVerificationCode || null,
+      emailVerificationExpiry: mongoUser.emailVerificationExpiry || null,
       createdAt: mongoUser.createdAt,
       updatedAt: mongoUser.updatedAt
     };

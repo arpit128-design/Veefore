@@ -146,6 +146,7 @@ export default function Auth() {
   const [showVerification, setShowVerification] = useState(false);
   const [signupData, setSignupData] = useState<SignUpForm | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
+  const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
   const { toast } = useToast();
 
   const signInForm = useForm<SignInForm>({
@@ -181,9 +182,15 @@ export default function Auth() {
           }),
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to send verification email');
+          throw new Error(result.message || 'Failed to send verification email');
+        }
+
+        // Capture OTP for development testing
+        if (result.developmentOtp) {
+          setDevelopmentOtp(result.developmentOtp);
         }
 
         toast({
@@ -415,6 +422,19 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-4">
+                    {/* Development OTP Display - Only visible in development */}
+                    {developmentOtp && (
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                          <span className="text-yellow-400 text-sm font-medium">Development Mode</span>
+                        </div>
+                        <p className="text-yellow-300 text-sm mt-2">
+                          For testing: Your OTP code is <span className="font-mono font-bold text-lg text-yellow-200">{developmentOtp}</span>
+                        </p>
+                      </div>
+                    )}
+
                     <div>
                       <label className="text-sm font-medium text-white/80">Verification Code</label>
                       <Input

@@ -5217,7 +5217,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[EMAIL] Verification email sent to ${email} with OTP: ${otp}`);
       res.json({ 
         message: 'Verification email sent successfully',
-        email: email
+        email: email,
+        // Include OTP for development/testing purposes only
+        developmentOtp: process.env.NODE_ENV !== 'production' ? otp : undefined
       });
 
     } catch (error: any) {

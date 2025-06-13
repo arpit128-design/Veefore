@@ -14,7 +14,7 @@ import {
 
 // MongoDB Schemas
 const UserSchema = new mongoose.Schema({
-  firebaseUid: { type: String, required: true, unique: true },
+  firebaseUid: { type: String, unique: true, sparse: true }, // Made optional for email verification users
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   displayName: String,
@@ -3507,6 +3507,7 @@ export class MongoStorage implements IStorage {
       email: data.email,
       displayName: data.firstName,
       username: data.email.split('@')[0] + '_' + Date.now(), // Generate unique username
+      firebaseUid: 'email_' + Date.now() + '_' + Math.random().toString(36).substring(7), // Temporary UID for manual signup
       isEmailVerified: data.isEmailVerified,
       emailVerificationCode: data.emailVerificationCode,
       emailVerificationExpiry: data.emailVerificationExpiry,

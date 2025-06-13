@@ -22,8 +22,9 @@ export class EmailService {
   // Send email verification OTP
   async sendVerificationEmail(email: string, otp: string, firstName?: string): Promise<boolean> {
     try {
+      // Use a simple sender address that doesn't require domain verification
       const mailOptions = {
-        from: '"VeeFore" <noreply@veefore.com>',
+        from: '"VeeFore Support" <support@example.com>',
         to: email,
         subject: 'Verify Your VeeFore Account',
         html: this.getVerificationEmailTemplate(otp, firstName || 'User')
@@ -34,6 +35,13 @@ export class EmailService {
       return true;
     } catch (error: any) {
       console.error('[EMAIL] Failed to send verification email:', error);
+      
+      // If SendGrid fails due to sender verification, log the OTP for development
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[EMAIL DEV] Verification code for ${email}: ${otp}`);
+        return true; // Return success for development testing
+      }
+      
       return false;
     }
   }

@@ -250,20 +250,31 @@ export default function Auth() {
       
       toast({
         title: "Email Verified!",
-        description: "Your account has been created successfully. Welcome to VeeFore!"
+        description: "Your account has been created successfully. Signing you in..."
       });
 
-      // Email verified successfully - redirect to sign-in
-      setShowVerification(false);
-      setSignupData(null);
-      setVerificationCode('');
-      setIsSignUp(false);
-      
-      // Show success message with instructions
-      toast({
-        title: "Account Created Successfully!",
-        description: "Please sign in with your email and password to continue."
-      });
+      // Automatically sign in the user after successful verification
+      try {
+        await signInWithEmailAndPassword(auth, signupData.email, signupData.password);
+        
+        toast({
+          title: "Welcome to VeeFore!",
+          description: "Account created and signed in successfully."
+        });
+        
+        // Navigation will be handled by Firebase auth state change
+      } catch (signInError: any) {
+        // If auto sign-in fails, show manual sign-in form
+        setShowVerification(false);
+        setSignupData(null);
+        setVerificationCode('');
+        setIsSignUp(false);
+        
+        toast({
+          title: "Account Created Successfully!",
+          description: "Please sign in with your email and password to continue."
+        });
+      }
 
     } catch (error: any) {
       toast({

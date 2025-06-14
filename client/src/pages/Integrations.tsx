@@ -25,7 +25,8 @@ import {
   Unlink,
   RefreshCw,
   Trash2,
-  Clock
+  Clock,
+  AlertTriangle
 } from "lucide-react";
 import InstagramTokenManager from "@/components/InstagramTokenManager";
 
@@ -98,6 +99,7 @@ export default function Integrations() {
   const queryClient = useQueryClient();
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
   const [manualConnectOpen, setManualConnectOpen] = useState(false);
+  const [manualConnectPlatform, setManualConnectPlatform] = useState<string>('instagram');
   const [accessToken, setAccessToken] = useState("");
   const [username, setUsername] = useState("");
 
@@ -222,19 +224,21 @@ export default function Integrations() {
     }
   });
 
-  // Manual Instagram connection mutation
+  // Manual connection mutation (supports both Instagram and YouTube)
   const manualConnectMutation = useMutation({
-    mutationFn: async ({ accessToken, username }: { accessToken: string; username: string }) => {
-      const response = await apiRequest('POST', '/api/instagram/manual-connect', {
+    mutationFn: async ({ accessToken, username, platform }: { accessToken: string; username: string; platform: string }) => {
+      const endpoint = platform === 'instagram' ? '/api/instagram/manual-connect' : '/api/youtube/manual-connect';
+      const response = await apiRequest('POST', endpoint, {
         accessToken,
         username
       });
       return response.json();
     },
     onSuccess: (data) => {
+      const platformName = platform === 'instagram' ? 'Instagram' : 'YouTube';
       toast({
-        title: "Instagram Connected",
-        description: `Successfully connected @${data.username}`,
+        title: `${platformName} Connected`,
+        description: `Successfully connected ${data.account?.username || data.username}`,
       });
       setManualConnectOpen(false);
       setAccessToken("");
@@ -640,7 +644,7 @@ export default function Integrations() {
                                 </p>
                               </div>
                               <Button
-                                onClick={() => manualConnectMutation.mutate({ accessToken, username })}
+                                onClick={() => manualConnectMutation.mutate({ accessToken, username, platform })}
                                 disabled={!accessToken || !username || manualConnectMutation.isPending}
                                 className="w-full bg-electric-cyan hover:bg-electric-cyan/80"
                               >

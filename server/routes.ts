@@ -1617,6 +1617,106 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // YouTube manual connection endpoint (OAuth verification workaround)
+  app.post("/api/youtube/manual-connect", requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { accessToken, username } = req.body;
+
+      if (!accessToken || !username) {
+        return res.status(400).json({ error: 'Access token and channel name are required' });
+      }
+
+      // Get user's workspace
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      if (!workspaces.length) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      const workspace = workspaces[0];
+
+      // Verify the access token by making a test API call to YouTube Data API
+      const testResponse = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true&access_token=${accessToken}`);
+      const testData = await testResponse.json();
+
+      if (!testResponse.ok) {
+        console.error('[YOUTUBE MANUAL CONNECT] API error:', testData);
+        return res.status(400).json({ 
+          error: testData.error?.message || 'Invalid YouTube access token' 
+        });
+      }
+
+      if (!testData.items || testData.items.length === 0) {
+        return res.status(400).json({ error: 'No YouTube channel found for this access token' });
+      }
+
+      const channel = testData.items[0];
+      const snippet = channel.snippet;
+      const statistics = channel.statistics;
+
+      console.log('[YOUTUBE MANUAL CONNECT] Channel data retrieved:', {
+        id: channel.id,
+        title: snippet.title,
+        subscriberCount: statistics.subscriberCount
+      });
+
+      // Store the YouTube account
+      const socialAccountData = {
+        workspaceId: workspace.id,
+        platform: 'youtube',
+        accountId: channel.id,
+        username: username,
+        accessToken: accessToken,
+        isActive: true,
+        // YouTube-specific data
+        subscriberCount: parseInt(statistics.subscriberCount || '0'),
+        videoCount: parseInt(statistics.videoCount || '0'),
+        viewCount: parseInt(statistics.viewCount || '0'),
+        channelDescription: snippet.description || null,
+        channelThumbnail: snippet.thumbnails?.default?.url || null,
+        accountType: 'CREATOR',
+        isBusinessAccount: false,
+        isVerified: false,
+        lastSyncAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Check if account already exists
+      const existingAccount = await storage.getSocialAccountByPlatform(workspace.id, 'youtube');
+      
+      let savedAccount;
+      if (existingAccount) {
+        console.log('[YOUTUBE MANUAL CONNECT] Updating existing YouTube account');
+        savedAccount = await storage.updateSocialAccount(existingAccount.id, socialAccountData);
+      } else {
+        console.log('[YOUTUBE MANUAL CONNECT] Creating new YouTube account');
+        savedAccount = await storage.createSocialAccount(socialAccountData);
+      }
+
+      console.log('[YOUTUBE MANUAL CONNECT] YouTube account connected successfully:', {
+        platform: 'youtube',
+        username: username,
+        channelId: channel.id,
+        subscribers: statistics.subscriberCount
+      });
+
+      res.json({ 
+        success: true, 
+        message: 'YouTube account connected successfully',
+        account: {
+          platform: 'youtube',
+          username: username,
+          accountId: channel.id,
+          subscribers: statistics.subscriberCount
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[YOUTUBE MANUAL CONNECT] Error:', error);
+      res.status(500).json({ error: 'Failed to connect YouTube account' });
+    }
+  });
+
   // Instagram OAuth routes
   app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
     try {

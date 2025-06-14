@@ -72,37 +72,66 @@ export function SpaceLoader({
             <div className="absolute inset-0 w-32 h-32 border-2 border-blue-400/30 rounded-full animate-spin-slow" />
             <div className="absolute inset-4 w-24 h-24 border border-purple-400/20 rounded-full animate-spin-reverse" />
             
-            {/* VeeFore Logo */}
+            {/* Transparent VeeFore Logo with Cool Animation */}
             <div className="relative w-32 h-32 flex items-center justify-center">
-              <div className="w-20 h-20 flex items-center justify-center bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full animate-pulse-slow">
-                <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  V
-                </span>
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                {/* Rotating outer ring */}
+                <div className="absolute inset-0 rounded-full border-2 border-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-spin-slow">
+                  <div className="absolute inset-0 rounded-full bg-black/80 backdrop-blur-sm m-0.5" />
+                </div>
+                
+                {/* Inner pulsing ring */}
+                <div className="absolute inset-3 rounded-full border border-white/10 bg-transparent animate-pulse-glow">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/5 via-purple-400/5 to-pink-400/5" />
+                </div>
+                
+                {/* Floating particles around logo */}
+                <div className="absolute -inset-4">
+                  <div className="absolute top-2 left-6 w-1 h-1 bg-blue-400 rounded-full animate-float-1" />
+                  <div className="absolute top-6 right-4 w-1 h-1 bg-purple-400 rounded-full animate-float-2" />
+                  <div className="absolute bottom-4 left-4 w-1 h-1 bg-pink-400 rounded-full animate-float-3" />
+                  <div className="absolute bottom-6 right-6 w-1 h-1 bg-cyan-400 rounded-full animate-float-1" />
+                </div>
+                
+                {/* Center "VF" letters with glow */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    <span className="text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text font-bold text-2xl tracking-wider animate-text-glow">
+                      VF
+                    </span>
+                    {/* Text shadow glow */}
+                    <span className="absolute inset-0 text-blue-400/20 font-bold text-2xl tracking-wider blur-sm">
+                      VF
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Outer shimmer effect */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
               </div>
-              
-              {/* Pulsing Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-xl animate-pulse-glow" />
             </div>
           </motion.div>
 
-          {/* Loading Text */}
-          <motion.h2 
-            className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-          >
-            VeeFore
-          </motion.h2>
-          
-          <motion.p 
-            className="text-white/70 text-lg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-          >
-            {message}
-          </motion.p>
+          {/* Loading Text - Centered */}
+          <div className="flex flex-col items-center justify-center text-center">
+            <motion.h2 
+              className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              VeeFore
+            </motion.h2>
+            
+            <motion.p 
+              className="text-white/70 text-lg text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+            >
+              {message}
+            </motion.p>
+          </div>
         </div>
       </div>
     </div>

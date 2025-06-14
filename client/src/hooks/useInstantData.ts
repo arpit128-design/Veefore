@@ -45,8 +45,8 @@ export function useInstantData() {
           staleTime: 300000,
         }),
         queryClient.prefetchQuery({
-          queryKey: ['/api/automation-rules', workspaceId],
-          queryFn: () => fetch(`/api/automation-rules?workspaceId=${workspaceId}`, { headers }).then(res => res.json()),
+          queryKey: ['/api/automation/rules', workspaceId],
+          queryFn: () => fetch(`/api/automation/rules/${workspaceId}`, { headers }).then(res => res.json()),
           staleTime: 300000,
         }),
       ];

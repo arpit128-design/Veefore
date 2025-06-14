@@ -90,10 +90,42 @@ export default {
             height: "0",
           },
         },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "spin-reverse": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(-360deg)" },
+        },
+        "pulse-slow": {
+          "0%, 100%": { 
+            transform: "scale(1)",
+            opacity: "0.8",
+          },
+          "50%": { 
+            transform: "scale(1.05)",
+            opacity: "1",
+          },
+        },
+        "pulse-glow": {
+          "0%, 100%": { 
+            transform: "scale(1)",
+            opacity: "0.3",
+          },
+          "50%": { 
+            transform: "scale(1.2)",
+            opacity: "0.6",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "spin-reverse": "spin-reverse 6s linear infinite",
+        "pulse-slow": "pulse-slow 2s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 interface SpaceLoaderProps {
   message?: string;
@@ -11,26 +12,47 @@ export function SpaceLoader({
   progress = 0, 
   className = "" 
 }: SpaceLoaderProps) {
+  // Generate stars data once and memoize for performance
+  const stars = useMemo(() => 
+    Array.from({ length: 40 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() > 0.8 ? 'w-1 h-1' : 'w-0.5 h-0.5',
+      delay: Math.random() * 4,
+      duration: 2 + Math.random() * 2
+    })), []
+  );
+
   return (
-    <div className={`fixed inset-0 bg-gradient-to-b from-space-navy via-space-navy to-cosmic-blue overflow-hidden ${className}`}>
-      {/* Animated Stars Background */}
+    <div className={`fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden ${className}`}>
+      {/* Optimized CSS-based Stars Background */}
       <div className="absolute inset-0">
-        {Array.from({ length: 100 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full"
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            className={`absolute ${star.size} bg-white rounded-full animate-pulse`}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+              animationDelay: `${star.delay}s`,
+              animationDuration: `${star.duration}s`,
             }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0],
-            }}
-            transition={{
-              duration: 2 + Math.random() * 3,
-              repeat: Infinity,
-              delay: Math.random() * 2,
+          />
+        ))}
+      </div>
+
+      {/* Additional subtle twinkling layer */}
+      <div className="absolute inset-0 opacity-60">
+        {stars.slice(0, 15).map((star) => (
+          <div
+            key={`twinkle-${star.id}`}
+            className="absolute w-px h-px bg-blue-200 rounded-full animate-ping"
+            style={{
+              left: `${(star.left + 10) % 100}%`,
+              top: `${(star.top + 15) % 100}%`,
+              animationDelay: `${star.delay + 1}s`,
+              animationDuration: `${star.duration + 1}s`,
             }}
           />
         ))}
@@ -46,48 +68,20 @@ export function SpaceLoader({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            {/* Orbital Rings */}
-            <motion.div 
-              className="absolute inset-0 w-32 h-32 border-2 border-blue-400/30 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div 
-              className="absolute inset-4 w-24 h-24 border border-purple-400/20 rounded-full"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            />
+            {/* Orbital Rings - CSS Animation for better performance */}
+            <div className="absolute inset-0 w-32 h-32 border-2 border-blue-400/30 rounded-full animate-spin-slow" />
+            <div className="absolute inset-4 w-24 h-24 border border-purple-400/20 rounded-full animate-spin-reverse" />
             
             {/* VeeFore Logo */}
             <div className="relative w-32 h-32 flex items-center justify-center">
-              <motion.img
-                src="/veefore-logo.png"
-                alt="VeeFore Logo"
-                className="w-20 h-20 object-contain"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
+              <div className="w-20 h-20 flex items-center justify-center bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full animate-pulse-slow">
+                <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  V
+                </span>
+              </div>
               
               {/* Pulsing Glow */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-xl"
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.3, 0.7, 0.3]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-xl animate-pulse-glow" />
             </div>
           </motion.div>
 

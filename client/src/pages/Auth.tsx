@@ -395,12 +395,12 @@ export default function Auth() {
           >
             <div className="w-20 h-20 flex items-center justify-center relative">
               <img 
-                src="/uptofeed-logo.png" 
-                alt="UpToFeed Logo" 
+                src="/veefore-logo.png" 
+                alt="VeeFore Logo" 
                 className="w-16 h-16 object-contain relative z-10"
               />
               
-              {/* Modern rings */}
+              {/* Orbital rings */}
               <motion.div 
                 className="absolute inset-0 border-2 border-blue-400/30 rounded-full"
                 animate={{ rotate: 360 }}
@@ -416,7 +416,7 @@ export default function Auth() {
 
           <h1 className="text-4xl font-bold mb-2">
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              UpToFeed
+              VeeFore
             </span>
           </h1>
           

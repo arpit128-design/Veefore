@@ -58,11 +58,11 @@ export function SpaceLoader({
               transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
             />
             
-            {/* UpToFeed Logo */}
+            {/* VeeFore Logo */}
             <div className="relative w-32 h-32 flex items-center justify-center">
               <motion.img
-                src="/uptofeed-logo.png"
-                alt="UpToFeed Logo"
+                src="/veefore-logo.png"
+                alt="VeeFore Logo"
                 className="w-20 h-20 object-contain"
                 animate={{
                   scale: [1, 1.1, 1],

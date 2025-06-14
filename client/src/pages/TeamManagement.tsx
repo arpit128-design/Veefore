@@ -854,7 +854,7 @@ export default function TeamManagement() {
                     <span className="text-asteroid-silver font-medium">White-label Branding</span>
                     <span className="text-solar-gold font-bold">₹499/month</span>
                   </div>
-                  <p className="text-xs text-gray-400">Remove UpToFeed branding and add your own</p>
+                  <p className="text-xs text-gray-400">Remove VeeFore branding and add your own</p>
                 </div>
               </div>
             </div>

@@ -720,7 +720,7 @@ Your AI is now configured to create personalized content for your brand!
                         glowColor="#10b981"
                         className="flex items-center gap-2"
                       >
-                        Launch UpToFeed
+                        Launch VeeFore
                         <Zap size={20} />
                       </HolographicButton>
                     )}

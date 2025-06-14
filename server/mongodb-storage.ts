@@ -525,7 +525,7 @@ export class MongoStorage implements IStorage {
       // Only create default workspace if user has none
       try {
         const defaultWorkspace = await this.createWorkspace({
-          name: "My UpToFeed Workspace",
+          name: "My VeeFore Workspace",
           description: "Default workspace for social media management",
           userId: convertedUser.id,
           theme: "space",

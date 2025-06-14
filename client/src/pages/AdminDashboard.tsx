@@ -262,7 +262,7 @@ const AdminDashboard = () => {
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">UpToFeed Admin Panel</h1>
+                <h1 className="text-xl font-bold text-white">VeeFore Admin Panel</h1>
                 <p className="text-sm text-gray-300">Welcome back, {adminUser.username}</p>
               </div>
             </div>

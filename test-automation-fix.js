@@ -5,7 +5,7 @@
  * MongoDB ObjectId strings without casting errors.
  */
 
-const axios = require('axios');
+import axios from 'axios';
 
 async function testAutomationServiceFix() {
   console.log('=== Testing Automation Service ObjectId Fix ===');

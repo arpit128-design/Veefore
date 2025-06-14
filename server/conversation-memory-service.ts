@@ -64,7 +64,7 @@ export class ConversationMemoryService {
       const analysis = await this.analyzeMessage(content);
       
       const messageData: InsertDmMessage = {
-        conversationId,
+        conversationId: typeof conversationId === 'string' ? parseInt(conversationId, 10) || 0 : conversationId,
         messageId,
         sender,
         content,
@@ -72,7 +72,7 @@ export class ConversationMemoryService {
         sentiment: analysis.sentiment,
         topics: analysis.topics,
         aiResponse: sender === 'ai',
-        automationRuleId
+        automationRuleId: typeof automationRuleId === 'string' ? parseInt(automationRuleId, 10) || undefined : automationRuleId
       };
 
       const message = await this.storage.createDmMessage(messageData);

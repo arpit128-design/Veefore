@@ -133,30 +133,56 @@ export class ConversationMemoryService {
     console.log(`[MEMORY] Generating contextual response for conversation ${conversationId}`);
 
     try {
-      // Get conversation history
-      const history = await this.getConversationHistory(conversationId, 8);
+      // Get conversation history - expand to get more context
+      const history = await this.getConversationHistory(conversationId, 15);
       const context = await this.getConversationContext(conversationId);
+      
+      console.log(`[MEMORY] Retrieved ${history.length} messages from history`);
+      console.log(`[MEMORY] Retrieved ${context.length} context items`);
 
-      // Build context prompt
-      const conversationSummary = history
-        .slice(-6) // Last 6 messages for immediate context
-        .map(msg => `${msg.sender === 'user' ? 'Customer' : 'You'}: ${msg.content}`)
-        .join('\n');
+      // Analyze conversation patterns and user behavior
+      const conversationAnalysis = this.analyzeConversationPatterns(history);
+      
+      // Build comprehensive conversation summary
+      const recentMessages = history.slice(-8).map(msg => 
+        `${msg.sender === 'user' ? 'Customer' : 'Assistant'}: ${msg.content} (${msg.sentiment || 'neutral'})`
+      ).join('\n');
 
       const contextSummary = context
         .filter(ctx => new Date(ctx.expiresAt!) > new Date()) // Only non-expired context
         .map(ctx => `${ctx.contextType}: ${ctx.contextValue}`)
         .join(', ');
 
-      // Analyze the conversation flow to avoid repetitive responses
-      const isFirstMessage = history.length <= 1;
-      const lastBotResponse = history.find(msg => msg.sender === 'ai');
-      const hasRepeatedGreeting = lastBotResponse?.content.includes('phir se') || lastBotResponse?.content.includes('again');
+      // Extract user intent and topics from current message
+      const messageAnalysis = await this.analyzeUserIntent(userMessage);
       
-      // Extract key topics from user message for contextual relevance
-      const messageTopics = await this.extractMessageTopics(userMessage);
+      // Build conversation state analysis
+      const conversationState = {
+        totalMessages: history.length,
+        userMessages: history.filter(m => m.sender === 'user').length,
+        aiMessages: history.filter(m => m.sender === 'ai').length,
+        lastUserSentiment: history.filter(m => m.sender === 'user')[0]?.sentiment || 'neutral',
+        recentTopics: history.slice(-5).flatMap(m => m.topics || []),
+        isReturningCustomer: history.length > 3
+      };
       
       const systemPrompt = `You are an intelligent social media assistant with perfect conversation memory. Respond naturally and contextually.
+
+CONVERSATION ANALYSIS:
+- Total messages exchanged: ${conversationState.totalMessages}
+- Customer is ${conversationState.isReturningCustomer ? 'returning' : 'new'}
+- Last sentiment: ${conversationState.lastUserSentiment}
+- Current intent: ${messageAnalysis.intent}
+- Key topics: ${messageAnalysis.topics.join(', ')}
+- Previous topics discussed: ${conversationState.recentTopics.join(', ')}
+
+RECENT CONVERSATION:
+${recentMessages}
+
+CUSTOMER CONTEXT: ${contextSummary}
+
+CONVERSATION PATTERNS:
+${conversationAnalysis.summary}
 
 CRITICAL RULES:
 - NEVER use generic phrases like "aap phir se khe rahe hai", "aap se baat karke acha laga"
@@ -207,6 +233,101 @@ Generate a relevant, specific response that directly addresses what they said, n
       console.error(`[MEMORY ERROR] Failed to generate contextual response:`, error);
       // Fallback response
       return "Thank you for your message! How can I help you today?";
+    }
+  }
+
+  // Analyze conversation patterns and user behavior
+  private analyzeConversationPatterns(history: DmMessage[]): { summary: string; patterns: string[] } {
+    if (history.length === 0) {
+      return { summary: "New conversation", patterns: [] };
+    }
+
+    const userMessages = history.filter(m => m.sender === 'user');
+    const aiMessages = history.filter(m => m.sender === 'ai');
+    
+    const patterns = [];
+    
+    // Check for repeated topics
+    const allTopics = history.flatMap(m => m.topics || []);
+    const topicCounts = allTopics.reduce((acc, topic) => {
+      acc[topic] = (acc[topic] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const repeatedTopics = Object.entries(topicCounts)
+      .filter(([_, count]) => count > 1)
+      .map(([topic, _]) => topic);
+      
+    if (repeatedTopics.length > 0) {
+      patterns.push(`Customer repeatedly asks about: ${repeatedTopics.join(', ')}`);
+    }
+    
+    // Check sentiment progression
+    const recentSentiments = userMessages.slice(-3).map(m => m.sentiment).filter(Boolean);
+    if (recentSentiments.length >= 2) {
+      const improving = recentSentiments.every((s, i) => i === 0 || s === 'positive' || recentSentiments[i-1] === 'negative');
+      const declining = recentSentiments.every((s, i) => i === 0 || s === 'negative' || recentSentiments[i-1] === 'positive');
+      
+      if (improving) patterns.push("Customer sentiment is improving");
+      if (declining) patterns.push("Customer sentiment is declining - needs attention");
+    }
+    
+    // Check response patterns
+    if (aiMessages.length > 1) {
+      const genericResponses = aiMessages.filter(m => 
+        m.content.includes('Thank you') || 
+        m.content.includes('How can I help') ||
+        m.content.includes('aap se baat karke')
+      ).length;
+      
+      if (genericResponses > 1) {
+        patterns.push("Too many generic responses - need more specific replies");
+      }
+    }
+
+    const summary = patterns.length > 0 
+      ? patterns.join('. ') 
+      : `${userMessages.length} customer messages, ${aiMessages.length} responses. Ongoing conversation.`;
+      
+    return { summary, patterns };
+  }
+
+  // Analyze user intent from message
+  private async analyzeUserIntent(message: string): Promise<{ intent: string; topics: string[]; urgency: string }> {
+    try {
+      const analysisPrompt = `Analyze this customer message for intent and key topics:
+
+Message: "${message}"
+
+Return JSON with:
+{
+  "intent": "question|complaint|request|information|greeting|other",
+  "topics": ["topic1", "topic2"],
+  "urgency": "low|medium|high"
+}
+
+Examples:
+- "I need help with my order" → {"intent": "request", "topics": ["order", "help"], "urgency": "medium"}
+- "When will this be delivered?" → {"intent": "question", "topics": ["delivery", "timing"], "urgency": "medium"}
+- "This is not working at all!" → {"intent": "complaint", "topics": ["problem", "functionality"], "urgency": "high"}`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: analysisPrompt }],
+        max_tokens: 100,
+        temperature: 0.1,
+        response_format: { type: "json_object" }
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || '{}');
+      return {
+        intent: result.intent || 'other',
+        topics: Array.isArray(result.topics) ? result.topics.slice(0, 3) : [],
+        urgency: result.urgency || 'low'
+      };
+    } catch (error) {
+      console.error(`[MEMORY ERROR] Failed to analyze user intent:`, error);
+      return { intent: 'other', topics: [], urgency: 'low' };
     }
   }
 

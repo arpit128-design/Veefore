@@ -3552,6 +3552,34 @@ export class MongoStorage implements IStorage {
     return this.convertUser(user);
   }
 
+  // YouTube workspace data update method
+  async updateYouTubeWorkspaceData(updates: any): Promise<any> {
+    await this.connect();
+    
+    console.log('[YOUTUBE UPDATE] Updating YouTube accounts with data:', updates);
+    
+    const result = await SocialAccountModel.updateMany(
+      { platform: 'youtube' },
+      {
+        $set: {
+          workspaceId: updates.workspaceId,
+          subscriberCount: updates.subscriberCount,
+          videoCount: updates.videoCount,
+          viewCount: updates.viewCount,
+          lastSync: updates.lastSync,
+          updatedAt: updates.updatedAt
+        }
+      }
+    );
+
+    console.log('[YOUTUBE UPDATE] Update result:', {
+      matched: result.matchedCount,
+      modified: result.modifiedCount
+    });
+
+    return result;
+  }
+
   async verifyUserEmail(id: number | string, data: { password?: string; firstName?: string; lastName?: string; firebaseUid?: string }): Promise<User> {
     await this.connect();
     

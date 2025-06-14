@@ -157,6 +157,9 @@ export interface IStorage {
   getDmConversations(workspaceId: string, limit?: number): Promise<any[]>;
   getDmMessages(conversationId: number | string, limit?: number): Promise<any[]>;
 
+  // YouTube workspace data operations
+  updateYouTubeWorkspaceData(updates: any): Promise<any>;
+
   // Admin operations
   getAdmin(id: number): Promise<Admin | undefined>;
   getAdminByEmail(email: string): Promise<Admin | undefined>;

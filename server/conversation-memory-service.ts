@@ -79,11 +79,11 @@ export class ConversationMemoryService {
       
       // Extract and store conversation context if this is a user message
       if (sender === 'user') {
-        await this.extractAndStoreContext(typeof conversationId === 'string' ? parseInt(conversationId, 10) || 0 : conversationId, content, analysis);
+        await this.extractAndStoreContext(conversationId, content, analysis);
       }
 
       // Update conversation's last message time
-      await this.storage.updateConversationLastMessage(typeof conversationId === 'string' ? parseInt(conversationId, 10) || 0 : conversationId);
+      await this.storage.updateConversationLastMessage(conversationId);
       
       console.log(`[MEMORY] Stored message ID: ${message.id} with sentiment: ${analysis.sentiment}`);
       return message;
@@ -399,7 +399,7 @@ Keep topics short (1-2 words) and relevant to customer service context.`;
 
   // Extract and store conversation context
   private async extractAndStoreContext(
-    conversationId: number,
+    conversationId: string | number,
     content: string,
     analysis: { sentiment: string; topics: string[] }
   ): Promise<void> {
@@ -410,7 +410,7 @@ Keep topics short (1-2 words) and relevant to customer service context.`;
       // Store sentiment as context
       if (analysis.sentiment !== 'neutral') {
         const sentimentContext: InsertConversationContext = {
-          conversationId,
+          conversationId: typeof conversationId === 'string' ? conversationId : conversationId.toString(),
           contextType: 'sentiment',
           contextValue: analysis.sentiment,
           confidence: 85,

@@ -2637,7 +2637,7 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  async updateConversationLastMessage(conversationId: number): Promise<void> {
+  async updateConversationLastMessage(conversationId: string | number): Promise<void> {
     await this.connect();
     
     await DmConversationModel.findByIdAndUpdate(conversationId, {

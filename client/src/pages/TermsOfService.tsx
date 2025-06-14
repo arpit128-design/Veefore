@@ -228,9 +228,9 @@ export default function TermsOfService() {
         </Link>
       </motion.div>
 
-      {/* Navigation Sidebar */}
+      {/* Navigation Sidebar - Fixed Vertical Layout */}
       <motion.div
-        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 space-y-4"
+        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-3 max-h-[80vh] overflow-y-auto"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}
@@ -239,7 +239,7 @@ export default function TermsOfService() {
           <motion.button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className={`group relative p-3 rounded-xl transition-all duration-300 backdrop-blur-sm ${
+            className={`group relative p-3 rounded-xl transition-all duration-300 backdrop-blur-sm block ${
               activeSection === section.id
                 ? 'bg-solar-gold/20 border border-solar-gold/50'
                 : 'bg-space-gray-800/30 border border-space-gray-600/30 hover:bg-space-gray-700/50'

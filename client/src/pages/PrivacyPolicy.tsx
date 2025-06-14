@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, Shield, Eye, Database, Lock, Globe, Users, FileText, Mail, Calendar, ArrowLeft } from "lucide-react";
+import { ChevronDown, Shield, Database, Eye, Users, Lock, Globe, Calendar, Mail, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,18 @@ const sections: Section[] = [
     ]
   },
   {
+    id: "cookies",
+    title: "Cookies & Tracking",
+    icon: Globe,
+    content: [
+      "Essential Cookies: We use cookies necessary for basic site functionality and security.",
+      "Analytics Cookies: These help us understand how users interact with our platform.",
+      "Preference Cookies: We store your settings and preferences for a better experience.",
+      "Third-Party Cookies: Some integrations may use their own cookies with your consent.",
+      "Cookie Control: You can manage cookie preferences through your browser settings."
+    ]
+  },
+  {
     id: "retention",
     title: "Data Retention",
     icon: Calendar,
@@ -84,38 +96,49 @@ const sections: Section[] = [
       "Backup Data: Backup copies are deleted within 90 days of account closure.",
       "Analytics Data: Aggregated, non-personal analytics data may be retained indefinitely."
     ]
+  },
+  {
+    id: "contact",
+    title: "Contact & Updates",
+    icon: Mail,
+    content: [
+      "Data Protection Officer: Contact our DPO at privacy@veefore.com for data-related inquiries.",
+      "Policy Updates: We'll notify you of material changes via email and platform notifications.",
+      "Support: Our support team is available to answer privacy-related questions.",
+      "Complaints: You have the right to file complaints with relevant data protection authorities.",
+      "Response Time: We aim to respond to all privacy requests within 30 days."
+    ]
   }
 ];
 
 export default function PrivacyPolicy() {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [activeNavItem, setActiveNavItem] = useState<string>("info");
+  const [activeSection, setActiveSection] = useState<string>("");
+  const [expandedSection, setExpandedSection] = useState<string>("");
 
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = document.querySelectorAll("[data-section]");
-      let currentSection = "";
-      
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 100 && rect.bottom >= 100) {
-          currentSection = section.getAttribute("data-section") || "";
-        }
-      });
-      
-      if (currentSection && currentSection !== activeNavItem) {
-        setActiveNavItem(currentSection);
-      }
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeNavItem]);
+    sections.forEach((section) => {
+      const element = document.getElementById(section.id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.querySelector(`[data-section="${sectionId}"]`);
+    const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -205,9 +228,9 @@ export default function PrivacyPolicy() {
         </Link>
       </motion.div>
 
-      {/* Navigation Sidebar */}
+      {/* Navigation Sidebar - Fixed Vertical Layout */}
       <motion.div
-        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 space-y-4"
+        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-3 max-h-[80vh] overflow-y-auto"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}
@@ -216,16 +239,16 @@ export default function PrivacyPolicy() {
           <motion.button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className={`group relative p-3 rounded-xl transition-all duration-300 backdrop-blur-sm ${
-              activeNavItem === section.id
-                ? 'bg-solar-gold/20 border border-solar-gold/50'
+            className={`group relative p-3 rounded-xl transition-all duration-300 backdrop-blur-sm block ${
+              activeSection === section.id
+                ? 'bg-electric-cyan/20 border border-electric-cyan/50'
                 : 'bg-space-gray-800/30 border border-space-gray-600/30 hover:bg-space-gray-700/50'
             }`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <section.icon className={`w-5 h-5 ${
-              activeNavItem === section.id ? 'text-solar-gold' : 'text-asteroid-silver group-hover:text-white'
+              activeSection === section.id ? 'text-electric-cyan' : 'text-asteroid-silver group-hover:text-white'
             }`} />
             
             {/* Tooltip */}
@@ -247,19 +270,19 @@ export default function PrivacyPolicy() {
             transition={{ duration: 0.8 }}
           >
             <motion.div
-              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-solar-gold to-orange-500 rounded-full mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-electric-cyan to-blue-500 rounded-full mb-6"
               whileHover={{ scale: 1.1, rotate: 5 }}
             >
               <Shield className="w-10 h-10 text-white" />
             </motion.div>
             
-            <h1 className="text-5xl font-bold font-orbitron bg-gradient-to-r from-solar-gold via-orange-400 to-solar-gold bg-clip-text text-transparent mb-4">
+            <h1 className="text-5xl font-bold font-orbitron bg-gradient-to-r from-electric-cyan via-blue-400 to-electric-cyan bg-clip-text text-transparent mb-4">
               Privacy Policy
             </h1>
             
             <p className="text-xl text-asteroid-silver max-w-2xl mx-auto leading-relaxed">
-              Your privacy and data security are fundamental to everything we do at VeeFore. 
-              This policy explains how we collect, use, and protect your information.
+              Your privacy is important to us. This policy explains how we collect, 
+              use, and protect your personal information when you use VeeFore.
             </p>
             
             <motion.p
@@ -268,8 +291,47 @@ export default function PrivacyPolicy() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
             >
-              Last updated: June 15, 2025
+              Last Updated: June 15, 2025
             </motion.p>
+          </motion.div>
+
+          {/* Privacy Summary */}
+          <motion.div
+            className="mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="content-card holographic border-space-gray-600/50 bg-space-gray-800/30 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-xl font-orbitron">
+                  <Shield className="h-6 w-6 text-electric-cyan" />
+                  <span>Privacy at a Glance</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-white mb-3">What We Collect</h4>
+                    <ul className="space-y-2 text-sm text-asteroid-silver">
+                      <li>• Account information and social media data</li>
+                      <li>• Usage analytics and device information</li>
+                      <li>• Communication data for support</li>
+                      <li>• Essential cookies for functionality</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white mb-3">How We Protect You</h4>
+                    <ul className="space-y-2 text-sm text-asteroid-silver">
+                      <li>• End-to-end encryption for all data</li>
+                      <li>• Strict access controls and regular audits</li>
+                      <li>• Data minimization principles</li>
+                      <li>• Full transparency and user control</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* Content Sections */}
@@ -277,7 +339,7 @@ export default function PrivacyPolicy() {
             {sections.map((section, index) => (
               <motion.div
                 key={section.id}
-                data-section={section.id}
+                id={section.id}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 * index }}
@@ -285,12 +347,12 @@ export default function PrivacyPolicy() {
                 <Card className="content-card holographic border-space-gray-600/50 bg-space-gray-800/30 backdrop-blur-sm">
                   <CardHeader
                     className="cursor-pointer"
-                    onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
+                    onClick={() => setExpandedSection(expandedSection === section.id ? "" : section.id)}
                   >
                     <CardTitle className="flex items-center justify-between text-xl font-orbitron">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-solar-gold/20 to-electric-cyan/20 flex items-center justify-center">
-                          <section.icon className="w-5 h-5 text-solar-gold" />
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-electric-cyan/20 to-blue-500/20 flex items-center justify-center">
+                          <section.icon className="w-5 h-5 text-electric-cyan" />
                         </div>
                         <span className="text-white">{section.title}</span>
                       </div>

@@ -380,14 +380,25 @@ export default function Analyzer() {
         {/* Growth Velocity Card */}
         <Card className="content-card holographic">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-400">
-              <TrendingUp className="h-5 w-5" />
+            <CardTitle className={`flex items-center gap-2 ${
+              realtimeAnalytics?.growthVelocity !== undefined 
+                ? (realtimeAnalytics.growthVelocity >= 0 ? 'text-green-400' : 'text-red-400')
+                : (analytics?.percentageChanges?.followers?.isPositive !== false ? 'text-green-400' : 'text-red-400')
+            }`}>
+              {realtimeAnalytics?.growthVelocity !== undefined 
+                ? (realtimeAnalytics.growthVelocity >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />)
+                : (analytics?.percentageChanges?.followers?.isPositive !== false ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />)
+              }
               Growth Velocity
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">
+              <div className={`text-3xl font-bold mb-2 ${
+                realtimeAnalytics?.growthVelocity !== undefined 
+                  ? (realtimeAnalytics.growthVelocity >= 0 ? 'text-green-400' : 'text-red-400')
+                  : (analytics?.percentageChanges?.followers?.isPositive !== false ? 'text-green-400' : 'text-red-400')
+              }`}>
                 {realtimeAnalytics?.growthVelocity !== undefined 
                   ? `${realtimeAnalytics.growthVelocity >= 0 ? '+' : ''}${realtimeAnalytics.growthVelocity.toFixed(1)}%`
                   : analytics?.percentageChanges?.followers?.value || analytics?.percentageChanges?.followers || 'Loading...'}

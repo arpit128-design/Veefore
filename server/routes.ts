@@ -90,9 +90,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           const userEmail = payload.email || `user_${firebaseUid}@example.com`;
           
           // First check if user exists by email (from email verification process)
-          console.log(`[AUTH] Checking for existing user by email: ${userEmail}`);
           const existingUser = await storage.getUserByEmail(userEmail);
-          console.log(`[AUTH] Existing user lookup result:`, existingUser ? `Found user ID: ${existingUser.id}` : 'Not found');
           
           if (existingUser) {
             // User exists from email verification, update with Firebase UID

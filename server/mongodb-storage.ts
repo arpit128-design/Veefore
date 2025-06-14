@@ -484,10 +484,8 @@ export class MongoStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    console.log(`[STORAGE] getUserByEmail called with email: ${email}`);
     await this.connect();
     const user = await UserModel.findOne({ email });
-    console.log(`[STORAGE] getUserByEmail result:`, user ? `Found user ${user._id}` : 'Not found');
     return user ? this.convertUser(user) : undefined;
   }
 

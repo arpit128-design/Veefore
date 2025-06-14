@@ -1410,6 +1410,213 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // YouTube OAuth routes
+  app.get('/api/youtube/auth', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.query.workspaceId;
+      
+      console.log('[YOUTUBE AUTH] Request for user:', user.id, 'workspaceId:', workspaceId);
+      
+      // Check if YouTube API key is configured
+      if (!process.env.YOUTUBE_API_KEY) {
+        return res.status(400).json({ 
+          error: 'YouTube API credentials not configured. Please provide YOUTUBE_API_KEY.' 
+        });
+      }
+
+      let workspace;
+      if (workspaceId && workspaceId !== 'undefined') {
+        workspace = await storage.getWorkspace(workspaceId.toString());
+        if (!workspace || workspace.userId.toString() !== user.id.toString()) {
+          console.log('[YOUTUBE AUTH] Access denied to workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      } else {
+        workspace = await storage.getDefaultWorkspace(user.id);
+        if (!workspace) {
+          console.log('[YOUTUBE AUTH] No workspace found for user:', user.id);
+          return res.status(400).json({ 
+            error: 'No workspace found. Please complete onboarding first or create a workspace.' 
+          });
+        }
+      }
+
+      const currentDomain = req.get('host');
+      const redirectUri = `https://${currentDomain}/api/youtube/callback`;
+      const stateData = {
+        workspaceId: workspace.id,
+        userId: user.id,
+        timestamp: Date.now(),
+        source: req.query.source || 'integrations'
+      };
+      const state = Buffer.from(JSON.stringify(stateData)).toString('base64');
+      
+      console.log(`[YOUTUBE AUTH] Starting OAuth flow for user ${user.id}`);
+      console.log(`[YOUTUBE AUTH] Redirect URI: ${redirectUri}`);
+      console.log(`[YOUTUBE AUTH] State data:`, stateData);
+      
+      // YouTube Data API v3 OAuth - scopes for channel management and analytics
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.channel-memberships.creator https://www.googleapis.com/auth/youtubepartner-channel-audit&state=${state}&access_type=offline&prompt=consent`;
+      
+      res.json({ authUrl });
+    } catch (error: any) {
+      console.error('[YOUTUBE AUTH] Error:', error);
+      console.error('[YOUTUBE AUTH] Stack trace:', error.stack);
+      res.status(500).json({ error: error.message || 'Failed to initiate YouTube authentication' });
+    }
+  });
+
+  // YouTube OAuth callback
+  app.get('/api/youtube/callback', async (req: any, res: Response) => {
+    try {
+      const { code, state, error, error_description } = req.query;
+      
+      console.log(`[YOUTUBE CALLBACK] Received callback with parameters:`, {
+        code: code ? `present (${String(code).substring(0, 10)}...)` : 'missing',
+        state: state ? 'present' : 'missing',
+        error: error || 'none',
+        error_description: error_description || 'none'
+      });
+      
+      if (error) {
+        console.error(`[YOUTUBE CALLBACK] OAuth error: ${error}`);
+        const redirectPage = state ? 'integrations' : 'integrations';
+        return res.redirect(`https://${req.get('host')}/${redirectPage}?error=${encodeURIComponent(error as string)}`);
+      }
+      
+      if (!code || !state) {
+        console.error('[YOUTUBE CALLBACK] Missing code or state parameter');
+        return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
+      }
+
+      // Decode state
+      let stateData;
+      try {
+        stateData = JSON.parse(Buffer.from(state as string, 'base64').toString());
+      } catch (e) {
+        console.error('[YOUTUBE CALLBACK] Invalid state parameter');
+        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state`);
+      }
+
+      const { workspaceId, userId, source } = stateData;
+      
+      console.log('[YOUTUBE CALLBACK] Processing callback for:', { workspaceId, userId, source });
+
+      // Exchange code for access token
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          code: code as string,
+          grant_type: 'authorization_code',
+          redirect_uri: `https://${req.get('host')}/api/youtube/callback`,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('[YOUTUBE CALLBACK] Token exchange failed:', errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
+      }
+
+      const tokenData = await tokenResponse.json();
+      console.log('[YOUTUBE CALLBACK] Token exchange successful');
+
+      // Get channel information
+      const channelResponse = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&mine=true`, {
+        headers: {
+          'Authorization': `Bearer ${tokenData.access_token}`,
+        },
+      });
+
+      if (!channelResponse.ok) {
+        console.error('[YOUTUBE CALLBACK] Failed to fetch channel info');
+        return res.redirect(`https://${req.get('host')}/integrations?error=channel_fetch_failed`);
+      }
+
+      const channelData = await channelResponse.json();
+      if (!channelData.items || channelData.items.length === 0) {
+        console.error('[YOUTUBE CALLBACK] No YouTube channel found');
+        return res.redirect(`https://${req.get('host')}/integrations?error=no_channel_found`);
+      }
+
+      const channel = channelData.items[0];
+      const snippet = channel.snippet;
+      const statistics = channel.statistics;
+
+      console.log('[YOUTUBE CALLBACK] Channel data retrieved:', {
+        id: channel.id,
+        title: snippet.title,
+        subscriberCount: statistics.subscriberCount
+      });
+
+      // Calculate token expiry
+      const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
+
+      // Store YouTube account
+      const socialAccountData = {
+        workspaceId: parseInt(workspaceId),
+        platform: 'youtube',
+        accountId: channel.id,
+        username: snippet.title,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token || null,
+        expiresAt,
+        isActive: true,
+        // YouTube-specific data
+        subscriberCount: parseInt(statistics.subscriberCount || '0'),
+        videoCount: parseInt(statistics.videoCount || '0'),
+        viewCount: parseInt(statistics.viewCount || '0'),
+        channelDescription: snippet.description || null,
+        channelThumbnail: snippet.thumbnails?.default?.url || null,
+        accountType: 'CREATOR',
+        isBusinessAccount: false,
+        isVerified: false,
+        lastSyncAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Check if account already exists
+      const existingAccount = await storage.getSocialAccountByPlatformAndAccountId(
+        workspaceId, 
+        'youtube', 
+        channel.id
+      );
+
+      let savedAccount;
+      if (existingAccount) {
+        console.log('[YOUTUBE CALLBACK] Updating existing YouTube account');
+        savedAccount = await storage.updateSocialAccount(existingAccount.id, socialAccountData);
+      } else {
+        console.log('[YOUTUBE CALLBACK] Creating new YouTube account');
+        savedAccount = await storage.createSocialAccount(socialAccountData);
+      }
+
+      console.log('[YOUTUBE CALLBACK] YouTube account saved successfully:', {
+        id: savedAccount.id,
+        username: savedAccount.username,
+        subscribers: savedAccount.subscriberCount
+      });
+
+      // Redirect based on source
+      const redirectPage = source === 'onboarding' ? 'onboarding' : 'integrations';
+      const successUrl = `https://${req.get('host')}/${redirectPage}?youtube=connected&channel=${encodeURIComponent(snippet.title)}`;
+      
+      console.log('[YOUTUBE CALLBACK] Redirecting to:', successUrl);
+      res.redirect(successUrl);
+
+    } catch (error: any) {
+      console.error('[YOUTUBE CALLBACK] Unexpected error:', error);
+      console.error('[YOUTUBE CALLBACK] Stack trace:', error.stack);
+      res.redirect(`https://${req.get('host')}/integrations?error=unexpected_error`);
+    }
+  });
+
   // Instagram OAuth routes
   app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
     try {
@@ -2445,6 +2652,76 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     } catch (error: any) {
       console.error('[CANCEL INVITATION] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to cancel invitation' });
+    }
+  });
+
+  // YouTube Token Refresh API Endpoints
+  app.post('/api/youtube/refresh-token/:accountId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { accountId } = req.params;
+      
+      console.log('[YOUTUBE TOKEN] Manual refresh requested for account:', accountId);
+      
+      // Verify account belongs to user's workspace
+      const account = await storage.getSocialAccount(accountId);
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+      
+      // Get user's workspaces to verify access
+      const userWorkspaces = await storage.getWorkspacesByUserId(user.id);
+      const hasAccess = userWorkspaces.some(w => w.id.toString() === account.workspaceId.toString());
+      
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      if (!account.refreshToken) {
+        return res.status(400).json({ error: 'No refresh token available. Please reconnect your YouTube account.' });
+      }
+
+      // Refresh YouTube access token
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          refresh_token: account.refreshToken,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        console.error('[YOUTUBE TOKEN] Refresh failed:', await tokenResponse.text());
+        return res.status(400).json({ error: 'Failed to refresh YouTube token' });
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // Update account with new token
+      const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
+      await storage.updateSocialAccount(accountId, {
+        accessToken: tokenData.access_token,
+        expiresAt,
+        updatedAt: new Date()
+      });
+
+      console.log('[YOUTUBE TOKEN] Token refreshed successfully for account:', account.username);
+      
+      res.json({ 
+        success: true, 
+        message: 'YouTube token refreshed successfully',
+        accountId,
+        username: account.username
+      });
+      
+    } catch (error: any) {
+      console.error('[YOUTUBE TOKEN] Manual refresh error:', error.message);
+      res.status(500).json({ error: error.message || 'Token refresh failed' });
     }
   });
 

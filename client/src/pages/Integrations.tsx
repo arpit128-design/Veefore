@@ -275,17 +275,17 @@ export default function Integrations() {
     }
   });
 
-  // Refresh token mutation
+  // Refresh token mutation (updated for multi-platform support)
   const refreshTokenMutation = useMutation({
-    mutationFn: async (accountId: number) => {
-      const response = await apiRequest('POST', `/api/social-accounts/${accountId}/refresh`);
+    mutationFn: async ({ accountId, platform }: { accountId: number; platform: string }) => {
+      const response = await apiRequest('POST', `/api/${platform}/refresh-token/${accountId}`);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
       toast({
         title: "Token Refreshed",
-        description: "Access token has been successfully refreshed.",
+        description: `${data.username} token has been successfully refreshed.`,
       });
     },
     onError: (error: any) => {
@@ -584,7 +584,10 @@ export default function Integrations() {
                     <>
                       {isExpired && (
                         <Button 
-                          onClick={() => refreshTokenMutation.mutate(connectedAccount.id)}
+                          onClick={() => refreshTokenMutation.mutate({ 
+                            accountId: connectedAccount.id, 
+                            platform: connectedAccount.platform 
+                          })}
                           disabled={refreshTokenMutation.isPending}
                           variant="outline"
                           className="flex-1"

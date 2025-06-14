@@ -81,13 +81,19 @@ export const socialAccounts = pgTable("social_accounts", {
   refreshToken: text("refresh_token"),
   expiresAt: timestamp("expires_at"),
   isActive: boolean("is_active").default(true),
-  // Instagram-specific profile data
+  // Platform-specific profile data
   followersCount: integer("followers_count"),
   followingCount: integer("following_count"),
   mediaCount: integer("media_count"),
   biography: text("biography"),
   website: text("website"),
   profilePictureUrl: text("profile_picture_url"),
+  // YouTube-specific data
+  subscriberCount: integer("subscriber_count"),
+  videoCount: integer("video_count"),
+  viewCount: integer("view_count"),
+  channelDescription: text("channel_description"),
+  channelThumbnail: text("channel_thumbnail"),
   accountType: text("account_type"), // PERSONAL, BUSINESS, CREATOR
   isBusinessAccount: boolean("is_business_account").default(false),
   isVerified: boolean("is_verified").default(false),

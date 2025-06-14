@@ -816,13 +816,19 @@ export class MongoStorage implements IStorage {
       refreshToken: mongoAccount.refreshToken || null,
       expiresAt: mongoAccount.expiresAt || null,
       isActive: mongoAccount.isActive !== false,
-      // Instagram sync data fields
+      // Platform-specific sync data fields
       followersCount: mongoAccount.followersCount ?? null,
       followingCount: mongoAccount.followingCount ?? null,
       mediaCount: mongoAccount.mediaCount ?? null,
       biography: mongoAccount.biography ?? null,
       website: mongoAccount.website ?? null,
       profilePictureUrl: mongoAccount.profilePictureUrl ?? null,
+      // YouTube-specific fields
+      subscriberCount: mongoAccount.subscriberCount ?? null,
+      videoCount: mongoAccount.videoCount ?? null,
+      viewCount: mongoAccount.viewCount ?? null,
+      channelDescription: mongoAccount.channelDescription ?? null,
+      channelThumbnail: mongoAccount.channelThumbnail ?? null,
       accountType: mongoAccount.accountType ?? null,
       isBusinessAccount: mongoAccount.isBusinessAccount ?? null,
       isVerified: mongoAccount.isVerified ?? null,
@@ -830,7 +836,7 @@ export class MongoStorage implements IStorage {
       avgComments: mongoAccount.avgComments ?? null,
       avgReach: mongoAccount.avgReach ?? null,
       engagementRate: mongoAccount.engagementRate ?? null,
-      // Critical Instagram Business API engagement fields
+      // Critical engagement fields for analytics
       totalLikes: mongoAccount.totalLikes ?? null,
       totalComments: mongoAccount.totalComments ?? null,
       totalReach: mongoAccount.totalReach ?? null,

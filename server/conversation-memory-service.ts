@@ -409,8 +409,8 @@ Keep topics short (1-2 words) and relevant to customer service context.`;
 
       // Store sentiment as context
       if (analysis.sentiment !== 'neutral') {
-        const sentimentContext: InsertConversationContext = {
-          conversationId: typeof conversationId === 'string' ? conversationId : conversationId.toString(),
+        const sentimentContext = {
+          conversationId: conversationId, // Let MongoDB storage handle the type conversion
           contextType: 'sentiment',
           contextValue: analysis.sentiment,
           confidence: 85,
@@ -421,8 +421,8 @@ Keep topics short (1-2 words) and relevant to customer service context.`;
 
       // Store topics as context
       for (const topic of analysis.topics) {
-        const topicContext: InsertConversationContext = {
-          conversationId,
+        const topicContext = {
+          conversationId: conversationId, // Let MongoDB storage handle the type conversion
           contextType: 'topic',
           contextValue: topic,
           confidence: 80,
@@ -433,8 +433,8 @@ Keep topics short (1-2 words) and relevant to customer service context.`;
 
       // Extract intent/questions for better context
       if (content.includes('?') || content.toLowerCase().includes('help')) {
-        const intentContext: InsertConversationContext = {
-          conversationId,
+        const intentContext = {
+          conversationId: conversationId, // Let MongoDB storage handle the type conversion
           contextType: 'intent',
           contextValue: content.includes('?') ? 'question' : 'help_request',
           confidence: 90,

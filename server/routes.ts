@@ -7384,17 +7384,25 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     try {
       console.log('[YOUTUBE FIX] Updating YouTube account data...');
       
+      const { targetWorkspaceId = '68449f3852d33d75b31ce737', subscriberCount = 156, videoCount = 23, viewCount = 5420 } = req.body;
+      
       const updates = {
-        workspaceId: '68449f3852d33d75b31ce737',
-        subscriberCount: 156,
-        videoCount: 23,
-        viewCount: 5420,
+        workspaceId: targetWorkspaceId,
+        subscriberCount: subscriberCount,
+        videoCount: videoCount,
+        viewCount: viewCount,
+        // Also update these fields for frontend compatibility
+        followersCount: subscriberCount,
+        mediaCount: videoCount,
         lastSync: new Date(),
         updatedAt: new Date()
       };
 
+      console.log('[YOUTUBE UPDATE] Updating YouTube accounts with data:', updates);
+      
       const result = await storage.updateYouTubeWorkspaceData(updates);
       
+      console.log('[YOUTUBE UPDATE] Update result:', { matched: result.matchedCount, modified: result.modifiedCount });
       console.log('[YOUTUBE FIX] Update completed:', result);
       res.json({ success: true, message: 'YouTube data updated successfully', result });
       

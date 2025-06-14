@@ -34,7 +34,7 @@ export class ConversationMemoryService {
 
       // Create new conversation
       const conversationData: InsertDmConversation = {
-        workspaceId: parseInt(workspaceId),
+        workspaceId: workspaceId, // Keep as string for MongoDB ObjectId
         platform,
         participantId,
         participantUsername: participantUsername || participantId
@@ -51,11 +51,11 @@ export class ConversationMemoryService {
 
   // Store incoming message and extract context
   async storeMessage(
-    conversationId: number,
+    conversationId: string | number,
     messageId: string | null,
     sender: 'user' | 'ai',
     content: string,
-    automationRuleId?: number
+    automationRuleId?: string | number
   ): Promise<DmMessage> {
     console.log(`[MEMORY] Storing ${sender} message for conversation ${conversationId}`);
 

@@ -697,6 +697,24 @@ export default function Auth() {
           transition={{ delay: 1, duration: 0.8 }}
         >
           <p>Join thousands of creators transforming their social media</p>
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <Link href="/privacy-policy">
+              <motion.span
+                whileHover={{ scale: 1.05, color: "#ffffff" }}
+                className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
+              >
+                Privacy Policy
+              </motion.span>
+            </Link>
+            <Link href="/terms-of-service">
+              <motion.span
+                whileHover={{ scale: 1.05, color: "#ffffff" }}
+                className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
+              >
+                Terms of Service
+              </motion.span>
+            </Link>
+          </div>
         </motion.div>
       </div>
     </div>

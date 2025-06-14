@@ -1025,6 +1025,24 @@ const Landing = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-center text-gray-500"
           >
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 mb-4">
+              <Link href="/privacy-policy">
+                <motion.span
+                  whileHover={{ scale: 1.05, color: "#ffffff" }}
+                  className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  Privacy Policy
+                </motion.span>
+              </Link>
+              <Link href="/terms-of-service">
+                <motion.span
+                  whileHover={{ scale: 1.05, color: "#ffffff" }}
+                  className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  Terms of Service
+                </motion.span>
+              </Link>
+            </div>
             <p className="text-xs sm:text-sm px-4">&copy; 2025 VeeFore. All rights reserved. | Made with ❤️ for the future of social media automation.</p>
           </motion.div>
         </div>

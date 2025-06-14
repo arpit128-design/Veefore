@@ -74,18 +74,6 @@ const sections: Section[] = [
     ]
   },
   {
-    id: "cookies",
-    title: "Cookies & Tracking",
-    icon: Globe,
-    content: [
-      "Essential Cookies: We use cookies necessary for basic site functionality and security.",
-      "Analytics Cookies: These help us understand how users interact with our platform.",
-      "Preference Cookies: We store your settings and preferences for a better experience.",
-      "Third-Party Cookies: Some integrations may use their own cookies with your consent.",
-      "Cookie Control: You can manage cookie preferences through your browser settings."
-    ]
-  },
-  {
     id: "retention",
     title: "Data Retention",
     icon: Calendar,
@@ -95,18 +83,6 @@ const sections: Section[] = [
       "Legal Requirements: Some data may be retained longer to comply with legal obligations.",
       "Backup Data: Backup copies are deleted within 90 days of account closure.",
       "Analytics Data: Aggregated, non-personal analytics data may be retained indefinitely."
-    ]
-  },
-  {
-    id: "contact",
-    title: "Contact & Updates",
-    icon: Mail,
-    content: [
-      "Data Protection Officer: Contact our DPO at privacy@veefore.com for data-related inquiries.",
-      "Policy Updates: We'll notify you of material changes via email and platform notifications.",
-      "Support: Our support team is available to answer privacy-related questions.",
-      "Complaints: You have the right to file complaints with relevant data protection authorities.",
-      "Response Time: We aim to respond to all privacy requests within 30 days."
     ]
   }
 ];

@@ -5257,44 +5257,28 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(400).json({ message: 'Verification code has expired' });
       }
 
-      // Create Firebase user with email and password
-      let firebaseUser;
-      try {
-        firebaseUser = await admin.auth().createUser({
-          email: email,
-          password: password,
-          displayName: `${firstName || user.firstName} ${lastName || user.lastName || ''}`.trim(),
-          emailVerified: true
-        });
-        console.log(`[FIREBASE] Created Firebase user for ${email}: ${firebaseUser.uid}`);
-      } catch (firebaseError: any) {
-        console.error('[FIREBASE] Error creating user:', firebaseError);
-        return res.status(500).json({ message: 'Error creating Firebase user account' });
-      }
-
-      // Complete user registration with Firebase UID
+      // Complete user registration
       const updatedUser = await storage.verifyUserEmail(user.id, {
         password: password || undefined,
-        firstName: firstName || user.firstName,
-        lastName: lastName || undefined,
-        firebaseUid: firebaseUser.uid
+        firstName: firstName || user.displayName,
+        lastName: lastName || undefined
       });
 
       // Send welcome email
-      await emailService.sendWelcomeEmail(email, firstName || user.firstName);
+      await emailService.sendWelcomeEmail(email, firstName || user.displayName);
 
-      console.log(`[EMAIL] User ${email} successfully verified and activated with Firebase UID: ${firebaseUser.uid}`);
+      console.log(`[EMAIL] User ${email} successfully verified and activated`);
       res.json({ 
         message: 'Email verified successfully',
         user: {
           id: updatedUser.id,
           email: updatedUser.email,
-          firstName: updatedUser.firstName,
+          displayName: updatedUser.displayName,
           isEmailVerified: true,
-          isOnboarded: false,
-          firebaseUid: firebaseUser.uid
+          isOnboarded: false
         },
-        requiresOnboarding: true
+        requiresOnboarding: true,
+        autoSignIn: true
       });
 
     } catch (error: any) {

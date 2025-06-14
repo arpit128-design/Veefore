@@ -446,6 +446,54 @@ canvas {
   animation: stellar-pulse 3s ease-in-out infinite;
 }
 
+/* Transparent logo animations */
+.animate-float-1 {
+  animation: float-1 3s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-2 2.5s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: float-3 3.5s ease-in-out infinite;
+}
+
+.animate-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.6; }
+  33% { transform: translateY(-8px) translateX(4px); opacity: 1; }
+  66% { transform: translateY(4px) translateX(-2px); opacity: 0.8; }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.8; }
+  50% { transform: translateY(-6px) translateX(-3px); opacity: 1; }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.7; }
+  25% { transform: translateY(-4px) translateX(2px); opacity: 1; }
+  75% { transform: translateY(2px) translateX(-4px); opacity: 0.9; }
+}
+
+@keyframes text-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3)); }
+  50% { filter: drop-shadow(0 0 16px rgba(147, 51, 234, 0.5)); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(200%) rotate(45deg); }
+}
+
 /* CSS Star Field - Minimal but visible */
 .star {
   position: absolute;

@@ -439,8 +439,8 @@ const Landing = () => {
         >
           <div className="flex items-center space-x-2">
             <motion.img
-              src="/veefore-logo.png"
-              alt="VeeFore Logo"
+              src="/uptofeed-logo.png"
+              alt="UpToFeed Logo"
               whileHover={{ scale: 1.05 }}
               className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
             />
@@ -448,7 +448,7 @@ const Landing = () => {
               whileHover={{ scale: 1.05 }}
               className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
             >
-              VeeFore
+              UpToFeed
             </motion.h1>
           </div>
           

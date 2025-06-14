@@ -20,11 +20,11 @@ export function Header() {
           {/* Brand Logo */}
           <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
             <img 
-              src="/veefore-logo.png" 
-              alt="VeeFore Logo" 
+              src="/uptofeed-logo.png" 
+              alt="UpToFeed Logo" 
               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain"
             />
-            <h1 className="text-base sm:text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">VeeFore</h1>
+            <h1 className="text-base sm:text-lg md:text-2xl font-orbitron font-bold neon-text text-electric-cyan">UpToFeed</h1>
           </div>
           
           {/* Desktop Controls */}

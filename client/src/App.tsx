@@ -130,7 +130,7 @@ function Router() {
     return (
       <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
         <OptimizedSpaceBackground />
-        <SpaceLoader message="Initializing VeeFore" />
+        <SpaceLoader message="Initializing UpToFeed" />
       </div>
     );
   }

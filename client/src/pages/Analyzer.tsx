@@ -158,7 +158,7 @@ export default function Analyzer() {
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.reach 
-                  ? `${analytics.percentageChanges.reach} vs last period`
+                  ? `${getPercentageValue(analytics.percentageChanges.reach)} vs last period`
                   : 'Real-time data'
                 }
               </span>
@@ -181,7 +181,7 @@ export default function Analyzer() {
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.engagement 
-                  ? `${analytics.percentageChanges.engagement.value || analytics.percentageChanges.engagement} vs last period`
+                  ? `${getPercentageValue(analytics.percentageChanges.engagement)} vs last period`
                   : 'Authentic data'
                 }
               </span>

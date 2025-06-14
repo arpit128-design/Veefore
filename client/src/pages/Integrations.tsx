@@ -235,7 +235,7 @@ export default function Integrations() {
       return response.json();
     },
     onSuccess: (data) => {
-      const platformName = platform === 'instagram' ? 'Instagram' : 'YouTube';
+      const platformName = manualConnectPlatform === 'instagram' ? 'Instagram' : 'YouTube';
       toast({
         title: `${platformName} Connected`,
         description: `Successfully connected ${data.account?.username || data.username}`,
@@ -585,6 +585,7 @@ export default function Integrations() {
                             <Button 
                               variant="outline"
                               className="border-electric-cyan text-electric-cyan hover:bg-electric-cyan hover:text-white"
+                              onClick={() => setManualConnectPlatform(platform)}
                             >
                               Manual Connect
                             </Button>
@@ -644,7 +645,7 @@ export default function Integrations() {
                                 </p>
                               </div>
                               <Button
-                                onClick={() => manualConnectMutation.mutate({ accessToken, username, platform })}
+                                onClick={() => manualConnectMutation.mutate({ accessToken, username, platform: manualConnectPlatform })}
                                 disabled={!accessToken || !username || manualConnectMutation.isPending}
                                 className="w-full bg-electric-cyan hover:bg-electric-cyan/80"
                               >
@@ -654,7 +655,7 @@ export default function Integrations() {
                                     Connecting...
                                   </>
                                 ) : (
-                                  `Connect ${platform === 'instagram' ? 'Instagram' : 'YouTube'}`
+                                  `Connect ${manualConnectPlatform === 'instagram' ? 'Instagram' : 'YouTube'}`
                                 )}
                               </Button>
                             </div>

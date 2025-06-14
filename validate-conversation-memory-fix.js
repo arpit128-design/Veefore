@@ -3,8 +3,8 @@
  * Confirms that the system can properly handle MongoDB ObjectIds in conversation context
  */
 
-const { MongoStorage } = require('./server/mongodb-storage.js');
-const { ConversationMemoryService } = require('./server/conversation-memory-service.js');
+import { MongoStorage } from './server/mongodb-storage.js';
+import { ConversationMemoryService } from './server/conversation-memory-service.js';
 
 async function validateConversationMemoryFix() {
   console.log('[VALIDATION] Testing conversation memory ObjectId handling...');
@@ -37,8 +37,8 @@ async function validateConversationMemoryFix() {
     console.log('[VALIDATION] Testing message storage and context extraction...');
     await memoryService.storeMessage(
       conversation.id,
-      'user',
       testMessage,
+      'user',
       false
     );
     

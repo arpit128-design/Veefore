@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, Shield, Database, Eye, Users, Lock, Globe, Calendar, Mail, ArrowLeft } from "lucide-react";
+import { ChevronDown, Shield, Database, Eye, Users, Lock, Globe, Calendar, Mail, ArrowLeft, Phone } from "lucide-react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

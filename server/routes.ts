@@ -83,27 +83,52 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[AUTH] User lookup for firebaseUid ${firebaseUid}:`, user ? `Found - isOnboarded: ${user.isOnboarded}` : 'Not found');
       
       if (!user) {
-        // Create new user from JWT payload
+        // Create new user from JWT payload, or update existing user with Firebase UID
         let payload: any;
         try {
           payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-          const userData = {
-            firebaseUid,
-            email: payload.email || `user_${firebaseUid}@example.com`,
-            username: payload.email?.split('@')[0] || `user_${firebaseUid.slice(0, 8)}`,
-            displayName: payload.name || null,
-            avatar: payload.picture || null,
-            referredBy: null,
-            isOnboarded: false // Explicitly set to false
-          };
+          const userEmail = payload.email || `user_${firebaseUid}@example.com`;
           
-          console.log(`[AUTH] Creating new user with userData:`, { ...userData, firebaseUid: firebaseUid.slice(0, 8) + '...' });
-          user = await storage.createUser(userData);
-          console.log(`[AUTH] Created user with ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
+          // First check if user exists by email (from email verification process)
+          console.log(`[AUTH] Checking for existing user by email: ${userEmail}`);
+          const existingUser = await storage.getUserByEmail(userEmail);
+          console.log(`[AUTH] Existing user lookup result:`, existingUser ? `Found user ID: ${existingUser.id}` : 'Not found');
+          
+          if (existingUser) {
+            // User exists from email verification, update with Firebase UID
+            console.log(`[AUTH] Found existing user by email, updating with Firebase UID:`, {
+              userId: existingUser.id,
+              email: userEmail,
+              firebaseUid: firebaseUid.slice(0, 8) + '...'
+            });
+            
+            user = await storage.updateUser(existingUser.id, {
+              firebaseUid,
+              displayName: payload.name || existingUser.displayName,
+              avatar: payload.picture || existingUser.avatar
+            });
+            
+            console.log(`[AUTH] Updated existing user with Firebase UID: ${user.id}`);
+          } else {
+            // No existing user, create new one
+            const userData = {
+              firebaseUid,
+              email: userEmail,
+              username: userEmail.split('@')[0] || `user_${firebaseUid.slice(0, 8)}`,
+              displayName: payload.name || null,
+              avatar: payload.picture || null,
+              referredBy: null,
+              isOnboarded: false // Explicitly set to false
+            };
+            
+            console.log(`[AUTH] Creating new user with userData:`, { ...userData, firebaseUid: firebaseUid.slice(0, 8) + '...' });
+            user = await storage.createUser(userData);
+            console.log(`[AUTH] Created user with ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
+          }
           
           // Note: Default workspace creation is handled by createUser method in storage layer
         } catch (error: any) {
-          console.error('[AUTH] Failed to create user:', error);
+          console.error('[AUTH] Failed to create/update user:', error);
           console.error('[AUTH] Error details:', {
             message: error.message,
             stack: error.stack,

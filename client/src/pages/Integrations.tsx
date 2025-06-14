@@ -575,7 +575,7 @@ export default function Integrations() {
                           </>
                         )}
                       </Button>
-                      {platform === 'instagram' && (
+                      {(platform === 'instagram' || platform === 'youtube') && (
                         <Dialog open={manualConnectOpen} onOpenChange={setManualConnectOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -587,14 +587,34 @@ export default function Integrations() {
                           </DialogTrigger>
                           <DialogContent className="bg-space-black border-asteroid-gray/20">
                             <DialogHeader>
-                              <DialogTitle className="text-white">Connect Instagram Manually</DialogTitle>
+                              <DialogTitle className="text-white">
+                                Connect {platform === 'instagram' ? 'Instagram' : 'YouTube'} Manually
+                              </DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4">
+                              {platform === 'youtube' && (
+                                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                                  <div className="flex items-start space-x-3">
+                                    <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
+                                    <div>
+                                      <h4 className="text-amber-500 font-medium">OAuth App Verification Required</h4>
+                                      <p className="text-xs text-asteroid-gray mt-1">
+                                        YouTube OAuth is blocked due to Google app verification requirements. Manual connection allows you to use YouTube features during development.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                               <div>
-                                <Label htmlFor="username" className="text-white">Instagram Username</Label>
+                                <Label htmlFor="username" className="text-white">
+                                  {platform === 'instagram' ? 'Instagram Username' : 'YouTube Channel Name'}
+                                </Label>
                                 <Input
                                   id="username"
-                                  placeholder="Enter your Instagram username (e.g., arpit9996363)"
+                                  placeholder={platform === 'instagram' 
+                                    ? "Enter your Instagram username (e.g., arpit9996363)"
+                                    : "Enter your YouTube channel name"
+                                  }
                                   value={username}
                                   onChange={(e) => setUsername(e.target.value)}
                                   className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
@@ -604,13 +624,19 @@ export default function Integrations() {
                                 <Label htmlFor="token" className="text-white">Access Token</Label>
                                 <Input
                                   id="token"
-                                  placeholder="Enter your Instagram access token"
+                                  placeholder={platform === 'instagram'
+                                    ? "Enter your Instagram access token"
+                                    : "Enter your YouTube API access token"
+                                  }
                                   value={accessToken}
                                   onChange={(e) => setAccessToken(e.target.value)}
                                   className="bg-asteroid-gray/10 border-asteroid-gray/20 text-white"
                                 />
                                 <p className="text-xs text-asteroid-gray mt-1">
-                                  Get your access token from Instagram Basic Display API or Graph API
+                                  {platform === 'instagram'
+                                    ? "Get your access token from Instagram Basic Display API or Graph API"
+                                    : "Get your access token from Google Cloud Console > YouTube Data API v3"
+                                  }
                                 </p>
                               </div>
                               <Button
@@ -624,7 +650,7 @@ export default function Integrations() {
                                     Connecting...
                                   </>
                                 ) : (
-                                  'Connect Instagram'
+                                  `Connect ${platform === 'instagram' ? 'Instagram' : 'YouTube'}`
                                 )}
                               </Button>
                             </div>

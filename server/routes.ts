@@ -5257,20 +5257,33 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.status(400).json({ message: 'Verification code has expired' });
       }
 
-      // Complete user registration
+      // Create Firebase user with email and password
+      let firebaseUser;
+      try {
+        firebaseUser = await admin.auth().createUser({
+          email: email,
+          password: password,
+          displayName: `${firstName || user.firstName} ${lastName || user.lastName || ''}`.trim(),
+          emailVerified: true
+        });
+        console.log(`[FIREBASE] Created Firebase user for ${email}: ${firebaseUser.uid}`);
+      } catch (firebaseError: any) {
+        console.error('[FIREBASE] Error creating user:', firebaseError);
+        return res.status(500).json({ message: 'Error creating Firebase user account' });
+      }
+
+      // Complete user registration with Firebase UID
       const updatedUser = await storage.verifyUserEmail(user.id, {
         password: password || undefined,
         firstName: firstName || user.firstName,
-        lastName: lastName || undefined
+        lastName: lastName || undefined,
+        firebaseUid: firebaseUser.uid
       });
-
-      // For email verification, we'll let the frontend handle Firebase authentication
-      // The user will need to sign in manually after verification
 
       // Send welcome email
       await emailService.sendWelcomeEmail(email, firstName || user.firstName);
 
-      console.log(`[EMAIL] User ${email} successfully verified and activated`);
+      console.log(`[EMAIL] User ${email} successfully verified and activated with Firebase UID: ${firebaseUser.uid}`);
       res.json({ 
         message: 'Email verified successfully',
         user: {
@@ -5278,7 +5291,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           email: updatedUser.email,
           firstName: updatedUser.firstName,
           isEmailVerified: true,
-          isOnboarded: false
+          isOnboarded: false,
+          firebaseUid: firebaseUser.uid
         },
         requiresOnboarding: true
       });

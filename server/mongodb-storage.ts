@@ -3552,7 +3552,7 @@ export class MongoStorage implements IStorage {
     return this.convertUser(user);
   }
 
-  async verifyUserEmail(id: number | string, data: { password?: string; firstName?: string; lastName?: string }): Promise<User> {
+  async verifyUserEmail(id: number | string, data: { password?: string; firstName?: string; lastName?: string; firebaseUid?: string }): Promise<User> {
     await this.connect();
     
     const updateData: any = {
@@ -3564,6 +3564,7 @@ export class MongoStorage implements IStorage {
 
     if (data.firstName) updateData.displayName = data.firstName;
     if (data.password) updateData.passwordHash = data.password; // Should be hashed before calling this
+    if (data.firebaseUid) updateData.firebaseUid = data.firebaseUid;
 
     const user = await UserModel.findByIdAndUpdate(
       id,

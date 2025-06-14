@@ -7,7 +7,7 @@ import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BarChart3, TrendingUp, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { formatNumber, formatEngagement } from "@/lib/utils";
 
 export default function Analyzer() {
@@ -154,8 +154,16 @@ export default function Analyzer() {
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <div className={`flex items-center space-x-1 sm:space-x-2 ${
+              analytics?.percentageChanges?.reach?.isPositive !== false 
+                ? 'text-green-400' 
+                : 'text-red-400'
+            }`}>
+              {analytics?.percentageChanges?.reach?.isPositive !== false ? (
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              ) : (
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+              )}
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.reach 
                   ? `${getPercentageValue(analytics.percentageChanges.reach)} vs last period`
@@ -177,8 +185,16 @@ export default function Analyzer() {
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Engagement</div>
               </div>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <div className={`flex items-center space-x-1 sm:space-x-2 ${
+              analytics?.percentageChanges?.engagement?.isPositive !== false 
+                ? 'text-green-400' 
+                : 'text-red-400'
+            }`}>
+              {analytics?.percentageChanges?.engagement?.isPositive !== false ? (
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              ) : (
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+              )}
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.engagement 
                   ? `${getPercentageValue(analytics.percentageChanges.engagement)} vs last period`
@@ -200,11 +216,19 @@ export default function Analyzer() {
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <div className={`flex items-center space-x-1 sm:space-x-2 ${
+              analytics?.percentageChanges?.reach?.isPositive !== false 
+                ? 'text-green-400' 
+                : 'text-red-400'
+            }`}>
+              {analytics?.percentageChanges?.reach?.isPositive !== false ? (
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              ) : (
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+              )}
               <span className="text-xs sm:text-sm">
-                {analytics?.percentageChanges?.followers 
-                  ? `${getPercentageValue(analytics.percentageChanges.followers)} vs last period`
+                {analytics?.percentageChanges?.reach 
+                  ? `${getPercentageValue(analytics.percentageChanges.reach)} vs last period`
                   : 'Live Instagram data'
                 }
               </span>
@@ -223,11 +247,19 @@ export default function Analyzer() {
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Followers</div>
               </div>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <div className={`flex items-center space-x-1 sm:space-x-2 ${
+              analytics?.percentageChanges?.followers?.isPositive !== false 
+                ? 'text-green-400' 
+                : 'text-red-400'
+            }`}>
+              {analytics?.percentageChanges?.followers?.isPositive !== false ? (
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              ) : (
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+              )}
               <span className="text-xs sm:text-sm">
-                {analytics?.changes?.followers !== undefined 
-                  ? `${analytics.changes.followers >= 0 ? '+' : ''}${analytics.changes.followers}% vs last period`
+                {analytics?.percentageChanges?.followers 
+                  ? `${getPercentageValue(analytics.percentageChanges.followers)} vs last period`
                   : 'Authentic Instagram data'
                 }
               </span>

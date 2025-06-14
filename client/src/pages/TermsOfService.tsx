@@ -260,8 +260,8 @@ export default function TermsOfService() {
       </motion.div>
 
       {/* Main Content - Centered */}
-      <div className="relative z-10 max-w-4xl mx-auto px-8 py-8">
-        <div className="ml-20">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="lg:ml-20">
           {/* Header */}
           <motion.div
             className="pt-12 pb-12 text-center"
@@ -276,11 +276,11 @@ export default function TermsOfService() {
               <Scale className="w-10 h-10 text-white" />
             </motion.div>
             
-            <h1 className="text-5xl font-bold font-orbitron bg-gradient-to-r from-solar-gold via-orange-400 to-solar-gold bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-orbitron bg-gradient-to-r from-solar-gold via-orange-400 to-solar-gold bg-clip-text text-transparent mb-4">
               Terms of Service
             </h1>
             
-            <p className="text-xl text-asteroid-silver max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-asteroid-silver max-w-2xl mx-auto leading-relaxed">
               These terms govern your use of VeeFore and outline the rights and 
               responsibilities of both you and VeeFore in our service relationship.
             </p>

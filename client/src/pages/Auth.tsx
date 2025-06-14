@@ -22,7 +22,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithCustomToken } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithCustomToken, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
@@ -253,9 +253,17 @@ export default function Auth() {
         description: "Your account has been created successfully. Signing you in..."
       });
 
-      // Automatically sign in the user after successful verification
+      // Create Firebase user and automatically sign in after successful verification
       try {
-        await signInWithEmailAndPassword(auth, signupData.email, signupData.password);
+        // First create the Firebase user
+        const userCredential = await createUserWithEmailAndPassword(auth, signupData.email, signupData.password);
+        
+        // Update the user's display name
+        if (userCredential.user && signupData.firstName) {
+          await updateProfile(userCredential.user, {
+            displayName: `${signupData.firstName} ${signupData.lastName || ''}`.trim()
+          });
+        }
         
         toast({
           title: "Welcome to VeeFore!",
@@ -263,17 +271,29 @@ export default function Auth() {
         });
         
         // Navigation will be handled by Firebase auth state change
-      } catch (signInError: any) {
-        // If auto sign-in fails, show manual sign-in form
-        setShowVerification(false);
-        setSignupData(null);
-        setVerificationCode('');
-        setIsSignUp(false);
+      } catch (firebaseError: any) {
+        console.error('Firebase user creation error:', firebaseError);
         
-        toast({
-          title: "Account Created Successfully!",
-          description: "Please sign in with your email and password to continue."
-        });
+        // If Firebase creation fails, try to sign in with existing user
+        try {
+          await signInWithEmailAndPassword(auth, signupData.email, signupData.password);
+          
+          toast({
+            title: "Welcome to VeeFore!",
+            description: "Successfully signed in to your account."
+          });
+        } catch (signInError: any) {
+          // If both fail, show manual sign-in form
+          setShowVerification(false);
+          setSignupData(null);
+          setVerificationCode('');
+          setIsSignUp(false);
+          
+          toast({
+            title: "Account Created Successfully!",
+            description: "Please sign in with your email and password to continue."
+          });
+        }
       }
 
     } catch (error: any) {

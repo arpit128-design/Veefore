@@ -1504,6 +1504,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log('[YOUTUBE CALLBACK] Processing callback for:', { workspaceId, userId, source });
 
       // Exchange code for access token
+      console.log('[YOUTUBE CALLBACK] Starting token exchange with Google OAuth2');
       const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: {
@@ -1521,28 +1522,41 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
         console.error('[YOUTUBE CALLBACK] Token exchange failed:', errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
+        console.error('[YOUTUBE CALLBACK] Token response status:', tokenResponse.status);
+        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`);
       }
 
       const tokenData = await tokenResponse.json();
-      console.log('[YOUTUBE CALLBACK] Token exchange successful');
+      console.log('[YOUTUBE CALLBACK] Token exchange successful, access_token length:', tokenData.access_token?.length || 0);
 
       // Get channel information
-      const channelResponse = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&mine=true`, {
+      console.log('[YOUTUBE CALLBACK] Fetching YouTube channel information');
+      const channelResponse = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&mine=true&key=${process.env.YOUTUBE_API_KEY}`, {
         headers: {
           'Authorization': `Bearer ${tokenData.access_token}`,
         },
       });
 
       if (!channelResponse.ok) {
-        console.error('[YOUTUBE CALLBACK] Failed to fetch channel info');
-        return res.redirect(`https://${req.get('host')}/integrations?error=channel_fetch_failed`);
+        const errorText = await channelResponse.text();
+        console.error('[YOUTUBE CALLBACK] Failed to fetch channel info:', channelResponse.status, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=channel_fetch_failed&details=${encodeURIComponent(errorText)}`);
       }
 
       const channelData = await channelResponse.json();
+      console.log('[YOUTUBE CALLBACK] Channel API response:', {
+        itemsCount: channelData.items?.length || 0,
+        hasError: !!channelData.error
+      });
+      
+      if (channelData.error) {
+        console.error('[YOUTUBE CALLBACK] YouTube API error:', channelData.error);
+        return res.redirect(`https://${req.get('host')}/integrations?error=youtube_api_error&details=${encodeURIComponent(channelData.error.message || 'Unknown API error')}`);
+      }
+      
       if (!channelData.items || channelData.items.length === 0) {
-        console.error('[YOUTUBE CALLBACK] No YouTube channel found');
-        return res.redirect(`https://${req.get('host')}/integrations?error=no_channel_found`);
+        console.error('[YOUTUBE CALLBACK] No YouTube channel found for this account');
+        return res.redirect(`https://${req.get('host')}/integrations?error=no_channel_found&details=No YouTube channel associated with this Google account`);
       }
 
       const channel = channelData.items[0];
@@ -1582,10 +1596,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       };
 
       // Check if account already exists
-      const existingAccount = await storage.getSocialAccountByPlatformAndAccountId(
+      const existingAccount = await storage.getSocialAccountByPlatform(
         workspaceId, 
-        'youtube', 
-        channel.id
+        'youtube'
       );
 
       let savedAccount;
@@ -1612,8 +1625,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
     } catch (error: any) {
       console.error('[YOUTUBE CALLBACK] Unexpected error:', error);
+      console.error('[YOUTUBE CALLBACK] Error message:', error.message);
       console.error('[YOUTUBE CALLBACK] Stack trace:', error.stack);
-      res.redirect(`https://${req.get('host')}/integrations?error=unexpected_error`);
+      console.error('[YOUTUBE CALLBACK] Request params:', req.query);
+      res.redirect(`https://${req.get('host')}/integrations?error=unexpected_error&details=${encodeURIComponent(error.message || 'Unknown error')}`);
     }
   });
 

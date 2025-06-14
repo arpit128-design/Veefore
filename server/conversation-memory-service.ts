@@ -34,7 +34,7 @@ export class ConversationMemoryService {
 
       // Create new conversation
       const conversationData: InsertDmConversation = {
-        workspaceId: workspaceId, // Keep as string for MongoDB ObjectId
+        workspaceId: typeof workspaceId === 'string' ? parseInt(workspaceId) : workspaceId,
         platform,
         participantId,
         participantUsername: participantUsername || participantId
@@ -79,11 +79,11 @@ export class ConversationMemoryService {
       
       // Extract and store conversation context if this is a user message
       if (sender === 'user') {
-        await this.extractAndStoreContext(conversationId, content, analysis);
+        await this.extractAndStoreContext(typeof conversationId === 'string' ? parseInt(conversationId, 10) || 0 : conversationId, content, analysis);
       }
 
       // Update conversation's last message time
-      await this.storage.updateConversationLastMessage(conversationId);
+      await this.storage.updateConversationLastMessage(typeof conversationId === 'string' ? parseInt(conversationId, 10) || 0 : conversationId);
       
       console.log(`[MEMORY] Stored message ID: ${message.id} with sentiment: ${analysis.sentiment}`);
       return message;
@@ -192,28 +192,24 @@ CRITICAL RULES:
 - Match the user's language and tone
 - Give specific, relevant responses based on the actual message content
 
-Conversation Context:
-${conversationSummary}
-
 Customer Context: ${contextSummary}
 
 Current Message Analysis:
 - User said: "${userMessage}"
-- Topics detected: ${messageTopics.join(', ')}
-- Is first interaction: ${isFirstMessage}
-- Previous greeting used: ${hasRepeatedGreeting}
+- Topics detected: ${messageAnalysis.topics.join(', ')}
+- Urgency level: ${messageAnalysis.urgency}
 
 Response Strategy:
-${isFirstMessage ? 
+${conversationState.totalMessages <= 1 ? 
   '- This is a new conversation, respond naturally to their specific message' : 
   '- Continue the ongoing conversation, reference previous context appropriately'
 }
-${hasRepeatedGreeting ? 
+${conversationAnalysis.patterns.some(p => p.includes('generic')) ? 
   '- AVOID any greeting-related phrases, focus on content' : 
   '- Respond naturally without forced politeness'
 }
 
-Generate a relevant, specific response that directly addresses what they said, not generic conversation fillers.`;
+Generate a relevant, specific response that directly addresses what they said based on the conversation history and analysis above.`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o",

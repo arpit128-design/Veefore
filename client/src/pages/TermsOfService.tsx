@@ -230,7 +230,7 @@ export default function TermsOfService() {
 
       {/* Navigation Sidebar - Fixed Vertical Layout */}
       <motion.div
-        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-3 max-h-[80vh] overflow-y-auto"
+        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-2"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}
@@ -398,9 +398,45 @@ export default function TermsOfService() {
             ))}
           </div>
 
+          {/* Contact Section */}
+          <motion.div
+            className="mt-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+          >
+            <Card className="content-card holographic border-solar-gold/30 bg-gradient-to-r from-solar-gold/10 to-orange-500/10 backdrop-blur-sm">
+              <CardContent className="p-8">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-solar-gold/20 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6 text-solar-gold" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-solar-gold mb-4 font-orbitron">
+                      Questions or Legal Concerns?
+                    </h3>
+                    <p className="text-asteroid-silver mb-6 leading-relaxed">
+                      If you have questions about these terms or need to report a legal concern, our legal and 
+                      support teams are here to help. We're committed to transparency and fair treatment of all users.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button className="bg-solar-gold hover:bg-solar-gold/80 text-space-gray-900 font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105">
+                        <Phone className="w-4 h-4 mr-2" />
+                        Contact Legal Team
+                      </Button>
+                      <Button variant="outline" className="border-solar-gold/50 text-solar-gold hover:bg-solar-gold/10 px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105">
+                        General Support
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* Footer */}
           <motion.div
-            className="mt-16 pt-8 border-t border-space-gray-600/50 text-center"
+            className="mt-12 pt-8 border-t border-space-gray-600/50 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}

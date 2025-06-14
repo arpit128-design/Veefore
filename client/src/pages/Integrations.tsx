@@ -296,8 +296,8 @@ export default function Integrations() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
       toast({
-        title: "Token Refreshed",
-        description: `${data.username} token has been successfully refreshed.`,
+        title: "Data Refreshed",
+        description: `${data.username || 'Account'} data has been successfully refreshed.`,
       });
     },
     onError: (error: any) => {

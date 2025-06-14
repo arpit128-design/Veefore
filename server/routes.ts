@@ -1643,6 +1643,86 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // YouTube data refresh endpoint
+  app.post("/api/youtube/refresh", requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      
+      // Get user's workspaces
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      if (!workspaces.length) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      let updatedAccounts = [];
+      
+      for (const workspace of workspaces) {
+        // Get YouTube accounts for this workspace
+        const youtubeAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        const youtubeAccount = youtubeAccounts.find(acc => acc.platform === 'youtube');
+        
+        if (youtubeAccount && youtubeAccount.accessToken) {
+          console.log('[YOUTUBE REFRESH] Refreshing data for account:', youtubeAccount.username);
+          
+          try {
+            // Fetch fresh channel data from YouTube API
+            const channelResponse = await fetch(
+              `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true&access_token=${youtubeAccount.accessToken}`
+            );
+            
+            if (channelResponse.ok) {
+              const channelData = await channelResponse.json();
+              
+              if (channelData.items && channelData.items.length > 0) {
+                const channel = channelData.items[0];
+                const statistics = channel.statistics;
+                
+                // Update account with fresh data
+                const updatedData = {
+                  subscriberCount: parseInt(statistics.subscriberCount || '0'),
+                  videoCount: parseInt(statistics.videoCount || '0'),
+                  viewCount: parseInt(statistics.viewCount || '0'),
+                  lastSyncAt: new Date(),
+                  updatedAt: new Date()
+                };
+                
+                await storage.updateSocialAccount(youtubeAccount.id, updatedData);
+                
+                updatedAccounts.push({
+                  platform: 'youtube',
+                  username: youtubeAccount.username,
+                  subscribers: updatedData.subscriberCount,
+                  videos: updatedData.videoCount,
+                  views: updatedData.viewCount
+                });
+                
+                console.log('[YOUTUBE REFRESH] Updated account data:', {
+                  username: youtubeAccount.username,
+                  subscribers: updatedData.subscriberCount,
+                  videos: updatedData.videoCount
+                });
+              }
+            } else {
+              console.error('[YOUTUBE REFRESH] API error for account:', youtubeAccount.username, channelResponse.status);
+            }
+          } catch (refreshError) {
+            console.error('[YOUTUBE REFRESH] Error refreshing account:', youtubeAccount.username, refreshError);
+          }
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Refreshed ${updatedAccounts.length} YouTube account(s)`,
+        accounts: updatedAccounts
+      });
+      
+    } catch (error: any) {
+      console.error('[YOUTUBE REFRESH] Error:', error);
+      res.status(500).json({ error: 'Failed to refresh YouTube data' });
+    }
+  });
+
   // YouTube manual connection endpoint (OAuth verification workaround)
   app.post("/api/youtube/manual-connect", requireAuth, async (req: any, res: any) => {
     try {
@@ -5301,6 +5381,310 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.error('[SCHEDULER] Memory cleanup failed:', error);
     }
   }, 24 * 60 * 60 * 1000); // 24 hours
+
+  // Scheduler endpoints
+  app.post('/api/scheduler/create', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { 
+        title, 
+        content, 
+        mediaUrl, 
+        platform, 
+        scheduledAt, 
+        workspaceId, 
+        hashtags = [],
+        mentions = [] 
+      } = req.body;
+
+      if (!title || !content || !platform || !scheduledAt || !workspaceId) {
+        return res.status(400).json({ 
+          error: 'Title, content, platform, scheduled time, and workspace are required' 
+        });
+      }
+
+      // Validate scheduled time is in the future
+      const scheduledTime = new Date(scheduledAt);
+      if (scheduledTime <= new Date()) {
+        return res.status(400).json({ 
+          error: 'Scheduled time must be in the future' 
+        });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Create scheduled content
+      const scheduledContent = await storage.createContent({
+        workspaceId: parseInt(workspaceId),
+        title,
+        description: content,
+        type: 'post',
+        platform,
+        status: 'scheduled',
+        mediaUrl: mediaUrl || null,
+        scheduledAt: scheduledTime,
+        metadata: {
+          hashtags,
+          mentions,
+          createdBy: user.id,
+          autoGenerated: false
+        }
+      });
+
+      console.log('[SCHEDULER] Created scheduled content:', {
+        id: scheduledContent.id,
+        platform,
+        scheduledAt: scheduledTime.toISOString(),
+        title
+      });
+
+      res.json({
+        success: true,
+        message: 'Content scheduled successfully',
+        content: {
+          id: scheduledContent.id,
+          title,
+          platform,
+          scheduledAt: scheduledTime.toISOString(),
+          status: 'scheduled'
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[SCHEDULER] Error creating scheduled content:', error);
+      res.status(500).json({ error: 'Failed to schedule content' });
+    }
+  });
+
+  app.get('/api/scheduler/list', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { workspaceId, status = 'scheduled' } = req.query;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Get scheduled content
+      const scheduledContent = await storage.getContent(parseInt(workspaceId), { status });
+      
+      // Format for frontend
+      const formattedContent = scheduledContent.map(content => ({
+        id: content.id,
+        title: content.title || 'Untitled',
+        description: content.description,
+        platform: content.platform,
+        type: content.type,
+        status: content.status,
+        scheduledAt: content.scheduledAt,
+        mediaUrl: content.mediaUrl,
+        createdAt: content.createdAt,
+        metadata: content.metadata
+      }));
+
+      res.json({
+        success: true,
+        content: formattedContent,
+        total: formattedContent.length
+      });
+
+    } catch (error: any) {
+      console.error('[SCHEDULER] Error fetching scheduled content:', error);
+      res.status(500).json({ error: 'Failed to fetch scheduled content' });
+    }
+  });
+
+  app.delete('/api/scheduler/delete/:id', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: 'Content ID is required' });
+      }
+
+      // Get content details (using getContent with filter)
+      const allContent = await storage.getContent(null, {});
+      const content = allContent.find(c => c.id.toString() === id.toString());
+      
+      if (!content) {
+        return res.status(404).json({ error: 'Content not found' });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id === content.workspaceId);
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Delete the scheduled content
+      await storage.deleteContent(content.id);
+
+      console.log('[SCHEDULER] Deleted scheduled content:', {
+        id: content.id,
+        title: content.title,
+        platform: content.platform
+      });
+
+      res.json({
+        success: true,
+        message: 'Scheduled content deleted successfully'
+      });
+
+    } catch (error: any) {
+      console.error('[SCHEDULER] Error deleting content:', error);
+      res.status(500).json({ error: 'Failed to delete scheduled content' });
+    }
+  });
+
+  // Automation endpoints
+  app.post('/api/automation/rules', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { 
+        name, 
+        workspaceId, 
+        type, 
+        trigger, 
+        action, 
+        isActive = true,
+        description 
+      } = req.body;
+
+      if (!name || !workspaceId || !type || !trigger || !action) {
+        return res.status(400).json({ 
+          error: 'Name, workspace, type, trigger, and action are required' 
+        });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Create automation rule
+      const automationRule = await storage.createAutomationRule({
+        name,
+        workspaceId: parseInt(workspaceId),
+        type,
+        trigger,
+        action,
+        isActive,
+        description: description || null
+      });
+
+      console.log('[AUTOMATION] Created automation rule:', {
+        id: automationRule.id,
+        name,
+        type,
+        workspaceId
+      });
+
+      res.json({
+        success: true,
+        message: 'Automation rule created successfully',
+        rule: automationRule
+      });
+
+    } catch (error: any) {
+      console.error('[AUTOMATION] Error creating automation rule:', error);
+      res.status(500).json({ error: 'Failed to create automation rule' });
+    }
+  });
+
+  app.get('/api/automation/rules', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { workspaceId } = req.query;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Get automation rules
+      const rules = await storage.getAutomationRulesByType(parseInt(workspaceId), null);
+
+      res.json({
+        success: true,
+        rules,
+        total: rules.length
+      });
+
+    } catch (error: any) {
+      console.error('[AUTOMATION] Error fetching automation rules:', error);
+      res.status(500).json({ error: 'Failed to fetch automation rules' });
+    }
+  });
+
+  app.patch('/api/automation/rules/:id/toggle', requireAuth, async (req: any, res: any) => {
+    try {
+      const { user } = req;
+      const { id } = req.params;
+      const { isActive } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: 'Rule ID is required' });
+      }
+
+      // Get rule details
+      const rules = await storage.getAutomationRulesByType(null, null);
+      const rule = rules.find(r => r.id.toString() === id.toString());
+      
+      if (!rule) {
+        return res.status(404).json({ error: 'Automation rule not found' });
+      }
+
+      // Verify workspace access
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find(w => w.id === rule.workspaceId);
+      if (!workspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      // Update rule status
+      const updatedRule = await storage.updateAutomationRule(rule.id, {
+        isActive: typeof isActive === 'boolean' ? isActive : !rule.isActive
+      });
+
+      console.log('[AUTOMATION] Toggled automation rule:', {
+        id: rule.id,
+        name: rule.name,
+        isActive: updatedRule.isActive
+      });
+
+      res.json({
+        success: true,
+        message: `Automation rule ${updatedRule.isActive ? 'enabled' : 'disabled'}`,
+        rule: updatedRule
+      });
+
+    } catch (error: any) {
+      console.error('[AUTOMATION] Error toggling automation rule:', error);
+      res.status(500).json({ error: 'Failed to toggle automation rule' });
+    }
+  });
 
   // Update content route
   app.put('/api/content/:id', requireAuth, async (req: any, res: Response) => {

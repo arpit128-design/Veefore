@@ -55,17 +55,27 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       // Extract Firebase UID from JWT token payload
       let firebaseUid;
+      let cleanToken = token;
+      
       try {
-        // Validate JWT structure (should have 3 parts)
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
+        // Handle malformed tokens by finding the actual JWT parts
+        // Clean any URL encoding or extra characters
+        cleanToken = cleanToken.replace(/\s+/g, '').replace(/[^\w\-._]/g, '');
+        
+        // If token has more than 3 parts, it might be concatenated
+        const tokenParts = cleanToken.split('.');
+        if (tokenParts.length > 3) {
+          // Try to reconstruct proper JWT from first 3 parts
+          cleanToken = tokenParts.slice(0, 3).join('.');
+          console.log('[AUTH] Reconstructed JWT from', tokenParts.length, 'parts to 3 parts');
+        } else if (tokenParts.length < 3) {
           console.error('[AUTH] Invalid JWT structure - expected 3 parts, got:', tokenParts.length);
           console.error('[AUTH] Token received:', token.substring(0, 100) + '...');
-          console.error('[AUTH] Authorization header:', authHeader.substring(0, 100) + '...');
           return res.status(401).json({ error: 'Invalid token format' });
         }
 
-        const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+        const finalParts = cleanToken.split('.');
+        const payload = JSON.parse(Buffer.from(finalParts[1], 'base64').toString());
         firebaseUid = payload.user_id || payload.sub;
         
         if (!firebaseUid) {
@@ -86,7 +96,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         // Create new user from JWT payload, or update existing user with Firebase UID
         let payload: any;
         try {
-          payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          // Use the cleaned token parts for payload extraction
+          const finalTokenParts = cleanToken.split('.');
+          payload = JSON.parse(Buffer.from(finalTokenParts[1], 'base64').toString());
           const userEmail = payload.email || `user_${firebaseUid}@example.com`;
           
           // First check if user exists by email (from email verification process)

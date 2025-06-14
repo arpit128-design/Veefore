@@ -18,7 +18,7 @@ import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import { emailService } from "./email-service";
 import OpenAI from "openai";
-import { admin } from './firebase-admin';
+import { firebaseAdmin } from './firebase-admin';
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);

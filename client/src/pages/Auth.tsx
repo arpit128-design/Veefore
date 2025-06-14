@@ -395,12 +395,12 @@ export default function Auth() {
           >
             <div className="w-20 h-20 flex items-center justify-center relative">
               <img 
-                src="/veefore-logo.png" 
-                alt="VeeFore Logo" 
+                src="/uptofeed-logo.png" 
+                alt="UpToFeed Logo" 
                 className="w-16 h-16 object-contain relative z-10"
               />
               
-              {/* Orbital rings */}
+              {/* Modern rings */}
               <motion.div 
                 className="absolute inset-0 border-2 border-blue-400/30 rounded-full"
                 animate={{ rotate: 360 }}

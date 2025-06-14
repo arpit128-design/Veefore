@@ -357,16 +357,23 @@ export default function Onboarding() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-yellow-400 to-cyan-300 bg-clip-text text-transparent mb-4">
-            VeeFore
-          </h1>
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="/uptofeed-logo.png" 
+              alt="UpToFeed Logo" 
+              className="w-24 h-24 object-contain mr-4"
+            />
+            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+              UpToFeed
+            </h1>
+          </div>
           <motion.p 
             className="text-2xl md:text-3xl text-white/90 font-light"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
-            AI-Powered Social Media Galaxy
+            AI-Powered Content Creation Platform
           </motion.p>
         </motion.div>
       </div>

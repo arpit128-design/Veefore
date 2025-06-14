@@ -956,25 +956,34 @@ export class MongoStorage implements IStorage {
     }
     
     // Now try Mongoose query with both string and numeric workspaceId
+    const workspaceIdStr = workspaceId.toString();
+    const workspaceIdFirst6 = workspaceIdStr.substring(0, 6);
+    
     const accounts = await SocialAccountModel.find({
       $or: [
-        { workspaceId: workspaceId.toString() },
+        { workspaceId: workspaceIdStr },
         { workspaceId: workspaceId },
         // Handle truncated workspace IDs that need fixing
-        { workspaceId: parseInt(workspaceId.toString().substring(0, 6)) }
+        { workspaceId: workspaceIdFirst6 },
+        { workspaceId: parseInt(workspaceIdFirst6) }
       ]
     });
     
     // Auto-fix workspace IDs that are truncated
     for (const account of accounts) {
-      if (account.workspaceId === parseInt(workspaceId.toString().substring(0, 6)) && 
-          account.workspaceId !== workspaceId.toString()) {
-        console.log(`[MONGODB DEBUG] Auto-fixing workspace ID for ${account.username}: ${account.workspaceId} -> ${workspaceId}`);
+      const accountWorkspaceId = account.workspaceId.toString();
+      const expectedWorkspaceId = workspaceIdStr;
+      
+      // Check if workspace ID needs fixing (is truncated or mismatched)
+      if (accountWorkspaceId !== expectedWorkspaceId && 
+          (accountWorkspaceId === workspaceIdFirst6 || 
+           accountWorkspaceId === parseInt(workspaceIdFirst6).toString())) {
+        console.log(`[MONGODB DEBUG] Auto-fixing workspace ID for ${account.username}: ${accountWorkspaceId} -> ${expectedWorkspaceId}`);
         await SocialAccountModel.updateOne(
           { _id: account._id },
-          { workspaceId: workspaceId.toString(), updatedAt: new Date() }
+          { workspaceId: expectedWorkspaceId, updatedAt: new Date() }
         );
-        account.workspaceId = workspaceId.toString();
+        account.workspaceId = expectedWorkspaceId;
       }
     }
     

@@ -42,7 +42,7 @@ export default function Analyzer() {
     refetchOnWindowFocus: true
   });
 
-  // Fetch dashboard analytics as fallback
+  // Fetch dashboard analytics with percentage changes
   const { data: rawAnalytics, refetch, isLoading } = useQuery({
     queryKey: ['dashboard-analytics', currentWorkspace?.id, timeRange],
     queryFn: async () => {
@@ -58,10 +58,10 @@ export default function Analyzer() {
       
       return response.json();
     },
-    enabled: !!currentWorkspace?.id && !!token && !realtimeAnalytics
+    enabled: !!currentWorkspace?.id && !!token
   });
 
-  // Use real-time analytics if available, fallback to dashboard analytics
+  // Use real-time analytics if available, fallback to dashboard analytics  
   const analytics = realtimeAnalytics ? {
     engagementRate: realtimeAnalytics.engagementRate,
     growthVelocity: realtimeAnalytics.growthVelocity,
@@ -77,11 +77,12 @@ export default function Analyzer() {
     totalComments: rawAnalytics?.totalComments ?? null,
     totalPosts: rawAnalytics?.totalPosts ?? null,
     accountUsername: rawAnalytics?.accountUsername,
+    percentageChanges: rawAnalytics?.percentageChanges,
     changes: {
       views: realtimeAnalytics.trendsData?.reachGrowth || 0,
       engagement: realtimeAnalytics.trendsData?.engagementTrend || 0,
       reach: realtimeAnalytics.trendsData?.reachGrowth || 0,
-      followers: 0 // Always use authentic 0% from real Instagram data calculation
+      followers: 0 // Use authentic calculation from real Instagram data
     }
   } : rawAnalytics ? {
     totalReach: rawAnalytics.totalReach ?? null,
@@ -92,9 +93,10 @@ export default function Analyzer() {
     totalComments: rawAnalytics.totalComments ?? null,
     totalPosts: rawAnalytics.totalPosts ?? null,
     accountUsername: rawAnalytics.accountUsername,
+    percentageChanges: rawAnalytics.percentageChanges,
     changes: {
       views: 0,
-      engagement: 0,
+      engagement: 0, 
       reach: 0,
       followers: 0
     }
@@ -147,8 +149,8 @@ export default function Analyzer() {
             <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
-                {analytics?.changes?.views !== undefined 
-                  ? `${analytics.changes.views >= 0 ? '+' : ''}${analytics.changes.views}% vs last period`
+                {analytics?.percentageChanges?.reach 
+                  ? `${analytics.percentageChanges.reach} vs last period`
                   : 'Real-time data'
                 }
               </span>
@@ -170,8 +172,8 @@ export default function Analyzer() {
             <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
-                {analytics?.changes?.engagement !== undefined 
-                  ? `${analytics.changes.engagement >= 0 ? '+' : ''}${analytics.changes.engagement}% vs last period`
+                {analytics?.percentageChanges?.engagement 
+                  ? `${analytics.percentageChanges.engagement} vs last period`
                   : 'Authentic data'
                 }
               </span>
@@ -193,8 +195,8 @@ export default function Analyzer() {
             <div className="flex items-center space-x-1 sm:space-x-2 text-green-400">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
-                {analytics?.changes?.reach !== undefined 
-                  ? `${analytics.changes.reach >= 0 ? '+' : ''}${analytics.changes.reach}% vs last period`
+                {analytics?.percentageChanges?.followers 
+                  ? `${analytics.percentageChanges.followers} vs last period`
                   : 'Live Instagram data'
                 }
               </span>
@@ -346,7 +348,9 @@ export default function Analyzer() {
           <CardContent>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-400 mb-2">
-                0%
+                {realtimeAnalytics?.growthVelocity !== undefined 
+                  ? `${realtimeAnalytics.growthVelocity >= 0 ? '+' : ''}${realtimeAnalytics.growthVelocity.toFixed(1)}%`
+                  : analytics?.percentageChanges?.followers || 'Loading...'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Based on recent posting performance' : 'Follower growth rate'}

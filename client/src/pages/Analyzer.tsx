@@ -15,6 +15,14 @@ export default function Analyzer() {
   const { token } = useAuth();
   const [timeRange, setTimeRange] = useState("30");
 
+  // Helper function to safely extract percentage value from object or string
+  const getPercentageValue = (percentageData: any): string => {
+    if (!percentageData) return '';
+    if (typeof percentageData === 'string') return percentageData;
+    if (typeof percentageData === 'object' && percentageData.value) return percentageData.value;
+    return '';
+  };
+
   // Fetch real-time analytics data with forced refresh
   const { data: realtimeAnalytics, refetch: refetchRealtime, isLoading: realtimeLoading } = useQuery({
     queryKey: ['analytics-realtime-fresh', currentWorkspace?.id, timeRange],
@@ -196,7 +204,7 @@ export default function Analyzer() {
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.followers 
-                  ? `${analytics.percentageChanges.followers.value || analytics.percentageChanges.followers} vs last period`
+                  ? `${getPercentageValue(analytics.percentageChanges.followers)} vs last period`
                   : 'Live Instagram data'
                 }
               </span>

@@ -38,6 +38,14 @@ interface SocialAccount {
   isActive: boolean;
   expiresAt?: Date;
   lastSync?: Date;
+  // Instagram-specific fields
+  followersCount?: number;
+  followingCount?: number;
+  mediaCount?: number;
+  // YouTube-specific fields
+  subscriberCount?: number;
+  videoCount?: number;
+  viewCount?: number;
 }
 
 const platformConfig = {
@@ -491,6 +499,50 @@ export default function Integrations() {
                         @{connectedAccount.username}
                       </span>
                     </div>
+                    
+                    {/* Platform-specific stats */}
+                    {platform === 'instagram' && connectedAccount.followersCount !== undefined && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-asteroid-silver">Followers:</span>
+                          <span className="text-xs text-electric-cyan">
+                            {connectedAccount.followersCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-asteroid-silver">Posts:</span>
+                          <span className="text-xs text-electric-cyan">
+                            {connectedAccount.mediaCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    
+                    {platform === 'youtube' && connectedAccount.subscriberCount !== undefined && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-asteroid-silver">Subscribers:</span>
+                          <span className="text-xs text-red-400">
+                            {connectedAccount.subscriberCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-asteroid-silver">Videos:</span>
+                          <span className="text-xs text-red-400">
+                            {connectedAccount.videoCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                        {connectedAccount.viewCount && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-asteroid-silver">Total Views:</span>
+                            <span className="text-xs text-red-400">
+                              {connectedAccount.viewCount?.toLocaleString() || '0'}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    
                     {connectedAccount.lastSync && (
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-asteroid-silver">Last Sync:</span>

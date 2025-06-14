@@ -84,8 +84,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       if (!user) {
         // Create new user from JWT payload
+        let payload: any;
         try {
-          const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
           const userData = {
             firebaseUid,
             email: payload.email || `user_${firebaseUid}@example.com`,
@@ -101,9 +102,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           console.log(`[AUTH] Created user with ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
           
           // Note: Default workspace creation is handled by createUser method in storage layer
-        } catch (error) {
+        } catch (error: any) {
           console.error('[AUTH] Failed to create user:', error);
-          return res.status(500).json({ error: 'Failed to create user account' });
+          console.error('[AUTH] Error details:', {
+            message: error.message,
+            stack: error.stack,
+            firebaseUid,
+            email: payload?.email || 'unknown'
+          });
+          return res.status(500).json({ 
+            error: 'Failed to create user account',
+            details: error.message
+          });
         }
       }
       

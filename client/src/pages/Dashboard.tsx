@@ -140,6 +140,10 @@ export default function Dashboard() {
   const rawData = analyticsData as any;
   const hasValidData = analyticsData && rawData?.accountUsername;
   
+  // Extract percentage changes from backend response
+  const percentageChanges = rawData?.percentageChanges || {};
+  console.log('[DASHBOARD DEBUG] Percentage changes received:', percentageChanges);
+  
   // Calculate real content score based on Instagram metrics
   const calculateContentScore = (data: any) => {
     if (!hasValidData || !data) return null;
@@ -256,7 +260,7 @@ export default function Dashboard() {
         <StatsCard
           title="Total Reach"
           value={analytics.totalReach !== null ? formatNumber(analytics.totalReach) : null}
-          change={analytics.totalReach !== null && analytics.totalReach > 0 ? { value: "Active data", isPositive: true } : undefined}
+          change={analytics.totalReach !== null && analytics.totalReach > 0 && percentageChanges.reach ? percentageChanges.reach : undefined}
           icon={<Eye className="text-lg sm:text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
           isLoading={isDataLoading}
@@ -264,7 +268,7 @@ export default function Dashboard() {
         <StatsCard
           title="Engagement"
           value={analytics.engagement !== null ? formatEngagement(analytics.engagement) : null}
-          change={analytics.engagement !== null && analytics.engagement > 0 ? { value: "Active data", isPositive: true } : undefined}
+          change={analytics.engagement !== null && analytics.engagement > 0 && percentageChanges.engagement ? percentageChanges.engagement : undefined}
           icon={<Heart className="text-lg sm:text-xl" />}
           gradient="from-solar-gold to-red-500"
           isLoading={isDataLoading}
@@ -272,7 +276,7 @@ export default function Dashboard() {
         <StatsCard
           title="New Followers"
           value={analytics.newFollowers !== null ? formatNumber(analytics.newFollowers) : null}
-          change={analytics.newFollowers !== null && analytics.newFollowers > 0 ? { value: "Active data", isPositive: true } : undefined}
+          change={analytics.newFollowers !== null && analytics.newFollowers > 0 && percentageChanges.followers ? percentageChanges.followers : undefined}
           icon={<Users className="text-lg sm:text-xl" />}
           gradient="from-nebula-purple to-pink-500"
           isLoading={isDataLoading}
@@ -280,7 +284,7 @@ export default function Dashboard() {
         <StatsCard
           title="Content Score"
           value={formatPercentage(analytics.contentScore)}
-          change={{ value: "Active data", isPositive: true }}
+          change={percentageChanges.contentScore ? percentageChanges.contentScore : undefined}
           icon={<TrendingUp className="text-lg sm:text-xl" />}
           gradient="from-green-400 to-blue-500"
           isLoading={false}

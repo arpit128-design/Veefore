@@ -1102,6 +1102,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       };
 
       console.log('[DASHBOARD REALTIME] Returning fresh data - followers:', account.followersCount, 'mediaCount:', account.mediaCount);
+      console.log('[DASHBOARD PERCENTAGE] Calculated changes:', {
+        reach: reachChange,
+        engagement: engagementChange,
+        followers: followersChange,
+        contentScore: contentScoreChange
+      });
+      console.log('[DASHBOARD RESPONSE] Full response object:', JSON.stringify(responseData, null, 2));
 
       // Cache for next request
       dashboardCache.updateCache(workspaceIdStr, responseData);

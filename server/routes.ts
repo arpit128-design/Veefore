@@ -1493,15 +1493,26 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Decode state
       let stateData;
       try {
-        stateData = JSON.parse(Buffer.from(state as string, 'base64').toString());
+        console.log('[YOUTUBE CALLBACK] Raw state parameter:', state);
+        const decodedState = Buffer.from(state as string, 'base64').toString();
+        console.log('[YOUTUBE CALLBACK] Decoded state string:', decodedState);
+        stateData = JSON.parse(decodedState);
+        console.log('[YOUTUBE CALLBACK] Parsed state data:', stateData);
       } catch (e) {
-        console.error('[YOUTUBE CALLBACK] Invalid state parameter');
-        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state`);
+        console.error('[YOUTUBE CALLBACK] Invalid state parameter:', state);
+        console.error('[YOUTUBE CALLBACK] State decode error:', e instanceof Error ? e.message : String(e));
+        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state&details=${encodeURIComponent('Failed to decode state parameter')}`);
       }
 
       const { workspaceId, userId, source } = stateData;
       
       console.log('[YOUTUBE CALLBACK] Processing callback for:', { workspaceId, userId, source });
+      
+      // Validate required state data
+      if (!workspaceId || !userId) {
+        console.error('[YOUTUBE CALLBACK] Missing required state data:', { workspaceId, userId });
+        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state&details=${encodeURIComponent('Missing workspaceId or userId in state')}`);
+      }
 
       // Exchange code for access token
       console.log('[YOUTUBE CALLBACK] Starting token exchange with Google OAuth2');

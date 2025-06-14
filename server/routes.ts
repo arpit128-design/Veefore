@@ -5420,7 +5420,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       // Create scheduled content
       const scheduledContent = await storage.createContent({
-        workspaceId: parseInt(workspaceId),
+        workspaceId: workspaceId,
         title,
         description: content,
         type: 'post',

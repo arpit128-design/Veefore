@@ -173,7 +173,7 @@ export default function Analyzer() {
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.engagement 
-                  ? `${analytics.percentageChanges.engagement} vs last period`
+                  ? `${analytics.percentageChanges.engagement.value || analytics.percentageChanges.engagement} vs last period`
                   : 'Authentic data'
                 }
               </span>
@@ -196,7 +196,7 @@ export default function Analyzer() {
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="text-xs sm:text-sm">
                 {analytics?.percentageChanges?.followers 
-                  ? `${analytics.percentageChanges.followers} vs last period`
+                  ? `${analytics.percentageChanges.followers.value || analytics.percentageChanges.followers} vs last period`
                   : 'Live Instagram data'
                 }
               </span>
@@ -350,7 +350,7 @@ export default function Analyzer() {
               <div className="text-3xl font-bold text-green-400 mb-2">
                 {realtimeAnalytics?.growthVelocity !== undefined 
                   ? `${realtimeAnalytics.growthVelocity >= 0 ? '+' : ''}${realtimeAnalytics.growthVelocity.toFixed(1)}%`
-                  : analytics?.percentageChanges?.followers || 'Loading...'}
+                  : analytics?.percentageChanges?.followers?.value || analytics?.percentageChanges?.followers || 'Loading...'}
               </div>
               <div className="text-sm text-asteroid-silver mb-4">
                 {realtimeAnalytics ? 'Based on recent posting performance' : 'Follower growth rate'}

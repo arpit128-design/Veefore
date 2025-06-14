@@ -228,9 +228,9 @@ export default function TermsOfService() {
         </Link>
       </motion.div>
 
-      {/* Navigation Sidebar - Fixed Vertical Layout */}
+      {/* Navigation Sidebar - Fixed Vertical Layout - Hidden on Mobile */}
       <motion.div
-        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-2"
+        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex-col space-y-2 hidden lg:flex"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}

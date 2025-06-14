@@ -228,9 +228,9 @@ export default function PrivacyPolicy() {
         </Link>
       </motion.div>
 
-      {/* Navigation Sidebar - Fixed Vertical Layout */}
+      {/* Navigation Sidebar - Fixed Vertical Layout - Hidden on Mobile */}
       <motion.div
-        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-2"
+        className="fixed left-6 top-1/2 transform -translate-y-1/2 z-40 flex-col space-y-2 hidden lg:flex"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}
@@ -413,19 +413,19 @@ export default function PrivacyPolicy() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-electric-cyan mb-4 font-orbitron">
-                      Questions or Legal Concerns?
+                      Privacy Questions or Data Concerns?
                     </h3>
                     <p className="text-asteroid-silver mb-6 leading-relaxed">
-                      If you have questions about these terms or need to report a legal concern, our legal and 
-                      support teams are here to help. We're committed to transparency and fair treatment of all users.
+                      If you have questions about our privacy practices, data handling, or need to request 
+                      data deletion/modification, our privacy team is here to help with your data protection needs.
                     </p>
                     <div className="flex flex-wrap gap-4">
                       <Button className="bg-electric-cyan hover:bg-electric-cyan/80 text-space-gray-900 font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105">
                         <Phone className="w-4 h-4 mr-2" />
-                        Contact Legal Team
+                        Contact Privacy Team
                       </Button>
                       <Button variant="outline" className="border-electric-cyan/50 text-electric-cyan hover:bg-electric-cyan/10 px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105">
-                        General Support
+                        Data Support
                       </Button>
                     </div>
                   </div>

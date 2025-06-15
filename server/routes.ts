@@ -963,12 +963,10 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const { user } = req;
       const workspaceId = req.query.workspaceId;
       
-      console.log('[DASHBOARD REALTIME] NEW ENDPOINT LOGIC - Bypassing all cache for real-time data');
-      console.log('[DASHBOARD REALTIME] User:', user.id, 'WorkspaceId:', workspaceId);
+      console.log('[DASHBOARD MULTI-PLATFORM] Aggregating analytics from ALL connected social platforms');
+      console.log('[DASHBOARD MULTI-PLATFORM] User:', user.id, 'WorkspaceId:', workspaceId);
 
-      // STEP 2: Cache miss - verify workspace access
-      console.log('[DASHBOARD INSTANT] Cache miss - doing workspace verification');
-      
+      // Verify workspace access
       let workspace;
       if (workspaceId) {
         workspace = await storage.getWorkspace(workspaceId);
@@ -984,77 +982,171 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
       }
 
-      // Get connected Instagram accounts
-      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      const instagramAccount = socialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
+      // Get ALL connected social accounts (Instagram, YouTube, X, WhatsApp, LinkedIn, Facebook, etc.)
+      const allSocialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      console.log('[MULTI-PLATFORM] Found social accounts:', allSocialAccounts.map((acc: any) => ({ 
+        platform: acc.platform, 
+        username: acc.username, 
+        hasToken: !!acc.accessToken 
+      })));
       
-      if (!instagramAccount) {
+      if (!allSocialAccounts || allSocialAccounts.length === 0) {
         return res.json({ 
           totalPosts: 0, 
           totalReach: 0, 
           engagementRate: 0, 
           topPlatform: 'none',
-          message: 'No Instagram account connected'
+          message: 'No social accounts connected',
+          connectedPlatforms: []
         });
       }
 
       const workspaceIdStr = workspace.id.toString();
-      console.log('[DASHBOARD INSTANT] Zero-wait response for workspace:', workspaceIdStr);
+      console.log('[MULTI-PLATFORM] Aggregating metrics from all platforms for workspace:', workspaceIdStr);
       
-      // Get fresh Instagram account data directly from database
-      console.log('[DASHBOARD REALTIME] Fetching latest synchronized data from database');
-      
-      // Refresh account data to get the most recent synchronized values
-      const freshSocialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-      const freshInstagramAccount = freshSocialAccounts.find((acc: any) => acc.platform === 'instagram' && acc.accessToken);
-      
-      if (!freshInstagramAccount) {
-        return res.json({ 
-          totalPosts: 0, 
-          totalReach: 0, 
-          engagementRate: 0, 
-          topPlatform: 'none',
-          message: 'No Instagram account connected'
-        });
+      // Initialize aggregated metrics
+      let aggregatedMetrics = {
+        totalPosts: 0,
+        totalReach: 0,
+        totalFollowers: 0,
+        totalLikes: 0,
+        totalComments: 0,
+        totalViews: 0,
+        totalSubscribers: 0,
+        platformData: {} as any,
+        connectedPlatforms: [] as string[]
+      };
+
+      let topPlatform = 'none';
+      let maxReach = 0;
+
+      // Process each connected social platform
+      for (const account of allSocialAccounts) {
+        if (!account.accessToken && account.platform !== 'youtube') continue; // Skip inactive accounts except YouTube
+        
+        const platform = account.platform.toLowerCase();
+        aggregatedMetrics.connectedPlatforms.push(platform);
+        
+        console.log(`[${platform.toUpperCase()}] Processing account: ${account.username || account.accountId}`);
+        
+        // Platform-specific metric extraction
+        switch (platform) {
+          case 'instagram':
+            const instagramMetrics = {
+              posts: account.mediaCount || 0,
+              reach: account.totalReach || 0,
+              followers: account.followersCount || 0,
+              likes: account.totalLikes || 0,
+              comments: account.totalComments || 0,
+              username: account.username
+            };
+            
+            aggregatedMetrics.totalPosts += instagramMetrics.posts;
+            aggregatedMetrics.totalReach += instagramMetrics.reach;
+            aggregatedMetrics.totalFollowers += instagramMetrics.followers;
+            aggregatedMetrics.totalLikes += instagramMetrics.likes;
+            aggregatedMetrics.totalComments += instagramMetrics.comments;
+            aggregatedMetrics.platformData.instagram = instagramMetrics;
+            
+            if (instagramMetrics.reach > maxReach) {
+              maxReach = instagramMetrics.reach;
+              topPlatform = 'instagram';
+            }
+            break;
+
+          case 'youtube':
+            const youtubeMetrics = {
+              videos: account.videoCount || 0,
+              subscribers: account.subscriberCount || 0,
+              views: account.viewCount || 0,
+              username: account.username
+            };
+            
+            aggregatedMetrics.totalPosts += youtubeMetrics.videos;
+            aggregatedMetrics.totalSubscribers += youtubeMetrics.subscribers;
+            aggregatedMetrics.totalViews += youtubeMetrics.views;
+            aggregatedMetrics.totalFollowers += youtubeMetrics.subscribers; // Subscribers count as followers
+            aggregatedMetrics.platformData.youtube = youtubeMetrics;
+            
+            if (youtubeMetrics.views > maxReach) {
+              maxReach = youtubeMetrics.views;
+              topPlatform = 'youtube';
+            }
+            break;
+
+          case 'x':
+          case 'twitter':
+            const twitterMetrics = {
+              tweets: account.tweetsCount || 0,
+              followers: account.followersCount || 0,
+              likes: account.likesCount || 0,
+              retweets: account.retweetsCount || 0,
+              username: account.username
+            };
+            
+            aggregatedMetrics.totalPosts += twitterMetrics.tweets;
+            aggregatedMetrics.totalFollowers += twitterMetrics.followers;
+            aggregatedMetrics.totalLikes += twitterMetrics.likes;
+            aggregatedMetrics.platformData.twitter = twitterMetrics;
+            break;
+
+          case 'linkedin':
+            const linkedinMetrics = {
+              posts: account.postsCount || 0,
+              connections: account.connectionsCount || 0,
+              impressions: account.impressionsCount || 0,
+              username: account.username
+            };
+            
+            aggregatedMetrics.totalPosts += linkedinMetrics.posts;
+            aggregatedMetrics.totalFollowers += linkedinMetrics.connections;
+            aggregatedMetrics.totalReach += linkedinMetrics.impressions;
+            aggregatedMetrics.platformData.linkedin = linkedinMetrics;
+            break;
+
+          default:
+            // Generic platform handling
+            const genericMetrics = {
+              posts: account.postsCount || account.mediaCount || 0,
+              followers: account.followersCount || 0,
+              reach: account.totalReach || account.impressionsCount || 0,
+              username: account.username
+            };
+            
+            aggregatedMetrics.totalPosts += genericMetrics.posts;
+            aggregatedMetrics.totalFollowers += genericMetrics.followers;
+            aggregatedMetrics.totalReach += genericMetrics.reach;
+            aggregatedMetrics.platformData[platform] = genericMetrics;
+            break;
+        }
       }
 
-      const account = freshInstagramAccount as any;
-      console.log('[DASHBOARD REALTIME] Fresh account data retrieved:', {
-        followersCount: account.followersCount,
-        mediaCount: account.mediaCount,
-        lastSyncAt: account.lastSyncAt
+      console.log('[MULTI-PLATFORM] Aggregated metrics:', {
+        totalPosts: aggregatedMetrics.totalPosts,
+        totalReach: aggregatedMetrics.totalReach,
+        totalFollowers: aggregatedMetrics.totalFollowers,
+        totalLikes: aggregatedMetrics.totalLikes,
+        totalComments: aggregatedMetrics.totalComments,
+        connectedPlatforms: aggregatedMetrics.connectedPlatforms,
+        topPlatform
       });
       
-      console.log('[DASHBOARD DATA] Raw Instagram account data:', {
-        totalPosts: account.totalPosts,
-        totalReach: account.totalReach, 
-        totalLikes: account.totalLikes,
-        totalComments: account.totalComments,
-        followerCount: account.followerCount,
-        mediaCount: account.mediaCount,
-        username: account.username
-      });
-      
-      // ENGAGEMENT RATE CALCULATION - Authentic Instagram Data
+      // MULTI-PLATFORM ENGAGEMENT RATE CALCULATION
       let engagementRate = 0;
-      let rawEngagementRate = 0;
-      const totalEngagements = (account.totalLikes || 0) + (account.totalComments || 0);
-      const totalReach = account.totalReach || 0;
+      const totalEngagements = aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments;
+      const totalReach = Math.max(aggregatedMetrics.totalReach, aggregatedMetrics.totalViews);
       
       if (totalReach > 0 && totalEngagements > 0) {
-        rawEngagementRate = (totalEngagements / totalReach) * 100;
-        engagementRate = Math.round(rawEngagementRate * 10) / 10; // Show actual rate
+        engagementRate = Math.round(((totalEngagements / totalReach) * 100) * 10) / 10;
       }
 
-      console.log('[ENGAGEMENT ANALYSIS] Authentic Instagram Data:', {
-        totalLikes: account.totalLikes,
-        totalComments: account.totalComments,
+      console.log('[MULTI-PLATFORM ENGAGEMENT] Cross-platform engagement analysis:', {
+        totalLikes: aggregatedMetrics.totalLikes,
+        totalComments: aggregatedMetrics.totalComments,
         totalEngagements,
         totalReach,
-        rawEngagementRate: rawEngagementRate,
-        displayedRate: engagementRate,
-        isHighEngagement: rawEngagementRate > 100,
-        possibleViralContent: rawEngagementRate > 200
+        engagementRate,
+        topPerformingPlatform: topPlatform
       });
 
       // Calculate authentic percentage changes based on realistic baseline comparison
@@ -1077,22 +1169,34 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       const reachChange = calculateChange(totalReach, baselineReach);
       const engagementChange = calculateChange(engagementRate, baselineEngagement);
-      const followersChange = calculateChange(account.followersCount || 0, baselineFollowers);
-      const contentScore = Math.round(((account.totalLikes || 0) + (account.totalComments || 0)) / Math.max(account.mediaCount || 1, 1) * 10);
+      const followersChange = calculateChange(aggregatedMetrics.totalFollowers, baselineFollowers);
+      const contentScore = Math.round((aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments) / Math.max(aggregatedMetrics.totalPosts, 1) * 10);
       const contentScoreChange = calculateChange(contentScore, baselineContentScore);
 
       const responseData = {
-        totalPosts: account.mediaCount || 0,
+        // Multi-platform aggregated metrics
+        totalPosts: aggregatedMetrics.totalPosts,
         totalReach: totalReach,
         engagementRate: engagementRate,
-        topPlatform: 'instagram',
-        followers: account.followersCount || 0, // Use fresh synchronized follower count
+        topPlatform: topPlatform,
+        followers: aggregatedMetrics.totalFollowers,
         impressions: totalReach,
-        accountUsername: account.username || '',
-        totalLikes: account.totalLikes || 0,
-        totalComments: account.totalComments || 0,
-        mediaCount: account.mediaCount || 0,
-        // Add authentic percentage changes
+        totalLikes: aggregatedMetrics.totalLikes,
+        totalComments: aggregatedMetrics.totalComments,
+        totalViews: aggregatedMetrics.totalViews,
+        totalSubscribers: aggregatedMetrics.totalSubscribers,
+        
+        // Platform breakdown
+        connectedPlatforms: aggregatedMetrics.connectedPlatforms,
+        platformData: aggregatedMetrics.platformData,
+        
+        // Legacy fields for backward compatibility
+        accountUsername: aggregatedMetrics.platformData.instagram?.username || 
+                        aggregatedMetrics.platformData.youtube?.username || 
+                        'Multi-Platform',
+        mediaCount: aggregatedMetrics.totalPosts,
+        
+        // Percentage changes
         percentageChanges: {
           reach: reachChange,
           engagement: engagementChange,
@@ -1101,14 +1205,20 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         }
       };
 
-      console.log('[DASHBOARD REALTIME] Returning fresh data - followers:', account.followersCount, 'mediaCount:', account.mediaCount);
-      console.log('[DASHBOARD PERCENTAGE] Calculated changes:', {
+      console.log('[MULTI-PLATFORM DASHBOARD] Returning aggregated data - total followers:', aggregatedMetrics.totalFollowers, 'total posts:', aggregatedMetrics.totalPosts);
+      console.log('[MULTI-PLATFORM PERCENTAGE] Calculated changes:', {
         reach: reachChange,
         engagement: engagementChange,
         followers: followersChange,
         contentScore: contentScoreChange
       });
-      console.log('[DASHBOARD RESPONSE] Full response object:', JSON.stringify(responseData, null, 2));
+      console.log('[MULTI-PLATFORM RESPONSE] Full aggregated response:', {
+        platforms: aggregatedMetrics.connectedPlatforms,
+        totalPosts: responseData.totalPosts,
+        totalReach: responseData.totalReach,
+        totalFollowers: responseData.followers,
+        topPlatform: responseData.topPlatform
+      });
 
       // Cache for next request
       dashboardCache.updateCache(workspaceIdStr, responseData);

@@ -3,10 +3,10 @@
  * Direct database update to fix subscriber count and video display
  */
 
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 async function updateYouTubeData() {
-  const client = new MongoClient(process.env.DATABASE_URL || 'mongodb+srv://arpitchoudhary5136:9dU8R7KkuqLNfHbE@cluster0.qofbkgp.mongodb.net/veeforedb?retryWrites=true&w=majority');
+  const client = new MongoClient('mongodb+srv://arpitchoudhary5136:9dU8R7KkuqLNfHbE@cluster0.qofbkgp.mongodb.net/veeforedb?retryWrites=true&w=majority&appName=VeeFore');
   
   try {
     await client.connect();

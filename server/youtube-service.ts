@@ -36,6 +36,52 @@ class YouTubeService {
   }
 
   /**
+   * Get authenticated user's channel statistics using OAuth token
+   */
+  async getAuthenticatedChannelStats(accessToken: string): Promise<YouTubeChannelStats | null> {
+    try {
+      console.log('[YOUTUBE OAUTH] Fetching authenticated channel data');
+      
+      // First get the authenticated user's channel
+      const channelResponse = await axios.get(`${this.baseUrl}/channels`, {
+        params: {
+          part: 'statistics,snippet',
+          mine: 'true',
+          key: this.apiKey
+        },
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!channelResponse.data.items || channelResponse.data.items.length === 0) {
+        console.log('[YOUTUBE OAUTH] No authenticated channel found');
+        return null;
+      }
+
+      const channel = channelResponse.data.items[0];
+      const stats = channel.statistics;
+
+      const channelStats: YouTubeChannelStats = {
+        subscriberCount: parseInt(stats.subscriberCount || '0'),
+        videoCount: parseInt(stats.videoCount || '0'),
+        viewCount: parseInt(stats.viewCount || '0'),
+        channelTitle: channel.snippet.title,
+        channelId: channel.id
+      };
+
+      console.log(`[YOUTUBE OAUTH] ✓ Authenticated channel: ${channelStats.channelTitle}`);
+      console.log(`[YOUTUBE OAUTH] ✓ Stats: ${channelStats.subscriberCount} subscribers, ${channelStats.videoCount} videos, ${channelStats.viewCount} views`);
+
+      return channelStats;
+      
+    } catch (error: any) {
+      console.error('[YOUTUBE OAUTH] Error fetching authenticated channel stats:', error.response?.data || error.message);
+      return null;
+    }
+  }
+
+  /**
    * Get channel statistics by channel ID
    */
   async getChannelStats(channelId: string): Promise<YouTubeChannelStats | null> {

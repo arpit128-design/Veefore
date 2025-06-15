@@ -1056,21 +1056,47 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             break;
 
           case 'youtube':
-            // Use stored account data - no automatic API calls to prevent wrong channel data
-            console.log(`[YOUTUBE CACHE FIX] Forcing YouTube data refresh for account: ${account.username}`);
+            // Get live YouTube data via OAuth-authenticated channel
+            console.log(`[YOUTUBE OAUTH] Fetching live data for authenticated channel: ${account.username}`);
             
-            // Force correct data for this user's actual YouTube channel
-            const correctYoutubeData = {
-              videos: 0,
-              subscribers: 78,  // User's actual subscriber count
-              views: 0,
+            let youtubeMetrics = {
+              videos: account.videoCount || account.mediaCount || 0,
+              subscribers: account.subscriberCount || account.followersCount || 0,
+              views: account.viewCount || 0,
               username: account.username,
               isLiveData: false
             };
             
-            console.log(`[YOUTUBE CACHE FIX] Fresh YouTube data - subscribers: ${correctYoutubeData.subscribers}, videos: ${correctYoutubeData.videos}`);
-            
-            const youtubeMetrics = correctYoutubeData;
+            // Try to get live data using the authenticated channel
+            try {
+              if (account.accessToken) {
+                console.log(`[YOUTUBE OAUTH] Using OAuth token to fetch channel data`);
+                const liveData = await youtubeService.getAuthenticatedChannelStats(account.accessToken);
+                if (liveData) {
+                  youtubeMetrics = {
+                    videos: liveData.videoCount,
+                    subscribers: liveData.subscriberCount,
+                    views: liveData.viewCount,
+                    username: account.username,
+                    isLiveData: true
+                  };
+                  
+                  // Update stored data
+                  await storage.updateSocialAccount(account.id, {
+                    subscriberCount: liveData.subscriberCount,
+                    videoCount: liveData.videoCount,
+                    viewCount: liveData.viewCount,
+                    lastSyncAt: new Date()
+                  });
+                  
+                  console.log(`[YOUTUBE OAUTH] ✓ Live authenticated data - subscribers: ${liveData.subscriberCount}, videos: ${liveData.videoCount}, views: ${liveData.viewCount}`);
+                }
+              } else {
+                console.log(`[YOUTUBE OAUTH] No access token found - using stored data for now`);
+              }
+            } catch (error) {
+              console.log(`[YOUTUBE OAUTH] Failed to fetch authenticated data: ${error}`);
+            }
             
             aggregatedMetrics.totalPosts += youtubeMetrics.videos;
             aggregatedMetrics.totalSubscribers += youtubeMetrics.subscribers;
@@ -1633,7 +1659,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       console.log(`[YOUTUBE AUTH] State data:`, stateData);
       
       // YouTube Data API v3 OAuth - scopes for channel management and analytics
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.channel-memberships.creator https://www.googleapis.com/auth/youtubepartner-channel-audit&state=${state}&access_type=offline&prompt=consent`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.YOUTUBE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.channel-memberships.creator https://www.googleapis.com/auth/youtubepartner-channel-audit&state=${state}&access_type=offline&prompt=consent`;
       
       res.json({ authUrl });
     } catch (error: any) {
@@ -1698,8 +1724,8 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          client_id: process.env.GOOGLE_CLIENT_ID!,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          client_id: process.env.YOUTUBE_CLIENT_ID!,
+          client_secret: process.env.YOUTUBE_CLIENT_SECRET!,
           code: code as string,
           grant_type: 'authorization_code',
           redirect_uri: `https://${req.get('host')}/api/youtube/callback`,

@@ -1056,9 +1056,9 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
           case 'youtube':
             const youtubeMetrics = {
-              videos: account.videoCount || 0,
-              subscribers: account.subscriberCount || 0,
-              views: account.viewCount || 0,
+              videos: account.videoCount || account.mediaCount || 0,
+              subscribers: account.subscriberCount || account.followersCount || 0,
+              views: account.viewCount || account.totalViews || 0,
               username: account.username
             };
             

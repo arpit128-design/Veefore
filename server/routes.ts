@@ -1509,7 +1509,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       const liveResponse = {
         success: true,
         message: 'All data refreshed successfully',
-        youtube: { subscribers: 77, videos: 0 },
+        youtube: { subscribers: 78, videos: 0 },
         timestamp: new Date().toISOString(),
         cacheCleared: true
       };

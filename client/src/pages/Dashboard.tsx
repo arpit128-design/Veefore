@@ -204,17 +204,18 @@ export default function Dashboard() {
     platforms: hasValidData && rawData?.accountUsername ? ['instagram'] : []
   };
   
-  // Create proper data mapping for Instagram metrics
+  // Create proper data mapping for Instagram metrics - use Instagram-specific platform data
+  const instagramPlatformData = rawData?.platformData?.instagram;
   const instagramData = {
-    followers: hasValidData ? (rawData?.followers || 0) : null,
+    followers: hasValidData && instagramPlatformData ? (instagramPlatformData.followers || 0) : null,
     engagementRate: hasValidData ? (rawData?.engagementRate || 0) : null,
     impressions: hasValidData ? (rawData?.impressions || 0) : null,
-    totalPosts: hasValidData ? (rawData?.totalPosts || 0) : null,
-    totalReach: hasValidData ? (rawData?.totalReach || 0) : null,
-    totalLikes: hasValidData ? (rawData?.totalLikes || 0) : null,
-    totalComments: hasValidData ? (rawData?.totalComments || 0) : null,
-    mediaCount: hasValidData ? (rawData?.mediaCount || rawData?.totalPosts || 0) : null,
-    accountUsername: rawData?.accountUsername
+    totalPosts: hasValidData && instagramPlatformData ? (instagramPlatformData.posts || 0) : null,
+    totalReach: hasValidData && instagramPlatformData ? (instagramPlatformData.reach || 0) : null,
+    totalLikes: hasValidData && instagramPlatformData ? (instagramPlatformData.likes || 0) : null,
+    totalComments: hasValidData && instagramPlatformData ? (instagramPlatformData.comments || 0) : null,
+    mediaCount: hasValidData && instagramPlatformData ? (instagramPlatformData.posts || 0) : null,
+    accountUsername: instagramPlatformData?.username || rawData?.accountUsername
   };
   
   // Show loading message when data is null/empty

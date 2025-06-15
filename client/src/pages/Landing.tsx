@@ -79,372 +79,370 @@ const scaleIn = {
   transition: { duration: 0.5, ease: "easeOut" }
 };
 
-// Removed AnimatedSection component to implement individual component animations
-
 // Loading Skeleton Component for Lazy Loading
 function LoadingSkeleton() {
   return (
-    <div className="animate-pulse">
-      <div className="h-64 bg-slate-800/50 rounded-lg mb-4"></div>
-      <div className="space-y-3">
-        <div className="h-4 bg-slate-700/50 rounded w-3/4"></div>
-        <div className="h-4 bg-slate-700/50 rounded w-1/2"></div>
-        <div className="h-4 bg-slate-700/50 rounded w-5/6"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-black animate-pulse">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto animate-spin"></div>
+          <div className="h-4 bg-slate-700 rounded w-32 mx-auto"></div>
+        </div>
       </div>
     </div>
   );
 }
 
-// Navigation Component
+// Enhanced Navigation with better mobile support and animations
 function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <motion.nav 
+    <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-slate-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        isScrolled 
+          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-800' 
+          : 'bg-transparent'
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Rocket className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          <motion.div 
+            className="flex items-center space-x-3"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <Rocket className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">VeeFore</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              VeeFore
+            </span>
+          </motion.div>
+
+          <div className="hidden lg:flex items-center space-x-8">
+            {['Features', 'Solutions', 'Pricing', 'About'].map((item) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="text-gray-300 hover:text-white transition-colors cursor-pointer"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {item}
+              </motion.a>
+            ))}
           </div>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('features')} className="text-gray-300 hover:text-white transition-colors">Features</button>
-            <button onClick={() => scrollToSection('solutions')} className="text-gray-300 hover:text-white transition-colors">Solutions</button>
-            <button onClick={() => scrollToSection('pricing')} className="text-gray-300 hover:text-white transition-colors">Pricing</button>
-            <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors">Reviews</button>
-            <Link href="/login">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">Sign In</Button>
+
+          <div className="hidden lg:flex items-center space-x-4">
+            <Link href="/dashboard">
+              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+                Sign In
+              </Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/dashboard">
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                Get Started
+                Get Started Free
               </Button>
             </Link>
           </div>
+
+          <button
+            className="lg:hidden text-gray-300 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+              <div className={`w-full h-0.5 bg-current transition-transform ${isMobileMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></div>
+              <div className={`w-full h-0.5 bg-current transition-opacity ${isMobileMenuOpen ? 'opacity-0' : ''}`}></div>
+              <div className={`w-full h-0.5 bg-current transition-transform ${isMobileMenuOpen ? '-rotate-45 -translate-y-1' : ''}`}></div>
+            </div>
+          </button>
         </div>
+
+        {isMobileMenuOpen && (
+          <motion.div
+            className="lg:hidden border-t border-slate-800 mt-4 pt-4 pb-6"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <div className="flex flex-col space-y-4">
+              {['Features', 'Solutions', 'Pricing', 'About'].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="text-gray-300 hover:text-white transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item}
+                </a>
+              ))}
+              <div className="flex flex-col space-y-2 mt-4">
+                <Link href="/dashboard">
+                  <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                    Get Started Free
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.nav>
   );
 }
 
-// Starfield Background Component
+// Enhanced Starfield Background
 function StarfieldBackground() {
-  const stars = Array.from({ length: 150 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    animationDelay: Math.random() * 4,
-    twinkleSpeed: 2 + Math.random() * 3
-  }));
+  const starsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!starsRef.current) return;
+
+    const createStar = () => {
+      const star = document.createElement('div');
+      star.className = 'absolute rounded-full bg-white';
+      
+      const size = Math.random() * 3 + 1;
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      const duration = Math.random() * 3 + 2;
+      
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.left = `${x}%`;
+      star.style.top = `${y}%`;
+      star.style.opacity = Math.random().toString();
+      star.style.animation = `twinkle ${duration}s infinite alternate`;
+      
+      return star;
+    };
+
+    // Create initial stars
+    for (let i = 0; i < 150; i++) {
+      starsRef.current.appendChild(createStar());
+    }
+
+    // Create shooting stars periodically
+    const createShootingStar = () => {
+      const shootingStar = document.createElement('div');
+      shootingStar.className = 'absolute h-px bg-gradient-to-r from-transparent via-white to-transparent';
+      shootingStar.style.width = '100px';
+      shootingStar.style.left = '-100px';
+      shootingStar.style.top = `${Math.random() * 50}%`;
+      shootingStar.style.animation = 'shoot 2s linear forwards';
+      
+      starsRef.current?.appendChild(shootingStar);
+      
+      setTimeout(() => {
+        shootingStar.remove();
+      }, 2000);
+    };
+
+    const shootingInterval = setInterval(createShootingStar, 3000);
+
+    return () => {
+      clearInterval(shootingInterval);
+    };
+  }, []);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {stars.map((star) => (
-        <motion.div
-          key={star.id}
-          className="absolute bg-white rounded-full"
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
-          }}
-          animate={{
-            opacity: [0.1, 1, 0.1],
-            scale: [0.8, 1.2, 0.8],
-          }}
-          transition={{
-            duration: star.twinkleSpeed,
-            repeat: Infinity,
-            delay: star.animationDelay,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
-      
-      {/* Shooting stars */}
-      <motion.div 
-        className="absolute top-1/4 left-0 w-2 h-2 bg-gradient-to-r from-purple-400 to-transparent rounded-full"
-        animate={{
-          x: ['-100px', '100vw'],
-          opacity: [0, 1, 0]
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          delay: 2,
-          ease: "easeOut"
-        }}
-      />
-      <motion.div 
-        className="absolute top-3/4 right-0 w-2 h-2 bg-gradient-to-l from-violet-400 to-transparent rounded-full"
-        animate={{
-          x: ['100px', '-100vw'],
-          opacity: [0, 1, 0]
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          delay: 5,
-          ease: "easeOut"
-        }}
-      />
-    </div>
+    <div 
+      ref={starsRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{
+        background: 'radial-gradient(ellipse at center, rgba(30, 41, 59, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%)'
+      }}
+    />
   );
 }
 
-// Hero Section with seamless blending
+// Hero Section with individual component animations
 function HeroSection() {
-  const scrollToFeatures = () => {
-    const element = document.getElementById('features');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-950/90 to-slate-900/70">
-      {/* Starfield Background */}
+    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/10 to-black">
       <StarfieldBackground />
       
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0">
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2],
-            rotate: [0, 360],
-            x: [-20, 20, -20],
-            y: [-30, 30, -30]
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.6, 0.3],
-            rotate: [360, 0],
-            x: [30, -30, 30],
-            y: [20, -20, 20]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.4, 1],
-            opacity: [0.1, 0.3, 0.1],
-            x: [-40, 40, -40],
-            y: [-50, 50, -50]
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-        />
-      </div>
-      
-      {/* Gradient overlay for seamless blending */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
-
-      {/* Hero Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-8"
-        >
-          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
-            <Sparkles className="w-3 h-3 mr-1" />
-            AI-Powered Social Media Management
-          </Badge>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-        >
-          Take Your Social Media to{' '}
-          <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Mission Control
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
-        >
-          Create, schedule, analyze, and optimize social media content. All powered by 
-          advanced AI in one user-friendly command center.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-        >
-          <Link href="/signup">
-            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
-              Start Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-          <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
-            <Play className="mr-2 w-5 h-5" />
-            Watch Demo
-          </Button>
-        </motion.div>
-
-        {/* Platform Icons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex justify-center items-center space-x-6 mb-12"
-        >
-          <div className="text-gray-400 text-sm">Connect with:</div>
-          <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors" />
-          <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors" />
-          <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors" />
-          <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors" />
-          <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors" />
-        </motion.div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
-        onClick={scrollToFeatures}
-      >
-        <div className="flex flex-col items-center text-gray-400 hover:text-white transition-colors">
-          <span className="text-sm mb-2">Scroll to explore</span>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="text-center">
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8 }}
           >
-            <ArrowDown className="w-6 h-6" />
+            <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <Sparkles className="w-3 h-3 mr-1" />
+              AI-Powered Social Media Automation
+            </Badge>
           </motion.div>
+
+          <motion.h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            Transform Your
+            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block">
+              Social Media Game
+            </span>
+          </motion.h1>
+
+          <motion.p
+            className="text-xl text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Harness the power of AI to automate content creation, schedule posts across platforms, 
+            and engage with your audience like never before. Join thousands of creators who've 
+            revolutionized their social media strategy.
+          </motion.p>
+
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <Link href="/dashboard">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-4 h-auto"
+              >
+                Start Free Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-gray-600 text-gray-300 hover:bg-gray-800 text-lg px-8 py-4 h-auto"
+            >
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </Button>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            {[
+              { icon: <Users className="w-8 h-8" />, label: "50K+ Users", color: "from-blue-400 to-cyan-500" },
+              { icon: <Globe className="w-8 h-8" />, label: "6 Platforms", color: "from-purple-400 to-pink-500" },
+              { icon: <Zap className="w-8 h-8" />, label: "10M+ Posts", color: "from-green-400 to-emerald-500" },
+              { icon: <TrendingUp className="w-8 h-8" />, label: "500% Growth", color: "from-yellow-400 to-orange-500" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className="text-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+              >
+                <div className={`bg-gradient-to-r ${stat.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3`}>
+                  {stat.icon}
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">
+                  {stat.label.split(' ')[0]}
+                </div>
+                <div className="text-gray-400 text-sm">
+                  {stat.label.split(' ').slice(1).join(' ')}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+      >
+        <div className="animate-bounce">
+          <ArrowDown className="w-6 h-6 text-gray-400" />
         </div>
       </motion.div>
     </section>
   );
 }
 
-// Features Section with Media
+// Features Section with individual component animations
 function FeaturesSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
   const features = [
     {
-      icon: <BrainCircuit className="w-6 h-6" />,
-      title: "AI-Powered Content Creation",
-      description: "Generate high-quality posts, captions, and hashtags with our advanced AI that understands your brand voice and audience preferences.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop&crop=center",
-      features: [
-        "Smart caption generation with brand voice matching",
-        "Trending hashtag recommendations",
-        "AI image and video creation",
-        "Content optimization for each platform",
-        "Real-time trend analysis integration"
-      ],
-      color: "from-blue-500 to-purple-600"
+      title: "AI Content Generation",
+      description: "Create engaging posts, captions, and stories with our advanced AI that understands your brand voice and audience preferences.",
+      icon: <BrainCircuit className="w-8 h-8" />,
+      color: "from-blue-500 to-cyan-600",
+      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80"
     },
     {
-      icon: <Calendar className="w-6 h-6" />,
-      title: "Intelligent Scheduling & Automation",
-      description: "Schedule posts across all platforms with AI-optimized timing, automated responses, and smart content distribution.",
-      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop&crop=center",
-      features: [
-        "AI-optimized posting times for maximum reach",
-        "Cross-platform content adaptation",
-        "Automated response generation",
-        "Bulk scheduling with smart queuing",
-        "Time zone optimization for global audiences"
-      ],
-      color: "from-purple-500 to-pink-600"
+      title: "Smart Scheduling",
+      description: "Optimize posting times with AI-driven analytics that determine when your audience is most active across all platforms.",
+      icon: <Clock className="w-8 h-8" />,
+      color: "from-purple-500 to-pink-600",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
     },
     {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: "Advanced Analytics & Insights",
-      description: "Track performance across all platforms with comprehensive analytics, competitor analysis, and predictive insights.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&crop=center",
-      features: [
-        "Real-time performance tracking",
-        "Competitor benchmark analysis",
-        "Predictive engagement forecasting",
-        "ROI calculation and reporting",
-        "Custom dashboard creation"
-      ],
-      color: "from-green-500 to-blue-600"
+      title: "Multi-Platform Management",
+      description: "Manage Instagram, YouTube, Twitter, LinkedIn, Facebook, and WhatsApp from one unified dashboard with seamless integration.",
+      icon: <Globe className="w-8 h-8" />,
+      color: "from-green-500 to-emerald-600",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&w=800&q=80"
     },
     {
-      icon: <MessageSquare className="w-6 h-6" />,
-      title: "Unified Social Media Management",
-      description: "Manage all your social accounts from one powerful dashboard with AI-assisted community management and engagement tools.",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop&crop=center",
-      features: [
-        "Unified inbox for all platforms",
-        "AI-powered comment moderation",
-        "Smart DM automation and routing",
-        "Team collaboration tools",
-        "Crisis management alerts"
-      ],
-      color: "from-orange-500 to-red-600"
+      title: "Advanced Analytics",
+      description: "Get deep insights into your content performance with comprehensive analytics, engagement tracking, and ROI measurement.",
+      icon: <BarChart3 className="w-8 h-8" />,
+      color: "from-orange-500 to-red-600",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Automated Engagement",
+      description: "Respond to comments and messages automatically with AI-powered responses that maintain your brand personality.",
+      icon: <MessageSquare className="w-8 h-8" />,
+      color: "from-pink-500 to-rose-600",
+      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Content Templates",
+      description: "Access hundreds of professionally designed templates for posts, stories, and videos that match your brand aesthetic.",
+      icon: <Palette className="w-8 h-8" />,
+      color: "from-indigo-500 to-purple-600",
+      image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80"
     }
   ];
 
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
   return (
-    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-slate-900/70 to-slate-900">
+    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-black to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div
@@ -454,7 +452,7 @@ function FeaturesSection() {
           >
             <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
               <Zap className="w-3 h-3 mr-1" />
-              Powerful Features
+              Features
             </Badge>
           </motion.div>
           <motion.h2 
@@ -474,105 +472,55 @@ function FeaturesSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
+            Our comprehensive suite of AI-powered tools helps you create, schedule, and optimize your social media presence across all major platforms.
           </motion.p>
         </div>
 
-        <div className="space-y-24">
-          {features.map((feature, index) => {
-            const featureRef = useRef(null);
-            const featureInView = useInView(featureRef, { once: true, margin: "-100px" });
-            
-            return (
-              <div
-                key={index}
-                ref={featureRef}
-                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
-              >
-                {/* Content */}
-                <div className="flex-1 space-y-6">
-                  <motion.div 
-                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    {feature.icon}
-                  </motion.div>
-                  <motion.h3 
-                    className="text-3xl font-bold text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    {feature.title}
-                  </motion.h3>
-                  <motion.p 
-                    className="text-lg text-gray-300 leading-relaxed"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                  >
-                    {feature.description}
-                  </motion.p>
-                  
-                  <motion.div 
-                    className="space-y-3"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                  >
-                    {feature.features.map((item, i) => (
-                      <motion.div 
-                        key={i} 
-                        className="flex items-center text-gray-300"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={featureInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                        transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
-                      >
-                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                        <span>{item}</span>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                  >
-                    <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
-                      Learn more
-                      <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </motion.div>
-                </div>
-
-                {/* Media */}
-                <motion.div 
-                  className="flex-1"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
-                    <div className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className="group"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="relative h-full">
+                <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="relative mb-6">
                       <img 
                         src={feature.image} 
                         alt={feature.title}
-                        className="w-full h-64 object-cover rounded-xl"
+                        className="w-full h-48 object-cover rounded-xl"
                       />
-                      <div className="absolute top-8 right-8">
-                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.color} animate-pulse`}></div>
+                      <div className="absolute top-4 right-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                          {feature.icon}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
               </div>
-            );
-          })}
+            </motion.div>
+          ))}
         </div>
+
+        <motion.div
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+            Explore All Features
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </motion.div>
       </div>
     </section>
   );
@@ -593,39 +541,57 @@ function StatsSection() {
   return (
     <section ref={ref} id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Trusted by{' '}
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              Proven Results
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Real Results from{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Creators Worldwide
+              Real Users
             </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Join thousands of successful creators and businesses who've transformed their social media strategy with VeeFore.
-          </p>
-        </motion.div>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Join thousands of successful creators and businesses who have transformed their social media presence with VeeFore.
+          </motion.p>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              variants={scaleIn}
-              className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-colors"
+              className="text-center"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
             >
-              <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
-                {stat.number}
-              </div>
-              <div className="text-gray-300 mb-2 leading-relaxed">{stat.label}</div>
-              <div className="text-sm text-gray-500">{stat.company}</div>
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
+                  <div className="text-gray-300 mb-2">{stat.label}</div>
+                  <div className="text-sm text-gray-500">{stat.company}</div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -635,6 +601,7 @@ function StatsSection() {
 function SolutionsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
+  
   const solutions = [
     {
       title: "For Content Creators",
@@ -652,68 +619,67 @@ function SolutionsSection() {
     },
     {
       title: "For Agencies",
-      description: "Manage multiple client accounts efficiently with advanced collaboration and reporting tools.",
-      icon: <Users className="w-8 h-8" />,
-      features: ["Client Management", "Team Collaboration", "White-Label Reports", "Bulk Operations"],
-      color: "from-purple-500 to-indigo-600"
-    },
-    {
-      title: "For Enterprises",
-      description: "Enterprise-grade social media management with advanced security and compliance features.",
-      icon: <Shield className="w-8 h-8" />,
-      features: ["Advanced Security", "Compliance Tools", "Custom Integrations", "Priority Support"],
+      description: "Manage multiple client accounts efficiently with advanced collaboration and reporting features.",
+      icon: <Briefcase className="w-8 h-8" />,
+      features: ["Client Management", "Team Collaboration", "White-label Reports", "Bulk Operations"],
       color: "from-green-500 to-emerald-600"
     }
   ];
 
   return (
-    <AnimatedSection id="solutions" className="py-24 bg-slate-800">
+    <section ref={ref} id="solutions" className="py-24 bg-gradient-to-b from-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
-            <Target className="w-3 h-3 mr-1" />
-            Solutions
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <Target className="w-3 h-3 mr-1" />
+              Solutions
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             Built for Every{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               Use Case
             </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Whether you're a solo creator or managing enterprise accounts, VeeFore adapts to your unique needs and workflows.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {solutions.map((solution, index) => (
             <motion.div
               key={index}
-              variants={scaleIn}
-              className="group relative"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <Card className="relative bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
-                <CardHeader className="space-y-4">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} text-white`}>
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all">
+                <CardContent className="p-6">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} flex items-center justify-center mb-6`}>
                     {solution.icon}
                   </div>
-                  <CardTitle className="text-2xl text-white">{solution.title}</CardTitle>
-                  <CardDescription className="text-gray-300 text-base leading-relaxed">
-                    {solution.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white mb-3">{solution.title}</h3>
+                  <p className="text-gray-300 mb-6">{solution.description}</p>
                   <div className="space-y-3">
-                    {solution.features.map((feature, i) => (
-                      <div key={i} className="flex items-center text-gray-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
+                    {solution.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center">
+                        <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
                         <span className="text-sm">{feature}</span>
                       </div>
                     ))}
@@ -726,137 +692,147 @@ function SolutionsSection() {
               </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
 // Pricing Section
 function PricingSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  
   const plans = [
     {
       name: "Starter",
       price: "$9",
       period: "/month",
-      description: "Perfect for individual creators getting started",
+      description: "Perfect for individuals and small creators",
       features: [
-        "5 social accounts",
-        "100 AI-generated posts/month",
-        "Basic analytics",
-        "Email support",
-        "Mobile app access"
+        "3 Social Accounts",
+        "50 AI-Generated Posts/month",
+        "Basic Analytics",
+        "Email Support",
+        "Content Templates"
       ],
       popular: false,
-      color: "from-gray-500 to-gray-600"
+      color: "from-blue-500 to-cyan-600"
     },
     {
       name: "Professional",
       price: "$29",
       period: "/month",
-      description: "Ideal for growing businesses and serious creators",
+      description: "Ideal for growing businesses and agencies",
       features: [
-        "20 social accounts",
-        "500 AI-generated posts/month",
-        "Advanced analytics",
-        "Priority support",
-        "Team collaboration",
-        "Custom branding",
-        "Automation rules"
+        "10 Social Accounts",
+        "500 AI-Generated Posts/month",
+        "Advanced Analytics",
+        "Priority Support",
+        "Custom Templates",
+        "Team Collaboration",
+        "Auto-Engagement"
       ],
       popular: true,
-      color: "from-blue-500 to-purple-600"
+      color: "from-purple-500 to-pink-600"
     },
     {
       name: "Enterprise",
       price: "$99",
       period: "/month",
-      description: "For agencies and large organizations",
+      description: "For large teams and enterprise clients",
       features: [
-        "Unlimited social accounts",
-        "Unlimited AI content",
-        "White-label reports",
-        "Dedicated account manager",
-        "Custom integrations",
-        "Advanced security",
-        "SLA guarantee"
+        "Unlimited Accounts",
+        "Unlimited AI Posts",
+        "Custom Analytics",
+        "Dedicated Support",
+        "White-label Solution",
+        "API Access",
+        "Custom Integrations",
+        "Advanced Security"
       ],
       popular: false,
-      color: "from-purple-500 to-pink-600"
+      color: "from-green-500 to-emerald-600"
     }
   ];
 
   return (
-    <AnimatedSection id="pricing" className="py-24 bg-slate-900">
+    <section ref={ref} id="pricing" className="py-24 bg-gradient-to-b from-slate-900 to-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
-            <CreditCard className="w-3 h-3 mr-1" />
-            Pricing
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
+              <CreditCard className="w-3 h-3 mr-1" />
+              Pricing
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             Simple,{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               Transparent Pricing
             </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Choose the perfect plan for your needs. All plans include a 14-day free trial with full access to features.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              variants={scaleIn}
-              className={`relative ${plan.popular ? 'scale-105' : ''}`}
+              className="relative"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 px-4 py-1">
+                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0">
                     <Star className="w-3 h-3 mr-1" />
                     Most Popular
                   </Badge>
                 </div>
               )}
-              
-              <div className={`absolute inset-0 bg-gradient-to-r ${plan.color} opacity-10 rounded-2xl blur-xl`}></div>
-              
-              <Card className={`relative bg-slate-800/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full ${
-                plan.popular ? 'border-blue-500/50' : ''
-              }`}>
-                <CardHeader className="text-center space-y-4">
-                  <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
-                  <div className="space-y-2">
+              <Card className={`${plan.popular ? 'border-purple-500 bg-slate-800/80' : 'border-slate-700 bg-slate-800/50'} backdrop-blur-sm h-full transition-all hover:border-slate-600`}>
+                <CardContent className="p-8">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                    <p className="text-gray-400 mb-4">{plan.description}</p>
                     <div className="flex items-baseline justify-center">
                       <span className="text-5xl font-bold text-white">{plan.price}</span>
                       <span className="text-gray-400 ml-1">{plan.period}</span>
                     </div>
-                    <CardDescription className="text-gray-300">{plan.description}</CardDescription>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-3">
-                    {plan.features.map((feature, i) => (
-                      <div key={i} className="flex items-center text-gray-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                  
+                  <div className="space-y-4 mb-8">
+                    {plan.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center">
+                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                        <span className="text-gray-300">{feature}</span>
                       </div>
                     ))}
                   </div>
+                  
                   <Button 
-                    className={`w-full ${
-                      plan.popular 
-                        ? `bg-gradient-to-r ${plan.color} hover:opacity-90` 
-                        : 'bg-slate-700 hover:bg-slate-600 text-white'
-                    } transition-all duration-300`}
+                    className={`w-full ${plan.popular 
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700' 
+                      : 'bg-slate-700 hover:bg-slate-600'
+                    }`}
                   >
                     {plan.popular ? 'Start Free Trial' : 'Get Started'}
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -865,509 +841,482 @@ function PricingSection() {
               </Card>
             </motion.div>
           ))}
-        </motion.div>
-        
+        </div>
+
         <motion.div
           className="text-center mt-12"
-          variants={fadeInUp}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <p className="text-gray-400 mb-4">All plans include 14-day free trial • No credit card required • Cancel anytime</p>
+          <p className="text-gray-400 mb-4">All plans include 14-day free trial • No credit card required</p>
           <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
             Compare All Features
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
 // Testimonials Section
 function TestimonialsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
   const testimonials = [
     {
       name: "Sarah Johnson",
       role: "Content Creator",
-      company: "@sarahcreates",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face",
-      content: "VeeFore has completely transformed my content strategy. The AI-generated captions are spot-on and save me hours every week. My engagement has increased by 300% since I started using it!",
-      rating: 5,
-      platform: "Instagram"
+      company: "@sarahjohnson",
+      content: "VeeFore has completely transformed how I manage my social media. The AI-generated content is incredibly engaging, and I've seen a 400% increase in my follower growth!",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?auto=format&fit=crop&w=150&h=150&q=80",
+      rating: 5
     },
     {
-      name: "Mike Chen",
+      name: "Michael Chen",
       role: "Marketing Director",
       company: "TechStart Inc.",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-      content: "Managing multiple client accounts was a nightmare before VeeFore. Now I can schedule weeks of content in minutes and the analytics help me prove ROI to every client. Game changer!",
-      rating: 5,
-      platform: "Multiple"
+      content: "As a startup, we needed efficient social media management. VeeFore's automation features saved us 20+ hours per week while improving our engagement rates significantly.",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80",
+      rating: 5
     },
     {
       name: "Emily Rodriguez",
-      role: "Small Business Owner",
-      company: "Bloom Bakery",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
-      content: "As a small business owner, I don't have time for complex tools. VeeFore is incredibly intuitive and the automated posting keeps my social media active even when I'm busy baking.",
-      rating: 5,
-      platform: "Facebook"
-    },
-    {
-      name: "David Park",
       role: "Social Media Manager",
-      company: "Creative Agency",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
-      content: "The team collaboration features are fantastic. We can manage 50+ client accounts seamlessly. The white-label reports save us so much time and look incredibly professional.",
-      rating: 5,
-      platform: "Agency"
-    },
-    {
-      name: "Lisa Thompson",
-      role: "YouTuber",
-      company: "@lisatech",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face",
-      content: "The cross-platform optimization is brilliant. I create content once and VeeFore adapts it perfectly for YouTube, Instagram, and Twitter. My reach has expanded dramatically.",
-      rating: 5,
-      platform: "YouTube"
-    },
-    {
-      name: "Alex Kumar",
-      role: "E-commerce Manager",
-      company: "Fashion Forward",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
-      content: "VeeFore's AI understands our brand voice perfectly. The generated content feels authentic and drives real sales. Our social commerce revenue is up 250% this quarter.",
-      rating: 5,
-      platform: "E-commerce"
+      company: "Creative Agency Co.",
+      content: "Managing multiple client accounts was a nightmare until we found VeeFore. The platform's intuitive interface and powerful automation make our job so much easier.",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&h=150&q=80",
+      rating: 5
     }
   ];
 
   return (
-    <AnimatedSection id="testimonials" className="py-24 bg-slate-800">
+    <section ref={ref} className="py-24 bg-gradient-to-b from-black to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-            <Star className="w-3 h-3 mr-1" />
-            Testimonials
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+              <Star className="w-3 h-3 mr-1" />
+              Testimonials
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             Loved by{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Creators Everywhere
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Don't just take our word for it. Here's what real users say about their experience with VeeFore.
-          </p>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-        >
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              variants={scaleIn}
-              className="group"
-            >
-              <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full group-hover:transform group-hover:scale-105">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center space-x-1">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-300 leading-relaxed">"{testimonial.content}"</p>
-                  <div className="flex items-center space-x-3 pt-4 border-t border-slate-700">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div>
-                      <div className="font-semibold text-white">{testimonial.name}</div>
-                      <div className="text-sm text-gray-400">{testimonial.role}</div>
-                      <div className="text-sm text-gray-500">{testimonial.company}</div>
-                    </div>
-                    <div className="ml-auto">
-                      <Badge variant="outline" className="border-slate-600 text-slate-400 text-xs">
-                        {testimonial.platform}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </AnimatedSection>
-  );
-}
-
-// Integration Section
-function IntegrationSection() {
-  const integrations = [
-    { name: "Instagram", icon: <Instagram className="w-8 h-8" />, color: "text-pink-500" },
-    { name: "YouTube", icon: <Youtube className="w-8 h-8" />, color: "text-red-500" },
-    { name: "Twitter", icon: <Twitter className="w-8 h-8" />, color: "text-blue-400" },
-    { name: "LinkedIn", icon: <Linkedin className="w-8 h-8" />, color: "text-blue-600" },
-    { name: "Facebook", icon: <Facebook className="w-8 h-8" />, color: "text-blue-500" },
-    { name: "TikTok", icon: <Video className="w-8 h-8" />, color: "text-black" },
-    { name: "Pinterest", icon: <Camera className="w-8 h-8" />, color: "text-red-600" },
-    { name: "Snapchat", icon: <Zap className="w-8 h-8" />, color: "text-yellow-400" }
-  ];
-
-  return (
-    <AnimatedSection className="py-24 bg-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <Badge className="mb-4 bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
-            <Wifi className="w-3 h-3 mr-1" />
-            Integrations
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Connect with{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              All Your Platforms
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Seamlessly integrate with all major social media platforms and manage everything from one unified dashboard.
-          </p>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6"
-          variants={staggerContainer}
-        >
-          {integrations.map((integration, index) => (
-            <motion.div
-              key={index}
-              variants={scaleIn}
-              className="flex flex-col items-center space-y-3 p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-all duration-300 group hover:transform hover:scale-105"
-            >
-              <div className={`${integration.color} group-hover:scale-110 transition-transform duration-300`}>
-                {integration.icon}
-              </div>
-              <span className="text-sm text-gray-300 font-medium">{integration.name}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div
-          className="text-center mt-12"
-          variants={fadeInUp}
-        >
-          <p className="text-gray-400 mb-6">Don't see your platform? We're constantly adding new integrations.</p>
-          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-            Request Integration
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
-      </div>
-    </AnimatedSection>
-  );
-}
-
-// FAQ Section
-function FAQSection() {
-  const faqs = [
-    {
-      question: "How does VeeFore's AI content generation work?",
-      answer: "Our AI analyzes your brand voice, audience preferences, and current trends to generate highly relevant content. It learns from your past posts and engagement patterns to create content that resonates with your specific audience while maintaining your unique brand personality."
-    },
-    {
-      question: "Can I try VeeFore before committing to a paid plan?",
-      answer: "Absolutely! We offer a 14-day free trial with full access to all features. No credit card required. You can explore all the capabilities and see how VeeFore transforms your social media workflow before making any commitment."
-    },
-    {
-      question: "Which social media platforms does VeeFore support?",
-      answer: "VeeFore integrates with all major social media platforms including Instagram, YouTube, Twitter, LinkedIn, Facebook, TikTok, Pinterest, and Snapchat. We're continuously adding support for new platforms based on user demand."
-    },
-    {
-      question: "Is my data secure with VeeFore?",
-      answer: "Security is our top priority. We use enterprise-grade encryption, secure data centers, and comply with all major privacy regulations including GDPR and CCPA. Your data is never shared with third parties and you maintain full control over your content."
-    },
-    {
-      question: "Can I cancel my subscription anytime?",
-      answer: "Yes, you can cancel your subscription at any time with no cancellation fees. If you cancel, you'll continue to have access to your paid features until the end of your current billing period."
-    },
-    {
-      question: "Do you offer support for teams and agencies?",
-      answer: "Yes! Our Professional and Enterprise plans include team collaboration features, role-based permissions, client management tools, and white-label reporting. Perfect for agencies managing multiple client accounts."
-    }
-  ];
-
-  return (
-    <AnimatedSection className="py-24 bg-slate-800">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
-          <Badge className="mb-4 bg-orange-500/20 text-orange-300 border-orange-500/30">
-            <Headphones className="w-3 h-3 mr-1" />
-            FAQ
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Questions
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300">
-            Got questions? We've got answers. Here are some of the most common questions about VeeFore.
-          </p>
-        </motion.div>
-
-        <motion.div
-          className="space-y-6"
-          variants={staggerContainer}
-        >
-          {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              variants={fadeInUp}
-              className="group"
-            >
-              <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                      {index + 1}
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
-                      <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div
-          className="text-center mt-12"
-          variants={fadeInUp}
-        >
-          <p className="text-gray-400 mb-6">Still have questions? We're here to help!</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-              <Mail className="mr-2 w-4 h-4" />
-              Contact Support
-            </Button>
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-              <BookOpen className="mr-2 w-4 h-4" />
-              View Documentation
-            </Button>
-          </div>
-        </motion.div>
-      </div>
-    </AnimatedSection>
-  );
-}
-
-// CTA Section with seamless blending
-function CTASection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
-  return (
-    <section ref={ref} className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
-      {/* Gradient overlay for seamless blending */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none"></div>
-      
-      {/* Starfield Background */}
-      <StarfieldBackground />
-      
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0">
-        <motion.div 
-          className="absolute top-1/4 left-1/6 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-            rotate: [0, 180],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-violet-600/25 rounded-full blur-3xl"
-          animate={{
-            scale: [1.1, 1.3, 1.1],
-            opacity: [0.2, 0.4, 0.2],
-            rotate: [180, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="space-y-8">
-          <motion.h2 
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0,
-              textShadow: [
-                "0 0 20px rgba(147, 51, 234, 0.5)",
-                "0 0 40px rgba(139, 92, 246, 0.8)",
-                "0 0 20px rgba(147, 51, 234, 0.5)"
-              ]
-            } : { opacity: 0, y: 30 }}
-            transition={{
-              opacity: { duration: 0.6 },
-              y: { duration: 0.6 },
-              textShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-            }}
-          >
-            Ready to Transform Your
-            <br />
-            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
-              Social Media Strategy?
+              Thousands of Creators
             </span>
           </motion.h2>
-          
           <motion.p 
-            className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed"
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Join thousands of creators and businesses who've already discovered the power of AI-driven social media management.
+            See what our users have to say about their experience with VeeFore's AI-powered social media automation.
           </motion.p>
+        </div>
 
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <Link href="/signup">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
-                  Start Your Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </motion.div>
-            </Link>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((testimonial, index) => (
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              key={index}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
             >
-              <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
-              </Button>
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-300 mb-6 leading-relaxed">"{testimonial.content}"</p>
+                  <div className="flex items-center">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm text-gray-400">{testimonial.role}</div>
+                      <div className="text-sm text-purple-400">{testimonial.company}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
-          </motion.div>
-
-          <motion.div 
-            className="pt-8 text-purple-200"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <p className="text-sm opacity-90">
-              ✓ 14-day free trial &nbsp;&nbsp;•&nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Cancel anytime
-            </p>
-          </motion.div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// Footer
-function Footer() {
-  const footerSections = [
+// Integration Section
+function IntegrationSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  const integrations = [
+    { name: "Instagram", icon: <Instagram className="w-8 h-8" />, color: "from-pink-500 to-rose-600" },
+    { name: "YouTube", icon: <Youtube className="w-8 h-8" />, color: "from-red-500 to-red-600" },
+    { name: "Twitter", icon: <Twitter className="w-8 h-8" />, color: "from-blue-400 to-blue-500" },
+    { name: "LinkedIn", icon: <Linkedin className="w-8 h-8" />, color: "from-blue-600 to-blue-700" },
+    { name: "Facebook", icon: <Facebook className="w-8 h-8" />, color: "from-blue-500 to-indigo-600" },
+    { name: "WhatsApp", icon: <MessageSquare className="w-8 h-8" />, color: "from-green-500 to-green-600" }
+  ];
+
+  return (
+    <section ref={ref} className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <Globe className="w-3 h-3 mr-1" />
+              Integrations
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Connect All Your{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Favorite Platforms
+            </span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Seamlessly manage all major social media platforms from one unified dashboard with native integrations.
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {integrations.map((integration, index) => (
+            <motion.div
+              key={index}
+              className="text-center"
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.9 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${integration.color} flex items-center justify-center shadow-lg`}>
+                {integration.icon}
+              </div>
+              <h3 className="text-white font-semibold">{integration.name}</h3>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+            View All Integrations
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// FAQ Section
+function FAQSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  const faqs = [
     {
-      title: "Product",
-      links: ["Features", "Pricing", "Integrations", "API", "Security"]
+      question: "How does VeeFore's AI content generation work?",
+      answer: "Our AI analyzes your brand voice, audience preferences, and trending topics to create engaging, personalized content that resonates with your followers across all platforms."
     },
     {
-      title: "Solutions",
-      links: ["Creators", "Small Business", "Agencies", "Enterprise", "E-commerce"]
+      question: "Can I manage multiple social media accounts?",
+      answer: "Yes! VeeFore supports managing multiple accounts across Instagram, YouTube, Twitter, LinkedIn, Facebook, and WhatsApp from a single dashboard."
     },
     {
-      title: "Resources",
-      links: ["Blog", "Help Center", "Webinars", "Templates", "Case Studies"]
+      question: "Is there a free trial available?",
+      answer: "Absolutely! We offer a 14-day free trial with full access to all features. No credit card required to get started."
     },
     {
-      title: "Company",
-      links: ["About", "Careers", "Press", "Partners", "Contact"]
+      question: "How accurate is the AI-generated content?",
+      answer: "Our AI is trained on millions of high-performing posts and maintains a 95% accuracy rate. You can always review and edit content before publishing."
+    },
+    {
+      question: "Do you offer customer support?",
+      answer: "Yes, we provide 24/7 customer support via email for all plans, with priority support for Professional and Enterprise subscribers."
     }
   ];
 
   return (
-    <footer className="bg-slate-900 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Logo and Description */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">VeeFore</span>
-            </div>
-            <p className="text-gray-400 leading-relaxed">
-              AI-powered social media management platform that helps creators and businesses grow their online presence with intelligent automation and analytics.
-            </p>
-            <div className="flex space-x-4">
-              <Instagram className="w-5 h-5 text-gray-400 hover:text-pink-400 cursor-pointer transition-colors" />
-              <Twitter className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
-              <Linkedin className="w-5 h-5 text-gray-400 hover:text-blue-600 cursor-pointer transition-colors" />
-              <Youtube className="w-5 h-5 text-gray-400 hover:text-red-400 cursor-pointer transition-colors" />
-            </div>
-          </div>
+    <section ref={ref} className="py-24 bg-gradient-to-b from-slate-800 to-black">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <Headphones className="w-3 h-3 mr-1" />
+              FAQ
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Frequently Asked{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Questions
+            </span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Got questions? We've got answers. Find everything you need to know about VeeFore.
+          </motion.p>
+        </div>
 
-          {/* Footer Links */}
-          {footerSections.map((section, index) => (
-            <div key={index} className="space-y-4">
-              <h3 className="text-white font-semibold">{section.title}</h3>
-              <ul className="space-y-2">
-                {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div className="space-y-6">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+            >
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3">{faq.question}</h3>
+                  <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
+        <motion.div
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <p className="text-gray-400 mb-4">Still have questions? We're here to help!</p>
+          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+            Contact Support
+            <Mail className="ml-2 w-4 h-4" />
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// CTA Section with seamless blending
+function CTASection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  return (
+    <section ref={ref} className="py-24 bg-gradient-to-br from-black via-purple-900/20 to-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+      
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
+            <Rocket className="w-3 h-3 mr-1" />
+            Ready to Launch?
+          </Badge>
+        </motion.div>
+
+        <motion.h2
+          className="text-4xl sm:text-6xl font-bold text-white mb-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+        >
+          Ready to Transform Your
+          <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block">
+            Social Media Strategy?
+          </span>
+        </motion.h2>
+
+        <motion.p
+          className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Join thousands of successful creators and businesses who have revolutionized their social media presence with VeeFore's AI-powered automation.
+        </motion.p>
+
+        <motion.div
+          className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <Link href="/dashboard">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-4 h-auto"
+            >
+              Start Your Free Trial
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="border-gray-600 text-gray-300 hover:bg-gray-800 text-lg px-8 py-4 h-auto"
+          >
+            <Mail className="mr-2 w-5 h-5" />
+            Contact Support
+          </Button>
+        </motion.div>
+
+        <motion.p
+          className="text-gray-400 text-sm"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          Still have questions? We're here to help!
+        </motion.p>
+
+        <motion.div
+          className="flex flex-col sm:flex-row gap-4 justify-center mt-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <Button 
+            variant="outline" 
+            className="border-blue-600 text-blue-300 hover:bg-blue-800"
+          >
+            <Mail className="mr-2 w-4 h-4" />
+            Contact Support
+          </Button>
+          <Button 
+            variant="outline" 
+            className="border-purple-600 text-purple-300 hover:bg-purple-800"
+          >
+            <BookOpen className="mr-2 w-4 h-4" />
+            View Documentation
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// Footer with seamless blending
+function Footer() {
+  return (
+    <footer className="bg-gradient-to-t from-black to-slate-900 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="col-span-1 md:col-span-2">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Rocket className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                VeeFore
+              </span>
+            </div>
+            <p className="text-gray-400 mb-6 max-w-md">
+              Transform your social media strategy with AI-powered automation. Create, schedule, and optimize content across all major platforms.
+            </p>
+            <div className="flex space-x-4">
+              {[
+                { icon: <Twitter className="w-5 h-5" />, href: "#" },
+                { icon: <Instagram className="w-5 h-5" />, href: "#" },
+                { icon: <Linkedin className="w-5 h-5" />, href: "#" },
+                { icon: <Youtube className="w-5 h-5" />, href: "#" }
+              ].map((social, index) => (
+                <a
+                  key={index}
+                  href={social.href}
+                  className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-slate-700 transition-colors"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold mb-4">Product</h3>
+            <div className="space-y-3">
+              {['Features', 'Pricing', 'API', 'Integrations', 'Updates'].map((item) => (
+                <a key={item} href="#" className="block text-gray-400 hover:text-white transition-colors">
+                  {item}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold mb-4">Support</h3>
+            <div className="space-y-3">
+              {['Help Center', 'Documentation', 'Contact Us', 'Status', 'Community'].map((item) => (
+                <a key={item} href="#" className="block text-gray-400 hover:text-white transition-colors">
+                  {item}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
             © 2024 VeeFore. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 sm:mt-0">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
+              <a key={item} href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                {item}
+              </a>
+            ))}
           </div>
         </div>
       </div>
@@ -1375,7 +1324,7 @@ function Footer() {
   );
 }
 
-// Enhanced Scroll to Top Button with Space Theme
+// Scroll to Top Button
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -1401,78 +1350,43 @@ function ScrollToTopButton() {
 
   return (
     <motion.button
-      className={`fixed bottom-8 right-8 p-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 z-50 backdrop-blur-sm border border-purple-500/20 ${
+      className={`fixed bottom-8 right-8 z-50 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={scrollToTop}
-      whileHover={{ 
-        scale: 1.15,
-        rotate: 360,
-        boxShadow: "0 0 30px rgba(147, 51, 234, 0.6)"
-      }}
+      whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      animate={{
-        boxShadow: [
-          "0 0 20px rgba(147, 51, 234, 0.3)",
-          "0 0 40px rgba(139, 92, 246, 0.5)",
-          "0 0 20px rgba(147, 51, 234, 0.3)"
-        ]
-      }}
-      transition={{
-        boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+      animate={isVisible ? { 
+        opacity: 1,
+        boxShadow: "0 0 20px rgba(139, 92, 246, 0.5)"
+      } : { 
+        opacity: 0,
+        boxShadow: "0 0 0px rgba(139, 92, 246, 0)"
       }}
     >
-      <Rocket className="w-5 h-5" />
+      <ChevronUp className="w-6 h-6" />
     </motion.button>
   );
 }
 
-// Main Landing Page Component with Lazy Loading
+// Main Landing Page Component
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
-      <Navigation />
-      <HeroSection />
-      
-      {/* Core sections load immediately */}
-      <AnimatedSection delay={0.1}>
+    <Suspense fallback={<LoadingSkeleton />}>
+      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+        <Navigation />
+        <HeroSection />
         <FeaturesSection />
-      </AnimatedSection>
-      
-      {/* Heavy sections use Suspense for lazy loading */}
-      <Suspense fallback={<LoadingSkeleton />}>
-        <AnimatedSection delay={0.2}>
-          <StatsSection />
-        </AnimatedSection>
-      </Suspense>
-      
-      <AnimatedSection delay={0.3}>
+        <StatsSection />
         <SolutionsSection />
-      </AnimatedSection>
-      
-      <AnimatedSection delay={0.4}>
         <PricingSection />
-      </AnimatedSection>
-      
-      <Suspense fallback={<LoadingSkeleton />}>
-        <AnimatedSection delay={0.5}>
-          <TestimonialsSection />
-        </AnimatedSection>
-      </Suspense>
-      
-      <Suspense fallback={<LoadingSkeleton />}>
-        <AnimatedSection delay={0.6}>
-          <IntegrationSection />
-        </AnimatedSection>
-      </Suspense>
-      
-      <AnimatedSection delay={0.7}>
+        <TestimonialsSection />
+        <IntegrationSection />
         <FAQSection />
-      </AnimatedSection>
-      
-      <CTASection />
-      <Footer />
-      <ScrollToTopButton />
-    </div>
+        <CTASection />
+        <Footer />
+        <ScrollToTopButton />
+      </div>
+    </Suspense>
   );
 }

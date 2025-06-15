@@ -619,12 +619,9 @@ function SolutionsSection() {
   ];
 
   return (
-    <AnimatedSection id="solutions" className="py-24 bg-slate-800">
+    <section id="solutions" className="py-24 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
             <Target className="w-3 h-3 mr-1" />
             Solutions
@@ -638,18 +635,11 @@ function SolutionsSection() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Whether you're a solo creator or managing enterprise accounts, VeeFore adapts to your unique needs and workflows.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {solutions.map((solution, index) => (
-            <motion.div
-              key={index}
-              variants={scaleIn}
-              className="group relative"
-            >
+            <div key={index} className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
               <Card className="relative bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
                 <CardHeader className="space-y-4">
@@ -676,11 +666,11 @@ function SolutionsSection() {
                   </Button>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
@@ -739,12 +729,9 @@ function PricingSection() {
   ];
 
   return (
-    <AnimatedSection id="pricing" className="py-24 bg-slate-900">
+    <section id="pricing" className="py-24 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
             <CreditCard className="w-3 h-3 mr-1" />
             Pricing
@@ -758,16 +745,12 @@ function PricingSection() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Choose the perfect plan for your needs. All plans include a 14-day free trial with full access to features.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={scaleIn}
               className={`relative ${plan.popular ? 'scale-105' : ''}`}
             >
               {plan.popular && (
@@ -815,22 +798,19 @@ function PricingSection() {
                   </Button>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
         
-        <motion.div
-          className="text-center mt-12"
-          variants={fadeInUp}
-        >
+        <div className="text-center mt-12">
           <p className="text-gray-400 mb-4">All plans include 14-day free trial • No credit card required • Cancel anytime</p>
           <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
             Compare All Features
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
@@ -894,12 +874,9 @@ function TestimonialsSection() {
   ];
 
   return (
-    <AnimatedSection id="testimonials" className="py-24 bg-slate-800">
+    <section id="testimonials" className="py-24 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
             <Star className="w-3 h-3 mr-1" />
             Testimonials
@@ -913,18 +890,11 @@ function TestimonialsSection() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Don't just take our word for it. Here's what real users say about their experience with VeeFore.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              variants={scaleIn}
-              className="group"
-            >
+            <div key={index} className="group">
               <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full group-hover:transform group-hover:scale-105">
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center space-x-1">
@@ -952,11 +922,11 @@ function TestimonialsSection() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
@@ -974,12 +944,9 @@ function IntegrationSection() {
   ];
 
   return (
-    <AnimatedSection className="py-24 bg-slate-900">
+    <section className="py-24 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
             <Wifi className="w-3 h-3 mr-1" />
             Integrations
@@ -993,38 +960,31 @@ function IntegrationSection() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Seamlessly integrate with all major social media platforms and manage everything from one unified dashboard.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
           {integrations.map((integration, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={scaleIn}
               className="flex flex-col items-center space-y-3 p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-all duration-300 group hover:transform hover:scale-105"
             >
               <div className={`${integration.color} group-hover:scale-110 transition-transform duration-300`}>
                 {integration.icon}
               </div>
               <span className="text-sm text-gray-300 font-medium">{integration.name}</span>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="text-center mt-12"
-          variants={fadeInUp}
-        >
+        <div className="text-center mt-12">
           <p className="text-gray-400 mb-6">Don't see your platform? We're constantly adding new integrations.</p>
           <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
             Request Integration
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
@@ -1058,12 +1018,9 @@ function FAQSection() {
   ];
 
   return (
-    <AnimatedSection className="py-24 bg-slate-800">
+    <section className="py-24 bg-slate-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-orange-500/20 text-orange-300 border-orange-500/30">
             <Headphones className="w-3 h-3 mr-1" />
             FAQ
@@ -1077,7 +1034,7 @@ function FAQSection() {
           <p className="text-xl text-gray-300">
             Got questions? We've got answers. Here are some of the most common questions about VeeFore.
           </p>
-        </motion.div>
+        </div>
 
         <motion.div
           className="space-y-6"

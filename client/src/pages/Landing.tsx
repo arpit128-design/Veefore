@@ -1036,14 +1036,10 @@ function FAQSection() {
           </p>
         </div>
 
-        <motion.div
-          className="space-y-6"
-          variants={staggerContainer}
-        >
+        <div className="space-y-6">
           {faqs.map((faq, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={fadeInUp}
               className="group"
             >
               <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-colors">
@@ -1059,14 +1055,11 @@ function FAQSection() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="text-center mt-12"
-          variants={fadeInUp}
-        >
+        <div className="text-center mt-12">
           <p className="text-gray-400 mb-6">Still have questions? We're here to help!</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
@@ -1078,130 +1071,60 @@ function FAQSection() {
               View Documentation
             </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
 // CTA Section with seamless blending
 function CTASection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
   return (
-    <section ref={ref} className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
+    <section className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
       {/* Gradient overlay for seamless blending */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none"></div>
       
       {/* Starfield Background */}
       <StarfieldBackground />
       
-      {/* Animated Background Orbs */}
+      {/* Static Background Orbs */}
       <div className="absolute inset-0">
-        <motion.div 
-          className="absolute top-1/4 left-1/6 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-            rotate: [0, 180],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-violet-600/25 rounded-full blur-3xl"
-          animate={{
-            scale: [1.1, 1.3, 1.1],
-            opacity: [0.2, 0.4, 0.2],
-            rotate: [180, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
+        <div className="absolute top-1/4 left-1/6 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl opacity-40" />
+        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-violet-600/25 rounded-full blur-3xl opacity-30" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8">
-          <motion.h2 
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0,
-              textShadow: [
-                "0 0 20px rgba(147, 51, 234, 0.5)",
-                "0 0 40px rgba(139, 92, 246, 0.8)",
-                "0 0 20px rgba(147, 51, 234, 0.5)"
-              ]
-            } : { opacity: 0, y: 30 }}
-            transition={{
-              opacity: { duration: 0.6 },
-              y: { duration: 0.6 },
-              textShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-            }}
-          >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
             Ready to Transform Your
             <br />
             <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
               Social Media Strategy?
             </span>
-          </motion.h2>
+          </h2>
           
-          <motion.p 
-            className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+          <p className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed">
             Join thousands of creators and businesses who've already discovered the power of AI-driven social media management.
-          </motion.p>
+          </p>
 
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <Link href="/signup">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
-                  Start Your Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </motion.div>
-            </Link>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
+              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
+                Start Your Free Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-            </motion.div>
-          </motion.div>
+            </Link>
+            <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
+              <Play className="mr-2 w-5 h-5" />
+              Watch Demo
+            </Button>
+          </div>
 
-          <motion.div 
-            className="pt-8 text-purple-200"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
+          <div className="pt-8 text-purple-200">
             <p className="text-sm opacity-90">
               ✓ 14-day free trial &nbsp;&nbsp;•&nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Cancel anytime
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

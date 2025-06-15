@@ -710,26 +710,49 @@ function FeaturesSection() {
               </motion.div>
 
               {/* Media */}
-              <div className="flex-1">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
-                  <div className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700">
-                    <img 
+              <motion.div 
+                className="flex-1"
+                initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                <motion.div 
+                  className="relative"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div 
+                    className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700"
+                    whileHover={{ borderColor: "#64748b" }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <motion.img 
                       src={feature.image} 
                       alt={feature.title}
                       className="w-full h-64 object-cover rounded-xl"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
                     />
-                    <div className="absolute top-8 right-8">
+                    <motion.div 
+                      className="absolute top-8 right-8"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
                       <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.color}`}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           ))}
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }
 
@@ -743,36 +766,83 @@ function StatsSection() {
   ];
 
   return (
-    <section id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
+    <AnimatedSection id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <motion.div 
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             Trusted by{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Creators Worldwide
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Join thousands of successful creators and businesses who've transformed their social media strategy with VeeFore.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-colors"
+            <motion.span 
+              className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+              Creators Worldwide
+            </motion.span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Join thousands of successful creators and businesses who've transformed their social media strategy with VeeFore.
+          </motion.p>
+        </motion.div>
+
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          variants={staggerContainer}
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700"
+              variants={scaleIn}
+              whileHover={{ 
+                scale: 1.05, 
+                borderColor: "#64748b",
+                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)" 
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div 
+                className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2"
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
                 {stat.number}
-              </div>
-              <div className="text-gray-300 mb-2 leading-relaxed">{stat.label}</div>
-              <div className="text-sm text-gray-500">{stat.company}</div>
-            </div>
+              </motion.div>
+              <motion.div 
+                className="text-gray-300 mb-2 leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+              >
+                {stat.label}
+              </motion.div>
+              <motion.div 
+                className="text-sm text-gray-500"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: index * 0.1 + 0.4 }}
+              >
+                {stat.company}
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }
 
@@ -810,58 +880,152 @@ function SolutionsSection() {
   ];
 
   return (
-    <section id="solutions" className="py-24 bg-slate-800">
+    <AnimatedSection id="solutions" className="py-24 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
-            <Target className="w-3 h-3 mr-1" />
-            Solutions
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <motion.div 
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <motion.div
+                className="w-3 h-3 mr-1 inline-block"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Target className="w-3 h-3" />
+              </motion.div>
+              Solutions
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             Built for Every{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <motion.span 
+              className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
               Use Case
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            </motion.span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Whether you're a solo creator or managing enterprise accounts, VeeFore adapts to your unique needs and workflows.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          variants={staggerContainer}
+        >
           {solutions.map((solution, index) => (
-            <div key={index} className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <Card className="relative bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
-                <CardHeader className="space-y-4">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} text-white`}>
-                    {solution.icon}
-                  </div>
-                  <CardTitle className="text-2xl text-white">{solution.title}</CardTitle>
-                  <CardDescription className="text-gray-300 text-base leading-relaxed">
-                    {solution.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    {solution.features.map((feature, i) => (
-                      <div key={i} className="flex items-center text-gray-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
-                    Learn More
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <motion.div 
+              key={index} 
+              className="group relative"
+              variants={scaleIn}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="relative bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
+                  <CardHeader className="space-y-4">
+                    <motion.div 
+                      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} text-white`}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {solution.icon}
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                      <CardTitle className="text-2xl text-white">{solution.title}</CardTitle>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                      <CardDescription className="text-gray-300 text-base leading-relaxed">
+                        {solution.description}
+                      </CardDescription>
+                    </motion.div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <motion.div 
+                      className="space-y-3"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.3 }}
+                    >
+                      {solution.features.map((feature, i) => (
+                        <motion.div 
+                          key={i} 
+                          className="flex items-center text-gray-300"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: 0.1 * i }}
+                          whileHover={{ x: 5, color: "#d1d5db" }}
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.2, color: "#22c55e" }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
+                          </motion.div>
+                          <span className="text-sm">{feature}</span>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.5 }}
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
+                          Learn More
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </Button>
+                      </motion.div>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }
 

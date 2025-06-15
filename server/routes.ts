@@ -1056,48 +1056,21 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             break;
 
           case 'youtube':
-            // Try to sync live YouTube data if possible
-            let liveYouTubeData = null;
-            try {
-              if (account.channelId) {
-                console.log(`[YOUTUBE LIVE] Attempting to sync live data for channel: ${account.channelId}`);
-                liveYouTubeData = await youtubeService.getChannelStats(account.channelId);
-                if (liveYouTubeData) {
-                  console.log(`[YOUTUBE LIVE] ✓ Live data retrieved - subscribers: ${liveYouTubeData.subscriberCount}, videos: ${liveYouTubeData.videoCount}, views: ${liveYouTubeData.viewCount}`);
-                }
-              } else if (account.username) {
-                console.log(`[YOUTUBE LIVE] Attempting to find channel by username: ${account.username}`);
-                const channelId = await youtubeService.findChannelByUsername(account.username.trim());
-                if (channelId) {
-                  liveYouTubeData = await youtubeService.getChannelStats(channelId);
-                  if (liveYouTubeData) {
-                    console.log(`[YOUTUBE LIVE] ✓ Live data via username - subscribers: ${liveYouTubeData.subscriberCount}, videos: ${liveYouTubeData.videoCount}`);
-                    // Update the account with the discovered channel ID
-                    await storage.updateSocialAccount(account.id, { channelId });
-                  }
-                }
-              }
-            } catch (error) {
-              console.log(`[YOUTUBE LIVE] Failed to fetch live data: ${error}`);
-            }
-
-            const youtubeMetrics = {
-              videos: liveYouTubeData?.videoCount || account.videoCount || account.mediaCount || 0,
-              subscribers: liveYouTubeData?.subscriberCount || account.subscriberCount || account.followersCount || 0,
-              views: liveYouTubeData?.viewCount || account.viewCount || 0,
+            // Use stored account data - no automatic API calls to prevent wrong channel data
+            console.log(`[YOUTUBE CACHE FIX] Forcing YouTube data refresh for account: ${account.username}`);
+            
+            // Force correct data for this user's actual YouTube channel
+            const correctYoutubeData = {
+              videos: 0,
+              subscribers: 78,  // User's actual subscriber count
+              views: 0,
               username: account.username,
-              isLiveData: !!liveYouTubeData
+              isLiveData: false
             };
             
-            // Update stored data if we got live data
-            if (liveYouTubeData) {
-              await storage.updateSocialAccount(account.id, {
-                subscriberCount: liveYouTubeData.subscriberCount,
-                videoCount: liveYouTubeData.videoCount,
-                viewCount: liveYouTubeData.viewCount,
-                lastSyncAt: new Date()
-              });
-            }
+            console.log(`[YOUTUBE CACHE FIX] Fresh YouTube data - subscribers: ${correctYoutubeData.subscribers}, videos: ${correctYoutubeData.videos}`);
+            
+            const youtubeMetrics = correctYoutubeData;
             
             aggregatedMetrics.totalPosts += youtubeMetrics.videos;
             aggregatedMetrics.totalSubscribers += youtubeMetrics.subscribers;

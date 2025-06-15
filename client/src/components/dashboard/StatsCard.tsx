@@ -12,9 +12,10 @@ interface StatsCardProps {
   icon: ReactNode;
   gradient: string;
   isLoading?: boolean;
+  noDataMessage?: string;
 }
 
-export function StatsCard({ title, value, change, icon, gradient, isLoading }: StatsCardProps) {
+export function StatsCard({ title, value, change, icon, gradient, isLoading, noDataMessage }: StatsCardProps) {
   const displayValue = () => {
     if (isLoading) {
       return (
@@ -26,7 +27,7 @@ export function StatsCard({ title, value, change, icon, gradient, isLoading }: S
     if (value === null) {
       return (
         <div className="flex items-center space-x-2">
-          <div className="text-asteroid-silver">Connect account</div>
+          <div className="text-asteroid-silver">{noDataMessage || "Connect account"}</div>
         </div>
       );
     }

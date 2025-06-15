@@ -55,6 +55,27 @@ export default function Dashboard() {
     refetchOnReconnect: true
   });
 
+  // Fetch connected social accounts
+  const { data: socialAccounts, isLoading: socialAccountsLoading } = useQuery({
+    queryKey: ['social-accounts'],
+    queryFn: async () => {
+      const response = await fetch('/api/social-accounts', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!currentWorkspace?.id && !!token,
+    staleTime: 30000,
+    refetchOnMount: true
+  });
+
   // Live clock that updates every second
   useEffect(() => {
     const timer = setInterval(() => {
@@ -220,6 +241,60 @@ export default function Dashboard() {
   
   // Show loading message when data is null/empty
   const isDataLoading = analyticsLoading || !hasValidData;
+
+  // Get connected platforms from social accounts
+  const connectedPlatforms = socialAccounts || [];
+  const hasConnectedAccounts = connectedPlatforms.length > 0;
+
+  // Create platform-specific analytics data mapping
+  const getPlatformAnalytics = (platform: string) => {
+    const platformData = rawData?.platformData?.[platform];
+    if (!platformData) return null;
+
+    return {
+      followers: platformData.followers || 0,
+      posts: platformData.posts || platformData.videos || 0,
+      reach: platformData.reach || platformData.views || 0,
+      likes: platformData.likes || 0,
+      comments: platformData.comments || 0,
+      username: platformData.username || '',
+      isLiveData: platformData.isLiveData || false
+    };
+  };
+
+  // Platform configuration
+  const platformConfig = {
+    instagram: {
+      name: 'Instagram Analytics',
+      icon: <i className="fab fa-instagram text-xl md:text-2xl text-pink-500" />,
+      color: 'text-pink-500',
+      metrics: ['followers', 'posts', 'reach', 'likes', 'comments']
+    },
+    youtube: {
+      name: 'YouTube Analytics', 
+      icon: <i className="fab fa-youtube text-xl md:text-2xl text-red-500" />,
+      color: 'text-red-500',
+      metrics: ['subscribers', 'videos', 'views']
+    },
+    twitter: {
+      name: 'Twitter Analytics',
+      icon: <i className="fab fa-x-twitter text-xl md:text-2xl text-white" />,
+      color: 'text-white',
+      metrics: ['followers', 'tweets', 'reach', 'likes']
+    },
+    facebook: {
+      name: 'Facebook Analytics',
+      icon: <i className="fab fa-facebook text-xl md:text-2xl text-blue-500" />,
+      color: 'text-blue-500', 
+      metrics: ['followers', 'posts', 'reach', 'likes']
+    },
+    linkedin: {
+      name: 'LinkedIn Analytics',
+      icon: <i className="fab fa-linkedin text-xl md:text-2xl text-blue-400" />,
+      color: 'text-blue-400',
+      metrics: ['connections', 'posts', 'impressions']
+    }
+  };
   
   console.log('[DASHBOARD DEBUG] Mapped analytics:', analytics);
   console.log('[DASHBOARD DEBUG] Formatted engagement:', formatNumber(analytics.engagement));
@@ -259,147 +334,199 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <StatsCard
           title="Total Reach"
-          value={analytics.totalReach !== null ? formatNumber(analytics.totalReach) : null}
-          change={analytics.totalReach !== null && analytics.totalReach > 0 && percentageChanges.reach ? percentageChanges.reach : undefined}
+          value={hasConnectedAccounts && analytics.totalReach !== null ? formatNumber(analytics.totalReach) : null}
+          change={hasConnectedAccounts && analytics.totalReach !== null && analytics.totalReach > 0 && percentageChanges.reach ? percentageChanges.reach : undefined}
           icon={<Eye className="text-lg sm:text-xl" />}
           gradient="from-electric-cyan to-nebula-purple"
-          isLoading={isDataLoading}
+          isLoading={hasConnectedAccounts ? isDataLoading : false}
+          noDataMessage={!hasConnectedAccounts ? "Connect accounts" : undefined}
         />
         <StatsCard
           title="Engagement"
-          value={analytics.engagement !== null ? formatEngagement(analytics.engagement) : null}
-          change={analytics.engagement !== null && analytics.engagement > 0 && percentageChanges.engagement ? percentageChanges.engagement : undefined}
+          value={hasConnectedAccounts && analytics.engagement !== null ? formatEngagement(analytics.engagement) : null}
+          change={hasConnectedAccounts && analytics.engagement !== null && analytics.engagement > 0 && percentageChanges.engagement ? percentageChanges.engagement : undefined}
           icon={<Heart className="text-lg sm:text-xl" />}
           gradient="from-solar-gold to-red-500"
-          isLoading={isDataLoading}
+          isLoading={hasConnectedAccounts ? isDataLoading : false}
+          noDataMessage={!hasConnectedAccounts ? "Connect accounts" : undefined}
         />
         <StatsCard
           title="New Followers"
-          value={analytics.newFollowers !== null ? formatNumber(analytics.newFollowers) : null}
-          change={analytics.newFollowers !== null && analytics.newFollowers > 0 && percentageChanges.followers ? percentageChanges.followers : undefined}
+          value={hasConnectedAccounts && analytics.newFollowers !== null ? formatNumber(analytics.newFollowers) : null}
+          change={hasConnectedAccounts && analytics.newFollowers !== null && analytics.newFollowers > 0 && percentageChanges.followers ? percentageChanges.followers : undefined}
           icon={<Users className="text-lg sm:text-xl" />}
           gradient="from-nebula-purple to-pink-500"
-          isLoading={isDataLoading}
+          isLoading={hasConnectedAccounts ? isDataLoading : false}
+          noDataMessage={!hasConnectedAccounts ? "Connect accounts" : undefined}
         />
         <StatsCard
           title="Content Score"
-          value={formatPercentage(analytics.contentScore)}
-          change={percentageChanges.contentScore ? percentageChanges.contentScore : undefined}
+          value={hasConnectedAccounts ? formatPercentage(analytics.contentScore) : null}
+          change={hasConnectedAccounts && percentageChanges.contentScore ? percentageChanges.contentScore : undefined}
           icon={<TrendingUp className="text-lg sm:text-xl" />}
           gradient="from-green-400 to-blue-500"
           isLoading={false}
+          noDataMessage={!hasConnectedAccounts ? "Connect accounts" : undefined}
         />
       </div>
 
-      {/* Platform Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-        {/* Instagram Analytics - Live Data */}
+      {/* Dynamic Platform Analytics Grid */}
+      {!hasConnectedAccounts ? (
+        // No Social Accounts Connected - Show Connection Message
         <div className="content-card holographic">
-          <div className="p-4 md:p-6">
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div className="flex items-center space-x-2 md:space-x-3">
-                <i className="fab fa-instagram text-xl md:text-2xl text-pink-500" />
-                <h3 className="text-lg md:text-xl font-orbitron font-semibold">Instagram Analytics</h3>
-              </div>
-              <Button
-                onClick={() => forceRefreshData.mutate()}
-                disabled={isRefreshing || forceRefreshData.isPending}
-                size="sm"
-                variant="outline"
-                className="border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${(isRefreshing || forceRefreshData.isPending) ? 'animate-spin' : ''}`} />
-                {(isRefreshing || forceRefreshData.isPending) ? 'Syncing...' : 'Refresh Data'}
-              </Button>
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-electric-cyan/10 flex items-center justify-center">
+              <i className="fas fa-link text-2xl text-electric-cyan" />
             </div>
-            {isDataLoading && (
-              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin opacity-50" />
-            )}
+            <h3 className="text-xl font-orbitron font-semibold mb-3">No Social Accounts Connected</h3>
+            <p className="text-asteroid-silver mb-6">
+              Connect your social media accounts to view analytics and start managing your content.
+            </p>
+            <Button
+              onClick={() => window.location.href = '/integrations'}
+              className="bg-electric-cyan hover:bg-electric-cyan/80 text-cosmic-void font-semibold"
+            >
+              <i className="fas fa-plus mr-2" />
+              Connect Social Accounts
+            </Button>
+          </div>
+        </div>
+      ) : (
+        // Show Analytics for Connected Platforms
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          {connectedPlatforms.map((account: any) => {
+            const platform = account.platform.toLowerCase();
+            const config = platformConfig[platform as keyof typeof platformConfig];
+            const platformAnalytics = getPlatformAnalytics(platform);
             
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Followers</span>
-                <span className="text-xl font-bold text-white">{instagramData.followers !== null ? formatNumber(instagramData.followers) : '—'}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Avg. Engagement</span>
-                <span className="text-xl font-bold text-green-400">
-                  {instagramData.engagementRate !== null ? formatEngagement(instagramData.engagementRate) : '—'}
-                </span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Impressions</span>
-                <span className="text-xl font-bold text-white">{instagramData.impressions !== null ? formatNumber(instagramData.impressions) : '—'}</span>
-              </div>
-              
-              {/* Instagram Business API Insights Notice */}
-              {instagramData.impressions === 0 && instagramData.totalReach === 0 && (
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <div className="flex items-start space-x-2">
-                    <i className="fas fa-info-circle text-amber-400 mt-0.5"></i>
-                    <div className="text-xs text-amber-200">
-                      <strong>Insights Limited:</strong> Instagram Business API insights require specific permissions. 
-                      Connect through Facebook Business Manager for full reach and impression data.
+            if (!config || !platformAnalytics) return null;
+
+            return (
+              <div key={account.id} className="content-card holographic">
+                <div className="p-4 md:p-6">
+                  <div className="flex items-center justify-between mb-4 md:mb-6">
+                    <div className="flex items-center space-x-2 md:space-x-3">
+                      {config.icon}
+                      <h3 className="text-lg md:text-xl font-orbitron font-semibold">{config.name}</h3>
+                      {platformAnalytics.isLiveData && (
+                        <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">LIVE</span>
+                      )}
                     </div>
+                    <Button
+                      onClick={() => forceRefreshData.mutate()}
+                      disabled={isRefreshing || forceRefreshData.isPending}
+                      size="sm"
+                      variant="outline"
+                      className="border-electric-cyan/30 text-electric-cyan hover:bg-electric-cyan/10"
+                    >
+                      <RefreshCw className={`w-4 h-4 mr-2 ${(isRefreshing || forceRefreshData.isPending) ? 'animate-spin' : ''}`} />
+                      {(isRefreshing || forceRefreshData.isPending) ? 'Syncing...' : 'Refresh'}
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* Username Display */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-asteroid-silver">Account</span>
+                      <span className={`font-semibold ${config.color}`}>@{platformAnalytics.username}</span>
+                    </div>
+
+                    {/* Platform-specific metrics */}
+                    {platform === 'instagram' && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Followers</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.followers)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Posts</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.posts)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Reach</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.reach)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Likes</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.likes)}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {platform === 'youtube' && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Subscribers</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.followers)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Videos</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.posts)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Views</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.reach)}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {platform === 'twitter' && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Followers</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.followers)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Tweets</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.posts)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Reach</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.reach)}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {platform === 'facebook' && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Followers</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.followers)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Posts</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.posts)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Reach</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.reach)}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {platform === 'linkedin' && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Connections</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.followers)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Posts</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.posts)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-asteroid-silver">Impressions</span>
+                          <span className="text-xl font-bold text-white">{formatNumber(platformAnalytics.reach)}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-              )}
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Total Posts</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalPosts !== null ? formatNumber(instagramData.totalPosts) : '—'}</span>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Total Likes</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalLikes !== null ? formatNumber(instagramData.totalLikes) : '—'}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Reach</span>
-                <span className="text-xl font-bold text-white">{instagramData.totalReach !== null ? formatNumber(instagramData.totalReach) : '—'}</span>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-
-        {/* Twitter Analytics */}
-        <div className="content-card holographic">
-          <div className="p-4 md:p-6">
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div className="flex items-center space-x-2 md:space-x-3">
-                <i className="fab fa-x-twitter text-xl md:text-2xl text-white" />
-                <h3 className="text-lg md:text-xl font-orbitron font-semibold">Twitter Analytics</h3>
-              </div>
-              {/* No loading spinner for Twitter as no data is connected */}
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Followers</span>
-                <span className="text-xl font-bold text-white">0</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Avg. Engagement</span>
-                <span className="text-xl font-bold text-green-400">0%</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Impressions</span>
-                <span className="text-xl font-bold text-white">0</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-asteroid-silver">Reach (7d)</span>
-                <span className="text-xl font-bold text-white">0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Analytics Chart */}
       <AnalyticsChart />

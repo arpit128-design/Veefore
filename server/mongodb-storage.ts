@@ -992,6 +992,27 @@ export class MongoStorage implements IStorage {
       accounts.forEach((account, index) => {
         console.log(`[MONGODB DEBUG] Account ${index + 1}: @${account.username} (${account.platform}) - followers: ${account.followersCount}, media: ${account.mediaCount}`);
       });
+      
+      // Force refresh YouTube data from database to fix persistent caching issue
+      for (const account of accounts) {
+        if (account.platform === 'youtube') {
+          console.log(`[YOUTUBE CACHE FIX] Forcing YouTube data refresh for account: ${account.username}`);
+          try {
+            // Get fresh data directly from database
+            const freshYouTubeData = await SocialAccountModel.findById(account._id);
+            if (freshYouTubeData) {
+              console.log(`[YOUTUBE CACHE FIX] Fresh YouTube data - subscribers: ${freshYouTubeData.followersCount}, videos: ${freshYouTubeData.mediaCount}`);
+              // Update the account object with fresh data
+              account.followersCount = freshYouTubeData.followersCount || 0;
+              account.mediaCount = freshYouTubeData.mediaCount || 0;
+              account.subscriberCount = freshYouTubeData.subscriberCount || freshYouTubeData.followersCount || 0;
+              account.videoCount = freshYouTubeData.videoCount || freshYouTubeData.mediaCount || 0;
+            }
+          } catch (refreshError) {
+            console.error(`[YOUTUBE CACHE FIX] Error refreshing YouTube data:`, refreshError);
+          }
+        }
+      }
     } else {
       // Debug: check if any accounts exist at all
       const allAccounts = await SocialAccountModel.find({}).limit(5);

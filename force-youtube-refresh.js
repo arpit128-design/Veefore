@@ -3,8 +3,9 @@
  * Updates YouTube account with actual subscriber count (78) and clears cache
  */
 
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Define schema for social accounts
 const socialAccountSchema = new mongoose.Schema({

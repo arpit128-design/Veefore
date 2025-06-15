@@ -1095,17 +1095,33 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             
             console.log(`[YOUTUBE LIVE] ✓ Forcing current live data - subscribers: ${youtubeMetrics.subscribers}, videos: ${youtubeMetrics.videos}, views: ${youtubeMetrics.views}`);
             
-            // Optional: Try to get live data for comparison/validation
+            // PRIORITY: Use live API data over cached database values
             try {
               if (account.accessToken) {
-                console.log(`[YOUTUBE API] Attempting OAuth validation (non-blocking)`);
+                console.log(`[YOUTUBE API] Fetching live data from YouTube API`);
                 const liveData = await youtubeService.getAuthenticatedChannelStats(account.accessToken);
-                if (liveData && liveData.subscriberCount !== youtubeMetrics.subscribers) {
-                  console.log(`[YOUTUBE API] API vs DB mismatch: API=${liveData.subscriberCount}, DB=${youtubeMetrics.subscribers} - Using DB value`);
+                if (liveData) {
+                  // Update metrics with live API data
+                  youtubeMetrics.subscribers = liveData.subscriberCount;
+                  youtubeMetrics.videos = liveData.videoCount;
+                  youtubeMetrics.views = liveData.viewCount;
+                  console.log(`[YOUTUBE API] ✓ Using live API data: ${liveData.subscriberCount} subscribers, ${liveData.videoCount} videos, ${liveData.viewCount} views`);
+                  
+                  // Update database with fresh API data
+                  await storage.updateSocialAccount(account.id, {
+                    followers: liveData.subscriberCount,
+                    totalVideos: liveData.videoCount,
+                    totalViews: liveData.viewCount,
+                    lastSyncAt: new Date(),
+                    updatedAt: new Date()
+                  });
+                  console.log(`[YOUTUBE API] ✓ Database updated with live data`);
+                } else {
+                  console.log(`[YOUTUBE API] Live data unavailable, using database cache: ${youtubeMetrics.subscribers} subscribers`);
                 }
               }
             } catch (error) {
-              console.log(`[YOUTUBE API] OAuth validation failed (non-critical): ${error}`);
+              console.log(`[YOUTUBE API] Live data fetch failed, using database cache: ${error}`);
             }
             
             aggregatedMetrics.totalPosts += youtubeMetrics.videos;

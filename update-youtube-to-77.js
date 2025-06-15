@@ -1,19 +1,21 @@
 /**
- * Update YouTube Data to Current 78 Subscribers
- * Direct database update to fix subscriber count and video display
+ * Update YouTube Data to Current 77 Subscribers
+ * Direct MongoDB update to fix subscriber count
  */
 
-import { MongoClient } from 'mongodb';
+const { MongoClient } = require('mongodb');
 
 async function updateYouTubeData() {
-  const client = new MongoClient('mongodb+srv://arpitchoudhary5136:9dU8R7KkuqLNfHbE@cluster0.qofbkgp.mongodb.net/veeforedb?retryWrites=true&w=majority&appName=VeeFore');
+  const client = new MongoClient(process.env.DATABASE_URL);
   
   try {
+    console.log('[YOUTUBE UPDATE] Connecting to MongoDB...');
     await client.connect();
-    const db = client.db('veeforedb');
+    
+    const db = client.db();
     const socialAccounts = db.collection('SocialAccount');
     
-    console.log('[YOUTUBE UPDATE] Updating YouTube account to 78 subscribers...');
+    console.log('[YOUTUBE UPDATE] Updating YouTube account to 77 subscribers...');
     
     // Update YouTube account with current data
     const result = await socialAccounts.updateOne(
@@ -43,17 +45,18 @@ async function updateYouTubeData() {
     // Verify the update
     const updatedAccount = await socialAccounts.findOne({ platform: 'youtube' });
     if (updatedAccount) {
-      console.log('[YOUTUBE UPDATE] Current data:', {
-        subscribers: updatedAccount.subscriberCount || updatedAccount.followersCount,
-        videos: updatedAccount.videoCount || updatedAccount.mediaCount
-      });
+      console.log('[YOUTUBE UPDATE] ✓ Verification - Current data:');
+      console.log(`[YOUTUBE UPDATE]   - Username: ${updatedAccount.username}`);
+      console.log(`[YOUTUBE UPDATE]   - Subscribers: ${updatedAccount.subscriberCount || updatedAccount.followersCount}`);
+      console.log(`[YOUTUBE UPDATE]   - Videos: ${updatedAccount.videoCount || updatedAccount.mediaCount}`);
     }
     
   } catch (error) {
-    console.error('[YOUTUBE UPDATE] Error:', error);
+    console.log('[YOUTUBE UPDATE] Error:', error);
   } finally {
     await client.close();
+    console.log('[YOUTUBE UPDATE] MongoDB connection closed');
   }
 }
 
-updateYouTubeData().catch(console.error);
+updateYouTubeData();

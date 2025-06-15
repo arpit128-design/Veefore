@@ -1220,14 +1220,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
         topPlatform: responseData.topPlatform
       });
 
-      // Cache for next request
+      // Update multi-platform cache for future requests
       dashboardCache.updateCache(workspaceIdStr, responseData);
       
-      // Background sync for future requests
+      // Background sync for all connected platforms
       setImmediate(() => {
-        instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
-          .then(() => console.log('[DASHBOARD INSTANT] Background population completed'))
-          .catch((error) => console.log('[DASHBOARD INSTANT] Background population error:', error.message));
+        // Sync Instagram data if connected
+        if (aggregatedMetrics.platformData.instagram) {
+          instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
+            .then(() => console.log('[MULTI-PLATFORM] Instagram background sync completed'))
+            .catch((error) => console.log('[MULTI-PLATFORM] Instagram sync error:', error.message));
+        }
+        // Additional platform syncs can be added here for YouTube, X, etc.
       });
 
       res.json(responseData);

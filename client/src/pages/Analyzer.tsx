@@ -114,9 +114,16 @@ export default function Analyzer() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-        <h2 className="text-xl sm:text-2xl lg:text-4xl font-orbitron font-bold text-green-400">
-          Growth & Trend Analyzer
-        </h2>
+        <div>
+          <h2 className="text-xl sm:text-2xl lg:text-4xl font-orbitron font-bold text-green-400">
+            Growth & Trend Analyzer
+          </h2>
+          {rawAnalytics?.connectedPlatforms && rawAnalytics.connectedPlatforms.length > 0 && (
+            <p className="text-sm text-asteroid-silver mt-1">
+              Analyzing {rawAnalytics.connectedPlatforms.length} connected platform{rawAnalytics.connectedPlatforms.length > 1 ? 's' : ''}: {rawAnalytics.connectedPlatforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')}
+            </p>
+          )}
+        </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger className="w-full sm:w-32 glassmorphism text-sm">
@@ -275,7 +282,87 @@ export default function Analyzer() {
         color="text-pink-500"
       />
 
-      {/* YouTube Analytics - Second Section */}
+      {/* Multi-Platform Analytics - Connected Platforms */}
+      {rawAnalytics?.connectedPlatforms && rawAnalytics.connectedPlatforms.length > 0 && (
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-electric-cyan">
+              <Activity className="h-5 w-5" />
+              Connected Platforms ({rawAnalytics.connectedPlatforms.length})
+              <RefreshCw className="h-4 w-4 ml-auto cursor-pointer hover:text-electric-cyan/80" onClick={() => refetch()} />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {rawAnalytics.platformData?.instagram && (
+                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg border border-pink-500/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center">
+                      <i className="fab fa-instagram text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-pink-400">Instagram</div>
+                      <div className="text-xs text-asteroid-silver">@{rawAnalytics.platformData.instagram.username}</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="text-asteroid-silver">Posts</div>
+                      <div className="font-bold text-pink-400">{formatNumber(rawAnalytics.platformData.instagram.posts || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Followers</div>
+                      <div className="font-bold text-pink-400">{formatNumber(rawAnalytics.platformData.instagram.followers || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Reach</div>
+                      <div className="font-bold text-pink-400">{formatNumber(rawAnalytics.platformData.instagram.reach || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Likes</div>
+                      <div className="font-bold text-pink-400">{formatNumber(rawAnalytics.platformData.instagram.likes || 0)}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {rawAnalytics.platformData?.youtube && (
+                <div className="p-4 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-lg border border-red-500/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center">
+                      <Play className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-red-400">YouTube</div>
+                      <div className="text-xs text-asteroid-silver">@{rawAnalytics.platformData.youtube.username}</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="text-asteroid-silver">Videos</div>
+                      <div className="font-bold text-red-400">{formatNumber(rawAnalytics.platformData.youtube.videos || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Subscribers</div>
+                      <div className="font-bold text-red-400">{formatNumber(rawAnalytics.platformData.youtube.subscribers || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Views</div>
+                      <div className="font-bold text-red-400">{formatNumber(rawAnalytics.platformData.youtube.views || 0)}</div>
+                    </div>
+                    <div>
+                      <div className="text-asteroid-silver">Status</div>
+                      <div className="font-bold text-green-400">Connected</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Legacy YouTube Analytics Section */}
       <Card className="content-card holographic">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-500">
@@ -288,26 +375,26 @@ export default function Analyzer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-lg font-semibold text-asteroid-silver mb-1">Subscribers</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+              <div className="text-2xl font-bold text-red-500">{rawAnalytics?.totalSubscribers ? formatNumber(rawAnalytics.totalSubscribers) : '0'}</div>
+              <div className="text-xs text-asteroid-silver">{rawAnalytics?.platformData?.youtube ? 'Connected' : 'Connect YouTube to view data'}</div>
             </div>
             
             <div className="text-center">
               <div className="text-lg font-semibold text-asteroid-silver mb-1">Views</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+              <div className="text-2xl font-bold text-red-500">{rawAnalytics?.totalViews ? formatNumber(rawAnalytics.totalViews) : '0'}</div>
+              <div className="text-xs text-asteroid-silver">{rawAnalytics?.platformData?.youtube ? 'Connected' : 'Connect YouTube to view data'}</div>
             </div>
             
             <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Watch Time (hrs)</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Videos</div>
+              <div className="text-2xl font-bold text-red-500">{rawAnalytics?.platformData?.youtube?.videos ? formatNumber(rawAnalytics.platformData.youtube.videos) : '0'}</div>
+              <div className="text-xs text-asteroid-silver">{rawAnalytics?.platformData?.youtube ? 'Connected' : 'Connect YouTube to view data'}</div>
             </div>
             
             <div className="text-center">
-              <div className="text-lg font-semibold text-asteroid-silver mb-1">Engagement</div>
-              <div className="text-2xl font-bold text-red-500">0</div>
-              <div className="text-xs text-asteroid-silver">Connect YouTube to view data</div>
+              <div className="text-lg font-semibold text-asteroid-silver mb-1">Channel</div>
+              <div className="text-2xl font-bold text-red-500">{rawAnalytics?.platformData?.youtube?.username || 'N/A'}</div>
+              <div className="text-xs text-asteroid-silver">{rawAnalytics?.platformData?.youtube ? 'Connected' : 'Connect YouTube to view data'}</div>
             </div>
           </div>
           

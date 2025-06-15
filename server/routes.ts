@@ -950,23 +950,51 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       let accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
       
-      // Force real-time YouTube data for integrations page
-      accounts = accounts.map((account: any) => {
-        if (account.platform === 'youtube') {
-          console.log(`[SOCIAL ACCOUNTS API] ✓ Overriding YouTube data with real-time values`);
-          return {
-            ...account,
-            subscriberCount: 77, // Current real-time subscriber count
-            followers: 77,
-            videoCount: 0,
-            mediaCount: 0,
-            viewCount: 0,
-            isLiveData: true,
-            lastSyncAt: new Date()
-          };
+      // Fetch real-time YouTube data for integrations page
+      for (let i = 0; i < accounts.length; i++) {
+        if (accounts[i].platform === 'youtube') {
+          console.log(`[SOCIAL ACCOUNTS API] Processing YouTube account: ${accounts[i].username}`);
+          
+          // Use the latest live YouTube data by calling the channel API directly
+          try {
+            const axiosImport = await import('axios');
+            const axios = axiosImport.default;
+            
+            console.log(`[SOCIAL ACCOUNTS API] Making YouTube API call for live data...`);
+            const channelResponse = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
+              params: {
+                part: 'statistics,snippet',
+                forUsername: 'arpitchoudhary5136',
+                key: process.env.YOUTUBE_API_KEY
+              }
+            });
+
+            if (channelResponse.data.items && channelResponse.data.items.length > 0) {
+              const channel = channelResponse.data.items[0];
+              const liveSubscribers = parseInt(channel.statistics.subscriberCount || '0');
+              const liveVideos = parseInt(channel.statistics.videoCount || '0');
+              
+              console.log(`[SOCIAL ACCOUNTS API] ✓ Live YouTube API response: ${liveSubscribers} subscribers, ${liveVideos} videos`);
+              
+              accounts[i] = {
+                ...accounts[i],
+                subscriberCount: liveSubscribers,
+                followersCount: liveSubscribers,
+                videoCount: liveVideos,
+                mediaCount: liveVideos,
+                viewCount: parseInt(channel.statistics.viewCount || '0'),
+                isLiveData: true,
+                lastSyncAt: new Date()
+              };
+            } else {
+              console.log(`[SOCIAL ACCOUNTS API] No YouTube data found in API response`);
+            }
+          } catch (error: any) {
+            console.log(`[SOCIAL ACCOUNTS API] YouTube API Error: ${error.message}`);
+            console.log(`[SOCIAL ACCOUNTS API] Error details:`, error.response?.data || 'No response data');
+          }
         }
-        return account;
-      });
+      }
       
       res.json(accounts);
     } catch (error: any) {
@@ -1078,16 +1106,13 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             // Get live YouTube data via OAuth-authenticated channel
             console.log(`[YOUTUBE OAUTH] Fetching live data for authenticated channel: ${account.username}`);
             
-            // Force current real-time YouTube data (77 subscribers)
             let youtubeMetrics = {
-              videos: 0, // Current actual video count
-              subscribers: 77, // Current real-time subscriber count
-              views: 0,
+              videos: account.videoCount || account.mediaCount || 0,
+              subscribers: account.subscriberCount || account.followersCount || 0,
+              views: account.viewCount || 0,
               username: account.username,
-              isLiveData: true
+              isLiveData: false
             };
-            
-            console.log(`[YOUTUBE LIVE DATA] ✓ Displaying current real-time data - 77 subscribers`);
             
             // Try to get live data using the authenticated channel
             try {

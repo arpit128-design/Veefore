@@ -242,9 +242,12 @@ export default function Dashboard() {
   // Show loading message when data is null/empty
   const isDataLoading = analyticsLoading || !hasValidData;
 
-  // Get connected platforms from social accounts
-  const connectedPlatforms = socialAccounts || [];
+  // Get connected platforms from analytics data
+  const connectedPlatforms = rawData?.connectedPlatforms || [];
   const hasConnectedAccounts = connectedPlatforms.length > 0;
+  
+  console.log('[DASHBOARD DEBUG] Connected platforms:', connectedPlatforms);
+  console.log('[DASHBOARD DEBUG] Has connected accounts:', hasConnectedAccounts);
 
   // Create platform-specific analytics data mapping
   const getPlatformAnalytics = (platform: string) => {
@@ -394,15 +397,15 @@ export default function Dashboard() {
       ) : (
         // Show Analytics for Connected Platforms
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-          {connectedPlatforms.map((account: any) => {
-            const platform = account.platform.toLowerCase();
+          {connectedPlatforms.filter(Boolean).map((platformName: string) => {
+            const platform = platformName?.toLowerCase();
             const config = platformConfig[platform as keyof typeof platformConfig];
             const platformAnalytics = getPlatformAnalytics(platform);
             
-            if (!config || !platformAnalytics) return null;
+            if (!platform || !config || !platformAnalytics) return null;
 
             return (
-              <div key={account.id} className="content-card holographic">
+              <div key={platform} className="content-card holographic">
                 <div className="p-4 md:p-6">
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <div className="flex items-center space-x-2 md:space-x-3">

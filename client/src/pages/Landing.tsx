@@ -50,13 +50,20 @@ const scaleIn = {
 };
 
 // Animated Section Component
-function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+interface AnimatedSectionProps {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+}
+
+function AnimatedSection({ children, className = "", id }: AnimatedSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <motion.section
       ref={ref}
+      id={id}
       initial="initial"
       animate={isInView ? "animate" : "initial"}
       variants={fadeInUp}
@@ -70,7 +77,7 @@ function AnimatedSection({ children, className = "" }: { children: React.ReactNo
 // Hero Section
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Animated Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] bg-cover bg-center opacity-10"></div>
@@ -163,13 +170,33 @@ function HeroSection() {
             transition={{ delay: 1 }}
           >
             <p className="text-gray-400 mb-4">Trusted by 50,000+ creators worldwide</p>
-            <div className="flex justify-center space-x-8 opacity-60">
+            <div className="flex justify-center space-x-8 opacity-60 mb-8">
               <Instagram className="w-8 h-8" />
               <Youtube className="w-8 h-8" />
               <Twitter className="w-8 h-8" />
               <Linkedin className="w-8 h-8" />
               <Facebook className="w-8 h-8" />
             </div>
+            
+            {/* Scroll Indicator */}
+            <motion.div
+              className="flex flex-col items-center cursor-pointer"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              onClick={() => {
+                const nextSection = document.querySelector('#stats-section');
+                nextSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <p className="text-gray-400 text-sm mb-2">Scroll to explore</p>
+              <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
+                <motion.div
+                  className="w-1 h-2 bg-gray-400 rounded-full mt-2"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
@@ -186,7 +213,7 @@ function StatsSection() {
   ];
 
   return (
-    <AnimatedSection className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
+    <AnimatedSection id="stats-section" className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -664,7 +691,7 @@ function CTASection() {
 // Main Landing Page Component
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-slate-900 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-900 text-white">
       <HeroSection />
       <StatsSection />
       <FeaturesSection />

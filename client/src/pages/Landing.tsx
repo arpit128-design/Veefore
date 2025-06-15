@@ -187,10 +187,10 @@ function Navigation() {
             <button onClick={() => scrollToSection('solutions')} className="text-gray-300 hover:text-white transition-colors">Solutions</button>
             <button onClick={() => scrollToSection('pricing')} className="text-gray-300 hover:text-white transition-colors">Pricing</button>
             <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors">Reviews</button>
-            <Link href="/login">
+            <Link href="/auth">
               <Button variant="ghost" className="text-gray-300 hover:text-white">Sign In</Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/auth">
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                 Get Started
               </Button>
@@ -394,7 +394,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
         >
-          <Link href="/signup">
+          <Link href="/auth">
             <motion.div
               whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
               whileTap={{ scale: 0.95 }}
@@ -1463,7 +1463,7 @@ function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/signup">
+            <Link href="/auth">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 w-5 h-5" />

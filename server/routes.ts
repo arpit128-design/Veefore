@@ -950,28 +950,44 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       
       let accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
       
-      // Ensure live data consistency for all platforms (integrations page)
+      // Fetch live data for all platforms (integrations page)
       for (let i = 0; i < accounts.length; i++) {
-        if (accounts[i].platform === 'youtube') {
+        if (accounts[i].platform === 'youtube' && accounts[i].accessToken) {
           console.log(`[SOCIAL ACCOUNTS API] Processing YouTube account: ${accounts[i].username}`);
           
-          // Force current subscriber count to match live data
-          const liveSubscribers = 78; // Current actual count
-          const liveVideos = 0; // Current actual count
-          
-          console.log(`[SOCIAL ACCOUNTS API] ✓ Forcing live data: ${liveSubscribers} subscribers, ${liveVideos} videos`);
-          
-          // Override with current live values
-          accounts[i] = {
-            ...accounts[i],
-            subscriberCount: liveSubscribers,
-            followersCount: liveSubscribers,
-            followers: liveSubscribers,
-            videoCount: liveVideos,
-            mediaCount: liveVideos,
-            isLiveData: true,
-            lastSyncAt: new Date()
-          };
+          try {
+            // Fetch live data from YouTube API
+            const liveData = await youtubeService.getAuthenticatedChannelStats(accounts[i].accessToken);
+            if (liveData) {
+              console.log(`[SOCIAL ACCOUNTS API] ✓ Live API data: ${liveData.subscriberCount} subscribers, ${liveData.videoCount} videos, ${liveData.viewCount} views`);
+              
+              // Override with live API values
+              accounts[i] = {
+                ...accounts[i],
+                subscriberCount: liveData.subscriberCount,
+                followersCount: liveData.subscriberCount,
+                followers: liveData.subscriberCount,
+                videoCount: liveData.videoCount,
+                mediaCount: liveData.videoCount,
+                totalViews: liveData.viewCount,
+                isLiveData: true,
+                lastSyncAt: new Date()
+              };
+              
+              // Update database with fresh data
+              await storage.updateSocialAccount(accounts[i].id, {
+                followers: liveData.subscriberCount,
+                totalVideos: liveData.videoCount,
+                totalViews: liveData.viewCount,
+                lastSyncAt: new Date(),
+                updatedAt: new Date()
+              });
+            } else {
+              console.log(`[SOCIAL ACCOUNTS API] Live data unavailable for: ${accounts[i].username}`);
+            }
+          } catch (error) {
+            console.log(`[SOCIAL ACCOUNTS API] Error fetching live data for ${accounts[i].username}:`, error);
+          }
         }
       }
       

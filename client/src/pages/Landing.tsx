@@ -79,56 +79,7 @@ const scaleIn = {
   transition: { duration: 0.5, ease: "easeOut" }
 };
 
-// Animated Section Component with Enhanced Lazy Loading
-interface AnimatedSectionProps {
-  children: React.ReactNode;
-  className?: string;
-  id?: string;
-  delay?: number;
-}
-
-function AnimatedSection({ children, className = "", id, delay = 0 }: AnimatedSectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px", amount: 0.1 });
-
-  return (
-    <motion.section
-      ref={ref}
-      id={id}
-      className={className}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
-      animate={isInView ? { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1,
-        transition: {
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: delay,
-          staggerChildren: 0.1
-        }
-      } : { opacity: 0, y: 60, scale: 0.95 }}
-      variants={staggerContainer}
-    >
-      <motion.div
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.15,
-              delayChildren: 0.2
-            }
-          }
-        }}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-      >
-        {children}
-      </motion.div>
-    </motion.section>
-  );
-}
+// Removed AnimatedSection component to implement individual component animations
 
 // Loading Skeleton Component for Lazy Loading
 function LoadingSkeleton() {
@@ -627,8 +578,11 @@ function FeaturesSection() {
   );
 }
 
-// Stats Section
+// Stats Section with seamless blending
 function StatsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  
   const stats = [
     { number: "500%", label: "Average engagement increase using VeeFore AI automation", company: "Content Creators Network" },
     { number: "10M+", label: "Posts created and optimized through our AI-powered platform", company: "Global Analytics" },
@@ -637,7 +591,7 @@ function StatsSection() {
   ];
 
   return (
-    <AnimatedSection id="stats-section" className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
+    <section ref={ref} id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -673,12 +627,14 @@ function StatsSection() {
           ))}
         </motion.div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 
 // Solutions Section
 function SolutionsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const solutions = [
     {
       title: "For Content Creators",

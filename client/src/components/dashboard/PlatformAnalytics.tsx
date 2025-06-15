@@ -45,25 +45,33 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
     }
   });
 
-  // Map Instagram data directly from analytics response with Indian number formatting
+  // Map Instagram-specific data from platformData.instagram
   const getMetricValue = (key: string, fallback: string = '—') => {
     if (!analytics || isLoading) return fallback;
     
+    // Extract Instagram-specific data from platformData
+    const instagramData = analytics.platformData?.instagram;
+    if (!instagramData) return fallback;
+    
     switch (key) {
       case 'followers':
-        return formatNumber(analytics.followers || 0);
+        return formatNumber(instagramData.followers || 0);
       case 'engagement':
-        return formatEngagement(analytics.engagementRate || 0);
+        // Calculate Instagram-specific engagement rate
+        const igEngagement = instagramData.followers > 0 
+          ? ((instagramData.likes + instagramData.comments) / instagramData.followers * 100)
+          : 0;
+        return formatEngagement(igEngagement);
       case 'reach':
-        return formatNumber(analytics.totalReach || 0);
+        return formatNumber(instagramData.reach || 0);
       case 'impressions':
-        return formatNumber(analytics.impressions || 0);
+        return formatNumber(instagramData.reach || 0); // Using reach as impressions for Instagram
       case 'totalLikes':
-        return formatNumber(analytics.totalLikes || 0);
+        return formatNumber(instagramData.likes || 0);
       case 'totalComments':
-        return formatNumber(analytics.totalComments || 0);
+        return formatNumber(instagramData.comments || 0);
       case 'totalPosts':
-        return formatNumber(analytics.totalPosts || 0);
+        return formatNumber(instagramData.posts || 0);
       default:
         return fallback;
     }

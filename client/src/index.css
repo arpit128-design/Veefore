@@ -56,6 +56,55 @@
   50% { opacity: 1; transform: scale(1.2); }
 }
 
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Space theme text effect */
+.space-theme-text {
+  background: linear-gradient(45deg, #60a5fa, #a855f7, #f59e0b, #60a5fa);
+  background-size: 400% 400%;
+  animation: gradientShift 4s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* 3D Perspective and Transform Utilities */
 .perspective-1000 {
   perspective: 1000px;

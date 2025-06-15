@@ -46,7 +46,7 @@ export function StatsCard({ title, value, change, icon, gradient, isLoading, noD
     if (value === null) {
       return (
         <div className="flex items-center space-x-2 text-asteroid-silver">
-          <span className="text-sm">No social account connected</span>
+          <span className="text-sm">{noDataMessage ? "—" : "No social account connected"}</span>
         </div>
       );
     }

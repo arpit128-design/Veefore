@@ -309,7 +309,7 @@ function FeaturesSection() {
       icon: <BrainCircuit className="w-6 h-6" />,
       title: "AI-Powered Content Creation",
       description: "Generate high-quality posts, captions, and hashtags with our advanced AI that understands your brand voice and audience preferences.",
-      image: "/api/placeholder/600/400?text=AI+Content+Generator&bg=1e293b&color=60a5fa",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop&crop=center",
       features: [
         "Smart caption generation with brand voice matching",
         "Trending hashtag recommendations",
@@ -323,7 +323,7 @@ function FeaturesSection() {
       icon: <Calendar className="w-6 h-6" />,
       title: "Intelligent Scheduling & Automation",
       description: "Schedule posts across all platforms with AI-optimized timing, automated responses, and smart content distribution.",
-      image: "/api/placeholder/600/400?text=Smart+Scheduling&bg=1e293b&color=a855f7",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop&crop=center",
       features: [
         "AI-optimized posting times for maximum reach",
         "Cross-platform content adaptation",
@@ -337,7 +337,7 @@ function FeaturesSection() {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics & Insights",
       description: "Track performance across all platforms with comprehensive analytics, competitor analysis, and predictive insights.",
-      image: "/api/placeholder/600/400?text=Analytics+Dashboard&bg=1e293b&color=10b981",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&crop=center",
       features: [
         "Real-time performance tracking",
         "Competitor benchmark analysis",
@@ -351,7 +351,7 @@ function FeaturesSection() {
       icon: <MessageSquare className="w-6 h-6" />,
       title: "Unified Social Media Management",
       description: "Manage all your social accounts from one powerful dashboard with AI-assisted community management and engagement tools.",
-      image: "/api/placeholder/600/400?text=Social+Management&bg=1e293b&color=f97316",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop&crop=center",
       features: [
         "Unified inbox for all platforms",
         "AI-powered comment moderation",
@@ -745,7 +745,7 @@ function TestimonialsSection() {
       name: "Sarah Johnson",
       role: "Content Creator",
       company: "@sarahcreates",
-      avatar: "/api/placeholder/80/80?text=SJ&bg=ec4899&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face",
       content: "VeeFore has completely transformed my content strategy. The AI-generated captions are spot-on and save me hours every week. My engagement has increased by 300% since I started using it!",
       rating: 5,
       platform: "Instagram"
@@ -754,7 +754,7 @@ function TestimonialsSection() {
       name: "Mike Chen",
       role: "Marketing Director",
       company: "TechStart Inc.",
-      avatar: "/api/placeholder/80/80?text=MC&bg=3b82f6&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
       content: "Managing multiple client accounts was a nightmare before VeeFore. Now I can schedule weeks of content in minutes and the analytics help me prove ROI to every client. Game changer!",
       rating: 5,
       platform: "Multiple"
@@ -763,7 +763,7 @@ function TestimonialsSection() {
       name: "Emily Rodriguez",
       role: "Small Business Owner",
       company: "Bloom Bakery",
-      avatar: "/api/placeholder/80/80?text=ER&bg=10b981&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
       content: "As a small business owner, I don't have time for complex tools. VeeFore is incredibly intuitive and the automated posting keeps my social media active even when I'm busy baking.",
       rating: 5,
       platform: "Facebook"

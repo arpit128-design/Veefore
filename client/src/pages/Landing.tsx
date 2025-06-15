@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'wouter';
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { 
   ArrowRight, 
   Calendar, 
@@ -80,28 +79,68 @@ const scaleIn = {
   transition: { duration: 0.5, ease: "easeOut" }
 };
 
-// Animated Section Component
+// Animated Section Component with Enhanced Lazy Loading
 interface AnimatedSectionProps {
   children: React.ReactNode;
   className?: string;
   id?: string;
+  delay?: number;
 }
 
-function AnimatedSection({ children, className = "", id }: AnimatedSectionProps) {
+function AnimatedSection({ children, className = "", id, delay = 0 }: AnimatedSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px", amount: 0.1 });
 
   return (
     <motion.section
       ref={ref}
       id={id}
-      initial="initial"
-      animate={isInView ? "animate" : "initial"}
-      variants={fadeInUp}
       className={className}
+      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      animate={isInView ? { 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+        transition: {
+          duration: 0.8,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: delay,
+          staggerChildren: 0.1
+        }
+      } : { opacity: 0, y: 60, scale: 0.95 }}
+      variants={staggerContainer}
     >
-      {children}
+      <motion.div
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.15,
+              delayChildren: 0.2
+            }
+          }
+        }}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+      >
+        {children}
+      </motion.div>
     </motion.section>
+  );
+}
+
+// Loading Skeleton Component for Lazy Loading
+function LoadingSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-64 bg-slate-800/50 rounded-lg mb-4"></div>
+      <div className="space-y-3">
+        <div className="h-4 bg-slate-700/50 rounded w-3/4"></div>
+        <div className="h-4 bg-slate-700/50 rounded w-1/2"></div>
+        <div className="h-4 bg-slate-700/50 rounded w-5/6"></div>
+      </div>
+    </div>
   );
 }
 
@@ -163,6 +202,73 @@ function Navigation() {
   );
 }
 
+// Starfield Background Component
+function StarfieldBackground() {
+  const stars = Array.from({ length: 150 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 3 + 1,
+    animationDelay: Math.random() * 4,
+    twinkleSpeed: 2 + Math.random() * 3
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute bg-white rounded-full"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+          }}
+          animate={{
+            opacity: [0.1, 1, 0.1],
+            scale: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: star.twinkleSpeed,
+            repeat: Infinity,
+            delay: star.animationDelay,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+      
+      {/* Shooting stars */}
+      <motion.div 
+        className="absolute top-1/4 left-0 w-2 h-2 bg-gradient-to-r from-purple-400 to-transparent rounded-full"
+        animate={{
+          x: ['-100px', '100vw'],
+          opacity: [0, 1, 0]
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          delay: 2,
+          ease: "easeOut"
+        }}
+      />
+      <motion.div 
+        className="absolute top-3/4 right-0 w-2 h-2 bg-gradient-to-l from-violet-400 to-transparent rounded-full"
+        animate={{
+          x: ['100px', '-100vw'],
+          opacity: [0, 1, 0]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          delay: 5,
+          ease: "easeOut"
+        }}
+      />
+    </div>
+  );
+}
+
 // Hero Section
 function HeroSection() {
   const scrollToFeatures = () => {
@@ -173,41 +279,58 @@ function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated Background */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-black via-purple-950 to-violet-950">
+      {/* Starfield Background */}
+      <StarfieldBackground />
+      
+      {/* Animated Background Orbs */}
       <div className="absolute inset-0">
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"
-          animate={{ 
-            background: [
-              "linear-gradient(to right, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2))",
-              "linear-gradient(to right, rgba(147, 51, 234, 0.2), rgba(59, 130, 246, 0.2))",
-              "linear-gradient(to right, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2))"
-            ]
+          className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+            rotate: [0, 360],
+            x: [-20, 20, -20],
+            y: [-30, 30, -30]
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
         />
-        
-        {/* Floating Particles */}
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400/40 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.4, 1, 0.4],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        <motion.div 
+          className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.6, 0.3],
+            rotate: [360, 0],
+            x: [30, -30, 30],
+            y: [20, -20, 20]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.1, 0.3, 0.1],
+            x: [-40, 40, -40],
+            y: [-50, 50, -50]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
       </div>
 
       {/* Hero Content */}
@@ -1034,33 +1157,93 @@ function FAQSection() {
 // CTA Section
 function CTASection() {
   return (
-    <AnimatedSection className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <AnimatedSection className="relative py-24 overflow-hidden bg-gradient-to-br from-black via-purple-950 to-violet-950">
+      {/* Starfield Background */}
+      <StarfieldBackground />
+      
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0">
+        <motion.div 
+          className="absolute top-1/4 left-1/6 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+            rotate: [0, 180],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-violet-600/25 rounded-full blur-3xl"
+          animate={{
+            scale: [1.1, 1.3, 1.1],
+            opacity: [0.2, 0.4, 0.2],
+            rotate: [180, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div variants={fadeInUp} className="space-y-8">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
+          <motion.h2 
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white"
+            animate={{
+              textShadow: [
+                "0 0 20px rgba(147, 51, 234, 0.5)",
+                "0 0 40px rgba(139, 92, 246, 0.8)",
+                "0 0 20px rgba(147, 51, 234, 0.5)"
+              ]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
             Ready to Transform Your
             <br />
-            <span className="text-blue-100">Social Media Strategy?</span>
-          </h2>
+            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
+              Social Media Strategy?
+            </span>
+          </motion.h2>
           
-          <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed">
             Join thousands of creators and businesses who've already discovered the power of AI-driven social media management.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             <Link href="/signup">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-6 font-semibold">
-                Start Your Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </motion.div>
             </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6">
-              <Play className="mr-2 w-5 h-5" />
-              Watch Demo
-            </Button>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
+                <Play className="mr-2 w-5 h-5" />
+                Watch Demo
+              </Button>
+            </motion.div>
           </div>
 
-          <div className="pt-8 text-blue-100">
+          <div className="pt-8 text-purple-200">
             <p className="text-sm opacity-90">
               ✓ 14-day free trial &nbsp;&nbsp;•&nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Cancel anytime
             </p>
@@ -1185,19 +1368,49 @@ function ScrollToTopButton() {
   );
 }
 
-// Main Landing Page Component
+// Main Landing Page Component with Lazy Loading
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-slate-900 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
       <Navigation />
       <HeroSection />
-      <FeaturesSection />
-      <StatsSection />
-      <SolutionsSection />
-      <PricingSection />
-      <TestimonialsSection />
-      <IntegrationSection />
-      <FAQSection />
+      
+      {/* Core sections load immediately */}
+      <AnimatedSection delay={0.1}>
+        <FeaturesSection />
+      </AnimatedSection>
+      
+      {/* Heavy sections use Suspense for lazy loading */}
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.2}>
+          <StatsSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <AnimatedSection delay={0.3}>
+        <SolutionsSection />
+      </AnimatedSection>
+      
+      <AnimatedSection delay={0.4}>
+        <PricingSection />
+      </AnimatedSection>
+      
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.5}>
+          <TestimonialsSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.6}>
+          <IntegrationSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <AnimatedSection delay={0.7}>
+        <FAQSection />
+      </AnimatedSection>
+      
       <CTASection />
       <Footer />
       <ScrollToTopButton />

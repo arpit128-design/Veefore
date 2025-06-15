@@ -58,7 +58,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-// Animation variants
+// Animation variants for individual components
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
@@ -93,7 +93,7 @@ function LoadingSkeleton() {
   );
 }
 
-// Enhanced Navigation with better mobile support and animations
+// Navigation with individual animations
 function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -122,6 +122,7 @@ function Navigation() {
           <motion.div 
             className="flex items-center space-x-3"
             whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
           >
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <Rocket className="w-6 h-6 text-white" />
@@ -132,11 +133,14 @@ function Navigation() {
           </motion.div>
 
           <div className="hidden lg:flex items-center space-x-8">
-            {['Features', 'Solutions', 'Pricing', 'About'].map((item) => (
+            {['Features', 'Solutions', 'Pricing', 'About'].map((item, index) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
                 className="text-gray-300 hover:text-white transition-colors cursor-pointer"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -146,16 +150,28 @@ function Navigation() {
           </div>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <Link href="/dashboard">
-              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                Get Started Free
-              </Button>
-            </Link>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <Link href="/dashboard">
+                <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+                  Sign In
+                </Button>
+              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <Link href="/dashboard">
+                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                  Get Started Free
+                </Button>
+              </Link>
+            </motion.div>
           </div>
 
           <button
@@ -208,7 +224,7 @@ function Navigation() {
   );
 }
 
-// Enhanced Starfield Background
+// Starfield Background
 function StarfieldBackground() {
   const starsRef = useRef<HTMLDivElement>(null);
 
@@ -279,7 +295,7 @@ function HeroSection() {
   const isInView = useInView(ref, { once: true });
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/10 to-black">
+    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-800">
       <StarfieldBackground />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -291,7 +307,7 @@ function HeroSection() {
           >
             <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
               <Sparkles className="w-3 h-3 mr-1" />
-              AI-Powered Social Media Automation
+              AI-Powered Social Media Revolution
             </Badge>
           </motion.div>
 
@@ -301,9 +317,9 @@ function HeroSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.8, delay: 0.1 }}
           >
-            Transform Your
+            VeeFore: The Future of
             <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block">
-              Social Media Game
+              Social Media Automation
             </span>
           </motion.h1>
 
@@ -313,9 +329,7 @@ function HeroSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Harness the power of AI to automate content creation, schedule posts across platforms, 
-            and engage with your audience like never before. Join thousands of creators who've 
-            revolutionized their social media strategy.
+            Transform your social media presence with cutting-edge AI technology. From intelligent content creation to automated engagement, VeeFore empowers creators, businesses, and agencies to dominate the digital landscape.
           </motion.p>
 
           <motion.div
@@ -329,8 +343,8 @@ function HeroSection() {
                 size="lg" 
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-4 h-auto"
               >
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
+                Launch Your Journey
+                <Rocket className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Button 
@@ -391,21 +405,21 @@ function HeroSection() {
   );
 }
 
-// Features Section with individual component animations
+// Features Section with individual component animations and seamless blending
 function FeaturesSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
   const features = [
     {
-      title: "AI Content Generation",
-      description: "Create engaging posts, captions, and stories with our advanced AI that understands your brand voice and audience preferences.",
+      title: "AI-Powered Content Creation",
+      description: "Generate engaging posts, captions, and stories with advanced AI that understands your brand voice and audience preferences.",
       icon: <BrainCircuit className="w-8 h-8" />,
       color: "from-blue-500 to-cyan-600",
       image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Smart Scheduling",
+      title: "Smart Scheduling & Automation",
       description: "Optimize posting times with AI-driven analytics that determine when your audience is most active across all platforms.",
       icon: <Clock className="w-8 h-8" />,
       color: "from-purple-500 to-pink-600",
@@ -413,27 +427,27 @@ function FeaturesSection() {
     },
     {
       title: "Multi-Platform Management",
-      description: "Manage Instagram, YouTube, Twitter, LinkedIn, Facebook, and WhatsApp from one unified dashboard with seamless integration.",
+      description: "Manage Instagram, YouTube, Twitter, LinkedIn, Facebook, and WhatsApp from one unified, intuitive dashboard.",
       icon: <Globe className="w-8 h-8" />,
       color: "from-green-500 to-emerald-600",
       image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Advanced Analytics",
+      title: "Advanced Analytics & Insights",
       description: "Get deep insights into your content performance with comprehensive analytics, engagement tracking, and ROI measurement.",
       icon: <BarChart3 className="w-8 h-8" />,
       color: "from-orange-500 to-red-600",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Automated Engagement",
+      title: "Intelligent Auto-Engagement",
       description: "Respond to comments and messages automatically with AI-powered responses that maintain your brand personality.",
       icon: <MessageSquare className="w-8 h-8" />,
       color: "from-pink-500 to-rose-600",
       image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Content Templates",
+      title: "Professional Templates",
       description: "Access hundreds of professionally designed templates for posts, stories, and videos that match your brand aesthetic.",
       icon: <Palette className="w-8 h-8" />,
       color: "from-indigo-500 to-purple-600",
@@ -442,7 +456,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-black to-slate-900">
+    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div
@@ -452,7 +466,7 @@ function FeaturesSection() {
           >
             <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
               <Zap className="w-3 h-3 mr-1" />
-              Features
+              Powerful Features
             </Badge>
           </motion.div>
           <motion.h2 
@@ -472,7 +486,7 @@ function FeaturesSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Our comprehensive suite of AI-powered tools helps you create, schedule, and optimize your social media presence across all major platforms.
+            Our comprehensive suite of AI-powered tools helps you create, schedule, and optimize your social media presence like never before.
           </motion.p>
         </div>
 
@@ -480,32 +494,51 @@ function FeaturesSection() {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="group"
+              className="group relative"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-              whileHover={{ y: -5 }}
+              transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
-              <div className="relative h-full">
-                <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="relative mb-6">
-                      <img 
-                        src={feature.image} 
-                        alt={feature.title}
-                        className="w-full h-48 object-cover rounded-xl"
-                      />
-                      <div className="absolute top-4 right-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
-                          {feature.icon}
-                        </div>
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all duration-300 overflow-hidden">
+                <div className="relative">
+                  <motion.img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="w-full h-48 object-cover"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  <div className="absolute top-4 right-4">
+                    <motion.div 
+                      className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                    >
+                      {feature.icon}
+                    </motion.div>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <motion.h3 
+                    className="text-xl font-semibold text-white mb-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  >
+                    {feature.title}
+                  </motion.h3>
+                  <motion.p 
+                    className="text-gray-300 leading-relaxed"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                  >
+                    {feature.description}
+                  </motion.p>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -526,20 +559,20 @@ function FeaturesSection() {
   );
 }
 
-// Stats Section with seamless blending
+// Stats Section with seamless blending and individual animations
 function StatsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   
   const stats = [
-    { number: "500%", label: "Average engagement increase using VeeFore AI automation", company: "Content Creators Network" },
-    { number: "10M+", label: "Posts created and optimized through our AI-powered platform", company: "Global Analytics" },
-    { number: "90%", label: "Time saved on content creation and social media management", company: "Digital Marketing Institute" },
+    { number: "500%", label: "Average engagement increase using VeeFore's AI automation", company: "Content Creators Network" },
+    { number: "10M+", label: "Posts created and optimized through our platform", company: "Global Analytics" },
+    { number: "90%", label: "Time saved on content creation and management", company: "Digital Marketing Institute" },
     { number: "50K+", label: "Active creators and businesses trust VeeFore daily", company: "User Statistics" }
   ];
 
   return (
-    <section ref={ref} id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
+    <section ref={ref} id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div
@@ -547,7 +580,7 @@ function StatsSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6 }}
           >
-            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+            <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
               <TrendingUp className="w-3 h-3 mr-1" />
               Proven Results
             </Badge>
@@ -569,7 +602,7 @@ function StatsSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Join thousands of successful creators and businesses who have transformed their social media presence with VeeFore.
+            Join thousands of successful creators and businesses who have revolutionized their social media strategy with VeeFore.
           </motion.p>
         </div>
 
@@ -577,16 +610,38 @@ function StatsSection() {
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              className="text-center"
+              className="text-center group"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+              transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm group-hover:border-slate-600 transition-all duration-300">
                 <CardContent className="p-6">
-                  <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
-                  <div className="text-gray-300 mb-2">{stat.label}</div>
-                  <div className="text-sm text-gray-500">{stat.company}</div>
+                  <motion.div 
+                    className="text-4xl font-bold text-white mb-2"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                  >
+                    {stat.number}
+                  </motion.div>
+                  <motion.div 
+                    className="text-gray-300 mb-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                    transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  >
+                    {stat.label}
+                  </motion.div>
+                  <motion.div 
+                    className="text-sm text-gray-500"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                    transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                  >
+                    {stat.company}
+                  </motion.div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -597,37 +652,40 @@ function StatsSection() {
   );
 }
 
-// Solutions Section
+// Solutions Section with seamless blending
 function SolutionsSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const isInView = useInView(ref, { once: true });
   
   const solutions = [
     {
       title: "For Content Creators",
-      description: "Streamline your content creation workflow with AI-powered tools designed for individual creators.",
+      description: "Streamline your content creation workflow with AI-powered tools designed specifically for individual creators and influencers.",
       icon: <Camera className="w-8 h-8" />,
       features: ["AI Content Generation", "Automated Scheduling", "Performance Analytics", "Engagement Tracking"],
-      color: "from-pink-500 to-rose-600"
+      color: "from-pink-500 to-rose-600",
+      image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80"
     },
     {
       title: "For Small Businesses",
-      description: "Grow your business with professional social media management tools that scale with you.",
+      description: "Grow your business with professional social media management tools that scale with your success.",
       icon: <Building className="w-8 h-8" />,
       features: ["Multi-Platform Management", "Customer Engagement", "Brand Monitoring", "ROI Tracking"],
-      color: "from-blue-500 to-cyan-600"
+      color: "from-blue-500 to-cyan-600",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80"
     },
     {
       title: "For Agencies",
-      description: "Manage multiple client accounts efficiently with advanced collaboration and reporting features.",
+      description: "Manage multiple client accounts efficiently with advanced collaboration and white-label reporting features.",
       icon: <Briefcase className="w-8 h-8" />,
       features: ["Client Management", "Team Collaboration", "White-label Reports", "Bulk Operations"],
-      color: "from-green-500 to-emerald-600"
+      color: "from-green-500 to-emerald-600",
+      image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=800&q=80"
     }
   ];
 
   return (
-    <section ref={ref} id="solutions" className="py-24 bg-gradient-to-b from-slate-800 to-slate-900">
+    <section ref={ref} id="solutions" className="py-24 bg-gradient-to-b from-black to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div
@@ -665,482 +723,78 @@ function SolutionsSection() {
           {solutions.map((solution, index) => (
             <motion.div
               key={index}
+              className="group"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+              transition={{ duration: 0.6, delay: 0.1 + index * 0.15 }}
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
             >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all">
-                <CardContent className="p-6">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} flex items-center justify-center mb-6`}>
-                    {solution.icon}
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all duration-300 overflow-hidden">
+                <div className="relative">
+                  <motion.img 
+                    src={solution.image} 
+                    alt={solution.title}
+                    className="w-full h-48 object-cover"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  <div className="absolute top-4 left-4">
+                    <motion.div 
+                      className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} flex items-center justify-center shadow-lg`}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
+                      transition={{ duration: 0.6, delay: 0.2 + index * 0.15 }}
+                    >
+                      {solution.icon}
+                    </motion.div>
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">{solution.title}</h3>
-                  <p className="text-gray-300 mb-6">{solution.description}</p>
-                  <div className="space-y-3">
-                    {solution.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
-                    Learn More
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Pricing Section
-function PricingSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
-  const plans = [
-    {
-      name: "Starter",
-      price: "$9",
-      period: "/month",
-      description: "Perfect for individuals and small creators",
-      features: [
-        "3 Social Accounts",
-        "50 AI-Generated Posts/month",
-        "Basic Analytics",
-        "Email Support",
-        "Content Templates"
-      ],
-      popular: false,
-      color: "from-blue-500 to-cyan-600"
-    },
-    {
-      name: "Professional",
-      price: "$29",
-      period: "/month",
-      description: "Ideal for growing businesses and agencies",
-      features: [
-        "10 Social Accounts",
-        "500 AI-Generated Posts/month",
-        "Advanced Analytics",
-        "Priority Support",
-        "Custom Templates",
-        "Team Collaboration",
-        "Auto-Engagement"
-      ],
-      popular: true,
-      color: "from-purple-500 to-pink-600"
-    },
-    {
-      name: "Enterprise",
-      price: "$99",
-      period: "/month",
-      description: "For large teams and enterprise clients",
-      features: [
-        "Unlimited Accounts",
-        "Unlimited AI Posts",
-        "Custom Analytics",
-        "Dedicated Support",
-        "White-label Solution",
-        "API Access",
-        "Custom Integrations",
-        "Advanced Security"
-      ],
-      popular: false,
-      color: "from-green-500 to-emerald-600"
-    }
-  ];
-
-  return (
-    <section ref={ref} id="pricing" className="py-24 bg-gradient-to-b from-slate-900 to-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
-              <CreditCard className="w-3 h-3 mr-1" />
-              Pricing
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Simple,{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Transparent Pricing
-            </span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-gray-300 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Choose the perfect plan for your needs. All plans include a 14-day free trial with full access to features.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={index}
-              className="relative"
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0">
-                    <Star className="w-3 h-3 mr-1" />
-                    Most Popular
-                  </Badge>
                 </div>
-              )}
-              <Card className={`${plan.popular ? 'border-purple-500 bg-slate-800/80' : 'border-slate-700 bg-slate-800/50'} backdrop-blur-sm h-full transition-all hover:border-slate-600`}>
-                <CardContent className="p-8">
-                  <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                    <p className="text-gray-400 mb-4">{plan.description}</p>
-                    <div className="flex items-baseline justify-center">
-                      <span className="text-5xl font-bold text-white">{plan.price}</span>
-                      <span className="text-gray-400 ml-1">{plan.period}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Button 
-                    className={`w-full ${plan.popular 
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700' 
-                      : 'bg-slate-700 hover:bg-slate-600'
-                    }`}
+                <CardContent className="p-6">
+                  <motion.h3 
+                    className="text-2xl font-bold text-white mb-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, delay: 0.3 + index * 0.15 }}
                   >
-                    {plan.popular ? 'Start Free Trial' : 'Get Started'}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <p className="text-gray-400 mb-4">All plans include 14-day free trial • No credit card required</p>
-          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-            Compare All Features
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// Testimonials Section
-function TestimonialsSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Content Creator",
-      company: "@sarahjohnson",
-      content: "VeeFore has completely transformed how I manage my social media. The AI-generated content is incredibly engaging, and I've seen a 400% increase in my follower growth!",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?auto=format&fit=crop&w=150&h=150&q=80",
-      rating: 5
-    },
-    {
-      name: "Michael Chen",
-      role: "Marketing Director",
-      company: "TechStart Inc.",
-      content: "As a startup, we needed efficient social media management. VeeFore's automation features saved us 20+ hours per week while improving our engagement rates significantly.",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80",
-      rating: 5
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Social Media Manager",
-      company: "Creative Agency Co.",
-      content: "Managing multiple client accounts was a nightmare until we found VeeFore. The platform's intuitive interface and powerful automation make our job so much easier.",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&h=150&q=80",
-      rating: 5
-    }
-  ];
-
-  return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-black to-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-              <Star className="w-3 h-3 mr-1" />
-              Testimonials
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Loved by{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Thousands of Creators
-            </span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-gray-300 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            See what our users have to say about their experience with VeeFore's AI-powered social media automation.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-            >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    {solution.title}
+                  </motion.h3>
+                  <motion.p 
+                    className="text-gray-300 mb-6"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5, delay: 0.4 + index * 0.15 }}
+                  >
+                    {solution.description}
+                  </motion.p>
+                  <div className="space-y-3 mb-6">
+                    {solution.features.map((feature, featureIndex) => (
+                      <motion.div 
+                        key={featureIndex} 
+                        className="flex items-center"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                        transition={{ duration: 0.4, delay: 0.5 + index * 0.15 + featureIndex * 0.1 }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                        <span className="text-sm text-gray-300">{feature}</span>
+                      </motion.div>
                     ))}
                   </div>
-                  <p className="text-gray-300 mb-6 leading-relaxed">"{testimonial.content}"</p>
-                  <div className="flex items-center">
-                    <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
-                    <div>
-                      <div className="font-semibold text-white">{testimonial.name}</div>
-                      <div className="text-sm text-gray-400">{testimonial.role}</div>
-                      <div className="text-sm text-purple-400">{testimonial.company}</div>
-                    </div>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5, delay: 0.7 + index * 0.15 }}
+                  >
+                    <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity`}>
+                      Learn More
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </motion.div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-// Integration Section
-function IntegrationSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
-  const integrations = [
-    { name: "Instagram", icon: <Instagram className="w-8 h-8" />, color: "from-pink-500 to-rose-600" },
-    { name: "YouTube", icon: <Youtube className="w-8 h-8" />, color: "from-red-500 to-red-600" },
-    { name: "Twitter", icon: <Twitter className="w-8 h-8" />, color: "from-blue-400 to-blue-500" },
-    { name: "LinkedIn", icon: <Linkedin className="w-8 h-8" />, color: "from-blue-600 to-blue-700" },
-    { name: "Facebook", icon: <Facebook className="w-8 h-8" />, color: "from-blue-500 to-indigo-600" },
-    { name: "WhatsApp", icon: <MessageSquare className="w-8 h-8" />, color: "from-green-500 to-green-600" }
-  ];
-
-  return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
-              <Globe className="w-3 h-3 mr-1" />
-              Integrations
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Connect All Your{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Favorite Platforms
-            </span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-gray-300 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Seamlessly manage all major social media platforms from one unified dashboard with native integrations.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          {integrations.map((integration, index) => (
-            <motion.div
-              key={index}
-              className="text-center"
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.9 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${integration.color} flex items-center justify-center shadow-lg`}>
-                {integration.icon}
-              </div>
-              <h3 className="text-white font-semibold">{integration.name}</h3>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-            View All Integrations
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// FAQ Section
-function FAQSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
-  const faqs = [
-    {
-      question: "How does VeeFore's AI content generation work?",
-      answer: "Our AI analyzes your brand voice, audience preferences, and trending topics to create engaging, personalized content that resonates with your followers across all platforms."
-    },
-    {
-      question: "Can I manage multiple social media accounts?",
-      answer: "Yes! VeeFore supports managing multiple accounts across Instagram, YouTube, Twitter, LinkedIn, Facebook, and WhatsApp from a single dashboard."
-    },
-    {
-      question: "Is there a free trial available?",
-      answer: "Absolutely! We offer a 14-day free trial with full access to all features. No credit card required to get started."
-    },
-    {
-      question: "How accurate is the AI-generated content?",
-      answer: "Our AI is trained on millions of high-performing posts and maintains a 95% accuracy rate. You can always review and edit content before publishing."
-    },
-    {
-      question: "Do you offer customer support?",
-      answer: "Yes, we provide 24/7 customer support via email for all plans, with priority support for Professional and Enterprise subscribers."
-    }
-  ];
-
-  return (
-    <section ref={ref} className="py-24 bg-gradient-to-b from-slate-800 to-black">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
-              <Headphones className="w-3 h-3 mr-1" />
-              FAQ
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Questions
-            </span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-gray-300"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Got questions? We've got answers. Find everything you need to know about VeeFore.
-          </motion.p>
-        </div>
-
-        <div className="space-y-6">
-          {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-            >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-3">{faq.question}</h3>
-                  <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <p className="text-gray-400 mb-4">Still have questions? We're here to help!</p>
-          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-            Contact Support
-            <Mail className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
       </div>
     </section>
   );
@@ -1152,7 +806,7 @@ function CTASection() {
   const isInView = useInView(ref, { once: true });
 
   return (
-    <section ref={ref} className="py-24 bg-gradient-to-br from-black via-purple-900/20 to-slate-900 relative overflow-hidden">
+    <section ref={ref} className="py-24 bg-gradient-to-br from-slate-900 via-purple-900/20 to-black relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -1185,7 +839,7 @@ function CTASection() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Join thousands of successful creators and businesses who have revolutionized their social media presence with VeeFore's AI-powered automation.
+          Join thousands of successful creators and businesses who have revolutionized their social media presence with VeeFore's cutting-edge AI technology.
         </motion.p>
 
         <motion.div
@@ -1214,7 +868,7 @@ function CTASection() {
         </motion.div>
 
         <motion.p
-          className="text-gray-400 text-sm"
+          className="text-gray-400 text-sm mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -1223,7 +877,7 @@ function CTASection() {
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center mt-6"
+          className="flex flex-col sm:flex-row gap-4 justify-center"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -1264,7 +918,7 @@ function Footer() {
               </span>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              Transform your social media strategy with AI-powered automation. Create, schedule, and optimize content across all major platforms.
+              Transform your social media strategy with AI-powered automation. Create, schedule, and optimize content across all major platforms with VeeFore.
             </p>
             <div className="flex space-x-4">
               {[
@@ -1324,7 +978,7 @@ function Footer() {
   );
 }
 
-// Scroll to Top Button
+// Scroll to Top Button with enhanced animations
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -1379,10 +1033,6 @@ export default function Landing() {
         <FeaturesSection />
         <StatsSection />
         <SolutionsSection />
-        <PricingSection />
-        <TestimonialsSection />
-        <IntegrationSection />
-        <FAQSection />
         <CTASection />
         <Footer />
         <ScrollToTopButton />

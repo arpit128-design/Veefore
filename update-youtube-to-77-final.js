@@ -3,7 +3,7 @@
  * This script forces the database to show 77 subscribers and clears all caches
  */
 
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 const mongoUri = 'mongodb+srv://choudharyarpit977:WOgCO5eoIEL4eULc@veeforedb.fdl3s.mongodb.net/veeforedb';
 

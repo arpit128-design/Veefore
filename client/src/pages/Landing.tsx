@@ -279,7 +279,7 @@ function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-950/90 to-slate-900/70">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-950 to-slate-900">
       {/* Starfield Background */}
       <StarfieldBackground />
       
@@ -338,46 +338,26 @@ function HeroSection() {
 
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
             <Sparkles className="w-3 h-3 mr-1" />
             AI-Powered Social Media Management
           </Badge>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-        >
+        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
           Take Your Social Media to{' '}
           <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Mission Control
           </span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
-        >
+        <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
           Create, schedule, analyze, and optimize social media content. All powered by 
           advanced AI in one user-friendly command center.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-        >
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <Link href="/signup">
             <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
               Start Free Trial
@@ -388,22 +368,17 @@ function HeroSection() {
             <Play className="mr-2 w-5 h-5" />
             Watch Demo
           </Button>
-        </motion.div>
+        </div>
 
         {/* Platform Icons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex justify-center items-center space-x-6 mb-12"
-        >
+        <div className="flex justify-center items-center space-x-6 mb-12">
           <div className="text-gray-400 text-sm">Connect with:</div>
           <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors" />
           <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors" />
           <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors" />
           <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors" />
           <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors" />
-        </motion.div>
+        </div>
       </div>
 
       {/* Scroll Indicator */}
@@ -489,138 +464,78 @@ function FeaturesSection() {
     }
   ];
 
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
   return (
-    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-slate-900/70 to-slate-900">
+    <section id="features" className="py-24 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
-              <Zap className="w-3 h-3 mr-1" />
-              Powerful Features
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
+          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+            <Zap className="w-3 h-3 mr-1" />
+            Powerful Features
+          </Badge>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             Everything You Need to{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               Dominate Social Media
             </span>
-          </motion.h2>
-          <motion.p 
-            className="text-xl text-gray-300 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
-          </motion.p>
+          </p>
         </div>
 
         <div className="space-y-24">
-          {features.map((feature, index) => {
-            const featureRef = useRef(null);
-            const featureInView = useInView(featureRef, { once: true, margin: "-100px" });
-            
-            return (
-              <div
-                key={index}
-                ref={featureRef}
-                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
-              >
-                {/* Content */}
-                <div className="flex-1 space-y-6">
-                  <motion.div 
-                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    {feature.icon}
-                  </motion.div>
-                  <motion.h3 
-                    className="text-3xl font-bold text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    {feature.title}
-                  </motion.h3>
-                  <motion.p 
-                    className="text-lg text-gray-300 leading-relaxed"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                  >
-                    {feature.description}
-                  </motion.p>
-                  
-                  <motion.div 
-                    className="space-y-3"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                  >
-                    {feature.features.map((item, i) => (
-                      <motion.div 
-                        key={i} 
-                        className="flex items-center text-gray-300"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={featureInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                        transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
-                      >
-                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                        <span>{item}</span>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                  >
-                    <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
-                      Learn more
-                      <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </motion.div>
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
+            >
+              {/* Content */}
+              <div className="flex-1 space-y-6">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}>
+                  {feature.icon}
                 </div>
+                <h3 className="text-3xl font-bold text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  {feature.description}
+                </p>
+                
+                <div className="space-y-3">
+                  {feature.features.map((item, i) => (
+                    <div key={i} className="flex items-center text-gray-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div>
+                  <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
+                    Learn more
+                    <ChevronRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
 
-                {/* Media */}
-                <motion.div 
-                  className="flex-1"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
-                    <div className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700">
-                      <img 
-                        src={feature.image} 
-                        alt={feature.title}
-                        className="w-full h-64 object-cover rounded-xl"
-                      />
-                      <div className="absolute top-8 right-8">
-                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.color} animate-pulse`}></div>
-                      </div>
+              {/* Media */}
+              <div className="flex-1">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-64 object-cover rounded-xl"
+                    />
+                    <div className="absolute top-8 right-8">
+                      <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.color}`}></div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -637,12 +552,9 @@ function StatsSection() {
   ];
 
   return (
-    <AnimatedSection id="stats-section" className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
+    <section id="stats-section" className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp}
-        >
+        <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             Trusted by{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -652,16 +564,12 @@ function StatsSection() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Join thousands of successful creators and businesses who've transformed their social media strategy with VeeFore.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          variants={staggerContainer}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={scaleIn}
               className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-colors"
             >
               <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
@@ -669,11 +577,11 @@ function StatsSection() {
               </div>
               <div className="text-gray-300 mb-2 leading-relaxed">{stat.label}</div>
               <div className="text-sm text-gray-500">{stat.company}</div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
 

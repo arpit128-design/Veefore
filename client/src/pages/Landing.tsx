@@ -1330,7 +1330,7 @@ function Footer() {
   );
 }
 
-// Scroll to Top Button
+// Enhanced Scroll to Top Button with Space Theme
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -1356,14 +1356,28 @@ function ScrollToTopButton() {
 
   return (
     <motion.button
-      className={`fixed bottom-8 right-8 p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 ${
+      className={`fixed bottom-8 right-8 p-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 z-50 backdrop-blur-sm border border-purple-500/20 ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={scrollToTop}
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ 
+        scale: 1.15,
+        rotate: 360,
+        boxShadow: "0 0 30px rgba(147, 51, 234, 0.6)"
+      }}
       whileTap={{ scale: 0.9 }}
+      animate={{
+        boxShadow: [
+          "0 0 20px rgba(147, 51, 234, 0.3)",
+          "0 0 40px rgba(139, 92, 246, 0.5)",
+          "0 0 20px rgba(147, 51, 234, 0.3)"
+        ]
+      }}
+      transition={{
+        boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+      }}
     >
-      <ChevronUp className="w-5 h-5" />
+      <Rocket className="w-5 h-5" />
     </motion.button>
   );
 }

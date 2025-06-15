@@ -7823,15 +7823,30 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   });
 
   // Placeholder image endpoint for landing page
-  app.get('/api/placeholder/:width/:height', (req: Request, res: Response) => {
+  app.get('/api/placeholder/:width/:height', async (req: Request, res: Response) => {
     const { width, height } = req.params;
     const text = req.query.text || 'VeeFore';
     const bgColor = req.query.bg || '1e293b'; // slate-800
     const textColor = req.query.color || 'ffffff';
     
-    // Redirect to a reliable placeholder service
-    const placeholderUrl = `https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}?text=${encodeURIComponent(text.toString())}`;
-    res.redirect(placeholderUrl);
+    try {
+      // Generate SVG placeholder directly
+      const svg = `
+        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100%" height="100%" fill="#${bgColor}"/>
+          <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="16" fill="#${textColor}" text-anchor="middle" dominant-baseline="middle">
+            ${text}
+          </text>
+        </svg>
+      `;
+      
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.send(svg);
+    } catch (error) {
+      console.error('[PLACEHOLDER] Error generating image:', error);
+      res.status(500).json({ error: 'Failed to generate placeholder image' });
+    }
   });
 
   const httpServer = createServer(app);

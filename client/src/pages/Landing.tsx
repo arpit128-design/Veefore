@@ -772,7 +772,7 @@ function TestimonialsSection() {
       name: "David Park",
       role: "Social Media Manager",
       company: "Creative Agency",
-      avatar: "/api/placeholder/80/80?text=DP&bg=a855f7&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
       content: "The team collaboration features are fantastic. We can manage 50+ client accounts seamlessly. The white-label reports save us so much time and look incredibly professional.",
       rating: 5,
       platform: "Agency"
@@ -781,7 +781,7 @@ function TestimonialsSection() {
       name: "Lisa Thompson",
       role: "YouTuber",
       company: "@lisatech",
-      avatar: "/api/placeholder/80/80?text=LT&bg=ef4444&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face",
       content: "The cross-platform optimization is brilliant. I create content once and VeeFore adapts it perfectly for YouTube, Instagram, and Twitter. My reach has expanded dramatically.",
       rating: 5,
       platform: "YouTube"
@@ -790,7 +790,7 @@ function TestimonialsSection() {
       name: "Alex Kumar",
       role: "E-commerce Manager",
       company: "Fashion Forward",
-      avatar: "/api/placeholder/80/80?text=AK&bg=f97316&color=ffffff",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
       content: "VeeFore's AI understands our brand voice perfectly. The generated content feels authentic and drives real sales. Our social commerce revenue is up 250% this quarter.",
       rating: 5,
       platform: "E-commerce"

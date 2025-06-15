@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,9 @@ import {
   RefreshCw,
   Trash2,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  Radio,
+  Activity
 } from "lucide-react";
 import InstagramTokenManager from "@/components/InstagramTokenManager";
 
@@ -98,20 +100,61 @@ export default function Integrations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [liveDataStatus, setLiveDataStatus] = useState<Record<string, 'syncing' | 'live' | 'stale'>>({});
   const [manualConnectOpen, setManualConnectOpen] = useState(false);
   const [manualConnectPlatform, setManualConnectPlatform] = useState<string>('instagram');
   const [accessToken, setAccessToken] = useState("");
   const [username, setUsername] = useState("");
 
-  // Fetch connected social accounts
-  const { data: socialAccounts, isLoading } = useQuery({
+  // Fetch connected social accounts with auto-refresh
+  const { data: socialAccounts, isLoading, refetch } = useQuery({
     queryKey: ['social-accounts', currentWorkspace?.id],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/social-accounts?workspaceId=${currentWorkspace?.id}`);
       return response.json();
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id,
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    refetchIntervalInBackground: true,
   });
+
+  // Auto-refresh effect for live data updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLastRefresh(new Date());
+      if (socialAccounts?.length > 0) {
+        // Mark all accounts as syncing
+        const updatedStatus: Record<string, 'syncing' | 'live' | 'stale'> = {};
+        socialAccounts.forEach((account: SocialAccount) => {
+          updatedStatus[account.platform] = 'syncing';
+        });
+        setLiveDataStatus(updatedStatus);
+        
+        // Refresh data
+        refetch().then(() => {
+          // Mark as live after successful refresh
+          socialAccounts.forEach((account: SocialAccount) => {
+            updatedStatus[account.platform] = 'live';
+          });
+          setLiveDataStatus({...updatedStatus});
+        });
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [socialAccounts, refetch]);
+
+  // Initialize live status
+  useEffect(() => {
+    if (socialAccounts?.length > 0) {
+      const initialStatus: Record<string, 'syncing' | 'live' | 'stale'> = {};
+      socialAccounts.forEach((account: SocialAccount) => {
+        initialStatus[account.platform] = 'live';
+      });
+      setLiveDataStatus(initialStatus);
+    }
+  }, [socialAccounts]);
 
   // Connect social account mutation
   const connectMutation = useMutation({
@@ -448,13 +491,33 @@ export default function Integrations() {
                         <div className="flex items-center gap-2 mt-1">
                           {isExpired ? (
                             <Badge variant="destructive" className="text-xs">
+                              <AlertTriangle className="w-3 h-3 mr-1" />
                               Token Expired
                             </Badge>
                           ) : (
-                            <Badge variant="default" className="text-xs bg-green-500/20 text-green-400">
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Connected
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="default" className="text-xs bg-green-500/20 text-green-400">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Connected
+                              </Badge>
+                              {/* Live Data Status Indicator */}
+                              {liveDataStatus[platform] === 'syncing' ? (
+                                <Badge variant="outline" className="text-xs border-electric-cyan text-electric-cyan">
+                                  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                                  Syncing
+                                </Badge>
+                              ) : liveDataStatus[platform] === 'live' ? (
+                                <Badge variant="outline" className="text-xs border-green-400 text-green-400">
+                                  <Radio className="w-3 h-3 mr-1" />
+                                  Live
+                                </Badge>
+                              ) : liveDataStatus[platform] === 'stale' ? (
+                                <Badge variant="outline" className="text-xs border-amber-400 text-amber-400">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  Stale
+                                </Badge>
+                              ) : null}
+                            </div>
                           )}
                         </div>
                       )}
@@ -551,10 +614,25 @@ export default function Integrations() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-asteroid-silver">Last Sync:</span>
                         <span className="text-xs text-asteroid-silver">
-                          {new Date(connectedAccount.lastSync).toLocaleDateString()}
+                          {new Date(connectedAccount.lastSync).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          })}
                         </span>
                       </div>
                     )}
+                    
+                    {/* Live Data Timestamp */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-asteroid-silver">Auto-refresh:</span>
+                      <span className="text-xs text-electric-cyan">
+                        {lastRefresh.toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
                   </div>
                 )}
 

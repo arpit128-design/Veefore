@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'wouter';
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { 
   ArrowRight, 
   Calendar, 
@@ -44,6 +44,7 @@ import {
   UserCheck,
   Video,
   Wifi,
+  Zap as ZapIcon,
   Bot,
   BrainCircuit,
   Palette,
@@ -51,80 +52,13 @@ import {
   Activity,
   BookOpen,
   Briefcase,
-  ChevronUp,
-  Eye,
-  Heart,
-  ThumbsUp,
-  Share2,
-  Download,
-  Upload,
-  Filter,
-  Tag,
-  Layers,
-  Sliders,
-  MousePointer,
-  Cpu,
-  Network,
-  CloudLightning,
-  Gauge,
-  LineChart,
-  TrendingDown,
-  Repeat,
-  RefreshCw,
-  BarChart4,
-  PlusCircle,
-  MinusCircle,
-  Edit3,
-  Copy,
-  Save,
-  FolderOpen,
-  Archive,
-  Trash2,
-  MoreHorizontal,
-  Image,
-  Music,
-  Film,
-  Mic,
-  Speaker,
-  Volume2,
-  Radio,
-  Tv,
-  Gamepad2,
-  Laptop,
-  Tablet,
-  Watch,
-  Home,
-  MapPin,
-  Compass,
-  Map,
-  Route,
-  Car,
-  Plane,
-  Ship,
-  Train,
-  Bike,
-  ShoppingCart,
-  ShoppingBag,
-  Wallet,
-  Banknote,
-  Receipt,
-  Calculator,
-  Percent,
-  DollarSign,
-  Euro,
-  PoundSterling,
-  Bitcoin,
-  Coins,
-  User,
-  Crown,
-  X
+  ChevronUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-// Advanced animation variants
+// Animation variants
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
@@ -145,584 +79,437 @@ const scaleIn = {
   transition: { duration: 0.5, ease: "easeOut" }
 };
 
-const slideInLeft = {
-  initial: { opacity: 0, x: -100 },
-  animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.6, ease: "easeOut" }
-};
+// Animated Section Component with Enhanced Lazy Loading
+interface AnimatedSectionProps {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+  delay?: number;
+}
 
-const slideInRight = {
-  initial: { opacity: 0, x: 100 },
-  animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.6, ease: "easeOut" }
-};
+function AnimatedSection({ children, className = "", id, delay = 0 }: AnimatedSectionProps) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px", amount: 0.1 });
 
-// Loading Skeleton Component
+  return (
+    <motion.section
+      ref={ref}
+      id={id}
+      className={className}
+      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      animate={isInView ? { 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+        transition: {
+          duration: 0.8,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: delay,
+          staggerChildren: 0.1
+        }
+      } : { opacity: 0, y: 60, scale: 0.95 }}
+      variants={staggerContainer}
+    >
+      <motion.div
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.15,
+              delayChildren: 0.2
+            }
+          }
+        }}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+      >
+        {children}
+      </motion.div>
+    </motion.section>
+  );
+}
+
+// Loading Skeleton Component for Lazy Loading
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-black animate-pulse">
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto animate-spin"></div>
-          <div className="h-4 bg-slate-700 rounded w-32 mx-auto"></div>
-        </div>
+    <div className="animate-pulse">
+      <div className="h-64 bg-slate-800/50 rounded-lg mb-4"></div>
+      <div className="space-y-3">
+        <div className="h-4 bg-slate-700/50 rounded w-3/4"></div>
+        <div className="h-4 bg-slate-700/50 rounded w-1/2"></div>
+        <div className="h-4 bg-slate-700/50 rounded w-5/6"></div>
       </div>
     </div>
   );
 }
 
-// Advanced Navigation with scroll effects
-function NavigationBar() {
+// Navigation Component
+function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { scrollY } = useScroll();
-  const navOpacity = useTransform(scrollY, [0, 100], [0.95, 1]);
-  const navBlur = useTransform(scrollY, [0, 100], [10, 20]);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <motion.nav
+    <motion.nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-800' 
-          : 'bg-transparent'
+        isScrolled ? 'bg-slate-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
-      style={{ 
-        opacity: navOpacity,
-        backdropFilter: `blur(${navBlur}px)`
-      }}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          <motion.div 
-            className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <motion.div 
-              className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Rocket className="w-6 h-6 text-white" />
-            </motion.div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              VeeFore
-            </span>
-          </motion.div>
-
-          <div className="hidden lg:flex items-center space-x-8">
-            {[
-              { name: 'Features', href: '#features' },
-              { name: 'Solutions', href: '#solutions' },
-              { name: 'Pricing', href: '#pricing' },
-              { name: 'Enterprise', href: '#enterprise' },
-              { name: 'Resources', href: '#resources' }
-            ].map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                className="text-gray-300 hover:text-white transition-colors cursor-pointer relative group"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {item.name}
-                <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 group-hover:w-full transition-all duration-300"
-                  layoutId={`underline-${item.name}`}
-                />
-              </motion.a>
-            ))}
-          </div>
-
-          <div className="hidden lg:flex items-center space-x-4">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <Link href="/dashboard">
-                <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                  Sign In
-                </Button>
-              </Link>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                  Start Free Trial
-                  <Sparkles className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-
-          <motion.button
-            className="lg:hidden text-gray-300 hover:text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            whileTap={{ scale: 0.95 }}
-          >
-            <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-              <motion.div 
-                className="w-full h-0.5 bg-current"
-                animate={{ 
-                  rotate: isMobileMenuOpen ? 45 : 0,
-                  y: isMobileMenuOpen ? 6 : 0
-                }}
-                transition={{ duration: 0.3 }}
-              />
-              <motion.div 
-                className="w-full h-0.5 bg-current"
-                animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
-                transition={{ duration: 0.3 }}
-              />
-              <motion.div 
-                className="w-full h-0.5 bg-current"
-                animate={{ 
-                  rotate: isMobileMenuOpen ? -45 : 0,
-                  y: isMobileMenuOpen ? -6 : 0
-                }}
-                transition={{ duration: 0.3 }}
-              />
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Rocket className="w-5 h-5 text-white" />
             </div>
-          </motion.button>
+            <span className="text-xl font-bold text-white">VeeFore</span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8">
+            <button onClick={() => scrollToSection('features')} className="text-gray-300 hover:text-white transition-colors">Features</button>
+            <button onClick={() => scrollToSection('solutions')} className="text-gray-300 hover:text-white transition-colors">Solutions</button>
+            <button onClick={() => scrollToSection('pricing')} className="text-gray-300 hover:text-white transition-colors">Pricing</button>
+            <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors">Reviews</button>
+            <Link href="/login">
+              <Button variant="ghost" className="text-gray-300 hover:text-white">Sign In</Button>
+            </Link>
+            <Link href="/signup">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                Get Started
+              </Button>
+            </Link>
+          </div>
         </div>
-
-        {isMobileMenuOpen && (
-          <motion.div
-            className="lg:hidden border-t border-slate-800 mt-4 pt-4 pb-6"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex flex-col space-y-4">
-              {['Features', 'Solutions', 'Pricing', 'Enterprise', 'Resources'].map((item, index) => (
-                <motion.a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="text-gray-300 hover:text-white transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  {item}
-                </motion.a>
-              ))}
-              <div className="flex flex-col space-y-2 mt-4">
-                <Link href="/dashboard">
-                  <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/dashboard">
-                  <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                    Start Free Trial
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </motion.nav>
   );
 }
 
-// Enhanced Starfield Background with parallax
+// Starfield Background Component
 function StarfieldBackground() {
-  const starsRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 1000], [0, -200]);
-
-  useEffect(() => {
-    if (!starsRef.current) return;
-
-    const createStar = (layer: number) => {
-      const star = document.createElement('div');
-      star.className = 'absolute rounded-full bg-white';
-      
-      const size = Math.random() * (layer === 1 ? 4 : 2) + 1;
-      const x = Math.random() * 100;
-      const y = Math.random() * 100;
-      const duration = Math.random() * 4 + 2;
-      const opacity = layer === 1 ? Math.random() * 0.8 + 0.2 : Math.random() * 0.6 + 0.1;
-      
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      star.style.left = `${x}%`;
-      star.style.top = `${y}%`;
-      star.style.opacity = opacity.toString();
-      star.style.animation = `twinkle ${duration}s infinite alternate`;
-      star.style.zIndex = layer.toString();
-      
-      return star;
-    };
-
-    // Create multiple star layers for depth
-    for (let layer = 1; layer <= 3; layer++) {
-      for (let i = 0; i < 100; i++) {
-        starsRef.current.appendChild(createStar(layer));
-      }
-    }
-
-    // Enhanced shooting stars
-    const createShootingStar = () => {
-      const shootingStar = document.createElement('div');
-      shootingStar.className = 'absolute h-px bg-gradient-to-r from-transparent via-white to-transparent';
-      shootingStar.style.width = `${Math.random() * 150 + 100}px`;
-      shootingStar.style.left = '-200px';
-      shootingStar.style.top = `${Math.random() * 60}%`;
-      shootingStar.style.animation = 'shoot 3s linear forwards';
-      shootingStar.style.boxShadow = '0 0 6px rgba(255, 255, 255, 0.8)';
-      
-      starsRef.current?.appendChild(shootingStar);
-      
-      setTimeout(() => {
-        shootingStar.remove();
-      }, 3000);
-    };
-
-    const shootingInterval = setInterval(createShootingStar, 2000);
-
-    return () => {
-      clearInterval(shootingInterval);
-    };
-  }, []);
+  const stars = Array.from({ length: 150 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 3 + 1,
+    animationDelay: Math.random() * 4,
+    twinkleSpeed: 2 + Math.random() * 3
+  }));
 
   return (
-    <motion.div 
-      ref={starsRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{
-        y,
-        background: 'radial-gradient(ellipse at center, rgba(30, 41, 59, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%)'
-      }}
-    />
+    <div className="absolute inset-0 overflow-hidden">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute bg-white rounded-full"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+          }}
+          animate={{
+            opacity: [0.1, 1, 0.1],
+            scale: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: star.twinkleSpeed,
+            repeat: Infinity,
+            delay: star.animationDelay,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+      
+      {/* Shooting stars */}
+      <motion.div 
+        className="absolute top-1/4 left-0 w-2 h-2 bg-gradient-to-r from-purple-400 to-transparent rounded-full"
+        animate={{
+          x: ['-100px', '100vw'],
+          opacity: [0, 1, 0]
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          delay: 2,
+          ease: "easeOut"
+        }}
+      />
+      <motion.div 
+        className="absolute top-3/4 right-0 w-2 h-2 bg-gradient-to-l from-violet-400 to-transparent rounded-full"
+        animate={{
+          x: ['100px', '-100vw'],
+          opacity: [0, 1, 0]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          delay: 5,
+          ease: "easeOut"
+        }}
+      />
+    </div>
   );
 }
 
-// Advanced Hero Section with parallax and morphing effects
+// Hero Section with seamless blending
 function HeroSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const scrollToFeatures = () => {
+    const element = document.getElementById('features');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-800">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-950/90 to-slate-900/70">
+      {/* Starfield Background */}
       <StarfieldBackground />
       
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5"
-        style={{ opacity }}
-      />
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0">
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+            rotate: [0, 360],
+            x: [-20, 20, -20],
+            y: [-30, 30, -30]
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.6, 0.3],
+            rotate: [360, 0],
+            x: [30, -30, 30],
+            y: [20, -20, 20]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.1, 0.3, 0.1],
+            x: [-40, 40, -40],
+            y: [-50, 50, -50]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+      </div>
       
-      <motion.div 
-        className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20"
-        style={{ y }}
+      {/* Gradient overlay for seamless blending */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
+
+      {/* Hero Content */}
+      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-8"
+        >
+          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+            <Sparkles className="w-3 h-3 mr-1" />
+            AI-Powered Social Media Management
+          </Badge>
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+        >
+          Take Your Social Media to{' '}
+          <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Mission Control
+          </span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+        >
+          Create, schedule, analyze, and optimize social media content. All powered by 
+          advanced AI in one user-friendly command center.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+        >
+          <Link href="/signup">
+            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
+              Start Free Trial
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
+          <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
+            <Play className="mr-2 w-5 h-5" />
+            Watch Demo
+          </Button>
+        </motion.div>
+
+        {/* Platform Icons */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="flex justify-center items-center space-x-6 mb-12"
+        >
+          <div className="text-gray-400 text-sm">Connect with:</div>
+          <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors" />
+          <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors" />
+          <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors" />
+          <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors" />
+          <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors" />
+        </motion.div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1.2 }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+        onClick={scrollToFeatures}
       >
-        <div className="text-center">
+        <div className="flex flex-col items-center text-gray-400 hover:text-white transition-colors">
+          <span className="text-sm mb-2">Scroll to explore</span>
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30 text-lg px-6 py-2">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Revolutionizing Social Media Management
-            </Badge>
-          </motion.div>
-
-          <motion.h1
-            className="text-6xl sm:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight"
-            initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          >
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              The Future of
-            </motion.span>
-            <motion.span 
-              className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block"
-              initial={{ opacity: 0, backgroundPosition: "0% 50%" }}
-              animate={isInView ? { 
-                opacity: 1,
-                backgroundPosition: "100% 50%"
-              } : { opacity: 0 }}
-              transition={{ 
-                duration: 2, 
-                delay: 0.6,
-                backgroundPosition: { 
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  duration: 3
-                }
-              }}
-            >
-              AI-Powered Marketing
-            </motion.span>
-          </motion.h1>
-
-          <motion.p
-            className="text-2xl text-gray-300 max-w-4xl mx-auto mb-12 leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            Transform your social media presence with VeeFore's cutting-edge AI technology. 
-            From intelligent content creation to automated engagement across all platforms, 
-            we empower creators, businesses, and agencies to dominate the digital landscape.
-          </motion.p>
-
-          <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 1 }}
-          >
-            <Link href="/dashboard">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-xl px-12 py-6 h-auto relative overflow-hidden group"
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <span className="relative z-10 flex items-center">
-                    Start Your Journey
-                    <Rocket className="ml-3 w-6 h-6" />
-                  </span>
-                </Button>
-              </motion.div>
-            </Link>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-gray-600 text-gray-300 hover:bg-gray-800 text-xl px-12 py-6 h-auto group"
-              >
-                <Play className="mr-3 w-6 h-6 group-hover:animate-pulse" />
-                Watch Demo
-              </Button>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          >
-            {[
-              { icon: <Users className="w-10 h-10" />, number: "100K+", label: "Active Users", color: "from-blue-400 to-cyan-500" },
-              { icon: <Globe className="w-10 h-10" />, number: "15", label: "Platforms", color: "from-purple-400 to-pink-500" },
-              { icon: <Zap className="w-10 h-10" />, number: "50M+", label: "Posts Created", color: "from-green-400 to-emerald-500" },
-              { icon: <TrendingUp className="w-10 h-10" />, number: "800%", label: "Growth Rate", color: "from-yellow-400 to-orange-500" }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center group"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-                transition={{ duration: 0.6, delay: 1.4 + index * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-              >
-                <motion.div 
-                  className={`bg-gradient-to-r ${stat.color} w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300`}
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  {stat.icon}
-                </motion.div>
-                <motion.div 
-                  className="text-3xl font-bold text-white mb-2"
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                  transition={{ duration: 0.5, delay: 1.6 + index * 0.1 }}
-                >
-                  {stat.number}
-                </motion.div>
-                <motion.div 
-                  className="text-gray-400 text-sm font-medium"
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                  transition={{ duration: 0.5, delay: 1.7 + index * 0.1 }}
-                >
-                  {stat.label}
-                </motion.div>
-              </motion.div>
-            ))}
+            <ArrowDown className="w-6 h-6" />
           </motion.div>
         </div>
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.8, delay: 2 }}
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="cursor-pointer"
-          onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-        >
-          <ArrowDown className="w-8 h-8 text-gray-400 hover:text-white transition-colors" />
-        </motion.div>
       </motion.div>
     </section>
   );
 }
 
-// Advanced Features Section with interactive elements
+// Features Section with Media
 function FeaturesSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const [activeFeature, setActiveFeature] = useState(0);
-
   const features = [
     {
-      title: "AI-Powered Content Generation",
-      description: "Create engaging posts, captions, stories, and videos with our advanced AI that learns your brand voice, analyzes audience preferences, and generates content that drives engagement.",
-      icon: <BrainCircuit className="w-8 h-8" />,
-      color: "from-blue-500 to-cyan-600",
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80",
-      details: [
-        "GPT-4 powered content creation",
-        "Brand voice learning and adaptation",
-        "Multi-language content support",
-        "Visual content recommendations",
-        "A/B testing for optimal performance"
-      ]
+      icon: <BrainCircuit className="w-6 h-6" />,
+      title: "AI-Powered Content Creation",
+      description: "Generate high-quality posts, captions, and hashtags with our advanced AI that understands your brand voice and audience preferences.",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop&crop=center",
+      features: [
+        "Smart caption generation with brand voice matching",
+        "Trending hashtag recommendations",
+        "AI image and video creation",
+        "Content optimization for each platform",
+        "Real-time trend analysis integration"
+      ],
+      color: "from-blue-500 to-purple-600"
     },
     {
-      title: "Smart Scheduling & Automation",
-      description: "Optimize posting times with AI-driven analytics that determine peak engagement hours, automate your entire content calendar, and ensure consistent presence across all platforms.",
-      icon: <Clock className="w-8 h-8" />,
-      color: "from-purple-500 to-pink-600",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-      details: [
-        "Intelligent timing optimization",
-        "Automated cross-platform posting",
-        "Content queue management",
-        "Timezone-aware scheduling",
-        "Bulk upload and scheduling"
-      ]
+      icon: <Calendar className="w-6 h-6" />,
+      title: "Intelligent Scheduling & Automation",
+      description: "Schedule posts across all platforms with AI-optimized timing, automated responses, and smart content distribution.",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop&crop=center",
+      features: [
+        "AI-optimized posting times for maximum reach",
+        "Cross-platform content adaptation",
+        "Automated response generation",
+        "Bulk scheduling with smart queuing",
+        "Time zone optimization for global audiences"
+      ],
+      color: "from-purple-500 to-pink-600"
     },
     {
-      title: "Multi-Platform Management",
-      description: "Manage Instagram, YouTube, Twitter, LinkedIn, Facebook, TikTok, Pinterest, Snapchat, and more from one unified dashboard with native integrations and real-time synchronization.",
-      icon: <Globe className="w-8 h-8" />,
-      color: "from-green-500 to-emerald-600",
-      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&w=800&q=80",
-      details: [
-        "15+ platform integrations",
-        "Unified content management",
-        "Platform-specific optimization",
-        "Real-time synchronization",
-        "Cross-platform analytics"
-      ]
-    },
-    {
+      icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics & Insights",
-      description: "Get comprehensive insights into your content performance with detailed analytics, audience segmentation, competitor analysis, and actionable recommendations for growth.",
-      icon: <BarChart3 className="w-8 h-8" />,
-      color: "from-orange-500 to-red-600",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-      details: [
+      description: "Track performance across all platforms with comprehensive analytics, competitor analysis, and predictive insights.",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&crop=center",
+      features: [
         "Real-time performance tracking",
-        "Audience demographic analysis",
-        "Competitor benchmarking",
-        "ROI and conversion tracking",
-        "Custom reporting dashboards"
-      ]
+        "Competitor benchmark analysis",
+        "Predictive engagement forecasting",
+        "ROI calculation and reporting",
+        "Custom dashboard creation"
+      ],
+      color: "from-green-500 to-blue-600"
     },
     {
-      title: "Intelligent Auto-Engagement",
-      description: "Respond to comments, messages, and mentions automatically with AI-powered responses that maintain your brand personality and increase engagement rates.",
-      icon: <MessageSquare className="w-8 h-8" />,
-      color: "from-pink-500 to-rose-600",
-      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80",
-      details: [
-        "Contextual AI responses",
-        "Sentiment analysis",
-        "Auto-moderation tools",
-        "Response time optimization",
-        "Engagement rate improvement"
-      ]
-    },
-    {
-      title: "Professional Design Suite",
-      description: "Access thousands of professionally designed templates, AI-powered design suggestions, and advanced editing tools to create stunning visual content.",
-      icon: <Palette className="w-8 h-8" />,
-      color: "from-indigo-500 to-purple-600",
-      image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80",
-      details: [
-        "10,000+ design templates",
-        "AI-powered design suggestions",
-        "Advanced photo editing",
-        "Video editing capabilities",
-        "Brand consistency tools"
-      ]
+      icon: <MessageSquare className="w-6 h-6" />,
+      title: "Unified Social Media Management",
+      description: "Manage all your social accounts from one powerful dashboard with AI-assisted community management and engagement tools.",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop&crop=center",
+      features: [
+        "Unified inbox for all platforms",
+        "AI-powered comment moderation",
+        "Smart DM automation and routing",
+        "Team collaboration tools",
+        "Crisis management alerts"
+      ],
+      color: "from-orange-500 to-red-600"
     }
   ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
-    <section ref={ref} id="features" className="py-32 bg-gradient-to-b from-slate-800 to-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5" />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-20">
+    <section ref={ref} id="features" className="py-24 bg-gradient-to-b from-slate-900/70 to-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6 }}
           >
-            <Badge className="mb-6 bg-blue-500/20 text-blue-300 border-blue-500/30 text-lg px-6 py-2">
-              <Zap className="w-4 h-4 mr-2" />
+            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <Zap className="w-3 h-3 mr-1" />
               Powerful Features
             </Badge>
           </motion.div>
           <motion.h2 
-            className="text-5xl sm:text-6xl font-bold text-white mb-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             Everything You Need to{' '}
@@ -731,604 +518,900 @@ function FeaturesSection() {
             </span>
           </motion.h2>
           <motion.p 
-            className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Our comprehensive suite of AI-powered tools revolutionizes how you create, manage, and optimize your social media presence across all platforms.
+            From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
           </motion.p>
         </div>
 
-        {/* Interactive Feature Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
-          <motion.div
-            className="space-y-8"
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            {features.map((feature, index) => (
-              <motion.div
+        <div className="space-y-24">
+          {features.map((feature, index) => {
+            const featureRef = useRef(null);
+            const featureInView = useInView(featureRef, { once: true, margin: "-100px" });
+            
+            return (
+              <div
                 key={index}
-                className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 ${
-                  activeFeature === index 
-                    ? 'bg-slate-800/80 border-2 border-purple-500/50' 
-                    : 'bg-slate-800/40 border-2 border-transparent hover:border-slate-600'
-                }`}
-                onClick={() => setActiveFeature(index)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                ref={featureRef}
+                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
               >
-                <div className="flex items-start space-x-4">
+                {/* Content */}
+                <div className="flex-1 space-y-6">
                   <motion.div 
-                    className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}
-                    animate={{ 
-                      scale: activeFeature === index ? 1.1 : 1,
-                      rotate: activeFeature === index ? 360 : 0 
-                    }}
-                    transition={{ duration: 0.5 }}
+                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
                   >
                     {feature.icon}
                   </motion.div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                    {activeFeature === index && (
-                      <motion.div
-                        className="mt-4 space-y-2"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                      >
-                        {feature.details.map((detail, detailIndex) => (
-                          <motion.div
-                            key={detailIndex}
-                            className="flex items-center text-sm text-gray-400"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: detailIndex * 0.1 }}
-                          >
-                            <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
-                            {detail}
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
-            <motion.div
-              className="relative overflow-hidden rounded-3xl bg-slate-800/50 border border-slate-700"
-              key={activeFeature}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <img 
-                src={features[activeFeature].image} 
-                alt={features[activeFeature].title}
-                className="w-full h-96 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6">
-                <h4 className="text-2xl font-bold text-white mb-2">
-                  {features[activeFeature].title}
-                </h4>
-                <p className="text-gray-300">
-                  {features[activeFeature].description}
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="group relative"
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.95 }}
-              transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
-            >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm h-full hover:border-slate-600 transition-all duration-300 overflow-hidden group-hover:shadow-2xl">
-                <div className="relative">
-                  <motion.img 
-                    src={feature.image} 
-                    alt={feature.title}
-                    className="w-full h-56 object-cover"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
-                  />
-                  <div className="absolute top-4 right-4">
-                    <motion.div 
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center shadow-lg`}
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      {feature.icon}
-                    </motion.div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <CardContent className="p-8">
                   <motion.h3 
-                    className="text-2xl font-semibold text-white mb-4"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                    transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                    className="text-3xl font-bold text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
                   >
                     {feature.title}
                   </motion.h3>
                   <motion.p 
-                    className="text-gray-300 leading-relaxed mb-6"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                    transition={{ duration: 0.5, delay: 0.9 + index * 0.1 }}
+                    className="text-lg text-gray-300 leading-relaxed"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
                   >
                     {feature.description}
                   </motion.p>
+                  
+                  <motion.div 
+                    className="space-y-3"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    {feature.features.map((item, i) => (
+                      <motion.div 
+                        key={i} 
+                        className="flex items-center text-gray-300"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={featureInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                        transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                        <span>{item}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                  
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+                    animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
                   >
-                    <Button 
-                      variant="outline" 
-                      className="group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 group-hover:border-transparent transition-all duration-300"
-                    >
-                      Learn More
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
+                      Learn more
+                      <ChevronRight className="ml-2 w-4 h-4" />
                     </Button>
                   </motion.div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                </div>
 
-        <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6, delay: 1.5 }}
-        >
-          <Button 
-            size="lg" 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-10 py-4"
-          >
-            Explore All Features
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
-        </motion.div>
+                {/* Media */}
+                <motion.div 
+                  className="flex-1"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={featureInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                >
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
+                    <div className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className="w-full h-64 object-cover rounded-xl"
+                      />
+                      <div className="absolute top-8 right-8">
+                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.color} animate-pulse`}></div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
 }
 
-// Advanced Stats Section with animated counters
+// Stats Section
 function StatsSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const [counters, setCounters] = useState([0, 0, 0, 0, 0, 0]);
-  
   const stats = [
-    { 
-      number: 500, 
-      suffix: "%", 
-      label: "Average engagement increase using VeeFore's AI automation", 
-      company: "Content Creators Network",
-      icon: <TrendingUp className="w-8 h-8" />,
-      color: "from-green-400 to-emerald-500"
-    },
-    { 
-      number: 50, 
-      suffix: "M+", 
-      label: "Posts created and optimized through our AI platform", 
-      company: "Global Analytics",
-      icon: <BarChart3 className="w-8 h-8" />,
-      color: "from-blue-400 to-cyan-500"
-    },
-    { 
-      number: 90, 
-      suffix: "%", 
-      label: "Time saved on content creation and management", 
-      company: "Digital Marketing Institute",
-      icon: <Clock className="w-8 h-8" />,
-      color: "from-purple-400 to-pink-500"
-    },
-    { 
-      number: 100, 
-      suffix: "K+", 
-      label: "Active creators and businesses trust VeeFore daily", 
-      company: "User Statistics",
-      icon: <Users className="w-8 h-8" />,
-      color: "from-orange-400 to-red-500"
-    },
-    { 
-      number: 15, 
-      suffix: "+", 
-      label: "Social media platforms seamlessly integrated", 
-      company: "Platform Coverage",
-      icon: <Globe className="w-8 h-8" />,
-      color: "from-indigo-400 to-purple-500"
-    },
-    { 
-      number: 99, 
-      suffix: "%", 
-      label: "Uptime guarantee with enterprise-grade infrastructure", 
-      company: "Reliability Metrics",
-      icon: <Shield className="w-8 h-8" />,
-      color: "from-teal-400 to-cyan-500"
-    }
+    { number: "500%", label: "Average engagement increase using VeeFore AI automation", company: "Content Creators Network" },
+    { number: "10M+", label: "Posts created and optimized through our AI-powered platform", company: "Global Analytics" },
+    { number: "90%", label: "Time saved on content creation and social media management", company: "Digital Marketing Institute" },
+    { number: "50K+", label: "Active creators and businesses trust VeeFore daily", company: "User Statistics" }
   ];
 
-  useEffect(() => {
-    if (isInView) {
-      stats.forEach((stat, index) => {
-        let count = 0;
-        const increment = stat.number / 50;
-        const timer = setInterval(() => {
-          count += increment;
-          if (count >= stat.number) {
-            count = stat.number;
-            clearInterval(timer);
-          }
-          setCounters(prev => {
-            const newCounters = [...prev];
-            newCounters[index] = Math.floor(count);
-            return newCounters;
-          });
-        }, 50);
-      });
-    }
-  }, [isInView]);
-
   return (
-    <section ref={ref} id="stats-section" className="py-32 bg-gradient-to-b from-slate-900 to-black relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 to-blue-600/5" />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Badge className="mb-6 bg-green-500/20 text-green-300 border-green-500/30 text-lg px-6 py-2">
-              <Award className="w-4 h-4 mr-2" />
-              Proven Results
-            </Badge>
-          </motion.div>
-          <motion.h2 
-            className="text-5xl sm:text-6xl font-bold text-white mb-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Real Results from{' '}
+    <AnimatedSection id="stats-section" className="py-24 bg-gradient-to-r from-slate-900 to-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Trusted by{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Real Users
+              Creators Worldwide
             </span>
-          </motion.h2>
-          <motion.p 
-            className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Join hundreds of thousands of successful creators and businesses who have revolutionized their social media strategy with VeeFore's advanced AI technology.
-          </motion.p>
-        </div>
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Join thousands of successful creators and businesses who've transformed their social media strategy with VeeFore.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          variants={staggerContainer}
+        >
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              className="text-center group"
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.9 }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+              variants={scaleIn}
+              className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-colors"
             >
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm group-hover:border-slate-600 transition-all duration-300 p-8 h-full group-hover:shadow-2xl">
-                <CardContent className="p-0">
-                  <motion.div 
-                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg`}
-                    whileHover={{ rotate: 360, scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    {stat.icon}
-                  </motion.div>
-                  <motion.div 
-                    className="text-5xl font-bold text-white mb-4"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
-                  >
-                    <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                      {counters[index]}{stat.suffix}
-                    </span>
-                  </motion.div>
-                  <motion.div 
-                    className="text-lg text-gray-300 mb-4 leading-relaxed"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
-                  >
-                    {stat.label}
-                  </motion.div>
-                  <motion.div 
-                    className="text-sm text-gray-500 font-medium"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                  >
-                    {stat.company}
-                  </motion.div>
+              <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                {stat.number}
+              </div>
+              <div className="text-gray-300 mb-2 leading-relaxed">{stat.label}</div>
+              <div className="text-sm text-gray-500">{stat.company}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// Solutions Section
+function SolutionsSection() {
+  const solutions = [
+    {
+      title: "For Content Creators",
+      description: "Streamline your content creation workflow with AI-powered tools designed for individual creators.",
+      icon: <Camera className="w-8 h-8" />,
+      features: ["AI Content Generation", "Automated Scheduling", "Performance Analytics", "Engagement Tracking"],
+      color: "from-pink-500 to-rose-600"
+    },
+    {
+      title: "For Small Businesses",
+      description: "Grow your business with professional social media management tools that scale with you.",
+      icon: <Building className="w-8 h-8" />,
+      features: ["Multi-Platform Management", "Customer Engagement", "Brand Monitoring", "ROI Tracking"],
+      color: "from-blue-500 to-cyan-600"
+    },
+    {
+      title: "For Agencies",
+      description: "Manage multiple client accounts efficiently with advanced collaboration and reporting tools.",
+      icon: <Users className="w-8 h-8" />,
+      features: ["Client Management", "Team Collaboration", "White-Label Reports", "Bulk Operations"],
+      color: "from-purple-500 to-indigo-600"
+    },
+    {
+      title: "For Enterprises",
+      description: "Enterprise-grade social media management with advanced security and compliance features.",
+      icon: <Shield className="w-8 h-8" />,
+      features: ["Advanced Security", "Compliance Tools", "Custom Integrations", "Priority Support"],
+      color: "from-green-500 to-emerald-600"
+    }
+  ];
+
+  return (
+    <AnimatedSection id="solutions" className="py-24 bg-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30">
+            <Target className="w-3 h-3 mr-1" />
+            Solutions
+          </Badge>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Built for Every{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Use Case
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Whether you're a solo creator or managing enterprise accounts, VeeFore adapts to your unique needs and workflows.
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          variants={staggerContainer}
+        >
+          {solutions.map((solution, index) => (
+            <motion.div
+              key={index}
+              variants={scaleIn}
+              className="group relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
+                <CardHeader className="space-y-4">
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${solution.color} text-white`}>
+                    {solution.icon}
+                  </div>
+                  <CardTitle className="text-2xl text-white">{solution.title}</CardTitle>
+                  <CardDescription className="text-gray-300 text-base leading-relaxed">
+                    {solution.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    {solution.features.map((feature, i) => (
+                      <div key={i} className="flex items-center text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
+                    Learn More
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// Pricing Section
+function PricingSection() {
+  const plans = [
+    {
+      name: "Starter",
+      price: "$9",
+      period: "/month",
+      description: "Perfect for individual creators getting started",
+      features: [
+        "5 social accounts",
+        "100 AI-generated posts/month",
+        "Basic analytics",
+        "Email support",
+        "Mobile app access"
+      ],
+      popular: false,
+      color: "from-gray-500 to-gray-600"
+    },
+    {
+      name: "Professional",
+      price: "$29",
+      period: "/month",
+      description: "Ideal for growing businesses and serious creators",
+      features: [
+        "20 social accounts",
+        "500 AI-generated posts/month",
+        "Advanced analytics",
+        "Priority support",
+        "Team collaboration",
+        "Custom branding",
+        "Automation rules"
+      ],
+      popular: true,
+      color: "from-blue-500 to-purple-600"
+    },
+    {
+      name: "Enterprise",
+      price: "$99",
+      period: "/month",
+      description: "For agencies and large organizations",
+      features: [
+        "Unlimited social accounts",
+        "Unlimited AI content",
+        "White-label reports",
+        "Dedicated account manager",
+        "Custom integrations",
+        "Advanced security",
+        "SLA guarantee"
+      ],
+      popular: false,
+      color: "from-purple-500 to-pink-600"
+    }
+  ];
+
+  return (
+    <AnimatedSection id="pricing" className="py-24 bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <Badge className="mb-4 bg-green-500/20 text-green-300 border-green-500/30">
+            <CreditCard className="w-3 h-3 mr-1" />
+            Pricing
+          </Badge>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Simple,{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Transparent Pricing
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Choose the perfect plan for your needs. All plans include a 14-day free trial with full access to features.
+          </p>
+        </motion.div>
 
         <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          variants={staggerContainer}
         >
-          <p className="text-gray-400 mb-6 text-lg">
-            Ready to join these success stories?
-          </p>
-          <Button 
-            size="lg" 
-            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg px-10 py-4"
-          >
-            Start Your Success Story
-            <Rocket className="ml-2 w-5 h-5" />
+          {plans.map((plan, index) => (
+            <motion.div
+              key={index}
+              variants={scaleIn}
+              className={`relative ${plan.popular ? 'scale-105' : ''}`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 px-4 py-1">
+                    <Star className="w-3 h-3 mr-1" />
+                    Most Popular
+                  </Badge>
+                </div>
+              )}
+              
+              <div className={`absolute inset-0 bg-gradient-to-r ${plan.color} opacity-10 rounded-2xl blur-xl`}></div>
+              
+              <Card className={`relative bg-slate-800/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full ${
+                plan.popular ? 'border-blue-500/50' : ''
+              }`}>
+                <CardHeader className="text-center space-y-4">
+                  <CardTitle className="text-2xl text-white">{plan.name}</CardTitle>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-center">
+                      <span className="text-5xl font-bold text-white">{plan.price}</span>
+                      <span className="text-gray-400 ml-1">{plan.period}</span>
+                    </div>
+                    <CardDescription className="text-gray-300">{plan.description}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    {plan.features.map((feature, i) => (
+                      <div key={i} className="flex items-center text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button 
+                    className={`w-full ${
+                      plan.popular 
+                        ? `bg-gradient-to-r ${plan.color} hover:opacity-90` 
+                        : 'bg-slate-700 hover:bg-slate-600 text-white'
+                    } transition-all duration-300`}
+                  >
+                    {plan.popular ? 'Start Free Trial' : 'Get Started'}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+        
+        <motion.div
+          className="text-center mt-12"
+          variants={fadeInUp}
+        >
+          <p className="text-gray-400 mb-4">All plans include 14-day free trial • No credit card required • Cancel anytime</p>
+          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+            Compare All Features
+            <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }
 
-// CTA Section with advanced animations
-function CTASection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+// Testimonials Section
+function TestimonialsSection() {
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Content Creator",
+      company: "@sarahcreates",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face",
+      content: "VeeFore has completely transformed my content strategy. The AI-generated captions are spot-on and save me hours every week. My engagement has increased by 300% since I started using it!",
+      rating: 5,
+      platform: "Instagram"
+    },
+    {
+      name: "Mike Chen",
+      role: "Marketing Director",
+      company: "TechStart Inc.",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+      content: "Managing multiple client accounts was a nightmare before VeeFore. Now I can schedule weeks of content in minutes and the analytics help me prove ROI to every client. Game changer!",
+      rating: 5,
+      platform: "Multiple"
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Small Business Owner",
+      company: "Bloom Bakery",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
+      content: "As a small business owner, I don't have time for complex tools. VeeFore is incredibly intuitive and the automated posting keeps my social media active even when I'm busy baking.",
+      rating: 5,
+      platform: "Facebook"
+    },
+    {
+      name: "David Park",
+      role: "Social Media Manager",
+      company: "Creative Agency",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
+      content: "The team collaboration features are fantastic. We can manage 50+ client accounts seamlessly. The white-label reports save us so much time and look incredibly professional.",
+      rating: 5,
+      platform: "Agency"
+    },
+    {
+      name: "Lisa Thompson",
+      role: "YouTuber",
+      company: "@lisatech",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face",
+      content: "The cross-platform optimization is brilliant. I create content once and VeeFore adapts it perfectly for YouTube, Instagram, and Twitter. My reach has expanded dramatically.",
+      rating: 5,
+      platform: "YouTube"
+    },
+    {
+      name: "Alex Kumar",
+      role: "E-commerce Manager",
+      company: "Fashion Forward",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
+      content: "VeeFore's AI understands our brand voice perfectly. The generated content feels authentic and drives real sales. Our social commerce revenue is up 250% this quarter.",
+      rating: 5,
+      platform: "E-commerce"
+    }
+  ];
 
   return (
-    <section ref={ref} className="py-32 bg-gradient-to-br from-black via-purple-900/20 to-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10" />
-      <motion.div
-        className="absolute inset-0 opacity-30"
-        animate={{
-          background: [
-            "radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
-            "radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%)",
-            "radial-gradient(circle at 40% 80%, rgba(119, 198, 255, 0.3) 0%, transparent 50%)"
-          ]
-        }}
-        transition={{ duration: 8, repeat: Infinity, repeatType: "reverse" }}
-      />
-      
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <AnimatedSection id="testimonials" className="py-24 bg-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+          variants={fadeInUp}
         >
-          <Badge className="mb-8 bg-purple-500/20 text-purple-300 border-purple-500/30 text-lg px-6 py-3">
-            <Rocket className="w-5 h-5 mr-2" />
-            Ready to Transform Your Business?
+          <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+            <Star className="w-3 h-3 mr-1" />
+            Testimonials
           </Badge>
-        </motion.div>
-
-        <motion.h2
-          className="text-5xl sm:text-7xl font-bold text-white mb-8 leading-tight"
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          Start Your
-          <motion.span 
-            className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block"
-            animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            Success Story Today
-          </motion.span>
-        </motion.h2>
-
-        <motion.p
-          className="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          Join over 100,000 creators and businesses who have revolutionized their social media presence with VeeFore's cutting-edge AI technology.
-        </motion.p>
-
-        <motion.div
-          className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <Link href="/dashboard">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-xl px-12 py-6 h-auto relative overflow-hidden group"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.6 }}
-                />
-                <span className="relative z-10 flex items-center">
-                  Start Free Trial
-                  <ArrowRight className="ml-3 w-6 h-6" />
-                </span>
-              </Button>
-            </motion.div>
-          </Link>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-gray-600 text-gray-300 hover:bg-gray-800 text-xl px-12 py-6 h-auto group"
-            >
-              <Calendar className="mr-3 w-6 h-6 group-hover:animate-pulse" />
-              Schedule Demo
-            </Button>
-          </motion.div>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Loved by{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Creators Everywhere
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Don't just take our word for it. Here's what real users say about their experience with VeeFore.
+          </p>
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={staggerContainer}
         >
-          {[
-            { icon: <Shield className="w-8 h-8" />, title: "14-Day Free Trial", desc: "Full access, no credit card required" },
-            { icon: <Headphones className="w-8 h-8" />, title: "24/7 Support", desc: "Expert help whenever you need it" },
-            { icon: <Zap className="w-8 h-8" />, title: "Setup in Minutes", desc: "Start seeing results immediately" }
-          ].map((benefit, index) => (
+          {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
-              className="text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.6, delay: 1 + index * 0.1 }}
+              variants={scaleIn}
+              className="group"
             >
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                {benefit.icon}
+              <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full group-hover:transform group-hover:scale-105">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center space-x-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-300 leading-relaxed">"{testimonial.content}"</p>
+                  <div className="flex items-center space-x-3 pt-4 border-t border-slate-700">
+                    <img 
+                      src={testimonial.avatar} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm text-gray-400">{testimonial.role}</div>
+                      <div className="text-sm text-gray-500">{testimonial.company}</div>
+                    </div>
+                    <div className="ml-auto">
+                      <Badge variant="outline" className="border-slate-600 text-slate-400 text-xs">
+                        {testimonial.platform}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// Integration Section
+function IntegrationSection() {
+  const integrations = [
+    { name: "Instagram", icon: <Instagram className="w-8 h-8" />, color: "text-pink-500" },
+    { name: "YouTube", icon: <Youtube className="w-8 h-8" />, color: "text-red-500" },
+    { name: "Twitter", icon: <Twitter className="w-8 h-8" />, color: "text-blue-400" },
+    { name: "LinkedIn", icon: <Linkedin className="w-8 h-8" />, color: "text-blue-600" },
+    { name: "Facebook", icon: <Facebook className="w-8 h-8" />, color: "text-blue-500" },
+    { name: "TikTok", icon: <Video className="w-8 h-8" />, color: "text-black" },
+    { name: "Pinterest", icon: <Camera className="w-8 h-8" />, color: "text-red-600" },
+    { name: "Snapchat", icon: <Zap className="w-8 h-8" />, color: "text-yellow-400" }
+  ];
+
+  return (
+    <AnimatedSection className="py-24 bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <Badge className="mb-4 bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
+            <Wifi className="w-3 h-3 mr-1" />
+            Integrations
+          </Badge>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Connect with{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              All Your Platforms
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Seamlessly integrate with all major social media platforms and manage everything from one unified dashboard.
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6"
+          variants={staggerContainer}
+        >
+          {integrations.map((integration, index) => (
+            <motion.div
+              key={index}
+              variants={scaleIn}
+              className="flex flex-col items-center space-y-3 p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-all duration-300 group hover:transform hover:scale-105"
+            >
+              <div className={`${integration.color} group-hover:scale-110 transition-transform duration-300`}>
+                {integration.icon}
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">{benefit.title}</h4>
-              <p className="text-gray-400">{benefit.desc}</p>
+              <span className="text-sm text-gray-300 font-medium">{integration.name}</span>
             </motion.div>
           ))}
         </motion.div>
 
-        <motion.p
-          className="text-gray-400 text-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.8, delay: 1.4 }}
+        <motion.div
+          className="text-center mt-12"
+          variants={fadeInUp}
         >
-          Trusted by industry leaders • SOC 2 compliant • 99.9% uptime guarantee
-        </motion.p>
+          <p className="text-gray-400 mb-6">Don't see your platform? We're constantly adding new integrations.</p>
+          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+            Request Integration
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </motion.div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// FAQ Section
+function FAQSection() {
+  const faqs = [
+    {
+      question: "How does VeeFore's AI content generation work?",
+      answer: "Our AI analyzes your brand voice, audience preferences, and current trends to generate highly relevant content. It learns from your past posts and engagement patterns to create content that resonates with your specific audience while maintaining your unique brand personality."
+    },
+    {
+      question: "Can I try VeeFore before committing to a paid plan?",
+      answer: "Absolutely! We offer a 14-day free trial with full access to all features. No credit card required. You can explore all the capabilities and see how VeeFore transforms your social media workflow before making any commitment."
+    },
+    {
+      question: "Which social media platforms does VeeFore support?",
+      answer: "VeeFore integrates with all major social media platforms including Instagram, YouTube, Twitter, LinkedIn, Facebook, TikTok, Pinterest, and Snapchat. We're continuously adding support for new platforms based on user demand."
+    },
+    {
+      question: "Is my data secure with VeeFore?",
+      answer: "Security is our top priority. We use enterprise-grade encryption, secure data centers, and comply with all major privacy regulations including GDPR and CCPA. Your data is never shared with third parties and you maintain full control over your content."
+    },
+    {
+      question: "Can I cancel my subscription anytime?",
+      answer: "Yes, you can cancel your subscription at any time with no cancellation fees. If you cancel, you'll continue to have access to your paid features until the end of your current billing period."
+    },
+    {
+      question: "Do you offer support for teams and agencies?",
+      answer: "Yes! Our Professional and Enterprise plans include team collaboration features, role-based permissions, client management tools, and white-label reporting. Perfect for agencies managing multiple client accounts."
+    }
+  ];
+
+  return (
+    <AnimatedSection className="py-24 bg-slate-800">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <Badge className="mb-4 bg-orange-500/20 text-orange-300 border-orange-500/30">
+            <Headphones className="w-3 h-3 mr-1" />
+            FAQ
+          </Badge>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Frequently Asked{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Questions
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300">
+            Got questions? We've got answers. Here are some of the most common questions about VeeFore.
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="space-y-6"
+          variants={staggerContainer}
+        >
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="group"
+            >
+              <Card className="bg-slate-900/80 border-slate-700 hover:border-slate-600 transition-colors">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
+                      <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="text-center mt-12"
+          variants={fadeInUp}
+        >
+          <p className="text-gray-400 mb-6">Still have questions? We're here to help!</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+              <Mail className="mr-2 w-4 h-4" />
+              Contact Support
+            </Button>
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+              <BookOpen className="mr-2 w-4 h-4" />
+              View Documentation
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
+// CTA Section with seamless blending
+function CTASection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  return (
+    <section ref={ref} className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
+      {/* Gradient overlay for seamless blending */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none"></div>
+      
+      {/* Starfield Background */}
+      <StarfieldBackground />
+      
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0">
+        <motion.div 
+          className="absolute top-1/4 left-1/6 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+            rotate: [0, 180],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-violet-600/25 rounded-full blur-3xl"
+          animate={{
+            scale: [1.1, 1.3, 1.1],
+            opacity: [0.2, 0.4, 0.2],
+            rotate: [180, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="space-y-8">
+          <motion.h2 
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { 
+              opacity: 1, 
+              y: 0,
+              textShadow: [
+                "0 0 20px rgba(147, 51, 234, 0.5)",
+                "0 0 40px rgba(139, 92, 246, 0.8)",
+                "0 0 20px rgba(147, 51, 234, 0.5)"
+              ]
+            } : { opacity: 0, y: 30 }}
+            transition={{
+              opacity: { duration: 0.6 },
+              y: { duration: 0.6 },
+              textShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            }}
+          >
+            Ready to Transform Your
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
+              Social Media Strategy?
+            </span>
+          </motion.h2>
+          
+          <motion.p 
+            className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Join thousands of creators and businesses who've already discovered the power of AI-driven social media management.
+          </motion.p>
+
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Link href="/signup">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </motion.div>
+            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
+                <Play className="mr-2 w-5 h-5" />
+                Watch Demo
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          <motion.div 
+            className="pt-8 text-purple-200"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            <p className="text-sm opacity-90">
+              ✓ 14-day free trial &nbsp;&nbsp;•&nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Cancel anytime
+            </p>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
 }
 
-// Enhanced Footer
+// Footer
 function Footer() {
+  const footerSections = [
+    {
+      title: "Product",
+      links: ["Features", "Pricing", "Integrations", "API", "Security"]
+    },
+    {
+      title: "Solutions",
+      links: ["Creators", "Small Business", "Agencies", "Enterprise", "E-commerce"]
+    },
+    {
+      title: "Resources",
+      links: ["Blog", "Help Center", "Webinars", "Templates", "Case Studies"]
+    },
+    {
+      title: "Company",
+      links: ["About", "Careers", "Press", "Partners", "Contact"]
+    }
+  ];
+
   return (
-    <footer className="bg-gradient-to-t from-black to-slate-900 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-          <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Rocket className="w-7 h-7 text-white" />
+    <footer className="bg-slate-900 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+          {/* Logo and Description */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Rocket className="w-5 h-5 text-white" />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                VeeFore
-              </span>
+              <span className="text-xl font-bold text-white">VeeFore</span>
             </div>
-            <p className="text-gray-400 mb-8 max-w-md leading-relaxed">
-              Transform your social media strategy with AI-powered automation. Create, schedule, and optimize content across all major platforms with VeeFore's cutting-edge technology.
+            <p className="text-gray-400 leading-relaxed">
+              AI-powered social media management platform that helps creators and businesses grow their online presence with intelligent automation and analytics.
             </p>
-            <div className="flex space-x-6">
-              {[
-                { icon: <Twitter className="w-6 h-6" />, href: "#", color: "hover:text-blue-400" },
-                { icon: <Instagram className="w-6 h-6" />, href: "#", color: "hover:text-pink-400" },
-                { icon: <Linkedin className="w-6 h-6" />, href: "#", color: "hover:text-blue-600" },
-                { icon: <Youtube className="w-6 h-6" />, href: "#", color: "hover:text-red-500" },
-                { icon: <Facebook className="w-6 h-6" />, href: "#", color: "hover:text-blue-500" }
-              ].map((social, index) => (
-                <motion.a
-                  key={index}
-                  href={social.href}
-                  className={`w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-gray-400 ${social.color} transition-all duration-300 hover:scale-110`}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {social.icon}
-                </motion.a>
-              ))}
+            <div className="flex space-x-4">
+              <Instagram className="w-5 h-5 text-gray-400 hover:text-pink-400 cursor-pointer transition-colors" />
+              <Twitter className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
+              <Linkedin className="w-5 h-5 text-gray-400 hover:text-blue-600 cursor-pointer transition-colors" />
+              <Youtube className="w-5 h-5 text-gray-400 hover:text-red-400 cursor-pointer transition-colors" />
             </div>
           </div>
 
-          {[
-            {
-              title: "Product",
-              links: ["Features", "Integrations", "API", "Pricing", "Changelog", "Roadmap"]
-            },
-            {
-              title: "Solutions",
-              links: ["For Creators", "For Businesses", "For Agencies", "Enterprise", "Use Cases"]
-            },
-            {
-              title: "Resources",
-              links: ["Blog", "Help Center", "Tutorials", "Webinars", "Community", "Status"]
-            },
-            {
-              title: "Company",
-              links: ["About", "Careers", "Press", "Partners", "Contact", "Security"]
-            }
-          ].map((section, index) => (
-            <div key={index}>
-              <h3 className="text-white font-semibold mb-6 text-lg">{section.title}</h3>
-              <div className="space-y-4">
-                {section.links.map((link) => (
-                  <motion.a
-                    key={link}
-                    href="#"
-                    className="block text-gray-400 hover:text-white transition-colors"
-                    whileHover={{ x: 4 }}
-                  >
-                    {link}
-                  </motion.a>
+          {/* Footer Links */}
+          {footerSections.map((section, index) => (
+            <div key={index} className="space-y-4">
+              <h3 className="text-white font-semibold">{section.title}</h3>
+              <ul className="space-y-2">
+                {section.links.map((link, linkIndex) => (
+                  <li key={linkIndex}>
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                      {link}
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-slate-800 mt-16 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2024 VeeFore. All rights reserved.
-            </p>
-            <div className="flex flex-wrap justify-center md:justify-end gap-6">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR', 'Security'].map((item) => (
-                <a key={item} href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  {item}
-                </a>
-              ))}
-            </div>
+        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <p className="text-gray-400 text-sm">
+            © 2024 VeeFore. All rights reserved.
+          </p>
+          <div className="flex space-x-6 mt-4 sm:mt-0">
+            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
+            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
+            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -1336,7 +1419,7 @@ function Footer() {
   );
 }
 
-// Enhanced Scroll to Top Button
+// Enhanced Scroll to Top Button with Space Theme
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -1362,39 +1445,78 @@ function ScrollToTopButton() {
 
   return (
     <motion.button
-      className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all ${
+      className={`fixed bottom-8 right-8 p-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 z-50 backdrop-blur-sm border border-purple-500/20 ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={scrollToTop}
-      whileHover={{ scale: 1.1, rotate: 360 }}
-      whileTap={{ scale: 0.9 }}
-      animate={isVisible ? { 
-        opacity: 1,
-        boxShadow: "0 0 30px rgba(139, 92, 246, 0.6)"
-      } : { 
-        opacity: 0,
-        boxShadow: "0 0 0px rgba(139, 92, 246, 0)"
+      whileHover={{ 
+        scale: 1.15,
+        rotate: 360,
+        boxShadow: "0 0 30px rgba(147, 51, 234, 0.6)"
       }}
-      transition={{ duration: 0.3 }}
+      whileTap={{ scale: 0.9 }}
+      animate={{
+        boxShadow: [
+          "0 0 20px rgba(147, 51, 234, 0.3)",
+          "0 0 40px rgba(139, 92, 246, 0.5)",
+          "0 0 20px rgba(147, 51, 234, 0.3)"
+        ]
+      }}
+      transition={{
+        boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+      }}
     >
-      <ChevronUp className="w-7 h-7" />
+      <Rocket className="w-5 h-5" />
     </motion.button>
   );
 }
 
-// Main Landing Page Component
+// Main Landing Page Component with Lazy Loading
 export default function Landing() {
   return (
-    <Suspense fallback={<LoadingSkeleton />}>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
-        <NavigationBar />
-        <HeroSection />
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
+      <Navigation />
+      <HeroSection />
+      
+      {/* Core sections load immediately */}
+      <AnimatedSection delay={0.1}>
         <FeaturesSection />
-        <StatsSection />
-        <CTASection />
-        <Footer />
-        <ScrollToTopButton />
-      </div>
-    </Suspense>
+      </AnimatedSection>
+      
+      {/* Heavy sections use Suspense for lazy loading */}
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.2}>
+          <StatsSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <AnimatedSection delay={0.3}>
+        <SolutionsSection />
+      </AnimatedSection>
+      
+      <AnimatedSection delay={0.4}>
+        <PricingSection />
+      </AnimatedSection>
+      
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.5}>
+          <TestimonialsSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AnimatedSection delay={0.6}>
+          <IntegrationSection />
+        </AnimatedSection>
+      </Suspense>
+      
+      <AnimatedSection delay={0.7}>
+        <FAQSection />
+      </AnimatedSection>
+      
+      <CTASection />
+      <Footer />
+      <ScrollToTopButton />
+    </div>
   );
 }

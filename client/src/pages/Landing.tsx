@@ -338,47 +338,158 @@ function HeroSection() {
 
       {/* Hero Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <div className="mb-8">
-          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
-            <Sparkles className="w-3 h-3 mr-1" />
-            AI-Powered Social Media Management
-          </Badge>
-        </div>
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <motion.div
+                className="w-3 h-3 mr-1 inline-block"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-3 h-3" />
+              </motion.div>
+              AI-Powered Social Media Management
+            </Badge>
+          </motion.div>
+        </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+        <motion.h1 
+          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
           Take Your Social Media to{' '}
-          <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          <motion.span 
+            className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             Mission Control
-          </span>
-        </h1>
+          </motion.span>
+        </motion.h1>
 
-        <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+        <motion.p 
+          className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
           Create, schedule, analyze, and optimize social media content. All powered by 
           advanced AI in one user-friendly command center.
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+        <motion.div 
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+        >
           <Link href="/signup">
-            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
-              Start Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+            <motion.div
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+            >
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
+                Start Free Trial
+                <motion.div
+                  className="ml-2 w-5 h-5 inline-block"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </motion.div>
+              </Button>
+            </motion.div>
           </Link>
-          <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
-            <Play className="mr-2 w-5 h-5" />
-            Watch Demo
-          </Button>
-        </div>
+          <motion.div
+            whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 1 }}
+          >
+            <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
+              <motion.div
+                className="mr-2 w-5 h-5 inline-block"
+                whileHover={{ scale: 1.2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Play className="w-5 h-5" />
+              </motion.div>
+              Watch Demo
+            </Button>
+          </motion.div>
+        </motion.div>
 
         {/* Platform Icons */}
-        <div className="flex justify-center items-center space-x-6 mb-12">
-          <div className="text-gray-400 text-sm">Connect with:</div>
-          <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors" />
-          <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors" />
-          <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors" />
-          <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors" />
-          <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors" />
-        </div>
+        <motion.div 
+          className="flex justify-center items-center space-x-6 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
+        >
+          <motion.div 
+            className="text-gray-400 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.1 }}
+          >
+            Connect with:
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.2, color: "#f472b6" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.2 }}
+          >
+            <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors cursor-pointer" />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.2, color: "#f87171" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.3 }}
+          >
+            <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors cursor-pointer" />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.2, color: "#60a5fa" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.4 }}
+          >
+            <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.2, color: "#2563eb" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.5 }}
+          >
+            <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer" />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.2, color: "#3b82f6" }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.6 }}
+          >
+            <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors cursor-pointer" />
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Scroll Indicator */}
@@ -465,58 +576,138 @@ function FeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-24 bg-slate-900">
+    <AnimatedSection id="features" className="py-24 bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
-            <Zap className="w-3 h-3 mr-1" />
-            Powerful Features
-          </Badge>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+        <motion.div 
+          className="text-center mb-16"
+          variants={fadeInUp}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <motion.div
+                className="w-3 h-3 mr-1 inline-block"
+                animate={{ rotate: [0, 180, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Zap className="w-3 h-3" />
+              </motion.div>
+              Powerful Features
+            </Badge>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl sm:text-5xl font-bold text-white mb-6"
+            variants={fadeInUp}
+          >
             Everything You Need to{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            <motion.span 
+              className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
               Dominate Social Media
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            </motion.span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            variants={fadeInUp}
+          >
             From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         <div className="space-y-24">
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
               className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              viewport={{ once: true, amount: 0.3 }}
             >
               {/* Content */}
-              <div className="flex-1 space-y-6">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}>
+              <motion.div 
+                className="flex-1 space-y-6"
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                <motion.div 
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   {feature.icon}
-                </div>
-                <h3 className="text-3xl font-bold text-white">
+                </motion.div>
+                <motion.h3 
+                  className="text-3xl font-bold text-white"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
                   {feature.title}
-                </h3>
-                <p className="text-lg text-gray-300 leading-relaxed">
+                </motion.h3>
+                <motion.p 
+                  className="text-lg text-gray-300 leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
                   {feature.description}
-                </p>
+                </motion.p>
                 
-                <div className="space-y-3">
+                <motion.div 
+                  className="space-y-3"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                >
                   {feature.features.map((item, i) => (
-                    <div key={i} className="flex items-center text-gray-300">
-                      <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                    <motion.div 
+                      key={i} 
+                      className="flex items-center text-gray-300"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.1 * i }}
+                      whileHover={{ x: 5, color: "#d1d5db" }}
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.2, color: "#22c55e" }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                      </motion.div>
                       <span>{item}</span>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
                 
-                <div>
-                  <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
-                    Learn more
-                    <ChevronRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
+                      Learn more
+                      <motion.div
+                        className="ml-2 w-4 h-4 inline-block"
+                        whileHover={{ x: 3 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </motion.div>
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
 
               {/* Media */}
               <div className="flex-1">

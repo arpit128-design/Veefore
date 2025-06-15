@@ -30,6 +30,8 @@ class YouTubeService {
     this.apiKey = process.env.YOUTUBE_API_KEY || '';
     if (!this.apiKey) {
       console.warn('[YOUTUBE SERVICE] API key not found');
+    } else {
+      console.log('[YOUTUBE SERVICE] ✓ API key configured');
     }
   }
 

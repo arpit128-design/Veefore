@@ -17,6 +17,7 @@ import { RealVideoProcessor } from './real-video-processor';
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import { emailService } from "./email-service";
+import { youtubeService } from "./youtube-service";
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -1055,12 +1056,48 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
             break;
 
           case 'youtube':
+            // Try to sync live YouTube data if possible
+            let liveYouTubeData = null;
+            try {
+              if (account.channelId) {
+                console.log(`[YOUTUBE LIVE] Attempting to sync live data for channel: ${account.channelId}`);
+                liveYouTubeData = await youtubeService.getChannelStats(account.channelId);
+                if (liveYouTubeData) {
+                  console.log(`[YOUTUBE LIVE] ✓ Live data retrieved - subscribers: ${liveYouTubeData.subscriberCount}, videos: ${liveYouTubeData.videoCount}, views: ${liveYouTubeData.viewCount}`);
+                }
+              } else if (account.username) {
+                console.log(`[YOUTUBE LIVE] Attempting to find channel by username: ${account.username}`);
+                const channelId = await youtubeService.findChannelByUsername(account.username.trim());
+                if (channelId) {
+                  liveYouTubeData = await youtubeService.getChannelStats(channelId);
+                  if (liveYouTubeData) {
+                    console.log(`[YOUTUBE LIVE] ✓ Live data via username - subscribers: ${liveYouTubeData.subscriberCount}, videos: ${liveYouTubeData.videoCount}`);
+                    // Update the account with the discovered channel ID
+                    await storage.updateSocialAccount(account.id, { channelId });
+                  }
+                }
+              }
+            } catch (error) {
+              console.log(`[YOUTUBE LIVE] Failed to fetch live data: ${error}`);
+            }
+
             const youtubeMetrics = {
-              videos: account.videoCount || account.mediaCount || 0,
-              subscribers: account.subscriberCount || account.followersCount || 0,
-              views: account.viewCount || account.totalViews || 0,
-              username: account.username
+              videos: liveYouTubeData?.videoCount || account.videoCount || account.mediaCount || 0,
+              subscribers: liveYouTubeData?.subscriberCount || account.subscriberCount || account.followersCount || 0,
+              views: liveYouTubeData?.viewCount || account.viewCount || 0,
+              username: account.username,
+              isLiveData: !!liveYouTubeData
             };
+            
+            // Update stored data if we got live data
+            if (liveYouTubeData) {
+              await storage.updateSocialAccount(account.id, {
+                subscriberCount: liveYouTubeData.subscriberCount,
+                videoCount: liveYouTubeData.videoCount,
+                viewCount: liveYouTubeData.viewCount,
+                lastSyncAt: new Date()
+              });
+            }
             
             aggregatedMetrics.totalPosts += youtubeMetrics.videos;
             aggregatedMetrics.totalSubscribers += youtubeMetrics.subscribers;
@@ -7542,6 +7579,117 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     } catch (error: any) {
       console.error('[MEDIA SERVE] Error serving file:', error);
       res.status(500).json({ error: 'Failed to serve media file' });
+    }
+  });
+
+  // Sync live YouTube data using YouTube Data API
+  app.post('/api/youtube/sync-live-data', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { accountId, channelId, username } = req.body;
+      const workspaceId = req.user.defaultWorkspaceId;
+      
+      console.log(`[YOUTUBE LIVE SYNC] Starting sync for user: ${req.user.id}, workspace: ${workspaceId}`);
+      
+      if (!accountId && !channelId && !username) {
+        return res.status(400).json({ 
+          error: 'Account ID, channel ID, or username required',
+          message: 'Please provide at least one identifier to sync YouTube data'
+        });
+      }
+      
+      let liveData = null;
+      let targetAccount = null;
+      
+      // Get the account if accountId provided
+      if (accountId) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+        targetAccount = accounts.find(acc => acc.id.toString() === accountId.toString());
+        if (!targetAccount) {
+          return res.status(404).json({ error: 'YouTube account not found' });
+        }
+      }
+      
+      // Try to fetch live data using different methods
+      if (channelId) {
+        console.log(`[YOUTUBE LIVE SYNC] Fetching data by channel ID: ${channelId}`);
+        liveData = await youtubeService.getChannelStats(channelId);
+      } else if (username) {
+        console.log(`[YOUTUBE LIVE SYNC] Finding channel by username: ${username}`);
+        const foundChannelId = await youtubeService.findChannelByUsername(username.trim());
+        if (foundChannelId) {
+          liveData = await youtubeService.getChannelStats(foundChannelId);
+          // Update account with discovered channel ID
+          if (targetAccount) {
+            await storage.updateSocialAccount(targetAccount.id, { channelId: foundChannelId });
+          }
+        }
+      } else if (targetAccount?.channelId) {
+        console.log(`[YOUTUBE LIVE SYNC] Using stored channel ID: ${targetAccount.channelId}`);
+        liveData = await youtubeService.getChannelStats(targetAccount.channelId);
+      } else if (targetAccount?.username) {
+        console.log(`[YOUTUBE LIVE SYNC] Finding channel by stored username: ${targetAccount.username}`);
+        const foundChannelId = await youtubeService.findChannelByUsername(targetAccount.username.trim());
+        if (foundChannelId) {
+          liveData = await youtubeService.getChannelStats(foundChannelId);
+          await storage.updateSocialAccount(targetAccount.id, { channelId: foundChannelId });
+        }
+      }
+      
+      if (!liveData) {
+        return res.status(404).json({ 
+          error: 'YouTube channel not found',
+          message: 'Could not retrieve data from YouTube API. Please check the channel ID or username.'
+        });
+      }
+      
+      console.log(`[YOUTUBE LIVE SYNC] ✓ Retrieved live data:`, {
+        channelTitle: liveData.channelTitle,
+        subscribers: liveData.subscriberCount,
+        videos: liveData.videoCount,
+        views: liveData.viewCount
+      });
+      
+      // Update the account with live data
+      const updateData = {
+        subscriberCount: liveData.subscriberCount,
+        videoCount: liveData.videoCount,
+        viewCount: liveData.viewCount,
+        followersCount: liveData.subscriberCount, // Frontend compatibility
+        mediaCount: liveData.videoCount, // Frontend compatibility
+        channelId: liveData.channelId,
+        lastSyncAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      if (targetAccount) {
+        await storage.updateSocialAccount(targetAccount.id, updateData);
+        console.log(`[YOUTUBE LIVE SYNC] ✓ Updated account ${targetAccount.id} with live data`);
+      }
+      
+      // Clear dashboard cache to force refresh
+      const dashboardCache = new DashboardCache();
+      dashboardCache.clearCache(workspaceId);
+      
+      res.json({
+        success: true,
+        message: 'YouTube data synchronized successfully',
+        data: {
+          channelTitle: liveData.channelTitle,
+          channelId: liveData.channelId,
+          subscriberCount: liveData.subscriberCount,
+          videoCount: liveData.videoCount,
+          viewCount: liveData.viewCount,
+          lastSyncAt: new Date(),
+          isLiveData: true
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('[YOUTUBE LIVE SYNC] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to sync YouTube data',
+        message: error.message || 'An unexpected error occurred'
+      });
     }
   });
 

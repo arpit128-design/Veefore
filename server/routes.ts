@@ -7822,6 +7822,18 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Placeholder image endpoint for landing page
+  app.get('/api/placeholder/:width/:height', (req: Request, res: Response) => {
+    const { width, height } = req.params;
+    const text = req.query.text || 'VeeFore';
+    const bgColor = req.query.bg || '1e293b'; // slate-800
+    const textColor = req.query.color || 'ffffff';
+    
+    // Redirect to a reliable placeholder service
+    const placeholderUrl = `https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}?text=${encodeURIComponent(text.toString())}`;
+    res.redirect(placeholderUrl);
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

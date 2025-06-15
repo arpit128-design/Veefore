@@ -309,7 +309,7 @@ function FeaturesSection() {
       icon: <BrainCircuit className="w-6 h-6" />,
       title: "AI-Powered Content Creation",
       description: "Generate high-quality posts, captions, and hashtags with our advanced AI that understands your brand voice and audience preferences.",
-      image: "/api/placeholder/600/400",
+      image: "/api/placeholder/600/400?text=AI+Content+Generator&bg=1e293b&color=60a5fa",
       features: [
         "Smart caption generation with brand voice matching",
         "Trending hashtag recommendations",
@@ -323,7 +323,7 @@ function FeaturesSection() {
       icon: <Calendar className="w-6 h-6" />,
       title: "Intelligent Scheduling & Automation",
       description: "Schedule posts across all platforms with AI-optimized timing, automated responses, and smart content distribution.",
-      image: "/api/placeholder/600/400",
+      image: "/api/placeholder/600/400?text=Smart+Scheduling&bg=1e293b&color=a855f7",
       features: [
         "AI-optimized posting times for maximum reach",
         "Cross-platform content adaptation",
@@ -337,7 +337,7 @@ function FeaturesSection() {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics & Insights",
       description: "Track performance across all platforms with comprehensive analytics, competitor analysis, and predictive insights.",
-      image: "/api/placeholder/600/400",
+      image: "/api/placeholder/600/400?text=Analytics+Dashboard&bg=1e293b&color=10b981",
       features: [
         "Real-time performance tracking",
         "Competitor benchmark analysis",
@@ -351,7 +351,7 @@ function FeaturesSection() {
       icon: <MessageSquare className="w-6 h-6" />,
       title: "Unified Social Media Management",
       description: "Manage all your social accounts from one powerful dashboard with AI-assisted community management and engagement tools.",
-      image: "/api/placeholder/600/400",
+      image: "/api/placeholder/600/400?text=Social+Management&bg=1e293b&color=f97316",
       features: [
         "Unified inbox for all platforms",
         "AI-powered comment moderation",
@@ -745,7 +745,7 @@ function TestimonialsSection() {
       name: "Sarah Johnson",
       role: "Content Creator",
       company: "@sarahcreates",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=SJ&bg=ec4899&color=ffffff",
       content: "VeeFore has completely transformed my content strategy. The AI-generated captions are spot-on and save me hours every week. My engagement has increased by 300% since I started using it!",
       rating: 5,
       platform: "Instagram"
@@ -754,7 +754,7 @@ function TestimonialsSection() {
       name: "Mike Chen",
       role: "Marketing Director",
       company: "TechStart Inc.",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=MC&bg=3b82f6&color=ffffff",
       content: "Managing multiple client accounts was a nightmare before VeeFore. Now I can schedule weeks of content in minutes and the analytics help me prove ROI to every client. Game changer!",
       rating: 5,
       platform: "Multiple"
@@ -763,7 +763,7 @@ function TestimonialsSection() {
       name: "Emily Rodriguez",
       role: "Small Business Owner",
       company: "Bloom Bakery",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=ER&bg=10b981&color=ffffff",
       content: "As a small business owner, I don't have time for complex tools. VeeFore is incredibly intuitive and the automated posting keeps my social media active even when I'm busy baking.",
       rating: 5,
       platform: "Facebook"
@@ -772,7 +772,7 @@ function TestimonialsSection() {
       name: "David Park",
       role: "Social Media Manager",
       company: "Creative Agency",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=DP&bg=a855f7&color=ffffff",
       content: "The team collaboration features are fantastic. We can manage 50+ client accounts seamlessly. The white-label reports save us so much time and look incredibly professional.",
       rating: 5,
       platform: "Agency"
@@ -781,7 +781,7 @@ function TestimonialsSection() {
       name: "Lisa Thompson",
       role: "YouTuber",
       company: "@lisatech",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=LT&bg=ef4444&color=ffffff",
       content: "The cross-platform optimization is brilliant. I create content once and VeeFore adapts it perfectly for YouTube, Instagram, and Twitter. My reach has expanded dramatically.",
       rating: 5,
       platform: "YouTube"
@@ -790,7 +790,7 @@ function TestimonialsSection() {
       name: "Alex Kumar",
       role: "E-commerce Manager",
       company: "Fashion Forward",
-      avatar: "/api/placeholder/80/80",
+      avatar: "/api/placeholder/80/80?text=AK&bg=f97316&color=ffffff",
       content: "VeeFore's AI understands our brand voice perfectly. The generated content feels authentic and drives real sales. Our social commerce revenue is up 250% this quarter.",
       rating: 5,
       platform: "E-commerce"

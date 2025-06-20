@@ -301,10 +301,15 @@ export default function Analyzer() {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center">
                       <i className="fab fa-instagram text-white text-sm"></i>
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <div className="font-semibold text-pink-400">Instagram</div>
                       <div className="text-xs text-asteroid-silver">@{rawAnalytics.platformData.instagram.username}</div>
                     </div>
+                    <Link href="/analytics/instagram">
+                      <Button variant="outline" size="sm" className="glassmorphism text-xs">
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>

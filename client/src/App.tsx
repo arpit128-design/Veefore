@@ -80,6 +80,8 @@ function AuthenticatedApp() {
               <Route path="/subscribe" component={Subscribe} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/terms-of-service" component={TermsOfService} />
+              <Route path="/analytics/instagram" component={InstagramAnalytics} />
+              <Route path="/analytics/youtube" component={YouTubeAnalytics} />
               <Route component={NotFound} />
             </Switch>
           </main>

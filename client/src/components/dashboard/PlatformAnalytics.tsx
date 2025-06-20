@@ -57,9 +57,13 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
       case 'followers':
         return formatNumber(instagramData.followers || 0);
       case 'engagement':
-        // Calculate Instagram-specific engagement rate
-        const igEngagement = instagramData.followers > 0 
-          ? ((instagramData.likes + instagramData.comments) / instagramData.followers * 100)
+        // Calculate correct Instagram engagement rate: (total interactions) / (followers * posts) * 100
+        const totalInteractions = (instagramData.likes || 0) + (instagramData.comments || 0);
+        const followers = instagramData.followers || 0;
+        const posts = instagramData.posts || 1; // Avoid division by zero
+        
+        const igEngagement = (followers > 0 && posts > 0) 
+          ? (totalInteractions / (followers * posts) * 100)
           : 0;
         return formatEngagement(igEngagement);
       case 'reach':

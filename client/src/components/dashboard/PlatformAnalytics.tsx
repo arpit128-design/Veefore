@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { formatNumber, formatEngagement } from "@/lib/utils";
+import { Link } from "wouter";
 
 interface PlatformAnalyticsProps {
   platform: string;
@@ -87,10 +88,17 @@ export function PlatformAnalytics({ platform, icon, color }: PlatformAnalyticsPr
         <CardTitle className="flex items-center gap-2 text-pink-500">
           {icon}
           Instagram Analytics
-          <RefreshCw 
-            className={`h-4 w-4 ml-auto cursor-pointer hover:text-pink-400 ${(refreshMutation.isPending || isLoading) ? 'animate-spin' : ''}`}
-            onClick={() => refreshMutation.mutate()}
-          />
+          <div className="flex items-center gap-2 ml-auto">
+            <Link href="/analytics/instagram">
+              <Button variant="outline" size="sm" className="glassmorphism text-xs">
+                View Details
+              </Button>
+            </Link>
+            <RefreshCw 
+              className={`h-4 w-4 cursor-pointer hover:text-pink-400 ${(refreshMutation.isPending || isLoading) ? 'animate-spin' : ''}`}
+              onClick={() => refreshMutation.mutate()}
+            />
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>

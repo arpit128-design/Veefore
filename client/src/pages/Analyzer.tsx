@@ -7,8 +7,9 @@ import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BarChart3, TrendingUp, TrendingDown, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Users, Eye, RefreshCw, Zap, Heart, Activity, Clock, Calendar, Play, ThumbsUp, MessageSquare, Share2, Instagram } from "lucide-react";
 import { formatNumber, formatEngagement } from "@/lib/utils";
+import { Link } from "wouter";
 
 export default function Analyzer() {
   const { currentWorkspace } = useWorkspaceContext();
@@ -368,7 +369,14 @@ export default function Analyzer() {
           <CardTitle className="flex items-center gap-2 text-red-500">
             <Play className="h-5 w-5" />
             YouTube Analytics
-            <RefreshCw className="h-4 w-4 ml-auto cursor-pointer hover:text-red-400" />
+            <div className="ml-auto flex items-center gap-2">
+              <Link href="/analytics/youtube">
+                <Button variant="outline" size="sm" className="glassmorphism text-xs">
+                  View Details
+                </Button>
+              </Link>
+              <RefreshCw className="h-4 w-4 cursor-pointer hover:text-red-400" />
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>

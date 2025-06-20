@@ -39,6 +39,8 @@ import TermsOfService from "@/pages/TermsOfService";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import InstagramAnalytics from "@/pages/InstagramAnalytics";
+import YouTubeAnalytics from "@/pages/YouTubeAnalytics";
 
 function AuthenticatedApp() {
   return (

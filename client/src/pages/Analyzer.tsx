@@ -404,7 +404,7 @@ export default function Analyzer() {
                 <ThumbsUp className="h-4 w-4 text-red-400" />
                 <span className="text-sm">Avg. Likes</span>
               </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
+              <span className="text-red-400 font-medium">{rawAnalytics?.platformData?.youtube ? 'N/A' : 'Connect YouTube'}</span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
@@ -412,7 +412,7 @@ export default function Analyzer() {
                 <MessageSquare className="h-4 w-4 text-red-400" />
                 <span className="text-sm">Comments</span>
               </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
+              <span className="text-red-400 font-medium">{rawAnalytics?.platformData?.youtube ? 'N/A' : 'Connect YouTube'}</span>
             </div>
             
             <div className="flex items-center justify-between p-3 bg-cosmic-void/30 rounded-lg border border-red-500/20">
@@ -420,15 +420,20 @@ export default function Analyzer() {
                 <Share2 className="h-4 w-4 text-red-400" />
                 <span className="text-sm">Shares</span>
               </div>
-              <span className="text-red-400 font-medium">Connect YouTube</span>
+              <span className="text-red-400 font-medium">{rawAnalytics?.platformData?.youtube ? 'N/A' : 'Connect YouTube'}</span>
             </div>
           </div>
           
           <div className="mt-6 p-4 bg-red-500/10 rounded-lg border border-red-500/30">
             <div className="text-center">
-              <div className="text-sm text-red-400 mb-2">YouTube API Not Connected</div>
+              <div className="text-sm text-red-400 mb-2">
+                {rawAnalytics?.platformData?.youtube ? 'YouTube Analytics Connected' : 'YouTube API Not Connected'}
+              </div>
               <div className="text-xs text-asteroid-silver">
-                Connect your YouTube account to view authentic analytics data including subscribers, views, watch time, and engagement metrics.
+                {rawAnalytics?.platformData?.youtube 
+                  ? `Displaying analytics for @${rawAnalytics.platformData.youtube.username} with ${formatNumber(rawAnalytics.platformData.youtube.subscribers || 0)} subscribers and ${formatNumber(rawAnalytics.platformData.youtube.videos || 0)} videos.`
+                  : 'Connect your YouTube account to view authentic analytics data including subscribers, views, watch time, and engagement metrics.'
+                }
               </div>
             </div>
           </div>

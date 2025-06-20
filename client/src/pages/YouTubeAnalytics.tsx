@@ -29,6 +29,25 @@ export default function YouTubeAnalytics() {
     enabled: !!currentWorkspace?.id && !!token
   });
 
+  // Get detailed YouTube analytics including demographics
+  const { data: detailedInsights, isLoading: insightsLoading } = useQuery({
+    queryKey: ['youtube-insights', currentWorkspace?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/youtube/detailed-insights?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: Boolean(currentWorkspace?.id && token && analytics?.platformData?.youtube)
+  });
+
   const youtubeData = analytics?.platformData?.youtube;
   const hasData = analytics && youtubeData;
 
@@ -334,6 +353,225 @@ export default function YouTubeAnalytics() {
         </CardContent>
       </Card>
 
+      {/* Audience Demographics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-red-400">Audience Demographics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.demographics ? (
+              <div className="space-y-6">
+                {/* Age Groups */}
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Age Distribution</h4>
+                  <div className="space-y-2">
+                    {Object.entries(detailedInsights.demographics.ageGroups || {}).map(([age, percentage]) => (
+                      <div key={age} className="flex justify-between items-center">
+                        <span className="text-xs text-asteroid-silver">{age} years</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-cosmic-void rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-red-400 rounded-full" 
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-red-400 font-semibold w-8">{percentage}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gender Distribution */}
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Gender Distribution</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                      <div className="text-2xl font-bold text-red-400">
+                        {detailedInsights.demographics.gender?.female || 0}%
+                      </div>
+                      <div className="text-xs text-asteroid-silver">Female</div>
+                    </div>
+                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                      <div className="text-2xl font-bold text-red-400">
+                        {detailedInsights.demographics.gender?.male || 0}%
+                      </div>
+                      <div className="text-xs text-asteroid-silver">Male</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading audience data...' : 'Demographics data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  YouTube audience insights require channel monetization
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Locations & Traffic Sources */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-red-400">Audience Geography & Traffic</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.geography ? (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Top Countries</h4>
+                  <div className="space-y-2">
+                    {detailedInsights.geography.countries?.map((country, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                        <span className="text-sm text-asteroid-silver">{country.name}</span>
+                        <span className="text-sm text-red-400 font-semibold">{country.percentage}%</span>
+                      </div>
+                    )) || (
+                      <div className="text-xs text-asteroid-silver">No geographic data available</div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Traffic Sources</h4>
+                  <div className="space-y-2">
+                    {detailedInsights.geography.trafficSources?.map((source, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                        <span className="text-sm text-asteroid-silver">{source.name}</span>
+                        <span className="text-sm text-red-400 font-semibold">{source.percentage}%</span>
+                      </div>
+                    )) || (
+                      <div className="text-xs text-asteroid-silver">No traffic data available</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading geography data...' : 'Geographic data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  Geographic insights require channel monetization
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Video Performance & Revenue */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-red-400">Video Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.performance ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">
+                      {detailedInsights.performance.avgWatchTime || '0:00'}
+                    </div>
+                    <div className="text-xs text-asteroid-silver">Avg Watch Time</div>
+                  </div>
+                  
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">
+                      {detailedInsights.performance.clickThroughRate || 0}%
+                    </div>
+                    <div className="text-xs text-asteroid-silver">Click-through Rate</div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Top Performing Videos</h4>
+                  <div className="space-y-2">
+                    {detailedInsights.performance.topVideos?.map((video, index) => (
+                      <div key={index} className="p-2 bg-cosmic-void/30 rounded">
+                        <div className="text-sm text-asteroid-silver">{video.title}</div>
+                        <div className="text-xs text-red-400">{formatNumber(video.views)} views • {video.duration}</div>
+                      </div>
+                    )) || (
+                      <div className="text-xs text-asteroid-silver">No video performance data available</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading performance data...' : 'Performance data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  Upload videos to see performance metrics
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-red-400">Revenue & Monetization</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.revenue ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">
+                      ${detailedInsights.revenue.estimated || 0}
+                    </div>
+                    <div className="text-xs text-asteroid-silver">Est. Revenue (28d)</div>
+                  </div>
+                  
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">
+                      ${detailedInsights.revenue.rpm || 0}
+                    </div>
+                    <div className="text-xs text-asteroid-silver">RPM</div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Monetization Status</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                      <span className="text-sm text-asteroid-silver">YouTube Partner Program</span>
+                      <span className={`text-sm font-semibold ${detailedInsights.revenue.monetized ? 'text-green-400' : 'text-red-400'}`}>
+                        {detailedInsights.revenue.monetized ? 'Enabled' : 'Not Enabled'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                      <span className="text-sm text-asteroid-silver">Ad Revenue</span>
+                      <span className="text-sm text-red-400 font-semibold">
+                        ${detailedInsights.revenue.adRevenue || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading revenue data...' : 'Revenue data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  Enable monetization to see revenue metrics
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Data Authenticity Notice */}
       <Card className="content-card holographic border-red-500/30">
         <CardContent className="p-6">
@@ -342,11 +580,10 @@ export default function YouTubeAnalytics() {
               <i className="fab fa-youtube text-xl text-white" />
             </div>
             <div>
-              <h3 className="text-red-400 font-semibold mb-1">Authentic YouTube Data</h3>
+              <h3 className="text-red-400 font-semibold mb-1">Authentic YouTube Analytics Data</h3>
               <p className="text-asteroid-silver text-sm">
-                All analytics displayed are sourced from your connected YouTube channel. 
-                Metrics include subscriber count, video performance, and channel statistics 
-                retrieved from YouTube's official API for maximum accuracy.
+                All analytics including demographics, geography, revenue, and performance metrics are sourced directly from YouTube Analytics API. 
+                Advanced insights require channel monetization and are updated in real-time for maximum accuracy.
               </p>
             </div>
           </div>

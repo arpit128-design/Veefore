@@ -29,6 +29,25 @@ export default function InstagramAnalytics() {
     enabled: !!currentWorkspace?.id && !!token
   });
 
+  // Get detailed Instagram insights including demographics
+  const { data: detailedInsights, isLoading: insightsLoading } = useQuery({
+    queryKey: ['instagram-insights', currentWorkspace?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/instagram/detailed-insights?workspaceId=${currentWorkspace?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    enabled: Boolean(currentWorkspace?.id && token && analytics?.platformData?.instagram)
+  });
+
   const instagramData = analytics?.platformData?.instagram;
   const hasData = analytics && instagramData;
 
@@ -285,6 +304,167 @@ export default function InstagramAnalytics() {
         </CardContent>
       </Card>
 
+      {/* Audience Demographics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-pink-400">Audience Demographics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.demographics ? (
+              <div className="space-y-6">
+                {/* Age Groups */}
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Age Distribution</h4>
+                  <div className="space-y-2">
+                    {Object.entries(detailedInsights.demographics.ageGroups || {}).map(([age, percentage]) => (
+                      <div key={age} className="flex justify-between items-center">
+                        <span className="text-xs text-asteroid-silver">{age} years</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-cosmic-void rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-pink-400 rounded-full" 
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-pink-400 font-semibold w-8">{percentage}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gender Distribution */}
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Gender Distribution</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                      <div className="text-2xl font-bold text-pink-400">
+                        {detailedInsights.demographics.gender?.female || 0}%
+                      </div>
+                      <div className="text-xs text-asteroid-silver">Female</div>
+                    </div>
+                    <div className="text-center p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                      <div className="text-2xl font-bold text-pink-400">
+                        {detailedInsights.demographics.gender?.male || 0}%
+                      </div>
+                      <div className="text-xs text-asteroid-silver">Male</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading audience data...' : 'Demographics data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  Audience insights require at least 100 followers
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Locations */}
+        <Card className="content-card holographic">
+          <CardHeader>
+            <CardTitle className="text-pink-400">Top Locations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {detailedInsights?.locations ? (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Countries</h4>
+                  <div className="space-y-2">
+                    {detailedInsights.locations.countries?.map((country, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                        <span className="text-sm text-asteroid-silver">{country.name}</span>
+                        <span className="text-sm text-pink-400 font-semibold">{country.percentage}%</span>
+                      </div>
+                    )) || (
+                      <div className="text-xs text-asteroid-silver">No country data available</div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Cities</h4>
+                  <div className="space-y-2">
+                    {detailedInsights.locations.cities?.map((city, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-cosmic-void/30 rounded">
+                        <span className="text-sm text-asteroid-silver">{city.name}</span>
+                        <span className="text-sm text-pink-400 font-semibold">{city.percentage}%</span>
+                      </div>
+                    )) || (
+                      <div className="text-xs text-asteroid-silver">No city data available</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-asteroid-silver mb-2">
+                  {insightsLoading ? 'Loading location data...' : 'Location data not available'}
+                </div>
+                <div className="text-xs text-asteroid-silver">
+                  Location insights require at least 100 followers
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Peak Activity Times */}
+      <Card className="content-card holographic">
+        <CardHeader>
+          <CardTitle className="text-pink-400">Audience Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {detailedInsights?.activity ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Best Times to Post</h4>
+                <div className="space-y-2">
+                  {detailedInsights.activity.bestTimes?.map((time, index) => (
+                    <div key={index} className="flex justify-between items-center p-2 bg-pink-500/10 rounded border border-pink-500/20">
+                      <span className="text-sm text-asteroid-silver">{time.day}</span>
+                      <span className="text-sm text-pink-400 font-semibold">{time.hour}:00</span>
+                    </div>
+                  )) || (
+                    <div className="text-xs text-asteroid-silver">Activity data not available</div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Peak Activity Days</h4>
+                <div className="space-y-2">
+                  {detailedInsights.activity.peakDays?.map((day, index) => (
+                    <div key={index} className="flex justify-between items-center p-2 bg-pink-500/10 rounded border border-pink-500/20">
+                      <span className="text-sm text-asteroid-silver">{day.name}</span>
+                      <span className="text-sm text-pink-400 font-semibold">{day.activity}%</span>
+                    </div>
+                  )) || (
+                    <div className="text-xs text-asteroid-silver">Activity data not available</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="text-asteroid-silver mb-2">
+                {insightsLoading ? 'Loading activity data...' : 'Activity data not available'}
+              </div>
+              <div className="text-xs text-asteroid-silver">
+                Activity insights require at least 100 followers
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Data Authenticity Notice */}
       <Card className="content-card holographic border-pink-500/30">
         <CardContent className="p-6">
@@ -295,9 +475,8 @@ export default function InstagramAnalytics() {
             <div>
               <h3 className="text-pink-400 font-semibold mb-1">Authentic Instagram Business Data</h3>
               <p className="text-asteroid-silver text-sm">
-                All analytics displayed are sourced directly from Instagram Business API. 
-                Metrics include reach, engagement, followers, and post performance calculated using 
-                official Instagram insights data for maximum accuracy.
+                All analytics including demographics, locations, and activity patterns are sourced directly from Instagram Business API. 
+                Audience insights require a minimum of 100 followers and are updated in real-time for maximum accuracy.
               </p>
             </div>
           </div>

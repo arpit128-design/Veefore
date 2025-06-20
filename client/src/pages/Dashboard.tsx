@@ -217,12 +217,17 @@ export default function Dashboard() {
     return Math.min(100, Math.max(0, Math.round(score)));
   };
 
+  // FIXED: Use multi-platform aggregated data for KPI cards
   const analytics = {
     totalReach: hasValidData ? (rawData?.totalReach || rawData?.impressions || 0) : null,
     engagement: hasValidData ? (rawData?.engagementRate || 0) : null,
-    newFollowers: hasValidData ? (rawData?.followers || 0) : null,
+    newFollowers: hasValidData ? (
+      // Use aggregated followers from backend (Instagram + YouTube + other platforms)
+      rawData?.followers || 
+      (rawData?.platformData?.instagram?.followers || 0) + (rawData?.platformData?.youtube?.subscribers || 0)
+    ) : null,
     contentScore: calculateContentScore(rawData),
-    platforms: hasValidData && rawData?.accountUsername ? ['instagram'] : []
+    platforms: hasValidData ? (rawData?.connectedPlatforms || []) : []
   };
   
   // Create proper data mapping for Instagram metrics - use Instagram-specific platform data

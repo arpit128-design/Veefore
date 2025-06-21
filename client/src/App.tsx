@@ -15,7 +15,7 @@ import { GlobalWorkspaceSwitchingOverlay } from "@/components/workspaces/GlobalW
 // Pages
 import Dashboard from "@/pages/Dashboard";
 import ContentStudio from "@/pages/ContentStudio";
-import Scheduler from "@/pages/Scheduler";
+import AdvancedScheduler from "@/pages/AdvancedScheduler";
 import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
 import ContentRecommendations from "@/pages/ContentRecommendations";

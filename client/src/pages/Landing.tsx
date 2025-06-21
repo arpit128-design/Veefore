@@ -860,7 +860,9 @@ function StatsSection() {
       </div>
     </AnimatedSection>
   );
-}
+});
+
+FeaturesSection.displayName = 'FeaturesSection';
 
 // Optimized Solutions Section
 const SolutionsSection = memo(() => {

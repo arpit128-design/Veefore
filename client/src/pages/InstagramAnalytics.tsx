@@ -162,7 +162,8 @@ export default function InstagramAnalytics() {
                       followers: instagramData.followers || 1,
                       impressions: instagramData.reach || 0
                     };
-                    const engagement = calculateEngagementRateUtil('instagram', metrics, 'post');
+                    // Force reach-based calculation for consistency with backend
+                    const engagement = calculateEngagementRateUtil('instagram', metrics, 'reach');
                     const quality = getEngagementQuality(engagement.rate, 'instagram');
                     return (
                       <span className={quality.color}>{engagement.formattedRate}</span>
@@ -223,7 +224,19 @@ export default function InstagramAnalytics() {
               <div className="flex justify-between items-center p-3 bg-cosmic-void/30 rounded-lg">
                 <span className="text-asteroid-silver">Engagement Rate</span>
                 <span className="text-pink-400 font-semibold">
-                  {hasData ? `${calculateEngagementRate().toFixed(2)}%` : 'Loading...'}
+                  {hasData ? (() => {
+                    const metrics: EngagementMetrics = {
+                      likes: instagramData.likes || 0,
+                      comments: instagramData.comments || 0,
+                      shares: 0,
+                      saves: 0,
+                      views: instagramData.reach || 0,
+                      followers: instagramData.followers || 1,
+                      impressions: instagramData.reach || 0
+                    };
+                    const engagement = calculateEngagementRateUtil('instagram', metrics, 'reach');
+                    return engagement.formattedRate;
+                  })() : 'Loading...'}
                 </span>
               </div>
               

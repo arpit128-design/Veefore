@@ -84,7 +84,7 @@ function AuthenticatedApp() {
               <Route path="/onboarding" component={OnboardingPremium} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
-              <Route path="/scheduler" component={Scheduler} />
+              <Route path="/scheduler" component={AdvancedScheduler} />
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/trends" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />

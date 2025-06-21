@@ -130,10 +130,10 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
         comments: platformData.comments || 0,
         shares: 0, // Not available in current data structure
         saves: 0,  // Not available in current data structure
-        views: platformData.views || platformData.reach || 0,
+        views: platformData.reach || 0, // Use reach as views for Instagram
         followers: platformData.followers || 0,
         subscribers: platformData.subscribers || 0,
-        impressions: platformData.reach || 0
+        impressions: platformData.reach || 0 // Use reach as impressions base
       };
       
       return {
@@ -241,7 +241,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
       comments: platformData.comments || 0,
       shares: 0,
       saves: 0,
-      views: platformData.views || platformData.reach || 0,
+      views: platformData.reach || 0, // Use reach as the primary base for Instagram
       followers: platformData.followers || 0,
       subscribers: platformData.subscribers || 0,
       impressions: platformData.reach || 0
@@ -418,7 +418,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                         comments: data.comments || 0,
                         shares: 0,
                         saves: 0,
-                        views: data.views || data.reach || 0,
+                        views: data.reach || 0, // Use reach for Instagram engagement base
                         followers: data.followers || 0,
                         subscribers: data.subscribers || 0,
                         impressions: data.reach || 0
@@ -526,8 +526,9 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                                   comments: platformData.comments || 0,
                                   shares: 0,
                                   saves: 0,
-                                  views: platformData.reach || 0,
-                                  followers: platformData.followers || 1
+                                  views: platformData.reach || 0, // Use reach as base for authentic calculation
+                                  followers: platformData.followers || 1,
+                                  impressions: platformData.reach || 0
                                 };
                                 const engagement = calculateEngagementRate('instagram', metrics, 'post');
                                 const quality = getEngagementQuality(engagement.rate, 'instagram');

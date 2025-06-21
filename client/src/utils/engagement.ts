@@ -28,7 +28,7 @@ export function calculateInstagramEngagement(
   metrics: EngagementMetrics,
   contentType: 'post' | 'reel' = 'post'
 ): EngagementResult {
-  const { likes = 0, comments = 0, shares = 0, saves = 0, views = 0, followers = 1 } = metrics;
+  const { likes = 0, comments = 0, shares = 0, saves = 0, views = 0, followers = 1, impressions = 0 } = metrics;
   
   const totalEngagements = likes + comments + shares + saves;
   let base: number;
@@ -37,8 +37,16 @@ export function calculateInstagramEngagement(
     // Instagram Reel: (likes + comments + shares + saves) / views * 100
     base = views > 0 ? views : 1;
   } else {
-    // Instagram Post: (likes + comments + shares + saves) / followers * 100
-    base = followers > 0 ? followers : 1;
+    // Instagram Post: Use reach/impressions for more accurate calculation
+    // For small accounts, follower-based calculation can be misleading
+    // Use reach if available, otherwise fall back to impressions, then followers
+    if (impressions > 0) {
+      base = impressions;
+    } else if (views > 0) {
+      base = views; // This is often the reach value in our data structure
+    } else {
+      base = followers > 0 ? followers : 1;
+    }
   }
   
   const rate = (totalEngagements / base) * 100;

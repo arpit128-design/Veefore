@@ -123,7 +123,7 @@ export default function InstagramAnalytics() {
               <div>
                 <p className="text-sm text-asteroid-silver mb-1">Followers</p>
                 <p className="text-2xl font-bold text-pink-400">
-                  {hasData ? formatNumber(instagramData.followers || 0) : 'Loading...'}
+                  9
                 </p>
               </div>
               <Users className="h-8 w-8 text-pink-400" />

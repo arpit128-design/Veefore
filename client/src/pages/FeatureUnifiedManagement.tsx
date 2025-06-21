@@ -210,8 +210,11 @@ export default function FeatureUnifiedManagement() {
             </Link>
             
             <div className="flex items-center space-x-4">
+              <Link href="/">
+                <Button variant="ghost" className="text-gray-300 hover:text-white">← Back to Home</Button>
+              </Link>
               <Link href="/features">
-                <Button variant="ghost" className="text-gray-300 hover:text-white">← Back to Features</Button>
+                <Button variant="ghost" className="text-gray-300 hover:text-white">Features</Button>
               </Link>
               <Link href="/auth">
                 <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700">

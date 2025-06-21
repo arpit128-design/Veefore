@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense, memo, useMemo } from 'react';
 import { Link } from 'wouter';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
-import { LazyMotion } from '@/components/ui/lazy-motion';
 import { 
   ArrowRight, 
   Calendar, 
@@ -385,10 +384,9 @@ function HeroSection() {
           >
             Mission Control
           </motion.span>
-        </LazyMotion>
+        </motion.div>
 
-        <LazyMotion
-          as="p"
+        <motion.p 
           className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -398,7 +396,7 @@ function HeroSection() {
           advanced AI in one user-friendly command center.
         </motion.p>
 
-        <LazyMotion
+        <motion.div 
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -406,16 +404,17 @@ function HeroSection() {
         >
           <Link href="/auth">
             <motion.div
-              whileHover={shouldReduceMotion ? {} : { scale: 1.02, boxShadow: "0 10px 20px rgba(59, 130, 246, 0.3)" }}
-              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-              {...variants.fadeInUp}
-              transition={{ ...variants.fadeInUp.transition, delay: 0.3 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
             >
               <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
                 Start Free Trial
                 <motion.div
                   className="ml-2 w-5 h-5 inline-block"
-                  whileHover={shouldReduceMotion ? {} : { x: 3 }}
+                  whileHover={{ x: 3 }}
                   transition={{ duration: 0.2 }}
                 >
                   <ArrowRight className="w-5 h-5" />

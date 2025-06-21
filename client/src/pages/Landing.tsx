@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense, memo, useMemo } from 'react';
 import { Link } from 'wouter';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { 
   ArrowRight, 
   Calendar, 
@@ -58,26 +58,26 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut" }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
+// Optimized animation variants with reduced motion support
+const createAnimationVariants = (shouldReduce) => ({
+  fadeInUp: {
+    initial: shouldReduce ? {} : { opacity: 0, y: 30 },
+    animate: shouldReduce ? {} : { opacity: 1, y: 0 },
+    transition: shouldReduce ? {} : { duration: 0.4, ease: "easeOut" }
+  },
+  staggerContainer: {
+    animate: {
+      transition: shouldReduce ? {} : {
+        staggerChildren: 0.05
+      }
     }
+  },
+  scaleIn: {
+    initial: shouldReduce ? {} : { opacity: 0, scale: 0.9 },
+    animate: shouldReduce ? {} : { opacity: 1, scale: 1 },
+    transition: shouldReduce ? {} : { duration: 0.3, ease: "easeOut" }
   }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: "easeOut" }
-};
+});
 
 // Animated Section Component with Enhanced Lazy Loading
 interface AnimatedSectionProps {
@@ -404,17 +404,16 @@ function HeroSection() {
         >
           <Link href="/auth">
             <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
+              whileHover={shouldReduceMotion ? {} : { scale: 1.02, boxShadow: "0 10px 20px rgba(59, 130, 246, 0.3)" }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+              {...variants.fadeInUp}
+              transition={{ ...variants.fadeInUp.transition, delay: 0.3 }}
             >
               <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
                 Start Free Trial
                 <motion.div
                   className="ml-2 w-5 h-5 inline-block"
-                  whileHover={{ x: 5 }}
+                  whileHover={shouldReduceMotion ? {} : { x: 3 }}
                   transition={{ duration: 0.2 }}
                 >
                   <ArrowRight className="w-5 h-5" />

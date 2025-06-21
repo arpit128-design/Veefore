@@ -94,30 +94,18 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate }: ScheduleDialog
         throw new Error(`No ${contentData.platform} account connected to this workspace`);
       }
 
-      const formData = new FormData();
-      
-      // Add workspace validation
-      formData.append('workspaceId', currentWorkspace.id);
-      formData.append('socialAccountId', connectedAccount.id);
-      formData.append('title', contentData.title);
-      formData.append('description', contentData.description);
-      formData.append('type', contentData.type);
-      formData.append('platform', contentData.platform);
-      formData.append('scheduledAt', contentData.scheduledAt);
-      
-      // Add media files if any
-      uploadedFiles.forEach((file, index) => {
-        formData.append(`mediaFile_${index}`, file);
-      });
-      
-      if (uploadedFiles.length > 0) {
-        formData.append('mediaCount', uploadedFiles.length.toString());
-      }
+      const requestData = {
+        title: contentData.title,
+        description: contentData.description,
+        type: contentData.type,
+        platform: contentData.platform,
+        scheduledDate: contentData.scheduledDate ? contentData.scheduledDate.toISOString().split('T')[0] : '',
+        scheduledTime: contentData.scheduledTime,
+        contentData: contentData.contentData || {},
+        optimalTime: useOptimalTime
+      };
 
-      const response = await apiRequest('/api/scheduled-content', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await apiRequest('POST', '/api/content', requestData);
       
       return response;
     },
@@ -504,11 +492,9 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate }: ScheduleDialog
                     </SelectItem>
                   ))}
                   {/* All available times */}
-                  {Array.from({ length: 24 }, (_, i) => {
+                  {!useOptimalTime && Array.from({ length: 24 }, (_, i) => {
                     const time = `${i.toString().padStart(2, '0')}:00`;
-                    const isOptimal = useOptimalTime && form.platform && getOptimalTimes().includes(time);
-                    
-                    if (useOptimalTime && !isOptimal) return null;
+                    const isOptimal = form.platform && getOptimalTimes().includes(time);
                     
                     return (
                       <SelectItem key={time} value={time}>

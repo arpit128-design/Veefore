@@ -184,7 +184,7 @@ function Router() {
           <Route path="/feature/advanced-analytics" component={FeatureAnalytics} />
           <Route path="/feature/unified-management" component={FeatureUnifiedManagement} />
           <Route path="/solution/content-creators" component={SolutionContentCreators} />
-          <Route path="/solution/small-businesses" component={SolutionSmallBusiness} />
+          <Route path="/solution/small-businesses" component={SolutionSmallBusinesses} />
           <Route path="/solution/agencies" component={SolutionAgencies} />
           <Route path="/solution/enterprises" component={SolutionEnterprises} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />

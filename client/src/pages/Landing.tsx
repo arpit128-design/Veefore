@@ -539,7 +539,8 @@ function FeaturesSection() {
         "Content optimization for each platform",
         "Real-time trend analysis integration"
       ],
-      color: "from-blue-500 to-purple-600"
+      color: "from-blue-500 to-purple-600",
+      slug: "ai-content-creation"
     },
     {
       icon: <Calendar className="w-6 h-6" />,
@@ -553,7 +554,8 @@ function FeaturesSection() {
         "Bulk scheduling with smart queuing",
         "Time zone optimization for global audiences"
       ],
-      color: "from-purple-500 to-pink-600"
+      color: "from-purple-500 to-pink-600",
+      slug: "intelligent-scheduling"
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
@@ -567,7 +569,8 @@ function FeaturesSection() {
         "ROI calculation and reporting",
         "Custom dashboard creation"
       ],
-      color: "from-green-500 to-blue-600"
+      color: "from-green-500 to-blue-600",
+      slug: "advanced-analytics"
     },
     {
       icon: <MessageSquare className="w-6 h-6" />,
@@ -581,7 +584,8 @@ function FeaturesSection() {
         "Team collaboration tools",
         "Crisis management alerts"
       ],
-      color: "from-orange-500 to-red-600"
+      color: "from-orange-500 to-red-600",
+      slug: "unified-management"
     }
   ];
 
@@ -701,21 +705,23 @@ function FeaturesSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
-                      Learn more
-                      <motion.div
-                        className="ml-2 w-4 h-4 inline-block"
-                        whileHover={{ x: 3 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </motion.div>
-                    </Button>
-                  </motion.div>
+                  <Link href={`/feature/${feature.slug}`}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button className={`bg-gradient-to-r ${feature.color} hover:opacity-90 transition-opacity`}>
+                        Learn more
+                        <motion.div
+                          className="ml-2 w-4 h-4 inline-block"
+                          whileHover={{ x: 3 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </motion.div>
+                      </Button>
+                    </motion.div>
+                  </Link>
                 </motion.div>
               </motion.div>
 
@@ -1582,9 +1588,9 @@ function Footer() {
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
                     <Link href={link.href}>
-                      <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">
+                      <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">
                         {link.name}
-                      </a>
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -1599,13 +1605,13 @@ function Footer() {
           </p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
             <Link href="/privacy-policy">
-              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Privacy Policy</a>
+              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Privacy Policy</span>
             </Link>
             <Link href="/terms-of-service">
-              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Terms of Service</a>
+              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Terms of Service</span>
             </Link>
             <Link href="/contact">
-              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Cookie Policy</a>
+              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Cookie Policy</span>
             </Link>
           </div>
         </div>

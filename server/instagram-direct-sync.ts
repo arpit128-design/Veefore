@@ -477,12 +477,14 @@ export class InstagramDirectSync {
     const avgLikes = postsAnalyzed > 0 ? Math.floor(totalLikes / postsAnalyzed) : 0;
     const avgComments = postsAnalyzed > 0 ? Math.floor(totalComments / postsAnalyzed) : 0;
     
-    // Calculate authentic engagement rate
-    const engagementRate = followers > 0 && postsAnalyzed > 0 ? 
-      ((totalLikes + totalComments) / (followers * postsAnalyzed)) * 100 : 0;
+    // Calculate authentic engagement rate using reach-based method for consistency
+    // Use reach instead of followers for more accurate industry-standard calculation
+    const totalReach = realEngagement.totalReach || 0;
+    const engagementRate = totalReach > 0 ? 
+      ((totalLikes + totalComments) / totalReach) * 100 : 0;
     
     // Use ONLY authentic Instagram Business API reach data - no fallbacks
-    const totalReach = realEngagement.totalReach || 0;
+    // Note: totalReach is already defined above for engagement calculation
     
     console.log('[INSTAGRAM DIRECT] Authentic Instagram Business metrics:', {
       username: profileData.username,
@@ -493,7 +495,8 @@ export class InstagramDirectSync {
       avgLikes,
       avgComments,
       engagementRate: parseFloat(engagementRate.toFixed(2)),
-      totalReach
+      totalReach,
+      calculationMethod: 'reach-based'
     });
     
     return {

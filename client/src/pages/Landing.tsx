@@ -1018,15 +1018,17 @@ function SolutionsSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.5 }}
                     >
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
-                          Learn More
-                          <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
-                      </motion.div>
+                      <Link href="/solutions">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
+                            Learn More
+                            <ArrowRight className="ml-2 w-4 h-4" />
+                          </Button>
+                        </motion.div>
+                      </Link>
                     </motion.div>
                   </CardContent>
                 </Card>
@@ -1343,10 +1345,12 @@ function IntegrationSection() {
 
         <div className="text-center mt-12">
           <p className="text-gray-400 mb-6">Don't see your platform? We're constantly adding new integrations.</p>
-          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-            Request Integration
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
+          <Link href="/contact">
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+              Request Integration
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
@@ -1427,14 +1431,18 @@ function FAQSection() {
         <div className="text-center mt-12">
           <p className="text-gray-400 mb-6">Still have questions? We're here to help!</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-              <Mail className="mr-2 w-4 h-4" />
-              Contact Support
-            </Button>
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-              <BookOpen className="mr-2 w-4 h-4" />
-              View Documentation
-            </Button>
+            <Link href="/contact">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                <Mail className="mr-2 w-4 h-4" />
+                Contact Support
+              </Button>
+            </Link>
+            <Link href="/help">
+              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+                <BookOpen className="mr-2 w-4 h-4" />
+                View Documentation
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -1479,10 +1487,12 @@ function CTASection() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
-              <Play className="mr-2 w-5 h-5" />
-              Watch Demo
-            </Button>
+            <Link href="/watch-demo">
+              <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
+                <Play className="mr-2 w-5 h-5" />
+                Watch Demo
+              </Button>
+            </Link>
           </div>
 
           <div className="pt-8 text-purple-200">
@@ -1501,19 +1511,43 @@ function Footer() {
   const footerSections = [
     {
       title: "Product",
-      links: ["Features", "Pricing", "Integrations", "API", "Security"]
+      links: [
+        { name: "Features", href: "/features" },
+        { name: "Pricing", href: "/pricing" },
+        { name: "Integrations", href: "/contact" },
+        { name: "API", href: "/help" },
+        { name: "Security", href: "/about" }
+      ]
     },
     {
       title: "Solutions",
-      links: ["Creators", "Small Business", "Agencies", "Enterprise", "E-commerce"]
+      links: [
+        { name: "Creators", href: "/solutions" },
+        { name: "Small Business", href: "/solutions" },
+        { name: "Agencies", href: "/solutions" },
+        { name: "Enterprise", href: "/contact" },
+        { name: "E-commerce", href: "/solutions" }
+      ]
     },
     {
       title: "Resources",
-      links: ["Blog", "Help Center", "Webinars", "Templates", "Case Studies"]
+      links: [
+        { name: "Blog", href: "/blog" },
+        { name: "Help Center", href: "/help" },
+        { name: "Webinars", href: "/contact" },
+        { name: "Templates", href: "/contact" },
+        { name: "Case Studies", href: "/blog" }
+      ]
     },
     {
       title: "Company",
-      links: ["About", "Careers", "Press", "Partners", "Contact"]
+      links: [
+        { name: "About", href: "/about" },
+        { name: "Careers", href: "/careers" },
+        { name: "Press", href: "/contact" },
+        { name: "Partners", href: "/contact" },
+        { name: "Contact", href: "/contact" }
+      ]
     }
   ];
 
@@ -1547,9 +1581,11 @@ function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-                      {link}
-                    </a>
+                    <Link href={link.href}>
+                      <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">
+                        {link.name}
+                      </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -1562,9 +1598,15 @@ function Footer() {
             © 2024 VeeFore. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
+            <Link href="/privacy-policy">
+              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Privacy Policy</a>
+            </Link>
+            <Link href="/terms-of-service">
+              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Terms of Service</a>
+            </Link>
+            <Link href="/contact">
+              <a className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Cookie Policy</a>
+            </Link>
           </div>
         </div>
       </div>

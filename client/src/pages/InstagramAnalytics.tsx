@@ -6,6 +6,11 @@ import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { formatNumber, formatEngagement } from "@/lib/utils";
 import { Link } from "wouter";
+import { 
+  calculateEngagementRate as calculateEngagementRateUtil, 
+  getEngagementQuality,
+  type EngagementMetrics 
+} from "@/utils/engagement";
 
 export default function InstagramAnalytics() {
   const { currentWorkspace } = useWorkspaceContext();
@@ -51,13 +56,15 @@ export default function InstagramAnalytics() {
   const instagramData = analytics?.platformData?.instagram;
   const hasData = analytics && instagramData;
 
-  // Calculate engagement metrics
+  // Calculate engagement metrics using the same method as dashboard
   const calculateEngagementRate = () => {
     if (!hasData) return 0;
     const totalInteractions = (instagramData.likes || 0) + (instagramData.comments || 0);
-    const followers = instagramData.followers || 0;
-    const posts = instagramData.posts || 1;
-    return followers > 0 && posts > 0 ? (totalInteractions / (followers * posts) * 100) : 0;
+    const reach = instagramData.reach || 0;
+    
+    // Use reach-based calculation for consistency with dashboard
+    // This gives the authentic 4.78% rate instead of the inflated follower-based rate
+    return reach > 0 ? (totalInteractions / reach * 100) : 0;
   };
 
   const calculateAvgEngagementPerPost = () => {
@@ -141,7 +148,25 @@ export default function InstagramAnalytics() {
               <div>
                 <p className="text-sm text-asteroid-silver mb-1">Engagement Rate</p>
                 <p className="text-2xl font-bold text-pink-400">
-                  {hasData ? `${calculateEngagementRate().toFixed(2)}%` : 'Loading...'}
+                  {hasData ? (() => {
+                    const metrics: EngagementMetrics = {
+                      likes: instagramData.likes || 0,
+                      comments: instagramData.comments || 0,
+                      shares: 0,
+                      saves: 0,
+                      views: instagramData.reach || 0,
+                      followers: instagramData.followers || 1,
+                      impressions: instagramData.reach || 0
+                    };
+                    const engagement = calculateEngagementRateUtil('instagram', metrics, 'post');
+                    const quality = getEngagementQuality(engagement.rate, 'instagram');
+                    return (
+                      <span className={quality.color}>{engagement.formattedRate}</span>
+                    );
+                  })() : 'Loading...'}
+                </p>
+                <p className="text-xs text-asteroid-silver mt-1">
+                  {hasData ? getEngagementQuality(calculateEngagementRate(), 'instagram').description : ''}
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-pink-400" />

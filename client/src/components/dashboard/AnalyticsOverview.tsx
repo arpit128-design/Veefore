@@ -62,25 +62,26 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
     onSuccess: () => refetch()
   });
 
-  const analyticsData = filteredData || data;
+  const displayData = filteredData || data;
   const loading = filteredLoading || isLoading;
   
   console.log('[ANALYTICS OVERVIEW] Selected platforms:', selectedPlatforms);
   console.log('[ANALYTICS OVERVIEW] Time period:', timePeriod);
   console.log('[ANALYTICS OVERVIEW] Filtered data:', filteredData);
-  console.log('[ANALYTICS OVERVIEW] Display data:', analyticsData);
+  console.log('[ANALYTICS OVERVIEW] Display data:', displayData);
 
   // Get available platforms from data
-  const availablePlatforms = analyticsData?.connectedPlatforms || [];
+  const availablePlatforms = displayData?.connectedPlatforms || [];
   
-  // Calculate combined metrics
+  // Calculate combined metrics based on filtered data
   const combinedMetrics = {
-    totalReach: analyticsData?.totalReach || 0,
-    totalFollowers: (analyticsData?.platformData?.instagram?.followers || 0) + 
-                   (analyticsData?.platformData?.youtube?.subscribers || 0),
-    totalEngagement: analyticsData?.totalLikes + analyticsData?.totalComments || 0,
-    totalContent: (analyticsData?.platformData?.instagram?.posts || 0) + 
-                 (analyticsData?.platformData?.youtube?.videos || 0)
+    totalReach: displayData?.totalReach || 0,
+    totalFollowers: (displayData?.platformData?.instagram?.followers || 0) + 
+                   (displayData?.platformData?.youtube?.subscribers || 0),
+    totalEngagement: (displayData?.totalLikes || 0) + (displayData?.totalComments || 0),
+    totalContent: (displayData?.platformData?.instagram?.posts || 0) + 
+                 (displayData?.platformData?.youtube?.videos || 0),
+    engagementRate: displayData?.engagementRate || 0
   };
 
   const handlePlatformToggle = (platform: string) => {
@@ -176,16 +177,16 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                 <p className="text-2xl font-bold text-electric-cyan">
                   {loading ? '—' : formatNumber(combinedMetrics.totalReach)}
                 </p>
-                {analyticsData?.percentageChanges?.reach && (
+                {displayData?.percentageChanges?.reach && (
                   <div className={`flex items-center gap-1 text-xs ${
-                    analyticsData.percentageChanges.reach.isPositive ? 'text-green-400' : 'text-red-400'
+                    displayData.percentageChanges.reach.isPositive ? 'text-green-400' : 'text-red-400'
                   }`}>
-                    {analyticsData.percentageChanges.reach.isPositive ? (
+                    {displayData.percentageChanges.reach.isPositive ? (
                       <TrendingUp className="h-3 w-3" />
                     ) : (
                       <TrendingDown className="h-3 w-3" />
                     )}
-                    {analyticsData.percentageChanges.reach.value}
+                    <span>{displayData.percentageChanges.reach.value}</span>
                   </div>
                 )}
               </div>
@@ -255,7 +256,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                   {loading ? '—' : formatNumber(combinedMetrics.totalContent)}
                 </p>
                 <p className="text-xs text-asteroid-silver">
-                  {analyticsData?.platformData?.instagram?.posts || 0} posts + {analyticsData?.platformData?.youtube?.videos || 0} videos
+                  {displayData?.platformData?.instagram?.posts || 0} posts + {displayData?.platformData?.youtube?.videos || 0} videos
                 </p>
               </div>
               <Calendar className="h-8 w-8 text-solar-gold/50" />
@@ -266,7 +267,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
 
       {/* Analytics Chart */}
       <AnalyticsChart 
-        data={analyticsData} 
+        data={displayData} 
         selectedPlatforms={selectedPlatforms}
         timePeriod={timePeriod}
       />
@@ -282,7 +283,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availablePlatforms.map((platform: string) => {
-                const platformData = analyticsData?.platformData?.[platform];
+                const platformData = displayData?.platformData?.[platform];
                 if (!platformData) return null;
 
                 return (

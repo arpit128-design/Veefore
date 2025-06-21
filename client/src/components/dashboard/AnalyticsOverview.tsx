@@ -44,7 +44,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
     queryKey: ['analytics-filtered', currentWorkspace?.id, selectedPlatforms, timePeriod],
     queryFn: async () => {
       const platforms = selectedPlatforms.includes('all') ? [] : selectedPlatforms;
-      const response = await fetch(`/api/analytics/filtered?workspaceId=${currentWorkspace?.id}&platforms=${platforms.join(',')}&period=${timePeriod}`, {
+      const response = await fetch(`/api/dashboard/analytics/filtered?platforms=${platforms.join(',')}&timePeriod=${timePeriod}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       

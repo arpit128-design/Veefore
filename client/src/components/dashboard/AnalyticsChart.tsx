@@ -68,14 +68,14 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
     else if (posts >= 1) score += 2;  // Some content
     
     return Math.min(100, Math.max(0, Math.round(score)));
-  }, [analyticsData]);
+  }, [chartData]);
 
   // Generate engagement trend data based on real analytics with proper variations
   const engagementTrend = React.useMemo(() => {
-    if (!analyticsData) return [];
+    if (!chartData) return [];
     
-    const baseEngagement = analyticsData.engagementRate || analyticsData.engagement || 0;
-    const baseReach = analyticsData.totalReach || 0;
+    const baseEngagement = chartData.engagementRate || chartData.engagement || 0;
+    const baseReach = chartData.totalReach || 0;
     
     // Create realistic weekly variations with significant differences for clear chart visualization
     // Using your real engagement rate as baseline with authentic social media patterns
@@ -94,19 +94,39 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
       engagement: Math.round((baseEngagement * day.engagementMultiplier) * 100) / 100,
       reach: Math.round(baseReach * day.reachMultiplier)
     }));
-  }, [analyticsData]);
+  }, [chartData]);
 
-  // Platform distribution data
+  // Platform distribution data based on filtered selection and data
   const platformData = React.useMemo(() => {
-    if (!analyticsData?.totalReach) return [];
+    if (!chartData?.platformData) return [];
     
-    return [
-      { name: 'Instagram', value: analyticsData.totalReach || 0, color: '#8b5cf6' },
-      { name: 'YouTube', value: 0, color: '#06b6d4' },
-      { name: 'Twitter', value: 0, color: '#10b981' },
-      { name: 'LinkedIn', value: 0, color: '#f59e0b' }
-    ].filter(item => item.value > 0);
-  }, [analyticsData]);
+    const data = [];
+    
+    // Add data based on filtered platforms or all platforms
+    if (selectedPlatforms.includes('all') || selectedPlatforms.includes('instagram')) {
+      const instagramData = chartData.platformData.instagram;
+      if (instagramData && instagramData.reach > 0) {
+        data.push({ name: 'Instagram', value: instagramData.reach, color: '#8b5cf6' });
+      }
+    }
+    
+    if (selectedPlatforms.includes('all') || selectedPlatforms.includes('youtube')) {
+      const youtubeData = chartData.platformData.youtube;
+      if (youtubeData && youtubeData.views > 0) {
+        data.push({ name: 'YouTube', value: youtubeData.views, color: '#06b6d4' });
+      }
+    }
+    
+    // Add other platforms when available
+    if (selectedPlatforms.includes('all') || selectedPlatforms.includes('twitter')) {
+      const twitterData = chartData.platformData.twitter;
+      if (twitterData && twitterData.impressions > 0) {
+        data.push({ name: 'Twitter', value: twitterData.impressions, color: '#10b981' });
+      }
+    }
+    
+    return data;
+  }, [chartData, selectedPlatforms]);
 
   if (isLoading && !propData) {
     return (
@@ -136,6 +156,11 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
         <CardTitle className="flex items-center gap-2 text-white">
           <TrendingUp className="h-5 w-5" />
           Analytics Overview
+          {!selectedPlatforms.includes('all') && (
+            <span className="text-sm text-asteroid-silver ml-2">
+              ({selectedPlatforms.join(', ')}) • {timePeriod}
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -239,7 +264,7 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
                   <span className="text-sm text-white/80">Total Reach</span>
                 </div>
                 <span className="text-white font-medium">
-                  {analyticsData?.totalReach?.toLocaleString() || '0'}
+                  {chartData?.totalReach?.toLocaleString() || '0'}
                 </span>
               </div>
               
@@ -249,7 +274,7 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
                   <span className="text-sm text-white/80">Engagement Rate</span>
                 </div>
                 <span className="text-white font-medium">
-                  {(analyticsData?.engagementRate || analyticsData?.engagement || 0).toFixed(1)}%
+                  {(chartData?.engagementRate || chartData?.engagement || 0).toFixed(1)}%
                 </span>
               </div>
               
@@ -259,7 +284,7 @@ export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], ti
                   <span className="text-sm text-white/80">Followers</span>
                 </div>
                 <span className="text-white font-medium">
-                  {analyticsData?.newFollowers?.toLocaleString() || analyticsData?.followers?.toLocaleString() || '0'}
+                  {chartData?.totalFollowers?.toLocaleString() || chartData?.followers?.toLocaleString() || '0'}
                 </span>
               </div>
               

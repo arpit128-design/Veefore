@@ -133,6 +133,31 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
       return scaled;
     }, {} as any);
 
+    // Calculate percentage changes based on time period scaling
+    const getPercentageChange = (current: number, period: string) => {
+      const baselineChange = {
+        '1d': -95,    // 5% vs 100% = -95%
+        '7d': -75,    // 25% vs 100% = -75%
+        '30d': 0,     // Baseline
+        '90d': 180,   // 280% vs 100% = +180%
+        '1y': 900     // 1000% vs 100% = +900%
+      };
+      
+      const change = baselineChange[period as keyof typeof baselineChange] || 0;
+      const isPositive = change >= 0;
+      const value = `${isPositive ? '+' : ''}${Math.abs(change).toFixed(1)}%`;
+      
+      return { value, isPositive };
+    };
+
+    // Generate time-aware percentage changes
+    const scaledPercentageChanges = {
+      reach: getPercentageChange(totalReach, timePeriod),
+      engagement: getPercentageChange(engagementRate, timePeriod),
+      followers: getPercentageChange(totalFollowers, timePeriod),
+      contentScore: getPercentageChange(62, timePeriod) // Base content score
+    };
+
     return {
       ...data,
       totalPosts,
@@ -146,6 +171,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
       connectedPlatforms: selectedPlatforms,
       platformData: scaledPlatformData,
       topPlatform: selectedPlatforms[0] || 'none',
+      percentageChanges: scaledPercentageChanges,
       filteredBy: { platforms: selectedPlatforms, timePeriod }
     };
   };
@@ -159,14 +185,18 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
   console.log('[ANALYTICS OVERVIEW] Filtered display data:', displayData);
   
   // Log filtering results for debugging
-  if (data && !selectedPlatforms.includes('all')) {
-    console.log('[ANALYTICS FILTER TEST] Filtering applied:');
-    console.log('- Selected platforms:', selectedPlatforms);
-    console.log('- Original total reach:', data.totalReach);
-    console.log('- Filtered total reach:', displayData?.totalReach);
-    console.log('- Original platforms:', data.connectedPlatforms);
-    console.log('- Filtered platforms:', displayData?.connectedPlatforms);
-    console.log('- Time multiplier for', timePeriod, ':', displayData?.filteredBy?.timePeriod === timePeriod ? 'applied' : 'not applied');
+  if (data) {
+    const isFiltered = !selectedPlatforms.includes('all') || timePeriod !== '30d';
+    if (isFiltered) {
+      console.log('[ANALYTICS FILTER TEST] Filtering applied:');
+      console.log('- Selected platforms:', selectedPlatforms);
+      console.log('- Time period:', timePeriod);
+      console.log('- Original total reach:', data.totalReach);
+      console.log('- Filtered total reach:', displayData?.totalReach);
+      console.log('- Original platforms:', data.connectedPlatforms);
+      console.log('- Filtered platforms:', displayData?.connectedPlatforms);
+      console.log('- Percentage changes:', displayData?.percentageChanges);
+    }
   }
 
   // Get available platforms from data
@@ -187,11 +217,11 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
     if (platform === 'all') {
       setSelectedPlatforms(['all']);
     } else {
-      const newSelection = selectedPlatforms.includes('all') 
-        ? [platform]
-        : selectedPlatforms.includes(platform)
-          ? selectedPlatforms.filter(p => p !== platform)
-          : [...selectedPlatforms.filter(p => p !== 'all'), platform];
+      // Remove 'all' if it exists, then toggle the specific platform
+      const withoutAll = selectedPlatforms.filter(p => p !== 'all');
+      const newSelection = withoutAll.includes(platform)
+        ? withoutAll.filter(p => p !== platform)
+        : [...withoutAll, platform];
       
       setSelectedPlatforms(newSelection.length === 0 ? ['all'] : newSelection);
     }
@@ -326,7 +356,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
               <div>
                 <p className="text-sm text-asteroid-silver">Engagement Rate</p>
                 <p className="text-2xl font-bold text-nebula-purple">
-                  {loading ? '—' : `${formatEngagement(combinedMetrics.engagementRate)}%`}
+                  {loading ? '—' : `${combinedMetrics.engagementRate.toFixed(1)}%`}
                 </p>
                 {displayData?.percentageChanges?.engagement && (
                   <div className={`flex items-center gap-1 text-xs ${

@@ -1,23 +1,23 @@
 import { motion } from 'framer-motion';
 import { 
   Building, 
-  Bot, 
-  Calendar, 
   BarChart3, 
-  DollarSign,
-  Users,
+  Users, 
+  Calendar, 
+  TrendingUp,
+  MessageSquare,
+  Target,
   Zap,
   CheckCircle,
   ArrowRight,
   Star,
-  TrendingUp,
-  Target,
+  Shield,
   Clock,
   Globe,
+  DollarSign,
+  Play,
   ShoppingCart,
-  MessageSquare,
-  Camera,
-  Play
+  Megaphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,96 +28,75 @@ import { useEffect } from 'react';
 const features = [
   {
     icon: <BarChart3 className="h-8 w-8" />,
-    title: "Multi-Platform Management",
-    description: "Manage all your social media accounts from one unified dashboard.",
-    benefits: ["Instagram, Facebook, LinkedIn", "Twitter, YouTube, TikTok", "Centralized content calendar", "Cross-platform analytics"]
-  },
-  {
-    icon: <Users className="h-8 w-8" />,
-    title: "Customer Engagement",
-    description: "Build stronger relationships with your customers through automated engagement.",
-    benefits: ["Auto-respond to comments", "DM automation", "Customer service tools", "Lead generation"]
+    title: "Business Analytics",
+    description: "Track ROI, customer acquisition costs, and revenue attribution from social media campaigns.",
+    benefits: ["Revenue tracking", "Customer journey mapping", "Cost per acquisition", "Lifetime value analysis"]
   },
   {
     icon: <Target className="h-8 w-8" />,
-    title: "Brand Monitoring",
-    description: "Track mentions, reviews, and brand sentiment across all platforms.",
-    benefits: ["Reputation management", "Competitor tracking", "Sentiment analysis", "Crisis alerts"]
-  },
-  {
-    icon: <DollarSign className="h-8 w-8" />,
-    title: "ROI Tracking",
-    description: "Measure the real impact of your social media efforts on your bottom line.",
-    benefits: ["Conversion tracking", "Sales attribution", "Revenue analytics", "Cost per acquisition"]
-  },
-  {
-    icon: <Bot className="h-8 w-8" />,
-    title: "Smart Content Creation",
-    description: "Generate professional content that speaks to your target audience.",
-    benefits: ["Industry-specific templates", "Brand voice consistency", "Product showcase tools", "Promotional content"]
+    title: "Audience Targeting",
+    description: "Reach your ideal customers with precision targeting and lookalike audience creation.",
+    benefits: ["Demographic targeting", "Interest-based segments", "Behavioral analytics", "Custom audiences"]
   },
   {
     icon: <Calendar className="h-8 w-8" />,
-    title: "Strategic Scheduling",
-    description: "Post when your customers are most likely to engage and convert.",
-    benefits: ["Optimal timing analysis", "Campaign scheduling", "Seasonal planning", "Event coordination"]
+    title: "Campaign Management",
+    description: "Plan, execute, and optimize marketing campaigns across multiple social platforms.",
+    benefits: ["Campaign scheduling", "A/B testing", "Performance optimization", "Budget allocation"]
+  },
+  {
+    icon: <MessageSquare className="h-8 w-8" />,
+    title: "Customer Engagement",
+    description: "Build relationships with automated responses and community management tools.",
+    benefits: ["Auto customer service", "Review management", "Community building", "Lead nurturing"]
+  },
+  {
+    icon: <ShoppingCart className="h-8 w-8" />,
+    title: "E-commerce Integration",
+    description: "Connect your online store and track social commerce performance seamlessly.",
+    benefits: ["Product catalog sync", "Social shopping", "Conversion tracking", "Abandoned cart recovery"]
+  },
+  {
+    icon: <Megaphone className="h-8 w-8" />,
+    title: "Brand Monitoring",
+    description: "Monitor brand mentions, competitor activity, and industry trends in real-time.",
+    benefits: ["Mention tracking", "Sentiment analysis", "Competitor insights", "Crisis management"]
   }
 ];
 
 const testimonials = [
   {
-    name: "Sarah Martinez",
-    company: "Bloom Boutique",
-    industry: "Fashion Retail",
-    followers: "25K",
-    content: "VeeFore helped us increase our online sales by 300% in just 4 months. The ROI tracking feature shows exactly which posts drive purchases.",
-    rating: 5,
-    results: "+300% Sales Growth"
-  },
-  {
-    name: "David Chen",
-    company: "Tech Solutions Inc",
-    industry: "B2B Services",
-    followers: "15K",
-    content: "Managing multiple client campaigns was overwhelming until we found VeeFore. Now we can handle 3x more clients with the same team.",
-    rating: 5,
-    results: "+200% Client Capacity"
-  },
-  {
-    name: "Maria Rodriguez",
-    company: "Healthy Eats Cafe",
+    name: "Sarah Mitchell",
+    role: "Marketing Director",
+    company: "Green Valley Organics",
     industry: "Food & Beverage",
-    followers: "18K",
-    content: "The automated customer service has been a game-changer. We respond to customer inquiries 24/7 and our satisfaction scores have skyrocketed.",
+    revenue: "$2.3M",
+    image: "/api/placeholder/64/64",
+    content: "VeeFore helped us increase online sales by 340% in 8 months. The ROI tracking shows exactly which social posts drive revenue.",
     rating: 5,
-    results: "+150% Customer Satisfaction"
-  }
-];
-
-const caseStudies = [
-  {
-    company: "Green Gardens Landscaping",
-    industry: "Home Services",
-    challenge: "Struggled to generate leads through social media",
-    solution: "Implemented targeted content strategy with lead generation tools",
-    results: [
-      "250% increase in qualified leads",
-      "40% reduction in customer acquisition cost",
-      "85% of new customers from social media"
-    ],
-    timeframe: "6 months"
+    results: "+340% sales growth"
   },
   {
-    company: "Artisan Coffee Roasters",
-    industry: "Food & Beverage",
-    challenge: "Low engagement and brand awareness",
-    solution: "Created authentic brand storytelling with community building",
-    results: [
-      "400% increase in social media engagement",
-      "200% growth in local store visits",
-      "150% increase in online orders"
-    ],
-    timeframe: "4 months"
+    name: "Michael Chen",
+    role: "Founder",
+    company: "TechStart Solutions",
+    industry: "B2B Software",
+    revenue: "$1.8M",
+    image: "/api/placeholder/64/64",
+    content: "We went from 500 to 25K LinkedIn followers and generated $500K in leads. The B2B targeting features are incredibly powerful.",
+    rating: 5,
+    results: "+4900% follower growth"
+  },
+  {
+    name: "Amanda Rodriguez",
+    role: "Owner",
+    company: "Bella Fashion Boutique",
+    industry: "Retail",
+    revenue: "$950K",
+    image: "/api/placeholder/64/64",
+    content: "Social commerce integration doubled our online revenue. Customers can now shop directly from our Instagram posts.",
+    rating: 5,
+    results: "+200% online revenue"
   }
 ];
 
@@ -126,14 +105,13 @@ const pricing = {
   price: "$49",
   period: "month",
   features: [
-    "Multi-platform management (up to 10 accounts)",
+    "Multi-platform management",
     "Advanced analytics & ROI tracking",
     "Customer engagement automation",
-    "Brand monitoring & reputation management",
-    "Team collaboration tools",
-    "Priority customer support",
-    "Custom integrations",
-    "White-label reporting"
+    "E-commerce integration",
+    "Brand monitoring & alerts",
+    "Campaign management tools",
+    "Priority support & training"
   ]
 };
 
@@ -200,8 +178,8 @@ export default function SolutionSmallBusinesses() {
             For Small Businesses
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-            Grow your business with professional social media management tools that scale with you. 
-            Increase brand awareness, generate leads, and drive sales through strategic social media presence.
+            Grow your business with professional social media management tools designed for small businesses. 
+            Track ROI, engage customers, and scale your brand across all social platforms with data-driven insights.
           </p>
           <div className="flex items-center justify-center space-x-4">
             <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
@@ -210,11 +188,11 @@ export default function SolutionSmallBusinesses() {
             </Badge>
             <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
               <DollarSign className="h-4 w-4 mr-1" />
-              ROI Driven
+              ROI Tracking
             </Badge>
             <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30">
               <Users className="h-4 w-4 mr-1" />
-              Customer Focused
+              Customer Focus
             </Badge>
           </div>
         </motion.div>
@@ -225,20 +203,20 @@ export default function SolutionSmallBusinesses() {
           {...fadeInUp}
         >
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-400 mb-2">50K+</div>
+            <div className="text-3xl font-bold text-blue-400 mb-2">250%</div>
+            <div className="text-gray-400">Avg. Revenue Growth</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">50K+</div>
             <div className="text-gray-400">Small Businesses</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-cyan-400 mb-2">250%</div>
-            <div className="text-gray-400">Avg. Lead Increase</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-400 mb-2">$2.5M</div>
+            <div className="text-3xl font-bold text-green-400 mb-2">$2.5B+</div>
             <div className="text-gray-400">Revenue Generated</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-purple-400 mb-2">15hrs</div>
-            <div className="text-gray-400">Saved Per Week</div>
+            <div className="text-3xl font-bold text-purple-400 mb-2">4.2x</div>
+            <div className="text-gray-400">Average ROI</div>
           </div>
         </motion.div>
 
@@ -248,7 +226,7 @@ export default function SolutionSmallBusinesses() {
           {...fadeInUp}
         >
           <h2 className="text-3xl font-bold text-center mb-12">
-            Everything Your Business <span className="text-blue-400">Needs to Succeed</span>
+            Everything Your Business <span className="text-blue-400">Needs to Grow</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -286,58 +264,22 @@ export default function SolutionSmallBusinesses() {
           </div>
         </motion.div>
 
-        {/* Case Studies */}
+        {/* Video Demo Section */}
         <motion.div 
-          className="mb-20"
+          className="mb-20 text-center"
           {...fadeInUp}
         >
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Real <span className="text-blue-400">Success Stories</span>
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {caseStudies.map((study, index) => (
-              <motion.div
-                key={study.company}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-              >
-                <Card className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border-blue-500/50 h-full">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <CardTitle className="text-white">{study.company}</CardTitle>
-                        <p className="text-blue-400 text-sm">{study.industry}</p>
-                      </div>
-                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-                        {study.timeframe}
-                      </Badge>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-300 mb-1">Challenge</h4>
-                        <p className="text-sm text-gray-400">{study.challenge}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-300 mb-1">Solution</h4>
-                        <p className="text-sm text-gray-400">{study.solution}</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <h4 className="text-sm font-medium text-gray-300 mb-3">Results</h4>
-                    <ul className="space-y-2">
-                      {study.results.map((result, idx) => (
-                        <li key={idx} className="flex items-center space-x-2 text-sm text-green-400">
-                          <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                          <span>{result}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+          <h2 className="text-3xl font-bold mb-8">See How Small Businesses Grow with VeeFore</h2>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Play className="h-8 w-8 text-white ml-1" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Business Growth Success Stories</h3>
+                <p className="text-gray-400">Watch how small businesses achieve 250% growth</p>
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -365,20 +307,18 @@ export default function SolutionSmallBusinesses() {
                       </div>
                       <div>
                         <div className="font-medium text-white">{testimonial.name}</div>
-                        <div className="text-sm text-gray-400">{testimonial.company}</div>
-                        <div className="text-xs text-blue-400">{testimonial.industry}</div>
+                        <div className="text-sm text-gray-400">{testimonial.role} • {testimonial.company}</div>
+                        <div className="text-xs text-blue-400">{testimonial.industry} • {testimonial.revenue} revenue</div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-1">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                        ))}
-                      </div>
-                      <Badge variant="secondary" className="bg-green-500/20 text-green-300 text-xs">
-                        {testimonial.results}
-                      </Badge>
+                    <div className="flex space-x-1 mb-2">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                      ))}
                     </div>
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                      {testimonial.results}
+                    </Badge>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-300 italic">"{testimonial.content}"</p>
@@ -386,31 +326,6 @@ export default function SolutionSmallBusinesses() {
                 </Card>
               </motion.div>
             ))}
-          </div>
-        </motion.div>
-
-        {/* ROI Calculator Section */}
-        <motion.div 
-          className="mb-20 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-2xl p-12 border border-blue-500/20"
-          {...fadeInUp}
-        >
-          <h2 className="text-3xl font-bold text-center mb-8">Calculate Your Potential ROI</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-400 mb-2">3.2x</div>
-              <div className="text-gray-300">Average ROI</div>
-              <div className="text-sm text-gray-400 mt-2">Based on client data</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-cyan-400 mb-2">$25K</div>
-              <div className="text-gray-300">Avg. Revenue Increase</div>
-              <div className="text-sm text-gray-400 mt-2">First 6 months</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-green-400 mb-2">45%</div>
-              <div className="text-gray-300">Cost Reduction</div>
-              <div className="text-sm text-gray-400 mt-2">vs traditional marketing</div>
-            </div>
           </div>
         </motion.div>
 
@@ -456,7 +371,7 @@ export default function SolutionSmallBusinesses() {
         >
           <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Business?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of small businesses that are already using VeeFore to increase sales, engage customers, and build their brand.
+            Join thousands of small businesses already using VeeFore to increase revenue and build stronger customer relationships.
           </p>
           <div className="flex items-center justify-center space-x-4">
             <Link href="/auth">
@@ -467,8 +382,8 @@ export default function SolutionSmallBusinesses() {
             </Link>
             <Link href="/demo">
               <Button size="lg" variant="outline" className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
-                Schedule Demo
-                <Calendar className="ml-2 h-5 w-5" />
+                Watch Demo
+                <Play className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>

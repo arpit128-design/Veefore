@@ -1,21 +1,23 @@
 import { motion } from 'framer-motion';
 import { 
   Users, 
-  Shield, 
+  Bot, 
+  Calendar, 
   BarChart3, 
-  Target, 
-  Globe, 
-  Zap, 
-  CheckCircle, 
+  Shield,
+  Globe,
+  Zap,
+  CheckCircle,
   ArrowRight,
-  PlayCircle,
-  Clock,
-  DollarSign,
   Star,
-  Building,
-  Award,
+  TrendingUp,
+  Target,
+  Clock,
   FileText,
-  Settings
+  Settings,
+  DollarSign,
+  MessageSquare,
+  Play
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,573 +25,487 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 import { useEffect } from 'react';
 
+const features = [
+  {
+    icon: <Users className="h-8 w-8" />,
+    title: "Client Management",
+    description: "Efficiently manage multiple client accounts with dedicated workspaces and permissions.",
+    benefits: ["Unlimited client accounts", "Role-based access control", "Client billing integration", "Workspace isolation"]
+  },
+  {
+    icon: <FileText className="h-8 w-8" />,
+    title: "White-label Reports",
+    description: "Generate professional, branded reports that showcase your expertise to clients.",
+    benefits: ["Custom branding", "Automated report generation", "Performance insights", "Client-ready presentations"]
+  },
+  {
+    icon: <Settings className="h-8 w-8" />,
+    title: "Team Permissions",
+    description: "Control what your team can access and do across different client accounts.",
+    benefits: ["Granular permissions", "Team collaboration tools", "Activity tracking", "Approval workflows"]
+  },
+  {
+    icon: <Target className="h-8 w-8" />,
+    title: "Bulk Operations",
+    description: "Scale your operations with bulk content creation, scheduling, and management.",
+    benefits: ["Batch content creation", "Multi-client scheduling", "Template libraries", "Automated workflows"]
+  },
+  {
+    icon: <DollarSign className="h-8 w-8" />,
+    title: "Client Billing",
+    description: "Transparent billing system with usage tracking and automated invoicing.",
+    benefits: ["Usage-based billing", "Automated invoicing", "Client cost tracking", "Profit margin analysis"]
+  },
+  {
+    icon: <BarChart3 className="h-8 w-8" />,
+    title: "Campaign Management",
+    description: "Organize and track campaigns across multiple clients and platforms.",
+    benefits: ["Campaign tracking", "Performance comparison", "ROI measurement", "Client reporting"]
+  }
+];
+
+const testimonials = [
+  {
+    name: "Marcus Thompson",
+    company: "Digital Growth Agency",
+    role: "Founder & CEO",
+    clients: "45+ Clients",
+    content: "VeeFore transformed our agency operations. We went from managing 15 clients to 45+ with the same team size. The white-label reports alone saved us 20 hours per week.",
+    rating: 5,
+    results: "3x Client Growth"
+  },
+  {
+    name: "Lisa Chen",
+    company: "Social Media Experts",
+    role: "Operations Director",
+    clients: "30+ Clients",
+    content: "The team permission system is incredible. We can give clients access to their data without compromising other accounts. Our client satisfaction scores increased by 40%.",
+    rating: 5,
+    results: "+40% Client Satisfaction"
+  },
+  {
+    name: "David Rodriguez",
+    company: "Creative Collective",
+    role: "Agency Owner",
+    clients: "25+ Clients",
+    content: "Client billing used to be a nightmare. Now it's completely automated and transparent. We've increased our profit margins by 35% with better cost tracking.",
+    rating: 5,
+    results: "+35% Profit Margins"
+  }
+];
+
+const caseStudies = [
+  {
+    agency: "Stellar Marketing Agency",
+    challenge: "Managing 20+ client accounts across multiple platforms was overwhelming",
+    solution: "Implemented VeeFore's agency solution with team permissions and white-label reporting",
+    results: [
+      "Increased client capacity from 20 to 60+ accounts",
+      "Reduced report generation time by 80%",
+      "Improved team productivity by 250%",
+      "Increased monthly recurring revenue by 400%"
+    ],
+    timeframe: "8 months",
+    teamSize: "12 people"
+  },
+  {
+    agency: "Growth Partners Digital",
+    challenge: "Clients wanted more transparency and detailed reporting",
+    solution: "Deployed custom white-label reports and client portal access",
+    results: [
+      "100% client retention rate",
+      "30% increase in average contract value",
+      "50% reduction in client meetings",
+      "Automated 90% of reporting processes"
+    ],
+    timeframe: "6 months",
+    teamSize: "8 people"
+  }
+];
+
+const pricingTiers = [
+  {
+    name: "Agency Starter",
+    price: "$199",
+    period: "month",
+    description: "Perfect for growing agencies",
+    features: [
+      "Up to 25 client accounts",
+      "5 team members",
+      "Basic white-label reports",
+      "Standard integrations",
+      "Email support"
+    ],
+    highlighted: false
+  },
+  {
+    name: "Agency Pro",
+    price: "$399",
+    period: "month",
+    description: "Most popular for established agencies",
+    features: [
+      "Up to 100 client accounts",
+      "15 team members",
+      "Advanced white-label reports",
+      "All integrations + API access",
+      "Priority support + account manager",
+      "Custom branding",
+      "Advanced analytics"
+    ],
+    highlighted: true
+  },
+  {
+    name: "Agency Enterprise",
+    price: "Custom",
+    period: "month",
+    description: "Unlimited scale for large agencies",
+    features: [
+      "Unlimited client accounts",
+      "Unlimited team members",
+      "Custom white-label solutions",
+      "Dedicated infrastructure",
+      "24/7 dedicated support",
+      "Custom integrations",
+      "SLA guarantees"
+    ],
+    highlighted: false
+  }
+];
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, ease: "easeOut" }
+};
+
 export default function SolutionAgencies() {
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
-  };
-
-  const staggerContainer = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const scaleIn = {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: { opacity: 1, scale: 1 },
-    transition: { duration: 0.5 }
-  };
-
-  const agencyFeatures = [
-    {
-      icon: <Building className="w-6 h-6" />,
-      title: "Multi-Client Management",
-      description: "Efficiently manage unlimited client accounts with organized workspaces and streamlined workflows.",
-      features: ["Client workspace separation", "Bulk operations", "Account switching", "Centralized billing"]
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Team Collaboration",
-      description: "Collaborate seamlessly with team members using advanced permission controls and approval workflows.",
-      features: ["Role-based permissions", "Approval workflows", "Team communication", "Task assignment"]
-    },
-    {
-      icon: <FileText className="w-6 h-6" />,
-      title: "White-Label Reporting",
-      description: "Create professional, branded reports that showcase your agency's value to clients.",
-      features: ["Custom branding", "Automated reports", "Client dashboards", "Performance insights"]
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Agency-Grade Security",
-      description: "Enterprise-level security features designed specifically for agencies handling multiple client accounts.",
-      features: ["2FA authentication", "Access logs", "Data encryption", "Compliance tools"]
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: <DollarSign className="w-8 h-8" />,
-      title: "500% Revenue Growth",
-      description: "Agencies scale revenue faster with streamlined operations",
-      metric: "500% growth"
-    },
-    {
-      icon: <Clock className="w-8 h-8" />,
-      title: "40+ Hours Saved",
-      description: "Save 40+ hours weekly across your entire team",
-      metric: "40+ hours saved"
-    },
-    {
-      icon: <Users className="w-8 h-8" />,
-      title: "10x Client Capacity",
-      description: "Manage 10x more clients with the same team size",
-      metric: "10x capacity"
-    },
-    {
-      icon: <Star className="w-8 h-8" />,
-      title: "98% Client Retention",
-      description: "Improve client satisfaction and retention rates",
-      metric: "98% retention"
-    }
-  ];
-
-  const agencyStories = [
-    {
-      name: "Digital Growth Agency",
-      location: "New York, NY",
-      teamSize: "25 employees",
-      clientCount: "150+ clients",
-      story: "VeeFore transformed our agency operations. We went from managing 30 clients with constant stress to handling 150+ clients smoothly. Our team productivity increased 400% and client satisfaction is at an all-time high.",
-      results: ["5x client capacity increase", "$2M annual revenue growth", "95% client retention rate"]
-    },
-    {
-      name: "Social Impact Marketing",
-      location: "Los Angeles, CA",
-      teamSize: "15 employees",
-      clientCount: "80+ clients",
-      story: "The white-label reporting feature alone justified our investment. Clients love the professional reports, and we've reduced report creation time from 5 hours to 15 minutes per client.",
-      results: ["95% time saved on reporting", "$500K new client revenue", "Industry recognition awards"]
-    },
-    {
-      name: "Creative Collective",
-      location: "Austin, TX",
-      teamSize: "35 employees",
-      clientCount: "200+ clients",
-      story: "Managing multiple client accounts used to be a nightmare. VeeFore's multi-client dashboard and team collaboration tools made us the most efficient agency in our market.",
-      results: ["200+ clients managed efficiently", "50% faster project delivery", "Best Agency Award 2024"]
-    }
-  ];
-
-  const agencyServices = [
-    {
-      title: "Social Media Management",
-      description: "Full-service social media management for all client accounts",
-      tools: ["Content creation", "Scheduling", "Community management", "Performance tracking"]
-    },
-    {
-      title: "Content Marketing",
-      description: "Comprehensive content strategies and execution",
-      tools: ["Content planning", "AI content generation", "Editorial calendars", "Content optimization"]
-    },
-    {
-      title: "Paid Social Advertising",
-      description: "Manage and optimize social advertising campaigns",
-      tools: ["Campaign management", "Budget optimization", "Creative testing", "ROI tracking"]
-    },
-    {
-      title: "Analytics & Reporting",
-      description: "Data-driven insights and client reporting",
-      tools: ["Performance analytics", "Competitive analysis", "Custom dashboards", "Automated reports"]
-    }
-  ];
-
-  const teamSizes = [
-    {
-      size: "Solo Agencies",
-      clients: "1-10 clients",
-      features: ["Client management", "Basic reporting", "Content tools", "Growth support"]
-    },
-    {
-      size: "Small Teams",
-      clients: "10-50 clients",
-      features: ["Team collaboration", "Workflow automation", "Advanced reporting", "Client portals"]
-    },
-    {
-      size: "Large Agencies",
-      clients: "50+ clients",
-      features: ["Enterprise features", "Custom integrations", "Dedicated support", "White-label options"]
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
-      {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-space-navy via-purple-900/20 to-indigo-900/20" />
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-4 h-4 bg-purple-400 rounded-full opacity-25"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.1, 0.5, 0.1],
-              scale: [1, 1.4, 1],
-              rotate: [0, 360, 0],
-            }}
-            transition={{
-              duration: Math.random() * 6 + 5,
-              repeat: Infinity,
-              delay: Math.random() * 4,
-            }}
-          />
-        ))}
+    <div className="min-h-screen bg-space-black text-white">
+      {/* Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-space-black via-cosmic-void to-space-black">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-transparent to-transparent"></div>
       </div>
 
       {/* Header */}
-      <motion.header 
-        className="relative z-10 border-b border-slate-800 bg-space-navy/80 backdrop-blur-md"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <div className="relative z-10 border-b border-white/10 bg-space-black/50 backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
             <Link href="/">
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">VeeFore</span>
+                <span className="text-xl font-bold">VeeFore</span>
               </div>
             </Link>
             
             <div className="flex items-center space-x-4">
               <Link href="/">
-                <Button variant="ghost" className="text-gray-300 hover:text-white">← Back to Home</Button>
+                <Button variant="ghost">← Back to Home</Button>
               </Link>
               <Link href="/solutions">
-                <Button variant="ghost" className="text-gray-300 hover:text-white">All Solutions</Button>
+                <Button variant="ghost">All Solutions</Button>
               </Link>
               <Link href="/auth">
-                <Button className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
-                  Start Agency Trial
-                </Button>
+                <Button>Get Started</Button>
               </Link>
             </div>
           </div>
         </div>
-      </motion.header>
+      </div>
 
-      {/* Hero Section */}
-      <section className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.div
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-8"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Users className="w-10 h-10" />
-            </motion.div>
-            
-            <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30 text-lg px-4 py-2">
-              <Award className="w-4 h-4 mr-2" />
-              For Agencies
+      <div className="relative z-10 container mx-auto px-6 py-20">
+        {/* Hero Section */}
+        <motion.div 
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+              <Users className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+            For Agencies
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+            Scale your agency operations with powerful client management tools, white-label reporting, and team collaboration features. 
+            Manage multiple client accounts efficiently while maintaining the highest level of service quality.
+          </p>
+          <div className="flex items-center justify-center space-x-4">
+            <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <Users className="h-4 w-4 mr-1" />
+              Multi-Client
             </Badge>
-            
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
-              Scale Your Agency with{' '}
-              <span className="bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
-                Enterprise Tools
-              </span>
-            </h1>
-            
-            <p className="text-xl sm:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Manage unlimited clients, streamline team workflows, and deliver exceptional results with 
-              professional-grade social media management tools built specifically for agencies.
-            </p>
+            <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-violet-500/30">
+              <FileText className="h-4 w-4 mr-1" />
+              White-Label
+            </Badge>
+            <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <Shield className="h-4 w-4 mr-1" />
+              Enterprise Security
+            </Badge>
+          </div>
+        </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
-                <Button size="lg" className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-lg px-10 py-6">
-                  Start Agency Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/watch-demo">
-                <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-10 py-6">
-                  <PlayCircle className="mr-2 w-5 h-5" />
-                  Watch Agency Demo
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+        {/* Stats Section */}
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20"
+          {...fadeInUp}
+        >
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-400 mb-2">2,500+</div>
+            <div className="text-gray-400">Agencies Using VeeFore</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-violet-400 mb-2">500%</div>
+            <div className="text-gray-400">Avg. Client Capacity Increase</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-400 mb-2">$50M+</div>
+            <div className="text-gray-400">Client Revenue Managed</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-400 mb-2">80%</div>
+            <div className="text-gray-400">Time Savings on Reports</div>
+          </div>
+        </motion.div>
 
-          {/* Agency dashboard preview */}
-          <motion.div 
-            className="relative"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700">
-              <img 
-                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop&crop=center"
-                alt="Agency Management Dashboard"
-                className="w-full h-96 object-cover rounded-xl"
-              />
-              <div className="absolute top-12 right-12 bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                Agency Dashboard
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Agency Sizes */}
-      <section className="relative z-10 py-24 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Built for Agencies of All Sizes
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              From solo consultants to large agencies, VeeFore scales with your business
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-          >
-            {teamSizes.map((team, index) => (
+        {/* Features Grid */}
+        <motion.div 
+          className="mb-20"
+          {...fadeInUp}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Built for <span className="text-purple-400">Agency Success</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
               <motion.div
-                key={index}
-                className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-slate-600 transition-all duration-300"
-                variants={scaleIn}
-                whileHover={{ scale: 1.05, y: -5 }}
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <h3 className="text-2xl font-bold text-white mb-2">{team.size}</h3>
-                <p className="text-purple-400 mb-6">{team.clients}</p>
-                <div className="space-y-3">
-                  {team.features.map((feature, i) => (
-                    <div key={i} className="flex items-center text-gray-300">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Agency Features */}
-      <section className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Professional Agency Features
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Everything you need to run a successful social media agency
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-          >
-            {agencyFeatures.map((feature, index) => (
-              <motion.div key={index} variants={scaleIn}>
-                <Card className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-all duration-300 h-full">
+                <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-all duration-300 h-full">
                   <CardHeader>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center text-white">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="p-2 bg-gradient-to-r from-purple-500 to-violet-600 rounded-lg text-white">
                         {feature.icon}
                       </div>
-                      <CardTitle className="text-2xl text-white">{feature.title}</CardTitle>
+                      <CardTitle className="text-white">{feature.title}</CardTitle>
                     </div>
-                    <CardDescription className="text-gray-300 text-lg leading-relaxed">
+                    <CardDescription className="text-gray-300">
                       {feature.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {feature.features.map((item, i) => (
-                        <div key={i} className="flex items-center text-gray-300">
-                          <CheckCircle className="w-4 h-4 text-green-400 mr-3 flex-shrink-0" />
-                          <span>{item}</span>
-                        </div>
+                    <ul className="space-y-2">
+                      {feature.benefits.map((benefit, idx) => (
+                        <li key={idx} className="flex items-center space-x-2 text-sm text-gray-400">
+                          <CheckCircle className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                          <span>{benefit}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </motion.div>
 
-      {/* Agency Services */}
-      <section className="relative z-10 py-24 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Expand Your Service Offerings
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Offer comprehensive social media services with professional tools and capabilities
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-          >
-            {agencyServices.map((service, index) => (
+        {/* Case Studies */}
+        <motion.div 
+          className="mb-20"
+          {...fadeInUp}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Agency <span className="text-purple-400">Success Stories</span>
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {caseStudies.map((study, index) => (
               <motion.div
-                key={index}
-                className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-slate-600 transition-all duration-300"
-                variants={scaleIn}
-                whileHover={{ scale: 1.02 }}
+                key={study.agency}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <h3 className="text-2xl font-bold text-white mb-4">{service.title}</h3>
-                <p className="text-gray-300 mb-6">{service.description}</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {service.tools.map((tool, i) => (
-                    <div key={i} className="bg-slate-700/50 rounded-lg p-3 text-center">
-                      <span className="text-purple-300 text-sm font-medium">{tool}</span>
+                <Card className="bg-gradient-to-br from-purple-900/20 to-violet-900/20 border-purple-500/50 h-full">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <CardTitle className="text-white">{study.agency}</CardTitle>
+                        <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
+                          <span>Team: {study.teamSize}</span>
+                          <span>Timeline: {study.timeframe}</span>
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Agency Success Stories */}
-      <section className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Agency Success Stories
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              See how agencies have scaled their operations and grown revenue with VeeFore
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="space-y-8"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-          >
-            {agencyStories.map((story, index) => (
-              <motion.div
-                key={index}
-                className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8"
-                variants={scaleIn}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                  <div className="lg:col-span-2">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white">
-                        <Users className="w-8 h-8" />
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-300 mb-1">Challenge</h4>
+                        <p className="text-sm text-gray-400">{study.challenge}</p>
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-white">{story.name}</h3>
-                        <p className="text-purple-400">{story.location}</p>
-                        <p className="text-gray-400">{story.teamSize} • {story.clientCount}</p>
+                        <h4 className="text-sm font-medium text-gray-300 mb-1">Solution</h4>
+                        <p className="text-sm text-gray-400">{study.solution}</p>
                       </div>
                     </div>
-                    <p className="text-gray-300 text-lg mb-6 italic">"{story.story}"</p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-6">
-                    <h4 className="text-white font-semibold mb-4">Agency Results:</h4>
-                    <div className="space-y-2">
-                      {story.results.map((result, i) => (
-                        <div key={i} className="flex items-center text-green-400">
-                          <Award className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <span className="text-sm">{result}</span>
-                        </div>
+                  </CardHeader>
+                  <CardContent>
+                    <h4 className="text-sm font-medium text-gray-300 mb-3">Results</h4>
+                    <ul className="space-y-2">
+                      {study.results.map((result, idx) => (
+                        <li key={idx} className="flex items-center space-x-2 text-sm text-green-400">
+                          <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                          <span>{result}</span>
+                        </li>
                       ))}
-                    </div>
-                  </div>
-                </div>
+                    </ul>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </motion.div>
 
-      {/* Benefits */}
-      <section className="relative z-10 py-24 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Agency Growth Metrics
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              See the measurable impact VeeFore has on agency operations and profitability
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-          >
-            {benefits.map((benefit, index) => (
+        {/* Testimonials */}
+        <motion.div 
+          className="mb-20"
+          {...fadeInUp}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12">
+            What <span className="text-purple-400">Agency Owners</span> Are Saying
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
               <motion.div
-                key={index}
-                className="text-center p-8 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 transition-all duration-300"
-                variants={scaleIn}
-                whileHover={{ scale: 1.05, y: -5 }}
+                key={testimonial.company}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6">
-                  {benefit.icon}
-                </div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent mb-2">
-                  {benefit.metric}
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{benefit.title}</h3>
-                <p className="text-gray-300">{benefit.description}</p>
+                <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-gray-700 h-full">
+                  <CardHeader>
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-full flex items-center justify-center text-white font-bold">
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <div className="font-medium text-white">{testimonial.name}</div>
+                        <div className="text-sm text-gray-400">{testimonial.role}</div>
+                        <div className="text-xs text-purple-400">{testimonial.company}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex space-x-1">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                        ))}
+                      </div>
+                      <Badge variant="secondary" className="bg-green-500/20 text-green-300 text-xs">
+                        {testimonial.results}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 italic">"{testimonial.content}"</p>
+                    <div className="mt-3 text-xs text-purple-400">{testimonial.clients}</div>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </motion.div>
 
-      {/* CTA Section */}
-      <section className="relative z-10 py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            variants={fadeInUp}
-            initial="initial"
-            whileInView="animate"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-8">
-              Ready to Scale Your Agency?
-            </h2>
-            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-              Join hundreds of successful agencies using VeeFore to manage more clients, increase efficiency, and grow revenue
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
-                <Button size="lg" className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-lg px-10 py-6">
-                  Start Agency Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/contact">
-                <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-10 py-6">
-                  Request Agency Demo
-                </Button>
-              </Link>
-            </div>
-            
-            <p className="text-gray-400 mt-8">
-              ✓ 30-day agency trial • ✓ Dedicated onboarding • ✓ Priority support
-            </p>
-          </motion.div>
-        </div>
-      </section>
+        {/* Pricing Section */}
+        <motion.div 
+          className="mb-20"
+          {...fadeInUp}
+        >
+          <h2 className="text-3xl font-bold text-center mb-8">Choose Your <span className="text-purple-400">Agency Plan</span></h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pricingTiers.map((tier, index) => (
+              <motion.div
+                key={tier.name}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className={`relative ${tier.highlighted 
+                  ? 'bg-gradient-to-br from-purple-900/20 to-violet-900/20 border-purple-500/50' 
+                  : 'bg-gradient-to-br from-gray-900/50 to-gray-800/50 border-gray-700'
+                } h-full`}>
+                  {tier.highlighted && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-purple-500 text-white">Most Popular</Badge>
+                    </div>
+                  )}
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl text-white">{tier.name}</CardTitle>
+                    <p className="text-gray-400 text-sm">{tier.description}</p>
+                    <div className="text-4xl font-bold text-purple-400">
+                      {tier.price}
+                      {tier.price !== "Custom" && <span className="text-lg text-gray-400">/{tier.period}</span>}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3 mb-6">
+                      {tier.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center space-x-2 text-gray-300">
+                          <CheckCircle className="h-5 w-5 text-purple-500 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      className={`w-full ${tier.highlighted 
+                        ? 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700' 
+                        : 'bg-gray-700 hover:bg-gray-600'
+                      }`}
+                    >
+                      {tier.price === "Custom" ? "Contact Sales" : "Start Free Trial"}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div 
+          className="text-center bg-gradient-to-r from-purple-900/20 to-violet-900/20 rounded-2xl p-12 border border-purple-500/20"
+          {...fadeInUp}
+        >
+          <h2 className="text-3xl font-bold mb-4">Ready to Scale Your Agency?</h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join thousands of agencies that are already using VeeFore to manage more clients, deliver better results, and increase profitability.
+          </p>
+          <div className="flex items-center justify-center space-x-4">
+            <Link href="/auth">
+              <Button size="lg" className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700">
+                Start Agency Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/demo">
+              <Button size="lg" variant="outline" className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10">
+                Schedule Demo
+                <Calendar className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

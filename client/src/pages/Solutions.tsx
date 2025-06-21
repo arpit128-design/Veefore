@@ -31,7 +31,7 @@ const solutions = [
       "Hashtag Optimization"
     ],
     cta: "Learn More",
-    href: "/solutions/creators"
+    href: "/solution/content-creators"
   },
   {
     icon: <Building className="h-12 w-12" />,
@@ -47,7 +47,7 @@ const solutions = [
       "Lead Generation"
     ],
     cta: "Learn More",
-    href: "/solution-small-businesses"
+    href: "/solution/small-businesses"
   },
   {
     icon: <Users className="h-12 w-12" />,

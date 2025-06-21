@@ -58,9 +58,10 @@ import FeatureAIContent from "@/pages/FeatureAIContent";
 import FeatureScheduling from "@/pages/FeatureScheduling";
 import FeatureAnalytics from "@/pages/FeatureAnalytics";
 import FeatureUnifiedManagement from "@/pages/FeatureUnifiedManagement";
-
-// Individual solution detail pages
 import SolutionContentCreators from "@/pages/SolutionContentCreators";
+import SolutionSmallBusinesses from "@/pages/SolutionSmallBusinesses";
+import SolutionAgencies from "@/pages/SolutionAgencies";
+import SolutionEnterprises from "@/pages/SolutionEnterprises";
 import SolutionSmallBusiness from "@/pages/SolutionSmallBusiness";
 import SolutionAgencies from "@/pages/SolutionAgencies";
 import SolutionEnterprises from "@/pages/SolutionEnterprises";
@@ -105,6 +106,10 @@ function AuthenticatedApp() {
               <Route path="/terms-of-service" component={TermsOfService} />
               <Route path="/analytics/instagram" component={InstagramAnalytics} />
               <Route path="/analytics/youtube" component={YouTubeAnalytics} />
+              <Route path="/solution/content-creators" component={SolutionContentCreators} />
+              <Route path="/solution/small-businesses" component={SolutionSmallBusinesses} />
+              <Route path="/solution/agencies" component={SolutionAgencies} />
+              <Route path="/solution/enterprises" component={SolutionEnterprises} />
               <Route component={NotFound} />
             </Switch>
           </main>

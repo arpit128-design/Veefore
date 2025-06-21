@@ -873,7 +873,7 @@ export default function AdvancedScheduler() {
                     const statusColor = statusColors[content.status as keyof typeof statusColors];
                     
                     return (
-                      <div key={content.id} className="border border-space-gray rounded-lg p-4 hover:border-electric-cyan/50 transition-all glassmorphism"
+                      <div key={content.id} className="border border-space-gray rounded-lg p-4 hover:border-electric-cyan/50 transition-all glassmorphism">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
@@ -885,7 +885,7 @@ export default function AdvancedScheduler() {
                             
                             <p className="text-asteroid-silver mb-3 line-clamp-2">{content.description}</p>
                             
-                            <div className="flex items-center space-x-4 text-sm text-asteroid-silver"
+                            <div className="flex items-center space-x-4 text-sm text-asteroid-silver">
                               <div className="flex items-center space-x-1">
                                 <CalendarIcon className="w-4 h-4" />
                                 <span>{formatScheduledTime(content.scheduledAt)}</span>

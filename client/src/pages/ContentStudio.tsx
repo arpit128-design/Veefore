@@ -47,7 +47,8 @@ import {
   Target,
   Bot,
   Link as LinkIcon,
-  RotateCcw
+  RotateCcw,
+  RefreshCw
 } from "lucide-react";
 
 // Platform dimensions configuration

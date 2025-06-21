@@ -6,15 +6,24 @@ import { useInstantAnalytics } from '@/hooks/useInstantData';
 
 const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 
-export function AnalyticsChart() {
+interface AnalyticsChartProps {
+  data?: any;
+  selectedPlatforms?: string[];
+  timePeriod?: string;
+}
+
+export function AnalyticsChart({ data: propData, selectedPlatforms = ['all'], timePeriod = '30d' }: AnalyticsChartProps) {
   const { data: analyticsData, isLoading } = useInstantAnalytics();
+  
+  // Use prop data if available, fallback to hook data
+  const chartData = propData || analyticsData;
   
   // Calculate content score using exact same logic as dashboard
   const calculateContentScore = React.useMemo(() => {
-    if (!analyticsData) return 0;
+    if (!chartData) return 0;
     
-    const rawData = analyticsData as any;
-    const hasValidData = analyticsData && rawData?.accountUsername;
+    const rawData = chartData as any;
+    const hasValidData = chartData && (rawData?.accountUsername || rawData?.connectedPlatforms);
     
     if (!hasValidData || !rawData) return 0;
     
@@ -99,7 +108,7 @@ export function AnalyticsChart() {
     ].filter(item => item.value > 0);
   }, [analyticsData]);
 
-  if (isLoading) {
+  if (isLoading && !propData) {
     return (
       <Card className="bg-white/5 backdrop-blur-sm border-white/10">
         <CardHeader>

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { RefreshCw, TrendingUp, TrendingDown, Users, Eye, Heart, Play, Calendar, BarChart3 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +64,11 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
 
   const analyticsData = filteredData || data;
   const loading = filteredLoading || isLoading;
+  
+  console.log('[ANALYTICS OVERVIEW] Selected platforms:', selectedPlatforms);
+  console.log('[ANALYTICS OVERVIEW] Time period:', timePeriod);
+  console.log('[ANALYTICS OVERVIEW] Filtered data:', filteredData);
+  console.log('[ANALYTICS OVERVIEW] Display data:', analyticsData);
 
   // Get available platforms from data
   const availablePlatforms = analyticsData?.connectedPlatforms || [];

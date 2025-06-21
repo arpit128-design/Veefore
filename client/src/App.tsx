@@ -32,7 +32,7 @@ import SubscriptionEnhanced from "@/pages/SubscriptionEnhanced";
 import Auth from "@/pages/Auth";
 import OnboardingPremium from "@/pages/OnboardingPremium";
 
-import Landing from "@/pages/Landing";
+import Landing from "@/pages/LandingClean";
 import Subscribe from "@/pages/Subscribe";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";

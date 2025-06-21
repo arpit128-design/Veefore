@@ -1,4 +1,3 @@
-import { Suspense, lazy } from 'react';
 import { Link } from 'wouter';
 import { 
   ArrowRight, 
@@ -12,18 +11,36 @@ import {
   Brain
 } from 'lucide-react';
 
-const OptimizedSpaceBackground = lazy(() => import('@/components/layout/OptimizedSpaceBackground'));
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+// Simple Space Background Component
+function SpaceBackground() {
+  return (
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/10 via-slate-900 to-slate-900" />
+      <div className="absolute inset-0">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900" />}>
-        <OptimizedSpaceBackground />
-      </Suspense>
+      <SpaceBackground />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8">

@@ -48,7 +48,6 @@ import {
   Bot,
   Link as LinkIcon,
   RotateCcw,
-  RefreshCw
 } from "lucide-react";
 
 // Platform dimensions configuration
@@ -1267,7 +1266,7 @@ function AIImageGenerator() {
                     </>
                   ) : (
                     <>
-                      <RefreshCw className="mr-2 h-4 w-4" />
+                      <RotateCcw className="mr-2 h-4 w-4" />
                       Regenerate Content
                     </>
                   )}

@@ -53,6 +53,12 @@ import Careers from "@/pages/Careers";
 import HelpCenter from "@/pages/HelpCenter";
 import WatchDemo from "@/pages/WatchDemo";
 
+// Individual feature detail pages
+import FeatureAIContent from "@/pages/FeatureAIContent";
+import FeatureScheduling from "@/pages/FeatureScheduling";
+import FeatureAnalytics from "@/pages/FeatureAnalytics";
+import FeatureUnifiedManagement from "@/pages/FeatureUnifiedManagement";
+
 function AuthenticatedApp() {
   return (
     <WorkspaceProvider>
@@ -165,6 +171,10 @@ function Router() {
           <Route path="/careers" component={Careers} />
           <Route path="/help" component={HelpCenter} />
           <Route path="/watch-demo" component={WatchDemo} />
+          <Route path="/feature/ai-content-creation" component={FeatureAIContent} />
+          <Route path="/feature/intelligent-scheduling" component={FeatureScheduling} />
+          <Route path="/feature/advanced-analytics" component={FeatureAnalytics} />
+          <Route path="/feature/unified-management" component={FeatureUnifiedManagement} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/" component={Landing} />

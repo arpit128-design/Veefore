@@ -58,20 +58,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-// Optimized animation variants with reduced motion support
-const createAnimationVariants = (shouldReduce) => ({
-  fadeInUp: {
-    initial: shouldReduce ? {} : { opacity: 0, y: 30 },
-    animate: shouldReduce ? {} : { opacity: 1, y: 0 },
-    transition: shouldReduce ? {} : { duration: 0.4, ease: "easeOut" }
-  },
+// Optimized animation variants 
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.4, ease: "easeOut" }
+};
 
-  scaleIn: {
-    initial: shouldReduce ? {} : { opacity: 0, scale: 0.9 },
-    animate: shouldReduce ? {} : { opacity: 1, scale: 1 },
-    transition: shouldReduce ? {} : { duration: 0.3, ease: "easeOut" }
-  }
-});
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.9 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.3, ease: "easeOut" }
+};
 
 // Animated Section Component with Enhanced Lazy Loading
 interface AnimatedSectionProps {
@@ -587,7 +585,9 @@ function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-16"
-          variants={fadeInUp}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
         >
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -606,7 +606,9 @@ function FeaturesSection() {
           </motion.div>
           <motion.h2 
             className="text-4xl sm:text-5xl font-bold text-white mb-6"
-            variants={fadeInUp}
+            initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           >
             Everything You Need to{' '}
             <motion.span 
@@ -620,7 +622,9 @@ function FeaturesSection() {
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-300 max-w-3xl mx-auto"
-            variants={fadeInUp}
+            initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           >
             From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
           </motion.p>
@@ -779,7 +783,9 @@ function StatsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-16"
-          variants={fadeInUp}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
         >
           <motion.h2 
             className="text-4xl sm:text-5xl font-bold text-white mb-6"
@@ -809,13 +815,17 @@ function StatsSection() {
 
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          variants={staggerContainer}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
         >
           {stats.map((stat, index) => (
             <motion.div
               key={index}
               className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700"
-              variants={scaleIn}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
               whileHover={{ 
                 scale: 1.05, 
                 borderColor: "#64748b",
@@ -901,7 +911,9 @@ const SolutionsSection = memo(() => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-16"
-          variants={fadeInUp}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
         >
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -946,13 +958,17 @@ const SolutionsSection = memo(() => {
 
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          variants={staggerContainer}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
         >
           {solutions.map((solution, index) => (
             <motion.div 
               key={index} 
               className="group relative"
-              variants={scaleIn}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >

@@ -203,16 +203,16 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                 <p className="text-2xl font-bold text-green-400">
                   {loading ? '—' : formatNumber(combinedMetrics.totalFollowers)}
                 </p>
-                {analyticsData?.percentageChanges?.followers && (
+                {displayData?.percentageChanges?.followers && (
                   <div className={`flex items-center gap-1 text-xs ${
-                    analyticsData.percentageChanges.followers.isPositive ? 'text-green-400' : 'text-red-400'
+                    displayData.percentageChanges.followers.isPositive ? 'text-green-400' : 'text-red-400'
                   }`}>
-                    {analyticsData.percentageChanges.followers.isPositive ? (
+                    {displayData.percentageChanges.followers.isPositive ? (
                       <TrendingUp className="h-3 w-3" />
                     ) : (
                       <TrendingDown className="h-3 w-3" />
                     )}
-                    {analyticsData.percentageChanges.followers.value}
+                    <span>{displayData.percentageChanges.followers.value}</span>
                   </div>
                 )}
               </div>
@@ -227,18 +227,18 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
               <div>
                 <p className="text-sm text-asteroid-silver">Engagement Rate</p>
                 <p className="text-2xl font-bold text-nebula-purple">
-                  {loading ? '—' : `${formatEngagement(analyticsData?.engagementRate || 0)}%`}
+                  {loading ? '—' : `${formatEngagement(combinedMetrics.engagementRate)}%`}
                 </p>
-                {analyticsData?.percentageChanges?.engagement && (
+                {displayData?.percentageChanges?.engagement && (
                   <div className={`flex items-center gap-1 text-xs ${
-                    analyticsData.percentageChanges.engagement.isPositive ? 'text-green-400' : 'text-red-400'
+                    displayData.percentageChanges.engagement.isPositive ? 'text-green-400' : 'text-red-400'
                   }`}>
-                    {analyticsData.percentageChanges.engagement.isPositive ? (
+                    {displayData.percentageChanges.engagement.isPositive ? (
                       <TrendingUp className="h-3 w-3" />
                     ) : (
                       <TrendingDown className="h-3 w-3" />
                     )}
-                    {analyticsData.percentageChanges.engagement.value}
+                    <span>{displayData.percentageChanges.engagement.value}</span>
                   </div>
                 )}
               </div>

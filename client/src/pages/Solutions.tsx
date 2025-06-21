@@ -47,7 +47,7 @@ const solutions = [
       "Lead Generation"
     ],
     cta: "Learn More",
-    href: "/solutions/business"
+    href: "/solution-small-businesses"
   },
   {
     icon: <Users className="h-12 w-12" />,
@@ -63,7 +63,7 @@ const solutions = [
       "Campaign Management"
     ],
     cta: "Learn More", 
-    href: "/solutions/agencies"
+    href: "/solution/agencies"
   },
   {
     icon: <Briefcase className="h-12 w-12" />,
@@ -78,8 +78,8 @@ const solutions = [
       "Advanced Analytics",
       "Compliance Tools"
     ],
-    cta: "Contact Sales",
-    href: "/contact"
+    cta: "Learn More",
+    href: "/solution/enterprises"
   }
 ];
 

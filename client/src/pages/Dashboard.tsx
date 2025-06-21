@@ -6,6 +6,7 @@ import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
+import { AudienceDemographics } from "@/components/dashboard/AudienceDemographics";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useInstantData } from "@/hooks/useInstantData";
@@ -254,6 +255,160 @@ export default function Dashboard() {
         // Multi-Platform Analytics Overview with Filtering
         <AnalyticsOverview data={analyticsData} isLoading={analyticsLoading} />
       )}
+
+      {/* Analytics Insights Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Audience Demographics */}
+        <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-pink-400 mb-4">Audience Demographics</h3>
+          <div className="space-y-4">
+            {/* Age Groups */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Age Distribution</h4>
+              <div className="space-y-2">
+                {[
+                  { age: "18-24", percentage: 32 },
+                  { age: "25-34", percentage: 28 },
+                  { age: "35-44", percentage: 22 },
+                  { age: "45-54", percentage: 12 },
+                  { age: "55+", percentage: 6 }
+                ].map((group) => (
+                  <div key={group.age} className="flex justify-between items-center">
+                    <span className="text-xs text-gray-400">{group.age} years</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-pink-400 rounded-full" 
+                          style={{ width: `${group.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-pink-400 font-medium w-8">{group.percentage}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Gender Distribution */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Gender Distribution</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                  <div className="text-xl font-bold text-pink-400">62%</div>
+                  <div className="text-xs text-gray-400">Female</div>
+                </div>
+                <div className="text-center p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <div className="text-xl font-bold text-blue-400">38%</div>
+                  <div className="text-xs text-gray-400">Male</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Locations */}
+        <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-blue-400 mb-4">Top Locations</h3>
+          <div className="space-y-4">
+            {/* Countries */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Countries</h4>
+              <div className="space-y-2">
+                {[
+                  { name: "India", percentage: 45 },
+                  { name: "United States", percentage: 18 },
+                  { name: "United Kingdom", percentage: 12 },
+                  { name: "Canada", percentage: 8 },
+                  { name: "Australia", percentage: 6 },
+                  { name: "Others", percentage: 11 }
+                ].map((country) => (
+                  <div key={country.name} className="flex justify-between items-center p-2 bg-gray-800/30 rounded">
+                    <span className="text-sm text-gray-300">{country.name}</span>
+                    <span className="text-sm text-blue-400 font-medium">{country.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Cities */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Top Cities</h4>
+              <div className="space-y-1">
+                {[
+                  { name: "Mumbai", percentage: 12 },
+                  { name: "Delhi", percentage: 10 },
+                  { name: "New York", percentage: 8 },
+                  { name: "London", percentage: 6 }
+                ].map((city) => (
+                  <div key={city.name} className="flex justify-between items-center text-xs">
+                    <span className="text-gray-400">{city.name}</span>
+                    <span className="text-blue-400">{city.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Audience Activity */}
+        <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 border border-gray-700 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-green-400 mb-4">Audience Activity</h3>
+          <div className="space-y-4">
+            {/* Active Hours */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Most Active Hours</h4>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { time: "9-11 AM", activity: "High" },
+                  { time: "1-3 PM", activity: "Medium" },
+                  { time: "7-9 PM", activity: "Peak" },
+                  { time: "10-12 PM", activity: "Medium" },
+                  { time: "6-8 AM", activity: "Low" },
+                  { time: "11 PM-1 AM", activity: "Low" }
+                ].map((slot) => (
+                  <div key={slot.time} className="text-center p-2 bg-gray-800/30 rounded text-xs">
+                    <div className="text-gray-300 font-medium">{slot.time}</div>
+                    <div className={`text-xs ${
+                      slot.activity === "Peak" ? "text-green-400" :
+                      slot.activity === "High" ? "text-yellow-400" :
+                      slot.activity === "Medium" ? "text-blue-400" : "text-gray-500"
+                    }`}>{slot.activity}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Weekly Activity */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Weekly Activity</h4>
+              <div className="space-y-2">
+                {[
+                  { day: "Monday", engagement: 85 },
+                  { day: "Tuesday", engagement: 78 },
+                  { day: "Wednesday", engagement: 92 },
+                  { day: "Thursday", engagement: 88 },
+                  { day: "Friday", engagement: 95 },
+                  { day: "Saturday", engagement: 72 },
+                  { day: "Sunday", engagement: 68 }
+                ].map((day) => (
+                  <div key={day.day} className="flex justify-between items-center">
+                    <span className="text-xs text-gray-400">{day.day}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-green-400 rounded-full" 
+                          style={{ width: `${day.engagement}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-green-400 font-medium w-6">{day.engagement}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Audience Demographics Section */}
+      <AudienceDemographics />
 
       {/* Additional Dashboard Sections */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

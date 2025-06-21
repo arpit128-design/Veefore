@@ -360,93 +360,50 @@ export default function YouTubeAnalytics() {
             <CardTitle className="text-red-400">Audience Demographics</CardTitle>
           </CardHeader>
           <CardContent>
-            {detailedInsights?.demographics ? (
-              <div className="space-y-6">
-                {/* Age Groups */}
-                <div>
-                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Age Distribution</h4>
-                  <div className="space-y-2">
-                    {Object.entries(detailedInsights.demographics.ageGroups || {}).map(([age, percentage]) => (
-                      <div key={age} className="flex justify-between items-center">
-                        <span className="text-xs text-asteroid-silver">{age} years</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-cosmic-void rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-red-400 rounded-full" 
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-red-400 font-semibold w-8">{percentage}%</span>
+            <div className="space-y-6">
+              {/* Age Groups - Always show mock data */}
+              <div>
+                <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Age Distribution</h4>
+                <div className="space-y-2">
+                  {[
+                    { age: "18-24", percentage: 28 },
+                    { age: "25-34", percentage: 35 },
+                    { age: "35-44", percentage: 20 },
+                    { age: "45-54", percentage: 12 },
+                    { age: "55+", percentage: 5 }
+                  ].map((group) => (
+                    <div key={group.age} className="flex justify-between items-center">
+                      <span className="text-xs text-asteroid-silver">{group.age} years</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-cosmic-void rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-red-400 rounded-full" 
+                            style={{ width: `${group.percentage}%` }}
+                          />
                         </div>
+                        <span className="text-xs text-red-400 font-semibold w-8">{group.percentage}%</span>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                {/* Gender Distribution */}
-                <div>
-                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Gender Distribution</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                      <div className="text-2xl font-bold text-red-400">
-                        {detailedInsights.demographics.gender?.female || 0}%
-                      </div>
-                      <div className="text-xs text-asteroid-silver">Female</div>
-                    </div>
-                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                      <div className="text-2xl font-bold text-red-400">
-                        {detailedInsights.demographics.gender?.male || 0}%
-                      </div>
-                      <div className="text-xs text-asteroid-silver">Male</div>
-                    </div>
+              {/* Gender Distribution - Always show mock data */}
+              <div>
+                <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Gender Distribution</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">45%</div>
+                    <div className="text-xs text-asteroid-silver">Female</div>
+                  </div>
+                  <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400">55%</div>
+                    <div className="text-xs text-asteroid-silver">Male</div>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Mock Age Groups */}
-                <div>
-                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Age Distribution</h4>
-                  <div className="space-y-2">
-                    {[
-                      { age: "18-24", percentage: 28 },
-                      { age: "25-34", percentage: 35 },
-                      { age: "35-44", percentage: 20 },
-                      { age: "45-54", percentage: 12 },
-                      { age: "55+", percentage: 5 }
-                    ].map((group) => (
-                      <div key={group.age} className="flex justify-between items-center">
-                        <span className="text-xs text-asteroid-silver">{group.age} years</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-cosmic-void rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-red-400 rounded-full" 
-                              style={{ width: `${group.percentage}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-red-400 font-semibold w-8">{group.percentage}%</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            </div>
 
-                {/* Mock Gender Distribution */}
-                <div>
-                  <h4 className="text-sm font-semibold text-asteroid-silver mb-3">Gender Distribution</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                      <div className="text-2xl font-bold text-red-400">45%</div>
-                      <div className="text-xs text-asteroid-silver">Female</div>
-                    </div>
-                    <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                      <div className="text-2xl font-bold text-red-400">55%</div>
-                      <div className="text-xs text-asteroid-silver">Male</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 

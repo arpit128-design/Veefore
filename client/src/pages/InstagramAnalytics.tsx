@@ -55,6 +55,13 @@ export default function InstagramAnalytics() {
 
   const instagramData = analytics?.platformData?.instagram;
   const hasData = analytics && instagramData;
+  
+  // Debug log for Instagram data
+  console.log('[INSTAGRAM ANALYTICS] Data received:', {
+    hasData,
+    instagramData,
+    analytics: analytics?.platformData
+  });
 
   // Calculate engagement metrics using the same method as dashboard
   const calculateEngagementRate = () => {
@@ -64,6 +71,12 @@ export default function InstagramAnalytics() {
     
     // Use reach-based calculation for consistency with dashboard
     // This gives the authentic 4.78% rate instead of the inflated follower-based rate
+    console.log('[INSTAGRAM ANALYTICS] Engagement calculation:', {
+      totalInteractions,
+      reach,
+      rate: reach > 0 ? (totalInteractions / reach * 100) : 0
+    });
+    
     return reach > 0 ? (totalInteractions / reach * 100) : 0;
   };
 

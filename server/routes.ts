@@ -6677,6 +6677,125 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   });
 
+  // Get scheduled content for Advanced Scheduler
+  app.get('/api/scheduled-content', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+      
+      if (!currentWorkspace) {
+        return res.json([]);
+      }
+      
+      const scheduledContent = await storage.getScheduledContent(currentWorkspace.id);
+      console.log('[SCHEDULED CONTENT] Found content items:', scheduledContent.length);
+      
+      res.json(scheduledContent);
+    } catch (error: any) {
+      console.error('[SCHEDULED CONTENT] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create scheduled content for Advanced Scheduler
+  app.post('/api/content', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { 
+        title, 
+        description, 
+        type = 'post', 
+        platform, 
+        scheduledDate,
+        scheduledTime,
+        contentData = {},
+        optimalTime
+      } = req.body;
+
+      console.log('[CREATE CONTENT] Request data:', {
+        title,
+        platform,
+        scheduledDate,
+        scheduledTime,
+        optimalTime,
+        hasContentData: !!contentData
+      });
+
+      if (!title || !description || !platform || !scheduledDate || !scheduledTime) {
+        return res.status(400).json({ 
+          error: 'Title, description, platform, scheduled date and time are required' 
+        });
+      }
+
+      // Get user's default workspace
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+      
+      if (!currentWorkspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      // Parse the scheduled date and time
+      const [year, month, day] = scheduledDate.split('-').map(Number);
+      const [hours, minutes] = scheduledTime.split(':').map(Number);
+      
+      const scheduledAt = new Date(year, month - 1, day, hours, minutes);
+      
+      // If optimal time is selected, use the optimal time suggestion
+      if (optimalTime && platform === 'instagram') {
+        // Set optimal posting time for Instagram (best engagement times)
+        const optimalHours = [9, 13, 17, 19]; // 9 AM, 1 PM, 5 PM, 7 PM
+        const randomOptimalHour = optimalHours[Math.floor(Math.random() * optimalHours.length)];
+        scheduledAt.setHours(randomOptimalHour, 0, 0, 0);
+        console.log('[CREATE CONTENT] Using optimal time:', scheduledAt);
+      }
+
+      // Validate scheduled time is in the future
+      if (scheduledAt <= new Date()) {
+        return res.status(400).json({ 
+          error: 'Scheduled time must be in the future' 
+        });
+      }
+
+      // Create scheduled content
+      const contentToSave = {
+        title,
+        description,
+        type,
+        platform,
+        status: 'scheduled',
+        scheduledAt,
+        workspaceId: currentWorkspace.id,
+        creditsUsed: 0,
+        contentData: {
+          ...contentData,
+          optimalTimeUsed: !!optimalTime
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      console.log('[CREATE CONTENT] Saving content:', {
+        ...contentToSave,
+        scheduledAt: contentToSave.scheduledAt.toISOString()
+      });
+
+      const savedContent = await storage.createContent(contentToSave);
+      
+      console.log('[CREATE CONTENT] Content saved successfully:', savedContent.id);
+
+      res.json({ 
+        success: true, 
+        content: savedContent,
+        message: 'Content scheduled successfully'
+      });
+    } catch (error: any) {
+      console.error('[CREATE CONTENT] Error:', error);
+      res.status(500).json({ error: error.message || 'Failed to schedule content' });
+    }
+  });
+
   // Content metrics route
   app.get('/api/content/metrics', requireAuth, async (req: any, res: Response) => {
     try {

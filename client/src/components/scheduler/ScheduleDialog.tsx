@@ -44,6 +44,8 @@ interface ContentForm {
   scheduledDate: Date | undefined;
   scheduledTime: string;
   contentData: any;
+  mediaFile?: File;
+  optimalTime?: boolean;
 }
 
 export function ScheduleDialog({ isOpen, onClose, selectedDate }: ScheduleDialogProps) {

@@ -362,12 +362,50 @@ export default function AdvancedScheduler() {
     );
   };
 
-  const getWeekDays = () => {
-    const start = startOfWeek(currentWeek);
+  const getMonthDays = () => {
+    const year = currentWeek.getFullYear();
+    const month = currentWeek.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Adjust for Monday start
+
     const days = [];
-    for (let i = 0; i < 7; i++) {
-      days.push(addDays(start, i));
+    const today = new Date();
+
+    // Add days from previous month
+    const prevMonth = new Date(year, month - 1, 0);
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      const date = prevMonth.getDate() - i;
+      days.push({
+        date: new Date(year, month - 1, date),
+        isCurrentMonth: false,
+        isToday: false
+      });
     }
+
+    // Add days from current month
+    for (let date = 1; date <= daysInMonth; date++) {
+      const fullDate = new Date(year, month, date);
+      const isToday = fullDate.toDateString() === today.toDateString();
+      
+      days.push({
+        date: fullDate,
+        isCurrentMonth: true,
+        isToday
+      });
+    }
+
+    // Add days from next month to fill the grid
+    const remainingDays = 42 - days.length; // 6 rows × 7 days
+    for (let date = 1; date <= remainingDays; date++) {
+      days.push({
+        date: new Date(year, month + 1, date),
+        isCurrentMonth: false,
+        isToday: false
+      });
+    }
+
     return days;
   };
 
@@ -754,78 +792,106 @@ export default function AdvancedScheduler() {
           <Card className="content-card holographic">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-electric-cyan font-orbitron">Weekly Calendar</CardTitle>
+                <CardTitle className="text-electric-cyan font-orbitron">Monthly Calendar</CardTitle>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentWeek(addDays(currentWeek, -7))}
+                    onClick={() => setCurrentWeek(new Date(currentWeek.getFullYear(), currentWeek.getMonth() - 1, 1))}
                     className="glassmorphism"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                   <span className="text-sm font-medium text-white">
-                    {format(startOfWeek(currentWeek), 'MMM dd')} - {format(endOfWeek(currentWeek), 'MMM dd, yyyy')}
+                    {format(currentWeek, 'MMMM yyyy')}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentWeek(addDays(currentWeek, 7))}
+                    onClick={() => setCurrentWeek(new Date(currentWeek.getFullYear(), currentWeek.getMonth() + 1, 1))}
                     className="glassmorphism"
                   >
                     <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentWeek(new Date())}
+                    className="glassmorphism text-electric-cyan"
+                  >
+                    Today
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-7 gap-4">
-                {getWeekDays().map((day) => {
-                  const dayContent = getContentForDate(day);
-                  const isToday = isSameDay(day, new Date());
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 gap-2 mb-4">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  <div key={day} className="text-center py-2 text-asteroid-silver font-medium text-sm border-b border-space-gray">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {getMonthDays().map((dayObj, index) => {
+                  const dayContent = getContentForDate(dayObj.date);
                   
                   return (
                     <div
-                      key={day.toISOString()}
-                      className={`min-h-[200px] border rounded-lg p-3 glassmorphism ${
-                        isToday ? 'border-electric-cyan bg-electric-cyan/10' : 'border-space-gray'
+                      key={index}
+                      className={`min-h-[120px] border rounded-lg p-2 glassmorphism cursor-pointer hover:border-electric-cyan/50 transition-all ${
+                        dayObj.isToday 
+                          ? 'border-electric-cyan bg-electric-cyan/10' 
+                          : dayObj.isCurrentMonth 
+                            ? 'border-space-gray' 
+                            : 'border-space-gray/30 opacity-40'
                       }`}
+                      onClick={() => dayObj.isCurrentMonth && setIsCreateOpen(true)}
                     >
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center mb-1">
                         <span className={`text-sm font-medium ${
-                          isToday ? 'text-electric-cyan' : 'text-asteroid-silver'
+                          dayObj.isToday 
+                            ? 'text-electric-cyan' 
+                            : dayObj.isCurrentMonth 
+                              ? 'text-white' 
+                              : 'text-asteroid-silver'
                         }`}>
-                          {format(day, 'EEE dd')}
+                          {format(dayObj.date, 'd')}
                         </span>
-                        <Badge variant="secondary" className="text-xs">
-                          {dayContent.length}
-                        </Badge>
+                        {dayContent.length > 0 && (
+                          <Badge variant="secondary" className="text-xs h-4 w-4 rounded-full p-0 flex items-center justify-center bg-electric-cyan text-black">
+                            {dayContent.length}
+                          </Badge>
+                        )}
                       </div>
                       
-                      <div className="space-y-2">
-                        {dayContent.slice(0, 3).map((content) => {
+                      <div className="space-y-1">
+                        {dayContent.slice(0, 2).map((content) => {
                           const Icon = platformIcons[content.platform as keyof typeof platformIcons];
-                          const platformColor = platformColors[content.platform as keyof typeof platformColors];
                           
                           return (
                             <div
                               key={content.id}
-                              className={`text-xs p-2 rounded border ${platformColor} cursor-pointer hover:shadow-sm`}
+                              className="text-xs p-1 rounded bg-cosmic-blue/30 border border-electric-cyan/20 cursor-pointer hover:bg-cosmic-blue/50 transition-colors"
+                              title={`${content.title} - ${format(new Date(content.scheduledAt), 'HH:mm')}`}
                             >
-                              <div className="flex items-center space-x-1 mb-1">
-                                {Icon && <Icon className="w-3 h-3" />}
-                                <span className="font-medium truncate">{content.title}</span>
+                              <div className="flex items-center space-x-1">
+                                {Icon && <Icon className="w-3 h-3 text-electric-cyan" />}
+                                <span className="font-medium truncate text-white text-xs">{content.title}</span>
                               </div>
-                              <div className="text-gray-600 truncate">
+                              <div className="text-asteroid-silver text-xs">
                                 {format(new Date(content.scheduledAt), 'HH:mm')}
                               </div>
                             </div>
                           );
                         })}
                         
-                        {dayContent.length > 3 && (
-                          <div className="text-xs text-gray-500 text-center py-1">
-                            +{dayContent.length - 3} more
+                        {dayContent.length > 2 && (
+                          <div className="text-xs text-electric-cyan text-center py-1">
+                            +{dayContent.length - 2}
                           </div>
                         )}
                       </div>

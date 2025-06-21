@@ -816,7 +816,8 @@ function StatsSection() {
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ staggerChildren: 0.1 }}
         >
           {stats.map((stat, index) => (
@@ -824,14 +825,14 @@ function StatsSection() {
               key={index}
               className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               whileHover={{ 
-                scale: 1.05, 
+                scale: 1.02, 
                 borderColor: "#64748b",
                 boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)" 
               }}
-              transition={{ duration: 0.3 }}
             >
               <motion.div 
                 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2"
@@ -959,7 +960,8 @@ const SolutionsSection = memo(() => {
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ staggerChildren: 0.1 }}
         >
           {solutions.map((solution, index) => (
@@ -967,10 +969,10 @@ const SolutionsSection = memo(() => {
               key={index} 
               className="group relative"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              transition={{ duration: 0.3 }}
             >
               <motion.div 
                 className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl"

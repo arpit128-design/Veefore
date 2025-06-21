@@ -65,13 +65,7 @@ const createAnimationVariants = (shouldReduce) => ({
     animate: shouldReduce ? {} : { opacity: 1, y: 0 },
     transition: shouldReduce ? {} : { duration: 0.4, ease: "easeOut" }
   },
-  staggerContainer: {
-    animate: {
-      transition: shouldReduce ? {} : {
-        staggerChildren: 0.05
-      }
-    }
-  },
+
   scaleIn: {
     initial: shouldReduce ? {} : { opacity: 0, scale: 0.9 },
     animate: shouldReduce ? {} : { opacity: 1, scale: 1 },
@@ -108,7 +102,6 @@ function AnimatedSection({ children, className = "", id, delay = 0 }: AnimatedSe
           staggerChildren: 0.1
         }
       } : { opacity: 0, y: 60, scale: 0.95 }}
-      variants={staggerContainer}
     >
       <motion.div
         variants={{

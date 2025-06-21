@@ -183,10 +183,18 @@ function Navigation() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('features')} className="text-gray-300 hover:text-white transition-colors">Features</button>
-            <button onClick={() => scrollToSection('solutions')} className="text-gray-300 hover:text-white transition-colors">Solutions</button>
-            <button onClick={() => scrollToSection('pricing')} className="text-gray-300 hover:text-white transition-colors">Pricing</button>
-            <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors">Reviews</button>
+            <Link href="/features">
+              <button className="text-gray-300 hover:text-white transition-colors">Features</button>
+            </Link>
+            <Link href="/solutions">
+              <button className="text-gray-300 hover:text-white transition-colors">Solutions</button>
+            </Link>
+            <Link href="/pricing">
+              <button className="text-gray-300 hover:text-white transition-colors">Pricing</button>
+            </Link>
+            <Link href="/reviews">
+              <button className="text-gray-300 hover:text-white transition-colors">Reviews</button>
+            </Link>
             <Link href="/auth">
               <Button variant="ghost" className="text-gray-300 hover:text-white">Sign In</Button>
             </Link>
@@ -414,24 +422,26 @@ function HeroSection() {
               </Button>
             </motion.div>
           </Link>
-          <motion.div
-            whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 1 }}
-          >
-            <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
-              <motion.div
-                className="mr-2 w-5 h-5 inline-block"
-                whileHover={{ scale: 1.2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Play className="w-5 h-5" />
-              </motion.div>
-              Watch Demo
-            </Button>
-          </motion.div>
+          <Link href="/watch-demo">
+            <motion.div
+              whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
+              <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
+                <motion.div
+                  className="mr-2 w-5 h-5 inline-block"
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Play className="w-5 h-5" />
+                </motion.div>
+                Watch Demo
+              </Button>
+            </motion.div>
+          </Link>
         </motion.div>
 
         {/* Platform Icons */}

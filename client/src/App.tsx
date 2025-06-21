@@ -42,6 +42,17 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import InstagramAnalytics from "@/pages/InstagramAnalytics";
 import YouTubeAnalytics from "@/pages/YouTubeAnalytics";
 
+// New landing page related pages
+import Features from "@/pages/Features";
+import Solutions from "@/pages/Solutions";
+import Reviews from "@/pages/Reviews";
+import Blog from "@/pages/Blog";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
+import Careers from "@/pages/Careers";
+import HelpCenter from "@/pages/HelpCenter";
+import WatchDemo from "@/pages/WatchDemo";
+
 function AuthenticatedApp() {
   return (
     <WorkspaceProvider>
@@ -145,6 +156,15 @@ function Router() {
         <OptimizedSpaceBackground />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/features" component={Features} />
+          <Route path="/solutions" component={Solutions} />
+          <Route path="/reviews" component={Reviews} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/careers" component={Careers} />
+          <Route path="/help" component={HelpCenter} />
+          <Route path="/watch-demo" component={WatchDemo} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/" component={Landing} />

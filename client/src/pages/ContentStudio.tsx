@@ -925,6 +925,9 @@ function AIImageGenerator() {
   const [style, setStyle] = useState("photorealistic");
   const [generatedImage, setGeneratedImage] = useState<any>(null);
   const [step, setStep] = useState('input');
+  const [editedCaption, setEditedCaption] = useState("");
+  const [editedHashtags, setEditedHashtags] = useState<string[]>([]);
+  const [isEditingContent, setIsEditingContent] = useState(false);
   
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
@@ -936,6 +939,8 @@ function AIImageGenerator() {
     },
     onSuccess: (response: any) => {
       setGeneratedImage(response);
+      setEditedCaption(response.caption || "");
+      setEditedHashtags(response.hashtags || []);
       setStep('preview');
       toast({
         title: "AI Image Generated!",
@@ -1138,73 +1143,155 @@ function AIImageGenerator() {
               )}
             </div>
 
-            {generatedImage.caption && (
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Generated Caption</Label>
-                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                  <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{generatedImage.caption}</p>
-                </div>
-              </div>
-            )}
-
-            {generatedImage.hashtags && generatedImage.hashtags.length > 0 && (
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Relevant Hashtags</Label>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                  <div className="flex flex-wrap gap-2">
-                    {generatedImage.hashtags.map((tag: string, index: number) => (
-                      <Badge 
-                        key={index} 
-                        variant="secondary" 
-                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs px-2 py-1"
+            {!isEditingContent ? (
+              <div className="space-y-4">
+                {editedCaption && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-medium text-gray-700">Generated Caption</Label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setIsEditingContent(true)}
                       >
-                        #{tag.replace(/^#+/, '')}
-                      </Badge>
-                    ))}
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                      <p className="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{editedCaption}</p>
+                    </div>
                   </div>
+                )}
+
+                {editedHashtags && editedHashtags.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">Relevant Hashtags</Label>
+                    <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                      <div className="flex flex-wrap gap-2">
+                        {editedHashtags.map((tag: string, index: number) => (
+                          <Badge 
+                            key={index} 
+                            variant="secondary" 
+                            className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs px-2 py-1"
+                          >
+                            #{tag.replace(/^#+/, '')}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="caption-edit">Edit Caption</Label>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setIsEditingContent(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setIsEditingContent(false);
+                          toast({
+                            title: "Content Updated",
+                            description: "Caption and hashtags have been updated",
+                          });
+                        }}
+                      >
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                  <Textarea
+                    id="caption-edit"
+                    value={editedCaption}
+                    onChange={(e) => setEditedCaption(e.target.value)}
+                    placeholder="Write your caption..."
+                    rows={4}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="hashtags-edit">Edit Hashtags (comma-separated)</Label>
+                  <Textarea
+                    id="hashtags-edit"
+                    value={editedHashtags.join(', ')}
+                    onChange={(e) => setEditedHashtags(e.target.value.split(',').map(tag => tag.trim()).filter(Boolean))}
+                    placeholder="technology, AI, innovation, socialmedia"
+                    rows={2}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Separate hashtags with commas. Don't include # symbols.
+                  </p>
                 </div>
               </div>
             )}
 
-            <div className="flex space-x-2">
-              <Button variant="outline" className="flex-1">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
+            <div className="space-y-3">
+              <div className="flex space-x-2">
+                <Button variant="outline" className="flex-1">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    // Generate new caption and hashtags
+                    imageMutation.mutate({
+                      prompt: prompt.trim(),
+                      platform,
+                      contentType,
+                      style,
+                      workspaceId: currentWorkspace?.id,
+                      dimensions: PLATFORM_DIMENSIONS[platform]?.[contentType] || PLATFORM_DIMENSIONS.instagram.post
+                    });
+                  }}
+                  disabled={imageMutation.isPending}
+                >
+                  {imageMutation.isPending ? (
+                    <>
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                      Regenerating...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Regenerate Content
+                    </>
+                  )}
+                </Button>
+              </div>
               
               {platform === 'instagram' && generatedImage.imageUrl && (
                 <Button 
-                  className="flex-1"
-                  onClick={() => publishToInstagram(generatedImage.imageUrl, 'image', generatedImage.caption)}
+                  className="w-full"
+                  onClick={() => publishToInstagram(generatedImage.imageUrl, 'image', editedCaption, editedHashtags)}
                   disabled={publishMutation.isPending}
                 >
                   {publishMutation.isPending ? (
                     <>
                       <LoadingSpinner className="mr-2 h-4 w-4" />
-                      Publishing...
+                      Publishing to Instagram...
                     </>
                   ) : (
                     <>
                       <Instagram className="mr-2 h-4 w-4" />
-                      Publish to Instagram
+                      Publish to Instagram with Hashtags
                     </>
                   )}
                 </Button>
               )}
-              
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  toast({
-                    title: "Coming Soon",
-                    description: "Direct publishing will be available soon",
-                  });
-                }}
-              >
-                <Share className="mr-2 h-4 w-4" />
-                Share to Platform
-              </Button>
             </div>
           </CardContent>
         </Card>

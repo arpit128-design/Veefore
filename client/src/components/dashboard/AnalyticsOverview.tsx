@@ -74,6 +74,7 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
   console.log('[ANALYTICS OVERVIEW] Selected platforms:', selectedPlatforms);
   console.log('[ANALYTICS OVERVIEW] Time period:', timePeriod);
   console.log('[ANALYTICS OVERVIEW] Filtered data:', filteredData);
+  console.log('[ANALYTICS OVERVIEW] Filtered loading:', filteredLoading);
   console.log('[ANALYTICS OVERVIEW] Display data:', displayData);
 
   // Get available platforms from data

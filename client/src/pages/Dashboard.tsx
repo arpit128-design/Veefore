@@ -6,7 +6,6 @@ import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
-import AudienceDemographics from "@/components/dashboard/AudienceDemographics";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
@@ -407,9 +406,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Audience Demographics Section */}
-      <AudienceDemographics />
 
       {/* Additional Dashboard Sections */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

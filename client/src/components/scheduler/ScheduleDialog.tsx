@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,17 +9,31 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Image, Video, FileText, Upload } from "lucide-react";
+import { 
+  Calendar as CalendarIcon, 
+  Clock, 
+  Image, 
+  Video, 
+  FileText, 
+  Upload, 
+  X, 
+  Instagram, 
+  Youtube, 
+  Twitter, 
+  Linkedin, 
+  Facebook,
+  Sparkles 
+} from "lucide-react";
 
 interface ScheduleDialogProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate?: Date | null;
-  workspaceId?: number;
 }
 
 interface ContentForm {
@@ -32,42 +46,92 @@ interface ContentForm {
   contentData: any;
 }
 
-export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: ScheduleDialogProps) {
+export function ScheduleDialog({ isOpen, onClose, selectedDate }: ScheduleDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentWorkspace } = useWorkspace();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [form, setForm] = useState<ContentForm>({
     title: "",
     description: "",
     type: "post",
-    platform: "instagram",
+    platform: "",
     scheduledDate: selectedDate || undefined,
     scheduledTime: "09:00",
     contentData: {}
   });
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [useOptimalTime, setUseOptimalTime] = useState(false);
+
+  // Get connected social accounts for current workspace
+  const { data: socialAccounts = [] } = useQuery({
+    queryKey: ['/api/social-accounts'],
+    enabled: !!currentWorkspace?.id,
+  });
+
+  const platformIcons = {
+    instagram: Instagram,
+    youtube: Youtube,
+    twitter: Twitter,
+    linkedin: Linkedin,
+    facebook: Facebook,
+  };
 
   const createContentMutation = useMutation({
     mutationFn: async (contentData: any) => {
-      const response = await apiRequest('POST', '/api/content', {
-        body: JSON.stringify(contentData)
+      // Validate workspace and social account
+      if (!currentWorkspace?.id) {
+        throw new Error('No workspace selected');
+      }
+      
+      const connectedAccount = socialAccounts.find(account => account.platform === contentData.platform);
+      if (!connectedAccount) {
+        throw new Error(`No ${contentData.platform} account connected to this workspace`);
+      }
+
+      const formData = new FormData();
+      
+      // Add workspace validation
+      formData.append('workspaceId', currentWorkspace.id);
+      formData.append('socialAccountId', connectedAccount.id);
+      formData.append('title', contentData.title);
+      formData.append('description', contentData.description);
+      formData.append('type', contentData.type);
+      formData.append('platform', contentData.platform);
+      formData.append('scheduledAt', contentData.scheduledAt);
+      
+      // Add media files if any
+      uploadedFiles.forEach((file, index) => {
+        formData.append(`mediaFile_${index}`, file);
       });
-      return response.json();
+      
+      if (uploadedFiles.length > 0) {
+        formData.append('mediaCount', uploadedFiles.length.toString());
+      }
+
+      const response = await apiRequest('/api/scheduled-content', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-content'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/scheduled-content'] });
       toast({
-        title: "Content scheduled",
-        description: "Your content has been scheduled successfully."
+        title: "Content scheduled successfully",
+        description: `Your content has been scheduled to your ${form.platform} account.`
       });
       onClose();
       resetForm();
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
-        title: "Error",
-        description: "Failed to schedule content. Please try again.",
+        title: "Failed to schedule content",
+        description: error.message || "Please check your connection and try again.",
         variant: "destructive"
       });
     }
@@ -78,21 +142,37 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
       title: "",
       description: "",
       type: "post",
-      platform: "instagram",
+      platform: "",
       scheduledDate: selectedDate || undefined,
       scheduledTime: "09:00",
       contentData: {}
     });
     setUploadedFiles([]);
+    setMediaPreview(null);
+    setUseOptimalTime(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!workspaceId || !form.title || !form.scheduledDate) {
+    if (!currentWorkspace?.id || !form.title || !form.platform || !form.scheduledDate) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if platform account is connected
+    const connectedAccount = socialAccounts.find(account => account.platform === form.platform);
+    if (!connectedAccount) {
+      toast({
+        title: "Account not connected",
+        description: `Please connect your ${form.platform} account first from the Connections page.`,
         variant: "destructive"
       });
       return;
@@ -103,66 +183,38 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
     scheduledDateTime.setHours(parseInt(hours), parseInt(minutes));
 
     const contentData = {
-      workspaceId,
       title: form.title,
       description: form.description,
       type: form.type,
       platform: form.platform,
       scheduledAt: scheduledDateTime.toISOString(),
-      contentData: {
-        ...form.contentData,
-        files: uploadedFiles.map(file => ({
-          name: file.name,
-          type: file.type,
-          size: file.size
-        }))
-      }
     };
 
     createContentMutation.mutate(contentData);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    for (const file of files) {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await apiRequest('POST', '/api/upload', formData);
-        const result = await response.json();
-        
-        if (result.success) {
-          // Update form content data with the uploaded file URL
-          setForm(prev => ({
-            ...prev,
-            contentData: {
-              ...prev.contentData,
-              mediaUrl: result.fileUrl
-            }
-          }));
-          
-          toast({
-            title: "File uploaded successfully",
-            description: `${file.name} is ready for Instagram publishing`
-          });
-        }
-      } catch (error) {
-        console.error('File upload error:', error);
-        toast({
-          title: "Upload failed",
-          description: `Failed to upload ${file.name}`,
-          variant: "destructive"
-        });
+    files.forEach(file => {
+      // Create preview for images and videos
+      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setMediaPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
       }
-    }
+    });
     
     setUploadedFiles(prev => [...prev, ...files]);
   };
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    if (uploadedFiles.length === 1) {
+      setMediaPreview(null);
+    }
   };
 
   const getOptimalTimes = () => {
@@ -176,6 +228,8 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
         return ['09:00', '13:00', '15:00', '19:00', '21:00'];
       case 'linkedin':
         return ['08:00', '10:00', '12:00', '14:00', '17:00'];
+      case 'youtube':
+        return ['14:00', '18:00', '20:00', '21:00'];
       default:
         return ['09:00', '12:00', '15:00', '18:00', '21:00'];
     }
@@ -191,9 +245,44 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
     }
   };
 
+  const getOptimalTimeForPlatform = () => {
+    if (!form.platform) return '';
+    
+    const now = new Date();
+    const currentHour = now.getHours();
+    const optimalTimes = getOptimalTimes();
+    
+    // Find the next optimal time
+    const nextOptimalTime = optimalTimes.find(time => {
+      const [hours] = time.split(':');
+      return parseInt(hours) > currentHour;
+    }) || optimalTimes[0]; // Default to first optimal time if none found
+    
+    return nextOptimalTime;
+  };
+
+  // Auto-set optimal time when platform changes and optimal time is enabled
+  const handlePlatformChange = (platform: string) => {
+    setForm(prev => ({ ...prev, platform }));
+    if (useOptimalTime) {
+      const optimalTime = getOptimalTimeForPlatform();
+      setForm(prev => ({ ...prev, scheduledTime: optimalTime }));
+    }
+  };
+
+  const toggleOptimalTime = () => {
+    const newUseOptimalTime = !useOptimalTime;
+    setUseOptimalTime(newUseOptimalTime);
+    
+    if (newUseOptimalTime && form.platform) {
+      const optimalTime = getOptimalTimeForPlatform();
+      setForm(prev => ({ ...prev, scheduledTime: optimalTime }));
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl glassmorphism border-electric-cyan/20">
+      <DialogContent className="max-w-2xl glassmorphism border-electric-cyan/20 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-orbitron font-semibold neon-text text-electric-cyan">
             Schedule New Content
@@ -217,17 +306,28 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
 
             <div className="space-y-2">
               <Label htmlFor="platform" className="text-asteroid-silver">Platform *</Label>
-              <Select value={form.platform} onValueChange={(value) => setForm(prev => ({ ...prev, platform: value }))}>
+              <Select value={form.platform} onValueChange={handlePlatformChange}>
                 <SelectTrigger className="glassmorphism">
-                  <SelectValue />
+                  <SelectValue placeholder="Select connected platform" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="instagram">Instagram</SelectItem>
-                  <SelectItem value="facebook">Facebook</SelectItem>
-                  <SelectItem value="twitter">Twitter</SelectItem>
-                  <SelectItem value="linkedin">LinkedIn</SelectItem>
-                  <SelectItem value="youtube">YouTube</SelectItem>
-                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  {socialAccounts.map((account) => {
+                    const Icon = platformIcons[account.platform as keyof typeof platformIcons];
+                    return (
+                      <SelectItem key={account.id} value={account.platform}>
+                        <div className="flex items-center space-x-2">
+                          {Icon && <Icon className="w-4 h-4" />}
+                          <span>{account.platform.charAt(0).toUpperCase() + account.platform.slice(1)}</span>
+                          <span className="text-xs text-muted-foreground">@{account.username}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                  {socialAccounts.length === 0 && (
+                    <SelectItem value="" disabled>
+                      No social accounts connected
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -258,7 +358,7 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
                   key={type.value}
                   type="button"
                   variant={form.type === type.value ? "default" : "outline"}
-                  className={`glassmorphism ${form.type === type.value ? 'bg-electric-cyan' : ''}`}
+                  className={`glassmorphism ${form.type === type.value ? 'bg-electric-cyan text-black' : ''}`}
                   onClick={() => setForm(prev => ({ ...prev, type: type.value }))}
                 >
                   {getContentTypeIcon(type.value)}
@@ -268,7 +368,7 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
             </div>
           </div>
 
-          {/* File Upload */}
+          {/* Media File Upload */}
           <div className="space-y-2">
             <Label className="text-asteroid-silver">Media Files</Label>
             <div className="border-2 border-dashed border-electric-cyan/20 rounded-lg p-6 glassmorphism">
@@ -276,40 +376,72 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
                 <Upload className="h-8 w-8 text-asteroid-silver mx-auto mb-2" />
                 <p className="text-asteroid-silver text-sm mb-2">Upload images, videos, or documents</p>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   multiple
                   accept="image/*,video/*,.pdf,.doc,.docx"
                   onChange={handleFileUpload}
                   className="hidden"
-                  id="file-upload"
                 />
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   className="glassmorphism"
-                  onClick={() => document.getElementById('file-upload')?.click()}
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   Choose Files
                 </Button>
               </div>
               
+              {/* File Preview */}
               {uploadedFiles.length > 0 && (
                 <div className="mt-4 space-y-2">
                   {uploadedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-cosmic-blue rounded">
-                      <span className="text-sm text-asteroid-silver">{file.name}</span>
+                    <div key={index} className="flex items-center justify-between p-3 bg-cosmic-blue/30 border border-electric-cyan/20 rounded glassmorphism">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          {file.type.startsWith('image/') && <Image className="w-5 h-5 text-electric-cyan" />}
+                          {file.type.startsWith('video/') && <Video className="w-5 h-5 text-electric-cyan" />}
+                          {!file.type.startsWith('image/') && !file.type.startsWith('video/') && <FileText className="w-5 h-5 text-electric-cyan" />}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-white truncate max-w-[200px]">{file.name}</p>
+                          <p className="text-xs text-asteroid-silver">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => removeFile(index)}
-                        className="text-red-400 hover:text-red-300"
+                        className="text-red-400 hover:text-red-300 h-8 w-8 p-0"
                       >
-                        Remove
+                        <X className="w-4 h-4" />
                       </Button>
                     </div>
                   ))}
+                  
+                  {/* Media Preview */}
+                  {mediaPreview && uploadedFiles[0] && (
+                    <div className="mt-3 p-3 border border-space-gray rounded-lg glassmorphism">
+                      <p className="text-sm text-asteroid-silver mb-2">Preview:</p>
+                      {uploadedFiles[0].type.startsWith('image/') && (
+                        <img
+                          src={mediaPreview}
+                          alt="Preview"
+                          className="max-w-full h-48 object-cover rounded-md border border-space-gray"
+                        />
+                      )}
+                      {uploadedFiles[0].type.startsWith('video/') && (
+                        <video
+                          src={mediaPreview}
+                          className="max-w-full h-48 object-cover rounded-md border border-space-gray"
+                          controls
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -341,40 +473,58 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
             </div>
 
             <div className="space-y-2">
-              <Label className="text-asteroid-silver">Time *</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-asteroid-silver">Time *</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleOptimalTime}
+                  className={`h-6 px-2 text-xs ${useOptimalTime ? 'bg-electric-cyan text-black' : 'text-asteroid-silver'}`}
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Optimal
+                </Button>
+              </div>
+              
               <Select value={form.scheduledTime} onValueChange={(value) => setForm(prev => ({ ...prev, scheduledTime: value }))}>
                 <SelectTrigger className="glassmorphism">
                   <Clock className="mr-2 h-4 w-4" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {getOptimalTimes().map((time) => (
+                  {useOptimalTime && form.platform && getOptimalTimes().map((time) => (
                     <SelectItem key={time} value={time}>
-                      {time} <Badge variant="secondary" className="ml-2">Optimal</Badge>
+                      <div className="flex items-center space-x-2">
+                        <span>{time}</span>
+                        <Badge variant="secondary" className="text-xs bg-electric-cyan text-black">Optimal</Badge>
+                      </div>
                     </SelectItem>
                   ))}
-                  {/* Additional times */}
+                  {/* All available times */}
                   {Array.from({ length: 24 }, (_, i) => {
                     const time = `${i.toString().padStart(2, '0')}:00`;
-                    if (!getOptimalTimes().includes(time)) {
-                      return (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      );
-                    }
-                    return null;
+                    const isOptimal = useOptimalTime && form.platform && getOptimalTimes().includes(time);
+                    
+                    if (useOptimalTime && !isOptimal) return null;
+                    
+                    return (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    );
                   })}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Optimal Times Suggestion */}
-          {form.platform && (
+          {/* Optimal Times Information */}
+          {form.platform && useOptimalTime && (
             <Card className="content-card holographic">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-electric-cyan">
+                <CardTitle className="text-sm font-medium text-electric-cyan flex items-center">
+                  <Sparkles className="w-4 h-4 mr-2" />
                   Optimal posting times for {form.platform}
                 </CardTitle>
               </CardHeader>
@@ -384,13 +534,16 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
                     <Badge
                       key={time}
                       variant={form.scheduledTime === time ? "default" : "secondary"}
-                      className="cursor-pointer"
+                      className={`cursor-pointer ${form.scheduledTime === time ? 'bg-electric-cyan text-black' : ''}`}
                       onClick={() => setForm(prev => ({ ...prev, scheduledTime: time }))}
                     >
                       {time}
                     </Badge>
                   ))}
                 </div>
+                <p className="text-xs text-asteroid-silver mt-2">
+                  These times show the highest engagement rates for your audience.
+                </p>
               </CardContent>
             </Card>
           )}
@@ -407,7 +560,7 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate, workspaceId }: S
             </Button>
             <Button
               type="submit"
-              disabled={createContentMutation.isPending}
+              disabled={createContentMutation.isPending || socialAccounts.length === 0}
               className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
             >
               {createContentMutation.isPending ? "Scheduling..." : "Schedule Content"}

@@ -862,9 +862,11 @@ function StatsSection() {
   );
 }
 
-// Solutions Section
-function SolutionsSection() {
-  const solutions = [
+// Optimized Solutions Section
+const SolutionsSection = memo(() => {
+  const shouldReduceMotion = useReducedMotion();
+  
+  const solutions = useMemo(() => [
     {
       title: "For Content Creators",
       description: "Streamline your content creation workflow with AI-powered tools designed for individual creators.",
@@ -897,7 +899,7 @@ function SolutionsSection() {
       color: "from-green-500 to-emerald-600",
       slug: "enterprises"
     }
-  ];
+  ], []);
 
   return (
     <AnimatedSection id="solutions" className="py-24 bg-slate-800">
@@ -1030,8 +1032,8 @@ function SolutionsSection() {
                     >
                       <Link href={`/solution/${solution.slug}`}>
                         <motion.div
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                         >
                           <Button className={`w-full bg-gradient-to-r ${solution.color} hover:opacity-90 transition-opacity mt-6`}>
                             Learn More

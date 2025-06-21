@@ -39,25 +39,12 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['all']);
   const [timePeriod, setTimePeriod] = useState('30d');
 
-  // Fetch filtered analytics data
+  // Fetch filtered analytics data when specific platforms are selected
+  const shouldFetchFiltered = selectedPlatforms.length > 0 && !selectedPlatforms.includes('all');
   const { data: filteredData, isLoading: filteredLoading, refetch } = useQuery({
     queryKey: ['analytics-filtered', currentWorkspace?.id, selectedPlatforms, timePeriod],
-    queryFn: async () => {
-      const platforms = selectedPlatforms.includes('all') ? [] : selectedPlatforms;
-      const response = await fetch(`/api/dashboard/analytics/filtered?workspaceId=${currentWorkspace?.id}&platforms=${platforms.join(',')}&timePeriod=${timePeriod}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[ANALYTICS FILTER ERROR]', response.status, errorText);
-        throw new Error('Failed to fetch filtered analytics');
-      }
-      const result = await response.json();
-      console.log('[ANALYTICS FILTER SUCCESS]', result);
-      return result;
-    },
-    enabled: !!currentWorkspace?.id && !!token
+    queryFn: () => apiRequest('GET', `/api/dashboard/analytics/filtered?workspaceId=${currentWorkspace?.id}&platforms=${selectedPlatforms.join(',')}&timePeriod=${timePeriod}`),
+    enabled: !!currentWorkspace?.id && !!token && shouldFetchFiltered
   });
 
   const refreshMutation = useMutation({
@@ -68,13 +55,15 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
     onSuccess: () => refetch()
   });
 
-  const displayData = filteredData || data;
-  const loading = filteredLoading || isLoading;
+  // Use filtered data when available, otherwise fall back to regular data
+  const displayData = (shouldFetchFiltered && filteredData) ? filteredData : data;
+  const loading = shouldFetchFiltered ? filteredLoading : isLoading;
   
   console.log('[ANALYTICS OVERVIEW] Selected platforms:', selectedPlatforms);
   console.log('[ANALYTICS OVERVIEW] Time period:', timePeriod);
+  console.log('[ANALYTICS OVERVIEW] Should fetch filtered:', shouldFetchFiltered);
   console.log('[ANALYTICS OVERVIEW] Filtered data:', filteredData);
-  console.log('[ANALYTICS OVERVIEW] Filtered loading:', filteredLoading);
+  console.log('[ANALYTICS OVERVIEW] Regular data:', data);
   console.log('[ANALYTICS OVERVIEW] Display data:', displayData);
 
   // Get available platforms from data

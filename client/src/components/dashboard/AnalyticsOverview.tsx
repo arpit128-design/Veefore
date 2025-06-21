@@ -44,12 +44,18 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
     queryKey: ['analytics-filtered', currentWorkspace?.id, selectedPlatforms, timePeriod],
     queryFn: async () => {
       const platforms = selectedPlatforms.includes('all') ? [] : selectedPlatforms;
-      const response = await fetch(`/api/dashboard/analytics/filtered?platforms=${platforms.join(',')}&timePeriod=${timePeriod}`, {
+      const response = await fetch(`/api/dashboard/analytics/filtered?workspaceId=${currentWorkspace?.id}&platforms=${platforms.join(',')}&timePeriod=${timePeriod}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!response.ok) throw new Error('Failed to fetch filtered analytics');
-      return response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[ANALYTICS FILTER ERROR]', response.status, errorText);
+        throw new Error('Failed to fetch filtered analytics');
+      }
+      const result = await response.json();
+      console.log('[ANALYTICS FILTER SUCCESS]', result);
+      return result;
     },
     enabled: !!currentWorkspace?.id && !!token
   });

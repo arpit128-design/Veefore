@@ -135,6 +135,9 @@ export default function Blog() {
             </Link>
             
             <div className="flex items-center space-x-4">
+              <Link href="/">
+                <Button variant="ghost">← Back to Home</Button>
+              </Link>
               <Link href="/features">
                 <Button variant="ghost">Features</Button>
               </Link>

@@ -92,6 +92,9 @@ export default function Features() {
             </Link>
             
             <div className="flex items-center space-x-4">
+              <Link href="/">
+                <Button variant="ghost">← Back to Home</Button>
+              </Link>
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>

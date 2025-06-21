@@ -26,7 +26,7 @@ export interface EngagementResult {
  */
 export function calculateInstagramEngagement(
   metrics: EngagementMetrics,
-  contentType: 'post' | 'reel' = 'post'
+  contentType: 'post' | 'reel' | 'reach' = 'post'
 ): EngagementResult {
   const { likes = 0, comments = 0, shares = 0, saves = 0, views = 0, followers = 1, impressions = 0 } = metrics;
   
@@ -36,6 +36,9 @@ export function calculateInstagramEngagement(
   if (contentType === 'reel') {
     // Instagram Reel: (likes + comments + shares + saves) / views * 100
     base = views > 0 ? views : 1;
+  } else if (contentType === 'reach') {
+    // Force reach-based calculation for consistency
+    base = views > 0 ? views : (impressions > 0 ? impressions : 1);
   } else {
     // Instagram Post: Use reach/impressions for more accurate calculation
     // For small accounts, follower-based calculation can be misleading
@@ -140,7 +143,7 @@ export function calculateEngagementRate(
     case 'instagram':
       return calculateInstagramEngagement(
         metrics,
-        contentType as 'post' | 'reel' || 'post'
+        contentType as 'post' | 'reel' | 'reach' || 'post'
       );
     
     case 'youtube':

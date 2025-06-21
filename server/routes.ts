@@ -7965,13 +7965,22 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { user } = req;
       const { mediaType, mediaUrl, caption, workspaceId } = req.body;
 
-      console.log('[INSTAGRAM PUBLISH] Request:', { userId: user.id, mediaType, workspaceId });
+      console.log('[INSTAGRAM PUBLISH] Request:', { userId: user.id, mediaType, workspaceId, requestBody: req.body });
+      console.log('[INSTAGRAM PUBLISH] Workspace routing - received:', workspaceId, 'defaultWorkspace:', user.defaultWorkspaceId);
 
       if (!mediaUrl) {
         return res.status(400).json({ error: 'Media URL is required for Instagram publishing' });
       }
 
-      const targetWorkspaceId = workspaceId || user.defaultWorkspaceId;
+      if (!workspaceId) {
+        console.log('[INSTAGRAM PUBLISH] No workspace ID provided - this will cause publishing to default workspace instead of current workspace');
+        return res.status(400).json({ 
+          error: 'Workspace ID is required. Please ensure you are in the correct workspace.',
+          code: 'WORKSPACE_ID_REQUIRED'
+        });
+      }
+
+      const targetWorkspaceId = workspaceId;
 
       // Get Instagram account for this workspace
       const socialAccounts = await storage.getSocialAccountsByWorkspace(targetWorkspaceId);

@@ -274,7 +274,23 @@ function AIVideoGenerator() {
   };
 
   const publishToInstagram = (publishType: 'video' | 'reel' | 'story') => {
-    instagramPublishMutation.mutate(publishType);
+    console.log('[AI REEL GENERATOR] Publishing to Instagram with workspace:', currentWorkspace?.id);
+    
+    if (!currentWorkspace?.id) {
+      toast({
+        title: "Workspace Error",
+        description: "Please select a workspace before publishing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    instagramPublishMutation.mutate({
+      mediaType: publishType,
+      mediaUrl: generatedReel.videoUrl,
+      caption: generatedReel.caption,
+      workspaceId: currentWorkspace.id
+    });
   };
 
   const resetGenerator = () => {
@@ -1464,10 +1480,21 @@ function VideoShortener() {
   };
 
   const publishToInstagram = (mediaUrl: string, mediaType: string) => {
+    console.log('[AI VIDEO GENERATOR] Publishing to Instagram with workspace:', currentWorkspace?.id);
+    
+    if (!currentWorkspace?.id) {
+      toast({
+        title: "Workspace Error", 
+        description: "Please select a workspace before publishing",
+        variant: "destructive",
+      });
+      return;
+    }
+
     publishMutation.mutate({
       mediaUrl,
       mediaType,
-      workspaceId: currentWorkspace?.id
+      workspaceId: currentWorkspace.id
     });
   };
 

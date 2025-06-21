@@ -10,6 +10,12 @@ import { formatNumber, formatEngagement } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
 import { AnalyticsChart } from "./AnalyticsChart";
+import { 
+  calculateEngagementRate, 
+  calculateCrossPllatformEngagement,
+  getEngagementQuality,
+  type EngagementMetrics 
+} from "@/utils/engagement";
 
 interface AnalyticsOverviewProps {
   data?: any;
@@ -549,8 +555,23 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                             <div className="font-bold text-red-400">{formatNumber(platformData.views || 0)}</div>
                           </div>
                           <div>
-                            <div className="text-asteroid-silver">Watch Time</div>
-                            <div className="font-bold text-red-400">{platformData.watchTime || '0h'}</div>
+                            <div className="text-asteroid-silver">Engagement Rate</div>
+                            <div className="font-bold text-red-400">
+                              {(() => {
+                                const metrics: EngagementMetrics = {
+                                  likes: platformData.likes || 0,
+                                  comments: platformData.comments || 0,
+                                  shares: 0,
+                                  views: platformData.views || 0,
+                                  subscribers: platformData.subscribers || 1
+                                };
+                                const engagement = calculateEngagementRate('youtube', metrics, 'channel');
+                                const quality = getEngagementQuality(engagement.rate, 'youtube');
+                                return (
+                                  <span className={quality.color}>{engagement.formattedRate}</span>
+                                );
+                              })()}
+                            </div>
                           </div>
                         </>
                       )}

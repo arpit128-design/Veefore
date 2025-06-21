@@ -79,45 +79,11 @@ interface AnimatedSectionProps {
   delay?: number;
 }
 
-function AnimatedSection({ children, className = "", id, delay = 0 }: AnimatedSectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px", amount: 0.1 });
-
+function AnimatedSection({ children, className = "", id }: AnimatedSectionProps) {
   return (
-    <motion.section
-      ref={ref}
-      id={id}
-      className={className}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
-      animate={isInView ? { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1,
-        transition: {
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: delay,
-          staggerChildren: 0.1
-        }
-      } : { opacity: 0, y: 60, scale: 0.95 }}
-    >
-      <motion.div
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.15,
-              delayChildren: 0.2
-            }
-          }
-        }}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-      >
-        {children}
-      </motion.div>
-    </motion.section>
+    <section id={id} className={className}>
+      {children}
+    </section>
   );
 }
 
@@ -340,7 +306,7 @@ function HeroSection() {
         <motion.div 
           className="mb-8"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.div
@@ -363,14 +329,14 @@ function HeroSection() {
         <motion.h1 
           className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight"
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 1, delay: 0.3 }}
         >
           Take Your Social Media to{' '}
           <motion.span 
             className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className="opacity-100"
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             Mission Control
@@ -380,7 +346,7 @@ function HeroSection() {
         <motion.p 
           className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           Create, schedule, analyze, and optimize social media content. All powered by 
@@ -390,7 +356,7 @@ function HeroSection() {
         <motion.div 
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <Link href="/auth">
@@ -398,7 +364,7 @@ function HeroSection() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="opacity-100"
               transition={{ duration: 0.4, delay: 0.4 }}
             >
               <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
@@ -418,7 +384,7 @@ function HeroSection() {
               whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              className="opacity-100"
               transition={{ duration: 0.6, delay: 1 }}
             >
               <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 text-lg px-8 py-6">
@@ -439,13 +405,13 @@ function HeroSection() {
         <motion.div 
           className="flex justify-center items-center space-x-6 mb-12"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.8, delay: 0.9 }}
         >
           <motion.div 
             className="text-gray-400 text-sm"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className="opacity-100"
             transition={{ duration: 0.6, delay: 1.1 }}
           >
             Connect with:
@@ -453,7 +419,7 @@ function HeroSection() {
           <motion.div
             whileHover={{ scale: 1.2, color: "#f472b6" }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="opacity-100"
             transition={{ duration: 0.5, delay: 1.2 }}
           >
             <Instagram className="w-6 h-6 text-gray-400 hover:text-pink-400 transition-colors cursor-pointer" />
@@ -461,7 +427,7 @@ function HeroSection() {
           <motion.div
             whileHover={{ scale: 1.2, color: "#f87171" }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="opacity-100"
             transition={{ duration: 0.5, delay: 1.3 }}
           >
             <Youtube className="w-6 h-6 text-gray-400 hover:text-red-400 transition-colors cursor-pointer" />
@@ -469,7 +435,7 @@ function HeroSection() {
           <motion.div
             whileHover={{ scale: 1.2, color: "#60a5fa" }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="opacity-100"
             transition={{ duration: 0.5, delay: 1.4 }}
           >
             <Twitter className="w-6 h-6 text-gray-400 hover:text-blue-400 transition-colors cursor-pointer" />
@@ -477,7 +443,7 @@ function HeroSection() {
           <motion.div
             whileHover={{ scale: 1.2, color: "#2563eb" }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="opacity-100"
             transition={{ duration: 0.5, delay: 1.5 }}
           >
             <Linkedin className="w-6 h-6 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer" />
@@ -485,7 +451,7 @@ function HeroSection() {
           <motion.div
             whileHover={{ scale: 1.2, color: "#3b82f6" }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="opacity-100"
             transition={{ duration: 0.5, delay: 1.6 }}
           >
             <Facebook className="w-6 h-6 text-gray-400 hover:text-blue-500 transition-colors cursor-pointer" />
@@ -496,7 +462,7 @@ function HeroSection() {
       {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="opacity-100"
         transition={{ duration: 1, delay: 1.2 }}
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
         onClick={scrollToFeatures}
@@ -586,7 +552,7 @@ function FeaturesSection() {
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4 }}
         >
           <motion.div
@@ -607,7 +573,7 @@ function FeaturesSection() {
           <motion.h2 
             className="text-4xl sm:text-5xl font-bold text-white mb-6"
             initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4 }}
           >
             Everything You Need to{' '}
@@ -623,7 +589,7 @@ function FeaturesSection() {
           <motion.p 
             className="text-xl text-gray-300 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4 }}
           >
             From AI-powered content creation to advanced analytics, VeeFore provides all the tools you need to grow your social media presence.
@@ -784,7 +750,7 @@ function StatsSection() {
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4 }}
         >
           <motion.h2 
@@ -913,7 +879,7 @@ const SolutionsSection = memo(() => {
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="opacity-100"
           transition={{ duration: 0.4 }}
         >
           <motion.div

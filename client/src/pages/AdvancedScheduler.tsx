@@ -405,10 +405,10 @@ export default function AdvancedScheduler() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-electric-cyan font-orbitron neon-text">
             Advanced Content Scheduler
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-asteroid-silver mt-2">
             Schedule, manage, and optimize your social media content with advanced tools
           </p>
         </div>
@@ -424,12 +424,12 @@ export default function AdvancedScheduler() {
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button className="bg-gradient-to-r from-electric-cyan to-solar-gold hover:opacity-90 text-black font-medium">
                 <Plus className="w-4 h-4 mr-2" />
                 Schedule Content
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glassmorphism border-electric-cyan/20">
               <DialogHeader>
                 <DialogTitle>Schedule New Content</DialogTitle>
               </DialogHeader>
@@ -652,49 +652,49 @@ export default function AdvancedScheduler() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="content-card holographic">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <CalendarIcon className="w-5 h-5 text-blue-500" />
+              <CalendarIcon className="w-5 h-5 text-electric-cyan" />
               <div>
-                <p className="text-sm text-gray-600">Total Scheduled</p>
-                <p className="text-xl font-bold">{stats.total}</p>
+                <p className="text-sm text-asteroid-silver">Total Scheduled</p>
+                <p className="text-xl font-bold text-white">{stats.total}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="content-card holographic">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-orange-500" />
+              <Clock className="w-5 h-5 text-solar-gold" />
               <div>
-                <p className="text-sm text-gray-600">Today</p>
-                <p className="text-xl font-bold">{stats.today}</p>
+                <p className="text-sm text-asteroid-silver">Today</p>
+                <p className="text-xl font-bold text-white">{stats.today}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="content-card holographic">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
               <div>
-                <p className="text-sm text-gray-600">Published</p>
-                <p className="text-xl font-bold">{stats.published}</p>
+                <p className="text-sm text-asteroid-silver">Published</p>
+                <p className="text-xl font-bold text-white">{stats.published}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="content-card holographic">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-purple-500" />
+              <TrendingUp className="w-5 h-5 text-nebula-purple" />
               <div>
-                <p className="text-sm text-gray-600">This Week</p>
-                <p className="text-xl font-bold">{stats.thisWeek}</p>
+                <p className="text-sm text-asteroid-silver">This Week</p>
+                <p className="text-xl font-bold text-white">{stats.thisWeek}</p>
               </div>
             </div>
           </CardContent>
@@ -704,10 +704,10 @@ export default function AdvancedScheduler() {
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex justify-between items-center">
-          <TabsList className="grid w-fit grid-cols-3">
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsList className="grid w-fit grid-cols-3 glassmorphism">
+            <TabsTrigger value="calendar" className="data-[state=active]:bg-electric-cyan data-[state=active]:text-black">Calendar View</TabsTrigger>
+            <TabsTrigger value="list" className="data-[state=active]:bg-electric-cyan data-[state=active]:text-black">List View</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-electric-cyan data-[state=active]:text-black">Analytics</TabsTrigger>
           </TabsList>
           
           <div className="flex items-center space-x-2">
@@ -717,12 +717,12 @@ export default function AdvancedScheduler() {
                 placeholder="Search content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48"
+                className="w-48 glassmorphism"
               />
             </div>
             
             <Select value={filterPlatform} onValueChange={setFilterPlatform}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 glassmorphism">
                 <SelectValue placeholder="Platform" />
               </SelectTrigger>
               <SelectContent>
@@ -736,7 +736,7 @@ export default function AdvancedScheduler() {
             </Select>
             
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 glassmorphism">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -751,25 +751,27 @@ export default function AdvancedScheduler() {
         </div>
 
         <TabsContent value="calendar" className="space-y-4">
-          <Card>
+          <Card className="content-card holographic">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Weekly Calendar</CardTitle>
+                <CardTitle className="text-electric-cyan font-orbitron">Weekly Calendar</CardTitle>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentWeek(addDays(currentWeek, -7))}
+                    className="glassmorphism"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium text-white">
                     {format(startOfWeek(currentWeek), 'MMM dd')} - {format(endOfWeek(currentWeek), 'MMM dd, yyyy')}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentWeek(addDays(currentWeek, 7))}
+                    className="glassmorphism"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -785,13 +787,13 @@ export default function AdvancedScheduler() {
                   return (
                     <div
                       key={day.toISOString()}
-                      className={`min-h-[200px] border rounded-lg p-3 ${
-                        isToday ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
+                      className={`min-h-[200px] border rounded-lg p-3 glassmorphism ${
+                        isToday ? 'border-electric-cyan bg-electric-cyan/10' : 'border-space-gray'
                       }`}
                     >
                       <div className="flex justify-between items-center mb-2">
                         <span className={`text-sm font-medium ${
-                          isToday ? 'text-blue-600' : 'text-gray-600'
+                          isToday ? 'text-electric-cyan' : 'text-asteroid-silver'
                         }`}>
                           {format(day, 'EEE dd')}
                         </span>
@@ -836,9 +838,9 @@ export default function AdvancedScheduler() {
         </TabsContent>
 
         <TabsContent value="list" className="space-y-4">
-          <Card>
+          <Card className="content-card holographic">
             <CardHeader>
-              <CardTitle>Scheduled Content</CardTitle>
+              <CardTitle className="text-electric-cyan font-orbitron">Scheduled Content</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -857,7 +859,7 @@ export default function AdvancedScheduler() {
                   </p>
                   <Button 
                     onClick={() => setIsCreateOpen(true)}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="bg-gradient-to-r from-electric-cyan to-solar-gold hover:opacity-90 text-black font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Schedule Content
@@ -871,19 +873,19 @@ export default function AdvancedScheduler() {
                     const statusColor = statusColors[content.status as keyof typeof statusColors];
                     
                     return (
-                      <div key={content.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div key={content.id} className="border border-space-gray rounded-lg p-4 hover:border-electric-cyan/50 transition-all glassmorphism"
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               {Icon && <Icon className="w-5 h-5" />}
-                              <h3 className="font-medium text-gray-900">{content.title}</h3>
+                              <h3 className="font-medium text-white">{content.title}</h3>
                               <Badge className={statusColor}>{content.status}</Badge>
                               <Badge variant="outline">{content.type}</Badge>
                             </div>
                             
-                            <p className="text-gray-600 mb-3 line-clamp-2">{content.description}</p>
+                            <p className="text-asteroid-silver mb-3 line-clamp-2">{content.description}</p>
                             
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <div className="flex items-center space-x-4 text-sm text-asteroid-silver"
                               <div className="flex items-center space-x-1">
                                 <CalendarIcon className="w-4 h-4" />
                                 <span>{formatScheduledTime(content.scheduledAt)}</span>
@@ -891,7 +893,7 @@ export default function AdvancedScheduler() {
                               
                               {content.metadata?.hashtags && (
                                 <div className="flex items-center space-x-1">
-                                  <span className="text-blue-500">#</span>
+                                  <span className="text-electric-cyan">#</span>
                                   <span>{content.metadata.hashtags.length} hashtags</span>
                                 </div>
                               )}

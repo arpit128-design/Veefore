@@ -59,6 +59,12 @@ import FeatureScheduling from "@/pages/FeatureScheduling";
 import FeatureAnalytics from "@/pages/FeatureAnalytics";
 import FeatureUnifiedManagement from "@/pages/FeatureUnifiedManagement";
 
+// Individual solution detail pages
+import SolutionContentCreators from "@/pages/SolutionContentCreators";
+import SolutionSmallBusiness from "@/pages/SolutionSmallBusiness";
+import SolutionAgencies from "@/pages/SolutionAgencies";
+import SolutionEnterprises from "@/pages/SolutionEnterprises";
+
 function AuthenticatedApp() {
   return (
     <WorkspaceProvider>
@@ -175,6 +181,10 @@ function Router() {
           <Route path="/feature/intelligent-scheduling" component={FeatureScheduling} />
           <Route path="/feature/advanced-analytics" component={FeatureAnalytics} />
           <Route path="/feature/unified-management" component={FeatureUnifiedManagement} />
+          <Route path="/solution/content-creators" component={SolutionContentCreators} />
+          <Route path="/solution/small-businesses" component={SolutionSmallBusiness} />
+          <Route path="/solution/agencies" component={SolutionAgencies} />
+          <Route path="/solution/enterprises" component={SolutionEnterprises} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/" component={Landing} />

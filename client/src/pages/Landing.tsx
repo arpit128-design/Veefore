@@ -870,28 +870,32 @@ function SolutionsSection() {
       description: "Streamline your content creation workflow with AI-powered tools designed for individual creators.",
       icon: <Camera className="w-8 h-8" />,
       features: ["AI Content Generation", "Automated Scheduling", "Performance Analytics", "Engagement Tracking"],
-      color: "from-pink-500 to-rose-600"
+      color: "from-pink-500 to-rose-600",
+      slug: "content-creators"
     },
     {
       title: "For Small Businesses",
       description: "Grow your business with professional social media management tools that scale with you.",
       icon: <Building className="w-8 h-8" />,
       features: ["Multi-Platform Management", "Customer Engagement", "Brand Monitoring", "ROI Tracking"],
-      color: "from-blue-500 to-cyan-600"
+      color: "from-blue-500 to-cyan-600",
+      slug: "small-businesses"
     },
     {
       title: "For Agencies",
       description: "Manage multiple client accounts efficiently with advanced collaboration and reporting tools.",
       icon: <Users className="w-8 h-8" />,
       features: ["Client Management", "Team Collaboration", "White-Label Reports", "Bulk Operations"],
-      color: "from-purple-500 to-indigo-600"
+      color: "from-purple-500 to-indigo-600",
+      slug: "agencies"
     },
     {
       title: "For Enterprises",
       description: "Enterprise-grade social media management with advanced security and compliance features.",
       icon: <Shield className="w-8 h-8" />,
       features: ["Advanced Security", "Compliance Tools", "Custom Integrations", "Priority Support"],
-      color: "from-green-500 to-emerald-600"
+      color: "from-green-500 to-emerald-600",
+      slug: "enterprises"
     }
   ];
 
@@ -1024,7 +1028,7 @@ function SolutionsSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.5 }}
                     >
-                      <Link href="/solutions">
+                      <Link href={`/solution/${solution.slug}`}>
                         <motion.div
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

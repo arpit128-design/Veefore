@@ -5,6 +5,7 @@ import { DailySuggestions } from "@/components/dashboard/DailySuggestions";
 import { ContentPerformance } from "@/components/dashboard/ContentPerformance";
 import { TrendingHashtags } from "@/components/dashboard/TrendingHashtags";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
+import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useInstantData } from "@/hooks/useInstantData";

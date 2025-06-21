@@ -115,8 +115,31 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
       }
     });
 
-    // Calculate engagement rate
-    const engagementRate = totalReach > 0 ? ((totalLikes + totalComments) / totalReach) * 100 : 0;
+    // Calculate engagement rate using the multi-platform utility
+    const platformEngagementData = Object.keys(filteredPlatformData).map(platform => {
+      const platformData = filteredPlatformData[platform];
+      
+      const metrics: EngagementMetrics = {
+        likes: platformData.likes || 0,
+        comments: platformData.comments || 0,
+        shares: 0, // Not available in current data structure
+        saves: 0,  // Not available in current data structure
+        views: platformData.views || platformData.reach || 0,
+        followers: platformData.followers || 0,
+        subscribers: platformData.subscribers || 0,
+        impressions: platformData.reach || 0
+      };
+      
+      return {
+        platform,
+        metrics,
+        contentType: platform === 'instagram' ? 'post' : platform === 'youtube' ? 'channel' : undefined
+      };
+    });
+    
+    // Get cross-platform engagement rate
+    const crossPlatformEngagement = calculateCrossPllatformEngagement(platformEngagementData);
+    const engagementRate = crossPlatformEngagement.rate;
 
     // Apply time scaling to platform data
     const scaledPlatformData = Object.keys(filteredPlatformData).reduce((scaled, platform) => {
@@ -202,7 +225,26 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
   // Get available platforms from data
   const availablePlatforms = displayData?.connectedPlatforms || [];
   
-  // Calculate combined metrics based on filtered data
+  // Calculate combined metrics based on filtered data with real engagement rates
+  const platformEngagementRates = availablePlatforms.map(platform => {
+    const platformData = displayData?.platformData?.[platform];
+    if (!platformData) return null;
+    
+    const metrics: EngagementMetrics = {
+      likes: platformData.likes || 0,
+      comments: platformData.comments || 0,
+      shares: 0,
+      saves: 0,
+      views: platformData.views || platformData.reach || 0,
+      followers: platformData.followers || 0,
+      subscribers: platformData.subscribers || 0,
+      impressions: platformData.reach || 0
+    };
+    
+    const contentType = platform === 'instagram' ? 'post' : platform === 'youtube' ? 'channel' : undefined;
+    return calculateEngagementRate(platform, metrics, contentType);
+  }).filter(Boolean);
+  
   const combinedMetrics = {
     totalReach: displayData?.totalReach || 0,
     totalFollowers: (displayData?.platformData?.instagram?.followers || 0) + 
@@ -356,7 +398,36 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
               <div>
                 <p className="text-sm text-asteroid-silver">Engagement Rate</p>
                 <p className="text-2xl font-bold text-nebula-purple">
-                  {loading ? '—' : `${combinedMetrics.engagementRate.toFixed(1)}%`}
+                  {loading ? '—' : (() => {
+                    // Calculate real cross-platform engagement rate
+                    const platformData = displayData?.platformData || {};
+                    const platforms = Object.keys(platformData);
+                    
+                    if (platforms.length === 0) return '0.0%';
+                    
+                    const engagementData = platforms.map(platform => {
+                      const data = platformData[platform];
+                      const metrics: EngagementMetrics = {
+                        likes: data.likes || 0,
+                        comments: data.comments || 0,
+                        shares: 0,
+                        saves: 0,
+                        views: data.views || data.reach || 0,
+                        followers: data.followers || 0,
+                        subscribers: data.subscribers || 0,
+                        impressions: data.reach || 0
+                      };
+                      
+                      return {
+                        platform,
+                        metrics,
+                        contentType: platform === 'instagram' ? 'post' : platform === 'youtube' ? 'channel' : undefined
+                      };
+                    });
+                    
+                    const crossPlatformEngagement = calculateCrossPllatformEngagement(engagementData);
+                    return crossPlatformEngagement.formattedRate;
+                  })()}
                 </p>
                 {displayData?.percentageChanges?.engagement && (
                   <div className={`flex items-center gap-1 text-xs ${
@@ -441,8 +512,24 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
                             <div className="font-bold text-pink-400">{formatNumber(platformData.reach || 0)}</div>
                           </div>
                           <div>
-                            <div className="text-asteroid-silver">Likes</div>
-                            <div className="font-bold text-pink-400">{formatNumber(platformData.likes || 0)}</div>
+                            <div className="text-asteroid-silver">Engagement Rate</div>
+                            <div className="font-bold text-pink-400">
+                              {(() => {
+                                const metrics: EngagementMetrics = {
+                                  likes: platformData.likes || 0,
+                                  comments: platformData.comments || 0,
+                                  shares: 0,
+                                  saves: 0,
+                                  views: platformData.reach || 0,
+                                  followers: platformData.followers || 1
+                                };
+                                const engagement = calculateEngagementRate('instagram', metrics, 'post');
+                                const quality = getEngagementQuality(engagement.rate, 'instagram');
+                                return (
+                                  <span className={quality.color}>{engagement.formattedRate}</span>
+                                );
+                              })()}
+                            </div>
                           </div>
                         </>
                       )}

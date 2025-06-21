@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense, memo, useMemo } from 'react';
 import { Link } from 'wouter';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { LazyMotion } from '@/components/ui/lazy-motion';
 import { 
   ArrowRight, 
   Calendar, 
@@ -384,23 +385,24 @@ function HeroSection() {
           >
             Mission Control
           </motion.span>
-        </motion.h1>
+        </LazyMotion>
 
-        <motion.p 
+        <LazyMotion
+          as="p"
           className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           Create, schedule, analyze, and optimize social media content. All powered by 
           advanced AI in one user-friendly command center.
         </motion.p>
 
-        <motion.div 
+        <LazyMotion
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
         >
           <Link href="/auth">
             <motion.div

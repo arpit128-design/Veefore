@@ -384,7 +384,7 @@ function HeroSection() {
           >
             Mission Control
           </motion.span>
-        </motion.div>
+        </motion.h1>
 
         <motion.p 
           className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
@@ -860,9 +860,9 @@ function StatsSection() {
       </div>
     </AnimatedSection>
   );
-});
+}
 
-FeaturesSection.displayName = 'FeaturesSection';
+
 
 // Optimized Solutions Section
 const SolutionsSection = memo(() => {
@@ -1053,7 +1053,9 @@ const SolutionsSection = memo(() => {
       </div>
     </AnimatedSection>
   );
-}
+});
+
+SolutionsSection.displayName = 'SolutionsSection';
 
 // Pricing Section
 function PricingSection() {

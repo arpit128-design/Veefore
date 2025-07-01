@@ -195,16 +195,7 @@ export default function ThumbnailAIMakerPro() {
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
-      const variantsResponse = await fetch('/api/thumbnails/generate-complete', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
-      });
-
-      if (!variantsResponse.ok) {
-        throw new Error(`Generation failed: ${variantsResponse.statusText}`);
-      }
-
+      const variantsResponse = await apiRequest('POST', '/api/thumbnails/generate-complete', formData);
       const generatedVariants = await variantsResponse.json();
       setVariants(generatedVariants);
       

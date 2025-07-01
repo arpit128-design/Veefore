@@ -54,6 +54,7 @@ export class ThumbnailAIService {
   async generateThumbnailStrategy(request: ThumbnailRequest): Promise<ThumbnailDesignData> {
     try {
       console.log('[THUMBNAIL AI] Generating strategy for:', request.title);
+      console.log('[THUMBNAIL AI] OpenAI API key configured:', !!process.env.OPENAI_API_KEY);
 
       const prompt = `You are a viral video thumbnail strategist. Based on the following inputs:
 - Title: ${request.title}

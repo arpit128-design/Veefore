@@ -8550,12 +8550,45 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Test endpoint for thumbnail API
+  app.get('/api/thumbnails/test', async (req: any, res: Response) => {
+    try {
+      console.log('[THUMBNAIL TEST] OpenAI API Key exists:', !!process.env.OPENAI_API_KEY);
+      console.log('[THUMBNAIL TEST] Service instantiated:', !!thumbnailAIService);
+      
+      // Test basic OpenAI connection
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const testResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "Say 'test successful'" }],
+        max_tokens: 10
+      });
+      
+      res.json({ 
+        success: true, 
+        openaiTest: testResponse.choices[0].message.content,
+        apiKeyExists: !!process.env.OPENAI_API_KEY,
+        serviceReady: !!thumbnailAIService
+      });
+    } catch (error) {
+      console.error('[THUMBNAIL TEST] Error:', error);
+      res.status(500).json({ 
+        error: 'Test failed', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
   // AI Thumbnail Generation Routes
   app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
     try {
       const { title, description, category, style } = req.body;
 
+      console.log('[THUMBNAIL API] Request body:', req.body);
+      console.log('[THUMBNAIL API] OpenAI API Key exists:', !!process.env.OPENAI_API_KEY);
+
       if (!title || !category) {
+        console.log('[THUMBNAIL API] Missing required fields:', { title: !!title, category: !!category });
         return res.status(400).json({ error: 'Title and category are required' });
       }
 
@@ -8568,10 +8601,18 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         style: style || 'auto'
       });
 
+      console.log('[THUMBNAIL API] Strategy generated successfully:', strategy);
       res.json(strategy);
     } catch (error) {
       console.error('[THUMBNAIL API] Strategy generation failed:', error);
-      res.status(500).json({ error: 'Failed to generate thumbnail strategy' });
+      console.error('[THUMBNAIL API] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      res.status(500).json({ 
+        error: 'Failed to generate thumbnail strategy',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 

@@ -279,9 +279,9 @@ export function AICopilotWidget() {
   return (
     <motion.div
       className={cn(
-        "fixed bottom-6 right-6 z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl",
-        isMinimized ? "h-16" : "h-[600px] max-h-[calc(100vh-6rem)]",
-        "w-96 max-w-[calc(100vw-2rem)]"
+        "fixed bottom-6 right-6 z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl flex flex-col",
+        isMinimized ? "h-16" : "h-[500px] max-h-[calc(100vh-8rem)]",
+        "w-96 max-w-[calc(100vw-3rem)]"
       )}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -338,9 +338,9 @@ export function AICopilotWidget() {
       </div>
 
       {!isMinimized && (
-        <div className="flex flex-col h-[calc(100%-5rem)]">
+        <div className="flex flex-col h-[calc(100%-5rem)] overflow-hidden">
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <TabsList className="grid w-full grid-cols-3 bg-slate-800 border-b border-slate-700/50 rounded-none">
               <TabsTrigger value="chat" className="flex items-center gap-2 text-xs">
                 <MessageCircle className="h-3 w-3" />
@@ -357,57 +357,61 @@ export function AICopilotWidget() {
             </TabsList>
 
             {/* Chat Tab */}
-            <TabsContent value="chat" className="flex-1 flex flex-col m-0 overflow-hidden">
-              {/* Messages Area */}
-              <ScrollArea className="flex-1 px-4 py-2" ref={chatContainerRef}>
-                <div className="space-y-4 min-h-0">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        "flex",
-                        message.type === 'user' ? "justify-end" : "justify-start"
-                      )}
-                    >
+            <TabsContent value="chat" className="flex-1 flex flex-col m-0 h-0">
+              {/* Messages Area - Fixed height with proper scrolling */}
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full px-4 py-2" ref={chatContainerRef}>
+                  <div className="space-y-4 pb-4">
+                    {messages.map((message) => (
                       <div
+                        key={message.id}
                         className={cn(
-                          "max-w-[80%] rounded-2xl px-4 py-3 text-sm",
-                          message.type === 'user'
-                            ? "bg-purple-600 text-white"
-                            : message.type === 'ai'
-                            ? "bg-slate-800 text-slate-100 border border-slate-700"
-                            : "bg-slate-700 text-slate-300 border border-slate-600"
+                          "flex",
+                          message.type === 'user' ? "justify-end" : "justify-start"
                         )}
                       >
-                        {message.content}
-                        {message.needsConfirmation && (
-                          <div className="flex gap-2 mt-3">
-                            <Button size="sm" className="h-7 text-xs">
-                              Confirm
-                            </Button>
-                            <Button variant="outline" size="sm" className="h-7 text-xs">
-                              Cancel
-                            </Button>
+                        <div
+                          className={cn(
+                            "max-w-[85%] rounded-2xl px-4 py-3 text-sm break-words",
+                            message.type === 'user'
+                              ? "bg-purple-600 text-white"
+                              : message.type === 'ai'
+                              ? "bg-slate-800 text-slate-100 border border-slate-700"
+                              : "bg-slate-700 text-slate-300 border border-slate-600"
+                          )}
+                        >
+                          <div className="whitespace-pre-wrap">
+                            {message.content}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isTyping && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          {message.needsConfirmation && (
+                            <div className="flex gap-2 mt-3">
+                              <Button size="sm" className="h-7 text-xs">
+                                Confirm
+                              </Button>
+                              <Button variant="outline" size="sm" className="h-7 text-xs">
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </ScrollArea>
+                    ))}
+                    
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3">
+                          <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+              </div>
 
               {/* File Upload Area */}
               {uploadedFiles.length > 0 && (

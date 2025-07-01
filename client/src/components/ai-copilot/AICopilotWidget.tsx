@@ -280,7 +280,7 @@ export function AICopilotWidget() {
     <motion.div
       className={cn(
         "fixed bottom-6 right-6 z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl",
-        isMinimized ? "h-16" : "h-[600px]",
+        isMinimized ? "h-16" : "h-[600px] max-h-[calc(100vh-6rem)]",
         "w-96 max-w-[calc(100vw-2rem)]"
       )}
       initial={{ scale: 0, opacity: 0 }}
@@ -357,10 +357,10 @@ export function AICopilotWidget() {
             </TabsList>
 
             {/* Chat Tab */}
-            <TabsContent value="chat" className="flex-1 flex flex-col m-0">
+            <TabsContent value="chat" className="flex-1 flex flex-col m-0 overflow-hidden">
               {/* Messages Area */}
-              <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
-                <div className="space-y-4">
+              <ScrollArea className="flex-1 px-4 py-2" ref={chatContainerRef}>
+                <div className="space-y-4 min-h-0">
                   {messages.map((message) => (
                     <div
                       key={message.id}

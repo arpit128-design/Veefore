@@ -1673,7 +1673,7 @@ function VideoShortener() {
                   <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
                     {videoFile ? (
-                      <span className="text-foreground font-medium">
+                      <span className="text-gray-200 font-medium">
                         {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
                       </span>
                     ) : (
@@ -2073,7 +2073,7 @@ export default function ContentStudio() {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-3xl font-bold text-gray-200 mb-2">
             AI Content Studio
           </h1>
           <p className="text-muted-foreground">

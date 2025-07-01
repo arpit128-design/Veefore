@@ -401,7 +401,7 @@ const ContentRecommendations = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className={`h-8 w-8 p-0 ${isLiked ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`h-8 w-8 p-0 ${isLiked ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-gray-200'}`}
                   onClick={() => handleLike(recommendation.id)}
                 >
                   <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
@@ -409,7 +409,7 @@ const ContentRecommendations = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className={`h-8 w-8 p-0 ${isBookmarked ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`h-8 w-8 p-0 ${isBookmarked ? 'text-primary' : 'text-muted-foreground hover:text-gray-200'}`}
                   onClick={() => handleBookmark(recommendation.id)}
                 >
                   <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
@@ -417,7 +417,7 @@ const ContentRecommendations = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-gray-200"
                   onClick={() => trackInteractionMutation.mutate({ id: recommendation.id, action: 'shared' })}
                 >
                   <Share2 className="h-4 w-4" />

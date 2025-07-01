@@ -11,6 +11,7 @@ import { SpaceLoader } from "@/components/ui/space-loader";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/hooks/useWorkspace";
 import { GlobalWorkspaceSwitchingOverlay } from "@/components/workspaces/GlobalWorkspaceSwitchingOverlay";
+import { AICopilotWidget } from "@/components/ai-copilot/AICopilotWidget";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
@@ -112,6 +113,7 @@ function AuthenticatedApp() {
           </main>
         </div>
         <GlobalWorkspaceSwitchingOverlay />
+        <AICopilotWidget />
       </div>
     </WorkspaceProvider>
   );

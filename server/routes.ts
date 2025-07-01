@@ -20,6 +20,7 @@ import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
+import { createCopilotRoutes } from './ai-copilot';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);

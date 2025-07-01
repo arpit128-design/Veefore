@@ -19,7 +19,6 @@ interface CopilotRequest {
     role: 'user' | 'assistant';
     content: string;
   }>;
-  files?: Express.Multer.File[];
 }
 
 interface CopilotResponse {
@@ -175,7 +174,7 @@ const getContentPrompts = (language: string = 'en') => {
 
 // Process user message with OpenAI
 async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
-  const { message, language = 'en', context, files } = req;
+  const { message, language = 'en', context } = req;
   
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OpenAI API key not configured');
@@ -199,47 +198,6 @@ async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
       });
     }
 
-    // Process uploaded files
-    if (files && files.length > 0) {
-      for (const file of files) {
-        try {
-          if (file.mimetype.startsWith('image/')) {
-            // For images, encode as base64 and analyze
-            const imageBuffer = fs.readFileSync(file.path);
-            const base64Image = imageBuffer.toString('base64');
-            
-            messages.push({
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: `User uploaded an image: ${file.originalname}. Please analyze this image and help with their request.`
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:${file.mimetype};base64,${base64Image}`
-                  }
-                }
-              ]
-            });
-          } else {
-            // For other file types, read as text if possible
-            const fileContent = fs.readFileSync(file.path, 'utf-8');
-            messages.push({
-              role: 'user',
-              content: `User uploaded file: ${file.originalname}\nContent: ${fileContent.substring(0, 1000)}${fileContent.length > 1000 ? '...' : ''}`
-            });
-          }
-          
-          // Clean up uploaded file
-          fs.unlinkSync(file.path);
-        } catch (error) {
-          console.error('Error processing file:', error);
-        }
-      }
-    }
-
     // Add user message
     messages.push({
       role: 'user',
@@ -252,7 +210,6 @@ async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
       messages: messages,
       max_tokens: 2000,
       temperature: 0.7,
-      response_format: { type: "json_object" },
       stream: false
     });
 
@@ -262,23 +219,11 @@ async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
       throw new Error('No response from OpenAI');
     }
 
-    // Parse the JSON response
-    let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponse);
-    } catch (error) {
-      // Fallback if JSON parsing fails
-      parsedResponse = {
-        message: aiResponse,
-        language: language
-      };
-    }
-
     return {
-      message: parsedResponse.message || aiResponse,
-      actions: parsedResponse.actions || [],
-      suggestions: parsedResponse.suggestions || [],
-      needsConfirmation: parsedResponse.needsConfirmation || false,
+      message: aiResponse,
+      actions: [],
+      suggestions: [],
+      needsConfirmation: false,
       language: language
     };
 
@@ -302,11 +247,10 @@ async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
 
 // Create copilot routes
 export function createCopilotRoutes(app: Express, storage: IStorage) {
-  // Chat endpoint with file upload support
-  app.post('/api/copilot/chat', upload.array('files', 5), async (req: any, res: Response) => {
+  // Chat endpoint
+  app.post('/api/copilot/chat', async (req: any, res: Response) => {
     try {
       const { message, language, context } = req.body;
-      const files = req.files as Express.Multer.File[];
 
       if (!message?.trim()) {
         return res.status(400).json({ error: 'Message is required' });
@@ -323,8 +267,7 @@ export function createCopilotRoutes(app: Express, storage: IStorage) {
       const copilotRequest: CopilotRequest = {
         message: message.trim(),
         language: language || 'en',
-        context: parsedContext,
-        files: files
+        context: parsedContext
       };
 
       const response = await processMessage(copilotRequest);
@@ -388,71 +331,31 @@ export function createCopilotRoutes(app: Express, storage: IStorage) {
   });
 
   // Analyze content endpoint
-  app.post('/api/copilot/analyze', upload.single('file'), async (req: any, res: Response) => {
+  app.post('/api/copilot/analyze', async (req: any, res: Response) => {
     try {
       const { content, language = 'en' } = req.body;
-      const file = req.file;
 
-      if (!content && !file) {
-        return res.status(400).json({ error: 'Content or file is required' });
+      if (!content) {
+        return res.status(400).json({ error: 'Content is required' });
       }
 
-      let analysisPrompt = `Analyze this content for social media optimization and provide suggestions:\n\n`;
+      let analysisPrompt = `Analyze this content for social media optimization and provide suggestions:\n\n${content}`;
       
-      if (file && file.mimetype.startsWith('image/')) {
-        const imageBuffer = fs.readFileSync(file.path);
-        const base64Image = imageBuffer.toString('base64');
-        
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: `${getSystemPrompt(language)}\n\nAnalyze this image for social media effectiveness and provide optimization suggestions.`
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:${file.mimetype};base64,${base64Image}`
-                  }
-                }
-              ]
-            }
-          ],
-          max_tokens: 1000
-        });
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          { role: 'system', content: getSystemPrompt(language) },
+          { role: 'user', content: analysisPrompt }
+        ],
+        max_tokens: 1000
+      });
 
-        // Clean up uploaded file
-        fs.unlinkSync(file.path);
-
-        const analysis = response.choices[0]?.message?.content;
-        return res.json({
-          analysis: analysis,
-          type: 'image',
-          language: language
-        });
-      } else {
-        analysisPrompt += content;
-        
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          messages: [
-            { role: 'system', content: getSystemPrompt(language) },
-            { role: 'user', content: analysisPrompt }
-          ],
-          max_tokens: 1000
-        });
-
-        const analysis = response.choices[0]?.message?.content;
-        return res.json({
-          analysis: analysis,
-          type: 'text',
-          language: language
-        });
-      }
+      const analysis = response.choices[0]?.message?.content;
+      return res.json({
+        analysis: analysis,
+        type: 'text',
+        language: language
+      });
 
     } catch (error) {
       console.error('Content analysis error:', error);

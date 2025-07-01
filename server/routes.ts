@@ -8549,12 +8549,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   });
 
   // AI Copilot Routes
-  const copilotRoutes = createCopilotRoutes(storage);
-  
-  app.post('/api/copilot/chat', requireAuth, copilotRoutes.chat);
-  app.post('/api/copilot/generate-content', requireAuth, copilotRoutes.generateContent);
-  app.post('/api/copilot/analyze-content', requireAuth, copilotRoutes.analyzeContent);
-  app.get('/api/copilot/optimization-suggestions', requireAuth, copilotRoutes.getOptimizationSuggestions);
+  createCopilotRoutes(app, storage);
 
   const httpServer = createServer(app);
   return httpServer;

@@ -142,24 +142,28 @@ export function AICopilotWidget() {
     setIsTyping(true);
 
     try {
-      // Send to backend API with language preference and files
-      const formData = new FormData();
-      formData.append('message', inputMessage);
-      formData.append('language', selectedLanguage);
-      formData.append('context', JSON.stringify({
-        currentPage: window.location.pathname,
-        userActions: [],
-        workspaceId: 'current'
-      }));
+      // Get authentication token
+      const token = localStorage.getItem('veefore_auth_token');
+      if (!token) {
+        throw new Error('Authentication required. Please refresh and try again.');
+      }
 
-      // Add uploaded files
-      uploadedFiles.forEach((file, index) => {
-        formData.append(`files`, file);
-      });
-
+      // Send to backend API with language preference
       const response = await fetch('/api/copilot/chat', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          language: selectedLanguage,
+          context: {
+            currentPage: window.location.pathname,
+            userActions: [],
+            workspaceId: 'current'
+          }
+        })
       });
 
       if (!response.ok) {

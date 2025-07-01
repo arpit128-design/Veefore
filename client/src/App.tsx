@@ -92,6 +92,7 @@ function AuthenticatedApp() {
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
+              <Route path="/ai-thumbnails" component={ThumbnailAIMaker} />
               <Route path="/automation" component={Automation} />
               <Route path="/conversations" component={Conversations} />
               <Route path="/workspaces" component={Workspaces} />

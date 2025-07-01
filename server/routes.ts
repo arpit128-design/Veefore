@@ -8835,6 +8835,14 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
 
     } catch (error) {
       console.error('[THUMBNAIL PRO] Complete generation failed:', error);
+      console.error('[THUMBNAIL PRO] OpenAI API Key exists:', !!process.env.OPENAI_API_KEY);
+      console.error('[THUMBNAIL PRO] Error type:', typeof error);
+      console.error('[THUMBNAIL PRO] Error details:', JSON.stringify(error, null, 2));
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        console.error('[THUMBNAIL PRO] OpenAI API response error:', error.response);
+      }
+      
       res.status(500).json({ 
         error: 'Failed to generate thumbnails',
         details: error instanceof Error ? error.message : 'Unknown error'

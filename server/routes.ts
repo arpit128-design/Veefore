@@ -21,7 +21,7 @@ import { youtubeService } from "./youtube-service";
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
-export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
+export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);

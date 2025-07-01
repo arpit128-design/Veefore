@@ -117,50 +117,11 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Enable Vite development server without problematic routes
+  // Use the pre-configured setupVite function with proper host settings
   if (process.env.NODE_ENV !== "production") {
-    const { createServer } = await import("vite");
-    const vite = await createServer({
-      configFile: false,
-      server: { middlewareMode: true },
-      appType: 'custom',
-      root: path.resolve(process.cwd(), 'client'),
-      resolve: {
-        alias: {
-          "@": path.resolve(process.cwd(), "client", "src"),
-          "@shared": path.resolve(process.cwd(), "shared"),
-          "@assets": path.resolve(process.cwd(), "attached_assets"),
-        },
-      },
-    });
-    
-    app.use(vite.middlewares);
-    
-    // Handle SPA routing without using catch-all pattern that breaks path-to-regexp
-    app.get(['/', '/dashboard', '/content', '/analytics'], async (req, res) => {
-      try {
-        const template = await vite.transformIndexHtml(req.originalUrl, `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VeeFore</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-        `);
-        res.send(template);
-      } catch (e) {
-        vite.ssrFixStacktrace(e);
-        res.status(500).end(e.message);
-      }
-    });
+    await setupVite(app, server);
   } else {
-    app.use(express.static(path.join(process.cwd(), 'dist/public')));
+    serveStatic(app);
   }
 
   // ALWAYS serve the app on port 5000

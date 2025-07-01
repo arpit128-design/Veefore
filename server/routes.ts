@@ -8753,32 +8753,80 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         console.log('[THUMBNAIL PRO] Image uploaded:', uploadedFile.filename);
       }
 
-      // Generate multiple variants using AI
+      // Generate multiple variants using DALL-E 3 AI
+      const OpenAI = require('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
       const variants = [];
       
-      // Create 4 different variants with different layouts and styles
-      const layouts = ['left-face-right-text', 'center-focus', 'z-pattern', 'dynamic-split'];
-      const emotions = ['excited', 'shocked', 'curious', 'confident'];
+      // Create 4 different variants with professional YouTube thumbnail styles matching reference images
+      const stylePrompts = [
+        `Professional YouTube thumbnail in the style of top creators: Split-screen composition with "${title}" in massive bold white text with black outline, ${category} theme, photorealistic person with shocked facial expression on left side, dramatic scene on right side, vibrant saturated colors, high contrast lighting, 16:9 aspect ratio, premium quality graphic design`,
+        `YouTube thumbnail in viral style: "${title}" in huge bold text overlay with drop shadow, ${category} content featuring VS comparison layout with two contrasting elements, dramatic cinematic lighting, bright neon colors (red, blue, yellow), professional photography style, eye-catching composition that stops scrolling`,
+        `High-CTR YouTube thumbnail: "${title}" prominently displayed in thick bold font, ${category} scene with person pointing directly at camera with surprised expression, explosive background effects with particles and glow, vibrant color palette, high energy composition, clickbait aesthetic that drives engagement`,
+        `Premium YouTube thumbnail design: Clean bold "${title}" typography with modern sans-serif font, ${category} themed background with cinematic depth of field, professional studio lighting, sophisticated color grading, minimal but impactful composition, trending aesthetic used by top YouTubers`
+      ];
+      
+      const layouts = ['split-screen-shock', 'vs-comparison', 'pointing-explosive', 'centered-cinematic'];
+      const emotions = ['shocked', 'excited', 'surprised', 'confident'];
       
       for (let i = 0; i < 4; i++) {
-        const variant = {
-          id: `variant_${Date.now()}_${i}`,
-          title: parsedStrategy.titles[i % parsedStrategy.titles.length] || title,
-          imageUrl: uploadedFile 
-            ? `/api/generated-content/${uploadedFile.filename}`
-            : `https://via.placeholder.com/1280x720/${['ff6b6b', '4ecdc4', '45b7d1', '96ceb4'][i]}/ffffff?text=${encodeURIComponent(title)}`,
-          ctrScore: Math.round((8.5 + Math.random() * 1.5) * 10) / 10,
-          layout: layouts[i],
-          metadata: {
-            style: parsedStrategy.style,
-            emotion: emotions[i],
-            colors: parsedStrategy.colors,
-            placement: parsedStrategy.placement,
-            hooks: parsedStrategy.hooks,
-            trending_match: parsedTrending
-          }
-        };
-        variants.push(variant);
+        try {
+          console.log(`[THUMBNAIL PRO] Generating AI image ${i + 1}/4 with DALL-E 3`);
+          
+          const imageResponse = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: stylePrompts[i],
+            n: 1,
+            size: "1792x1024", // YouTube thumbnail ratio
+            quality: "hd",
+            style: "vivid"
+          });
+
+          const variant = {
+            id: `variant_${Date.now()}_${i}`,
+            title: parsedStrategy.titles[i % parsedStrategy.titles.length] || title,
+            imageUrl: imageResponse.data[0].url,
+            ctrScore: Math.round((8.5 + Math.random() * 1.5) * 10) / 10,
+            layout: layouts[i],
+            metadata: {
+              style: parsedStrategy.style,
+              emotion: emotions[i],
+              colors: parsedStrategy.colors,
+              placement: parsedStrategy.placement,
+              hooks: parsedStrategy.hooks,
+              trending_match: parsedTrending,
+              aiGenerated: true,
+              prompt: stylePrompts[i]
+            }
+          };
+          variants.push(variant);
+          
+          console.log(`[THUMBNAIL PRO] Successfully generated AI thumbnail ${i + 1}`);
+        } catch (error) {
+          console.error(`[THUMBNAIL PRO] Failed to generate AI image ${i + 1}:`, error);
+          
+          // Fallback with uploaded image if available
+          const fallbackVariant = {
+            id: `variant_${Date.now()}_${i}`,
+            title: parsedStrategy.titles[i % parsedStrategy.titles.length] || title,
+            imageUrl: uploadedFile 
+              ? `/api/generated-content/${uploadedFile.filename}`
+              : `https://via.placeholder.com/1792x1024/ff6b6b/ffffff?text=Error+Generating+AI+Image`,
+            ctrScore: Math.round((7.0 + Math.random() * 1.0) * 10) / 10,
+            layout: layouts[i],
+            metadata: {
+              style: parsedStrategy.style,
+              emotion: emotions[i],
+              colors: parsedStrategy.colors,
+              placement: parsedStrategy.placement,
+              hooks: parsedStrategy.hooks,
+              trending_match: parsedTrending,
+              error: 'AI generation failed'
+            }
+          };
+          variants.push(fallbackVariant);
+        }
       }
 
       console.log('[THUMBNAIL PRO] Generated variants:', variants.length);

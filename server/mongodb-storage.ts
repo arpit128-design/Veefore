@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 import { IStorage } from "./storage";
 import {
   User, Workspace, SocialAccount, Content, Analytics, AutomationRule,
@@ -3674,5 +3675,204 @@ export class MongoStorage implements IStorage {
     return this.convertUser(user);
   }
 
+  // THUMBNAIL GENERATION SYSTEM METHODS
 
+  // Thumbnail Projects
+  async createThumbnailProject(data: any): Promise<any> {
+    await this.connect();
+    const result = await this.client.db().collection('thumbnail_projects').insertOne({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    return {
+      id: result.insertedId.toString(),
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  async getThumbnailProject(projectId: number): Promise<any> {
+    await this.connect();
+    const project = await this.client.db().collection('thumbnail_projects')
+      .findOne({ _id: new ObjectId(projectId.toString()) });
+    
+    if (!project) return null;
+    
+    return {
+      id: project._id.toString(),
+      ...project
+    };
+  }
+
+  async updateThumbnailProject(projectId: number, updates: any): Promise<void> {
+    await this.connect();
+    await this.client.db().collection('thumbnail_projects')
+      .updateOne(
+        { _id: new ObjectId(projectId.toString()) },
+        { $set: { ...updates, updatedAt: new Date() } }
+      );
+  }
+
+  async getThumbnailProjects(workspaceId: number): Promise<any[]> {
+    await this.connect();
+    const projects = await this.client.db().collection('thumbnail_projects')
+      .find({ workspaceId })
+      .sort({ createdAt: -1 })
+      .toArray();
+    
+    return projects.map(project => ({
+      id: project._id.toString(),
+      ...project
+    }));
+  }
+
+  // Thumbnail Strategies
+  async createThumbnailStrategy(data: any): Promise<any> {
+    await this.connect();
+    const result = await this.client.db().collection('thumbnail_strategies').insertOne({
+      ...data,
+      createdAt: new Date()
+    });
+    
+    return {
+      id: result.insertedId.toString(),
+      ...data,
+      createdAt: new Date()
+    };
+  }
+
+  async getThumbnailStrategy(projectId: number): Promise<any> {
+    await this.connect();
+    const strategy = await this.client.db().collection('thumbnail_strategies')
+      .findOne({ projectId: projectId.toString() });
+    
+    if (!strategy) return null;
+    
+    return {
+      id: strategy._id.toString(),
+      ...strategy
+    };
+  }
+
+  // Thumbnail Variants
+  async createThumbnailVariant(data: any): Promise<any> {
+    await this.connect();
+    const result = await this.client.db().collection('thumbnail_variants').insertOne({
+      ...data,
+      createdAt: new Date()
+    });
+    
+    return {
+      id: result.insertedId.toString(),
+      ...data,
+      createdAt: new Date()
+    };
+  }
+
+  async getThumbnailVariant(variantId: number): Promise<any> {
+    await this.connect();
+    const variant = await this.client.db().collection('thumbnail_variants')
+      .findOne({ _id: new ObjectId(variantId.toString()) });
+    
+    if (!variant) return null;
+    
+    return {
+      id: variant._id.toString(),
+      ...variant
+    };
+  }
+
+  async getThumbnailVariants(projectId: number): Promise<any[]> {
+    await this.connect();
+    const variants = await this.client.db().collection('thumbnail_variants')
+      .find({ projectId: projectId.toString() })
+      .sort({ variantNumber: 1 })
+      .toArray();
+    
+    return variants.map(variant => ({
+      id: variant._id.toString(),
+      ...variant
+    }));
+  }
+
+  // Canvas Editor Sessions
+  async createCanvasEditorSession(data: any): Promise<any> {
+    await this.connect();
+    const result = await this.client.db().collection('canvas_editor_sessions').insertOne({
+      ...data,
+      createdAt: new Date(),
+      lastSaved: new Date()
+    });
+    
+    return {
+      id: result.insertedId.toString(),
+      ...data,
+      createdAt: new Date(),
+      lastSaved: new Date()
+    };
+  }
+
+  async getCanvasEditorSession(sessionId: number): Promise<any> {
+    await this.connect();
+    const session = await this.client.db().collection('canvas_editor_sessions')
+      .findOne({ _id: new ObjectId(sessionId.toString()) });
+    
+    if (!session) return null;
+    
+    return {
+      id: session._id.toString(),
+      ...session
+    };
+  }
+
+  async updateCanvasEditorSession(sessionId: number, updates: any): Promise<void> {
+    await this.connect();
+    await this.client.db().collection('canvas_editor_sessions')
+      .updateOne(
+        { _id: new ObjectId(sessionId.toString()) },
+        { $set: { ...updates, lastSaved: new Date() } }
+      );
+  }
+
+  // Thumbnail Exports
+  async createThumbnailExport(data: any): Promise<any> {
+    await this.connect();
+    const result = await this.client.db().collection('thumbnail_exports').insertOne({
+      ...data,
+      createdAt: new Date(),
+      downloadCount: 0
+    });
+    
+    return {
+      id: result.insertedId.toString(),
+      ...data,
+      createdAt: new Date(),
+      downloadCount: 0
+    };
+  }
+
+  async getThumbnailExports(sessionId: number): Promise<any[]> {
+    await this.connect();
+    const exports = await this.client.db().collection('thumbnail_exports')
+      .find({ sessionId: sessionId.toString() })
+      .sort({ createdAt: -1 })
+      .toArray();
+    
+    return exports.map(exp => ({
+      id: exp._id.toString(),
+      ...exp
+    }));
+  }
+
+  async incrementExportDownload(exportId: number): Promise<void> {
+    await this.connect();
+    await this.client.db().collection('thumbnail_exports')
+      .updateOne(
+        { _id: new ObjectId(exportId.toString()) },
+        { $inc: { downloadCount: 1 } }
+      );
+  }
 }

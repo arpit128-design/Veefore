@@ -20,6 +20,7 @@ import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
 import { ThumbnailAIService } from './thumbnail-ai-service';
+import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -8944,6 +8945,162 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     } catch (error) {
       console.error('[THUMBNAIL API] Project save failed:', error);
       res.status(500).json({ error: 'Failed to save project' });
+    }
+  });
+
+  // THUMBNAIL GENERATION SYSTEM ROUTES
+  
+  // Start thumbnail generation project (Stage 1)
+  app.post('/api/thumbnails/create', requireAuth, async (req, res) => {
+    try {
+      const { title, description, category, uploadedImageUrl } = req.body;
+      const userId = req.user!.id;
+      
+      // Get user's current workspace
+      const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+      const currentWorkspace = userWorkspaces[0]; // Use first workspace for now
+      
+      if (!currentWorkspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      const project = await advancedThumbnailGenerator.createThumbnailProject({
+        title,
+        description,
+        category,
+        uploadedImageUrl,
+        userId: parseInt(userId),
+        workspaceId: parseInt(currentWorkspace.id)
+      });
+
+      res.json(project);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Create project failed:', error);
+      res.status(500).json({ error: 'Failed to create thumbnail project' });
+    }
+  });
+
+  // Get project with all data (stages 2-5)
+  app.get('/api/thumbnails/project/:projectId', requireAuth, async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const project = await advancedThumbnailGenerator.getThumbnailProjectComplete(parseInt(projectId));
+      
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      res.json(project);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Get project failed:', error);
+      res.status(500).json({ error: 'Failed to get project' });
+    }
+  });
+
+  // Create canvas editor session (Stage 6)
+  app.post('/api/thumbnails/canvas/:variantId', requireAuth, async (req, res) => {
+    try {
+      const { variantId } = req.params;
+      const userId = req.user!.id;
+      
+      const session = await advancedThumbnailGenerator.createCanvasEditorSession(
+        parseInt(variantId),
+        parseInt(userId)
+      );
+
+      res.json(session);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Create canvas session failed:', error);
+      res.status(500).json({ error: 'Failed to create canvas session' });
+    }
+  });
+
+  // Update canvas data
+  app.post('/api/thumbnails/canvas/:sessionId/save', requireAuth, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const { canvasData, layers } = req.body;
+      
+      await storage.updateCanvasEditorSession(parseInt(sessionId), {
+        canvasData,
+        layers,
+        lastSaved: new Date()
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('[THUMBNAIL API] Save canvas failed:', error);
+      res.status(500).json({ error: 'Failed to save canvas' });
+    }
+  });
+
+  // Export thumbnail (Stage 7)
+  app.post('/api/thumbnails/export/:sessionId', requireAuth, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const { format } = req.body;
+      
+      const exportRecord = await advancedThumbnailGenerator.exportThumbnail(
+        parseInt(sessionId),
+        format
+      );
+
+      res.json(exportRecord);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Export failed:', error);
+      res.status(500).json({ error: 'Failed to export thumbnail' });
+    }
+  });
+
+  // Get user's thumbnail projects
+  app.get('/api/thumbnails/projects', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Get user's workspaces
+      const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+      const workspaceIds = userWorkspaces.map(w => parseInt(w.id));
+      
+      // Get projects for all workspaces
+      const allProjects = [];
+      for (const workspaceId of workspaceIds) {
+        const projects = await storage.getThumbnailProjects(workspaceId);
+        allProjects.push(...projects);
+      }
+
+      res.json(allProjects);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Get projects failed:', error);
+      res.status(500).json({ error: 'Failed to get projects' });
+    }
+  });
+
+  // Get exports for a session
+  app.get('/api/thumbnails/exports/:sessionId', requireAuth, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const exports = await storage.getThumbnailExports(parseInt(sessionId));
+      res.json(exports);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Get exports failed:', error);
+      res.status(500).json({ error: 'Failed to get exports' });
+    }
+  });
+
+  // Download export
+  app.get('/api/thumbnails/download/:exportId', requireAuth, async (req, res) => {
+    try {
+      const { exportId } = req.params;
+      
+      // Increment download count
+      await storage.incrementExportDownload(parseInt(exportId));
+      
+      // Redirect to the actual file URL
+      // In production, this would be a signed S3 URL or similar
+      res.json({ message: 'Download counted' });
+    } catch (error) {
+      console.error('[THUMBNAIL API] Download failed:', error);
+      res.status(500).json({ error: 'Failed to download' });
     }
   });
 

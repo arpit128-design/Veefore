@@ -42,6 +42,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import InstagramAnalytics from "@/pages/InstagramAnalytics";
 import YouTubeAnalytics from "@/pages/YouTubeAnalytics";
+import ThumbnailAIMaker from "@/pages/ThumbnailAIMaker";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -90,6 +91,7 @@ function AuthenticatedApp() {
               <Route path="/trends" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
+              <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
               <Route path="/automation" component={Automation} />
               <Route path="/conversations" component={Conversations} />
               <Route path="/workspaces" component={Workspaces} />

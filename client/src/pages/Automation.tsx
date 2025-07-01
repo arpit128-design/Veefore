@@ -927,7 +927,7 @@ export default function Automation() {
                     
                     {/* AI Configuration Panel */}
                     <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
-                      <h4 className="font-medium text-sm text-gray-200">AI Response Configuration</h4>
+                      <h4 className="font-medium text-sm text-foreground">AI Response Configuration</h4>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -1097,7 +1097,7 @@ export default function Automation() {
                         ...prev,
                         duration: { ...prev.duration!, startDate: e.target.value }
                       }))}
-                      className="w-full glassmorphism text-gray-200"
+                      className="w-full glassmorphism text-foreground"
                     />
                   </div>
                   
@@ -1173,7 +1173,7 @@ export default function Automation() {
                             ...prev,
                             activeTime: { ...prev.activeTime!, startTime: e.target.value }
                           }))}
-                          className="glassmorphism text-gray-200"
+                          className="glassmorphism text-foreground"
                         />
                       </div>
                       
@@ -1187,7 +1187,7 @@ export default function Automation() {
                             ...prev,
                             activeTime: { ...prev.activeTime!, endTime: e.target.value }
                           }))}
-                          className="glassmorphism text-gray-200"
+                          className="glassmorphism text-foreground"
                         />
                       </div>
                       

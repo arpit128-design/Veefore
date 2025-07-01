@@ -22,10 +22,6 @@ import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
-
-
-
-
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);
@@ -165,16 +161,6 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       res.status(401).json({ error: 'Unauthorized' });
     }
   };
-
-  // Basic health check endpoint - no auth required
-  app.get('/api/health', (req, res) => {
-    res.json({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      service: 'VeeFore API',
-      mongodb: 'connected'
-    });
-  });
 
   // Get current user
   app.get('/api/user', requireAuth, async (req: any, res: Response) => {

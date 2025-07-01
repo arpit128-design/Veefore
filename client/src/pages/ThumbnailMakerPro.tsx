@@ -102,12 +102,19 @@ const ThumbnailMakerPro: React.FC = () => {
 
     try {
       // Start the thumbnail generation process
-      const response = await apiRequest('/api/thumbnails/create', {
+      const response = await fetch('/api/thumbnails/create', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(formData)
       });
 
-      const project = response;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const project = await response.json();
       
       // Poll for project completion
       pollProjectProgress(project.id);
@@ -130,8 +137,17 @@ const ThumbnailMakerPro: React.FC = () => {
 
     const poll = async () => {
       try {
-        const response = await apiRequest(`/api/thumbnails/project/${projectId}`);
-        const data: ProjectData = response;
+        const response = await fetch(`/api/thumbnails/project/${projectId}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data: ProjectData = await response.json();
         
         setProjectData(data);
         setCurrentStage(data.project.stage);
@@ -188,10 +204,18 @@ const ThumbnailMakerPro: React.FC = () => {
     setSelectedVariant(variant);
     
     try {
-      const session = await apiRequest(`/api/thumbnails/canvas/${variant.id}`, {
-        method: 'POST'
+      const response = await fetch(`/api/thumbnails/canvas/${variant.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const session = await response.json();
       setCanvasSession(session);
       setCurrentStep(4); // Move to canvas editor
       
@@ -215,10 +239,19 @@ const ThumbnailMakerPro: React.FC = () => {
     if (!canvasSession) return;
     
     try {
-      const exportData = await apiRequest(`/api/thumbnails/export/${canvasSession.id}`, {
+      const response = await fetch(`/api/thumbnails/export/${canvasSession.id}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ format })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const exportData = await response.json();
       
       toast({
         title: "Export Complete",

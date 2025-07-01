@@ -102,18 +102,7 @@ const ThumbnailMakerPro: React.FC = () => {
 
     try {
       // Start the thumbnail generation process
-      const response = await fetch('/api/thumbnails/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      const response = await apiRequest('POST', '/api/thumbnails/create', formData);
       const project = await response.json();
       
       // Poll for project completion
@@ -137,16 +126,7 @@ const ThumbnailMakerPro: React.FC = () => {
 
     const poll = async () => {
       try {
-        const response = await fetch(`/api/thumbnails/project/${projectId}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
+        const response = await apiRequest('GET', `/api/thumbnails/project/${projectId}`);
         const data: ProjectData = await response.json();
         
         setProjectData(data);

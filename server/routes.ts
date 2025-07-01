@@ -8650,6 +8650,87 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // STAGE 2: GPT-4 Strategy Generation Pro
+  app.post('/api/thumbnails/generate-strategy-pro', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[THUMBNAIL PRO] Stage 2: GPT-4 Strategy Generation');
+      const { title, description, category, hasImage } = req.body;
+
+      if (!title || !category) {
+        return res.status(400).json({ error: 'Title and category are required' });
+      }
+
+      // Enhanced GPT-4 prompt for strategy generation
+      const strategyPrompt = `You are a viral video thumbnail strategist. Based on the following inputs:
+      - Title: ${title}
+      - Description: ${description || 'No description provided'}
+      - Category: ${category}
+      - Has Image: ${hasImage ? 'Yes' : 'No'}
+
+      Return in JSON format ONLY (no other text):
+      {
+        "titles": ["3 short attention-grabbing texts (<6 words each)"],
+        "ctas": ["2 CTA badge texts"],
+        "fonts": ["suggested font families"],
+        "colors": {
+          "background": "#hex_color",
+          "title": "#hex_color", 
+          "cta": "#hex_color"
+        },
+        "style": "visual style tag (luxury/chaos/mystery/etc)",
+        "emotion": "emotion type (shock/success/urgency/etc)",
+        "hooks": ["hook keywords like SECRET, EXPOSED"],
+        "placement": "placement suggestion (left-face-right-text/etc)"
+      }`;
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: strategyPrompt }],
+        response_format: { type: "json_object" },
+        temperature: 0.8
+      });
+
+      const strategy = JSON.parse(response.choices[0].message.content || '{}');
+      console.log('[THUMBNAIL PRO] Generated strategy:', strategy);
+      
+      res.json(strategy);
+    } catch (error) {
+      console.error('[THUMBNAIL PRO] Strategy generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate strategy',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // STAGE 3: Trending Vision Matching
+  app.post('/api/thumbnails/match-trending', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[THUMBNAIL PRO] Stage 3: Trending Vision Matching');
+      const { title, category, strategy } = req.body;
+
+      // Simulate trending match analysis (in real implementation, this would use CLIP/BLIP)
+      const trendingMatch = {
+        matched_trend_thumbnail: "https://via.placeholder.com/1280x720/ff6b6b/ffffff?text=Trending+Reference",
+        layout_style: "Z-pattern-left-face",
+        visual_motif: "zoomed face + glow + red stroke",
+        emoji: ["🔥", "😱", "💰"],
+        filters: ["vibrance", "warm_tone", "high_contrast"]
+      };
+
+      console.log('[THUMBNAIL PRO] Trending match generated:', trendingMatch);
+      res.json(trendingMatch);
+    } catch (error) {
+      console.error('[THUMBNAIL PRO] Trending match failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to match trending data',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // AI Thumbnail Generation Routes
   app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
     try {

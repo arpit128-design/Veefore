@@ -232,30 +232,39 @@ export function createCopilotRoutes(storage: IStorage) {
           return res.status(401).json({ error: 'Authentication required' });
         }
 
-        // Get user's recent analytics data
-        const user = await storage.getUserById(userId);
-        if (!user) {
-          return res.status(404).json({ error: 'User not found' });
+        // Get user's workspaces to find connected accounts
+        const workspaces = await storage.getWorkspacesByUserId(userId);
+        if (!workspaces.length) {
+          return res.json({
+            suggestions: [
+              "Connect your first social media account to get started",
+              "Try connecting Instagram for visual content management",
+              "Add YouTube for video content optimization"
+            ],
+            basedOn: 'No connected accounts',
+            generatedAt: new Date().toISOString()
+          });
         }
 
         // Get workspace analytics
-        const accounts = await storage.getSocialAccountsByWorkspace(user.workspaceId);
+        const defaultWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+        const accounts = await storage.getSocialAccountsByWorkspace(defaultWorkspace.id);
         
         let suggestions = [];
 
         if (accounts.length === 0) {
           suggestions = [
-            "🔗 Connect your first social media account to get started",
-            "📱 Try connecting Instagram for visual content management",
-            "🎥 Add YouTube for video content optimization"
+            "Connect your first social media account to get started",
+            "Try connecting Instagram for visual content management",
+            "Add YouTube for video content optimization"
           ];
         } else {
           suggestions = [
-            "📊 Your Instagram engagement is 4.8% - try posting at peak hours",
-            "🎯 Create more carousel posts - they get 3x more engagement",
-            "⏰ Schedule content during 7-9 PM for better reach",
-            "📈 Your YouTube channel needs more consistent posting",
-            "💬 Set up auto-DM responses to boost follower interaction"
+            "Your Instagram engagement is 4.8% - try posting at peak hours",
+            "Create more carousel posts - they get 3x more engagement",
+            "Schedule content during 7-9 PM for better reach",
+            "Your YouTube channel needs more consistent posting",
+            "Set up auto-DM responses to boost follower interaction"
           ];
         }
 

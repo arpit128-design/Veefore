@@ -18,6 +18,7 @@ import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
+import { createCopilotRoutes } from "./ai-copilot";
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 import { createCopilotRoutes } from './ai-copilot';
@@ -8547,6 +8548,14 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       res.status(500).json({ error: 'Failed to generate placeholder image' });
     }
   });
+
+  // AI Copilot Routes
+  const copilotRoutes = createCopilotRoutes(storage);
+  
+  app.post('/api/copilot/chat', requireAuth, copilotRoutes.chat);
+  app.post('/api/copilot/generate-content', requireAuth, copilotRoutes.generateContent);
+  app.post('/api/copilot/analyze-content', requireAuth, copilotRoutes.analyzeContent);
+  app.get('/api/copilot/optimization-suggestions', requireAuth, copilotRoutes.getOptimizationSuggestions);
 
   const httpServer = createServer(app);
   return httpServer;

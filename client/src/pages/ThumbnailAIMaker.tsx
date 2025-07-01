@@ -24,6 +24,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface ThumbnailVariant {
   id: string;
@@ -100,24 +101,15 @@ export default function ThumbnailAIMaker() {
       setGenerationStep(1);
       console.log('[THUMBNAIL] Generating AI strategy...');
       
-      const strategyResponse = await fetch('/api/thumbnails/generate-strategy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          category,
-          style: 'auto'
-        })
+      const strategyResponse = await apiRequest('POST', '/api/thumbnails/generate-strategy', {
+        title,
+        description,
+        category,
+        style: 'auto'
       });
 
-      if (!strategyResponse.ok) {
-        throw new Error('Failed to generate strategy');
-      }
-
+      console.log('[THUMBNAIL] Strategy response status:', strategyResponse.status);
+      
       const strategy = await strategyResponse.json();
       setDesignData(strategy);
 
@@ -129,23 +121,12 @@ export default function ThumbnailAIMaker() {
       setGenerationStep(3);
       console.log('[THUMBNAIL] Generating thumbnail variants...');
 
-      const variantsResponse = await fetch('/api/thumbnails/generate-variants', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          category,
-          designData: strategy
-        })
+      const variantsResponse = await apiRequest('POST', '/api/thumbnails/generate-variants', {
+        title,
+        description,
+        category,
+        designData: strategy
       });
-
-      if (!variantsResponse.ok) {
-        throw new Error('Failed to generate variants');
-      }
 
       const generatedVariants = await variantsResponse.json();
       setVariants(generatedVariants);

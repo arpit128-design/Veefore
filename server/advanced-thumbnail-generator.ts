@@ -4,10 +4,9 @@
  */
 
 import OpenAI from "openai";
-// Canvas dependencies temporarily disabled for development
-// import { createCanvas, loadImage, registerFont, CanvasRenderingContext2D } from "canvas";
-// import sharp from "sharp";
-// import puppeteer from "puppeteer";
+import { createCanvas, loadImage, registerFont, CanvasRenderingContext2D } from "canvas";
+import sharp from "sharp";
+import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
 import { storage } from "./storage";

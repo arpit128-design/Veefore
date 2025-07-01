@@ -20,7 +20,7 @@ import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
 import { ThumbnailAIService } from './thumbnail-ai-service';
-import { simpleThumbnailGenerator } from './simple-thumbnail-generator';
+import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -8964,7 +8964,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         return res.status(400).json({ error: 'No workspace found' });
       }
 
-      const project = await simpleThumbnailGenerator.createThumbnailProject({
+      const project = await advancedThumbnailGenerator.createThumbnailProject({
         title,
         description,
         category,
@@ -8984,7 +8984,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   app.get('/api/thumbnails/project/:projectId', requireAuth, async (req, res) => {
     try {
       const { projectId } = req.params;
-      const project = await simpleThumbnailGenerator.getThumbnailProjectComplete(parseInt(projectId));
+      const project = await advancedThumbnailGenerator.getThumbnailProjectComplete(parseInt(projectId));
       
       if (!project) {
         return res.status(404).json({ error: 'Project not found' });
@@ -9003,7 +9003,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { variantId } = req.params;
       const userId = req.user!.id;
       
-      const session = await simpleThumbnailGenerator.createCanvasEditorSession(
+      const session = await advancedThumbnailGenerator.createCanvasEditorSession(
         parseInt(variantId),
         parseInt(userId)
       );
@@ -9040,7 +9040,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { sessionId } = req.params;
       const { format } = req.body;
       
-      const exportRecord = await simpleThumbnailGenerator.exportThumbnail(
+      const exportRecord = await advancedThumbnailGenerator.exportThumbnail(
         parseInt(sessionId),
         format
       );

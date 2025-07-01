@@ -15,6 +15,7 @@ const navigationItems = [
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" },
   { href: "/thumbnail-maker", icon: ImageIcon, label: "AI Thumbnails", color: "text-pink-400" },
+  { href: "/ai-thumbnails-pro", icon: Sparkles, label: "Thumbnails Pro", color: "text-purple-500" },
   { href: "/automation", icon: Bot, label: "Automation", color: "text-orange-400" },
   { href: "/conversations", icon: MessageCircle, label: "Conversations", color: "text-blue-500" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },

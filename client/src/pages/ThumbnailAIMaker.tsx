@@ -350,17 +350,51 @@ export default function ThumbnailAIMaker() {
                     )}
                   </Button>
                   
-                  <Button
-                    onClick={testDebugGeneration}
-                    disabled={!title.trim() || !category}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Terminal className="h-4 w-4" />
-                      Test Debug Generation
-                    </div>
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={testDebugGeneration}
+                      disabled={!title.trim() || !category}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Terminal className="h-4 w-4" />
+                        Test Strategy
+                      </div>
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        try {
+                          console.log('[THUMBNAIL] Testing quick connection...');
+                          const response = await apiRequest('POST', '/api/thumbnails/quick-test', {
+                            title,
+                            category
+                          });
+                          const mockVariants = await response.json();
+                          setVariants(mockVariants);
+                          toast({
+                            title: "Connection Test Successful!",
+                            description: "Backend connection working - showing test thumbnails"
+                          });
+                        } catch (error) {
+                          console.error('[THUMBNAIL] Quick test failed:', error);
+                          toast({
+                            title: "Connection Test Failed",
+                            description: "Backend connection issue detected",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      disabled={!title.trim() || !category}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-4 w-4" />
+                        Quick Test
+                      </div>
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Progress Bar */}
@@ -371,8 +405,25 @@ export default function ThumbnailAIMaker() {
                       {generationSteps[generationStep]}
                     </p>
                     {generationStep === 3 && (
-                      <div className="text-xs text-amber-400 text-center bg-amber-900/20 px-3 py-2 rounded-lg">
-                        ⏱️ AI image generation takes time - please be patient while we create 5 unique thumbnails
+                      <div className="space-y-2">
+                        <div className="text-xs text-amber-400 text-center bg-amber-900/20 px-3 py-2 rounded-lg">
+                          ⏱️ AI image generation takes time - please be patient while we create 5 unique thumbnails
+                        </div>
+                        <Button
+                          onClick={() => {
+                            setIsGenerating(false);
+                            setGenerationStep(0);
+                            toast({
+                              title: "Generation Reset",
+                              description: "You can try generating thumbnails again",
+                            });
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          Cancel & Reset
+                        </Button>
                       </div>
                     )}
                   </div>

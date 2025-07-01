@@ -73,15 +73,31 @@ export async function apiRequest(
 
   console.log(`[CLIENT DEBUG] Request headers:`, Object.keys(headers));
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body,
-    credentials: "include",
-  });
+  // Set longer timeout for thumbnail generation
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, url.includes('thumbnails') ? 300000 : 30000); // 5 minutes for thumbnails, 30s for others
 
-  await throwIfResNotOk(res);
-  return res;
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body,
+      credentials: "include",
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${url.includes('thumbnails') ? '5 minutes' : '30 seconds'}`);
+    }
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

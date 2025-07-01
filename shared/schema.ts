@@ -324,6 +324,116 @@ export const conversationContext = pgTable("conversation_context", {
   expiresAt: timestamp("expires_at") // For 3-day memory cleanup
 });
 
+// AI Thumbnail Generation System - 7 Stage Implementation
+export const thumbnailProjects = pgTable("thumbnail_projects", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // Gaming, Finance, Education, etc.
+  uploadedImageUrl: text("uploaded_image_url"),
+  status: text("status").default("draft"), // draft, processing, completed, failed
+  creditsUsed: integer("credits_used").default(0),
+  stage: integer("stage").default(1), // Current stage 1-7
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Stage 2: GPT-4 Strategy Output
+export const thumbnailStrategies = pgTable("thumbnail_strategies", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => thumbnailProjects.id).notNull(),
+  titles: text("titles").array(), // 3 attention-grabbing texts
+  ctas: text("ctas").array(), // 2 CTA badge texts
+  fonts: text("fonts").array(), // Suggested font families
+  colors: json("colors"), // Background, title, CTA colors
+  style: text("style").notNull(), // luxury, chaos, mystery, hype
+  emotion: text("emotion").notNull(), // shock, success, sadness, urgency
+  hooks: text("hooks").array(), // Hook keywords
+  placement: text("placement").notNull(), // Layout placement strategy
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Stage 3: Trending Analysis & Visual Matching
+export const trendingThumbnails = pgTable("trending_thumbnails", {
+  id: serial("id").primaryKey(),
+  sourceUrl: text("source_url").notNull(),
+  thumbnailUrl: text("thumbnail_url").notNull(),
+  title: text("title"),
+  category: text("category"),
+  viewCount: integer("view_count"),
+  engagement: json("engagement"), // likes, comments, shares
+  visualFeatures: json("visual_features"), // CLIP/BLIP embeddings
+  layoutStyle: text("layout_style"), // Z-pattern-left-face, etc.
+  visualMotif: text("visual_motif"), // zoomed face + glow + red stroke
+  emojis: text("emojis").array(),
+  filters: text("filters").array(),
+  scrapedAt: timestamp("scraped_at").defaultNow(),
+  isActive: boolean("is_active").default(true)
+});
+
+export const thumbnailMatches = pgTable("thumbnail_matches", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => thumbnailProjects.id).notNull(),
+  trendingThumbnailId: integer("trending_thumbnail_id").references(() => trendingThumbnails.id).notNull(),
+  similarity: integer("similarity"), // 0-100 match score
+  matchedFeatures: text("matched_features").array(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Stage 4: Layout Variants Generation
+export const thumbnailVariants = pgTable("thumbnail_variants", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => thumbnailProjects.id).notNull(),
+  variantNumber: integer("variant_number").notNull(), // 1-5
+  layoutType: text("layout_type").notNull(), // Face left text right, Bold title top, etc.
+  previewUrl: text("preview_url").notNull(), // PNG preview
+  layerMetadata: json("layer_metadata"), // Editable layer data for canvas
+  layoutClassification: text("layout_classification"), // High CTR - Emotion + Red
+  predictedCtr: integer("predicted_ctr"), // 0-100 predicted CTR score
+  composition: json("composition"), // Node.js canvas composition data
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Stage 5: Canvas Editor Sessions
+export const canvasEditorSessions = pgTable("canvas_editor_sessions", {
+  id: serial("id").primaryKey(),
+  variantId: integer("variant_id").references(() => thumbnailVariants.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  canvasData: json("canvas_data"), // Fabric.js canvas state
+  layers: json("layers"), // Background, face, text, CTA, emojis
+  editHistory: json("edit_history"), // Version history
+  lastSaved: timestamp("last_saved").defaultNow(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Stage 6: Export History
+export const thumbnailExports = pgTable("thumbnail_exports", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").references(() => canvasEditorSessions.id).notNull(),
+  format: text("format").notNull(), // PNG 1280x720, PNG transparent, Instagram 1080x1080, JSON
+  exportUrl: text("export_url").notNull(),
+  downloadCount: integer("download_count").default(0),
+  cloudStorageUrl: text("cloud_storage_url"), // S3/Cloudinary URL
+  metadata: json("metadata"), // Additional export metadata
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Advanced Features - Style Library
+export const thumbnailStyles = pgTable("thumbnail_styles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  category: text("category").notNull(),
+  styleRules: json("style_rules"), // Emotion-based layout rules
+  templateData: json("template_data"), // Reusable template definition
+  previewUrl: text("preview_url"),
+  popularityScore: integer("popularity_score").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   firebaseUid: true,
@@ -541,6 +651,101 @@ export type DmMessage = typeof dmMessages.$inferSelect;
 export type InsertDmMessage = z.infer<typeof insertDmMessageSchema>;
 export type ConversationContext = typeof conversationContext.$inferSelect;
 export type InsertConversationContext = z.infer<typeof insertConversationContextSchema>;
+
+// Thumbnail system insert schemas
+export const insertThumbnailProjectSchema = createInsertSchema(thumbnailProjects).pick({
+  userId: true,
+  workspaceId: true,
+  title: true,
+  description: true,
+  category: true,
+  uploadedImageUrl: true,
+  status: true,
+  stage: true
+});
+
+export const insertThumbnailStrategySchema = createInsertSchema(thumbnailStrategies).pick({
+  projectId: true,
+  titles: true,
+  ctas: true,
+  fonts: true,
+  colors: true,
+  style: true,
+  emotion: true,
+  hooks: true,
+  placement: true
+});
+
+export const insertTrendingThumbnailSchema = createInsertSchema(trendingThumbnails).pick({
+  sourceUrl: true,
+  thumbnailUrl: true,
+  title: true,
+  category: true,
+  viewCount: true,
+  engagement: true,
+  visualFeatures: true,
+  layoutStyle: true,
+  visualMotif: true,
+  emojis: true,
+  filters: true,
+  isActive: true
+});
+
+export const insertThumbnailVariantSchema = createInsertSchema(thumbnailVariants).pick({
+  projectId: true,
+  variantNumber: true,
+  layoutType: true,
+  previewUrl: true,
+  layerMetadata: true,
+  layoutClassification: true,
+  predictedCtr: true,
+  composition: true
+});
+
+export const insertCanvasEditorSessionSchema = createInsertSchema(canvasEditorSessions).pick({
+  variantId: true,
+  userId: true,
+  canvasData: true,
+  layers: true,
+  editHistory: true,
+  isActive: true
+});
+
+export const insertThumbnailExportSchema = createInsertSchema(thumbnailExports).pick({
+  sessionId: true,
+  format: true,
+  exportUrl: true,
+  cloudStorageUrl: true,
+  metadata: true
+});
+
+export const insertThumbnailStyleSchema = createInsertSchema(thumbnailStyles).pick({
+  name: true,
+  category: true,
+  styleRules: true,
+  templateData: true,
+  previewUrl: true,
+  popularityScore: true,
+  isActive: true
+});
+
+// Thumbnail system types
+export type ThumbnailProject = typeof thumbnailProjects.$inferSelect;
+export type ThumbnailStrategy = typeof thumbnailStrategies.$inferSelect;
+export type TrendingThumbnail = typeof trendingThumbnails.$inferSelect;
+export type ThumbnailMatch = typeof thumbnailMatches.$inferSelect;
+export type ThumbnailVariant = typeof thumbnailVariants.$inferSelect;
+export type CanvasEditorSession = typeof canvasEditorSessions.$inferSelect;
+export type ThumbnailExport = typeof thumbnailExports.$inferSelect;
+export type ThumbnailStyle = typeof thumbnailStyles.$inferSelect;
+
+export type InsertThumbnailProject = z.infer<typeof insertThumbnailProjectSchema>;
+export type InsertThumbnailStrategy = z.infer<typeof insertThumbnailStrategySchema>;
+export type InsertTrendingThumbnail = z.infer<typeof insertTrendingThumbnailSchema>;
+export type InsertThumbnailVariant = z.infer<typeof insertThumbnailVariantSchema>;
+export type InsertCanvasEditorSession = z.infer<typeof insertCanvasEditorSessionSchema>;
+export type InsertThumbnailExport = z.infer<typeof insertThumbnailExportSchema>;
+export type InsertThumbnailStyle = z.infer<typeof insertThumbnailStyleSchema>;
 
 // Content recommendations schema
 export const insertContentRecommendationSchema = createInsertSchema(contentRecommendations).pick({

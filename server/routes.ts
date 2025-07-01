@@ -8732,140 +8732,33 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // TEST ROUTE - Identical to working routes
+  app.post('/api/thumbnails/test-route', requireAuth, async (req: any, res: Response) => {
+    console.log('[THUMBNAIL PRO DEBUG] Test route hit! User:', req.user?.id);
+    try {
+      res.json({ success: true, message: 'Test route works!' });
+    } catch (error) {
+      console.error('[THUMBNAIL PRO] Test route failed:', error);
+      res.status(500).json({ error: 'Test failed' });
+    }
+  });
+
   // STAGES 4-7: Complete Generation Pipeline
   app.post('/api/thumbnails/generate-complete', requireAuth, async (req: any, res: Response) => {
+    console.log('[THUMBNAIL PRO DEBUG] Route hit! User:', req.user?.id);
     try {
       console.log('[THUMBNAIL PRO] Complete generation pipeline started');
-      const { title, description, category, strategy, trending } = req.body;
-
-      if (!title || !category) {
-        return res.status(400).json({ error: 'Title and category are required' });
-      }
-
-      // Parse JSON strings back to objects
-      const parsedStrategy = typeof strategy === 'string' ? JSON.parse(strategy) : strategy;
-      const parsedTrending = typeof trending === 'string' ? JSON.parse(trending) : trending;
-
-      console.log('[THUMBNAIL PRO] Processing with strategy:', parsedStrategy);
-      console.log('[THUMBNAIL PRO] Processing with trending:', parsedTrending);
       
-      // Validate parsed objects
-      if (!parsedStrategy || !parsedStrategy.titles || !Array.isArray(parsedStrategy.titles)) {
-        console.error('[THUMBNAIL PRO] Invalid strategy object:', parsedStrategy);
-        return res.status(400).json({ error: 'Invalid strategy data' });
-      }
+      // Quick test response first
+      res.json({
+        success: true,
+        message: 'Route is working! Full implementation will be restored.'
+      });
       
-      if (!parsedStrategy.colors) {
-        console.error('[THUMBNAIL PRO] Missing colors in strategy:', parsedStrategy);
-        return res.status(400).json({ error: 'Invalid strategy - missing colors' });
-      }
-
-      // Generate multiple variants using DALL-E 3 AI
-      const OpenAI = require('openai');
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      
-      const variants = [];
-      
-      // Create 4 different variants with professional YouTube thumbnail styles matching reference images
-      const stylePrompts = [
-        `Professional YouTube thumbnail in the style of top creators: Split-screen composition with "${title}" in massive bold white text with black outline, ${category} theme, photorealistic person with shocked facial expression on left side, dramatic scene on right side, vibrant saturated colors, high contrast lighting, 16:9 aspect ratio, premium quality graphic design`,
-        `YouTube thumbnail in viral style: "${title}" in huge bold text overlay with drop shadow, ${category} content featuring VS comparison layout with two contrasting elements, dramatic cinematic lighting, bright neon colors (red, blue, yellow), professional photography style, eye-catching composition that stops scrolling`,
-        `High-CTR YouTube thumbnail: "${title}" prominently displayed in thick bold font, ${category} scene with person pointing directly at camera with surprised expression, explosive background effects with particles and glow, vibrant color palette, high energy composition, clickbait aesthetic that drives engagement`,
-        `Premium YouTube thumbnail design: Clean bold "${title}" typography with modern sans-serif font, ${category} themed background with cinematic depth of field, professional studio lighting, sophisticated color grading, minimal but impactful composition, trending aesthetic used by top YouTubers`
-      ];
-      
-      const layouts = ['split-screen-shock', 'vs-comparison', 'pointing-explosive', 'centered-cinematic'];
-      const emotions = ['shocked', 'excited', 'surprised', 'confident'];
-      
-      // Test OpenAI connection first
-      try {
-        console.log('[THUMBNAIL PRO] Testing OpenAI connection...');
-        const testResponse = await openai.chat.completions.create({
-          model: "gpt-4o", 
-          messages: [{ role: "user", content: "Test" }],
-          max_tokens: 5
-        });
-        console.log('[THUMBNAIL PRO] OpenAI connection test successful');
-      } catch (testError) {
-        console.error('[THUMBNAIL PRO] OpenAI connection test failed:', testError);
-        throw new Error(`OpenAI API test failed: ${testError.message}`);
-      }
-
-      for (let i = 0; i < 4; i++) {
-        try {
-          console.log(`[THUMBNAIL PRO] Generating AI image ${i + 1}/4 with DALL-E 3`);
-          console.log(`[THUMBNAIL PRO] Using prompt: ${stylePrompts[i]}`);
-          
-          const imageResponse = await openai.images.generate({
-            model: "dall-e-3",
-            prompt: stylePrompts[i],
-            n: 1,
-            size: "1792x1024", // YouTube thumbnail ratio
-            quality: "hd",
-            style: "vivid"
-          });
-
-          const variant = {
-            id: `variant_${Date.now()}_${i}`,
-            title: parsedStrategy.titles[i % parsedStrategy.titles.length] || title,
-            imageUrl: imageResponse.data[0].url,
-            ctrScore: Math.round((8.5 + Math.random() * 1.5) * 10) / 10,
-            layout: layouts[i],
-            metadata: {
-              style: parsedStrategy.style,
-              emotion: emotions[i],
-              colors: parsedStrategy.colors,
-              placement: parsedStrategy.placement,
-              hooks: parsedStrategy.hooks,
-              trending_match: parsedTrending,
-              aiGenerated: true,
-              prompt: stylePrompts[i]
-            }
-          };
-          variants.push(variant);
-          
-          console.log(`[THUMBNAIL PRO] Successfully generated AI thumbnail ${i + 1}`);
-        } catch (error) {
-          console.error(`[THUMBNAIL PRO] Failed to generate AI image ${i + 1}:`, error);
-          
-          // Fallback with uploaded image if available
-          const fallbackVariant = {
-            id: `variant_${Date.now()}_${i}`,
-            title: parsedStrategy.titles[i % parsedStrategy.titles.length] || title,
-            imageUrl: uploadedFile 
-              ? `/api/generated-content/${uploadedFile.filename}`
-              : `https://via.placeholder.com/1792x1024/ff6b6b/ffffff?text=Error+Generating+AI+Image`,
-            ctrScore: Math.round((7.0 + Math.random() * 1.0) * 10) / 10,
-            layout: layouts[i],
-            metadata: {
-              style: parsedStrategy.style,
-              emotion: emotions[i],
-              colors: parsedStrategy.colors,
-              placement: parsedStrategy.placement,
-              hooks: parsedStrategy.hooks,
-              trending_match: parsedTrending,
-              error: 'AI generation failed'
-            }
-          };
-          variants.push(fallbackVariant);
-        }
-      }
-
-      console.log('[THUMBNAIL PRO] Generated variants:', variants.length);
-      res.json(variants);
-
     } catch (error) {
       console.error('[THUMBNAIL PRO] Complete generation failed:', error);
-      console.error('[THUMBNAIL PRO] OpenAI API Key exists:', !!process.env.OPENAI_API_KEY);
-      console.error('[THUMBNAIL PRO] Error type:', typeof error);
-      console.error('[THUMBNAIL PRO] Error details:', JSON.stringify(error, null, 2));
-      
-      if (error && typeof error === 'object' && 'response' in error) {
-        console.error('[THUMBNAIL PRO] OpenAI API response error:', error.response);
-      }
-      
       res.status(500).json({ 
-        error: 'Failed to generate thumbnails',
+        error: 'Failed to generate complete thumbnails',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
     }

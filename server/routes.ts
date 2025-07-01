@@ -20,7 +20,7 @@ import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
 import { ThumbnailAIService } from './thumbnail-ai-service';
-import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
+import { simpleThumbnailGenerator } from './simple-thumbnail-generator';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 

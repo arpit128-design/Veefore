@@ -8617,6 +8617,39 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Quick test endpoint for frontend recovery
+  app.post('/api/thumbnails/quick-test', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[THUMBNAIL API] Quick test endpoint hit');
+      
+      // Return mock data quickly to test frontend-backend connection
+      const mockVariants = [
+        {
+          id: 'test_1',
+          title: 'Test Thumbnail',
+          imageUrl: 'https://via.placeholder.com/1280x720/9f7aea/ffffff?text=AI+Generated+Test+1',
+          ctrScore: 8.5,
+          layout: 'dynamic-left',
+          metadata: { style: 'modern', emotion: 'excited' }
+        },
+        {
+          id: 'test_2', 
+          title: 'Test Thumbnail 2',
+          imageUrl: 'https://via.placeholder.com/1280x720/6366f1/ffffff?text=AI+Generated+Test+2',
+          ctrScore: 9.2,
+          layout: 'center-focus',
+          metadata: { style: 'bold', emotion: 'engaging' }
+        }
+      ];
+      
+      console.log('[THUMBNAIL AI] Quick test successful - returning mock data');
+      res.json(mockVariants);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Quick test failed:', error);
+      res.status(500).json({ error: 'Quick test failed' });
+    }
+  });
+
   // AI Thumbnail Generation Routes
   app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
     try {

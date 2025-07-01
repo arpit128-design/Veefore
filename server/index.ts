@@ -114,8 +114,8 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Simple static file serving - avoiding path-to-regexp conflicts
-  app.use(express.static(path.join(process.cwd(), 'server/public')));
+  // Serve built static files
+  app.use(express.static(path.join(process.cwd(), 'dist/public')));
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes-test";
+import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
@@ -99,11 +99,12 @@ app.use((req, res, next) => {
   const storage = new MongoStorage();
   await storage.connect();
   
-  // Temporarily disable background services for debugging
-  console.log('[DEBUG] Background services disabled for debugging');
-  // startSchedulerService(storage);
-  // const autoSyncService = new AutoSyncService(storage);
-  // autoSyncService.start();
+  // Start the background scheduler service
+  startSchedulerService(storage);
+  
+  // Start the automatic Instagram sync service
+  const autoSyncService = new AutoSyncService(storage);
+  autoSyncService.start();
   
   const server = await registerRoutes(app, storage, upload);
 
@@ -115,13 +116,28 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Temporarily disable Vite setup for debugging
-  console.log('[DEBUG] Vite setup disabled for debugging');
-  // if (app.get("env") === "development") {
-  //   await setupVite(app, server);
-  // } else {
-  //   serveStatic(app);
-  // }
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    // Temporarily disable REPL_ID to prevent cartographer plugin from loading
+    const originalReplId = process.env.REPL_ID;
+    delete process.env.REPL_ID;
+    
+    try {
+      await setupVite(app, server);
+      console.log('[DEBUG] Vite setup completed successfully');
+    } catch (error) {
+      console.error('[DEBUG] Vite setup failed:', error);
+    } finally {
+      // Restore REPL_ID
+      if (originalReplId) {
+        process.env.REPL_ID = originalReplId;
+      }
+    }
+  } else {
+    serveStatic(app);
+  }
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

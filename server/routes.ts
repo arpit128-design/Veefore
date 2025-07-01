@@ -19,6 +19,7 @@ import { DashboardCache } from "./dashboard-cache";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
+import { ThumbnailAIService } from './thumbnail-ai-service';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -31,6 +32,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const creditService = new CreditService();
   const enhancedDMService = new EnhancedAutoDMService(storage as any);
   const dashboardCache = new DashboardCache(storage);
+  const thumbnailAIService = new ThumbnailAIService(storage);
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -8545,6 +8547,85 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     } catch (error) {
       console.error('[PLACEHOLDER] Error generating image:', error);
       res.status(500).json({ error: 'Failed to generate placeholder image' });
+    }
+  });
+
+  // AI Thumbnail Generation Routes
+  app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { title, description, category, style } = req.body;
+
+      if (!title || !category) {
+        return res.status(400).json({ error: 'Title and category are required' });
+      }
+
+      console.log('[THUMBNAIL API] Generating strategy for:', { title, category });
+
+      const strategy = await thumbnailAIService.generateThumbnailStrategy({
+        title,
+        description,
+        category,
+        style: style || 'auto'
+      });
+
+      res.json(strategy);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Strategy generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate thumbnail strategy' });
+    }
+  });
+
+  app.post('/api/thumbnails/generate-variants', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { title, description, category, designData } = req.body;
+
+      if (!title || !category || !designData) {
+        return res.status(400).json({ error: 'Title, category, and design data are required' });
+      }
+
+      console.log('[THUMBNAIL API] Generating variants for:', { title, category });
+
+      // Get trending data
+      const trendData = await thumbnailAIService.analyzeTrendingThumbnails({
+        title,
+        description,
+        category
+      });
+
+      // Generate variants
+      const variants = await thumbnailAIService.generateThumbnailVariants(
+        { title, description, category },
+        designData,
+        trendData
+      );
+
+      res.json(variants);
+    } catch (error) {
+      console.error('[THUMBNAIL API] Variant generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate thumbnail variants' });
+    }
+  });
+
+  app.post('/api/thumbnails/save-project', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { projectName, variants, designData } = req.body;
+      const userId = req.user.id;
+
+      if (!projectName || !variants) {
+        return res.status(400).json({ error: 'Project name and variants are required' });
+      }
+
+      const projectId = await thumbnailAIService.saveThumbnailProject(
+        userId,
+        projectName,
+        variants,
+        designData
+      );
+
+      res.json({ projectId, message: 'Project saved successfully' });
+    } catch (error) {
+      console.error('[THUMBNAIL API] Project save failed:', error);
+      res.status(500).json({ error: 'Failed to save project' });
     }
   });
 

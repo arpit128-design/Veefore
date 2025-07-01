@@ -8750,6 +8750,17 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.log('[THUMBNAIL PRO] Processing with strategy:', parsedStrategy);
       console.log('[THUMBNAIL PRO] Processing with trending:', parsedTrending);
       
+      // Validate parsed objects
+      if (!parsedStrategy || !parsedStrategy.titles || !Array.isArray(parsedStrategy.titles)) {
+        console.error('[THUMBNAIL PRO] Invalid strategy object:', parsedStrategy);
+        return res.status(400).json({ error: 'Invalid strategy data' });
+      }
+      
+      if (!parsedStrategy.colors) {
+        console.error('[THUMBNAIL PRO] Missing colors in strategy:', parsedStrategy);
+        return res.status(400).json({ error: 'Invalid strategy - missing colors' });
+      }
+      
       if (uploadedFile) {
         console.log('[THUMBNAIL PRO] Image uploaded:', uploadedFile.filename);
       }
@@ -8771,9 +8782,24 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const layouts = ['split-screen-shock', 'vs-comparison', 'pointing-explosive', 'centered-cinematic'];
       const emotions = ['shocked', 'excited', 'surprised', 'confident'];
       
+      // Test OpenAI connection first
+      try {
+        console.log('[THUMBNAIL PRO] Testing OpenAI connection...');
+        const testResponse = await openai.chat.completions.create({
+          model: "gpt-4o", 
+          messages: [{ role: "user", content: "Test" }],
+          max_tokens: 5
+        });
+        console.log('[THUMBNAIL PRO] OpenAI connection test successful');
+      } catch (testError) {
+        console.error('[THUMBNAIL PRO] OpenAI connection test failed:', testError);
+        throw new Error(`OpenAI API test failed: ${testError.message}`);
+      }
+
       for (let i = 0; i < 4; i++) {
         try {
           console.log(`[THUMBNAIL PRO] Generating AI image ${i + 1}/4 with DALL-E 3`);
+          console.log(`[THUMBNAIL PRO] Using prompt: ${stylePrompts[i]}`);
           
           const imageResponse = await openai.images.generate({
             model: "dall-e-3",

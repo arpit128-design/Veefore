@@ -223,6 +223,18 @@ export interface IStorage {
     revenueThisMonth: number;
     activeUsers: number;
   }>;
+
+  // Thumbnail generation operations
+  createThumbnailProject(project: any): Promise<any>;
+  getThumbnailProject(id: number): Promise<any>;
+  updateThumbnailProject(id: number, updates: any): Promise<any>;
+  createThumbnailStrategy(strategy: any): Promise<any>;
+  createThumbnailVariant(variant: any): Promise<any>;
+  getThumbnailVariants(projectId: number): Promise<any[]>;
+  createCanvasSession(session: any): Promise<any>;
+  updateCanvasSession(id: number, updates: any): Promise<any>;
+  createThumbnailExport(exportData: any): Promise<any>;
+  incrementExportDownload(exportId: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -1399,6 +1411,74 @@ export class MemStorage implements IStorage {
       notifications: paginatedNotifications,
       total: allNotifications.length
     };
+  }
+
+  // Thumbnail generation operations (simplified implementations for demo)
+  async createThumbnailProject(project: any): Promise<any> {
+    const id = Date.now();
+    const newProject = { ...project, id, createdAt: new Date(), status: 'processing', stage: 1 };
+    // In memory storage - just return the project
+    return newProject;
+  }
+
+  async getThumbnailProject(id: number): Promise<any> {
+    // Simulate completed project
+    return {
+      id,
+      status: 'completed',
+      stage: 5,
+      createdAt: new Date()
+    };
+  }
+
+  async updateThumbnailProject(id: number, updates: any): Promise<any> {
+    return { id, ...updates };
+  }
+
+  async createThumbnailStrategy(strategy: any): Promise<any> {
+    return { ...strategy, id: Date.now() };
+  }
+
+  async createThumbnailVariant(variant: any): Promise<any> {
+    return { ...variant, id: Date.now() };
+  }
+
+  async getThumbnailVariants(projectId: number): Promise<any[]> {
+    // Return mock variants for demo
+    return [
+      {
+        id: 1,
+        variantNumber: 1,
+        layoutType: "Face Left - Text Right",
+        previewUrl: "/api/placeholder/1280x720",
+        predictedCtr: 8.5,
+        layoutClassification: "High Impact"
+      },
+      {
+        id: 2,
+        variantNumber: 2,
+        layoutType: "Bold Title Top",
+        previewUrl: "/api/placeholder/1280x720",
+        predictedCtr: 7.2,
+        layoutClassification: "Attention Grabbing"
+      }
+    ];
+  }
+
+  async createCanvasSession(session: any): Promise<any> {
+    return { ...session, id: Date.now() };
+  }
+
+  async updateCanvasSession(id: number, updates: any): Promise<any> {
+    return { id, ...updates };
+  }
+
+  async createThumbnailExport(exportData: any): Promise<any> {
+    return { ...exportData, id: Date.now(), exportUrl: '/api/placeholder/export.png' };
+  }
+
+  async incrementExportDownload(exportId: number): Promise<void> {
+    // No-op for memory storage
   }
 }
 

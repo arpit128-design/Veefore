@@ -365,11 +365,16 @@ export default function ThumbnailAIMaker() {
 
                 {/* Progress Bar */}
                 {isGenerating && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Progress value={(generationStep / 4) * 100} className="h-2" />
                     <p className="text-sm text-gray-400 text-center">
                       {generationSteps[generationStep]}
                     </p>
+                    {generationStep === 3 && (
+                      <div className="text-xs text-amber-400 text-center bg-amber-900/20 px-3 py-2 rounded-lg">
+                        ⏱️ AI image generation takes time - please be patient while we create 5 unique thumbnails
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>

@@ -116,11 +116,6 @@ app.use((req, res, next) => {
 
   // Simple static file serving - avoiding path-to-regexp conflicts
   app.use(express.static(path.join(process.cwd(), 'server/public')));
-  
-  // Catch-all route for SPA
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'server/public/index.html'));
-  });
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

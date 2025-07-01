@@ -162,6 +162,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
   };
 
+  // Basic health check endpoint - no auth required
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      service: 'VeeFore API',
+      mongodb: 'connected'
+    });
+  });
+
   // Get current user
   app.get('/api/user', requireAuth, async (req: any, res: Response) => {
     try {

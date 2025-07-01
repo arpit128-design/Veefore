@@ -8733,11 +8733,10 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   });
 
   // STAGES 4-7: Complete Generation Pipeline
-  app.post('/api/thumbnails/generate-complete', requireAuth, upload?.single('image'), async (req: any, res: Response) => {
+  app.post('/api/thumbnails/generate-complete', requireAuth, async (req: any, res: Response) => {
     try {
       console.log('[THUMBNAIL PRO] Complete generation pipeline started');
       const { title, description, category, strategy, trending } = req.body;
-      const uploadedFile = req.file;
 
       if (!title || !category) {
         return res.status(400).json({ error: 'Title and category are required' });
@@ -8759,10 +8758,6 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       if (!parsedStrategy.colors) {
         console.error('[THUMBNAIL PRO] Missing colors in strategy:', parsedStrategy);
         return res.status(400).json({ error: 'Invalid strategy - missing colors' });
-      }
-      
-      if (uploadedFile) {
-        console.log('[THUMBNAIL PRO] Image uploaded:', uploadedFile.filename);
       }
 
       // Generate multiple variants using DALL-E 3 AI

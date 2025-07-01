@@ -21,7 +21,8 @@ import {
   Settings,
   Palette,
   Type,
-  Sparkles
+  Sparkles,
+  Terminal
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -80,6 +81,42 @@ export default function ThumbnailAIMaker() {
         return;
       }
       setImageFile(file);
+    }
+  };
+
+  const testDebugGeneration = async () => {
+    console.log('[THUMBNAIL] Testing debug generation endpoint...');
+    try {
+      const response = await fetch('/api/thumbnails/debug-strategy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          category,
+          style: 'auto'
+        })
+      });
+      
+      const result = await response.json();
+      console.log('[THUMBNAIL] Debug test result:', result);
+      
+      if (result.success) {
+        setDesignData(result.strategy);
+        toast({
+          title: "Debug Test Successful!",
+          description: "Strategy generated successfully without authentication"
+        });
+      }
+    } catch (error) {
+      console.error('[THUMBNAIL] Debug test failed:', error);
+      toast({
+        title: "Debug Test Failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
     }
   };
 
@@ -293,24 +330,38 @@ export default function ThumbnailAIMaker() {
                   </div>
                 </div>
 
-                {/* Generate Button */}
-                <Button
-                  onClick={generateThumbnails}
-                  disabled={isGenerating || !title.trim() || !category}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-lg"
-                >
-                  {isGenerating ? (
-                    <div className="flex items-center gap-3">
-                      <Zap className="h-5 w-5 animate-pulse" />
-                      {generationSteps[generationStep]}
-                    </div>
-                  ) : (
+                {/* Generate Buttons */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={generateThumbnails}
+                    disabled={isGenerating || !title.trim() || !category}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-lg"
+                  >
+                    {isGenerating ? (
+                      <div className="flex items-center gap-3">
+                        <Zap className="h-5 w-5 animate-pulse" />
+                        {generationSteps[generationStep]}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5" />
+                        Generate Viral Thumbnails with AI
+                      </div>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    onClick={testDebugGeneration}
+                    disabled={!title.trim() || !category}
+                    variant="outline"
+                    className="w-full"
+                  >
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5" />
-                      Generate Viral Thumbnails with AI
+                      <Terminal className="h-4 w-4" />
+                      Test Debug Generation
                     </div>
-                  )}
-                </Button>
+                  </Button>
+                </div>
 
                 {/* Progress Bar */}
                 {isGenerating && (

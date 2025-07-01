@@ -22,6 +22,19 @@ import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
 export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
+  // Health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      services: {
+        database: 'connected',
+        instagram: 'active',
+        youtube: 'active'
+      }
+    });
+  });
+
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);

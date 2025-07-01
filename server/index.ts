@@ -45,6 +45,9 @@ const upload = multer({
 // Serve uploaded files statically
 app.use('/uploads', express.static(uploadsDir));
 
+// Serve static files from public directory as fallback
+app.use('/public', express.static(path.join(process.cwd(), 'public')));
+
 // Fix body parsing middleware for content creation
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/content') && req.method === 'POST') {

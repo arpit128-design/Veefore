@@ -245,6 +245,32 @@ function Router() {
 }
 
 function App() {
+  // Simple test to see if React is working at all
+  const [testMode, setTestMode] = useState(true);
+  
+  useEffect(() => {
+    // Switch to full app after 3 seconds
+    const timer = setTimeout(() => {
+      setTestMode(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (testMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-8">
+        <div className="max-w-2xl mx-auto text-center pt-20">
+          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            VeeFore
+          </h1>
+          <p className="text-xl mb-4">Testing React Initialization...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent mx-auto"></div>
+          <p className="text-sm text-gray-400 mt-4">Loading your social media management platform</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

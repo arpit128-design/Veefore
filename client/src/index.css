@@ -788,7 +788,7 @@ canvas {
   }
 
   body {
-    @apply text-foreground;
+    color: hsl(var(--foreground));
     font-family: 'Inter', sans-serif;
     background: transparent;
     margin: 0;

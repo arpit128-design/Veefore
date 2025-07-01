@@ -8964,7 +8964,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         return res.status(400).json({ error: 'No workspace found' });
       }
 
-      const project = await advancedThumbnailGenerator.createThumbnailProject({
+      const project = await simpleThumbnailGenerator.createThumbnailProject({
         title,
         description,
         category,
@@ -8984,7 +8984,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   app.get('/api/thumbnails/project/:projectId', requireAuth, async (req, res) => {
     try {
       const { projectId } = req.params;
-      const project = await advancedThumbnailGenerator.getThumbnailProjectComplete(parseInt(projectId));
+      const project = await simpleThumbnailGenerator.getThumbnailProjectComplete(parseInt(projectId));
       
       if (!project) {
         return res.status(404).json({ error: 'Project not found' });
@@ -9003,7 +9003,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { variantId } = req.params;
       const userId = req.user!.id;
       
-      const session = await advancedThumbnailGenerator.createCanvasEditorSession(
+      const session = await simpleThumbnailGenerator.createCanvasEditorSession(
         parseInt(variantId),
         parseInt(userId)
       );
@@ -9040,7 +9040,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const { sessionId } = req.params;
       const { format } = req.body;
       
-      const exportRecord = await advancedThumbnailGenerator.exportThumbnail(
+      const exportRecord = await simpleThumbnailGenerator.exportThumbnail(
         parseInt(sessionId),
         format
       );

@@ -99,7 +99,8 @@ export default function ThumbnailAIMaker() {
     try {
       // Step 1: Generate AI strategy
       setGenerationStep(1);
-      console.log('[THUMBNAIL] Generating AI strategy...');
+      console.log('[THUMBNAIL] Starting AI strategy generation...');
+      console.log('[THUMBNAIL] Request payload:', { title, description, category, style: 'auto' });
       
       const strategyResponse = await apiRequest('POST', '/api/thumbnails/generate-strategy', {
         title,
@@ -108,7 +109,8 @@ export default function ThumbnailAIMaker() {
         style: 'auto'
       });
 
-      console.log('[THUMBNAIL] Strategy response status:', strategyResponse.status);
+      console.log('[THUMBNAIL] Strategy response received, status:', strategyResponse.status);
+      console.log('[THUMBNAIL] Strategy response headers:', strategyResponse.headers);
       
       const strategy = await strategyResponse.json();
       setDesignData(strategy);

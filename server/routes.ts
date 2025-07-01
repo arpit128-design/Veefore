@@ -8579,6 +8579,38 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Debug endpoint for thumbnail strategy generation (no auth required)
+  app.post('/api/thumbnails/debug-strategy', async (req: any, res: Response) => {
+    try {
+      console.log('[THUMBNAIL DEBUG] Starting strategy generation test');
+      console.log('[THUMBNAIL DEBUG] Request body:', req.body);
+      
+      const { title, description, category, style } = req.body;
+
+      if (!title || !category) {
+        console.log('[THUMBNAIL DEBUG] Missing required fields:', { title: !!title, category: !!category });
+        return res.status(400).json({ error: 'Title and category are required' });
+      }
+
+      console.log('[THUMBNAIL DEBUG] Calling generateThumbnailStrategy...');
+      const strategy = await thumbnailAIService.generateThumbnailStrategy({
+        title,
+        description,
+        category,
+        style: style || 'auto'
+      });
+
+      console.log('[THUMBNAIL DEBUG] Strategy generated successfully:', strategy);
+      res.json({ success: true, strategy });
+    } catch (error) {
+      console.error('[THUMBNAIL DEBUG] Strategy generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate thumbnail strategy',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // AI Thumbnail Generation Routes
   app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
     try {

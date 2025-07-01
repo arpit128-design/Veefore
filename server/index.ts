@@ -126,38 +126,31 @@ app.use((req, res, next) => {
     
     try {
       await setupVite(app, server);
-      console.log('[DEBUG] Vite setup completed successfully');
+      console.log('[DEBUG] Vite setup completed successfully - serving React application');
     } catch (error) {
       console.error('[DEBUG] Vite setup failed:', error);
       console.log('[DEBUG] Falling back to static file serving');
-      // Fallback to static serving when Vite fails
-      try {
-        serveStatic(app);
-      } catch (staticError) {
-        console.error('[DEBUG] Static serving also failed:', staticError);
-        console.log('[DEBUG] Setting up custom static serving');
-        // Custom static serving as final fallback
-        const distPath = path.join(process.cwd(), 'dist/public');
-        app.use(express.static(distPath));
-        
-        // Handle root route specifically to avoid path-to-regexp issues
-        app.get('/', (_req, res) => {
-          res.sendFile(path.join(distPath, "index.html"));
-        });
-        
-        // Handle common frontend routes
-        app.get('/dashboard', (_req, res) => {
-          res.sendFile(path.join(distPath, "index.html"));
-        });
-        
-        app.get('/login', (_req, res) => {
-          res.sendFile(path.join(distPath, "index.html"));
-        });
-        
-        app.get('/signup', (_req, res) => {
-          res.sendFile(path.join(distPath, "index.html"));
-        });
-      }
+      // Custom static serving as fallback
+      const distPath = path.join(process.cwd(), 'dist/public');
+      app.use(express.static(distPath));
+      
+      // Handle root route specifically to avoid path-to-regexp issues  
+      app.get('/', (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+      
+      // Handle common frontend routes
+      app.get('/dashboard', (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+      
+      app.get('/login', (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+      
+      app.get('/signup', (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
     } finally {
       // Restore REPL_ID
       if (originalReplId) {

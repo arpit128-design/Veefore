@@ -463,11 +463,20 @@ export default function ThumbnailAIMakerPro() {
                         src={variant.imageUrl} 
                         alt={variant.title}
                         className="w-full h-32 object-cover rounded-lg"
+                        onError={(e) => {
+                          console.error('[IMAGE ERROR] Failed to load:', variant.imageUrl);
+                          console.error('[IMAGE ERROR] Error:', e);
+                          // Set fallback placeholder
+                          e.currentTarget.src = `https://via.placeholder.com/320x180/6366f1/ffffff?text=Error+Loading+${encodeURIComponent(variant.layout)}`;
+                        }}
+                        onLoad={() => {
+                          console.log('[IMAGE SUCCESS] Loaded:', variant.imageUrl);
+                        }}
                       />
                       <Badge 
                         className="absolute top-2 right-2 bg-green-600"
                       >
-                        {variant.ctrScore}% CTR
+                        {(variant.ctrScore * 100).toFixed(2)}% CTR
                       </Badge>
                     </div>
                     

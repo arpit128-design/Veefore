@@ -8801,7 +8801,11 @@ Image should be 1280x720 pixels, professional quality.`;
         quality: "standard",
       });
 
-      const imageUrl = response.data[0].url;
+      const dalleImageUrl = response.data[0].url;
+      
+      // Download and save the image locally to bypass CORS restrictions
+      const imageFileName = `thumbnail_${Date.now()}_${variantNum}.png`;
+      const localImageUrl = await downloadAndSaveImage(dalleImageUrl, imageFileName);
       
       // Calculate CTR prediction based on layout and strategy
       const ctrScore = calculateCTRScore(layout, strategy);
@@ -8809,18 +8813,52 @@ Image should be 1280x720 pixels, professional quality.`;
       return {
         id: `variant_${variantNum}`,
         title: `${title} - ${layout}`,
-        imageUrl: imageUrl,
+        imageUrl: localImageUrl,
         ctrScore: ctrScore,
         layout: layout,
         metadata: {
           prompt: prompt,
           strategy: strategy,
-          generated_at: new Date().toISOString()
+          generated_at: new Date().toISOString(),
+          original_dalle_url: dalleImageUrl
         }
       };
       
     } catch (error) {
       console.error(`[THUMBNAIL PRO] Failed to generate variant ${variantNum}:`, error);
+      throw error;
+    }
+  }
+
+  // Helper function to download and save DALL-E images locally
+  async function downloadAndSaveImage(imageUrl: string, fileName: string): Promise<string> {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      
+      const buffer = await response.arrayBuffer();
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      // Ensure uploads directory exists
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Save the image file
+      const filePath = path.join(uploadsDir, fileName);
+      fs.writeFileSync(filePath, Buffer.from(buffer));
+      
+      console.log(`[THUMBNAIL PRO] Image saved locally: ${fileName}`);
+      
+      // Return the local URL that our server can serve
+      return `/uploads/${fileName}`;
+      
+    } catch (error) {
+      console.error('[THUMBNAIL PRO] Failed to download image:', error);
       throw error;
     }
   }
@@ -9102,6 +9140,35 @@ Image should be 1280x720 pixels, professional quality.`;
     } catch (error) {
       console.error('[THUMBNAIL API] Download failed:', error);
       res.status(500).json({ error: 'Failed to download' });
+    }
+  });
+
+  // Serve uploaded thumbnail images
+  app.get('/uploads/:filename', async (req: Request, res: Response) => {
+    try {
+      const { filename } = req.params;
+      const filePath = path.join(process.cwd(), 'uploads', filename);
+      
+      if (!fs.existsSync(filePath)) {
+        console.log('[UPLOADS] File not found:', filePath);
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      console.log('[UPLOADS] Serving thumbnail image:', filename);
+      
+      // Get file extension to set proper content type
+      const ext = path.extname(filename).toLowerCase();
+      const contentType = ext === '.png' ? 'image/png' : 
+                         ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 
+                         ext === '.webp' ? 'image/webp' :
+                         'image/png';
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error('[UPLOADS] Error serving thumbnail image:', error);
+      res.status(500).json({ error: 'Failed to serve image' });
     }
   });
 

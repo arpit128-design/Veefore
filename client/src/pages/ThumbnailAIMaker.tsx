@@ -218,7 +218,7 @@ export default function ThumbnailAIMaker() {
     "Preparing...",
     "Analyzing Content with AI",
     "Matching Trending Styles", 
-    "Generating Viral Variants",
+    "Creating 5 AI Images (2-3 minutes)",
     "Complete!"
   ];
 

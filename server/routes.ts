@@ -8579,6 +8579,12 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // Simple test endpoint
+  app.get('/api/thumbnails/ping', (req: any, res: Response) => {
+    console.log('[THUMBNAIL API] PING endpoint hit!');
+    res.json({ success: true, message: 'Thumbnail API is working!' });
+  });
+
   // Debug endpoint for thumbnail strategy generation (no auth required)
   app.post('/api/thumbnails/debug-strategy', async (req: any, res: Response) => {
     try {
@@ -8614,6 +8620,11 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   // AI Thumbnail Generation Routes
   app.post('/api/thumbnails/generate-strategy', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log('[THUMBNAIL API] ROUTE HIT: generate-strategy');
+      console.log('[THUMBNAIL API] Full request headers:', req.headers);
+      console.log('[THUMBNAIL API] Full request body:', req.body);
+      console.log('[THUMBNAIL API] User from auth:', req.user);
+      
       const { title, description, category, style } = req.body;
 
       console.log('[THUMBNAIL API] Request body:', req.body);
@@ -8650,9 +8661,19 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
 
   app.post('/api/thumbnails/generate-variants', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log('[THUMBNAIL API] ROUTE HIT: generate-variants');
+      console.log('[THUMBNAIL API] Full request headers:', req.headers);
+      console.log('[THUMBNAIL API] Full request body:', req.body);
+      console.log('[THUMBNAIL API] User from auth:', req.user);
+      
       const { title, description, category, designData } = req.body;
 
       if (!title || !category || !designData) {
+        console.log('[THUMBNAIL API] Missing required fields for variants:', { 
+          title: !!title, 
+          category: !!category, 
+          designData: !!designData 
+        });
         return res.status(400).json({ error: 'Title, category, and design data are required' });
       }
 

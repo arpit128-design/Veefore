@@ -326,22 +326,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Footer Navigation */}
-      <div className="mt-12 pt-6 border-t border-space-gray-600/50">
-        <div className="flex items-center justify-center gap-6 text-sm text-asteroid-silver">
-          <Link href="/privacy-policy">
-            <span className="hover:text-white transition-colors cursor-pointer">
-              Privacy Policy
-            </span>
-          </Link>
-          <span className="text-space-gray-600">•</span>
-          <Link href="/terms-of-service">
-            <span className="hover:text-white transition-colors cursor-pointer">
-              Terms of Service
-            </span>
-          </Link>
-        </div>
-      </div>
+
     </div>
   );
 }

@@ -82,8 +82,8 @@ export default function SocialListening() {
       language?: string;
       includeInfluencers?: boolean;
     }) => {
-      const response = await apiRequest('POST', '/api/ai/social-listening', data);
-      return response.json();
+      const result = await apiRequest('POST', '/api/ai/social-listening', data);
+      return result;
     },
     onSuccess: (data) => {
       setListeningResult(data);
@@ -104,80 +104,38 @@ export default function SocialListening() {
     }
   });
 
-  // Mock data for demonstration
-  const mockListeningData: SocialListeningData[] = [
-    {
-      id: "1",
-      keyword: "content creation",
-      platform: "all",
-      mentions: 15420,
-      sentiment: "positive",
-      reach: 2100000,
-      engagement: 18.5,
-      trendingScore: 89,
-      lastUpdated: new Date().toISOString(),
-      topMentions: [
-        {
-          content: "The future of content creation is here! AI tools are revolutionizing how we create...",
-          author: "@techguru2024",
-          platform: "twitter",
-          engagement: 1250,
-          sentiment: "positive",
-          url: "https://twitter.com/example"
-        },
-        {
-          content: "Best content creation tools I've tried this year. Game-changer!",
-          author: "@creativepro",
-          platform: "instagram",
-          engagement: 890,
-          sentiment: "positive", 
-          url: "https://instagram.com/example"
-        }
-      ],
-      demographics: {
-        ageGroups: [
-          { range: "18-24", percentage: 28 },
-          { range: "25-34", percentage: 45 },
-          { range: "35-44", percentage: 22 },
-          { range: "45+", percentage: 5 }
-        ],
-        locations: [
-          { country: "United States", percentage: 42 },
-          { country: "United Kingdom", percentage: 18 },
-          { country: "Canada", percentage: 15 },
-          { country: "Australia", percentage: 12 }
-        ],
-        interests: ["Marketing", "Social Media", "Technology", "Business", "Design"]
-      },
-      viralPotential: {
-        score: 87,
-        factors: ["High engagement rate", "Trending hashtags", "Influencer mentions"],
-        predictedReach: 500000
-      }
-    }
-  ];
-
-  const mockAlerts: ListeningAlert[] = [
-    {
-      id: "1",
-      type: "brand_mention",
-      title: "Brand Mention Spike",
-      description: "Your brand was mentioned 45 times in the last hour",
-      priority: "high",
-      timestamp: new Date().toISOString(),
-      actionRequired: true,
-      suggestedResponse: "Thank your community and share behind-the-scenes content"
+  // Create listening analysis mutation
+  const createListeningAnalysisMutation = useMutation({
+    mutationFn: async (data: {
+      keywords: string[];
+      platforms: string[];
+      analysisType: string;
+      dateRange: string;
+    }) => {
+      const result = await socialListeningMutation.mutateAsync({
+        keywords: data.keywords,
+        platforms: data.platforms,
+        timeframe: data.dateRange,
+        includeInfluencers: true
+      });
+      return result;
     },
-    {
-      id: "2", 
-      type: "trending_topic",
-      title: "AI Tools Trending",
-      description: "AI content creation tools are trending across platforms",
-      priority: "medium",
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      actionRequired: false
+    onSuccess: (data) => {
+      setListeningResult(data);
+      toast({
+        title: "Social Listening Complete!",
+        description: "Your comprehensive social media monitoring analysis is ready.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Social listening error:', error);
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Unable to complete social listening analysis.",
+        variant: "destructive"
+      });
     }
-  ];
+  });
 
   const handleAnalyze = () => {
     if (monitoringKeywords.length === 0) {
@@ -189,11 +147,11 @@ export default function SocialListening() {
       return;
     }
 
-    createListeningAnalysisMutation.mutate({
+    socialListeningMutation.mutate({
       keywords: monitoringKeywords,
       platforms: selectedPlatform === "all" ? ["twitter", "instagram", "youtube", "tiktok"] : [selectedPlatform],
-      analysisType: "comprehensive",
-      dateRange: "7d"
+      timeframe: selectedTimeframe,
+      includeInfluencers: true
     });
   };
 
@@ -579,36 +537,36 @@ export default function SocialListening() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {mockAlerts.map((alert) => (
-                <Card key={alert.id} className="bg-gray-800/50 border-gray-600">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={alert.priority === 'high' ? 'destructive' : 
-                                   alert.priority === 'medium' ? 'default' : 'secondary'}
-                          >
-                            {alert.priority}
-                          </Badge>
-                          <h3 className="font-medium">{alert.title}</h3>
-                        </div>
-                        <p className="text-sm text-gray-400">{alert.description}</p>
-                        {alert.suggestedResponse && (
-                          <div className="p-2 bg-blue-900/20 rounded border border-blue-800">
-                            <p className="text-sm text-blue-300">
-                              <strong>Suggested Action:</strong> {alert.suggestedResponse}
-                            </p>
+              {socialListeningMutation.isPending ? (
+                <div className="flex items-center justify-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+                  <span className="ml-2 text-gray-400">Analyzing social media mentions...</span>
+                </div>
+              ) : listeningResult?.recommendations?.crisisAlerts?.length > 0 ? (
+                listeningResult.recommendations.crisisAlerts.map((alert: string, index: number) => (
+                  <Card key={index} className="bg-gray-800/50 border-gray-600">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="destructive">high</Badge>
+                            <h3 className="font-medium">Crisis Alert</h3>
                           </div>
-                        )}
+                          <p className="text-sm text-gray-400">{alert}</p>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date().toLocaleTimeString()}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(alert.timestamp).toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center p-8 text-gray-400">
+                  <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No active alerts. Run a social listening analysis to monitor brand mentions and trends.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -621,18 +579,30 @@ export default function SocialListening() {
                 <CardTitle>Audience Demographics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-2">Age Groups</p>
-                  {mockListeningData[0]?.demographics.ageGroups.map((group) => (
-                    <div key={group.range} className="flex items-center justify-between mb-1">
-                      <span className="text-sm">{group.range}</span>
-                      <div className="flex items-center gap-2">
-                        <Progress value={group.percentage} className="w-20" />
-                        <span className="text-sm w-8">{group.percentage}%</span>
+                {socialListeningMutation.isPending ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+                    <span className="ml-2 text-gray-400">Analyzing audience demographics...</span>
+                  </div>
+                ) : listeningResult?.summary ? (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Platform Distribution</p>
+                    {listeningResult.summary.topPlatforms?.map((platform: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between mb-1">
+                        <span className="text-sm capitalize">{platform.platform}</span>
+                        <div className="flex items-center gap-2">
+                          <Progress value={(platform.mentions / listeningResult.summary.totalMentions) * 100} className="w-20" />
+                          <span className="text-sm w-12">{platform.mentions}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center p-8 text-gray-400">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Run social listening analysis to view platform demographics.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -641,18 +611,27 @@ export default function SocialListening() {
                 <CardTitle>Geographic Distribution</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mockListeningData[0]?.demographics.locations.map((location) => (
-                  <div key={location.country} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{location.country}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Progress value={location.percentage} className="w-20" />
-                      <span className="text-sm w-8">{location.percentage}%</span>
-                    </div>
+                {socialListeningMutation.isPending ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+                    <span className="ml-2 text-gray-400">Analyzing geographic distribution...</span>
                   </div>
-                ))}
+                ) : listeningResult?.summary?.trendingTopics?.length > 0 ? (
+                  listeningResult.summary.trendingTopics.map((topic: string, index: number) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm">{topic}</span>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">Trending</Badge>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center p-8 text-gray-400">
+                    <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Run social listening analysis to view trending topics by location.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

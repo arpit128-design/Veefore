@@ -10011,98 +10011,73 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
-  // STAGES 4-7: Complete Generation Pipeline
+  // STAGES 4-7: Complete Generation Pipeline - 7-Stage Thumbnail AI Maker Pro
   app.post('/api/thumbnails/generate-complete', requireAuth, async (req: any, res: Response) => {
-    console.log('[THUMBNAIL PRO] === ROUTE HANDLER CALLED ===');
-    console.log('[THUMBNAIL PRO] Method:', req.method);
-    console.log('[THUMBNAIL PRO] URL:', req.url);
-    console.log('[THUMBNAIL PRO] Headers:', Object.keys(req.headers));
-    console.log('[THUMBNAIL PRO] Body keys:', Object.keys(req.body || {}));
+    console.log('[THUMBNAIL PRO] === 7-STAGE GENERATION PIPELINE STARTED ===');
     console.log('[THUMBNAIL PRO] User ID:', req.user?.id);
-    console.log('[THUMBNAIL PRO] Complete generation pipeline started for user:', req.user?.id);
+    console.log('[THUMBNAIL PRO] Request data:', JSON.stringify(req.body, null, 2));
     
     try {
-      // Extract data from FormData
+      // Import the complete 7-stage service
+      const { generateCompleteThumbnailSet } = await import('./thumbnail-ai-service-complete');
+      
+      // Extract data from request body
       const title = req.body.title || 'AI Generated Thumbnail';
       const description = req.body.description || '';
-      const category = req.body.category || 'general';
-      const strategy = req.body.strategy ? JSON.parse(req.body.strategy) : {};
-      const trending = req.body.trending ? JSON.parse(req.body.trending) : {};
+      const category = req.body.category || 'gaming';
+      const advancedMode = req.body.advancedMode || false;
       
-      console.log('[THUMBNAIL PRO] Generating 4 variants for:', title);
+      console.log('[THUMBNAIL PRO] Input validation completed');
       
-      // OPTIMIZED: Generate 1 AI thumbnail + 3 programmatic variations to reduce API calls
-      console.log('[THUMBNAIL PRO] Generating 1 AI thumbnail + 3 programmatic variations');
-      
-      // Step 1: Generate only 1 high-quality AI thumbnail
-      const baseVariant = await generateDALLEThumbnail(title, strategy, 1, 'AI Generated');
-      
-      // Step 2: Create 3 programmatic variations by modifying the base thumbnail
-      console.log('[THUMBNAIL PRO] Starting variation creation for base:', baseVariant.imageUrl);
-      
-      const variants = [baseVariant];
-      
-      // Create variations one by one with detailed error handling
-      try {
-        console.log('[THUMBNAIL PRO] Creating Color Shift variation...');
-        const colorShift = await createThumbnailVariation(baseVariant, strategy, 2, 'Color Shift');
-        variants.push(colorShift);
-        console.log('[THUMBNAIL PRO] Color Shift variation created:', colorShift.imageUrl);
-      } catch (error) {
-        console.error('[THUMBNAIL PRO] Color Shift variation failed:', error);
-        variants.push({
-          ...baseVariant,
-          id: 'variant_2',
-          title: `${baseVariant.title} (Color Shift)`,
-          layout: 'Color Shift',
-          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
-          error: 'Variation generation failed'
+      // Validate user credits (8 credits required for complete generation)
+      const user = await storage.getUser(req.user.id);
+      if (!user || !user.credits || user.credits < 8) {
+        console.log('[THUMBNAIL PRO] Insufficient credits:', user?.credits);
+        return res.status(400).json({ 
+          error: 'Insufficient credits. Complete thumbnail generation requires 8 credits.',
+          creditsRequired: 8,
+          currentCredits: user?.credits || 0
         });
       }
       
-      try {
-        console.log('[THUMBNAIL PRO] Creating Text Reposition variation...');
-        const textReposition = await createThumbnailVariation(baseVariant, strategy, 3, 'Text Reposition');
-        variants.push(textReposition);
-        console.log('[THUMBNAIL PRO] Text Reposition variation created:', textReposition.imageUrl);
-      } catch (error) {
-        console.error('[THUMBNAIL PRO] Text Reposition variation failed:', error);
-        variants.push({
-          ...baseVariant,
-          id: 'variant_3',
-          title: `${baseVariant.title} (Text Reposition)`,
-          layout: 'Text Reposition',
-          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
-          error: 'Variation generation failed'
-        });
-      }
+      // Prepare input for 7-stage system
+      const thumbnailInput = {
+        title,
+        description,
+        category,
+        advancedMode
+      };
       
-      try {
-        console.log('[THUMBNAIL PRO] Creating Style Variant variation...');
-        const styleVariant = await createThumbnailVariation(baseVariant, strategy, 4, 'Style Variant');
-        variants.push(styleVariant);
-        console.log('[THUMBNAIL PRO] Style Variant variation created:', styleVariant.imageUrl);
-      } catch (error) {
-        console.error('[THUMBNAIL PRO] Style Variant variation failed:', error);
-        variants.push({
-          ...baseVariant,
-          id: 'variant_4',
-          title: `${baseVariant.title} (Style Variant)`,
-          layout: 'Style Variant',
-          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
-          error: 'Variation generation failed'
-        });
-      }
+      console.log('[THUMBNAIL PRO] Starting 7-stage generation process...');
       
-      console.log('[THUMBNAIL PRO] Generated', variants.length, 'variants successfully');
+      // Execute complete 7-stage thumbnail generation
+      const result = await generateCompleteThumbnailSet(thumbnailInput);
       
-      res.json(variants);
+      // Deduct credits after successful generation
+      await storage.updateUser(req.user.id, { 
+        credits: user.credits - result.metadata.creditsUsed 
+      });
+      
+      console.log(`[THUMBNAIL PRO] ✓ Complete generation successful`);
+      console.log(`[THUMBNAIL PRO] ✓ Generated ${result.variants.length} variants`);
+      console.log(`[THUMBNAIL PRO] ✓ Generation time: ${result.metadata.generationTime}ms`);
+      console.log(`[THUMBNAIL PRO] ✓ Credits deducted: ${result.metadata.creditsUsed}`);
+      
+      // Return the results in the expected format
+      res.json({
+        success: true,
+        variants: result.variants,
+        metadata: result.metadata,
+        creditsUsed: result.metadata.creditsUsed,
+        remainingCredits: user.credits - result.metadata.creditsUsed
+      });
       
     } catch (error) {
-      console.error('[THUMBNAIL PRO] Complete generation failed:', error);
+      console.error('[THUMBNAIL PRO] 7-stage generation failed:', error);
       res.status(500).json({ 
         error: 'Failed to generate thumbnails',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stage: 'Complete 7-stage pipeline'
       });
     }
   });

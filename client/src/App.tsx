@@ -43,7 +43,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import InstagramAnalytics from "@/pages/InstagramAnalytics";
 import YouTubeAnalytics from "@/pages/YouTubeAnalytics";
 import ThumbnailAIMaker from "@/pages/ThumbnailAIMaker";
-import ThumbnailAIMakerPro from "@/pages/ThumbnailAIMakerPro";
+import ThumbnailAIMakerProComplete from "@/pages/ThumbnailAIMakerProComplete";
 import ThumbnailMakerPro from "@/pages/ThumbnailMakerPro";
 import CreativeBriefGenerator from "@/pages/CreativeBriefGenerator";
 import ContentRepurpose from "@/pages/ContentRepurpose";

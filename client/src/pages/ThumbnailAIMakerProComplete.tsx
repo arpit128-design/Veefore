@@ -173,9 +173,12 @@ export default function ThumbnailAIMakerProComplete() {
       setCurrentStage('Executing complete generation...');
       setGenerationProgress(90);
 
-      // Call the complete 7-stage API
-      const response = await apiRequest('/api/thumbnails/generate-complete', {
+      // Call the complete 7-stage API using fetch directly for FormData
+      const response = await fetch('/api/thumbnails/generate-complete', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
         body: formData
       });
 

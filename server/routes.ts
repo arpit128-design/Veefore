@@ -5074,6 +5074,221 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // AI Creative Brief Routes
+  app.post('/api/ai/creative-brief', requireAuth, async (req, res) => {
+    try {
+      const { title, targetAudience, platforms, campaignGoals, tone, style, industry, deadline, budget, additionalRequirements } = req.body;
+      const userId = req.user!.id;
+      
+      if (!title || !targetAudience || !platforms || !campaignGoals) {
+        return res.status(400).json({ error: 'Title, target audience, platforms, and campaign goals are required' });
+      }
+
+      // Credit check
+      const creditCost = 3;
+      const userCredits = await creditService.getUserCredits(userId);
+      if (userCredits < creditCost) {
+        return res.status(402).json({ error: 'Insufficient credits' });
+      }
+
+      const { creativeBriefAI } = await import('./creative-brief-ai');
+      
+      const briefInput = {
+        title,
+        targetAudience,
+        platforms,
+        campaignGoals,
+        tone,
+        style,
+        industry,
+        deadline,
+        budget,
+        additionalRequirements
+      };
+
+      const generatedBrief = await creativeBriefAI.generateBrief(briefInput);
+      
+      // Save to database
+      const workspace = await storage.getWorkspaceByUserId(userId);
+      const savedBrief = await storage.createCreativeBrief({
+        workspaceId: workspace!.id,
+        userId,
+        title,
+        targetAudience,
+        platforms: JSON.stringify(platforms),
+        campaignGoals: JSON.stringify(campaignGoals),
+        tone,
+        style,
+        industry,
+        deadline: deadline ? new Date(deadline) : null,
+        budget,
+        additionalRequirements,
+        generatedBrief: generatedBrief.briefContent,
+        keyMessages: JSON.stringify(generatedBrief.keyMessages),
+        contentFormats: JSON.stringify(generatedBrief.contentFormats),
+        hashtags: JSON.stringify(generatedBrief.hashtags),
+        references: JSON.stringify(generatedBrief.references),
+        insights: generatedBrief.insights,
+        timeline: JSON.stringify(generatedBrief.timeline),
+        creditsUsed: creditCost
+      });
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'creative_brief', creditCost, 'Creative brief generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        brief: savedBrief,
+        generated: generatedBrief,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[CREATIVE BRIEF AI] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate creative brief' });
+    }
+  });
+
+  // Multi-Language Content Repurposing Routes
+  app.post('/api/ai/content-repurpose', requireAuth, async (req, res) => {
+    try {
+      const { sourceContent, sourceLanguage, targetLanguage, contentType, platform, tone, targetAudience } = req.body;
+      const userId = req.user!.id;
+      
+      if (!sourceContent || !sourceLanguage || !targetLanguage || !contentType || !platform) {
+        return res.status(400).json({ error: 'Source content, languages, content type, and platform are required' });
+      }
+
+      // Credit check
+      const creditCost = 2;
+      const userCredits = await creditService.getUserCredits(userId);
+      if (userCredits < creditCost) {
+        return res.status(402).json({ error: 'Insufficient credits' });
+      }
+
+      const { contentRepurposeAI } = await import('./content-repurpose-ai');
+      
+      const repurposeInput = {
+        sourceContent,
+        sourceLanguage,
+        targetLanguage,
+        contentType,
+        platform,
+        tone,
+        targetAudience
+      };
+
+      const repurposedContent = await contentRepurposeAI.repurposeContent(repurposeInput);
+      
+      // Save to database
+      const workspace = await storage.getWorkspaceByUserId(userId);
+      const savedRepurpose = await storage.createContentRepurpose({
+        workspaceId: workspace!.id,
+        userId,
+        sourceContent,
+        sourceLanguage,
+        targetLanguage,
+        contentType,
+        platform,
+        tone,
+        targetAudience,
+        repurposedContent: repurposedContent.repurposedContent,
+        culturalAdaptations: JSON.stringify(repurposedContent.culturalAdaptations),
+        toneAdjustments: JSON.stringify(repurposedContent.toneAdjustments),
+        qualityScore: repurposedContent.qualityScore,
+        alternativeVersions: JSON.stringify(repurposedContent.alternativeVersions),
+        localizationNotes: repurposedContent.localizationNotes,
+        creditsUsed: creditCost
+      });
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'content_repurpose', creditCost, 'Content repurposing');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        repurpose: savedRepurpose,
+        generated: repurposedContent,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[CONTENT REPURPOSE AI] Repurposing failed:', error);
+      res.status(500).json({ error: 'Failed to repurpose content' });
+    }
+  });
+
+  // Bulk Multi-Language Repurposing
+  app.post('/api/ai/content-repurpose/bulk', requireAuth, async (req, res) => {
+    try {
+      const { sourceContent, sourceLanguage, targetLanguages, contentType, platform } = req.body;
+      const userId = req.user!.id;
+      
+      if (!sourceContent || !sourceLanguage || !targetLanguages || !contentType || !platform) {
+        return res.status(400).json({ error: 'All fields are required for bulk repurposing' });
+      }
+
+      // Credit check (2 credits per language)
+      const creditCost = targetLanguages.length * 2;
+      const userCredits = await creditService.getUserCredits(userId);
+      if (userCredits < creditCost) {
+        return res.status(402).json({ error: 'Insufficient credits' });
+      }
+
+      const { contentRepurposeAI } = await import('./content-repurpose-ai');
+      
+      const bulkResults = await contentRepurposeAI.bulkRepurpose(
+        sourceContent,
+        sourceLanguage,
+        targetLanguages,
+        contentType,
+        platform
+      );
+
+      // Save successful results to database
+      const workspace = await storage.getWorkspaceByUserId(userId);
+      const savedResults = [];
+      
+      for (const [language, result] of Object.entries(bulkResults)) {
+        const saved = await storage.createContentRepurpose({
+          workspaceId: workspace!.id,
+          userId,
+          sourceContent,
+          sourceLanguage,
+          targetLanguage: language,
+          contentType,
+          platform,
+          repurposedContent: result.repurposedContent,
+          culturalAdaptations: JSON.stringify(result.culturalAdaptations),
+          toneAdjustments: JSON.stringify(result.toneAdjustments),
+          qualityScore: result.qualityScore,
+          alternativeVersions: JSON.stringify(result.alternativeVersions),
+          localizationNotes: result.localizationNotes,
+          creditsUsed: 2
+        });
+        savedResults.push(saved);
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'bulk_repurpose', creditCost, 'Bulk content repurposing');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        results: savedResults,
+        generated: bulkResults,
+        creditsUsed: creditCost,
+        remainingCredits,
+        successCount: Object.keys(bulkResults).length,
+        requestedCount: targetLanguages.length
+      });
+
+    } catch (error: any) {
+      console.error('[BULK REPURPOSE AI] Processing failed:', error);
+      res.status(500).json({ error: 'Failed to process bulk repurposing' });
+    }
+  });
+
   // AI Content Generation Routes
   app.post('/api/ai/generate-caption', requireAuth, async (req, res) => {
     try {

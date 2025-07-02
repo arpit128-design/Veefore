@@ -3,17 +3,20 @@ import {
   automationRules, suggestions, creditTransactions, referrals,
   subscriptions, payments, addons, contentRecommendations, userContentHistory,
   admins, adminSessions, notifications, popups, appSettings, auditLogs, feedbackMessages,
+  creativeBriefs, contentRepurposes,
   type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
   type Payment, type Addon, type ContentRecommendation, type UserContentHistory,
   type Admin, type AdminSession, type Notification, type Popup, type AppSetting, type AuditLog, type FeedbackMessage,
+  type CreativeBrief, type ContentRepurpose,
   type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
   type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
   type InsertSubscription, type InsertPayment, type InsertAddon,
   type InsertContentRecommendation, type InsertUserContentHistory,
-  type InsertAdmin, type InsertNotification, type InsertPopup, type InsertAppSetting, type InsertAuditLog, type InsertFeedbackMessage
+  type InsertAdmin, type InsertNotification, type InsertPopup, type InsertAppSetting, type InsertAuditLog, type InsertFeedbackMessage,
+  type InsertCreativeBrief, type InsertContentRepurpose
 } from "@shared/schema";
 
 export interface IStorage {

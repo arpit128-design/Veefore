@@ -98,9 +98,506 @@ export const socialAccounts = pgTable("social_accounts", {
   isBusinessAccount: boolean("is_business_account").default(false),
   isVerified: boolean("is_verified").default(false),
   // Performance metrics for AI analysis
-  avgLikes: integer("avg_likes"),
-  avgComments: integer("avg_comments"),
-  avgReach: integer("avg_reach"),
+  totalLikes: integer("total_likes").default(0),
+  totalComments: integer("total_comments").default(0),
+  totalShares: integer("total_shares").default(0),
+  totalSaves: integer("total_saves").default(0),
+  totalReach: integer("total_reach").default(0),
+  totalImpressions: integer("total_impressions").default(0),
+  avgEngagement: integer("avg_engagement").default(0),
+  lastSyncAt: timestamp("last_sync_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// AI Features Schema - Creative Brief Generator
+export const creativeBriefs = pgTable("creative_briefs", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  targetAudience: text("target_audience").notNull(),
+  platforms: json("platforms").notNull(), // ['instagram', 'youtube', 'tiktok']
+  campaignGoals: json("campaign_goals").notNull(), // ['awareness', 'engagement', 'conversions']
+  tone: text("tone").notNull(), // 'professional', 'casual', 'humorous'
+  style: text("style").notNull(), // 'minimalist', 'bold', 'vintage'
+  industry: text("industry").notNull(),
+  deadline: timestamp("deadline"),
+  budget: integer("budget"),
+  briefContent: text("brief_content").notNull(), // AI-generated structured brief
+  keyMessages: json("key_messages"), // AI-suggested key messages
+  contentFormats: json("content_formats"), // ['post', 'reel', 'story', 'video']
+  hashtags: json("hashtags"), // AI-suggested hashtags
+  references: json("references"), // URLs or descriptions
+  status: text("status").default("draft"), // draft, active, completed
+  creditsUsed: integer("credits_used").default(5), // Credits consumed for generation
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Multi-Language Content Repurposing
+export const contentRepurposes = pgTable("content_repurposes", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  originalContentId: integer("original_content_id"), // References original content if exists
+  sourceLanguage: text("source_language").notNull(), // 'en', 'es', 'fr', 'hi'
+  targetLanguage: text("target_language").notNull(),
+  sourceContent: text("source_content").notNull(), // Original text
+  repurposedContent: text("repurposed_content").notNull(), // AI-translated & localized
+  contentType: text("content_type").notNull(), // 'caption', 'hashtags', 'script'
+  culturalAdaptations: json("cultural_adaptations"), // Notes on cultural changes made
+  toneAdjustments: json("tone_adjustments"), // How tone was adapted for target culture
+  platform: text("platform").notNull(), // Target platform for optimization
+  qualityScore: integer("quality_score"), // AI confidence score 1-100
+  isApproved: boolean("is_approved").default(false),
+  creditsUsed: integer("credits_used").default(3),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Competitor Analysis Engine
+export const competitorAnalyses = pgTable("competitor_analyses", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  competitorUsername: text("competitor_username").notNull(),
+  platform: text("platform").notNull(), // 'instagram', 'youtube', 'tiktok'
+  analysisType: text("analysis_type").notNull(), // 'full_profile', 'recent_posts', 'trending_content'
+  scrapedData: json("scraped_data").notNull(), // Raw data from scraping/APIs
+  analysisResults: json("analysis_results").notNull(), // AI-processed insights
+  topPerformingPosts: json("top_performing_posts"), // Best posts with metrics
+  contentPatterns: json("content_patterns"), // Identified patterns in their content
+  hashtags: json("hashtags"), // Their most used hashtags
+  postingSchedule: json("posting_schedule"), // When they post most
+  engagementRate: integer("engagement_rate"), // Average engagement %
+  growthRate: integer("growth_rate"), // Monthly growth %
+  recommendations: text("recommendations").notNull(), // AI-generated action items
+  competitorScore: integer("competitor_score"), // Overall competitiveness 1-100
+  lastScraped: timestamp("last_scraped").defaultNow(),
+  creditsUsed: integer("credits_used").default(8),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Trend Calendar & Viral Planner
+export const trendCalendar = pgTable("trend_calendar", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  trendTitle: text("trend_title").notNull(),
+  trendType: text("trend_type").notNull(), // 'hashtag', 'audio', 'challenge', 'event', 'seasonal'
+  platform: text("platform").notNull(),
+  trendDate: timestamp("trend_date").notNull(), // When the trend is/was popular
+  peakDate: timestamp("peak_date"), // Predicted or actual peak
+  description: text("description").notNull(),
+  relatedHashtags: json("related_hashtags"),
+  suggestedFormats: json("suggested_formats"), // ['reel', 'post', 'story']
+  targetAudience: text("target_audience"),
+  viralityScore: integer("virality_score"), // 1-100 predicted viral potential
+  difficultyLevel: text("difficulty_level"), // 'easy', 'medium', 'hard'
+  contentSuggestions: text("content_suggestions"), // AI-generated content ideas
+  isGlobal: boolean("is_global").default(true), // Global vs niche trend
+  niche: text("niche"), // Specific niche if not global
+  source: text("source"), // Where trend was detected
+  status: text("status").default("active"), // active, declining, dead
+  aiGenerated: boolean("ai_generated").default(true), // Was this AI-predicted
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// A/B Testing Module
+export const abTests = pgTable("ab_tests", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  testName: text("test_name").notNull(),
+  testType: text("test_type").notNull(), // 'caption', 'hashtags', 'posting_time', 'format'
+  platform: text("platform").notNull(),
+  // Variant A
+  variantA: json("variant_a").notNull(), // Content, hashtags, timing, etc.
+  variantAResults: json("variant_a_results"), // Metrics after posting
+  variantAPostId: text("variant_a_post_id"), // Platform-specific post ID
+  // Variant B
+  variantB: json("variant_b").notNull(),
+  variantBResults: json("variant_b_results"),
+  variantBPostId: text("variant_b_post_id"),
+  // Test Configuration
+  testDuration: integer("test_duration").default(48), // Hours to run test
+  audienceSplit: integer("audience_split").default(50), // % for A vs B
+  successMetric: text("success_metric").notNull(), // 'engagement', 'reach', 'clicks'
+  // Results
+  winningVariant: text("winning_variant"), // 'A', 'B', or 'tie'
+  confidenceLevel: integer("confidence_level"), // Statistical confidence %
+  results: json("results"), // Full analysis results
+  insights: text("insights"), // AI-generated insights
+  recommendations: text("recommendations"), // Next steps
+  status: text("status").default("planning"), // planning, running, analyzing, completed
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  creditsUsed: integer("credits_used").default(10),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// ROI Calculator
+export const roiCalculations = pgTable("roi_calculations", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  campaignName: text("campaign_name").notNull(),
+  campaignType: text("campaign_type").notNull(), // 'organic', 'paid', 'influencer', 'sponsored'
+  // Investment Costs
+  timeInvested: integer("time_invested").notNull(), // Hours
+  hourlyRate: integer("hourly_rate").default(50), // $/hour
+  adSpend: integer("ad_spend").default(0), // $ spent on ads
+  toolsCost: integer("tools_cost").default(0), // $ on tools/software
+  otherCosts: integer("other_costs").default(0), // Misc costs
+  totalInvestment: integer("total_investment").notNull(), // Auto-calculated
+  // Returns
+  directRevenue: integer("direct_revenue").default(0), // $ directly attributable
+  leadValue: integer("lead_value").default(0), // Estimated value of leads
+  brandValue: integer("brand_value").default(0), // Brand awareness value
+  totalReturn: integer("total_return").notNull(), // Auto-calculated
+  // Metrics
+  roiPercentage: integer("roi_percentage").notNull(), // (Return - Investment) / Investment * 100
+  costPerEngagement: integer("cost_per_engagement"), // Investment / Total Engagements
+  costPerFollower: integer("cost_per_follower"), // Investment / New Followers
+  // Performance Data
+  totalReach: integer("total_reach").default(0),
+  totalEngagements: integer("total_engagements").default(0),
+  newFollowers: integer("new_followers").default(0),
+  clickThroughRate: integer("click_through_rate").default(0), // %
+  conversionRate: integer("conversion_rate").default(0), // %
+  // AI Insights
+  insights: text("insights"), // AI-generated ROI insights
+  recommendations: text("recommendations"), // How to improve ROI
+  benchmarkComparison: json("benchmark_comparison"), // vs industry benchmarks
+  period: text("period").notNull(), // '7d', '30d', '90d', 'custom'
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  creditsUsed: integer("credits_used").default(2),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// User Personas & AI Personalization
+export const userPersonas = pgTable("user_personas", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  personaName: text("persona_name").notNull(), // 'Fitness Coach', 'Tech Reviewer'
+  isActive: boolean("is_active").default(true),
+  // Quiz Results
+  quizAnswers: json("quiz_answers").notNull(), // Structured responses
+  refinedNiche: text("refined_niche").notNull(), // AI-determined ultra-specific niche
+  targetAudience: text("target_audience").notNull(), // Who they should target
+  contentPillars: json("content_pillars").notNull(), // Main content themes
+  toneProfile: json("tone_profile").notNull(), // Voice & tone characteristics
+  platformPreferences: json("platform_preferences").notNull(), // Best platforms for them
+  // AI-Generated Suggestions
+  contentFormats: json("content_formats"), // Best formats for their niche
+  postingSchedule: json("posting_schedule"), // Optimal times/frequency
+  hashtagStrategy: json("hashtag_strategy"), // Hashtag recommendations
+  growthStrategy: text("growth_strategy"), // Long-term growth plan
+  monthlyThemes: json("monthly_themes"), // Content calendar themes
+  // Performance Tracking
+  successMetrics: json("success_metrics"), // What metrics matter most
+  benchmarks: json("benchmarks"), // Target benchmarks for their niche
+  personalityScore: json("personality_score"), // AI personality analysis
+  confidenceScore: integer("confidence_score"), // How confident AI is in persona fit
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  creditsUsed: integer("credits_used").default(7),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Affiliate Engine
+export const affiliatePrograms = pgTable("affiliate_programs", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  programName: text("program_name").notNull(),
+  brandName: text("brand_name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // 'tech', 'fitness', 'beauty', 'finance'
+  commissionType: text("commission_type").notNull(), // 'percentage', 'flat', 'cpa'
+  commissionRate: integer("commission_rate").notNull(), // % or $
+  minimumPayout: integer("minimum_payout").default(50), // $
+  cookieDuration: integer("cookie_duration").default(30), // days
+  productTypes: json("product_types"), // Types of products
+  targetAudience: text("target_audience"),
+  requirements: json("requirements"), // Follower count, niche, etc.
+  applicationStatus: text("application_status").default("open"), // open, invite_only, closed
+  paymentSchedule: text("payment_schedule"), // 'weekly', 'monthly', 'net30'
+  trackingMethod: text("tracking_method"), // 'link', 'code', 'pixel'
+  isActive: boolean("is_active").default(true),
+  approvalRequired: boolean("approval_required").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const affiliateApplications = pgTable("affiliate_applications", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  programId: integer("program_id").references(() => affiliatePrograms.id).notNull(),
+  applicationData: json("application_data").notNull(), // Form responses
+  status: text("status").default("pending"), // pending, approved, rejected, paused
+  approvedAt: timestamp("approved_at"),
+  rejectionReason: text("rejection_reason"),
+  affiliateLink: text("affiliate_link"), // Generated unique link
+  trackingCode: text("tracking_code"), // Unique tracking code
+  totalClicks: integer("total_clicks").default(0),
+  totalConversions: integer("total_conversions").default(0),
+  totalEarnings: integer("total_earnings").default(0), // In cents
+  lastPayoutAt: timestamp("last_payout_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Social Listening Engine
+export const socialListening = pgTable("social_listening", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  queryName: text("query_name").notNull(), // User-defined name
+  keywords: json("keywords").notNull(), // Keywords to monitor
+  platforms: json("platforms").notNull(), // ['twitter', 'reddit', 'instagram']
+  includeCompetitors: boolean("include_competitors").default(false),
+  competitorHandles: json("competitor_handles"), // Handles to monitor
+  sentiment: text("sentiment"), // 'positive', 'negative', 'neutral', 'all'
+  language: text("language").default("en"),
+  location: text("location"), // Optional geo-targeting
+  isActive: boolean("is_active").default(true),
+  alertThreshold: integer("alert_threshold").default(10), // Mentions to trigger alert
+  lastScanned: timestamp("last_scanned"),
+  totalMentions: integer("total_mentions").default(0),
+  positiveMentions: integer("positive_mentions").default(0),
+  negativeMentions: integer("negative_mentions").default(0),
+  neutralMentions: integer("neutral_mentions").default(0),
+  creditsUsed: integer("credits_used").default(0), // Per scan
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const socialMentions = pgTable("social_mentions", {
+  id: serial("id").primaryKey(),
+  listeningQueryId: integer("listening_query_id").references(() => socialListening.id).notNull(),
+  platform: text("platform").notNull(), // 'twitter', 'reddit', 'instagram'
+  postId: text("post_id").notNull(), // Platform-specific post ID
+  authorUsername: text("author_username").notNull(),
+  authorFollowers: integer("author_followers"),
+  content: text("content").notNull(), // The mention text
+  url: text("url").notNull(), // Direct link to post
+  sentiment: text("sentiment").notNull(), // 'positive', 'negative', 'neutral'
+  sentimentScore: integer("sentiment_score"), // -100 to +100
+  engagement: json("engagement"), // Likes, shares, comments
+  isInfluencer: boolean("is_influencer").default(false), // High follower count
+  requiresResponse: boolean("requires_response").default(false), // AI suggests response
+  suggestedResponse: text("suggested_response"), // AI-generated response
+  hasResponded: boolean("has_responded").default(false),
+  isRead: boolean("is_read").default(false),
+  tags: json("tags"), // AI-generated tags for categorization
+  mentionedAt: timestamp("mentioned_at").notNull(),
+  scrapedAt: timestamp("scraped_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Gamification System
+export const userProgress = pgTable("user_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  totalXP: integer("total_xp").default(0),
+  level: integer("level").default(1),
+  currentLevelXP: integer("current_level_xp").default(0), // XP in current level
+  xpToNextLevel: integer("xp_to_next_level").default(100), // XP needed for next level
+  totalBadges: integer("total_badges").default(0),
+  streak: integer("streak").default(0), // Current activity streak (days)
+  longestStreak: integer("longest_streak").default(0),
+  lastActiveDate: timestamp("last_active_date"),
+  achievements: json("achievements"), // Unlocked achievements
+  currentMissions: json("current_missions"), // Active missions
+  completedMissions: json("completed_missions"), // Completed missions
+  seasonStats: json("season_stats"), // Seasonal challenge stats
+  leaderboardRank: integer("leaderboard_rank"), // Position in workspace leaderboard
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const gamificationEvents = pgTable("gamification_events", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  eventType: text("event_type").notNull(), // 'content_created', 'post_published', 'engagement_milestone'
+  eventData: json("event_data"), // Context about the event
+  xpEarned: integer("xp_earned").default(0),
+  badgeEarned: text("badge_earned"), // Badge ID if earned
+  missionProgress: json("mission_progress"), // Progress on active missions
+  streakBonus: integer("streak_bonus").default(0), // Extra XP for streak
+  isProcessed: boolean("is_processed").default(false),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Content Theft Detection
+export const contentProtection = pgTable("content_protection", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  originalContentId: text("original_content_id").notNull(), // Reference to original content
+  contentType: text("content_type").notNull(), // 'image', 'video', 'text'
+  contentHash: text("content_hash").notNull(), // AI-generated hash/fingerprint
+  watermarkApplied: boolean("watermark_applied").default(false),
+  watermarkType: text("watermark_type"), // 'visible', 'invisible', 'both'
+  protectionLevel: text("protection_level").default("standard"), // standard, premium
+  monitoringEnabled: boolean("monitoring_enabled").default(true),
+  scanFrequency: text("scan_frequency").default("weekly"), // daily, weekly, monthly
+  lastScanAt: timestamp("last_scan_at"),
+  totalThefts: integer("total_thefts").default(0),
+  activeThefts: integer("active_thefts").default(0),
+  resolvedThefts: integer("resolved_thefts").default(0),
+  creditsUsed: integer("credits_used").default(0), // Per scan
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const contentThefts = pgTable("content_thefts", {
+  id: serial("id").primaryKey(),
+  protectionId: integer("protection_id").references(() => contentProtection.id).notNull(),
+  theftUrl: text("theft_url").notNull(), // Where stolen content was found
+  theftPlatform: text("theft_platform").notNull(), // Platform where theft occurred
+  thiefUsername: text("thief_username"), // Username of thief if available
+  similarityScore: integer("similarity_score").notNull(), // % similarity (0-100)
+  theftType: text("theft_type").notNull(), // 'exact_copy', 'modified', 'cropped'
+  status: text("status").default("detected"), // detected, reported, dmca_sent, resolved, ignored
+  actionTaken: text("action_taken"), // What action was taken
+  detectedAt: timestamp("detected_at").defaultNow(),
+  reportedAt: timestamp("reported_at"),
+  resolvedAt: timestamp("resolved_at"),
+  notes: text("notes"), // User notes about this theft
+  autoDetected: boolean("auto_detected").default(true), // AI detected vs manual report
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Legal Assistant
+export const legalTemplates = pgTable("legal_templates", {
+  id: serial("id").primaryKey(),
+  templateName: text("template_name").notNull(),
+  templateType: text("template_type").notNull(), // 'contract', 'nda', 'terms', 'disclaimer'
+  category: text("category").notNull(), // 'influencer', 'brand', 'general'
+  description: text("description").notNull(),
+  templateContent: text("template_content").notNull(), // Fillable template
+  requiredFields: json("required_fields").notNull(), // Fields user must fill
+  optionalFields: json("optional_fields"), // Optional customization fields
+  jurisdiction: text("jurisdiction").default("US"), // Legal jurisdiction
+  language: text("language").default("en"),
+  lastReviewed: timestamp("last_reviewed").defaultNow(),
+  version: text("version").default("1.0"),
+  isActive: boolean("is_active").default(true),
+  usageCount: integer("usage_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const generatedLegalDocs = pgTable("generated_legal_docs", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  templateId: integer("template_id").references(() => legalTemplates.id).notNull(),
+  documentName: text("document_name").notNull(),
+  generatedContent: text("generated_content").notNull(), // Final document
+  customizations: json("customizations").notNull(), // User-provided data
+  aiSuggestions: text("ai_suggestions"), // AI-provided legal suggestions
+  status: text("status").default("draft"), // draft, finalized, signed
+  downloadCount: integer("download_count").default(0),
+  lastDownloadAt: timestamp("last_download_at"),
+  creditsUsed: integer("credits_used").default(5),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Emotion Analysis
+export const emotionAnalyses = pgTable("emotion_analyses", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  contentId: text("content_id").notNull(), // Platform-specific content ID
+  platform: text("platform").notNull(), // 'instagram', 'youtube', 'twitter'
+  analysisType: text("analysis_type").notNull(), // 'comments', 'caption', 'overall'
+  emotionData: json("emotion_data").notNull(), // Raw emotion analysis results
+  dominantEmotion: text("dominant_emotion").notNull(), // 'joy', 'sadness', 'anger', 'fear', 'surprise'
+  emotionScores: json("emotion_scores").notNull(), // Scores for each emotion
+  sentimentScore: integer("sentiment_score").notNull(), // -100 to +100
+  engagementCorrelation: json("engagement_correlation"), // How emotions correlate with engagement
+  recommendations: text("recommendations"), // AI suggestions based on emotions
+  totalComments: integer("total_comments").default(0),
+  processedComments: integer("processed_comments").default(0),
+  creditsUsed: integer("credits_used").default(3),
+  analyzedAt: timestamp("analyzed_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Fixed Post System
+export const fixedPosts = pgTable("fixed_posts", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  contentId: text("content_id").notNull(), // Reference to original content
+  platform: text("platform").notNull(),
+  postUrl: text("post_url"),
+  title: text("title").notNull(),
+  description: text("description"),
+  thumbnailUrl: text("thumbnail_url"),
+  isPinned: boolean("is_pinned").default(true),
+  displayOrder: integer("display_order").default(0), // Order in pinned feed
+  metrics: json("metrics"), // Performance metrics when pinned
+  pinnedAt: timestamp("pinned_at").defaultNow(),
+  unpinnedAt: timestamp("unpinned_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Export types for all schemas
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type Workspace = typeof workspaces.$inferSelect;
+export type InsertWorkspace = typeof workspaces.$inferInsert;
+export type SocialAccount = typeof socialAccounts.$inferSelect;
+export type InsertSocialAccount = typeof socialAccounts.$inferInsert;
+export type CreativeBrief = typeof creativeBriefs.$inferSelect;
+export type InsertCreativeBrief = typeof creativeBriefs.$inferInsert;
+export type ContentRepurpose = typeof contentRepurposes.$inferSelect;
+export type InsertContentRepurpose = typeof contentRepurposes.$inferInsert;
+export type CompetitorAnalysis = typeof competitorAnalyses.$inferSelect;
+export type InsertCompetitorAnalysis = typeof competitorAnalyses.$inferInsert;
+export type TrendCalendar = typeof trendCalendar.$inferSelect;
+export type InsertTrendCalendar = typeof trendCalendar.$inferInsert;
+export type ABTest = typeof abTests.$inferSelect;
+export type InsertABTest = typeof abTests.$inferInsert;
+export type ROICalculation = typeof roiCalculations.$inferSelect;
+export type InsertROICalculation = typeof roiCalculations.$inferInsert;
+export type UserPersona = typeof userPersonas.$inferSelect;
+export type InsertUserPersona = typeof userPersonas.$inferInsert;
+export type AffiliateProgram = typeof affiliatePrograms.$inferSelect;
+export type InsertAffiliateProgram = typeof affiliatePrograms.$inferInsert;
+export type SocialListening = typeof socialListening.$inferSelect;
+export type InsertSocialListening = typeof socialListening.$inferInsert;
+export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = typeof userProgress.$inferInsert;
+export type EmotionAnalysis = typeof emotionAnalyses.$inferSelect;
+export type InsertEmotionAnalysis = typeof emotionAnalyses.$inferInsert;
+
+// Zod schemas for validation
+export const insertCreativeBriefSchema = createInsertSchema(creativeBriefs);
+export const insertContentRepurposeSchema = createInsertSchema(contentRepurposes);
+export const insertCompetitorAnalysisSchema = createInsertSchema(competitorAnalyses);
+export const insertTrendCalendarSchema = createInsertSchema(trendCalendar);
+export const insertABTestSchema = createInsertSchema(abTests);
+export const insertROICalculationSchema = createInsertSchema(roiCalculations);
+export const insertUserPersonaSchema = createInsertSchema(userPersonas);
+export const insertAffiliateApplicationSchema = createInsertSchema(affiliateApplications);
+export const insertSocialListeningSchema = createInsertSchema(socialListening);
+export const insertEmotionAnalysisSchema = createInsertSchema(emotionAnalyses);
   engagementRate: integer("engagement_rate"), // stored as percentage * 100 (e.g., 3.45% = 345)
   // Instagram Business API engagement totals
   totalLikes: integer("total_likes"),

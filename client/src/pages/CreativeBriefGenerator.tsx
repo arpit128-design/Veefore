@@ -157,7 +157,7 @@ export default function CreativeBriefGenerator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Generation Form */}
-        <Card className="border-2 border-gradient-to-r from-purple-500/20 to-pink-500/20">
+        <Card className="content-card holographic">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
@@ -390,7 +390,7 @@ export default function CreativeBriefGenerator() {
 
         {/* Generated Brief */}
         {generatedBrief && (
-          <Card className="border-2 border-green-500/20">
+          <Card className="content-card holographic">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -491,7 +491,7 @@ export default function CreativeBriefGenerator() {
 
         {/* Empty state when no brief generated */}
         {!generatedBrief && (
-          <Card className="border-2 border-dashed border-muted-foreground/20">
+          <Card className="content-card holographic border-dashed">
             <CardContent className="flex flex-col items-center justify-center h-96 text-center">
               <Sparkles className="w-12 h-12 text-muted-foreground/40 mb-4" />
               <h3 className="text-lg font-semibold mb-2">AI-Powered Brief Generation</h3>

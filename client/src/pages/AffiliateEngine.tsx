@@ -456,7 +456,26 @@ export default function AffiliateEngine() {
                     </CardContent>
                   </Card>
                 </motion.div>
-              ))}
+              )) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-12"
+                >
+                  <DollarSign className="w-16 h-16 text-asteroid-silver/50 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No Commission Data Yet</h3>
+                  <p className="text-asteroid-silver mb-6">
+                    Start by discovering affiliate opportunities and joining programs. 
+                    Commission tracking will appear here once you begin earning.
+                  </p>
+                  <Button 
+                    onClick={handleDiscoverOpportunities}
+                    className="bg-gradient-to-r from-electric-cyan to-solar-gold text-cosmic-void font-semibold px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    Discover Opportunities
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </TabsContent>
 

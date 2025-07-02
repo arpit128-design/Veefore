@@ -39,8 +39,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Mobile: Full width, no sidebar margin */}
-        <div className="block md:hidden px-4 py-6">
+        {/* Mobile: Full width, no sidebar margin, extra bottom padding for mobile nav */}
+        <div className="block md:hidden px-4 py-6 pb-24">
           <div className="flex flex-col items-center justify-center space-y-3 text-center">
             {/* Main Copyright Line */}
             <div className="text-xs text-white/80 leading-relaxed">

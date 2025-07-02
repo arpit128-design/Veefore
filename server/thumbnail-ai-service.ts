@@ -303,6 +303,8 @@ provide trending design insights in JSON format:
     layout: string
   ): Promise<string> {
     try {
+      console.log('[THUMBNAIL AI] Generating real AI thumbnail with DALL-E 3');
+      
       const imagePrompt = `Create a high-quality YouTube thumbnail (1280x720) with:
 - Title: "${request.title}"
 - Style: ${designData.style}
@@ -313,6 +315,8 @@ provide trending design insights in JSON format:
 - Clear, readable text with strong contrast
 - Engaging visual elements that match the ${request.category} category`;
 
+      console.log('[THUMBNAIL AI] DALL-E 3 prompt:', imagePrompt);
+
       const response = await openai.images.generate({
         model: "dall-e-3",
         prompt: imagePrompt,
@@ -322,10 +326,57 @@ provide trending design insights in JSON format:
         style: "vivid"
       });
 
-      return response.data?.[0]?.url || '';
+      const imageUrl = response.data?.[0]?.url;
+      if (!imageUrl) {
+        throw new Error('No image URL returned from DALL-E 3');
+      }
+
+      console.log('[THUMBNAIL AI] DALL-E 3 generation successful:', imageUrl);
+      
+      // Download and save the image locally to bypass CORS restrictions
+      const imageFileName = `thumbnail_dalle_${Date.now()}.png`;
+      const localImageUrl = await this.downloadAndSaveImage(imageUrl, imageFileName);
+      
+      return localImageUrl;
+      
     } catch (error) {
-      console.error('[THUMBNAIL AI] Image generation failed:', error);
-      return `https://picsum.photos/1280/720?random=${Date.now()}`;
+      console.error('[THUMBNAIL AI] CRITICAL: Real image generation failed:', error);
+      throw new Error(`AI thumbnail generation failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Download and save DALL-E images locally to bypass CORS restrictions
+   */
+  private async downloadAndSaveImage(imageUrl: string, fileName: string): Promise<string> {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      
+      const buffer = await response.arrayBuffer();
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      // Ensure uploads directory exists
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Save the image file
+      const filePath = path.join(uploadsDir, fileName);
+      fs.writeFileSync(filePath, Buffer.from(buffer));
+      
+      console.log(`[THUMBNAIL AI] Image saved locally: ${fileName}`);
+      
+      // Return the local URL that our server can serve
+      return `/uploads/${fileName}`;
+      
+    } catch (error) {
+      console.error('[THUMBNAIL AI] Failed to download image:', error);
+      throw new Error(`Failed to save thumbnail image: ${error.message}`);
     }
   }
 

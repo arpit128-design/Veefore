@@ -50,6 +50,7 @@ import ContentRepurpose from "@/pages/ContentRepurpose";
 import AIIntelligence from "@/pages/AIIntelligence";
 import TrendCalendar from "@/pages/TrendCalendar";
 import ABTesting from "@/pages/ABTesting";
+import ABTestingAI from "@/pages/ABTestingAI";
 import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
 import ROICalculator from "@/pages/ROICalculator";
 import AffiliateEngine from "@/pages/AffiliateEngine";
@@ -110,6 +111,7 @@ function AuthenticatedApp() {
               <Route path="/ai-intelligence" component={AIIntelligence} />
               <Route path="/trend-calendar" component={TrendCalendar} />
               <Route path="/ab-testing" component={ABTesting} />
+              <Route path="/ab-testing-ai" component={ABTestingAI} />
               <Route path="/competitor-analysis" component={CompetitorAnalysis} />
               <Route path="/roi-calculator" component={ROICalculator} />
               <Route path="/affiliate-engine" component={AffiliateEngine} />

@@ -112,6 +112,11 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 02, 2025: **Navigation Restoration Complete** - Restored missing "Analyser" navigation link to bottom sidebar section
+  - ✅ Added standalone Analyser link with proper green color scheme and BarChart3 icon
+  - ✅ Fixed white screen flash when clicking Dashboard button by replacing window.location.href with smooth setLocation() navigation
+  - ✅ All original navigation elements now preserved and accessible
+  - ✅ Mobile tab functionality fully operational with single-tab behavior and smooth transitions
 - July 02, 2025: **Major UI Restructure: 5-Tab Navigation System** - Complete sidebar reorganization for better UX
   - ✅ Restructured navigation from individual feature links to 5 main tabs: Plan, Create, Publish, Optimize, Monetize
   - ✅ Organized all 15+ AI tools into logical, focused workspaces for better user experience

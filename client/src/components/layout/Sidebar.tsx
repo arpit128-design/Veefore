@@ -85,6 +85,7 @@ const mainTabs = [
 
 // Bottom navigation items (workspace management & remaining features)
 const bottomNavItems = [
+  { href: "/analyzer", icon: BarChart3, label: "Analyser", color: "text-green-400" },
   { href: "/automation", icon: Bot, label: "Automation", color: "text-orange-400" },
   { href: "/conversations", icon: MessageCircle, label: "Conversations", color: "text-blue-500" },
   { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },

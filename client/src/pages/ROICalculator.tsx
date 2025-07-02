@@ -83,9 +83,30 @@ export default function ROICalculator() {
 
   // Calculate ROI mutation
   const calculateMutation = useMutation({
-    mutationFn: async (data: ROIInput): Promise<ROIResult> => {
-      const response = await apiRequest('POST', '/api/ai/roi-calculator', data);
-      return response.json();
+    mutationFn: async (data: ROIInput) => {
+      const result = await apiRequest('POST', '/api/ai/roi-calculator', {
+        campaignId: `roi_${Date.now()}`,
+        investment: data.investment,
+        revenue: data.metrics.revenue,
+        costs: {
+          adSpend: data.costs.advertising,
+          contentCreation: data.costs.contentCreation,
+          toolsAndSoftware: data.costs.tools,
+          personnel: 0,
+          other: data.costs.other
+        },
+        metrics: {
+          impressions: data.metrics.reach,
+          clicks: Math.floor(data.metrics.reach * 0.03), // 3% CTR estimate
+          conversions: data.metrics.conversions,
+          engagementRate: data.metrics.engagement,
+          reachRate: data.metrics.reach > 0 ? (data.metrics.engagement / data.metrics.reach) * 100 : 0
+        },
+        timeframe: data.timeframe,
+        industry: data.industry,
+        platform: data.platform
+      });
+      return result;
     },
     onSuccess: (data: ROIResult) => {
       setROIResult(data);
@@ -113,31 +134,7 @@ export default function ROICalculator() {
     }
   });
 
-  // Mock ROI result for demonstration
-  const mockROIResult: ROIResult = {
-    roi: 285,
-    profit: 4250,
-    costPerConversion: 12.50,
-    revenuePerFollower: 0.85,
-    engagementValue: 2.30,
-    projections: {
-      month1: 1200,
-      month3: 3800,
-      month6: 7500,
-      month12: 15200
-    },
-    benchmarks: {
-      industry: 220,
-      platform: 195,
-      category: 'Above Average'
-    },
-    recommendations: [
-      'Increase video content production by 40% for better engagement',
-      'Focus on Stories and Reels which show 65% higher ROI',
-      'Optimize posting times to Tuesday 2-4 PM and Friday 6-8 PM',
-      'Consider micro-influencer partnerships for cost-effective reach'
-    ]
-  };
+
 
   const handleCalculateROI = () => {
     const totalCosts = Object.values(roiInput.costs).reduce((sum, cost) => sum + cost, 0);

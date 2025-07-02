@@ -24,6 +24,7 @@ import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
 import { canvasThumbnailGenerator } from './canvas-thumbnail-generator';
 import { generateCompetitorAnalysis } from './competitor-analysis-ai';
 import { abTestingAI } from './ab-testing-ai';
+import { personaSuggestionsAI } from './persona-suggestions-ai';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -11014,6 +11015,79 @@ Format the response as JSON with this structure:
       console.error('[A/B TESTING AI] Strategy generation failed:', error);
       res.status(500).json({ 
         error: 'Failed to generate A/B testing strategy',
+        details: error.message 
+      });
+    }
+  });
+
+  // Persona-Based Suggestions AI - 5 credits
+  app.post('/api/ai/persona-suggestions', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { 
+        industry,
+        audience,
+        brandTone,
+        goals,
+        currentChallenges,
+        platforms,
+        contentTypes,
+        brandValues,
+        competitorExamples,
+        budget,
+        timeframe
+      } = req.body;
+
+      if (!industry || !audience || !brandTone || !goals || !currentChallenges || !platforms || !contentTypes || !timeframe) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: industry, audience, brandTone, goals, currentChallenges, platforms, contentTypes, timeframe' 
+        });
+      }
+
+      // Check credits - 5 credits for persona-based suggestions
+      const creditCost = 5;
+      const hasCredits = await creditService.hasCredits(userId, 'persona-suggestions');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'persona-suggestions',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const suggestions = await personaSuggestionsAI.generatePersonaSuggestions({
+        industry,
+        audience,
+        brandTone,
+        goals: Array.isArray(goals) ? goals : [goals],
+        currentChallenges: Array.isArray(currentChallenges) ? currentChallenges : [currentChallenges],
+        platforms: Array.isArray(platforms) ? platforms : [platforms],
+        contentTypes: Array.isArray(contentTypes) ? contentTypes : [contentTypes],
+        brandValues,
+        competitorExamples,
+        budget: budget ? parseInt(budget) : undefined,
+        timeframe
+      });
+
+      // Consume credits after successful generation
+      await creditService.consumeCredits(userId, 'persona-suggestions', 1, 'Persona-based content suggestions generation');
+
+      // Get updated credits
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        suggestions,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[PERSONA SUGGESTIONS AI] Generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate persona-based suggestions',
         details: error.message 
       });
     }

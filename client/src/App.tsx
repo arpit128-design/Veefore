@@ -57,6 +57,7 @@ import AffiliateEngine from "@/pages/AffiliateEngine";
 import SocialListening from "@/pages/SocialListening";
 import SmartLegalAssistant from "@/pages/SmartLegalAssistant";
 import ContentTheftDetection from "@/pages/ContentTheftDetection";
+import PersonaSuggestions from "@/pages/PersonaSuggestions";
 import Gamification from "@/pages/Gamification";
 import EmotionAnalysis from "@/pages/EmotionAnalysis";
 
@@ -118,6 +119,7 @@ function AuthenticatedApp() {
               <Route path="/social-listening" component={SocialListening} />
               <Route path="/legal-assistant" component={SmartLegalAssistant} />
               <Route path="/content-theft-detection" component={ContentTheftDetection} />
+              <Route path="/persona-suggestions" component={PersonaSuggestions} />
               <Route path="/gamification" component={Gamification} />
               <Route path="/emotion-analysis" component={EmotionAnalysis} />
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />

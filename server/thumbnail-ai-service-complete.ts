@@ -95,22 +95,34 @@ export async function processUserInput(input: ThumbnailInput): Promise<boolean> 
 export async function generateThumbnailStrategy(input: ThumbnailInput): Promise<GPTPromptResponse> {
   console.log('[STAGE 2] Generating thumbnail strategy with GPT-4');
   
-  const prompt = `You are a viral video thumbnail strategist. Based on the following inputs:
-- Title: ${input.title}
+  const prompt = `You are a viral YouTube thumbnail strategist analyzing: "${input.title}"
+
+Create a scroll-stopping thumbnail strategy inspired by top-performing YouTube channels with 10M+ views.
+
+TITLE ANALYSIS:
+- Video Title: ${input.title}
 - Description: ${input.description || 'No description provided'}
 - Category: ${input.category}
 
-Return in JSON format:
-1. 3 Short attention-grabbing thumbnail texts (<6 words)
-2. 2 CTA badge texts
-3. Suggested font families and font styles
-4. Suggested color palettes (background, title, CTA)
-5. Visual style tag (e.g. luxury, chaos, mystery)
-6. Emotion type (e.g. shock, success, sadness, urgency)
-7. Hook keyword suggestions (e.g. SECRET, EXPOSED)
-8. Placement suggestions (e.g. left-face, right-text, top-badge)
+Generate viral thumbnail elements that match professional YouTuber standards like MrBeast, Sidemen, Logan Paul, etc.
 
-Respond with valid JSON only, no additional text.`;
+Return JSON with:
+{
+  "titles": [3 bold, dramatic text overlays under 4 words each - use ALL CAPS when impactful],
+  "ctas": [2 urgent action phrases like "WATCH NOW", "LAST CHANCE"],
+  "fonts": ["Bold Sans-Serif fonts like Anton, Impact, Bebas Neue"],
+  "colors": {
+    "background": "dramatic background color hex",
+    "title": "high-contrast title color hex", 
+    "cta": "urgent CTA color hex (reds/oranges for urgency)"
+  },
+  "style": "viral style keyword (dramatic/luxury/chaos/mystery/hype)",
+  "emotion": "primary emotion to trigger (shock/excitement/curiosity/urgency/fear)",
+  "hooks": ["3-4 viral hook words like EXPOSED, SECRET, TRUTH, REVEALED, LAST, FIRST"],
+  "placement": "optimal text placement for maximum impact"
+}
+
+Focus on creating thumbnails that immediately grab attention and trigger strong emotional responses. Think viral, dramatic, scroll-stopping impact.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -287,12 +299,30 @@ export async function generateThumbnailVariants(
 async function generateMasterThumbnail(input: ThumbnailInput, gptResponse: GPTPromptResponse): Promise<{ url: string; buffer: Buffer }> {
   console.log('[STAGE 3] Generating master thumbnail with DALL-E 3');
   
-  const dallePrompt = `Create a professional YouTube thumbnail for "${input.title}". 
-Style: ${gptResponse.style}, Emotion: ${gptResponse.emotion}. 
-Visual style: ${gptResponse.colors.background} background with ${gptResponse.colors.title} text.
-Include elements suggesting: ${gptResponse.hooks.join(', ')}.
-High-quality, eye-catching, professional thumbnail design.
-Dimensions: 1280x720 pixels, YouTube thumbnail format.`;
+  const dallePrompt = `Create a professional, scroll-stopping YouTube thumbnail for "${input.title}".
+
+STYLE REQUIREMENTS:
+- Bold, dramatic visual with high contrast colors
+- Professional YouTube thumbnail aesthetic similar to top YouTubers
+- Dramatic lighting and cinematic composition
+- Clear focal point with emotional expression
+- High-impact visual that immediately grabs attention
+
+CONTENT ELEMENTS:
+- Subject matter directly related to: ${input.title}
+- Visual style: ${gptResponse.style} with ${gptResponse.emotion} emotion
+- Include dramatic visual elements suggesting: ${gptResponse.hooks.join(', ')}
+- Use color scheme: ${gptResponse.colors.background} background, ${gptResponse.colors.title} accents
+
+VISUAL SPECIFICATIONS:
+- 16:9 aspect ratio (YouTube thumbnail format)
+- HD quality with sharp details
+- Bold, readable text space allocation
+- Professional graphic design quality
+- Eye-catching thumbnail that increases click-through rate
+- Inspired by viral YouTube thumbnails with dramatic visual impact
+
+Create a thumbnail that looks like it belongs on a top-performing YouTube channel with millions of views.`;
 
   try {
     const response = await openai.images.generate({
@@ -303,6 +333,10 @@ Dimensions: 1280x720 pixels, YouTube thumbnail format.`;
       quality: 'hd',
     });
 
+    if (!response.data || response.data.length === 0) {
+      throw new Error('No data returned from DALL-E');
+    }
+    
     const imageUrl = response.data[0].url;
     if (!imageUrl) {
       throw new Error('No image URL returned from DALL-E');

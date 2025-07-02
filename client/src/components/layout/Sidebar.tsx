@@ -282,28 +282,29 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Footer Navigation Bar - Simplified for mobile */}
+        {/* Footer Navigation Bar - Mobile with expandable features */}
         <nav className="glassmorphism border-t border-electric-cyan/20">
           <div className="grid grid-cols-5 h-16">
             {/* Main tabs for mobile */}
             {mainTabs.slice(0, 4).map((tab) => {
               const isActive = isTabActive(tab);
-              const href = tab.href || (tab.features && tab.features[0]?.href) || "#";
+              const tabExpanded = expandedTabs.includes(tab.id);
               
               return (
-                <Link
+                <Button
                   key={tab.id}
-                  href={href}
+                  variant="ghost"
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 transition-all group",
+                    "flex flex-col items-center justify-center space-y-1 transition-all group h-full rounded-none",
                     isActive 
                       ? "holographic bg-opacity-30" 
                       : "hover:bg-cosmic-blue"
                   )}
+                  onClick={() => toggleTab(tab.id)}
                 >
                   <tab.icon className={cn("h-5 w-5", tab.color)} />
                   <span className="text-xs font-medium truncate">{tab.label}</span>
-                </Link>
+                </Button>
               );
             })}
 
@@ -322,6 +323,52 @@ export function Sidebar() {
               <span className="text-xs font-medium">More</span>
             </Button>
           </div>
+          
+          {/* Mobile expanded features overlay */}
+          {expandedTabs.map(tabId => {
+            const tab = mainTabs.find(t => t.id === tabId);
+            if (!tab?.features || location?.includes('/dashboard')) return null;
+            
+            return (
+              <div 
+                key={tabId}
+                className="absolute bottom-16 left-0 right-0 bg-cosmic-black/95 backdrop-blur-xl border-t border-electric-cyan/20 p-4 max-h-60 overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                    <tab.icon className={cn("h-4 w-4", tab.color)} />
+                    {tab.label} Features
+                  </h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => toggleTab(tabId)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {tab.features.map((feature) => (
+                    <Link
+                      key={feature.href}
+                      href={feature.href}
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-lg transition-all group",
+                        location === feature.href
+                          ? "holographic text-white"
+                          : "hover:bg-cosmic-blue text-asteroid-silver hover:text-white"
+                      )}
+                      onClick={() => setExpandedTabs([])}
+                    >
+                      <feature.icon className={cn("h-4 w-4 flex-shrink-0", feature.color)} />
+                      <span className="text-xs truncate">{feature.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
       </div>
     </>

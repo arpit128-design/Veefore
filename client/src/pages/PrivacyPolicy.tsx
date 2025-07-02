@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Shield, Eye, Lock, Database, Users, Globe, FileText, ArrowLeft, AlertTriangle, CheckCircle, UserX, Settings, Clock, Mail } from 'lucide-react';
+import { Shield, Eye, Lock, Database, Users, Globe, FileText, ArrowLeft, AlertTriangle, CheckCircle, UserX, Settings, Clock, Mail, Phone, Scale } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 
@@ -166,11 +166,87 @@ export function PrivacyPolicy() {
           </div>
         </motion.div>
 
-        {/* Table of Contents */}
+        {/* Quick Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          className="mb-12 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-center">Quick Navigation</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a
+              href="#introduction"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <FileText className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Introduction</span>
+            </a>
+            
+            <a
+              href="#information-collection"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Database className="w-6 h-6 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Data Collection</span>
+            </a>
+            
+            <a
+              href="#information-use"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Settings className="w-6 h-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Data Usage</span>
+            </a>
+            
+            <a
+              href="#security-measures"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Shield className="w-6 h-6 text-orange-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Security</span>
+            </a>
+            
+            <a
+              href="#user-rights"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Users className="w-6 h-6 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Your Rights</span>
+            </a>
+            
+            <a
+              href="#cookies-tracking"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Eye className="w-6 h-6 text-yellow-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Cookies</span>
+            </a>
+            
+            <a
+              href="#compliance"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Scale className="w-6 h-6 text-red-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Compliance</span>
+            </a>
+            
+            <a
+              href="#contact-information"
+              className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
+            >
+              <Phone className="w-6 h-6 text-pink-400 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="text-sm text-white/70 group-hover:text-white text-center">Contact</span>
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Table of Contents */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="mb-12 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
         >
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
@@ -515,6 +591,56 @@ export function PrivacyPolicy() {
               For urgent matters involving data breaches or security concerns, we will respond 
               within 72 hours as required by applicable regulations.
             </p>
+          </div>
+        </motion.div>
+
+        {/* Contact Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="mb-12 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center"
+        >
+          <h2 className="text-2xl font-bold mb-6 flex items-center justify-center gap-3">
+            <Phone className="w-6 h-6 text-blue-400" />
+            Contact Us
+          </h2>
+          
+          <p className="text-white/70 mb-8 max-w-2xl mx-auto">
+            If you have any questions about this Privacy Policy or need to exercise your rights, please contact us:
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <Mail className="w-8 h-8 text-blue-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Email Support</h3>
+              <p className="text-white/60 text-sm">privacy@veefore.com</p>
+              <p className="text-white/60 text-sm">legal@veefore.com</p>
+            </div>
+            
+            <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <Globe className="w-8 h-8 text-green-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Company Information</h3>
+              <p className="text-white/60 text-sm">VEEFED TECHNOLOGIES PRIVATE LIMITED</p>
+              <p className="text-white/60 text-sm">India</p>
+            </div>
+          </div>
+          
+          <div className="mt-6 flex justify-center gap-4">
+            <Button
+              onClick={() => setLocation('/terms-of-service')}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              Terms of Service
+            </Button>
+            <Button
+              onClick={() => setLocation('/about')}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              About Us
+            </Button>
           </div>
         </motion.div>
 

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FileText, ArrowLeft, Scale, Shield, Users, CreditCard, AlertTriangle, CheckCircle, Globe, Eye } from 'lucide-react';
+import { FileText, ArrowLeft, Scale, Shield, Users, CreditCard, AlertTriangle, CheckCircle, Globe, Eye, Phone, Mail } from 'lucide-react';
 import { useLocation, Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 
@@ -448,24 +448,48 @@ export function TermsOfService() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="mt-12 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm rounded-2xl p-8 border border-purple-300/20"
+          className="mt-12 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center"
         >
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <AlertTriangle className="w-6 h-6 text-yellow-400" />
-              <h2 className="text-2xl font-semibold">Need Help or Have Questions?</h2>
+          <h2 className="text-2xl font-bold mb-6 flex items-center justify-center gap-3">
+            <Phone className="w-6 h-6 text-blue-400" />
+            Contact Us
+          </h2>
+          
+          <p className="text-white/70 mb-8 max-w-2xl mx-auto">
+            If you have any questions about these Terms of Service or need assistance, please contact us:
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <Mail className="w-8 h-8 text-blue-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Email Support</h3>
+              <p className="text-white/60 text-sm">legal@veefore.com</p>
+              <p className="text-white/60 text-sm">support@veefore.com</p>
             </div>
             
-            <p className="text-white/80 mb-6 max-w-2xl mx-auto">
-              If you have any questions about these Terms of Service or need assistance, 
-              please contact us through our support channels within the Veefore platform.
-            </p>
-            
-            <div className="space-y-2 text-sm text-white/60">
-              <p>VEEFED TECHNOLOGIES PRIVATE LIMITED</p>
-              <p>Email: legal@veefore.com</p>
-              <p>Support: support@veefore.com</p>
+            <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+              <Globe className="w-8 h-8 text-green-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Company Information</h3>
+              <p className="text-white/60 text-sm">VEEFED TECHNOLOGIES PRIVATE LIMITED</p>
+              <p className="text-white/60 text-sm">India</p>
             </div>
+          </div>
+          
+          <div className="flex justify-center gap-4">
+            <Button
+              onClick={() => setLocation('/privacy-policy')}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              Privacy Policy
+            </Button>
+            <Button
+              onClick={() => setLocation('/about')}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              About Us
+            </Button>
           </div>
         </motion.div>
 

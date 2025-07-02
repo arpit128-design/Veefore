@@ -77,10 +77,8 @@ export default function ContentRepurpose() {
 
       console.log('[CONTENT REPURPOSE] Sending request:', repurposeData);
 
-      const response = await apiRequest('/api/ai/content-repurpose', {
-        method: 'POST',
-        body: JSON.stringify(repurposeData)
-      });
+      const res = await apiRequest('POST', '/api/ai/content-repurpose', repurposeData);
+      const response = await res.json();
 
       console.log('[CONTENT REPURPOSE] Received response:', response);
 

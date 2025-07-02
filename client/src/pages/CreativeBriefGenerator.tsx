@@ -84,7 +84,8 @@ export default function CreativeBriefGenerator() {
 
   const generateBriefMutation = useMutation({
     mutationFn: async (data: CreativeBriefFormData) => {
-      return apiRequest('/api/ai/creative-brief', data);
+      const res = await apiRequest('POST', '/api/ai/creative-brief', data);
+      return res.json();
     },
     onSuccess: (data) => {
       setGeneratedBrief(data);

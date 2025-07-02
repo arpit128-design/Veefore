@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +70,12 @@ export default function Gamification() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const { toast } = useToast();
 
+  // Fetch real gamification data from API
+  const { data: gamificationData, isLoading, error } = useQuery({
+    queryKey: ['/api/gamification/stats'],
+    queryFn: () => apiRequest('GET', '/api/gamification/stats')
+  });
+
   const joinChallengeMutation = useMutation({
     mutationFn: (challengeId: string) => 
       apiRequest('POST', '/api/gamification/join-challenge', { challengeId }),
@@ -100,21 +106,14 @@ export default function Gamification() {
     claimRewardMutation.mutate(achievementId);
   };
 
-  // Mock data for demonstration
-  const mockUserStats: UserStats = {
-    level: 12,
-    totalPoints: 2450,
-    pointsToNextLevel: 550,
-    currentStreak: 7,
-    longestStreak: 21,
-    completedChallenges: 15,
-    rank: 3,
-    totalUsers: 1250,
-    badges: 8,
-    achievements: 23
+  // Use real data from API with fallback for loading states
+  const userStats: UserStats = gamificationData?.userStats || {
+    level: 0, totalPoints: 0, pointsToNextLevel: 0, currentStreak: 0,
+    longestStreak: 0, completedChallenges: 0, rank: 0, totalUsers: 0,
+    badges: 0, achievements: 0
   };
 
-  const mockAchievements: Achievement[] = [
+  const achievements: Achievement[] = gamificationData?.achievements || [
     {
       id: '1',
       title: 'Content Creator',

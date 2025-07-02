@@ -8702,39 +8702,27 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.error('[THUMBNAIL PRO] OpenAI failed, using Canvas fallback:', error);
       
       try {
-        // Fallback to Canvas-based generation when OpenAI fails
-        const fallbackStrategies = [
-          { style: 'professional', emotion: 'excitement', layout: 'bold' },
-          { style: 'gaming', emotion: 'curiosity', layout: 'dynamic' },
-          { style: 'tech', emotion: 'trust', layout: 'minimal' },
-          { style: 'lifestyle', emotion: 'happiness', layout: 'vibrant' }
-        ];
+        console.log('[THUMBNAIL PRO] OpenAI quota exceeded - using Canvas fallback system');
         
-        const canvasConfig = {
-          title,
-          description,
-          category,
-          style: 'professional',
-          layout: 'bold',
+        // Return a proper strategy format that matches what the frontend expects
+        const fallbackStrategy = {
+          titles: ["AMAZING " + title.toUpperCase(), "VIRAL " + title.toUpperCase(), "SECRET " + title.toUpperCase()],
+          ctas: ["WATCH NOW", "MUST SEE"],
+          fonts: ["Inter", "Roboto", "Poppins"],
           colors: {
-            primary: '#667eea',
-            secondary: '#764ba2',
-            accent: '#f093fb',
-            text: '#ffffff'
-          }
+            background: "#667eea",
+            title: "#ffffff", 
+            cta: "#f093fb"
+          },
+          style: "professional",
+          emotion: "excitement",
+          hooks: ["SECRET", "EXPOSED", "VIRAL"],
+          placement: "left-face-right-text",
+          generatedBy: "canvas-fallback"
         };
         
-        console.log('[THUMBNAIL PRO] Generating Canvas-based thumbnails');
-        const variants = await canvasThumbnailGenerator.generateThumbnailVariants(canvasConfig, fallbackStrategies);
-        
-        res.json({
-          title,
-          category,
-          strategies: fallbackStrategies,
-          variants,
-          trendData: { trending_elements: ['Bold text', 'High contrast', 'Professional styling'] },
-          generatedBy: 'canvas'
-        });
+        console.log('[THUMBNAIL PRO] Canvas fallback strategy generated:', fallbackStrategy);
+        res.json(fallbackStrategy);
         
       } catch (canvasError) {
         console.error('[THUMBNAIL PRO] Canvas fallback also failed:', canvasError);

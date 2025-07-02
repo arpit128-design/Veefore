@@ -94,7 +94,7 @@ const bottomNavItems = [
 ];
 
 export function Sidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [expandedTabs, setExpandedTabs] = useState<string[]>([]);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -119,14 +119,10 @@ export function Sidebar() {
   }, [location]);
 
   const toggleTab = (tabId: string) => {
-    console.log('[MOBILE TAB] Toggling tab:', tabId);
-    console.log('[MOBILE TAB] Current expandedTabs:', expandedTabs);
-    
     // For mobile: only allow one tab open at a time
-    const newTabs = expandedTabs.includes(tabId) ? [] : [tabId];
-    console.log('[MOBILE TAB] Setting new tabs:', newTabs);
-    
-    setExpandedTabs(newTabs);
+    setExpandedTabs(prev => 
+      prev.includes(tabId) ? [] : [tabId]
+    );
     // Close more menu when opening tab
     setShowMoreMenu(false);
   };
@@ -314,8 +310,8 @@ export function Sidebar() {
                   )}
                   onClick={() => {
                     if (tab.href) {
-                      // Dashboard button - navigate directly
-                      window.location.href = tab.href;
+                      // Dashboard button - navigate smoothly using setLocation
+                      setLocation(tab.href);
                     } else {
                       // Other tabs - toggle overlay
                       toggleTab(tab.id);

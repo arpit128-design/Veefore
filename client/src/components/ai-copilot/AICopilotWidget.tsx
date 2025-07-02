@@ -260,7 +260,7 @@ export function AICopilotWidget() {
   if (!isOpen) {
     return (
       <motion.div
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-20 right-6 z-40 md:bottom-6 md:z-50"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -279,7 +279,7 @@ export function AICopilotWidget() {
   return (
     <motion.div
       className={cn(
-        "fixed bottom-6 right-6 z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl flex flex-col",
+        "fixed bottom-20 right-6 z-40 md:bottom-6 md:z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl flex flex-col",
         isMinimized ? "h-16" : "h-[500px] max-h-[calc(100vh-8rem)]",
         "w-96 max-w-[calc(100vw-3rem)]"
       )}

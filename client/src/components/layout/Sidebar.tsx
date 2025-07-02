@@ -283,7 +283,7 @@ export function Sidebar() {
         )}
 
         {/* Footer Navigation Bar - Mobile with expandable features */}
-        <nav className="glassmorphism border-t border-electric-cyan/20">
+        <nav className="glassmorphism border-t border-electric-cyan/20 z-50 relative">
           <div className="grid grid-cols-5 h-16">
             {/* Main tabs for mobile */}
             {mainTabs.slice(0, 4).map((tab) => {
@@ -332,7 +332,8 @@ export function Sidebar() {
             return (
               <div 
                 key={tabId}
-                className="absolute bottom-16 left-0 right-0 bg-cosmic-black/95 backdrop-blur-xl border-t border-electric-cyan/20 p-4 max-h-60 overflow-y-auto"
+                className="absolute bottom-16 left-0 right-0 backdrop-blur-xl border-t border-electric-cyan/30 p-4 max-h-60 overflow-y-auto glassmorphism z-40"
+                style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)' }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-white flex items-center gap-2">

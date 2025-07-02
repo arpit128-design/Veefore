@@ -6,11 +6,13 @@ import {
   Suggestion, CreditTransaction, Referral, Subscription, Payment, Addon,
   WorkspaceMember, TeamInvitation, ContentRecommendation, UserContentHistory,
   Admin, AdminSession, Notification, Popup, AppSetting, AuditLog, FeedbackMessage,
+  CreativeBrief, ContentRepurpose, CompetitorAnalysis,
   InsertUser, InsertWorkspace, InsertSocialAccount, InsertContent,
   InsertAutomationRule, InsertAnalytics, InsertSuggestion,
   InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon,
   InsertWorkspaceMember, InsertTeamInvitation, InsertContentRecommendation, InsertUserContentHistory,
-  InsertAdmin, InsertAdminSession, InsertNotification, InsertPopup, InsertAppSetting, InsertAuditLog, InsertFeedbackMessage
+  InsertAdmin, InsertAdminSession, InsertNotification, InsertPopup, InsertAppSetting, InsertAuditLog, InsertFeedbackMessage,
+  InsertCreativeBrief, InsertContentRepurpose, InsertCompetitorAnalysis
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -386,6 +388,71 @@ const FeedbackMessageSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// AI Features Schemas
+const CreativeBriefSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  title: { type: String, required: true },
+  targetAudience: { type: String, required: true },
+  platforms: { type: mongoose.Schema.Types.Mixed, required: true }, // JSON array
+  campaignGoals: { type: mongoose.Schema.Types.Mixed, required: true }, // JSON array
+  tone: { type: String, required: true },
+  style: { type: String, required: true },
+  industry: { type: String, required: true },
+  deadline: Date,
+  budget: Number,
+  briefContent: { type: String, required: true }, // AI-generated content
+  keyMessages: { type: mongoose.Schema.Types.Mixed }, // JSON array
+  contentFormats: { type: mongoose.Schema.Types.Mixed }, // JSON array
+  hashtags: { type: mongoose.Schema.Types.Mixed }, // JSON array
+  references: { type: mongoose.Schema.Types.Mixed }, // JSON array
+  status: { type: String, default: 'draft' },
+  creditsUsed: { type: Number, default: 5 },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const ContentRepurposeSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  originalContentId: { type: mongoose.Schema.Types.Mixed },
+  sourceLanguage: { type: String, required: true },
+  targetLanguage: { type: String, required: true },
+  sourceContent: { type: String, required: true },
+  repurposedContent: { type: String, required: true },
+  contentType: { type: String, required: true },
+  culturalAdaptations: { type: mongoose.Schema.Types.Mixed },
+  toneAdjustments: { type: mongoose.Schema.Types.Mixed },
+  platform: { type: String, required: true },
+  qualityScore: Number,
+  isApproved: { type: Boolean, default: false },
+  creditsUsed: { type: Number, default: 3 },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const CompetitorAnalysisSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  competitorUsername: { type: String, required: true },
+  platform: { type: String, required: true },
+  analysisType: { type: String, required: true },
+  scrapedData: { type: mongoose.Schema.Types.Mixed, required: true },
+  analysisResults: { type: mongoose.Schema.Types.Mixed, required: true },
+  topPerformingPosts: { type: mongoose.Schema.Types.Mixed },
+  contentPatterns: { type: mongoose.Schema.Types.Mixed },
+  hashtags: { type: mongoose.Schema.Types.Mixed },
+  postingSchedule: { type: mongoose.Schema.Types.Mixed },
+  engagementRate: Number,
+  growthRate: Number,
+  recommendations: { type: String, required: true },
+  competitorScore: Number,
+  lastScraped: { type: Date, default: Date.now },
+  creditsUsed: { type: Number, default: 8 },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
@@ -415,6 +482,11 @@ const PopupModel = mongoose.model('Popup', PopupSchema);
 const AppSettingModel = mongoose.model('AppSetting', AppSettingSchema);
 const AuditLogModel = mongoose.model('AuditLog', AuditLogSchema);
 const FeedbackMessageModel = mongoose.model('FeedbackMessage', FeedbackMessageSchema);
+
+// AI Features Models
+const CreativeBriefModel = mongoose.model('CreativeBrief', CreativeBriefSchema);
+const ContentRepurposeModel = mongoose.model('ContentRepurpose', ContentRepurposeSchema);
+const CompetitorAnalysisModel = mongoose.model('CompetitorAnalysis', CompetitorAnalysisSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;

@@ -3,20 +3,20 @@ import {
   automationRules, suggestions, creditTransactions, referrals,
   subscriptions, payments, addons, contentRecommendations, userContentHistory,
   admins, adminSessions, notifications, popups, appSettings, auditLogs, feedbackMessages,
-  creativeBriefs, contentRepurposes,
+  creativeBriefs, contentRepurposes, competitorAnalyses,
   type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
   type Payment, type Addon, type ContentRecommendation, type UserContentHistory,
   type Admin, type AdminSession, type Notification, type Popup, type AppSetting, type AuditLog, type FeedbackMessage,
-  type CreativeBrief, type ContentRepurpose,
+  type CreativeBrief, type ContentRepurpose, type CompetitorAnalysis,
   type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
   type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
   type InsertSubscription, type InsertPayment, type InsertAddon,
   type InsertContentRecommendation, type InsertUserContentHistory,
   type InsertAdmin, type InsertNotification, type InsertPopup, type InsertAppSetting, type InsertAuditLog, type InsertFeedbackMessage,
-  type InsertCreativeBrief, type InsertContentRepurpose
+  type InsertCreativeBrief, type InsertContentRepurpose, type InsertCompetitorAnalysis
 } from "@shared/schema";
 
 export interface IStorage {
@@ -252,6 +252,13 @@ export interface IStorage {
   getContentRepurposesByWorkspace(workspaceId: number): Promise<ContentRepurpose[]>;
   updateContentRepurpose(id: number, updates: Partial<ContentRepurpose>): Promise<ContentRepurpose>;
   deleteContentRepurpose(id: number): Promise<void>;
+
+  // Competitor Analysis operations
+  createCompetitorAnalysis(analysis: InsertCompetitorAnalysis): Promise<CompetitorAnalysis>;
+  getCompetitorAnalysis(id: number): Promise<CompetitorAnalysis | undefined>;
+  getCompetitorAnalysesByWorkspace(workspaceId: number): Promise<CompetitorAnalysis[]>;
+  updateCompetitorAnalysis(id: number, updates: Partial<CompetitorAnalysis>): Promise<CompetitorAnalysis>;
+  deleteCompetitorAnalysis(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {

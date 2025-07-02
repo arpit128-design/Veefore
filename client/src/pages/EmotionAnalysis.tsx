@@ -83,13 +83,13 @@ export default function EmotionAnalysis() {
 
   const analyzeEmotionMutation = useMutation({
     mutationFn: async (data: { content?: string; url?: string; type: string; audience?: string }) => {
-      const response = await apiRequest('POST', '/api/ai/emotion-analysis', {
+      const result = await apiRequest('POST', '/api/ai/emotion-analysis', {
         content: data.content || data.url || '',
         contentType: data.type,
         targetAudience: data.audience || 'general',
         platform: 'instagram'
       });
-      return response as EmotionAnalysis;
+      return result;
     },
     onSuccess: (data) => {
       setEmotionResult(data);
@@ -433,28 +433,28 @@ export default function EmotionAnalysis() {
                       <CardContent className="space-y-3">
                         <div>
                           <span className="text-sm text-gray-400">Plutchik Analysis:</span>
-                          <p className="text-sm text-gray-300">{mockEmotionAnalysis.psychologicalInsights.plutchikWheel}</p>
+                          <p className="text-sm text-gray-300">{emotionResult.psychologicalInsights.plutchikWheel}</p>
                         </div>
                         <div>
                           <span className="text-sm text-gray-400">Cognitive Appraisal:</span>
-                          <p className="text-sm text-gray-300">{mockEmotionAnalysis.psychologicalInsights.cognitiveAppraisal}</p>
+                          <p className="text-sm text-gray-300">{emotionResult.psychologicalInsights.cognitiveAppraisal}</p>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-gray-400">Valence:</span>
                           <Badge className={
-                            mockEmotionAnalysis.psychologicalInsights.emotionalValence === 'positive' 
+                            emotionResult.psychologicalInsights.emotionalValence === 'positive' 
                               ? 'bg-green-900/50 text-green-300' 
-                              : mockEmotionAnalysis.psychologicalInsights.emotionalValence === 'negative'
+                              : emotionResult.psychologicalInsights.emotionalValence === 'negative'
                               ? 'bg-red-900/50 text-red-300'
                               : 'bg-gray-900/50 text-gray-300'
                           }>
-                            {mockEmotionAnalysis.psychologicalInsights.emotionalValence}
+                            {emotionResult.psychologicalInsights.emotionalValence}
                           </Badge>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-gray-400">Arousal:</span>
                           <Badge className="bg-orange-900/50 text-orange-300">
-                            {mockEmotionAnalysis.psychologicalInsights.arousalLevel}
+                            {emotionResult.psychologicalInsights.arousalLevel}
                           </Badge>
                         </div>
                       </CardContent>
@@ -471,23 +471,23 @@ export default function EmotionAnalysis() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Expected Engagement</span>
-                            <span className="text-blue-400">{mockEmotionAnalysis.audienceResonance.expectedEngagement}%</span>
+                            <span className="text-blue-400">{emotionResult.audienceResonance.expectedEngagement}%</span>
                           </div>
-                          <Progress value={mockEmotionAnalysis.audienceResonance.expectedEngagement} className="h-2" />
+                          <Progress value={emotionResult.audienceResonance.expectedEngagement} className="h-2" />
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Emotional Contagion</span>
-                            <span className="text-purple-400">{mockEmotionAnalysis.audienceResonance.emotionalContagion}%</span>
+                            <span className="text-purple-400">{emotionResult.audienceResonance.emotionalContagion}%</span>
                           </div>
-                          <Progress value={mockEmotionAnalysis.audienceResonance.emotionalContagion} className="h-2" />
+                          <Progress value={emotionResult.audienceResonance.emotionalContagion} className="h-2" />
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Viral Potential</span>
-                            <span className="text-green-400">{mockEmotionAnalysis.audienceResonance.viralPotential}%</span>
+                            <span className="text-green-400">{emotionResult.audienceResonance.viralPotential}%</span>
                           </div>
-                          <Progress value={mockEmotionAnalysis.audienceResonance.viralPotential} className="h-2" />
+                          <Progress value={emotionResult.audienceResonance.viralPotential} className="h-2" />
                         </div>
                         <div className="pt-2 border-t border-gray-700">
                           <p className="text-xs text-gray-400">Best fit: {emotionResult.audienceResonance.demographicAppeal.age}, {emotionResult.audienceResonance.demographicAppeal.gender}</p>

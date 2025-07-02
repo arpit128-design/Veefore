@@ -61,11 +61,12 @@ export default function AffiliateEngine() {
   const discoverMutation = useMutation({
     mutationFn: (data: any) => apiRequest('POST', '/api/ai/affiliate-discovery', data),
     onSuccess: (data) => {
+      setDiscoveredOpportunities(data.opportunities || []);
       toast({
         title: "Opportunities Discovered!",
-        description: "Found new affiliate programs matching your criteria.",
+        description: `Found ${data.opportunities?.length || 0} affiliate programs matching your criteria.`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/affiliate-opportunities'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/ai/affiliate-discovery'] });
     },
     onError: (error: any) => {
       if (error.upgradeModal) {
@@ -84,111 +85,9 @@ export default function AffiliateEngine() {
     }
   });
 
-  // Mock affiliate opportunities
-  const mockOpportunities: AffiliateOpportunity[] = [
-    {
-      id: '1',
-      brand: 'FitTech Pro',
-      program: 'Fitness Equipment Affiliate',
-      commission: '8-12%',
-      cookieDuration: 45,
-      category: 'fitness',
-      rating: 4.8,
-      requirements: ['1K+ followers', 'Fitness niche', 'High engagement'],
-      description: 'Premium fitness equipment and accessories with high conversion rates',
-      joinUrl: 'https://fittech.com/affiliate',
-      estimatedEarnings: {
-        monthly: 1250,
-        perSale: 45,
-        conversionRate: 3.2
-      },
-      contentSuggestions: [
-        'Workout routine videos featuring equipment',
-        'Before/after transformation posts',
-        'Equipment review and comparison content',
-        'Home gym setup tutorials'
-      ],
-      pros: [
-        'High commission rates',
-        'Quality products with good reviews',
-        'Extended cookie duration',
-        'Excellent affiliate support'
-      ],
-      cons: [
-        'Higher price point products',
-        'Competitive niche',
-        'Minimum follower requirement'
-      ]
-    },
-    {
-      id: '2',
-      brand: 'CreatorTools',
-      program: 'Content Creation Software',
-      commission: '30%',
-      cookieDuration: 60,
-      category: 'technology',
-      rating: 4.6,
-      requirements: ['Content creator', 'Tech knowledge', '500+ followers'],
-      description: 'All-in-one content creation and editing software suite',
-      joinUrl: 'https://creatortools.com/partners',
-      estimatedEarnings: {
-        monthly: 890,
-        perSale: 89,
-        conversionRate: 2.8
-      },
-      contentSuggestions: [
-        'Software tutorial and walkthrough videos',
-        'Before/after editing comparisons',
-        'Productivity tips using the software',
-        'Creative workflow demonstrations'
-      ],
-      pros: [
-        'Very high commission rate',
-        'Recurring subscription model',
-        'Strong brand recognition',
-        'Great marketing materials provided'
-      ],
-      cons: [
-        'Software learning curve',
-        'Competitive market',
-        'Requires technical knowledge'
-      ]
-    },
-    {
-      id: '3',
-      brand: 'EcoBeauty',
-      program: 'Sustainable Beauty Products',
-      commission: '15%',
-      cookieDuration: 30,
-      category: 'beauty',
-      rating: 4.9,
-      requirements: ['Beauty content', 'Sustainability focus', '2K+ followers'],
-      description: 'Eco-friendly and cruelty-free beauty products with growing demand',
-      joinUrl: 'https://ecobeauty.com/affiliate',
-      estimatedEarnings: {
-        monthly: 675,
-        perSale: 22,
-        conversionRate: 4.1
-      },
-      contentSuggestions: [
-        'Sustainable beauty routine videos',
-        'Product reviews and tutorials',
-        'Eco-friendly lifestyle content',
-        'Natural makeup looks'
-      ],
-      pros: [
-        'Growing market trend',
-        'High-quality products',
-        'Strong brand values',
-        'Good conversion rates'
-      ],
-      cons: [
-        'Shorter cookie duration',
-        'Niche audience',
-        'Premium pricing'
-      ]
-    }
-  ];
+  // Real affiliate opportunities from AI API
+  const [discoveredOpportunities, setDiscoveredOpportunities] = useState<AffiliateOpportunity[]>([]);
+  const opportunities = discoveredOpportunities;
 
   // Mock commission data
   const mockCommissions: CommissionTracker[] = [
@@ -267,7 +166,7 @@ export default function AffiliateEngine() {
     return 'text-red-400';
   };
 
-  const filteredOpportunities = mockOpportunities.filter(opp => {
+  const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = searchQuery === '' || 
       opp.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
       opp.program.toLowerCase().includes(searchQuery.toLowerCase()) ||

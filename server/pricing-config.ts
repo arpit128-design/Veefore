@@ -212,6 +212,16 @@ export const CREDIT_COSTS = {
   'ai-reel': 15,
   'viral-remix': 15,
   
+  // Advanced AI Analysis Features
+  'trend-intelligence': 6, // Trend analysis and viral potential scoring
+  'viral-predictor': 5, // Content viral potential analysis
+  'affiliate-discovery': 4, // Affiliate opportunity discovery engine
+  'affiliate-engine': 4, // Alias for affiliate-discovery  
+  'social-listening': 4, // Brand monitoring and sentiment analysis
+  'content-theft-detection': 7, // Plagiarism and content theft detection
+  'emotion-analysis': 5, // Psychological content analysis
+  'roi-calculator': 3, // Campaign ROI analysis
+  
   // Other features (unchanged)
   'trend-forecast': 4,
   'dm-auto-responder': 0.2,

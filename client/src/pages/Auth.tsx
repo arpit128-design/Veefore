@@ -689,7 +689,7 @@ export default function Auth() {
           </AnimatePresence>
         </AuthCard>
 
-        {/* Footer */}
+        {/* Tagline */}
         <motion.div 
           className="text-center mt-8 text-white/40 text-sm"
           initial={{ opacity: 0 }}
@@ -697,29 +697,6 @@ export default function Auth() {
           transition={{ delay: 1, duration: 0.8 }}
         >
           <p>Join thousands of creators transforming their social media</p>
-          <div className="flex items-center justify-center gap-6 mt-4">
-            <Link href="/privacy-policy">
-              <motion.span
-                whileHover={{ scale: 1.05, color: "#ffffff" }}
-                className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
-              >
-                Privacy Policy
-              </motion.span>
-            </Link>
-            <Link href="/terms-of-service">
-              <motion.span
-                whileHover={{ scale: 1.05, color: "#ffffff" }}
-                className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer"
-              >
-                Terms of Service
-              </motion.span>
-            </Link>
-          </div>
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <p className="text-xs text-white/30">
-              © 2025 Veefore — A product of VEEFED TECHNOLOGIES PRIVATE LIMITED
-            </p>
-          </div>
         </motion.div>
       </div>
     </div>

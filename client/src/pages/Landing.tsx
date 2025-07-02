@@ -1516,113 +1516,7 @@ function CTASection() {
   );
 }
 
-// Footer
-function Footer() {
-  const footerSections = [
-    {
-      title: "Product",
-      links: [
-        { name: "Features", href: "/features" },
-        { name: "Pricing", href: "/pricing" },
-        { name: "Integrations", href: "/contact" },
-        { name: "API", href: "/help" },
-        { name: "Security", href: "/about" }
-      ]
-    },
-    {
-      title: "Solutions",
-      links: [
-        { name: "Creators", href: "/solutions" },
-        { name: "Small Business", href: "/solutions" },
-        { name: "Agencies", href: "/solutions" },
-        { name: "Enterprise", href: "/contact" },
-        { name: "E-commerce", href: "/solutions" }
-      ]
-    },
-    {
-      title: "Resources",
-      links: [
-        { name: "Blog", href: "/blog" },
-        { name: "Help Center", href: "/help" },
-        { name: "Webinars", href: "/contact" },
-        { name: "Templates", href: "/contact" },
-        { name: "Case Studies", href: "/blog" }
-      ]
-    },
-    {
-      title: "Company",
-      links: [
-        { name: "About", href: "/about" },
-        { name: "Careers", href: "/careers" },
-        { name: "Press", href: "/contact" },
-        { name: "Partners", href: "/contact" },
-        { name: "Contact", href: "/contact" }
-      ]
-    }
-  ];
 
-  return (
-    <footer className="bg-slate-900 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Logo and Description */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">VeeFore</span>
-            </div>
-            <p className="text-gray-400 leading-relaxed">
-              AI-powered social media management platform that helps creators and businesses grow their online presence with intelligent automation and analytics.
-            </p>
-            <div className="flex space-x-4">
-              <Instagram className="w-5 h-5 text-gray-400 hover:text-pink-400 cursor-pointer transition-colors" />
-              <Twitter className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
-              <Linkedin className="w-5 h-5 text-gray-400 hover:text-blue-600 cursor-pointer transition-colors" />
-              <Youtube className="w-5 h-5 text-gray-400 hover:text-red-400 cursor-pointer transition-colors" />
-            </div>
-          </div>
-
-          {/* Footer Links */}
-          {footerSections.map((section, index) => (
-            <div key={index} className="space-y-4">
-              <h3 className="text-white font-semibold">{section.title}</h3>
-              <ul className="space-y-2">
-                {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    <Link href={link.href}>
-                      <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">
-                        {link.name}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            © 2024 VeeFore. All rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 sm:mt-0">
-            <Link href="/privacy-policy">
-              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Privacy Policy</span>
-            </Link>
-            <Link href="/terms-of-service">
-              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Terms of Service</span>
-            </Link>
-            <Link href="/contact">
-              <span className="text-gray-400 hover:text-white transition-colors text-sm cursor-pointer">Cookie Policy</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // Enhanced Scroll to Top Button with Space Theme
 function ScrollToTopButton() {
@@ -1720,7 +1614,6 @@ export default function Landing() {
       </AnimatedSection>
       
       <CTASection />
-      <Footer />
       <ScrollToTopButton />
     </div>
   );

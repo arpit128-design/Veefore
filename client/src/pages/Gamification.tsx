@@ -153,7 +153,7 @@ export default function Gamification() {
     }
   ];
 
-  const mockChallenges: Challenge[] = [
+  const challenges: Challenge[] = gamificationData?.challenges || [
     {
       id: '1',
       title: 'January Growth Sprint',
@@ -192,7 +192,7 @@ export default function Gamification() {
     }
   ];
 
-  const mockLeaderboard: Leaderboard[] = [
+  const leaderboard: Leaderboard[] = gamificationData?.leaderboard || [
     { rank: 1, username: 'CreatorPro', level: 25, points: 5420, badges: 15 },
     { rank: 2, username: 'ViralMaster', level: 23, points: 4890, badges: 12 },
     { rank: 3, username: 'You', level: 12, points: 2450, badges: 8, isCurrentUser: true },
@@ -237,40 +237,40 @@ export default function Gamification() {
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center">
                   <Crown className="h-8 w-8 text-yellow-400" />
-                  <span className="text-2xl font-bold ml-2">{mockUserStats.level}</span>
+                  <span className="text-2xl font-bold ml-2">{userStats.level}</span>
                 </div>
                 <p className="text-sm text-gray-400">Level</p>
                 <div className="space-y-1">
-                  <Progress value={(mockUserStats.totalPoints % 1000) / 10} className="h-2" />
-                  <p className="text-xs text-gray-500">{mockUserStats.pointsToNextLevel} XP to next level</p>
+                  <Progress value={(userStats.totalPoints % 1000) / 10} className="h-2" />
+                  <p className="text-xs text-gray-500">{userStats.pointsToNextLevel} XP to next level</p>
                 </div>
               </div>
 
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center">
                   <Flame className="h-8 w-8 text-orange-400" />
-                  <span className="text-2xl font-bold ml-2">{mockUserStats.currentStreak}</span>
+                  <span className="text-2xl font-bold ml-2">{userStats.currentStreak}</span>
                 </div>
                 <p className="text-sm text-gray-400">Day Streak</p>
-                <p className="text-xs text-gray-500">Longest: {mockUserStats.longestStreak} days</p>
+                <p className="text-xs text-gray-500">Longest: {userStats.longestStreak} days</p>
               </div>
 
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center">
                   <Trophy className="h-8 w-8 text-purple-400" />
-                  <span className="text-2xl font-bold ml-2">#{mockUserStats.rank}</span>
+                  <span className="text-2xl font-bold ml-2">#{userStats.rank}</span>
                 </div>
                 <p className="text-sm text-gray-400">Global Rank</p>
-                <p className="text-xs text-gray-500">Top {Math.round((mockUserStats.rank / mockUserStats.totalUsers) * 100)}%</p>
+                <p className="text-xs text-gray-500">Top {Math.round((userStats.rank / userStats.totalUsers) * 100)}%</p>
               </div>
 
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center">
                   <Star className="h-8 w-8 text-blue-400" />
-                  <span className="text-2xl font-bold ml-2">{mockUserStats.totalPoints}</span>
+                  <span className="text-2xl font-bold ml-2">{userStats.totalPoints}</span>
                 </div>
                 <p className="text-sm text-gray-400">Total Points</p>
-                <p className="text-xs text-gray-500">{mockUserStats.achievements} achievements</p>
+                <p className="text-xs text-gray-500">{userStats.achievements} achievements</p>
               </div>
             </div>
           </CardContent>
@@ -341,7 +341,7 @@ export default function Gamification() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mockAchievements.map((achievement) => (
+                  {achievements.map((achievement) => (
                     <Card 
                       key={achievement.id} 
                       className={`bg-gray-800/50 border-gray-600 ${
@@ -444,7 +444,7 @@ export default function Gamification() {
                 </div>
 
                 <div className="space-y-4">
-                  {mockChallenges.map((challenge) => (
+                  {challenges.map((challenge) => (
                     <Card key={challenge.id} className="bg-gray-800/50 border-gray-600">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -524,7 +524,7 @@ export default function Gamification() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  {mockLeaderboard.map((user, index) => (
+                  {leaderboard.map((user, index) => (
                     <div 
                       key={user.rank}
                       className={`flex items-center justify-between p-4 rounded-lg ${
@@ -603,7 +603,7 @@ export default function Gamification() {
                 <div className="text-center p-4 bg-blue-900/30 rounded-lg border border-blue-500/30">
                   <Sparkles className="h-8 w-8 text-blue-400 mx-auto mb-2" />
                   <h3 className="font-medium text-blue-400 mb-1">Available Points</h3>
-                  <p className="text-2xl font-bold text-white">{mockUserStats.totalPoints}</p>
+                  <p className="text-2xl font-bold text-white">{userStats.totalPoints}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -625,10 +625,10 @@ export default function Gamification() {
                             <span className="text-blue-400 font-medium">{reward.cost} points</span>
                             <Button 
                               size="sm" 
-                              disabled={mockUserStats.totalPoints < reward.cost}
+                              disabled={userStats.totalPoints < reward.cost}
                               className="bg-blue-600 hover:bg-blue-700"
                             >
-                              {mockUserStats.totalPoints >= reward.cost ? 'Redeem' : 'Not Enough'}
+                              {userStats.totalPoints >= reward.cost ? 'Redeem' : 'Not Enough'}
                             </Button>
                           </div>
                         </div>

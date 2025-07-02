@@ -176,9 +176,7 @@ export default function ThumbnailAIMakerProComplete() {
       // Call the complete 7-stage API using fetch directly for FormData
       const response = await fetch('/api/thumbnails/generate-complete', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
+        credentials: 'include', // Include session cookies for authentication
         body: formData
       });
 

@@ -8699,38 +8699,11 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       
       res.json(strategy);
     } catch (error) {
-      console.error('[THUMBNAIL PRO] OpenAI failed, using Canvas fallback:', error);
-      
-      try {
-        console.log('[THUMBNAIL PRO] OpenAI quota exceeded - using Canvas fallback system');
-        
-        // Return a proper strategy format that matches what the frontend expects
-        const fallbackStrategy = {
-          titles: ["AMAZING " + (req.body.title || "TITLE").toUpperCase(), "VIRAL " + (req.body.title || "TITLE").toUpperCase(), "SECRET " + (req.body.title || "TITLE").toUpperCase()],
-          ctas: ["WATCH NOW", "MUST SEE"],
-          fonts: ["Inter", "Roboto", "Poppins"],
-          colors: {
-            background: "#667eea",
-            title: "#ffffff", 
-            cta: "#f093fb"
-          },
-          style: "professional",
-          emotion: "excitement",
-          hooks: ["SECRET", "EXPOSED", "VIRAL"],
-          placement: "left-face-right-text",
-          generatedBy: "canvas-fallback"
-        };
-        
-        console.log('[THUMBNAIL PRO] Canvas fallback strategy generated:', fallbackStrategy);
-        res.json(fallbackStrategy);
-        
-      } catch (canvasError) {
-        console.error('[THUMBNAIL PRO] Canvas fallback also failed:', canvasError);
-        res.status(500).json({ 
-          error: 'Failed to generate strategy',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
+      console.error('[THUMBNAIL PRO] Strategy generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate strategy',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
@@ -8798,180 +8771,15 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       res.json(variants);
       
     } catch (error) {
-      console.error('[THUMBNAIL PRO] DALL-E generation failed, using Canvas fallback:', error);
-      
-      try {
-        // Generate Canvas-based thumbnails when DALL-E fails
-        console.log('[THUMBNAIL PRO] Generating Canvas-based thumbnails');
-        
-        const canvasVariants = await Promise.all([
-          generateCanvasThumbnailVariant(title, strategy, 1, 'Left Face - Right Text'),
-          generateCanvasThumbnailVariant(title, strategy, 2, 'Bold Title Top'),
-          generateCanvasThumbnailVariant(title, strategy, 3, 'Center Focus'),
-          generateCanvasThumbnailVariant(title, strategy, 4, 'Split Screen Drama')
-        ]);
-        
-        console.log('[THUMBNAIL PRO] Generated', canvasVariants.length, 'Canvas variants successfully');
-        res.json(canvasVariants);
-        
-      } catch (canvasError) {
-        console.error('[THUMBNAIL PRO] Canvas fallback also failed:', canvasError);
-        res.status(500).json({ 
-          error: 'Failed to generate thumbnails',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
+      console.error('[THUMBNAIL PRO] Complete generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate thumbnails',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
-  // Helper function to generate Canvas-based thumbnail variants
-  async function generateCanvasThumbnailVariant(title: string, strategy: any, variantNum: number, layout: string) {
-    try {
-      console.log(`[CANVAS VARIANT] Generating Canvas variant ${variantNum} - ${layout}`);
-      
-      // Generate professional Canvas thumbnail using node-canvas
-      const { createCanvas, loadImage } = require('canvas');
-      const canvas = createCanvas(1280, 720);
-      const ctx = canvas.getContext('2d');
-      
-      // Create gradient background based on variant
-      const gradients = [
-        ['#667eea', '#764ba2'], // Professional blue-purple
-        ['#f093fb', '#f5576c'], // Pink-red
-        ['#4facfe', '#00f2fe'], // Blue-cyan
-        ['#43e97b', '#38f9d7']  // Green-turquoise
-      ];
-      
-      const [color1, color2] = gradients[(variantNum - 1) % gradients.length];
-      const gradient = ctx.createLinearGradient(0, 0, 1280, 720);
-      gradient.addColorStop(0, color1);
-      gradient.addColorStop(1, color2);
-      
-      // Fill background
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 1280, 720);
-      
-      // Add geometric pattern overlay
-      ctx.globalAlpha = 0.1;
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 20; i++) {
-        ctx.beginPath();
-        ctx.arc(Math.random() * 1280, Math.random() * 720, Math.random() * 100, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1.0;
-      
-      // Add title text with shadow and stroke
-      ctx.font = 'bold 72px Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      // Text shadow
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetX = 3;
-      ctx.shadowOffsetY = 3;
-      
-      // Text stroke
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 6;
-      ctx.strokeText(title.toUpperCase(), 640, 300);
-      
-      // Main text
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(title.toUpperCase(), 640, 300);
-      
-      // Reset shadow
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      
-      // Add CTR elements based on layout
-      ctx.font = 'bold 36px Inter, Arial, sans-serif';
-      switch (layout) {
-        case 'Left Face - Right Text':
-          // Add arrow pointing to content
-          ctx.fillStyle = '#FFD700';
-          ctx.beginPath();
-          ctx.moveTo(100, 500);
-          ctx.lineTo(200, 450);
-          ctx.lineTo(200, 480);
-          ctx.lineTo(300, 480);
-          ctx.lineTo(300, 520);
-          ctx.lineTo(200, 520);
-          ctx.lineTo(200, 550);
-          ctx.closePath();
-          ctx.fill();
-          break;
-          
-        case 'Bold Title Top':
-          // Add "NEW" badge
-          ctx.fillStyle = '#FF4444';
-          ctx.fillRect(50, 50, 120, 60);
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 24px Inter, Arial, sans-serif';
-          ctx.fillText('NEW', 110, 85);
-          break;
-          
-        case 'Center Focus':
-          // Add glow effect around title
-          ctx.shadowColor = color1;
-          ctx.shadowBlur = 30;
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-          ctx.fillRect(200, 250, 880, 100);
-          ctx.shadowColor = 'transparent';
-          ctx.shadowBlur = 0;
-          break;
-          
-        case 'Split Screen Drama':
-          // Add dramatic split line
-          ctx.strokeStyle = '#FFD700';
-          ctx.lineWidth = 8;
-          ctx.beginPath();
-          ctx.moveTo(640, 0);
-          ctx.lineTo(640, 720);
-          ctx.stroke();
-          break;
-      }
-      
-      // Add hook text at bottom
-      ctx.font = 'bold 28px Inter, Arial, sans-serif';
-      ctx.fillStyle = '#FFD700';
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 3;
-      const hookText = strategy.hooks?.[0] || 'WATCH NOW';
-      ctx.strokeText(hookText, 640, 600);
-      ctx.fillText(hookText, 640, 600);
-      
-      // Save Canvas image
-      const buffer = canvas.toBuffer('image/png');
-      const fileName = `canvas_thumbnail_${Date.now()}_${variantNum}.png`;
-      const filePath = `uploads/${fileName}`;
-      
-      require('fs').writeFileSync(filePath, buffer);
-      
-      const ctrScore = calculateCTRScore(layout, strategy);
-      
-      return {
-        id: `canvas_variant_${variantNum}`,
-        title: `${title} - ${layout}`,
-        imageUrl: `/uploads/${fileName}`,
-        ctrScore: ctrScore,
-        layout: layout,
-        metadata: {
-          strategy: strategy,
-          generated_at: new Date().toISOString(),
-          generatedBy: 'canvas',
-          variant: variantNum
-        }
-      };
-      
-    } catch (error) {
-      console.error(`[CANVAS VARIANT] Failed to generate variant ${variantNum}:`, error);
-      throw error;
-    }
-  }
+
 
   // Helper function to generate individual thumbnail variants
   async function generateThumbnailVariant(title: string, strategy: any, variantNum: number, layout: string) {

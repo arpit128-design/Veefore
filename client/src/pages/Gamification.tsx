@@ -73,7 +73,7 @@ export default function Gamification() {
   // Fetch real gamification data from API
   const { data: gamificationData, isLoading, error } = useQuery({
     queryKey: ['/api/gamification/stats'],
-    queryFn: () => apiRequest('GET', '/api/gamification/stats')
+    queryFn: () => apiRequest('GET', '/api/gamification/stats').then(res => res.json())
   });
 
   const joinChallengeMutation = useMutation({
@@ -217,6 +217,35 @@ export default function Gamification() {
       default: return 'text-green-400 bg-green-900/50';
     }
   };
+
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+              <p className="text-gray-300">Loading gamification data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold text-red-400">Error Loading Data</h1>
+            <p className="text-gray-300">Unable to load gamification data. Please try again later.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-transparent">

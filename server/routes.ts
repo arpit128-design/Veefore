@@ -4881,6 +4881,389 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Trend Intelligence API - 6 credits
+  app.post('/api/ai/trend-intelligence', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { category, platform, timeframe, industry, location } = req.body;
+
+      if (!category || !platform || !timeframe) {
+        return res.status(400).json({ error: 'Category, platform, and timeframe are required' });
+      }
+
+      // Check credits
+      const creditCost = 6;
+      const hasCredits = await creditService.hasCredits(userId, 'trend-intelligence');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'trend-intelligence',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateTrendIntelligence } = require('./trend-intelligence-ai');
+      const result = await generateTrendIntelligence({
+        category,
+        platform,
+        timeframe,
+        industry,
+        location
+      });
+
+      // Save to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createTrendCalendar({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          title: `Trend Analysis: ${category}`,
+          category,
+          platform,
+          timeframe,
+          trends: result.trendData.emergingTrends,
+          predictions: result.predictions,
+          viralPotential: result.viralPotential,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'trend-intelligence', 1, 'Trend intelligence analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[TREND INTELLIGENCE API] Error:', error);
+      res.status(500).json({ error: 'Failed to generate trend intelligence' });
+    }
+  });
+
+  // Viral Predictor API - 5 credits
+  app.post('/api/ai/viral-predictor', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { contentType, platform, content, hashtags, targetAudience, scheduledTime } = req.body;
+
+      if (!contentType || !platform || !content) {
+        return res.status(400).json({ error: 'Content type, platform, and content are required' });
+      }
+
+      // Check credits
+      const creditCost = 5;
+      const hasCredits = await creditService.hasCredits(userId, 'viral-predictor');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'viral-predictor',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateViralPrediction } = require('./viral-predictor-ai');
+      const result = await generateViralPrediction({
+        contentType,
+        platform,
+        content,
+        hashtags,
+        targetAudience,
+        scheduledTime
+      });
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'viral-predictor', 1, 'Viral potential prediction');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[VIRAL PREDICTOR API] Error:', error);
+      res.status(500).json({ error: 'Failed to generate viral prediction' });
+    }
+  });
+
+  // ROI Calculator API - 3 credits
+  app.post('/api/ai/roi-calculator', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { investment, revenue, costs, metrics, timeframe, industry, platform, campaignId } = req.body;
+
+      if (!investment || !costs || !metrics || !timeframe || !industry || !platform) {
+        return res.status(400).json({ error: 'Investment, costs, metrics, timeframe, industry, and platform are required' });
+      }
+
+      // Check credits
+      const creditCost = 3;
+      const hasCredits = await creditService.hasCredits(userId, 'roi-calculator');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'roi-calculator',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateROICalculation } = require('./roi-calculator-ai');
+      const result = await generateROICalculation({
+        campaignId,
+        investment,
+        revenue,
+        costs,
+        metrics,
+        timeframe,
+        industry,
+        platform
+      });
+
+      // Save to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createROICalculation({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          campaignId: campaignId || `roi_${Date.now()}`,
+          investment,
+          revenue: result.totalRevenue,
+          costs,
+          roiPercentage: result.roiPercentage,
+          projections: result.projections,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'roi-calculator', 1, 'ROI calculation analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[ROI CALCULATOR API] Error:', error);
+      res.status(500).json({ error: 'Failed to calculate ROI' });
+    }
+  });
+
+  // Social Listening API - 4 credits
+  app.post('/api/ai/social-listening', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { keywords, platforms, sentiment, timeframe, location, language, includeInfluencers } = req.body;
+
+      if (!keywords || !platforms || !timeframe) {
+        return res.status(400).json({ error: 'Keywords, platforms, and timeframe are required' });
+      }
+
+      // Check credits
+      const creditCost = 4;
+      const hasCredits = await creditService.hasCredits(userId, 'social-listening');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'social-listening',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateSocialListening } = require('./social-listening-ai');
+      const result = await generateSocialListening({
+        keywords,
+        platforms,
+        sentiment,
+        timeframe,
+        location,
+        language,
+        includeInfluencers
+      });
+
+      // Save to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createSocialListening({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          keywords,
+          platforms,
+          sentiment: sentiment || 'all',
+          timeframe,
+          insights: result.insights,
+          summary: result.summary,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'social-listening', 1, 'Social listening analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[SOCIAL LISTENING API] Error:', error);
+      res.status(500).json({ error: 'Failed to perform social listening' });
+    }
+  });
+
+  // Content Theft Detection API - 7 credits
+  app.post('/api/ai/content-theft-detection', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { originalContent, contentType, platforms, searchDepth, includePartialMatches, timeframe } = req.body;
+
+      if (!originalContent || !contentType || !platforms || !searchDepth) {
+        return res.status(400).json({ error: 'Original content, content type, platforms, and search depth are required' });
+      }
+
+      // Check credits
+      const creditCost = 7;
+      const hasCredits = await creditService.hasCredits(userId, 'content-theft-detection');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'content-theft-detection',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateContentTheftDetection } = require('./content-theft-ai');
+      const result = await generateContentTheftDetection({
+        originalContent,
+        contentType,
+        platforms,
+        searchDepth,
+        includePartialMatches,
+        timeframe
+      });
+
+      // Save to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createContentProtection({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          originalContent,
+          contentType,
+          platforms,
+          detectedTheft: result.detectedTheft,
+          protectionScore: result.analysis.protectionScore,
+          riskLevel: result.summary.riskLevel,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'content-theft-detection', 1, 'Content theft detection');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[CONTENT THEFT API] Error:', error);
+      res.status(500).json({ error: 'Failed to detect content theft' });
+    }
+  });
+
+  // Emotion Analysis API - 5 credits
+  app.post('/api/ai/emotion-analysis', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { content, contentType, platform, analysisDepth, includeAudience, targetDemographic } = req.body;
+
+      if (!content || !contentType || !platform || !analysisDepth) {
+        return res.status(400).json({ error: 'Content, content type, platform, and analysis depth are required' });
+      }
+
+      // Check credits
+      const creditCost = 5;
+      const hasCredits = await creditService.hasCredits(userId, 'emotion-analysis');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'emotion-analysis',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { generateEmotionAnalysis } = require('./emotion-analysis-ai');
+      const result = await generateEmotionAnalysis({
+        content,
+        contentType,
+        platform,
+        analysisDepth,
+        includeAudience,
+        targetDemographic
+      });
+
+      // Save to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createEmotionAnalysis({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          content,
+          contentType,
+          platform,
+          primaryEmotion: result.primaryEmotion.emotion,
+          emotionBreakdown: result.emotionBreakdown,
+          sentimentScore: result.sentimentAnalysis.polarity,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'emotion-analysis', 1, 'Emotion analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[EMOTION ANALYSIS API] Error:', error);
+      res.status(500).json({ error: 'Failed to perform emotion analysis' });
+    }
+  });
+
   // AI Image Generation - 4 credits
   app.post('/api/generate-image', requireAuth, async (req: any, res: Response) => {
     try {

@@ -77,7 +77,7 @@ export async function apiRequest(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     controller.abort();
-  }, url.includes('thumbnails') ? 300000 : 30000); // 5 minutes for thumbnails, 30s for others
+  }, (typeof url === 'string' && url.includes('thumbnails')) ? 300000 : 30000); // 5 minutes for thumbnails, 30s for others
 
   try {
     const res = await fetch(url, {
@@ -93,8 +93,8 @@ export async function apiRequest(
     return res;
   } catch (error) {
     clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      throw new Error(`Request timeout after ${url.includes('thumbnails') ? '5 minutes' : '30 seconds'}`);
+    if ((error as any).name === 'AbortError') {
+      throw new Error(`Request timeout after ${(typeof url === 'string' && url.includes('thumbnails')) ? '5 minutes' : '30 seconds'}`);
     }
     throw error;
   }

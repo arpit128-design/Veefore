@@ -119,11 +119,12 @@ export function Sidebar() {
   }, [location]);
 
   const toggleTab = (tabId: string) => {
-    setExpandedTabs(prev =>
-      prev.includes(tabId)
-        ? prev.filter(id => id !== tabId)
-        : [...prev, tabId]
+    // For mobile: only allow one tab open at a time
+    setExpandedTabs(prev => 
+      prev.includes(tabId) ? [] : [tabId]
     );
+    // Close more menu when opening tab
+    setShowMoreMenu(false);
   };
 
   const isTabActive = (tab: any) => {
@@ -139,7 +140,14 @@ export function Sidebar() {
   // Close more menu when location changes
   useEffect(() => {
     setShowMoreMenu(false);
+    setExpandedTabs([]); // Close any expanded tab overlays
   }, [location]);
+
+  // Handle more menu toggle
+  const handleMoreToggle = () => {
+    setShowMoreMenu(!showMoreMenu);
+    setExpandedTabs([]); // Close any open tab overlays
+  };
 
   return (
     <>
@@ -295,15 +303,26 @@ export function Sidebar() {
                   key={tab.id}
                   variant="ghost"
                   className={cn(
-                    "flex flex-col items-center justify-center space-y-1 transition-all group h-full rounded-none",
-                    isActive 
-                      ? "holographic bg-opacity-30" 
+                    "flex flex-col items-center justify-center space-y-1 transition-all group h-full rounded-none relative",
+                    isActive || tabExpanded
+                      ? "holographic bg-opacity-30 border-b-2 border-electric-cyan" 
                       : "hover:bg-cosmic-blue"
                   )}
-                  onClick={() => toggleTab(tab.id)}
+                  onClick={() => {
+                    if (tab.href) {
+                      // Dashboard button - navigate directly
+                      window.location.href = tab.href;
+                    } else {
+                      // Other tabs - toggle overlay
+                      toggleTab(tab.id);
+                    }
+                  }}
                 >
                   <tab.icon className={cn("h-5 w-5", tab.color)} />
                   <span className="text-xs font-medium truncate">{tab.label}</span>
+                  {tabExpanded && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-electric-cyan rounded-full animate-pulse" />
+                  )}
                 </Button>
               );
             })}
@@ -312,15 +331,18 @@ export function Sidebar() {
             <Button
               variant="ghost"
               className={cn(
-                "flex flex-col items-center justify-center space-y-1 h-full rounded-none transition-all",
+                "flex flex-col items-center justify-center space-y-1 h-full rounded-none transition-all relative",
                 showMoreMenu 
-                  ? "holographic bg-opacity-30" 
+                  ? "holographic bg-opacity-30 border-b-2 border-electric-cyan" 
                   : "hover:bg-cosmic-blue"
               )}
-              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              onClick={handleMoreToggle}
             >
               <Settings className="h-5 w-5 text-asteroid-silver" />
               <span className="text-xs font-medium">More</span>
+              {showMoreMenu && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-electric-cyan rounded-full animate-pulse" />
+              )}
             </Button>
           </div>
           

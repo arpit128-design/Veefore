@@ -10013,6 +10013,12 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
 
   // STAGES 4-7: Complete Generation Pipeline
   app.post('/api/thumbnails/generate-complete', requireAuth, async (req: any, res: Response) => {
+    console.log('[THUMBNAIL PRO] === ROUTE HANDLER CALLED ===');
+    console.log('[THUMBNAIL PRO] Method:', req.method);
+    console.log('[THUMBNAIL PRO] URL:', req.url);
+    console.log('[THUMBNAIL PRO] Headers:', Object.keys(req.headers));
+    console.log('[THUMBNAIL PRO] Body keys:', Object.keys(req.body || {}));
+    console.log('[THUMBNAIL PRO] User ID:', req.user?.id);
     console.log('[THUMBNAIL PRO] Complete generation pipeline started for user:', req.user?.id);
     
     try {

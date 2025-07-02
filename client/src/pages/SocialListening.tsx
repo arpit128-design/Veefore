@@ -104,38 +104,7 @@ export default function SocialListening() {
     }
   });
 
-  // Create listening analysis mutation
-  const createListeningAnalysisMutation = useMutation({
-    mutationFn: async (data: {
-      keywords: string[];
-      platforms: string[];
-      analysisType: string;
-      dateRange: string;
-    }) => {
-      const result = await socialListeningMutation.mutateAsync({
-        keywords: data.keywords,
-        platforms: data.platforms,
-        timeframe: data.dateRange,
-        includeInfluencers: true
-      });
-      return result;
-    },
-    onSuccess: (data) => {
-      setListeningResult(data);
-      toast({
-        title: "Social Listening Complete!",
-        description: "Your comprehensive social media monitoring analysis is ready.",
-      });
-    },
-    onError: (error: any) => {
-      console.error('Social listening error:', error);
-      toast({
-        title: "Analysis Failed",
-        description: error.message || "Unable to complete social listening analysis.",
-        variant: "destructive"
-      });
-    }
-  });
+
 
   const handleAnalyze = () => {
     if (monitoringKeywords.length === 0) {

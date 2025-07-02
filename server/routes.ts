@@ -10032,12 +10032,61 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       const baseVariant = await generateThumbnailVariant(title, strategy, 1, 'AI Generated');
       
       // Step 2: Create 3 programmatic variations by modifying the base thumbnail
-      const variants = [
-        baseVariant,
-        await createThumbnailVariation(baseVariant, strategy, 2, 'Color Shift'),
-        await createThumbnailVariation(baseVariant, strategy, 3, 'Text Reposition'),
-        await createThumbnailVariation(baseVariant, strategy, 4, 'Style Variant')
-      ];
+      console.log('[THUMBNAIL PRO] Starting variation creation for base:', baseVariant.imageUrl);
+      
+      const variants = [baseVariant];
+      
+      // Create variations one by one with detailed error handling
+      try {
+        console.log('[THUMBNAIL PRO] Creating Color Shift variation...');
+        const colorShift = await createThumbnailVariation(baseVariant, strategy, 2, 'Color Shift');
+        variants.push(colorShift);
+        console.log('[THUMBNAIL PRO] Color Shift variation created:', colorShift.imageUrl);
+      } catch (error) {
+        console.error('[THUMBNAIL PRO] Color Shift variation failed:', error);
+        variants.push({
+          ...baseVariant,
+          id: 'variant_2',
+          title: `${baseVariant.title} (Color Shift)`,
+          layout: 'Color Shift',
+          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
+          error: 'Variation generation failed'
+        });
+      }
+      
+      try {
+        console.log('[THUMBNAIL PRO] Creating Text Reposition variation...');
+        const textReposition = await createThumbnailVariation(baseVariant, strategy, 3, 'Text Reposition');
+        variants.push(textReposition);
+        console.log('[THUMBNAIL PRO] Text Reposition variation created:', textReposition.imageUrl);
+      } catch (error) {
+        console.error('[THUMBNAIL PRO] Text Reposition variation failed:', error);
+        variants.push({
+          ...baseVariant,
+          id: 'variant_3',
+          title: `${baseVariant.title} (Text Reposition)`,
+          layout: 'Text Reposition',
+          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
+          error: 'Variation generation failed'
+        });
+      }
+      
+      try {
+        console.log('[THUMBNAIL PRO] Creating Style Variant variation...');
+        const styleVariant = await createThumbnailVariation(baseVariant, strategy, 4, 'Style Variant');
+        variants.push(styleVariant);
+        console.log('[THUMBNAIL PRO] Style Variant variation created:', styleVariant.imageUrl);
+      } catch (error) {
+        console.error('[THUMBNAIL PRO] Style Variant variation failed:', error);
+        variants.push({
+          ...baseVariant,
+          id: 'variant_4',
+          title: `${baseVariant.title} (Style Variant)`,
+          layout: 'Style Variant',
+          ctrScore: Math.max(baseVariant.ctrScore - 1, 6.0),
+          error: 'Variation generation failed'
+        });
+      }
       
       console.log('[THUMBNAIL PRO] Generated', variants.length, 'variants successfully');
       
@@ -10056,13 +10105,18 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
 
   // Helper function to create programmatic variations from base thumbnail
   async function createThumbnailVariation(baseVariant: any, strategy: any, variantNum: number, variationType: string) {
+    console.log(`[THUMBNAIL PRO] === ENTERING createThumbnailVariation for ${variationType} ===`);
+    
     try {
-      console.log(`[THUMBNAIL PRO] Creating programmatic variation ${variantNum}: ${variationType}`);
+      console.log(`[THUMBNAIL PRO] Step 1: Creating programmatic variation ${variantNum}: ${variationType}`);
+      console.log(`[THUMBNAIL PRO] Step 2: Base variant data:`, JSON.stringify(baseVariant, null, 2));
       
       // Import Sharp for image processing
       const sharp = require('sharp');
       const fs = require('fs');
       const path = require('path');
+      
+      console.log(`[THUMBNAIL PRO] Step 3: Dependencies imported successfully`);
       
       // Download base image if it's a URL
       let baseImageBuffer;

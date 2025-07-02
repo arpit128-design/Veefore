@@ -119,10 +119,14 @@ export function Sidebar() {
   }, [location]);
 
   const toggleTab = (tabId: string) => {
+    console.log('[MOBILE TAB] Toggling tab:', tabId);
+    console.log('[MOBILE TAB] Current expandedTabs:', expandedTabs);
+    
     // For mobile: only allow one tab open at a time
-    setExpandedTabs(prev => 
-      prev.includes(tabId) ? [] : [tabId]
-    );
+    const newTabs = expandedTabs.includes(tabId) ? [] : [tabId];
+    console.log('[MOBILE TAB] Setting new tabs:', newTabs);
+    
+    setExpandedTabs(newTabs);
     // Close more menu when opening tab
     setShowMoreMenu(false);
   };
@@ -349,7 +353,7 @@ export function Sidebar() {
           {/* Mobile expanded features overlay */}
           {expandedTabs.map(tabId => {
             const tab = mainTabs.find(t => t.id === tabId);
-            if (!tab?.features || location?.includes('/dashboard')) return null;
+            if (!tab?.features) return null;
             
             return (
               <div 

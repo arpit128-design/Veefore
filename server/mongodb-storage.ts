@@ -3947,4 +3947,188 @@ export class MongoStorage implements IStorage {
         { $inc: { downloadCount: 1 } }
       );
   }
+
+  // AI Features CRUD operations
+  
+  // Creative Brief operations
+  async createCreativeBrief(brief: InsertCreativeBrief): Promise<CreativeBrief> {
+    await this.connect();
+    const newBrief = new CreativeBriefModel(brief);
+    const saved = await newBrief.save();
+    return this.convertCreativeBrief(saved);
+  }
+
+  async getCreativeBrief(id: number): Promise<CreativeBrief | undefined> {
+    await this.connect();
+    const brief = await CreativeBriefModel.findById(id.toString());
+    return brief ? this.convertCreativeBrief(brief) : undefined;
+  }
+
+  async getCreativeBriefsByWorkspace(workspaceId: number): Promise<CreativeBrief[]> {
+    await this.connect();
+    const briefs = await CreativeBriefModel.find({ workspaceId: workspaceId.toString() }).sort({ createdAt: -1 });
+    return briefs.map(brief => this.convertCreativeBrief(brief));
+  }
+
+  async updateCreativeBrief(id: number, updates: Partial<CreativeBrief>): Promise<CreativeBrief> {
+    await this.connect();
+    const updated = await CreativeBriefModel.findByIdAndUpdate(
+      id.toString(),
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) throw new Error('Creative brief not found');
+    return this.convertCreativeBrief(updated);
+  }
+
+  async deleteCreativeBrief(id: number): Promise<void> {
+    await this.connect();
+    await CreativeBriefModel.findByIdAndDelete(id.toString());
+  }
+
+  // Content Repurpose operations
+  async createContentRepurpose(repurpose: InsertContentRepurpose): Promise<ContentRepurpose> {
+    await this.connect();
+    const newRepurpose = new ContentRepurposeModel(repurpose);
+    const saved = await newRepurpose.save();
+    return this.convertContentRepurpose(saved);
+  }
+
+  async getContentRepurpose(id: number): Promise<ContentRepurpose | undefined> {
+    await this.connect();
+    const repurpose = await ContentRepurposeModel.findById(id.toString());
+    return repurpose ? this.convertContentRepurpose(repurpose) : undefined;
+  }
+
+  async getContentRepurposesByWorkspace(workspaceId: number): Promise<ContentRepurpose[]> {
+    await this.connect();
+    const repurposes = await ContentRepurposeModel.find({ workspaceId: workspaceId.toString() }).sort({ createdAt: -1 });
+    return repurposes.map(repurpose => this.convertContentRepurpose(repurpose));
+  }
+
+  async updateContentRepurpose(id: number, updates: Partial<ContentRepurpose>): Promise<ContentRepurpose> {
+    await this.connect();
+    const updated = await ContentRepurposeModel.findByIdAndUpdate(
+      id.toString(),
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) throw new Error('Content repurpose not found');
+    return this.convertContentRepurpose(updated);
+  }
+
+  async deleteContentRepurpose(id: number): Promise<void> {
+    await this.connect();
+    await ContentRepurposeModel.findByIdAndDelete(id.toString());
+  }
+
+  // Competitor Analysis operations
+  async createCompetitorAnalysis(analysis: InsertCompetitorAnalysis): Promise<CompetitorAnalysis> {
+    await this.connect();
+    const newAnalysis = new CompetitorAnalysisModel(analysis);
+    const saved = await newAnalysis.save();
+    return this.convertCompetitorAnalysis(saved);
+  }
+
+  async getCompetitorAnalysis(id: number): Promise<CompetitorAnalysis | undefined> {
+    await this.connect();
+    const analysis = await CompetitorAnalysisModel.findById(id.toString());
+    return analysis ? this.convertCompetitorAnalysis(analysis) : undefined;
+  }
+
+  async getCompetitorAnalysesByWorkspace(workspaceId: number): Promise<CompetitorAnalysis[]> {
+    await this.connect();
+    const analyses = await CompetitorAnalysisModel.find({ workspaceId: workspaceId.toString() }).sort({ createdAt: -1 });
+    return analyses.map(analysis => this.convertCompetitorAnalysis(analysis));
+  }
+
+  async updateCompetitorAnalysis(id: number, updates: Partial<CompetitorAnalysis>): Promise<CompetitorAnalysis> {
+    await this.connect();
+    const updated = await CompetitorAnalysisModel.findByIdAndUpdate(
+      id.toString(),
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) throw new Error('Competitor analysis not found');
+    return this.convertCompetitorAnalysis(updated);
+  }
+
+  async deleteCompetitorAnalysis(id: number): Promise<void> {
+    await this.connect();
+    await CompetitorAnalysisModel.findByIdAndDelete(id.toString());
+  }
+
+  // Conversion helpers for AI features
+  private convertCreativeBrief(doc: any): CreativeBrief {
+    return {
+      id: parseInt(doc._id.toString()),
+      workspaceId: parseInt(doc.workspaceId),
+      userId: parseInt(doc.userId),
+      title: doc.title,
+      targetAudience: doc.targetAudience,
+      platforms: doc.platforms,
+      campaignGoals: doc.campaignGoals,
+      tone: doc.tone,
+      style: doc.style,
+      industry: doc.industry,
+      deadline: doc.deadline,
+      budget: doc.budget,
+      briefContent: doc.briefContent,
+      keyMessages: doc.keyMessages,
+      contentFormats: doc.contentFormats,
+      hashtags: doc.hashtags,
+      references: doc.references,
+      status: doc.status,
+      creditsUsed: doc.creditsUsed,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt
+    };
+  }
+
+  private convertContentRepurpose(doc: any): ContentRepurpose {
+    return {
+      id: parseInt(doc._id.toString()),
+      workspaceId: parseInt(doc.workspaceId),
+      userId: parseInt(doc.userId),
+      originalContentId: doc.originalContentId ? parseInt(doc.originalContentId) : null,
+      sourceLanguage: doc.sourceLanguage,
+      targetLanguage: doc.targetLanguage,
+      sourceContent: doc.sourceContent,
+      repurposedContent: doc.repurposedContent,
+      contentType: doc.contentType,
+      culturalAdaptations: doc.culturalAdaptations,
+      toneAdjustments: doc.toneAdjustments,
+      platform: doc.platform,
+      qualityScore: doc.qualityScore,
+      isApproved: doc.isApproved,
+      creditsUsed: doc.creditsUsed,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt
+    };
+  }
+
+  private convertCompetitorAnalysis(doc: any): CompetitorAnalysis {
+    return {
+      id: parseInt(doc._id.toString()),
+      workspaceId: parseInt(doc.workspaceId),
+      userId: parseInt(doc.userId),
+      competitorUsername: doc.competitorUsername,
+      platform: doc.platform,
+      analysisType: doc.analysisType,
+      scrapedData: doc.scrapedData,
+      analysisResults: doc.analysisResults,
+      topPerformingPosts: doc.topPerformingPosts,
+      contentPatterns: doc.contentPatterns,
+      hashtags: doc.hashtags,
+      postingSchedule: doc.postingSchedule,
+      engagementRate: doc.engagementRate,
+      growthRate: doc.growthRate,
+      recommendations: doc.recommendations,
+      competitorScore: doc.competitorScore,
+      lastScraped: doc.lastScraped,
+      creditsUsed: doc.creditsUsed,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt
+    };
+  }
 }

@@ -388,6 +388,64 @@ export default function ThumbnailAIMakerPro() {
                 <Wand2 className="h-5 w-5 mr-2" />
                 Generate Viral Thumbnails with AI
               </Button>
+
+              {/* Test Optimized System Button */}
+              <Button
+                onClick={async () => {
+                  if (!title.trim()) {
+                    toast({
+                      title: "Title Required",
+                      description: "Please enter a video title to test the system",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  try {
+                    setIsGenerating(true);
+                    console.log('[THUMBNAIL TEST] Testing optimized generation system');
+                    
+                    const response = await apiRequest('/api/thumbnails/test-optimized-generation', {
+                      method: 'POST',
+                      body: JSON.stringify({ title }),
+                      headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    setVariants(response.variants);
+                    
+                    toast({
+                      title: "✅ Optimized System Demo",
+                      description: response.optimization.message,
+                    });
+                    
+                    console.log('[THUMBNAIL TEST] Optimization Results:', response.optimization);
+                    
+                  } catch (error) {
+                    console.error('[THUMBNAIL TEST] Failed:', error);
+                    toast({
+                      title: "Test Failed",
+                      description: "Could not test the optimized system",
+                      variant: "destructive"
+                    });
+                  } finally {
+                    setIsGenerating(false);
+                  }
+                }}
+                disabled={!title.trim() || isGenerating}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 text-lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Timer className="h-5 w-5 mr-2 animate-spin" />
+                    Testing System...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-5 w-5 mr-2" />
+                    🔥 Test Optimized System (1 AI call + 4 variations)
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         )}

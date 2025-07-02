@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
-  Rocket, Brain, Calendar, BarChart3, Sparkles, 
+  Rocket, Brain, Calendar, BarChart3, Sparkles, Zap,
   Globe, Users, Share2, Settings, Link as LinkIcon, X, CreditCard, PlayCircle, Bot, MessageCircle, ImageIcon, FileText, Languages
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -12,6 +12,7 @@ const navigationItems = [
   { href: "/content-studio", icon: Brain, label: "Content Studio", color: "text-nebula-purple" },
   { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
   { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
+  { href: "/ai-intelligence", icon: Zap, label: "AI Intelligence", color: "text-purple-400" },
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-amber-400" },
   { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400" },

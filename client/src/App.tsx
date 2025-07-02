@@ -47,6 +47,7 @@ import ThumbnailAIMakerPro from "@/pages/ThumbnailAIMakerPro";
 import ThumbnailMakerPro from "@/pages/ThumbnailMakerPro";
 import CreativeBriefGenerator from "@/pages/CreativeBriefGenerator";
 import ContentRepurpose from "@/pages/ContentRepurpose";
+import AIIntelligence from "@/pages/AIIntelligence";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -95,6 +96,8 @@ function AuthenticatedApp() {
               <Route path="/trends" component={Analyzer} />
               <Route path="/ai-suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />
+              <Route path="/ai-features" component={AIFeatures} />
+              <Route path="/ai-intelligence" component={AIIntelligence} />
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
               <Route path="/ai-thumbnails" component={ThumbnailAIMaker} />
         <Route path="/ai-thumbnails-pro" component={ThumbnailAIMakerPro} />

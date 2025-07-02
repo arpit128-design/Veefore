@@ -37,12 +37,12 @@ export default function TrendCalendar() {
   // Fetch trend data
   const { data: trends, isLoading } = useQuery({
     queryKey: ['/api/trends/calendar', selectedDate, selectedPlatform],
-    queryFn: () => apiRequest('GET', `/api/trends/calendar?date=${selectedDate}&platform=${selectedPlatform}`)
+    queryFn: () => apiRequest('GET', `/api/trends/calendar?date=${selectedDate}&platform=${selectedPlatform}`).then(res => res.json())
   });
 
   // Generate trend prediction mutation
   const trendMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/ai/trend-intelligence', data),
+    mutationFn: (data: any) => apiRequest('POST', '/api/ai/trend-intelligence', data).then(res => res.json()),
     onSuccess: (data) => {
       toast({
         title: "Trend Analysis Complete!",
@@ -68,41 +68,17 @@ export default function TrendCalendar() {
     }
   });
 
-  const mockTrends: TrendEvent[] = [
-    {
-      id: '1',
-      title: 'New Year Fitness Challenge',
-      date: '2025-01-01',
-      platform: 'instagram',
-      viralPotential: 92,
-      category: 'fitness',
-      description: 'Annual fitness motivation peak with transformation content',
-      hashtags: ['#NewYearNewMe', '#FitnessJourney', '#2025Goals'],
-      suggestedContent: 'Create before/after transformation reels with motivational music'
-    },
-    {
-      id: '2',
-      title: 'Tech Predictions 2025',
-      date: '2025-01-05',
-      platform: 'youtube',
-      viralPotential: 87,
-      category: 'technology',
-      description: 'AI and tech prediction content performs well in early January',
-      hashtags: ['#TechPredictions', '#AI2025', '#FutureTech'],
-      suggestedContent: 'Long-form prediction videos with engaging thumbnails'
-    },
-    {
-      id: '3',
-      title: 'Lunar New Year Content',
-      date: '2025-01-29',
-      platform: 'tiktok',
-      viralPotential: 85,
-      category: 'culture',
-      description: 'Cultural celebration content gains massive reach',
-      hashtags: ['#LunarNewYear', '#ChineseNewYear', '#Celebration'],
-      suggestedContent: 'Traditional recipes, decorations, and celebration videos'
-    }
-  ];
+  // Show error state if API fails
+  if (!isLoading && !trends) {
+    return (
+      <div className="min-h-screen bg-transparent text-white p-4 md:p-6 flex items-center justify-center">
+        <Card className="bg-cosmic-void/40 border-asteroid-silver/30 backdrop-blur-sm p-8 text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-4">Failed to Load Trends</h2>
+          <p className="text-asteroid-silver">Unable to fetch trend calendar data. Please try again later.</p>
+        </Card>
+      </div>
+    );
+  }
 
   const handleAnalyzeTrend = (trend: TrendEvent) => {
     trendMutation.mutate({
@@ -205,8 +181,22 @@ export default function TrendCalendar() {
 
         {/* Trend Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockTrends
-            .filter(trend => 
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({length: 6}).map((_, i) => (
+              <Card key={i} className="bg-cosmic-void/40 border-asteroid-silver/30 backdrop-blur-sm animate-pulse">
+                <CardHeader>
+                  <div className="h-4 bg-asteroid-silver/20 rounded mb-2"></div>
+                  <div className="h-6 bg-asteroid-silver/20 rounded"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-4 bg-asteroid-silver/20 rounded mb-2"></div>
+                  <div className="h-4 bg-asteroid-silver/20 rounded w-3/4"></div>
+                </CardContent>
+              </Card>
+            ))
+          ) : trends?.events
+            ?.filter(trend => 
               selectedPlatform === 'all' || trend.platform === selectedPlatform
             )
             .filter(trend =>

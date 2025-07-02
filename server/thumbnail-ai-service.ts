@@ -341,7 +341,7 @@ provide trending design insights in JSON format:
       
     } catch (error) {
       console.error('[THUMBNAIL AI] CRITICAL: Real image generation failed:', error);
-      throw new Error(`AI thumbnail generation failed: ${error.message}`);
+      throw new Error(`AI thumbnail generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -376,7 +376,7 @@ provide trending design insights in JSON format:
       
     } catch (error) {
       console.error('[THUMBNAIL AI] Failed to download image:', error);
-      throw new Error(`Failed to save thumbnail image: ${error.message}`);
+      throw new Error(`Failed to save thumbnail image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

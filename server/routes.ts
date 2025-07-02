@@ -10070,16 +10070,26 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         const response = await fetch(baseVariant.imageUrl);
         baseImageBuffer = Buffer.from(await response.arrayBuffer());
       } else {
-        // Read from local file
-        baseImageBuffer = fs.readFileSync(baseVariant.imageUrl);
+        // Read from local file - handle both absolute and relative paths
+        const fullPath = baseVariant.imageUrl.startsWith('/uploads/') 
+          ? path.join(process.cwd(), baseVariant.imageUrl.substring(1)) // Remove leading slash
+          : baseVariant.imageUrl;
+        console.log(`[THUMBNAIL PRO] Reading base image from: ${fullPath}`);
+        if (!fs.existsSync(fullPath)) {
+          throw new Error(`Base image file not found: ${fullPath}`);
+        }
+        baseImageBuffer = fs.readFileSync(fullPath);
+        console.log(`[THUMBNAIL PRO] Successfully read base image, size: ${baseImageBuffer.length} bytes`);
       }
       
       let modifiedBuffer = baseImageBuffer;
       
       // Apply different modifications based on variation type
+      console.log(`[THUMBNAIL PRO] Applying ${variationType} modification`);
       switch (variationType) {
         case 'Color Shift':
           // Adjust hue and saturation
+          console.log('[THUMBNAIL PRO] Applying color shift modification');
           modifiedBuffer = await sharp(baseImageBuffer)
             .modulate({
               hue: 30, // Shift hue by 30 degrees
@@ -10087,6 +10097,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
               brightness: 1.1 // Increase brightness by 10%
             })
             .toBuffer();
+          console.log(`[THUMBNAIL PRO] Color shift complete, new size: ${modifiedBuffer.length} bytes`);
           break;
           
         case 'Text Reposition':
@@ -10114,9 +10125,12 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
           break;
       }
       
-      // Save the modified image
-      const filename = `thumbnail_variation_${variantNum}_${Date.now()}.jpg`;
+      // Save the modified image (match original format)
+      const originalExt = baseVariant.imageUrl.includes('.png') ? 'png' : 'jpg';
+      const filename = `thumbnail_variation_${variantNum}_${Date.now()}.${originalExt}`;
       const filePath = path.join(process.cwd(), 'uploads', filename);
+      
+      console.log(`[THUMBNAIL PRO] Saving variation to: ${filePath}`);
       
       // Ensure uploads directory exists
       if (!fs.existsSync(path.dirname(filePath))) {
@@ -10124,6 +10138,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       }
       
       fs.writeFileSync(filePath, modifiedBuffer);
+      console.log(`[THUMBNAIL PRO] Successfully saved variation: ${filename}`);
       
       // Calculate CTR score (slightly lower than base since it's a variation)
       const baseCTRScore = calculateCTRScore(baseVariant.layout || 'AI Generated', strategy);

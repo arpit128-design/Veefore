@@ -102,30 +102,37 @@ export default function ContentRepurpose() {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-cosmic-void via-nebula-purple/20 to-cosmic-void text-white relative overflow-hidden">
+      {/* Cosmic Background Effects */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-electric-cyan/10 to-nebula-purple/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-solar-gold/10 to-electric-cyan/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 right-20 w-60 h-60 bg-gradient-to-r from-nebula-purple/10 to-solar-gold/10 rounded-full blur-2xl"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full glassmorphism mb-4">
-            <Languages className="w-8 h-8 text-teal-400" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-electric-cyan/20 backdrop-blur-sm border border-electric-cyan/30 mb-4">
+            <Languages className="w-8 h-8 text-electric-cyan" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4 cosmic-text">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-cyan via-nebula-purple to-solar-gold bg-clip-text text-transparent mb-4">
             AI Content Repurpose Engine
           </h1>
-          <p className="text-xl text-nebula-gray max-w-2xl mx-auto">
+          <p className="text-xl text-asteroid-silver max-w-2xl mx-auto">
             Transform your content across languages, platforms, and audiences with advanced AI localization
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
-          <Card className="glassmorphism border-electric-cyan/20">
+          <Card className="bg-transparent border border-electric-cyan/30 backdrop-blur-sm shadow-2xl shadow-electric-cyan/10 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Globe className="w-5 h-5 text-teal-400" />
+                <Globe className="w-5 h-5 text-electric-cyan" />
                 Content Repurposing Configuration
               </CardTitle>
-              <CardDescription className="text-nebula-gray">
+              <CardDescription className="text-asteroid-silver">
                 Configure your content transformation settings
               </CardDescription>
             </CardHeader>
@@ -138,7 +145,7 @@ export default function ContentRepurpose() {
                   value={sourceContent}
                   onChange={(e) => setSourceContent(e.target.value)}
                   placeholder="Enter your original content to be repurposed..."
-                  className="min-h-[120px] bg-cosmic-dark/50 border-electric-cyan/30"
+                  className="min-h-[120px] bg-cosmic-void/50 backdrop-blur-sm border border-electric-cyan/30 text-white placeholder:text-asteroid-silver focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/20 rounded-lg transition-all"
                 />
               </div>
 
@@ -257,7 +264,7 @@ export default function ContentRepurpose() {
               <Button 
                 onClick={handleSubmit} 
                 disabled={isLoading}
-                className="w-full holographic hover:scale-105 transition-all"
+                className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-electric-cyan/80 hover:to-nebula-purple/80 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-electric-cyan/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isLoading ? (
                   <>

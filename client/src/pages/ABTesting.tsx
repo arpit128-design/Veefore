@@ -366,7 +366,7 @@ export default function ABTesting() {
           {/* My Tests Tab */}
           <TabsContent value="tests" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {mockTests.map((test, index) => (
+              {tests.map((test, index) => (
                 <motion.div
                   key={test.id}
                   initial={{ opacity: 0, y: 40 }}

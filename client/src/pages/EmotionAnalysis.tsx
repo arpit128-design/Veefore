@@ -79,16 +79,23 @@ export default function EmotionAnalysis() {
   const [targetAudience, setTargetAudience] = useState("");
   const { toast } = useToast();
 
+  const [emotionResult, setEmotionResult] = useState<EmotionAnalysis | null>(null);
+
   const analyzeEmotionMutation = useMutation({
-    mutationFn: (data: { content?: string; url?: string; type: string; audience?: string }) => 
-      apiRequest('POST', '/api/emotion-analysis', {
+    mutationFn: async (data: { content?: string; url?: string; type: string; audience?: string }) => {
+      const response = await apiRequest('POST', '/api/ai/emotion-analysis', {
         content: data.content || data.url || '',
-        contentType: data.type
-      }),
-    onSuccess: () => {
+        contentType: data.type,
+        targetAudience: data.audience || 'general',
+        platform: 'instagram'
+      });
+      return response as EmotionAnalysis;
+    },
+    onSuccess: (data) => {
+      setEmotionResult(data);
       toast({
         title: "Emotion Analysis Complete",
-        description: "Your content's emotional profile has been analyzed.",
+        description: `Primary emotion: ${data.primaryEmotion} with ${data.emotionIntensity}% intensity.`,
       });
     },
     onError: (error) => {
@@ -383,17 +390,18 @@ export default function EmotionAnalysis() {
                 </Button>
 
                 {/* Analysis Results */}
-                <div className="space-y-6 pt-4">
-                  <div className="text-center space-y-2">
-                    <h3 className="text-lg font-semibold text-pink-400">Primary Emotion Analysis</h3>
-                    <div className="flex items-center justify-center gap-3">
-                      {getEmotionIcon(mockEmotionAnalysis.primaryEmotion)}
-                      <span className="text-2xl font-bold">{mockEmotionAnalysis.primaryEmotion}</span>
-                      <Badge className="bg-pink-900/50 text-pink-300">
-                        {mockEmotionAnalysis.emotionIntensity}% intensity
-                      </Badge>
+                {emotionResult && (
+                  <div className="space-y-6 pt-4">
+                    <div className="text-center space-y-2">
+                      <h3 className="text-lg font-semibold text-pink-400">Primary Emotion Analysis</h3>
+                      <div className="flex items-center justify-center gap-3">
+                        {getEmotionIcon(emotionResult.primaryEmotion)}
+                        <span className="text-2xl font-bold">{emotionResult.primaryEmotion}</span>
+                        <Badge className="bg-pink-900/50 text-pink-300">
+                          {emotionResult.emotionIntensity}% intensity
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
 
                   <Card className="bg-gray-800/50 border-gray-600">
                     <CardHeader>
@@ -401,7 +409,7 @@ export default function EmotionAnalysis() {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {Object.entries(mockEmotionAnalysis.emotionProfile).map(([emotion, intensity]) => (
+                        {Object.entries(emotionResult.emotionProfile).map(([emotion, intensity]) => (
                           <div key={emotion} className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className={`capitalize ${getEmotionColor(emotion)}`}>{emotion}</span>
@@ -482,12 +490,13 @@ export default function EmotionAnalysis() {
                           <Progress value={mockEmotionAnalysis.audienceResonance.viralPotential} className="h-2" />
                         </div>
                         <div className="pt-2 border-t border-gray-700">
-                          <p className="text-xs text-gray-400">Best fit: {mockEmotionAnalysis.audienceResonance.demographicAppeal.age}, {mockEmotionAnalysis.audienceResonance.demographicAppeal.gender}</p>
+                          <p className="text-xs text-gray-400">Best fit: {emotionResult.audienceResonance.demographicAppeal.age}, {emotionResult.audienceResonance.demographicAppeal.gender}</p>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
                 </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

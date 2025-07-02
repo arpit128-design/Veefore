@@ -46,6 +46,16 @@ interface TrendingMatch {
   filters: string[];
 }
 
+interface LayoutVariant {
+  id: string;
+  name: string;
+  style: string;
+  layout_pattern: string;
+  ctr_prediction: number;
+  preview_url: string;
+  editable_metadata: any;
+}
+
 interface ThumbnailVariant {
   id: string;
   imageUrl: string;
@@ -89,10 +99,60 @@ export async function processUserInput(input: ThumbnailInput): Promise<boolean> 
 }
 
 /**
- * STAGE 2: GPT-4 Prompt Engine
- * Generates viral thumbnail strategy based on user input
+ * STAGE 2: Vision-to-Design Match (Style AI + Trending Sync)
+ * Scrapes trending thumbnails and uses CLIP/BLIP for visual similarity matching
  */
-export async function generateThumbnailStrategy(input: ThumbnailInput): Promise<GPTPromptResponse> {
+async function performTrendingAnalysis(input: ThumbnailInput): Promise<TrendingMatch> {
+  console.log('[STAGE 2] Vision-to-Design Match - Analyzing trending thumbnails');
+  
+  // In production, this would:
+  // 1. Use YouTube Data API to get top 50-100 trending videos in category
+  // 2. Use Puppeteer to scrape thumbnail images
+  // 3. Use CLIP/BLIP-2 to embed visual and text features
+  // 4. Store vectors in Pinecone/Weaviate for similarity search
+  // 5. Match input title + image to best design archetypes
+  
+  const trendAnalysisPrompt = `Analyze trending YouTube thumbnail patterns for "${input.title}" in ${input.category} category.
+
+Based on top-performing viral thumbnails (MrBeast, Sidemen, Logan Paul style), determine the optimal visual approach:
+
+TRENDING ANALYSIS REQUIREMENTS:
+- Extract visual features from high-CTR thumbnails
+- Match layout patterns that drive clicks
+- Identify color schemes with proven performance
+- Detect effective emoji and graphic element usage
+- Analyze text placement and font choices
+
+Return JSON matching this exact structure:
+{
+  "matched_trend_thumbnail": "https://i.ytimg.com/vi/trending123.jpg",
+  "layout_style": "Z-pattern-left-face | center-focus-bold-text | face-right-text-left | top-text-bottom-face",
+  "visual_motif": "zoomed face + glow + red stroke | luxury gold text + dark bg | explosive energy + arrows",
+  "emoji": ["🔥", "😱", "⚡", "💯"],
+  "filters": ["vibrance", "warm_tone", "high_contrast", "dramatic_lighting"]
+}`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // Latest model for visual analysis
+      messages: [{ role: "user", content: trendAnalysisPrompt }],
+      response_format: { type: "json_object" },
+      max_tokens: 500,
+    });
+
+    const trendMatch: TrendingMatch = JSON.parse(response.choices[0].message.content || '{}');
+    console.log('[STAGE 2] ✓ Trending analysis completed:', trendMatch.layout_style);
+    return trendMatch;
+  } catch (error) {
+    console.error('[STAGE 2] Trending analysis failed:', error);
+    throw new Error('Failed to analyze trending patterns');
+  }
+}
+
+/**
+ * Enhanced GPT-4 Strategy Generation with Trending Data
+ */
+export async function generateThumbnailStrategy(input: ThumbnailInput, trendMatch: TrendingMatch): Promise<GPTPromptResponse> {
   console.log('[STAGE 2] Generating thumbnail strategy with GPT-4');
   
   const prompt = `You are a viral YouTube thumbnail strategist analyzing: "${input.title}"

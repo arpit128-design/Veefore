@@ -148,23 +148,47 @@ provide trending design insights in JSON format:
     designData: ThumbnailDesignData,
     trendData: TrendingThumbnailData
   ): Promise<ThumbnailVariant[]> {
-    console.log('[THUMBNAIL AI] Generating variants...');
+    console.log('[THUMBNAIL AI] OPTIMIZED: Generating 1 AI thumbnail + 4 programmatic variations');
 
     const variants: ThumbnailVariant[] = [];
     const layouts = [
-      'Face Left - Text Right',
-      'Bold Title Top - Blurred Face BG',
-      'CTA Badge Bottom - Face Center',
-      'Overlay Emoji Corners',
-      'Split Screen Design'
+      'AI Generated Master',
+      'Color Shift Variant',
+      'Warm Tone Variant', 
+      'High Contrast Variant',
+      'Cool Tone Variant'
     ];
 
-    for (let i = 0; i < 5; i++) {
+    // Step 1: Generate only 1 AI thumbnail (the base)
+    const baseImageUrl = await this.generateThumbnailImage(request, designData, layouts[0]);
+    
+    // Step 2: Create base variant
+    const baseVariant: ThumbnailVariant = {
+      id: `variant_1`,
+      title: layouts[0],
+      imageUrl: baseImageUrl,
+      ctrScore: this.calculateCTRScore(designData, trendData, layouts[0]),
+      layout: layouts[0],
+      metadata: {
+        designData,
+        trendData,
+        layout: layouts[0],
+        colors: designData.colors,
+        fonts: designData.fonts[0] || 'Arial',
+        emotion: designData.emotion,
+        hooks: designData.hooks
+      }
+    };
+    variants.push(baseVariant);
+
+    // Step 3: Create 4 programmatic variations from the base image
+    for (let i = 1; i < 5; i++) {
+      const programmaticVariant = await this.createImageVariation(baseImageUrl, layouts[i], i + 1);
       const variant: ThumbnailVariant = {
         id: `variant_${i + 1}`,
         title: layouts[i],
-        imageUrl: await this.generateThumbnailImage(request, designData, layouts[i]),
-        ctrScore: this.calculateCTRScore(designData, trendData, layouts[i]),
+        imageUrl: programmaticVariant.imageUrl,
+        ctrScore: Math.max(baseVariant.ctrScore - (i * 0.5), 60),
         layout: layouts[i],
         metadata: {
           designData,
@@ -173,14 +197,101 @@ provide trending design insights in JSON format:
           colors: designData.colors,
           fonts: designData.fonts[0] || 'Arial',
           emotion: designData.emotion,
-          hooks: designData.hooks
+          hooks: designData.hooks,
+          isVariation: true,
+          baseVariantId: 'variant_1'
         }
       };
       variants.push(variant);
     }
 
-    console.log('[THUMBNAIL AI] Generated', variants.length, 'variants');
+    console.log('[THUMBNAIL AI] Generated', variants.length, 'variants (1 AI + 4 programmatic)');
     return variants;
+  }
+
+  /**
+   * Create programmatic variations from base image using Sharp
+   */
+  private async createImageVariation(baseImageUrl: string, layout: string, variantId: number): Promise<{ imageUrl: string }> {
+    try {
+      const sharp = require('sharp');
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Download base image if it's a URL
+      let baseImageBuffer;
+      if (baseImageUrl.startsWith('http')) {
+        const response = await fetch(baseImageUrl);
+        baseImageBuffer = Buffer.from(await response.arrayBuffer());
+      } else {
+        baseImageBuffer = fs.readFileSync(path.join(process.cwd(), baseImageUrl));
+      }
+      
+      let modifiedBuffer = baseImageBuffer;
+      
+      // Apply different modifications based on layout type
+      switch (layout) {
+        case 'Color Shift Variant':
+          modifiedBuffer = await sharp(baseImageBuffer)
+            .modulate({
+              hue: 25,
+              saturation: 1.15,
+              brightness: 1.05
+            })
+            .toBuffer();
+          break;
+          
+        case 'Warm Tone Variant':
+          modifiedBuffer = await sharp(baseImageBuffer)
+            .modulate({
+              hue: -15,
+              saturation: 0.95,
+              brightness: 1.08
+            })
+            .tint({ r: 255, g: 250, b: 235 })
+            .toBuffer();
+          break;
+          
+        case 'High Contrast Variant':
+          modifiedBuffer = await sharp(baseImageBuffer)
+            .modulate({
+              saturation: 1.25,
+              brightness: 1.02
+            })
+            .gamma(1.15)
+            .toBuffer();
+          break;
+          
+        case 'Cool Tone Variant':
+          modifiedBuffer = await sharp(baseImageBuffer)
+            .modulate({
+              hue: 35,
+              saturation: 1.1,
+              brightness: 0.98
+            })
+            .tint({ r: 230, g: 245, b: 255 })
+            .toBuffer();
+          break;
+      }
+      
+      // Save the modified image
+      const filename = `thumbnail_ai_variation_${variantId}_${Date.now()}.jpg`;
+      const filePath = path.join(process.cwd(), 'uploads', filename);
+      
+      // Ensure uploads directory exists
+      if (!fs.existsSync(path.dirname(filePath))) {
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      }
+      
+      fs.writeFileSync(filePath, modifiedBuffer);
+      
+      return { imageUrl: `/uploads/${filename}` };
+      
+    } catch (error) {
+      console.error(`[THUMBNAIL AI] Variation ${variantId} failed:`, error);
+      // Fallback: return base image URL
+      return { imageUrl: baseImageUrl };
+    }
   }
 
   /**

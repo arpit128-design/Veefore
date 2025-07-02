@@ -24,37 +24,51 @@ export async function generateRealDalleThumbnails(
   
   const variants: ThumbnailVariant[] = [];
   
-  // Professional thumbnail prompts based on trending styles
+  // Create context-aware prompts based on the video title
+  const titleLower = title.toLowerCase();
+  const isTitanic = titleLower.includes('titanic');
+  const isMystery = titleLower.includes('mystery') || titleLower.includes('secret');
+  const isHistorical = titleLower.includes('history') || titleLower.includes('ancient') || isTitanic;
+  
+  // Generate specific background context
+  const backgroundContext = isTitanic 
+    ? 'the RMS Titanic ship in dramatic ocean setting with icebergs and stormy waters'
+    : isMystery 
+    ? 'mysterious dark atmosphere with hidden secrets and dramatic lighting'
+    : isHistorical
+    ? 'epic historical scene with cinematic atmosphere'
+    : 'relevant background matching the video topic';
+
   const thumbnailPrompts = [
     {
-      id: 'mrbeast-style',
-      title: 'MrBeast Style',
-      layout: 'left-face-right-text',
-      prompt: `Create a high-energy YouTube thumbnail in MrBeast style: Large bold yellow text "${title}" positioned on the left side, excited person with wide open surprised expression on the right, dramatic red arrow pointing at the person, bright vibrant colors with high contrast, professional YouTube thumbnail composition, 1280x720 resolution, hyperrealistic style`
+      id: 'title-focused-viral',
+      title: 'Title-Focused Viral',
+      layout: 'title-prominent',
+      prompt: `Create a viral YouTube thumbnail with the title "${title}" in HUGE bold letters taking up most of the image. ${isTitanic ? 'Show the Titanic ship dramatically sinking with icebergs and massive waves in the background.' : `Show ${backgroundContext} in the background.`} Person with extreme shocked expression and wide open mouth pointing at the scene. Bright yellow/red text with black outline. High contrast viral style. 1280x720 resolution.`
     },
     {
-      id: 'sidemen-style', 
-      title: 'Sidemen Style',
-      layout: 'top-text-blur-bg',
-      prompt: `Generate a viral YouTube thumbnail in Sidemen style: Bold white text "${title}" at the top with black outline, blurred background with person showing shocked facial expression, vibrant blue and orange color scheme, trending layout composition, high saturation, 1280x720 resolution, photorealistic`
+      id: 'mystery-reveal',
+      title: 'Mystery Reveal Style',
+      layout: 'split-composition',
+      prompt: `Design a mystery reveal thumbnail for "${title}": Split the image - left side shows the mystery/question, right side shows the answer/revelation. ${isTitanic ? 'Left: Titanic sailing, Right: underwater wreckage with secrets revealed.' : `Left: the mystery, Right: the revelation about ${title}.`} Large text "${title}" across the center. Person with shocked face in the middle. Dark blue and gold colors. 1280x720.`
     },
     {
-      id: 'logan-paul-style',
-      title: 'Logan Paul Style', 
-      layout: 'split-screen',
-      prompt: `Create a scroll-stopping YouTube thumbnail in Logan Paul style: Split-screen composition, person with surprised expression pointing at viewer, bold text "${title}" in huge letters with dramatic shadow effects, bright neon colors, red circle highlighting key element, 1280x720 resolution, dramatic lighting`
+      id: 'documentary-style',
+      title: 'Documentary Epic',
+      layout: 'cinematic-wide',
+      prompt: `Create an epic documentary thumbnail for "${title}": Cinematic wide shot showing ${isTitanic ? 'the majestic Titanic ship against dramatic stormy ocean with lightning and massive waves' : backgroundContext}. Title "${title}" in elegant, readable font overlaid on the scene. Professional National Geographic documentary style with rich colors and dramatic lighting. 1280x720 resolution.`
     },
     {
-      id: 'viral-trending',
-      title: 'Viral Trending',
-      layout: 'center-focus',
-      prompt: `Design a high-CTR viral YouTube thumbnail: Central composition with person showing extreme emotion, "${title}" in massive impact font letters, multiple reaction emojis (😱🔥💯), bright gradient background, trending viral aesthetic, clickbait style, 1280x720 resolution, eye-catching design`
+      id: 'reaction-shock',
+      title: 'Reaction Shock',
+      layout: 'reaction-focused',
+      prompt: `Design an extreme reaction thumbnail for "${title}": Massive close-up of person's shocked face with bulging eyes and dropped jaw taking up 40% of image. Text "${title}" in huge red and yellow letters with explosion effects. ${isTitanic ? 'Background shows the Titanic breaking in half with dramatic water effects and debris.' : `Background shows shocking scene related to ${title}.`} Multiple reaction emojis. Viral clickbait style. 1280x720.`
     },
     {
-      id: 'professional-glow',
-      title: 'Professional Glow',
-      layout: 'gradient-overlay',
-      prompt: `Generate a professional YouTube thumbnail with glowing effects: Person in center with confident expression, "${title}" in modern bold font with glow effects, gradient background transitioning from purple to blue, professional lighting, high production value, 1280x720 resolution, cinematic quality`
+      id: 'professional-reveal',
+      title: 'Professional Reveal',
+      layout: 'reveal-style',
+      prompt: `Create a professional reveal thumbnail for "${title}": Clean composition with "${title}" in bold, professional font. ${isTitanic ? 'High-quality image of the Titanic with underwater exploration imagery and historical accuracy.' : `Professional imagery showing ${backgroundContext} with attention to detail.`} Subtle gradients and professional color grading. Premium documentary aesthetic. 1280x720 resolution.`
     }
   ];
   

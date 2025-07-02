@@ -21,6 +21,7 @@ import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
 import { ThumbnailAIService } from './thumbnail-ai-service';
 import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
+import { canvasThumbnailGenerator } from './canvas-thumbnail-generator';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -8698,11 +8699,50 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       
       res.json(strategy);
     } catch (error) {
-      console.error('[THUMBNAIL PRO] Strategy generation failed:', error);
-      res.status(500).json({ 
-        error: 'Failed to generate strategy',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
+      console.error('[THUMBNAIL PRO] OpenAI failed, using Canvas fallback:', error);
+      
+      try {
+        // Fallback to Canvas-based generation when OpenAI fails
+        const fallbackStrategies = [
+          { style: 'professional', emotion: 'excitement', layout: 'bold' },
+          { style: 'gaming', emotion: 'curiosity', layout: 'dynamic' },
+          { style: 'tech', emotion: 'trust', layout: 'minimal' },
+          { style: 'lifestyle', emotion: 'happiness', layout: 'vibrant' }
+        ];
+        
+        const canvasConfig = {
+          title,
+          description,
+          category,
+          style: 'professional',
+          layout: 'bold',
+          colors: {
+            primary: '#667eea',
+            secondary: '#764ba2',
+            accent: '#f093fb',
+            text: '#ffffff'
+          }
+        };
+        
+        console.log('[THUMBNAIL PRO] Generating Canvas-based thumbnails');
+        const variants = await canvasThumbnailGenerator.generateThumbnailVariants(canvasConfig, fallbackStrategies);
+        
+        res.json({
+          title,
+          category,
+          strategies: fallbackStrategies,
+          variants,
+          trendData: { trending_elements: ['Bold text', 'High contrast', 'Professional styling'] },
+          generatedBy: 'canvas'
+        });
+        
+      } catch (canvasError) {
+        console.error('[THUMBNAIL PRO] Canvas fallback also failed:', canvasError);
+        res.status(500).json({ 
+          error: 'Failed to generate strategy',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
     }
   });
 

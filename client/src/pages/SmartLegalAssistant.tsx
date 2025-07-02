@@ -259,7 +259,7 @@ export default function SmartLegalAssistant() {
             Legal Bot
           </TabsTrigger>
           <TabsTrigger value="generator" className="data-[state=active]:bg-green-600">
-            <Contract className="h-4 w-4 mr-2" />
+            <FileText className="h-4 w-4 mr-2" />
             Generator
           </TabsTrigger>
           <TabsTrigger value="guidance" className="data-[state=active]:bg-orange-600">
@@ -512,7 +512,7 @@ export default function SmartLegalAssistant() {
                   </>
                 ) : (
                   <>
-                    <Contract className="mr-2 h-4 w-4" />
+                    <FileText className="mr-2 h-4 w-4" />
                     Generate Custom Contract (5 Credits)
                   </>
                 )}

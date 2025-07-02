@@ -125,6 +125,7 @@ function AuthenticatedApp() {
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
               <Route path="/ai-thumbnails" component={ThumbnailAIMaker} />
         <Route path="/ai-thumbnails-pro" component={ThumbnailAIMakerProComplete} />
+        <Route path="/thumbnail-ai-maker-pro-complete" component={ThumbnailAIMakerProComplete} />
         <Route path="/thumbnail-maker-pro" component={ThumbnailMakerPro} />
               <Route path="/creative-brief" component={CreativeBriefGenerator} />
               <Route path="/content-repurpose" component={ContentRepurpose} />

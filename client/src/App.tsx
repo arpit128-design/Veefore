@@ -46,6 +46,7 @@ import ThumbnailAIMaker from "@/pages/ThumbnailAIMaker";
 import ThumbnailAIMakerPro from "@/pages/ThumbnailAIMakerPro";
 import ThumbnailMakerPro from "@/pages/ThumbnailMakerPro";
 import CreativeBriefGenerator from "@/pages/CreativeBriefGenerator";
+import ContentRepurpose from "@/pages/ContentRepurpose";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -99,6 +100,7 @@ function AuthenticatedApp() {
         <Route path="/ai-thumbnails-pro" component={ThumbnailAIMakerPro} />
         <Route path="/thumbnail-maker-pro" component={ThumbnailMakerPro} />
               <Route path="/creative-brief" component={CreativeBriefGenerator} />
+              <Route path="/content-repurpose" component={ContentRepurpose} />
               <Route path="/automation" component={Automation} />
               <Route path="/conversations" component={Conversations} />
               <Route path="/workspaces" component={Workspaces} />

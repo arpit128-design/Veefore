@@ -715,6 +715,11 @@ export default function Auth() {
               </motion.span>
             </Link>
           </div>
+          <div className="mt-4 pt-3 border-t border-white/10">
+            <p className="text-xs text-white/30">
+              © 2025 Veefore — A product of VEEFED TECHNOLOGIES PRIVATE LIMITED
+            </p>
+          </div>
         </motion.div>
       </div>
     </div>

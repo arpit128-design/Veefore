@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { OptimizedSpaceBackground } from "@/components/layout/OptimizedSpaceBackground";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Footer } from "@/components/layout/Footer";
 import { SpaceLoader } from "@/components/ui/space-loader";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/hooks/useWorkspace";
@@ -35,8 +36,8 @@ import OnboardingPremium from "@/pages/OnboardingPremium";
 
 import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfService from "@/pages/TermsOfService";
+import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
+import { TermsOfService } from "@/pages/TermsOfService";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -151,6 +152,7 @@ function AuthenticatedApp() {
             </Switch>
           </main>
         </div>
+        <Footer />
         <GlobalWorkspaceSwitchingOverlay />
         <AICopilotWidget />
       </div>
@@ -233,6 +235,7 @@ function Router() {
           <Route path="/" component={Landing} />
           <Route component={() => <Redirect to="/" />} />
         </Switch>
+        <Footer />
       </div>
     );
   }

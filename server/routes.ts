@@ -35,6 +35,110 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const enhancedDMService = new EnhancedAutoDMService(storage as any);
   const dashboardCache = new DashboardCache(storage);
   const thumbnailAIService = new ThumbnailAIService(storage);
+
+  // TEST ROUTE - Optimized generation test (early placement to avoid middleware issues)
+  app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
+    console.log('[THUMBNAIL TEST] Route hit - req.body:', req.body);
+    try {
+      console.log('[THUMBNAIL TEST] Testing optimized generation system');
+      
+      const { title } = req.body;
+      if (!title) {
+        return res.status(400).json({ error: 'Title is required for testing' });
+      }
+
+      // Simulate the optimized process: 1 AI call + 4 programmatic variations
+      console.log('[THUMBNAIL TEST] Step 1: Generate 1 AI thumbnail (simulated)');
+      
+      // Use a placeholder image to demonstrate the variation system
+      const baseImageUrl = 'https://picsum.photos/1280/720?random=' + Date.now();
+      
+      const baseVariant = {
+        id: 'variant_1',
+        title: `${title} - AI Generated Master`,
+        imageUrl: baseImageUrl,
+        ctrScore: 85.5,
+        layout: 'AI Generated Master',
+        isBase: true,
+        apiCallsUsed: 1 // This would be the only AI call
+      };
+
+      console.log('[THUMBNAIL TEST] Step 2: Create 4 programmatic variations');
+      
+      // Simulate the programmatic variations (without actually processing images)
+      const variations = [
+        {
+          id: 'variant_2',
+          title: `${title} - Color Shift`,
+          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 1),
+          ctrScore: 82.0,
+          layout: 'Color Shift Variant',
+          isVariation: true,
+          baseVariantId: 'variant_1',
+          apiCallsUsed: 0, // No AI call - programmatic
+          modifications: 'Hue +25°, Saturation +15%, Brightness +5%'
+        },
+        {
+          id: 'variant_3', 
+          title: `${title} - Warm Tone`,
+          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 2),
+          ctrScore: 80.5,
+          layout: 'Warm Tone Variant',
+          isVariation: true,
+          baseVariantId: 'variant_1',
+          apiCallsUsed: 0, // No AI call - programmatic
+          modifications: 'Hue -15°, Warm tint overlay'
+        },
+        {
+          id: 'variant_4',
+          title: `${title} - High Contrast`,
+          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 3),
+          ctrScore: 79.0,
+          layout: 'High Contrast Variant',
+          isVariation: true,
+          baseVariantId: 'variant_1',
+          apiCallsUsed: 0, // No AI call - programmatic
+          modifications: 'Saturation +25%, Gamma +15%'
+        },
+        {
+          id: 'variant_5',
+          title: `${title} - Cool Tone`,
+          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 4),
+          ctrScore: 77.5,
+          layout: 'Cool Tone Variant',
+          isVariation: true,
+          baseVariantId: 'variant_1',
+          apiCallsUsed: 0, // No AI call - programmatic
+          modifications: 'Hue +35°, Cool blue tint overlay'
+        }
+      ];
+
+      const allVariants = [baseVariant, ...variations];
+      
+      // Calculate total API usage
+      const totalApiCalls = allVariants.reduce((sum, variant) => sum + (variant.apiCallsUsed || 0), 0);
+      
+      console.log(`[THUMBNAIL TEST] Generated ${allVariants.length} variants with only ${totalApiCalls} AI call(s)`);
+      console.log(`[THUMBNAIL TEST] OLD SYSTEM: Would have used 5 AI calls`);
+      console.log(`[THUMBNAIL TEST] NEW SYSTEM: Uses ${totalApiCalls} AI call + 4 programmatic variations`);
+      console.log(`[THUMBNAIL TEST] API SAVINGS: ${((5 - totalApiCalls) / 5 * 100).toFixed(1)}%`);
+
+      res.json({
+        variants: allVariants,
+        optimization: {
+          oldSystemApiCalls: 5,
+          newSystemApiCalls: totalApiCalls,
+          programmaticVariations: 4,
+          apiSavingsPercent: ((5 - totalApiCalls) / 5 * 100).toFixed(1),
+          message: `Optimized system uses ${totalApiCalls} AI call instead of 5, saving ${((5 - totalApiCalls) / 5 * 100).toFixed(1)}% API usage`
+        }
+      });
+
+    } catch (error) {
+      console.error('[THUMBNAIL TEST] Test failed:', error);
+      res.status(500).json({ error: 'Test generation failed' });
+    }
+  });
   
   const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
@@ -8730,116 +8834,6 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         error: 'Failed to match trending data',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
-    }
-  });
-
-  // SIMPLE TEST ROUTE - Debug version
-  app.post('/api/test-simple', (req: any, res: Response) => {
-    console.log('[SIMPLE TEST] Route definitely hit!');
-    res.json({ success: true, message: 'Simple test works!' });
-  });
-
-  // TEST ROUTE - Identical to working routes
-  app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
-    console.log('[THUMBNAIL TEST] Route hit - req.body:', req.body);
-    try {
-      console.log('[THUMBNAIL TEST] Testing optimized generation system');
-      
-      const { title } = req.body;
-      if (!title) {
-        return res.status(400).json({ error: 'Title is required for testing' });
-      }
-
-      // Simulate the optimized process: 1 AI call + 4 programmatic variations
-      console.log('[THUMBNAIL TEST] Step 1: Generate 1 AI thumbnail (simulated)');
-      
-      // Use a placeholder image to demonstrate the variation system
-      const baseImageUrl = 'https://picsum.photos/1280/720?random=' + Date.now();
-      
-      const baseVariant = {
-        id: 'variant_1',
-        title: `${title} - AI Generated Master`,
-        imageUrl: baseImageUrl,
-        ctrScore: 85.5,
-        layout: 'AI Generated Master',
-        isBase: true,
-        apiCallsUsed: 1 // This would be the only AI call
-      };
-
-      console.log('[THUMBNAIL TEST] Step 2: Create 4 programmatic variations');
-      
-      // Simulate the programmatic variations (without actually processing images)
-      const variations = [
-        {
-          id: 'variant_2',
-          title: `${title} - Color Shift`,
-          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 1),
-          ctrScore: 82.0,
-          layout: 'Color Shift Variant',
-          isVariation: true,
-          baseVariantId: 'variant_1',
-          apiCallsUsed: 0, // No AI call - programmatic
-          modifications: 'Hue +25°, Saturation +15%, Brightness +5%'
-        },
-        {
-          id: 'variant_3', 
-          title: `${title} - Warm Tone`,
-          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 2),
-          ctrScore: 80.5,
-          layout: 'Warm Tone Variant',
-          isVariation: true,
-          baseVariantId: 'variant_1',
-          apiCallsUsed: 0, // No AI call - programmatic
-          modifications: 'Hue -15°, Warm tint overlay'
-        },
-        {
-          id: 'variant_4',
-          title: `${title} - High Contrast`,
-          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 3),
-          ctrScore: 79.0,
-          layout: 'High Contrast Variant',
-          isVariation: true,
-          baseVariantId: 'variant_1',
-          apiCallsUsed: 0, // No AI call - programmatic
-          modifications: 'Saturation +25%, Gamma +15%'
-        },
-        {
-          id: 'variant_5',
-          title: `${title} - Cool Tone`,
-          imageUrl: 'https://picsum.photos/1280/720?random=' + (Date.now() + 4),
-          ctrScore: 77.5,
-          layout: 'Cool Tone Variant',
-          isVariation: true,
-          baseVariantId: 'variant_1',
-          apiCallsUsed: 0, // No AI call - programmatic
-          modifications: 'Hue +35°, Cool blue tint overlay'
-        }
-      ];
-
-      const allVariants = [baseVariant, ...variations];
-      
-      // Calculate total API usage
-      const totalApiCalls = allVariants.reduce((sum, variant) => sum + (variant.apiCallsUsed || 0), 0);
-      
-      console.log(`[THUMBNAIL TEST] Generated ${allVariants.length} variants with only ${totalApiCalls} AI call(s)`);
-      console.log(`[THUMBNAIL TEST] OLD SYSTEM: Would have used 5 AI calls`);
-      console.log(`[THUMBNAIL TEST] NEW SYSTEM: Uses ${totalApiCalls} AI call + 4 programmatic variations`);
-      console.log(`[THUMBNAIL TEST] API SAVINGS: ${((5 - totalApiCalls) / 5 * 100).toFixed(1)}%`);
-
-      res.json({
-        variants: allVariants,
-        optimization: {
-          oldSystemApiCalls: 5,
-          newSystemApiCalls: totalApiCalls,
-          programmaticVariations: 4,
-          apiSavingsPercent: ((5 - totalApiCalls) / 5 * 100).toFixed(1),
-          message: `Optimized system uses ${totalApiCalls} AI call instead of 5, saving ${((5 - totalApiCalls) / 5 * 100).toFixed(1)}% API usage`
-        }
-      });
-
-    } catch (error) {
-      console.error('[THUMBNAIL TEST] Test failed:', error);
-      res.status(500).json({ error: 'Test generation failed' });
     }
   });
 

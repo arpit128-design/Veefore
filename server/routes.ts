@@ -10029,7 +10029,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.log('[THUMBNAIL PRO] Generating 1 AI thumbnail + 3 programmatic variations');
       
       // Step 1: Generate only 1 high-quality AI thumbnail
-      const baseVariant = await generateThumbnailVariant(title, strategy, 1, 'AI Generated');
+      const baseVariant = await generateDALLEThumbnail(title, strategy, 1, 'AI Generated');
       
       // Step 2: Create 3 programmatic variations by modifying the base thumbnail
       console.log('[THUMBNAIL PRO] Starting variation creation for base:', baseVariant.imageUrl);
@@ -10226,7 +10226,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   }
 
   // Helper function to generate individual thumbnail variants
-  async function generateThumbnailVariant(title: string, strategy: any, variantNum: number, layout: string) {
+  async function generateDALLEThumbnail(title: string, strategy: any, variantNum: number, layout: string) {
     try {
       // Initialize OpenAI client
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

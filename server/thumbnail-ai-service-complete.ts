@@ -104,23 +104,29 @@ TITLE ANALYSIS:
 - Description: ${input.description || 'No description provided'}
 - Category: ${input.category}
 
-Generate viral thumbnail elements that match professional YouTuber standards like MrBeast, Sidemen, Logan Paul, etc.
+Generate scroll-stopping thumbnail elements for maximum click-through rate like MrBeast, Sidemen, Logan Paul style.
 
-Return JSON with:
+ANALYSIS OF "${input.title}":
+${input.description ? `Description: ${input.description}` : ''}
+Category: ${input.category}
+
+Return JSON with viral thumbnail strategy:
 {
-  "titles": [3 bold, dramatic text overlays under 4 words each - use ALL CAPS when impactful],
-  "ctas": [2 urgent action phrases like "WATCH NOW", "LAST CHANCE"],
-  "fonts": ["Bold Sans-Serif fonts like Anton, Impact, Bebas Neue"],
+  "titles": ["${input.title.toUpperCase()}", "SHOCKING TRUTH", "YOU WON'T BELIEVE"],
+  "ctas": ["WATCH NOW", "MIND BLOWN", "LAST CHANCE"],
+  "fonts": ["Impact", "Anton", "Bebas Neue"],
   "colors": {
-    "background": "dramatic background color hex",
-    "title": "high-contrast title color hex", 
-    "cta": "urgent CTA color hex (reds/oranges for urgency)"
+    "background": "#000000 or #FF0000 or #1a1a1a for drama",
+    "title": "#FFFFFF or #FFFF00 for high contrast", 
+    "cta": "#FF0000 or #FF6B00 for urgency"
   },
-  "style": "viral style keyword (dramatic/luxury/chaos/mystery/hype)",
-  "emotion": "primary emotion to trigger (shock/excitement/curiosity/urgency/fear)",
-  "hooks": ["3-4 viral hook words like EXPOSED, SECRET, TRUTH, REVEALED, LAST, FIRST"],
-  "placement": "optimal text placement for maximum impact"
+  "style": "Choose: dramatic/explosive/luxury/mystery/shock/hype",
+  "emotion": "Choose: shock/excitement/curiosity/urgency/fear/amazement",
+  "hooks": ["EXPOSED", "SECRET", "TRUTH", "REVEALED", "SHOCKING", "CRAZY", "LAST", "FIRST", "HIDDEN"],
+  "placement": "Choose: center-focus/left-face-right-text/top-text-bottom-face"
 }
+
+Focus on creating thumbnails that immediately trigger curiosity and emotional response like viral YouTube content.
 
 Focus on creating thumbnails that immediately grab attention and trigger strong emotional responses. Think viral, dramatic, scroll-stopping impact.`;
 
@@ -299,30 +305,33 @@ export async function generateThumbnailVariants(
 async function generateMasterThumbnail(input: ThumbnailInput, gptResponse: GPTPromptResponse): Promise<{ url: string; buffer: Buffer }> {
   console.log('[STAGE 3] Generating master thumbnail with DALL-E 3');
   
-  const dallePrompt = `Create a professional, scroll-stopping YouTube thumbnail for "${input.title}".
+  const dallePrompt = `Create a YouTube thumbnail image with these exact specifications:
 
-STYLE REQUIREMENTS:
-- Bold, dramatic visual with high contrast colors
-- Professional YouTube thumbnail aesthetic similar to top YouTubers
-- Dramatic lighting and cinematic composition
-- Clear focal point with emotional expression
-- High-impact visual that immediately grabs attention
+TITLE: "${input.title}"
 
-CONTENT ELEMENTS:
-- Subject matter directly related to: ${input.title}
-- Visual style: ${gptResponse.style} with ${gptResponse.emotion} emotion
-- Include dramatic visual elements suggesting: ${gptResponse.hooks.join(', ')}
-- Use color scheme: ${gptResponse.colors.background} background, ${gptResponse.colors.title} accents
+VISUAL REQUIREMENTS:
+- Large, bold text overlay saying "${gptResponse.titles[0] || input.title.toUpperCase()}" in ${gptResponse.colors.title} color
+- Text should be clearly readable and take up 30-40% of the image
+- Add dramatic facial expression or reaction if person is included
+- High contrast background in ${gptResponse.colors.background} with dramatic lighting
+- Include visual elements for: ${gptResponse.hooks.join(', ')}
+- Style: ${gptResponse.style} with ${gptResponse.emotion} emotion
 
-VISUAL SPECIFICATIONS:
-- 16:9 aspect ratio (YouTube thumbnail format)
-- HD quality with sharp details
-- Bold, readable text space allocation
-- Professional graphic design quality
-- Eye-catching thumbnail that increases click-through rate
-- Inspired by viral YouTube thumbnails with dramatic visual impact
+YOUTUBE THUMBNAIL STYLE:
+- 16:9 aspect ratio (1280x720 pixels)
+- Bold, eye-catching design similar to MrBeast, Sidemen, or viral YouTubers
+- High contrast colors that pop on mobile screens
+- Dramatic composition that stops scrolling
+- Include arrows, circles, or highlighting elements if relevant
+- Professional graphic design quality with clear focal hierarchy
 
-Create a thumbnail that looks like it belongs on a top-performing YouTube channel with millions of views.`;
+CONTENT FOCUS:
+- Subject matter: ${input.title}
+- Emotional trigger: ${gptResponse.emotion}
+- Visual hooks: ${gptResponse.hooks.join(', ')}
+- Color palette: ${gptResponse.colors.background} background, ${gptResponse.colors.title} text
+
+Create an actual YouTube thumbnail that would get clicked by millions of viewers, with bold text overlay and dramatic visual composition.`;
 
   try {
     const response = await openai.images.generate({

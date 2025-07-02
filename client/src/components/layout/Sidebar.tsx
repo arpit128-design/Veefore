@@ -18,6 +18,8 @@ const navigationItems = [
   { href: "/competitor-analysis", icon: Users, label: "Competitor Analysis", color: "text-orange-400" },
   { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500" },
   { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400" },
+  { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400" },
+  { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400" },
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-amber-400" },
   { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400" },

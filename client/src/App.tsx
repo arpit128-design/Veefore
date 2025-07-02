@@ -48,6 +48,13 @@ import ThumbnailMakerPro from "@/pages/ThumbnailMakerPro";
 import CreativeBriefGenerator from "@/pages/CreativeBriefGenerator";
 import ContentRepurpose from "@/pages/ContentRepurpose";
 import AIIntelligence from "@/pages/AIIntelligence";
+import TrendCalendar from "@/pages/TrendCalendar";
+import ABTesting from "@/pages/ABTesting";
+import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
+import ROICalculator from "@/pages/ROICalculator";
+import AffiliateEngine from "@/pages/AffiliateEngine";
+import SocialListening from "@/pages/SocialListening";
+import SmartLegalAssistant from "@/pages/SmartLegalAssistant";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -98,6 +105,13 @@ function AuthenticatedApp() {
               <Route path="/content-recommendations" component={ContentRecommendations} />
               <Route path="/ai-features" component={AIFeatures} />
               <Route path="/ai-intelligence" component={AIIntelligence} />
+              <Route path="/trend-calendar" component={TrendCalendar} />
+              <Route path="/ab-testing" component={ABTesting} />
+              <Route path="/competitor-analysis" component={CompetitorAnalysis} />
+              <Route path="/roi-calculator" component={ROICalculator} />
+              <Route path="/affiliate-engine" component={AffiliateEngine} />
+              <Route path="/social-listening" component={SocialListening} />
+              <Route path="/legal-assistant" component={SmartLegalAssistant} />
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
               <Route path="/ai-thumbnails" component={ThumbnailAIMaker} />
         <Route path="/ai-thumbnails-pro" component={ThumbnailAIMakerPro} />

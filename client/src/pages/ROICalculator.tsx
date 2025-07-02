@@ -73,6 +73,7 @@ export default function ROICalculator() {
     industry: 'general',
     platform: 'instagram'
   });
+  const [roiResult, setROIResult] = useState<ROIResult | null>(null);
 
   // Get user data for credits
   const { data: user } = useQuery({
@@ -84,6 +85,8 @@ export default function ROICalculator() {
   const calculateMutation = useMutation({
     mutationFn: (data: ROIInput) => apiRequest('POST', '/api/ai/roi-calculator', data),
     onSuccess: (data: ROIResult) => {
+      setROIResult(data);
+      setActiveTab('results');
       toast({
         title: "ROI Analysis Complete!",
         description: "Your comprehensive ROI report is ready with AI insights.",
@@ -481,164 +484,195 @@ export default function ROICalculator() {
 
           {/* Results Tab */}
           <TabsContent value="results" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* ROI Metrics */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                  <CardContent className="p-6 text-center">
-                    <TrendingUp className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                    <div className="text-2xl font-bold text-green-400">{mockROIResult.roi}%</div>
-                    <div className="text-asteroid-silver text-sm">ROI</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+            {!roiResult ? (
+              <div className="text-center py-12">
+                <Calculator className="w-16 h-16 text-asteroid-silver mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold text-white mb-2">No ROI Analysis Available</h3>
+                <p className="text-asteroid-silver mb-6">Run a calculation first to see your comprehensive ROI analysis</p>
+                <Button
+                  onClick={() => setActiveTab('calculator')}
+                  className="bg-gradient-to-r from-electric-cyan to-nebula-purple hover:opacity-90 text-white"
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Start ROI Analysis
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* ROI Metrics */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                      <CardContent className="p-6 text-center">
+                        <TrendingUp className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                        <div className="text-2xl font-bold text-green-400">{roiResult.roi}%</div>
+                        <div className="text-asteroid-silver text-sm">ROI</div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                  <CardContent className="p-6 text-center">
-                    <DollarSign className="w-8 h-8 text-electric-cyan mx-auto mb-3" />
-                    <div className="text-2xl font-bold text-white">{formatCurrency(mockROIResult.profit)}</div>
-                    <div className="text-asteroid-silver text-sm">Profit</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                      <CardContent className="p-6 text-center">
+                        <DollarSign className="w-8 h-8 text-electric-cyan mx-auto mb-3" />
+                        <div className="text-2xl font-bold text-white">{formatCurrency(roiResult.profit)}</div>
+                        <div className="text-asteroid-silver text-sm">Profit</div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                  <CardContent className="p-6 text-center">
-                    <Target className="w-8 h-8 text-nebula-purple mx-auto mb-3" />
-                    <div className="text-2xl font-bold text-white">{formatCurrency(mockROIResult.costPerConversion)}</div>
-                    <div className="text-asteroid-silver text-sm">Cost per Conversion</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                      <CardContent className="p-6 text-center">
+                        <Target className="w-8 h-8 text-nebula-purple mx-auto mb-3" />
+                        <div className="text-2xl font-bold text-white">{formatCurrency(roiResult.costPerConversion)}</div>
+                        <div className="text-asteroid-silver text-sm">Cost per Conversion</div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                  <CardContent className="p-6 text-center">
-                    <BarChart3 className="w-8 h-8 text-solar-gold mx-auto mb-3" />
-                    <div className="text-2xl font-bold text-white">${mockROIResult.revenuePerFollower}</div>
-                    <div className="text-asteroid-silver text-sm">Revenue per Follower</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                      <CardContent className="p-6 text-center">
+                        <BarChart3 className="w-8 h-8 text-solar-gold mx-auto mb-3" />
+                        <div className="text-2xl font-bold text-white">${roiResult.revenuePerFollower}</div>
+                        <div className="text-asteroid-silver text-sm">Revenue per Follower</div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </div>
 
-            {/* Benchmarks */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-electric-cyan" />
-                    Industry Benchmarks
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-r from-electric-cyan/10 to-blue-500/10 rounded-lg p-4 border border-electric-cyan/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-electric-cyan font-medium">Your ROI</span>
-                        <ArrowUp className="w-4 h-4 text-green-400" />
-                      </div>
-                      <div className="text-2xl font-bold text-white">{mockROIResult.roi}%</div>
-                    </div>
-                    <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-4 border border-yellow-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-yellow-400 font-medium">Industry Average</span>
-                        <span className="text-xs bg-yellow-500/20 px-2 py-1 rounded">Fitness</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{mockROIResult.benchmarks.industry}%</div>
-                    </div>
-                    <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-purple-400 font-medium">Platform Average</span>
-                        <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">Instagram</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{mockROIResult.benchmarks.platform}%</div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-4 border border-green-500/20">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                      <span className="text-green-400 font-medium">Performance Category: {mockROIResult.benchmarks.category}</span>
-                    </div>
-                    <p className="text-asteroid-silver text-sm mt-2">
-                      Your ROI is {mockROIResult.roi - mockROIResult.benchmarks.industry}% above industry average and {mockROIResult.roi - mockROIResult.benchmarks.platform}% above platform average.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* AI Recommendations */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-electric-cyan" />
-                    AI Optimization Recommendations
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {mockROIResult.recommendations.map((rec, index) => (
-                    <div key={index} className="bg-gradient-to-r from-electric-cyan/10 to-nebula-purple/10 rounded-lg p-3 border border-electric-cyan/20">
-                      <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-electric-cyan/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-electric-cyan text-xs font-bold">{index + 1}</span>
+                {/* Benchmarks */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-electric-cyan" />
+                        Industry Benchmarks
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-gradient-to-r from-electric-cyan/10 to-blue-500/10 rounded-lg p-4 border border-electric-cyan/20">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-electric-cyan font-medium">Your ROI</span>
+                            <ArrowUp className="w-4 h-4 text-green-400" />
+                          </div>
+                          <div className="text-2xl font-bold text-white">{roiResult.roi}%</div>
                         </div>
-                        <p className="text-asteroid-silver text-sm">{rec}</p>
+                        <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-4 border border-yellow-500/20">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-yellow-400 font-medium">Industry Average</span>
+                            <span className="text-xs bg-yellow-500/20 px-2 py-1 rounded">{roiInput.industry}</span>
+                          </div>
+                          <div className="text-2xl font-bold text-white">{roiResult.benchmarks.industry}%</div>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/20">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-purple-400 font-medium">Platform Average</span>
+                            <span className="text-xs bg-purple-500/20 px-2 py-1 rounded">{roiInput.platform}</span>
+                          </div>
+                          <div className="text-2xl font-bold text-white">{roiResult.benchmarks.platform}%</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+                      
+                      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-4 border border-green-500/20">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-400" />
+                          <span className="text-green-400 font-medium">Performance Category: {roiResult.benchmarks.category}</span>
+                        </div>
+                        <p className="text-asteroid-silver text-sm mt-2">
+                          Your ROI is {roiResult.roi - roiResult.benchmarks.industry}% above industry average and {roiResult.roi - roiResult.benchmarks.platform}% above platform average.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* AI Recommendations */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-electric-cyan" />
+                        AI Optimization Recommendations
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {roiResult.recommendations.map((rec, index) => (
+                        <div key={index} className="bg-gradient-to-r from-electric-cyan/10 to-nebula-purple/10 rounded-lg p-3 border border-electric-cyan/20">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-electric-cyan/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-electric-cyan text-xs font-bold">{index + 1}</span>
+                            </div>
+                            <p className="text-asteroid-silver text-sm">{rec}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </div>
+            )}
           </TabsContent>
 
           {/* Projections Tab */}
           <TabsContent value="projections" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-              {Object.entries(mockROIResult.projections).map(([period, value], index) => (
-                <Card key={period} className="bg-cosmic-void/40 border-asteroid-silver/30">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-lg font-semibold text-white mb-2">
-                      {period === 'month1' ? '1 Month' : 
-                       period === 'month3' ? '3 Months' : 
-                       period === 'month6' ? '6 Months' : '12 Months'}
-                    </div>
-                    <div className="text-2xl font-bold text-electric-cyan">{formatCurrency(value)}</div>
-                    <div className="text-asteroid-silver text-sm">Projected Revenue</div>
-                    {index > 0 && (
-                      <div className="text-green-400 text-xs mt-1 flex items-center justify-center gap-1">
+            {!roiResult ? (
+              <div className="text-center py-12">
+                <TrendingUp className="w-16 h-16 text-asteroid-silver mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold text-white mb-2">No ROI Projections Available</h3>
+                <p className="text-asteroid-silver mb-6">Calculate ROI first to see detailed revenue projections</p>
+                <Button
+                  onClick={() => setActiveTab('calculator')}
+                  className="bg-gradient-to-r from-electric-cyan to-nebula-purple hover:opacity-90 text-white"
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Start ROI Analysis
+                </Button>
+              </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              >
+                {Object.entries(roiResult.projections).map(([period, value], index) => (
+                  <Card key={period} className="bg-cosmic-void/40 border-asteroid-silver/30">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-lg font-semibold text-white mb-2">
+                        {period === 'month1' ? '1 Month' : 
+                         period === 'month3' ? '3 Months' : 
+                         period === 'month6' ? '6 Months' : '12 Months'}
+                      </div>
+                      <div className="text-2xl font-bold text-electric-cyan">{formatCurrency(value)}</div>
+                      <div className="text-asteroid-silver text-sm">Projected Revenue</div>
+                      {index > 0 && (
+                        <div className="text-green-400 text-xs mt-1 flex items-center justify-center gap-1">
                         <ArrowUp className="w-3 h-3" />
                         Growth
                       </div>

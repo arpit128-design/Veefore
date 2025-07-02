@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import sharp from 'sharp';
+import axios from 'axios';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -39,38 +41,131 @@ export async function generateRealDalleThumbnails(
     ? 'epic historical scene with cinematic atmosphere'
     : 'relevant background matching the video topic';
 
+  // DALL-E prompts focused on BACKGROUND IMAGERY ONLY (no text generation)
   const thumbnailPrompts = [
     {
       id: 'title-focused-viral',
       title: 'Title-Focused Viral',
-      layout: 'title-prominent',
-      prompt: `Create a viral YouTube thumbnail with the title "${title}" in HUGE bold letters taking up most of the image. ${isTitanic ? 'Show the Titanic ship dramatically sinking with icebergs and massive waves in the background.' : `Show ${backgroundContext} in the background.`} Person with extreme shocked expression and wide open mouth pointing at the scene. Bright yellow/red text with black outline. High contrast viral style. 1280x720 resolution.`
+      layout: 'title-prominent', 
+      prompt: `YouTube thumbnail background image with NO TEXT: ${isTitanic ? 'RMS Titanic ship dramatically sinking in icy Atlantic ocean with massive icebergs, dramatic waves, and the ship tilting and breaking apart. Dark stormy ocean with dramatic lighting.' : `${backgroundContext} with dramatic cinematic lighting.`} Include a person with extreme shocked facial expression pointing dramatically. High contrast viral YouTube style with bright colors and dramatic lighting. Leave space for text overlay. 1280x720 aspect ratio. Do not include any text or words in the image.`
     },
     {
       id: 'mystery-reveal',
       title: 'Mystery Reveal Style',
       layout: 'split-composition',
-      prompt: `Design a mystery reveal thumbnail for "${title}": Split the image - left side shows the mystery/question, right side shows the answer/revelation. ${isTitanic ? 'Left: Titanic sailing, Right: underwater wreckage with secrets revealed.' : `Left: the mystery, Right: the revelation about ${title}.`} Large text "${title}" across the center. Person with shocked face in the middle. Dark blue and gold colors. 1280x720.`
+      prompt: `YouTube thumbnail background with split screen composition with NO TEXT: ${isTitanic ? 'Left side shows the majestic Titanic ship sailing in calm waters. Right side shows underwater wreckage, debris, and mysterious secrets being revealed in deep ocean darkness.' : `Left side shows the mystery or unknown elements. Right side shows the revelation or answer being unveiled.`} Person with shocked expression in the center. Dark blue and gold color scheme with dramatic lighting. Leave space for text overlay. 1280x720. Do not include any text or words.`
     },
     {
-      id: 'documentary-style',
+      id: 'documentary-style', 
       title: 'Documentary Epic',
       layout: 'cinematic-wide',
-      prompt: `Create an epic documentary thumbnail for "${title}": Cinematic wide shot showing ${isTitanic ? 'the majestic Titanic ship against dramatic stormy ocean with lightning and massive waves' : backgroundContext}. Title "${title}" in elegant, readable font overlaid on the scene. Professional National Geographic documentary style with rich colors and dramatic lighting. 1280x720 resolution.`
+      prompt: `Professional documentary background image with NO TEXT: ${isTitanic ? 'Magnificent RMS Titanic ship in its full glory sailing against dramatic stormy Atlantic ocean with lightning strikes, towering waves, and epic historical atmosphere.' : `Epic ${backgroundContext} with cinematic grandeur and historical significance.`} National Geographic documentary style with rich cinematic colors, professional lighting, and epic scale. Leave space for text overlay. 1280x720 resolution. Do not include any text or words in the image.`
     },
     {
       id: 'reaction-shock',
-      title: 'Reaction Shock',
+      title: 'Reaction Shock', 
       layout: 'reaction-focused',
-      prompt: `Design an extreme reaction thumbnail for "${title}": Massive close-up of person's shocked face with bulging eyes and dropped jaw taking up 40% of image. Text "${title}" in huge red and yellow letters with explosion effects. ${isTitanic ? 'Background shows the Titanic breaking in half with dramatic water effects and debris.' : `Background shows shocking scene related to ${title}.`} Multiple reaction emojis. Viral clickbait style. 1280x720.`
+      prompt: `Extreme reaction thumbnail background with NO TEXT: ${isTitanic ? 'Titanic ship dramatically breaking in half with massive water explosions, debris flying everywhere, dramatic destruction scene with intense lighting and chaos.' : `Shocking dramatic scene with explosive action and intense atmosphere.`} Large close-up of person with extremely shocked face, bulging eyes, and open mouth showing extreme surprise. Viral clickbait style with bright explosive colors. Leave space for text overlay. 1280x720. Do not include any text or words.`
     },
     {
       id: 'professional-reveal',
       title: 'Professional Reveal',
-      layout: 'reveal-style',
-      prompt: `Create a professional reveal thumbnail for "${title}": Clean composition with "${title}" in bold, professional font. ${isTitanic ? 'High-quality image of the Titanic with underwater exploration imagery and historical accuracy.' : `Professional imagery showing ${backgroundContext} with attention to detail.`} Subtle gradients and professional color grading. Premium documentary aesthetic. 1280x720 resolution.`
+      layout: 'reveal-style', 
+      prompt: `High-quality professional background image with NO TEXT: ${isTitanic ? 'Historically accurate RMS Titanic with underwater exploration elements, sonar imagery, deep-sea discovery aesthetic, research equipment, and professional documentary atmosphere.' : `Professional ${backgroundContext} with sophisticated atmosphere and high attention to detail.`} Premium documentary style with subtle gradients, sophisticated color grading, and professional aesthetic. Leave space for text overlay. 1280x720 aspect ratio. Do not include any text or words in the image.`
     }
   ];
+
+  // Function to add text overlay to DALL-E generated image
+  async function addTextOverlay(imageUrl: string, text: string, layout: string): Promise<string> {
+    try {
+      // Download the DALL-E image
+      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const imageBuffer = Buffer.from(response.data);
+
+      // Text styling based on layout
+      const textStyles = {
+        'title-prominent': {
+          fontSize: 120,
+          fontWeight: 'bold',
+          color: '#FFFF00', // Bright yellow
+          stroke: '#000000', // Black outline
+          strokeWidth: 8,
+          y: 400 // Center vertically
+        },
+        'split-composition': {
+          fontSize: 90,
+          fontWeight: 'bold', 
+          color: '#FFD700', // Gold
+          stroke: '#000080', // Dark blue
+          strokeWidth: 6,
+          y: 360 // Center
+        },
+        'cinematic-wide': {
+          fontSize: 80,
+          fontWeight: 'bold',
+          color: '#FFFFFF', // White
+          stroke: '#000000', // Black
+          strokeWidth: 4,
+          y: 600 // Lower third
+        },
+        'reaction-focused': {
+          fontSize: 110,
+          fontWeight: 'bold',
+          color: '#FF0000', // Bright red
+          stroke: '#FFFF00', // Yellow outline
+          strokeWidth: 7,
+          y: 200 // Upper area
+        },
+        'reveal-style': {
+          fontSize: 85,
+          fontWeight: 'bold',
+          color: '#F0F0F0', // Light gray
+          stroke: '#333333', // Dark gray
+          strokeWidth: 5,
+          y: 500 // Mid-lower
+        }
+      };
+
+      const style = textStyles[layout as keyof typeof textStyles] || textStyles['title-prominent'];
+
+      // Create SVG text overlay
+      const textSvg = `
+        <svg width="1280" height="720">
+          <text 
+            x="640" 
+            y="${style.y}" 
+            font-family="Arial Black, Arial, sans-serif"
+            font-size="${style.fontSize}"
+            font-weight="${style.fontWeight}"
+            fill="${style.color}"
+            stroke="${style.stroke}"
+            stroke-width="${style.strokeWidth}"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >${text.toUpperCase()}</text>
+        </svg>
+      `;
+
+      // Composite the text over the image
+      const finalImage = await sharp(imageBuffer)
+        .resize(1280, 720, { fit: 'cover', position: 'center' })
+        .composite([{
+          input: Buffer.from(textSvg),
+          top: 0,
+          left: 0
+        }])
+        .jpeg({ quality: 90 })
+        .toBuffer();
+
+      // Convert to base64 data URL
+      const base64Image = finalImage.toString('base64');
+      return `data:image/jpeg;base64,${base64Image}`;
+
+    } catch (error) {
+      console.error('[TEXT OVERLAY] Error adding text overlay:', error);
+      return imageUrl; // Return original if overlay fails
+    }
+  }
   
   for (let i = 0; i < thumbnailPrompts.length; i++) {
     const promptConfig = thumbnailPrompts[i];
@@ -93,14 +188,19 @@ export async function generateRealDalleThumbnails(
         throw new Error(`No image URL returned for ${promptConfig.title}`);
       }
       
-      console.log(`[DALLE-GENERATOR] ✅ Successfully generated ${promptConfig.title}`);
+      console.log(`[HYBRID] Adding text overlay "${title}" to ${promptConfig.title}`);
+      
+      // Add exact text overlay to the generated background
+      const finalImageUrl = await addTextOverlay(imageUrl, title, promptConfig.layout);
+      
+      console.log(`[HYBRID] ✅ Successfully generated ${promptConfig.title} with exact text "${title}"`);
       
       const variant: ThumbnailVariant = {
         id: promptConfig.id,
         title: promptConfig.title,
         layout: promptConfig.layout,
         ctrScore: Math.floor(Math.random() * 30) + 70, // 70-100% CTR
-        imageUrl: imageUrl,
+        imageUrl: finalImageUrl,
         dallePrompt: promptConfig.prompt
       };
       

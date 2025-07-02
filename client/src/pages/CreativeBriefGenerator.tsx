@@ -137,7 +137,8 @@ export default function CreativeBriefGenerator() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="space-y-8">
+      <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
           AI Creative Brief Generator
@@ -501,6 +502,7 @@ export default function CreativeBriefGenerator() {
             </CardContent>
           </Card>
         )}
+      </div>
       </div>
     </div>
   );

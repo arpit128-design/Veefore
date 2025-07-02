@@ -102,7 +102,7 @@ export default function ContentRepurpose() {
   };
 
   return (
-    <div className="min-h-screen cosmic-gradient">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-8">

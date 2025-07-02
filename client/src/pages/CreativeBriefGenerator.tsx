@@ -85,7 +85,7 @@ export default function CreativeBriefGenerator() {
   const generateBriefMutation = useMutation({
     mutationFn: async (data: CreativeBriefFormData) => {
       const res = await apiRequest('POST', '/api/ai/creative-brief', data);
-      return res.json();
+      return await res.json();
     },
     onSuccess: (data) => {
       setGeneratedBrief(data);
@@ -137,27 +137,34 @@ export default function CreativeBriefGenerator() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-          AI Creative Brief Generator
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Generate comprehensive campaign strategies with AI-powered insights
-        </p>
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="secondary">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Credits: {userCredits || 0}
-          </Badge>
-          <Badge variant="outline">3 credits per generation</Badge>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-cosmic-void via-nebula-purple/20 to-cosmic-void text-white relative overflow-hidden">
+      {/* Cosmic Background Effects */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-electric-cyan/10 to-nebula-purple/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-solar-gold/10 to-electric-cyan/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 right-20 w-60 h-60 bg-gradient-to-r from-nebula-purple/10 to-solar-gold/10 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Generation Form */}
-        <Card className="content-card holographic">
+      <div className="relative z-10 container mx-auto p-6 max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-cyan via-nebula-purple to-solar-gold bg-clip-text text-transparent mb-2">
+            AI Creative Brief Generator
+          </h1>
+          <p className="text-lg text-asteroid-silver">
+            Generate comprehensive campaign strategies with AI-powered insights
+          </p>
+          <div className="flex items-center gap-2 mt-4">
+            <Badge className="bg-electric-cyan/20 text-electric-cyan border-electric-cyan/30">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Credits: {userCredits || 0}
+            </Badge>
+            <Badge className="bg-solar-gold/20 text-solar-gold border-solar-gold/30">3 credits per generation</Badge>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Generation Form */}
+          <Card className="bg-transparent border border-electric-cyan/30 backdrop-blur-sm shadow-2xl shadow-electric-cyan/10 rounded-xl overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
@@ -368,7 +375,7 @@ export default function CreativeBriefGenerator() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="w-full bg-gradient-to-r from-electric-cyan to-nebula-purple hover:from-electric-cyan/80 hover:to-nebula-purple/80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg shadow-electric-cyan/25 transition-all duration-300 hover:shadow-xl hover:shadow-electric-cyan/40"
                   disabled={generateBriefMutation.isPending || (userCredits && userCredits < 3)}
                 >
                   {generateBriefMutation.isPending ? (
@@ -388,9 +395,9 @@ export default function CreativeBriefGenerator() {
           </CardContent>
         </Card>
 
-        {/* Generated Brief */}
-        {generatedBrief && (
-          <Card className="content-card holographic">
+          {/* Generated Brief */}
+          {generatedBrief && (
+            <Card className="bg-transparent border border-nebula-purple/30 backdrop-blur-sm shadow-2xl shadow-nebula-purple/10 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -489,9 +496,9 @@ export default function CreativeBriefGenerator() {
           </Card>
         )}
 
-        {/* Empty state when no brief generated */}
-        {!generatedBrief && (
-          <Card className="content-card holographic border-dashed">
+          {/* Empty state when no brief generated */}
+          {!generatedBrief && (
+            <Card className="bg-transparent border border-dashed border-asteroid-silver/30 backdrop-blur-sm shadow-2xl shadow-asteroid-silver/10 rounded-xl overflow-hidden">
             <CardContent className="flex flex-col items-center justify-center h-96 text-center">
               <Sparkles className="w-12 h-12 text-muted-foreground/40 mb-4" />
               <h3 className="text-lg font-semibold mb-2">AI-Powered Brief Generation</h3>
@@ -500,9 +507,9 @@ export default function CreativeBriefGenerator() {
                 strategic recommendations, and actionable timelines.
               </p>
             </CardContent>
-          </Card>
-        )}
-      </div>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

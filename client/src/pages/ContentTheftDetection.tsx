@@ -55,23 +55,32 @@ export default function ContentTheftDetection() {
   const [scanType, setScanType] = useState<'url' | 'text'>('url');
   const { toast } = useToast();
 
+  const [theftResult, setTheftResult] = useState<any>(null);
+
   const detectTheftMutation = useMutation({
-    mutationFn: (data: { url?: string; text?: string; scanType: string }) => 
-      apiRequest('POST', '/api/content-theft-detection', {
-        content: data.url || data.text || '',
-        contentType: data.scanType,
-        platforms: ['instagram', 'youtube', 'twitter']
-      }),
-    onSuccess: () => {
+    mutationFn: async (data: { url?: string; text?: string; scanType: string }) => {
+      const response = await apiRequest('POST', '/api/ai/content-theft', {
+        originalContent: data.url || data.text || '',
+        contentType: data.scanType === 'url' ? 'mixed' : 'text',
+        platforms: ['instagram', 'youtube', 'twitter', 'tiktok'],
+        searchDepth: 'comprehensive',
+        includePartialMatches: true,
+        timeframe: '30d'
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setTheftResult(data);
       toast({
         title: "Content Theft Analysis Complete",
         description: "Your content has been scanned for potential theft and plagiarism.",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Content theft analysis failed:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to complete theft detection analysis. Please try again.",
+        description: error.message || "Unable to complete theft detection analysis. Please try again.",
         variant: "destructive",
       });
     },
@@ -151,79 +160,7 @@ export default function ContentTheftDetection() {
     });
   };
 
-  // Mock data for demonstration
-  const mockTheftResults: ContentTheftResult = {
-    originalityScore: 87,
-    duplicateCount: 3,
-    potentialThefts: [
-      {
-        url: "https://example.com/stolen-content",
-        similarity: 94,
-        platform: "Instagram",
-        dateFound: "2025-01-02",
-        status: 'confirmed',
-        excerpt: "Your exact caption and hashtags copied without permission...",
-        recommendedAction: "Send DMCA takedown notice"
-      },
-      {
-        url: "https://another-site.com/similar",
-        similarity: 76,
-        platform: "TikTok",
-        dateFound: "2025-01-01",
-        status: 'potential',
-        excerpt: "Similar content structure and key phrases...",
-        recommendedAction: "Monitor for further violations"
-      }
-    ],
-    protectionStrategies: [
-      "Add visible watermarks to visual content",
-      "Register copyright for valuable content",
-      "Use unique hashtag combinations",
-      "Enable content monitoring alerts"
-    ],
-    legalOptions: [
-      {
-        action: "DMCA Takedown Notice",
-        complexity: 'low',
-        cost: "Free",
-        timeline: "3-7 days",
-        successRate: 85
-      },
-      {
-        action: "Cease and Desist Letter",
-        complexity: 'medium',
-        cost: "$200-500",
-        timeline: "1-2 weeks",
-        successRate: 70
-      }
-    ],
-    monitoringSetup: {
-      keywords: ["unique brand terms", "signature phrases"],
-      platforms: ["Instagram", "YouTube", "TikTok"],
-      frequency: "Daily scans"
-    }
-  };
-
-  const mockProtectionAudit: ProtectionAudit = {
-    contentType: "Mixed Media",
-    vulnerabilityScore: 65,
-    weaknesses: [
-      "No visible watermarks on images",
-      "Generic captions without unique identifiers",
-      "Missing copyright notices"
-    ],
-    recommendations: [
-      "Implement automated watermarking",
-      "Develop signature content style",
-      "Add copyright metadata to files"
-    ],
-    copyrightStatus: 'partial',
-    watermarkSuggestions: [
-      "Corner logo placement",
-      "Transparent overlay design",
-      "Embedded metadata"
-    ]
-  };
+  // Real API data will be stored in theftResult state
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -328,51 +265,93 @@ export default function ContentTheftDetection() {
                   )}
                 </Button>
 
-                {/* Mock Results Display */}
-                <div className="space-y-4 pt-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-red-400">Scan Results</h4>
-                    <Badge variant="secondary" className="bg-red-900/50 text-red-300">
-                      {mockTheftResults.duplicateCount} potential thefts found
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Originality Score</span>
-                      <span className="text-green-400">{mockTheftResults.originalityScore}%</span>
+                {/* Real API Results Display */}
+                {theftResult && (
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-red-400">Scan Results</h4>
+                      <Badge variant="secondary" className="bg-red-900/50 text-red-300">
+                        {theftResult.summary?.totalMatches || 0} matches found
+                      </Badge>
                     </div>
-                    <Progress value={mockTheftResults.originalityScore} className="h-2" />
-                  </div>
 
-                  <div className="space-y-3">
-                    {mockTheftResults.potentialThefts.map((theft, index) => (
-                      <Card key={index} className="bg-gray-800/50 border-gray-600">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-2 flex-1">
-                              <div className="flex items-center gap-2">
-                                <Badge 
-                                  variant={theft.status === 'confirmed' ? 'destructive' : 'secondary'}
-                                  className="text-xs"
-                                >
-                                  {theft.similarity}% match
-                                </Badge>
-                                <span className="text-sm text-gray-400">{theft.platform}</span>
-                                <span className="text-xs text-gray-500">{theft.dateFound}</span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Protection Score</span>
+                        <span className="text-green-400">{theftResult.analysis?.protectionScore || 0}%</span>
+                      </div>
+                      <Progress value={theftResult.analysis?.protectionScore || 0} className="h-2" />
+                    </div>
+
+                    <div className="space-y-3">
+                      {theftResult.detectedTheft?.map((theft: any, index: number) => (
+                        <Card key={index} className="bg-gray-800/50 border-gray-600">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge 
+                                    variant={theft.matchType === 'exact' ? 'destructive' : 'secondary'}
+                                    className="text-xs"
+                                  >
+                                    {theft.similarity}% match
+                                  </Badge>
+                                  <span className="text-sm text-gray-400">{theft.platform}</span>
+                                  <span className="text-xs text-gray-500">{theft.timestamp}</span>
+                                </div>
+                                <p className="text-sm text-gray-300">{theft.content}</p>
+                                <p className="text-xs text-blue-400">Author: {theft.author}</p>
                               </div>
-                              <p className="text-sm text-gray-300">{theft.excerpt}</p>
-                              <p className="text-xs text-blue-400">{theft.recommendedAction}</p>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="ml-4"
+                                onClick={() => window.open(theft.url, '_blank')}
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
                             </div>
-                            <Button size="sm" variant="outline" className="ml-4">
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
                   </div>
-                </div>
+
+                  {/* Display Recommendations */}
+                  {theftResult.recommendations && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <Card className="bg-gray-800/50 border-gray-600">
+                          <CardContent className="p-4">
+                            <h5 className="font-medium text-yellow-400 mb-2">Immediate Actions</h5>
+                            <ul className="space-y-1 text-sm">
+                              {theftResult.recommendations.immediateActions?.map((action: string, index: number) => (
+                                <li key={index} className="text-gray-300">• {action}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gray-800/50 border-gray-600">
+                          <CardContent className="p-4">
+                            <h5 className="font-medium text-green-400 mb-2">Prevention Strategies</h5>
+                            <ul className="space-y-1 text-sm">
+                              {theftResult.recommendations.preventionStrategies?.map((strategy: string, index: number) => (
+                                <li key={index} className="text-gray-300">• {strategy}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!theftResult && !detectTheftMutation.isPending && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Run a content theft scan to see results here</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -495,55 +474,13 @@ export default function ContentTheftDetection() {
                   )}
                 </Button>
 
-                {/* Protection Audit Results */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-yellow-400">Protection Score</h4>
-                    <Badge 
-                      variant={mockProtectionAudit.vulnerabilityScore > 70 ? 'destructive' : 'secondary'}
-                      className="bg-yellow-900/50 text-yellow-300"
-                    >
-                      {100 - mockProtectionAudit.vulnerabilityScore}% Protected
-                    </Badge>
+                {/* Protection Audit Results - Real API data will be shown here */}
+                {!protectionAuditMutation.isPending && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Run a protection audit to see vulnerability analysis and recommendations</p>
                   </div>
-
-                  <div className="space-y-2">
-                    <Progress value={100 - mockProtectionAudit.vulnerabilityScore} className="h-2" />
-                    <p className="text-sm text-gray-400">
-                      Your content has {mockProtectionAudit.vulnerabilityScore}% vulnerability score
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="bg-gray-800/50 border-gray-600">
-                      <CardContent className="p-4">
-                        <h5 className="font-medium text-red-400 mb-2 flex items-center gap-2">
-                          <XCircle className="h-4 w-4" />
-                          Vulnerabilities
-                        </h5>
-                        <ul className="space-y-1 text-sm">
-                          {mockProtectionAudit.weaknesses.map((weakness, index) => (
-                            <li key={index} className="text-gray-300">• {weakness}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gray-800/50 border-gray-600">
-                      <CardContent className="p-4">
-                        <h5 className="font-medium text-green-400 mb-2 flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4" />
-                          Recommendations
-                        </h5>
-                        <ul className="space-y-1 text-sm">
-                          {mockProtectionAudit.recommendations.map((rec, index) => (
-                            <li key={index} className="text-gray-300">• {rec}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -561,44 +498,54 @@ export default function ContentTheftDetection() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  {mockTheftResults.legalOptions.map((option, index) => (
-                    <Card key={index} className="bg-gray-800/50 border-gray-600">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h5 className="font-medium text-purple-400">{option.action}</h5>
-                              <Badge 
-                                variant={option.complexity === 'low' ? 'secondary' : 'destructive'}
-                                className="text-xs"
-                              >
-                                {option.complexity} complexity
-                              </Badge>
+                {/* Legal options will be shown here after content theft analysis */}
+                {!theftDetectionMutation.isPending && !theftResult && (
+                  <div className="text-center py-8 text-gray-400">
+                    <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Run content theft detection to see legal action recommendations</p>
+                  </div>
+                )}
+
+                {theftResult?.legalOptions && (
+                  <div className="space-y-4">
+                    {theftResult.legalOptions.map((option, index) => (
+                      <Card key={index} className="bg-gray-800/50 border-gray-600">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-2 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h5 className="font-medium text-purple-400">{option.action}</h5>
+                                <Badge 
+                                  variant={option.complexity === 'low' ? 'secondary' : 'destructive'}
+                                  className="text-xs"
+                                >
+                                  {option.complexity} complexity
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-400">Cost: </span>
+                                  <span className="text-green-400">{option.cost}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Timeline: </span>
+                                  <span className="text-blue-400">{option.timeline}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Success Rate: </span>
+                                  <span className="text-yellow-400">{option.successRate}%</span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <span className="text-gray-400">Cost: </span>
-                                <span className="text-green-400">{option.cost}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-400">Timeline: </span>
-                                <span className="text-blue-400">{option.timeline}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-400">Success Rate: </span>
-                                <span className="text-yellow-400">{option.successRate}%</span>
-                              </div>
-                            </div>
+                            <Button size="sm" variant="outline" className="ml-4">
+                              Learn More
+                            </Button>
                           </div>
-                          <Button size="sm" variant="outline" className="ml-4">
-                            Learn More
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
 
                 <Card className="bg-gray-800/50 border-gray-600">
                   <CardContent className="p-4">

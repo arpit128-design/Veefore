@@ -66,14 +66,14 @@ export default function ABTesting() {
   });
 
   // Fetch A/B tests
-  const { data: tests, isLoading } = useQuery({
+  const { data: testsData, isLoading } = useQuery({
     queryKey: ['/api/ab-tests'],
-    queryFn: () => apiRequest('GET', '/api/ab-tests')
+    queryFn: () => apiRequest('GET', '/api/ab-tests').then(res => res.json())
   });
 
   // Create A/B test mutation
   const createTestMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/ab-tests', data),
+    mutationFn: (data: any) => apiRequest('POST', '/api/ab-tests', data).then(res => res.json()),
     onSuccess: () => {
       toast({
         title: "A/B Test Created!",
@@ -97,47 +97,8 @@ export default function ABTesting() {
     }
   });
 
-  // Mock data for demonstration
-  const mockTests: ABTest[] = [
-    {
-      id: '1',
-      name: 'Holiday Marketing Campaign',
-      status: 'completed',
-      platform: 'instagram',
-      variantA: {
-        caption: 'Get ready for the holidays! 🎄 Shop our amazing deals now!',
-        hashtags: ['#holiday', '#sale', '#shopping', '#deals']
-      },
-      variantB: {
-        caption: 'Holiday savings are here! Limited time offers you can\'t miss ⭐',
-        hashtags: ['#holidaysale', '#limitedtime', '#savings', '#offers']
-      },
-      results: {
-        variantA: { reach: 15420, engagement: 892, clicks: 234, conversions: 12 },
-        variantB: { reach: 16890, engagement: 1240, clicks: 367, conversions: 23 },
-        winner: 'B'
-      },
-      startDate: '2024-12-15',
-      endDate: '2024-12-17',
-      createdAt: '2024-12-14'
-    },
-    {
-      id: '2',
-      name: 'Product Launch Announcement',
-      status: 'running',
-      platform: 'youtube',
-      variantA: {
-        caption: 'Introducing our revolutionary new product!',
-        hashtags: ['#newproduct', '#launch', '#innovation']
-      },
-      variantB: {
-        caption: 'The future is here - discover our game-changing product!',
-        hashtags: ['#future', '#gamechange', '#discover']
-      },
-      startDate: '2025-01-01',
-      createdAt: '2024-12-31'
-    }
-  ];
+  // Extract tests from API response
+  const tests = testsData?.tests || [];
 
   const handleCreateTest = () => {
     if (!newTest.name || !newTest.variantA?.caption || !newTest.variantB?.caption) {

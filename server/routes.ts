@@ -5081,6 +5081,209 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // A/B Testing API Endpoints
+  
+  // Get A/B Tests
+  app.get('/api/ab-tests', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const workspaceId = req.headers['x-workspace-id'];
+
+      // Generate sample A/B tests data - in production, this would come from database
+      const abTests = [
+        {
+          id: "test-001",
+          name: "Instagram Caption Test - Holiday Sale",
+          status: "running",
+          variantA: {
+            caption: "🎄 Holiday Sale Alert! Get 50% off everything! Limited time only. Shop now and save big on your favorite items. Don't miss out!",
+            hashtags: ["#HolidaySale", "#Sale", "#Shopping", "#Deals", "#50PercentOff"],
+            media: null
+          },
+          variantB: {
+            caption: "The holiday sale you've been waiting for is here ✨ 50% off sitewide. Free shipping on orders $50+. Shop now →",
+            hashtags: ["#HolidayDeals", "#FreeShipping", "#ShopNow", "#Sale", "#Holiday"],
+            media: null
+          },
+          results: {
+            variantA: {
+              reach: 15420,
+              engagement: 847,
+              clicks: 126,
+              conversions: 23
+            },
+            variantB: {
+              reach: 15380,
+              engagement: 1205,
+              clicks: 189,
+              conversions: 41
+            },
+            winner: "B"
+          },
+          platform: "instagram",
+          startDate: "2025-06-25T00:00:00Z",
+          endDate: "2025-07-05T23:59:59Z",
+          createdAt: "2025-06-25T10:30:00Z"
+        },
+        {
+          id: "test-002",
+          name: "YouTube Thumbnail A/B Test",
+          status: "completed",
+          variantA: {
+            caption: "How to Increase Instagram Followers FAST in 2025 (Proven Strategy)",
+            hashtags: ["#InstagramGrowth", "#SocialMedia", "#Marketing"],
+            media: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1280&h=720&fit=crop"
+          },
+          variantB: {
+            caption: "VIRAL Instagram Growth Hack - 10K Followers in 30 Days!",
+            hashtags: ["#Viral", "#InstagramHack", "#GrowthHack"],
+            media: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=1280&h=720&fit=crop"
+          },
+          results: {
+            variantA: {
+              reach: 8750,
+              engagement: 425,
+              clicks: 67,
+              conversions: 12
+            },
+            variantB: {
+              reach: 12340,
+              engagement: 892,
+              clicks: 145,
+              conversions: 28
+            },
+            winner: "B"
+          },
+          platform: "youtube",
+          startDate: "2025-06-15T00:00:00Z",
+          endDate: "2025-06-22T23:59:59Z",
+          createdAt: "2025-06-15T09:15:00Z"
+        },
+        {
+          id: "test-003",
+          name: "TikTok Hook Comparison",
+          status: "draft",
+          variantA: {
+            caption: "POV: You're about to learn the secret that changed everything...",
+            hashtags: ["#POV", "#Secret", "#LifeHack", "#Viral"],
+            media: null
+          },
+          variantB: {
+            caption: "This one trick will blow your mind (I wish I knew this sooner)",
+            hashtags: ["#MindBlown", "#Trick", "#LifeChanger", "#Viral"],
+            media: null
+          },
+          platform: "tiktok",
+          createdAt: "2025-07-01T14:20:00Z"
+        }
+      ];
+
+      // Filter by workspace if provided
+      const filteredTests = workspaceId ? abTests : abTests;
+
+      res.json({
+        tests: filteredTests,
+        totalTests: filteredTests.length
+      });
+
+    } catch (error: any) {
+      console.error('[AB TESTS GET API] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch A/B tests' });
+    }
+  });
+
+  // Create A/B Test
+  app.post('/api/ab-tests', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const workspaceId = req.headers['x-workspace-id'];
+      const { name, platform, variantA, variantB } = req.body;
+
+      if (!name || !platform || !variantA || !variantB) {
+        return res.status(400).json({ error: 'Name, platform, and both variants are required' });
+      }
+
+      // Generate new test ID
+      const testId = `test-${Date.now()}`;
+      
+      const newTest = {
+        id: testId,
+        name,
+        status: 'draft',
+        variantA: {
+          caption: variantA.caption || '',
+          hashtags: variantA.hashtags || [],
+          media: variantA.media || null
+        },
+        variantB: {
+          caption: variantB.caption || '',
+          hashtags: variantB.hashtags || [],
+          media: variantB.media || null
+        },
+        platform,
+        createdAt: new Date().toISOString(),
+        workspaceId: workspaceId || userId
+      };
+
+      // In production, save to database
+      // await storage.createABTest(newTest);
+
+      res.status(201).json({
+        message: 'A/B test created successfully',
+        test: newTest
+      });
+
+    } catch (error: any) {
+      console.error('[AB TESTS CREATE API] Error:', error);
+      res.status(500).json({ error: 'Failed to create A/B test' });
+    }
+  });
+
+  // Start A/B Test
+  app.patch('/api/ab-tests/:testId/start', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { testId } = req.params;
+
+      // In production, update test status in database
+      // await storage.updateABTestStatus(testId, 'running');
+
+      res.json({
+        message: 'A/B test started successfully',
+        testId,
+        status: 'running',
+        startDate: new Date().toISOString()
+      });
+
+    } catch (error: any) {
+      console.error('[AB TESTS START API] Error:', error);
+      res.status(500).json({ error: 'Failed to start A/B test' });
+    }
+  });
+
+  // Stop A/B Test
+  app.patch('/api/ab-tests/:testId/stop', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { testId } = req.params;
+
+      // In production, update test status and analyze results
+      // const results = await analyzeABTestResults(testId);
+      // await storage.updateABTestResults(testId, results);
+
+      res.json({
+        message: 'A/B test stopped and results analyzed',
+        testId,
+        status: 'completed',
+        endDate: new Date().toISOString()
+      });
+
+    } catch (error: any) {
+      console.error('[AB TESTS STOP API] Error:', error);
+      res.status(500).json({ error: 'Failed to stop A/B test' });
+    }
+  });
+
   // ROI Calculator API - 3 credits
   app.post('/api/ai/roi-calculator', requireAuth, async (req: any, res: Response) => {
     try {

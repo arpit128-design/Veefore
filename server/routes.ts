@@ -5081,6 +5081,85 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Affiliate Engine API - 4 credits
+  app.post('/api/ai/affiliate-discovery', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { 
+        niche, 
+        audience, 
+        contentType, 
+        followerCount, 
+        previousExperience, 
+        preferredCommission, 
+        contentStyle 
+      } = req.body;
+
+      if (!niche || !audience || !contentType) {
+        return res.status(400).json({ error: 'Niche, audience, and content type are required' });
+      }
+
+      // Check credits
+      const creditCost = 4;
+      const hasCredits = await creditService.hasCredits(userId, 'affiliate-engine');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'affiliate-engine',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const { discoverAffiliateOpportunities } = require('./affiliate-engine-ai');
+      const result = await discoverAffiliateOpportunities({
+        niche,
+        audience,
+        contentType,
+        followerCount: parseInt(followerCount) || 1000,
+        previousExperience: previousExperience || 'beginner',
+        preferredCommission,
+        contentStyle
+      });
+
+      // Save opportunities to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId && result.opportunities.length > 0) {
+        for (const opportunity of result.opportunities) {
+          await storage.createAffiliateOpportunity({
+            workspaceId: parseInt(workspaceId),
+            userId,
+            programName: opportunity.program,
+            brandName: opportunity.brand,
+            description: opportunity.description,
+            category: opportunity.category,
+            commissionRate: opportunity.commission,
+            requirements: opportunity.requirements,
+            estimatedEarnings: opportunity.estimatedEarnings,
+            contentSuggestions: opportunity.contentSuggestions,
+            creditsUsed: creditCost
+          });
+        }
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'affiliate-engine', 1, 'Affiliate opportunity discovery');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[AFFILIATE ENGINE API] Error:', error);
+      res.status(500).json({ error: 'Failed to discover affiliate opportunities' });
+    }
+  });
+
   // A/B Testing API Endpoints
   
   // Get A/B Tests

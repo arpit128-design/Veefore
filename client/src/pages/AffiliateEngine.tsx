@@ -233,9 +233,12 @@ export default function AffiliateEngine() {
 
     discoverMutation.mutate({
       niche: selectedNiche,
-      category: selectedCategory !== 'all' ? selectedCategory : undefined,
-      followers: user?.metrics?.followers || 0,
-      engagement: user?.metrics?.engagement || 0
+      audience: selectedCategory !== 'all' ? selectedCategory : 'general audience',
+      contentType: 'video', // Default to video content
+      followerCount: user?.metrics?.followers || 1000,
+      previousExperience: 'intermediate',
+      preferredCommission: '10-20%',
+      contentStyle: 'educational'
     });
   };
 

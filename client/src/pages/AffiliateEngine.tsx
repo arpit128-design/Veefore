@@ -59,7 +59,10 @@ export default function AffiliateEngine() {
 
   // Discover affiliate opportunities mutation
   const discoverMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/ai/affiliate-discovery', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/ai/affiliate-discovery', data);
+      return await response.json();
+    },
     onSuccess: (data) => {
       setDiscoveredOpportunities(data.opportunities || []);
       toast({
@@ -89,36 +92,8 @@ export default function AffiliateEngine() {
   const [discoveredOpportunities, setDiscoveredOpportunities] = useState<AffiliateOpportunity[]>([]);
   const opportunities = discoveredOpportunities;
 
-  // Mock commission data
-  const mockCommissions: CommissionTracker[] = [
-    {
-      id: '1',
-      brand: 'FitTech Pro',
-      clicks: 1240,
-      conversions: 42,
-      earnings: 1890,
-      period: 'December 2024',
-      status: 'paid'
-    },
-    {
-      id: '2',
-      brand: 'CreatorTools',
-      clicks: 856,
-      conversions: 28,
-      earnings: 2492,
-      period: 'December 2024',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      brand: 'EcoBeauty',
-      clicks: 634,
-      conversions: 31,
-      earnings: 682,
-      period: 'December 2024',
-      status: 'active'
-    }
-  ];
+  // Commission tracking data (populated after joining affiliate programs)
+  const [commissions] = useState<CommissionTracker[]>([]);
 
   const handleDiscoverOpportunities = () => {
     if (!selectedNiche.trim()) {
@@ -134,7 +109,7 @@ export default function AffiliateEngine() {
       niche: selectedNiche,
       audience: selectedCategory !== 'all' ? selectedCategory : 'general audience',
       contentType: 'video', // Default to video content
-      followerCount: user?.metrics?.followers || 1000,
+      followerCount: 1000, // Default follower count for affiliate discovery
       previousExperience: 'intermediate',
       preferredCommission: '10-20%',
       contentStyle: 'educational'
@@ -434,7 +409,7 @@ export default function AffiliateEngine() {
 
             {/* Commission Details */}
             <div className="space-y-4">
-              {mockCommissions.map((commission, index) => (
+              {commissions.length > 0 ? commissions.map((commission, index) => (
                 <motion.div
                   key={commission.id}
                   initial={{ opacity: 0, y: 20 }}

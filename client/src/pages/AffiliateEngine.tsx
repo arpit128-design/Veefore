@@ -156,9 +156,9 @@ export default function AffiliateEngine() {
     <div className="min-h-screen bg-transparent text-white p-4 md:p-6">
       {/* Cosmic Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-electric-cyan rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-solar-gold rounded-full animate-ping"></div>
-        <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-nebula-purple rounded-full animate-pulse"></div>
+        <div className="absolute top-20 left-10 w-1 h-1 bg-electric-cyan/30 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-solar-gold/20 rounded-full"></div>
+        <div className="absolute bottom-20 left-1/4 w-1 h-1 bg-nebula-purple/30 rounded-full animate-pulse"></div>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-8">

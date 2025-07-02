@@ -23,6 +23,7 @@ import { ThumbnailAIService } from './thumbnail-ai-service';
 import { advancedThumbnailGenerator } from './advanced-thumbnail-generator';
 import { canvasThumbnailGenerator } from './canvas-thumbnail-generator';
 import { generateCompetitorAnalysis } from './competitor-analysis-ai';
+import { abTestingAI } from './ab-testing-ai';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 
@@ -10923,6 +10924,96 @@ Format the response as JSON with this structure:
       console.error('[SMART LEGAL AI] Template fetch failed:', error);
       res.status(500).json({ 
         error: 'Failed to fetch legal templates',
+        details: error.message 
+      });
+    }
+  });
+
+  // A/B Testing AI - 4 credits
+  app.post('/api/ai/ab-testing', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { 
+        title, 
+        description, 
+        platform, 
+        audience, 
+        contentType, 
+        objective, 
+        currentPerformance, 
+        brandGuidelines, 
+        testDuration, 
+        budget 
+      } = req.body;
+
+      if (!title || !description || !platform || !audience || !contentType || !objective || !testDuration) {
+        return res.status(400).json({ 
+          error: 'Title, description, platform, audience, content type, objective, and test duration are required' 
+        });
+      }
+
+      // Check credits
+      const creditCost = 4;
+      const hasCredits = await creditService.hasCredits(userId, 'ab-testing');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ab-testing',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      console.log('[A/B TESTING AI] Generating test strategy for user:', userId);
+      console.log('[A/B TESTING AI] Campaign:', title);
+
+      const strategy = await abTestingAI.generateABTestStrategy({
+        title,
+        description,
+        platform,
+        audience,
+        contentType,
+        objective,
+        currentPerformance,
+        brandGuidelines,
+        testDuration,
+        budget
+      });
+
+      // Save A/B test to database
+      const workspaceId = req.headers['x-workspace-id'];
+      if (workspaceId) {
+        await storage.createABTest({
+          workspaceId: parseInt(workspaceId),
+          userId,
+          testName: strategy.testName,
+          hypothesis: strategy.hypothesis,
+          platform,
+          contentType,
+          objective,
+          status: 'draft',
+          variants: strategy.variants,
+          testSetup: strategy.testSetup,
+          creditsUsed: creditCost
+        });
+      }
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'ab-testing', 1, 'A/B Testing strategy generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        strategy,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[A/B TESTING AI] Strategy generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate A/B testing strategy',
         details: error.message 
       });
     }

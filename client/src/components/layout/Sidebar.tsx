@@ -37,13 +37,15 @@ const mainTabs = [
     icon: Brain,
     color: "text-nebula-purple",
     features: [
-      { href: "/content-studio", icon: Brain, label: "Caption Generator", color: "text-nebula-purple" },
-      { href: "/ai-suggestions", icon: Sparkles, label: "Hashtag Suggester", color: "text-electric-cyan" },
-      { href: "/thumbnail-maker", icon: ImageIcon, label: "Thumbnail Maker", color: "text-pink-400" },
+      { href: "/content-studio", icon: Brain, label: "Content Studio", color: "text-nebula-purple" },
+      { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
+      { href: "/thumbnail-maker", icon: ImageIcon, label: "AI Thumbnails", color: "text-pink-400" },
       { href: "/ai-thumbnails-pro", icon: Sparkles, label: "Thumbnails Pro", color: "text-purple-500" },
-      { href: "/content-repurpose", icon: Languages, label: "Multi-language Tool", color: "text-teal-400" },
-      { href: "/legal-assistant", icon: FileText, label: "Legal & IP Checker", color: "text-indigo-400" },
-      { href: "/content-theft-detection", icon: Shield, label: "Content Protection", color: "text-red-500" }
+      { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400" },
+      { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400" },
+      { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500" },
+      { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500" },
+      { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500" }
     ]
   },
   {
@@ -52,9 +54,8 @@ const mainTabs = [
     icon: Calendar,
     color: "text-solar-gold",
     features: [
-      { href: "/scheduler", icon: Calendar, label: "Smart Scheduler", color: "text-solar-gold" },
-      { href: "/ai-intelligence", icon: Zap, label: "Best Time Predictor", color: "text-purple-400" },
-      { href: "/integrations", icon: LinkIcon, label: "Multi-platform Poster", color: "text-pink-500" },
+      { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
+      { href: "/ai-intelligence", icon: Zap, label: "AI Intelligence", color: "text-purple-400" },
       { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" }
     ]
   },
@@ -64,11 +65,9 @@ const mainTabs = [
     icon: TrendingUp,
     color: "text-green-400",
     features: [
-      { href: "/analyzer", icon: BarChart3, label: "AI Analytics", color: "text-green-400" },
+      { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
       { href: "/ab-testing", icon: BarChart3, label: "A/B Testing", color: "text-blue-500" },
-      { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500" },
-      { href: "/emotion-analysis", icon: Heart, label: "Content Scoring", color: "text-pink-500" },
-      { href: "/gamification", icon: Trophy, label: "AI Feedback", color: "text-yellow-500" }
+      { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500" }
     ]
   },
   {
@@ -78,16 +77,17 @@ const mainTabs = [
     color: "text-yellow-400",
     features: [
       { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400" },
-      { href: "/referrals", icon: Share2, label: "Referral System", color: "text-solar-gold" },
-      { href: "/subscription", icon: CreditCard, label: "Credit Tracker", color: "text-yellow-400" }
+      { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
+      { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-yellow-400" }
     ]
   }
 ];
 
-// Bottom navigation items (workspace management)
+// Bottom navigation items (workspace management & remaining features)
 const bottomNavItems = [
   { href: "/automation", icon: Bot, label: "Automation", color: "text-orange-400" },
   { href: "/conversations", icon: MessageCircle, label: "Conversations", color: "text-blue-500" },
+  { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },
   { href: "/team", icon: Users, label: "Team", color: "text-blue-400" },
   { href: "/settings", icon: Settings, label: "Settings", color: "text-asteroid-silver" },

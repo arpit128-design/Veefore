@@ -57,7 +57,11 @@ export default function ContentTheftDetection() {
 
   const detectTheftMutation = useMutation({
     mutationFn: (data: { url?: string; text?: string; scanType: string }) => 
-      apiRequest('POST', '/api/ai/content-theft-detection', data),
+      apiRequest('POST', '/api/content-theft-detection', {
+        content: data.url || data.text || '',
+        contentType: data.scanType,
+        platforms: ['instagram', 'youtube', 'twitter']
+      }),
     onSuccess: () => {
       toast({
         title: "Content Theft Analysis Complete",

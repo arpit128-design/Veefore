@@ -81,7 +81,10 @@ export default function EmotionAnalysis() {
 
   const analyzeEmotionMutation = useMutation({
     mutationFn: (data: { content?: string; url?: string; type: string; audience?: string }) => 
-      apiRequest('POST', '/api/ai/emotion-analysis', data),
+      apiRequest('POST', '/api/emotion-analysis', {
+        content: data.content || data.url || '',
+        contentType: data.type
+      }),
     onSuccess: () => {
       toast({
         title: "Emotion Analysis Complete",

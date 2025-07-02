@@ -10182,6 +10182,245 @@ Image should be 1280x720 pixels, professional quality.`;
     }
   });
 
+  // Content Theft Detection API
+  app.post('/api/content-theft-detection', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { content, contentType, platforms } = req.body;
+
+      if (!user.credits || user.credits < 7) {
+        return res.status(402).json({ error: 'Insufficient credits. Content Theft Detection requires 7 credits.' });
+      }
+
+      console.log('[CONTENT THEFT] Analyzing content for theft detection');
+
+      const analysisPrompt = `Analyze this ${contentType} content for potential theft and plagiarism detection. Content: "${content}"
+
+Provide a comprehensive content theft analysis including:
+1. Originality score (0-100)
+2. Number of potential duplicates found
+3. List of potential theft cases with URLs, similarity scores, platforms, dates, and recommended actions
+4. Protection strategies to prevent future theft
+5. Legal options with complexity, cost, timeline, and success rates
+6. Monitoring setup recommendations
+
+Format the response as JSON with this structure:
+{
+  "originalityScore": number,
+  "duplicateCount": number,
+  "potentialThefts": [
+    {
+      "url": "string",
+      "similarity": number,
+      "platform": "string",
+      "dateFound": "string",
+      "status": "confirmed|potential|false_positive",
+      "excerpt": "string",
+      "recommendedAction": "string"
+    }
+  ],
+  "protectionStrategies": ["string"],
+  "legalOptions": [
+    {
+      "action": "string",
+      "complexity": "low|medium|high",
+      "cost": "string",
+      "timeline": "string",
+      "successRate": number
+    }
+  ],
+  "monitoringSetup": {
+    "keywords": ["string"],
+    "platforms": ["string"],
+    "frequency": "string"
+  }
+}`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: analysisPrompt }],
+        response_format: { type: "json_object" },
+        max_tokens: 2000
+      });
+
+      const result = JSON.parse(completion.choices[0].message.content);
+
+      // Deduct credits
+      await storage.updateUser(user.id, { credits: user.credits - 7 });
+      console.log(`[CONTENT THEFT] Deducted 7 credits from user ${user.id}, remaining: ${user.credits - 7}`);
+
+      res.json(result);
+    } catch (error) {
+      console.error('[CONTENT THEFT] Error:', error);
+      res.status(500).json({ error: 'Failed to analyze content for theft detection' });
+    }
+  });
+
+  // Gamification API
+  app.get('/api/gamification/stats', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      
+      // Mock comprehensive gamification data - in production, this would come from database
+      const gamificationData = {
+        userStats: {
+          level: 15,
+          totalPoints: 12850,
+          pointsToNextLevel: 1150,
+          currentStreak: 7,
+          longestStreak: 23,
+          completedChallenges: 42,
+          rank: 1247,
+          totalUsers: 15680,
+          badges: 18,
+          achievements: 27
+        },
+        achievements: [
+          {
+            id: "content_creator",
+            title: "Content Creator",
+            description: "Create your first piece of content",
+            icon: "🎨",
+            rarity: "common",
+            points: 100,
+            progress: 100,
+            maxProgress: 100,
+            completed: true,
+            unlockedAt: "2024-01-15T10:30:00Z",
+            category: "content"
+          },
+          {
+            id: "viral_master",
+            title: "Viral Master",
+            description: "Achieve 10K+ views on a single post",
+            icon: "🚀",
+            rarity: "legendary",
+            points: 2500,
+            progress: 85,
+            maxProgress: 100,
+            completed: false,
+            category: "engagement"
+          }
+        ],
+        challenges: [
+          {
+            id: "daily_post",
+            title: "Daily Content Challenge",
+            description: "Post content for 7 consecutive days",
+            difficulty: "medium",
+            duration: "7 days",
+            reward: { points: 500, badge: "consistency_badge", credits: 10 },
+            progress: 5,
+            maxProgress: 7,
+            startDate: "2024-01-01T00:00:00Z",
+            endDate: "2024-01-08T00:00:00Z",
+            status: "active",
+            participants: 1247
+          }
+        ],
+        leaderboard: [
+          {
+            rank: 1,
+            username: "ContentKing",
+            level: 45,
+            points: 89540,
+            badges: 67,
+            avatar: null,
+            isCurrentUser: false
+          },
+          {
+            rank: 1247,
+            username: user.username,
+            level: 15,
+            points: 12850,
+            badges: 18,
+            avatar: null,
+            isCurrentUser: true
+          }
+        ]
+      };
+
+      res.json(gamificationData);
+    } catch (error) {
+      console.error('[GAMIFICATION] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch gamification data' });
+    }
+  });
+
+  // Emotion Analysis API
+  app.post('/api/emotion-analysis', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { content, contentType } = req.body;
+
+      if (!user.credits || user.credits < 5) {
+        return res.status(402).json({ error: 'Insufficient credits. Emotion Analysis requires 5 credits.' });
+      }
+
+      console.log('[EMOTION ANALYSIS] Analyzing emotional content');
+
+      const analysisPrompt = `Perform a comprehensive psychological emotion analysis of this ${contentType} content using Plutchik's Wheel of Emotions: "${content}"
+
+Analyze the emotional profile, psychological insights, audience resonance, and optimization recommendations.
+
+Format the response as JSON with this structure:
+{
+  "primaryEmotion": "string",
+  "emotionIntensity": number,
+  "emotionProfile": {
+    "joy": number,
+    "anger": number,
+    "sadness": number,
+    "fear": number,
+    "surprise": number,
+    "disgust": number,
+    "trust": number,
+    "anticipation": number
+  },
+  "psychologicalInsights": {
+    "plutchikWheel": "string",
+    "cognitiveAppraisal": "string",
+    "emotionalValence": "positive|negative|neutral",
+    "arousalLevel": "high|medium|low"
+  },
+  "audienceResonance": {
+    "expectedEngagement": number,
+    "emotionalContagion": number,
+    "viralPotential": number,
+    "demographicAppeal": {
+      "age": "string",
+      "gender": "string",
+      "interests": ["string"]
+    }
+  },
+  "contentOptimization": {
+    "recommendations": ["string"],
+    "emotionalTriggers": ["string"],
+    "improvementAreas": ["string"],
+    "confidenceScore": number
+  }
+}`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: analysisPrompt }],
+        response_format: { type: "json_object" },
+        max_tokens: 1500
+      });
+
+      const result = JSON.parse(completion.choices[0].message.content);
+
+      // Deduct credits
+      await storage.updateUser(user.id, { credits: user.credits - 5 });
+      console.log(`[EMOTION ANALYSIS] Deducted 5 credits from user ${user.id}, remaining: ${user.credits - 5}`);
+
+      res.json(result);
+    } catch (error) {
+      console.error('[EMOTION ANALYSIS] Error:', error);
+      res.status(500).json({ error: 'Failed to analyze emotional content' });
+    }
+  });
+
   // AI Copilot Routes
   createCopilotRoutes(app, storage);
 

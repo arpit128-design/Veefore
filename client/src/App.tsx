@@ -55,6 +55,9 @@ import ROICalculator from "@/pages/ROICalculator";
 import AffiliateEngine from "@/pages/AffiliateEngine";
 import SocialListening from "@/pages/SocialListening";
 import SmartLegalAssistant from "@/pages/SmartLegalAssistant";
+import ContentTheftDetection from "@/pages/ContentTheftDetection";
+import Gamification from "@/pages/Gamification";
+import EmotionAnalysis from "@/pages/EmotionAnalysis";
 
 // New landing page related pages
 import Features from "@/pages/Features";

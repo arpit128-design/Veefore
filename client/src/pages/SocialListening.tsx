@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Search, TrendingUp, AlertCircle, Eye, MessageSquare, Share2, ThumbsUp, Users, MapPin, Clock, Filter, Bell, Zap, Globe, Target, Sparkles } from "lucide-react";
+import { Search, TrendingUp, AlertCircle, Eye, MessageSquare, Share2, ThumbsUp, Users, MapPin, Clock, Filter, Bell, Zap, Globe, Target, Sparkles, Loader2 } from "lucide-react";
 
 interface SocialListeningData {
   id: string;
@@ -60,25 +60,45 @@ export default function SocialListening() {
   const [selectedPlatform, setSelectedPlatform] = useState("all");
   const [monitoringKeywords, setMonitoringKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState("");
+  const [listeningResult, setListeningResult] = useState<any>(null);
+  const [selectedTimeframe, setSelectedTimeframe] = useState("7d");
+  const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const createListeningAnalysisMutation = useMutation({
-    mutationFn: (data: { 
-      keywords: string[]; 
-      platforms: string[]; 
-      analysisType: string;
-      dateRange: string;
-    }) => apiRequest('POST', '/api/ai/social-listening', data),
-    onSuccess: (data: SocialListeningData[]) => {
-      toast({
-        title: "Social Listening Analysis Complete",
-        description: `Found ${data.length} trending mentions and insights across platforms`
-      });
+  // Get user data for credit checking
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"],
+    refetchInterval: 30000
+  });
+
+  const socialListeningMutation = useMutation({
+    mutationFn: async (data: {
+      keywords: string[];
+      platforms: string[];
+      sentiment?: string;
+      timeframe: string;
+      location?: string;
+      language?: string;
+      includeInfluencers?: boolean;
+    }) => {
+      const response = await apiRequest('POST', '/api/ai/social-listening', data);
+      return response.json();
     },
-    onError: () => {
+    onSuccess: (data) => {
+      setListeningResult(data);
+      setActiveTab('insights');
+      toast({
+        title: "Social Listening Analysis Complete!",
+        description: "Your comprehensive social listening report is ready with AI insights.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/social-listening'] });
+    },
+    onError: (error: any) => {
+      console.error('Social listening analysis failed:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to complete social listening analysis. Please try again.",
+        description: error.message || "Unable to complete social listening analysis. Please try again.",
         variant: "destructive"
       });
     }
@@ -205,6 +225,28 @@ export default function SocialListening() {
       case 'negative': return 'text-red-400';
       default: return 'text-yellow-400';
     }
+  };
+
+  const handleStartAnalysis = () => {
+    if (monitoringKeywords.length === 0) {
+      toast({
+        title: "Keywords Required",
+        description: "Please add at least one keyword to monitor.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const platforms = selectedPlatform === 'all' ? ['twitter', 'instagram', 'youtube', 'tiktok'] : [selectedPlatform];
+
+    socialListeningMutation.mutate({
+      keywords: monitoringKeywords,
+      platforms,
+      timeframe: selectedTimeframe,
+      sentiment: 'all',
+      language: 'en',
+      includeInfluencers: true
+    });
   };
 
   return (
@@ -372,11 +414,11 @@ export default function SocialListening() {
               </div>
 
               <Button 
-                onClick={handleAnalyze} 
-                disabled={createListeningAnalysisMutation.isPending}
+                onClick={handleStartAnalysis} 
+                disabled={socialListeningMutation.isPending || monitoringKeywords.length === 0}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                {createListeningAnalysisMutation.isPending ? (
+                {socialListeningMutation.isPending ? (
                   <>
                     <Sparkles className="mr-2 h-4 w-4 animate-spin" />
                     Analyzing Social Signals...

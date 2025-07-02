@@ -10787,6 +10787,147 @@ Format the response as JSON with this structure:
     }
   });
 
+  // Smart Legal Assistant API - 5 credits for legal guidance, 6 credits for contract generation
+  app.post('/api/ai/legal-guidance', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { 
+        query, 
+        businessType, 
+        industry, 
+        location, 
+        scenario, 
+        contractType 
+      } = req.body;
+
+      if (!query || !businessType || !industry || !location) {
+        return res.status(400).json({ error: 'Query, business type, industry, and location are required' });
+      }
+
+      // Check credits
+      const creditCost = 5;
+      const hasCredits = await creditService.hasCredits(userId, 'smart-legal-assistant');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'smart-legal-assistant',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      console.log('[SMART LEGAL AI] Providing legal guidance for user:', userId);
+      console.log('[SMART LEGAL AI] Query:', query);
+
+      const { smartLegalAI } = await import('./smart-legal-ai');
+      const result = await smartLegalAI.provideLegalGuidance({
+        query,
+        businessType,
+        industry,
+        location,
+        scenario,
+        contractType
+      });
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'smart-legal-assistant', 1, 'Legal guidance');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[SMART LEGAL AI] Legal guidance failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to provide legal guidance',
+        details: error.message 
+      });
+    }
+  });
+
+  app.post('/api/ai/contract-generation', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { 
+        contractType,
+        parties,
+        terms,
+        industry,
+        jurisdiction
+      } = req.body;
+
+      if (!contractType || !parties || !terms || !industry || !jurisdiction) {
+        return res.status(400).json({ error: 'All contract details are required' });
+      }
+
+      // Check credits
+      const creditCost = 6;
+      const hasCredits = await creditService.hasCredits(userId, 'smart-legal-assistant');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'smart-legal-assistant',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      console.log('[SMART LEGAL AI] Generating contract for user:', userId);
+      console.log('[SMART LEGAL AI] Contract type:', contractType);
+
+      const { smartLegalAI } = await import('./smart-legal-ai');
+      const result = await smartLegalAI.generateContract({
+        contractType,
+        parties,
+        terms,
+        industry,
+        jurisdiction
+      });
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'smart-legal-assistant', 1, 'Contract generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        ...result,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[SMART LEGAL AI] Contract generation failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate contract',
+        details: error.message 
+      });
+    }
+  });
+
+  // Legal templates and jurisdictions endpoint
+  app.get('/api/legal/templates', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { smartLegalAI } = await import('./smart-legal-ai');
+      
+      res.json({
+        templates: smartLegalAI.getAvailableTemplates(),
+        jurisdictions: smartLegalAI.getJurisdictions()
+      });
+    } catch (error: any) {
+      console.error('[SMART LEGAL AI] Template fetch failed:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch legal templates',
+        details: error.message 
+      });
+    }
+  });
+
   // AI Copilot Routes
   createCopilotRoutes(app, storage);
 

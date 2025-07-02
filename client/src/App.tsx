@@ -115,6 +115,9 @@ function AuthenticatedApp() {
               <Route path="/affiliate-engine" component={AffiliateEngine} />
               <Route path="/social-listening" component={SocialListening} />
               <Route path="/legal-assistant" component={SmartLegalAssistant} />
+              <Route path="/content-theft-detection" component={ContentTheftDetection} />
+              <Route path="/gamification" component={Gamification} />
+              <Route path="/emotion-analysis" component={EmotionAnalysis} />
               <Route path="/thumbnail-maker" component={ThumbnailAIMaker} />
               <Route path="/ai-thumbnails" component={ThumbnailAIMaker} />
         <Route path="/ai-thumbnails-pro" component={ThumbnailAIMakerPro} />

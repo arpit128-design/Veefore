@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
   Rocket, Brain, Calendar, BarChart3, Sparkles, Zap,
-  Globe, Users, Share2, Settings, Link as LinkIcon, X, CreditCard, PlayCircle, Bot, MessageCircle, ImageIcon, FileText, Languages
+  Globe, Users, Share2, Settings, Link as LinkIcon, X, CreditCard, PlayCircle, Bot, MessageCircle, ImageIcon, FileText, Languages, Shield, Trophy, Heart
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ const navigationItems = [
   { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400" },
   { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400" },
   { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400" },
+  { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500" },
+  { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500" },
+  { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500" },
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
   { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-amber-400" },
   { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400" },

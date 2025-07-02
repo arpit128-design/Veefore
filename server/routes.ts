@@ -8733,8 +8733,15 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
     }
   });
 
+  // SIMPLE TEST ROUTE - Debug version
+  app.post('/api/test-simple', (req: any, res: Response) => {
+    console.log('[SIMPLE TEST] Route definitely hit!');
+    res.json({ success: true, message: 'Simple test works!' });
+  });
+
   // TEST ROUTE - Identical to working routes
   app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
+    console.log('[THUMBNAIL TEST] Route hit - req.body:', req.body);
     try {
       console.log('[THUMBNAIL TEST] Testing optimized generation system');
       

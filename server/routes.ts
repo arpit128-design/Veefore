@@ -8734,7 +8734,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
   });
 
   // TEST ROUTE - Identical to working routes
-  app.post('/api/thumbnails/test-optimized-generation', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
     try {
       console.log('[THUMBNAIL TEST] Testing optimized generation system');
       

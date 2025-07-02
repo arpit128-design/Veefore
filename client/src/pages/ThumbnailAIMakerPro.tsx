@@ -405,20 +405,26 @@ export default function ThumbnailAIMakerPro() {
                     setIsGenerating(true);
                     console.log('[THUMBNAIL TEST] Testing optimized generation system');
                     
-                    const response = await apiRequest('/api/thumbnails/test-optimized-generation', {
+                    const response = await fetch('/api/thumbnails/test-optimized-generation', {
                       method: 'POST',
                       body: JSON.stringify({ title }),
                       headers: { 'Content-Type': 'application/json' }
                     });
                     
-                    setVariants(response.variants);
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    setVariants(data.variants);
                     
                     toast({
                       title: "✅ Optimized System Demo",
-                      description: response.optimization.message,
+                      description: data.optimization.message,
                     });
                     
-                    console.log('[THUMBNAIL TEST] Optimization Results:', response.optimization);
+                    console.log('[THUMBNAIL TEST] Optimization Results:', data.optimization);
                     
                   } catch (error) {
                     console.error('[THUMBNAIL TEST] Failed:', error);

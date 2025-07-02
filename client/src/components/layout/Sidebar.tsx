@@ -21,6 +21,7 @@ const navigationItems = [
   { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400" },
   { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400" },
   { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500" },
+  { href: "/persona-suggestions", icon: Users, label: "Persona Suggestions", color: "text-purple-400" },
   { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500" },
   { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500" },
   { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },

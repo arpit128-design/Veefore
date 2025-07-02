@@ -8706,7 +8706,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         
         // Return a proper strategy format that matches what the frontend expects
         const fallbackStrategy = {
-          titles: ["AMAZING " + title.toUpperCase(), "VIRAL " + title.toUpperCase(), "SECRET " + title.toUpperCase()],
+          titles: ["AMAZING " + (req.body.title || "TITLE").toUpperCase(), "VIRAL " + (req.body.title || "TITLE").toUpperCase(), "SECRET " + (req.body.title || "TITLE").toUpperCase()],
           ctas: ["WATCH NOW", "MUST SEE"],
           fonts: ["Inter", "Roboto", "Poppins"],
           colors: {

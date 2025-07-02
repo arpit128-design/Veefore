@@ -83,7 +83,10 @@ export default function ROICalculator() {
 
   // Calculate ROI mutation
   const calculateMutation = useMutation({
-    mutationFn: (data: ROIInput) => apiRequest('POST', '/api/ai/roi-calculator', data),
+    mutationFn: async (data: ROIInput): Promise<ROIResult> => {
+      const response = await apiRequest('POST', '/api/ai/roi-calculator', data);
+      return response.json();
+    },
     onSuccess: (data: ROIResult) => {
       setROIResult(data);
       setActiveTab('results');
@@ -656,49 +659,52 @@ export default function ROICalculator() {
                 </Button>
               </div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-              >
-                {Object.entries(roiResult.projections).map(([period, value], index) => (
-                  <Card key={period} className="bg-cosmic-void/40 border-asteroid-silver/30">
-                    <CardContent className="p-6 text-center">
-                      <div className="text-lg font-semibold text-white mb-2">
-                        {period === 'month1' ? '1 Month' : 
-                         period === 'month3' ? '3 Months' : 
-                         period === 'month6' ? '6 Months' : '12 Months'}
-                      </div>
-                      <div className="text-2xl font-bold text-electric-cyan">{formatCurrency(value)}</div>
-                      <div className="text-asteroid-silver text-sm">Projected Revenue</div>
-                      {index > 0 && (
-                        <div className="text-green-400 text-xs mt-1 flex items-center justify-center gap-1">
-                        <ArrowUp className="w-3 h-3" />
-                        Growth
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </motion.div>
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
+                  {Object.entries(roiResult.projections).map(([period, value], index) => (
+                    <Card key={period} className="bg-cosmic-void/40 border-asteroid-silver/30">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-lg font-semibold text-white mb-2">
+                          {period === 'month1' ? '1 Month' : 
+                           period === 'month3' ? '3 Months' : 
+                           period === 'month6' ? '6 Months' : '12 Months'}
+                        </div>
+                        <div className="text-2xl font-bold text-electric-cyan">{formatCurrency(value)}</div>
+                        <div className="text-asteroid-silver text-sm">Projected Revenue</div>
+                        {index > 0 && (
+                          <div className="text-green-400 text-xs mt-1 flex items-center justify-center gap-1">
+                            <ArrowUp className="w-3 h-3" />
+                            Growth
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-6 border border-electric-cyan/20 text-center"
-            >
-              <BarChart3 className="w-12 h-12 text-electric-cyan mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">
-                12-Month Revenue Projection
-              </h3>
-              <div className="text-3xl font-bold text-electric-cyan mb-2">
-                {formatCurrency(mockROIResult.projections.month12)}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-6 border border-electric-cyan/20 text-center"
+                >
+                  <BarChart3 className="w-12 h-12 text-electric-cyan mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    12-Month Revenue Projection
+                  </h3>
+                  <div className="text-3xl font-bold text-electric-cyan mb-2">
+                    {formatCurrency(roiResult.projections.month12)}
+                  </div>
+                  <p className="text-asteroid-silver">
+                    Based on current performance trends and optimization recommendations
+                  </p>
+                </motion.div>
               </div>
-              <p className="text-asteroid-silver">
-                Based on current performance trends and optimization recommendations
-              </p>
-            </motion.div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

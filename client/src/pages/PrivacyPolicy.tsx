@@ -112,8 +112,8 @@ export function PrivacyPolicy() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900/95 via-purple-900/90 to-slate-900/95 text-white">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+    <div className="min-h-screen text-white">
+      <div className="absolute inset-0"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}

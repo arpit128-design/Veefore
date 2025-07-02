@@ -305,33 +305,33 @@ export async function generateThumbnailVariants(
 async function generateMasterThumbnail(input: ThumbnailInput, gptResponse: GPTPromptResponse): Promise<{ url: string; buffer: Buffer }> {
   console.log('[STAGE 3] Generating master thumbnail with DALL-E 3');
   
-  const dallePrompt = `Create a YouTube thumbnail image with these exact specifications:
+  const dallePrompt = `Design a YouTube video thumbnail graphic with big bold text saying "${gptResponse.titles[0] || input.title.toUpperCase()}" as the main focus.
 
-TITLE: "${input.title}"
-
-VISUAL REQUIREMENTS:
-- Large, bold text overlay saying "${gptResponse.titles[0] || input.title.toUpperCase()}" in ${gptResponse.colors.title} color
-- Text should be clearly readable and take up 30-40% of the image
-- Add dramatic facial expression or reaction if person is included
-- High contrast background in ${gptResponse.colors.background} with dramatic lighting
-- Include visual elements for: ${gptResponse.hooks.join(', ')}
+SPECIFICATIONS:
+- Graphic design style thumbnail, NOT cinematic or movie poster style
+- Large readable text "${gptResponse.titles[0] || input.title.toUpperCase()}" in bold font, must be clearly visible
+- Text color: ${gptResponse.colors.title} with dark stroke/outline for contrast
+- Background: ${gptResponse.colors.background} theme
+- 16:9 horizontal format (YouTube standard)
+- Include visual hook: ${gptResponse.hooks[0] || 'attention-grabbing element'}
 - Style: ${gptResponse.style} with ${gptResponse.emotion} emotion
 
-YOUTUBE THUMBNAIL STYLE:
-- 16:9 aspect ratio (1280x720 pixels)
-- Bold, eye-catching design similar to MrBeast, Sidemen, or viral YouTubers
-- High contrast colors that pop on mobile screens
-- Dramatic composition that stops scrolling
-- Include arrows, circles, or highlighting elements if relevant
-- Professional graphic design quality with clear focal hierarchy
+THUMBNAIL DESIGN STYLE:
+- Similar to popular YouTuber thumbnails (MrBeast, PewDiePie style)
+- Bold, clear typography as the dominant element
+- High contrast colors optimized for mobile viewing
+- Clean graphic design layout with text prominence
+- Include arrows, shapes, or graphic elements if relevant
+- Professional digital marketing thumbnail design
 
-CONTENT FOCUS:
-- Subject matter: ${input.title}
-- Emotional trigger: ${gptResponse.emotion}
-- Visual hooks: ${gptResponse.hooks.join(', ')}
-- Color palette: ${gptResponse.colors.background} background, ${gptResponse.colors.title} text
+AVOID:
+- Artistic illustrations or paintings
+- Cinematic movie poster aesthetics
+- Overly complex or artistic compositions
 
-Create an actual YouTube thumbnail that would get clicked by millions of viewers, with bold text overlay and dramatic visual composition.`;
+Create a click-optimized YouTube thumbnail graphic that emphasizes readability and visual impact.`;
+
+  console.log('[DALL-E PROMPT]', dallePrompt.substring(0, 200) + '...');
 
   try {
     const response = await openai.images.generate({

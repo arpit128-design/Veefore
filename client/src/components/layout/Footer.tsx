@@ -3,8 +3,8 @@ import { Link } from 'wouter';
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-purple-200/20 bg-gradient-to-r from-purple-950/10 via-blue-950/10 to-purple-950/10 backdrop-blur-sm">
-      <div className="w-full max-w-7xl mx-auto px-6 py-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+      <div className="w-full px-6 py-6 ml-0 md:ml-56 lg:ml-64">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-4xl mx-auto">
           {/* Main Copyright Line */}
           <div className="text-sm text-white/80">
             © 2025 Veefore — A product of{' '}

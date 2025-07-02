@@ -436,66 +436,134 @@ export default function SocialListening() {
 
         {/* Insights Tab */}
         <TabsContent value="insights" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {mockListeningData.map((data) => (
-              <Card key={data.id} className="bg-gray-900/50 border-gray-700">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <span>{getPlatformIcon(data.platform)}</span>
-                      {data.keyword}
-                    </CardTitle>
-                    <Badge className={`${getSentimentColor(data.sentiment)} bg-transparent border`}>
-                      {data.sentiment}
-                    </Badge>
+          {!listeningResult ? (
+            <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+              <CardContent className="p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-electric-cyan/20 to-solar-gold/20 flex items-center justify-center">
+                    <Search className="w-8 h-8 text-electric-cyan" />
                   </div>
-                  <CardDescription>
-                    {data.mentions.toLocaleString()} mentions • {data.reach.toLocaleString()} reach
-                  </CardDescription>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Start Social Listening Analysis</h3>
+                    <p className="text-asteroid-silver">Add keywords in the Monitor tab and run analysis to see AI-powered insights</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : socialListeningMutation.isPending ? (
+            <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+              <CardContent className="p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <Loader2 className="w-8 h-8 animate-spin text-electric-cyan" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Analyzing Social Media Data</h3>
+                    <p className="text-asteroid-silver">AI is processing mentions, sentiment, and trends across platforms...</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Summary Card */}
+              <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <TrendingUp className="w-5 h-5 text-electric-cyan" />
+                    Analysis Summary
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-electric-cyan/10 rounded border border-electric-cyan/20">
+                      <p className="text-2xl font-bold text-electric-cyan">{listeningResult.summary?.totalMentions?.toLocaleString() || '0'}</p>
+                      <p className="text-sm text-asteroid-silver">Total Mentions</p>
+                    </div>
+                    <div className="text-center p-3 bg-solar-gold/10 rounded border border-solar-gold/20">
+                      <p className="text-2xl font-bold text-solar-gold">{listeningResult.summary?.sentimentDistribution?.positive || 0}%</p>
+                      <p className="text-sm text-asteroid-silver">Positive Sentiment</p>
+                    </div>
+                  </div>
+                  
+                  {listeningResult.summary?.trendingTopics && listeningResult.summary.trendingTopics.length > 0 && (
                     <div>
-                      <p className="text-sm text-gray-400">Trending Score</p>
-                      <div className="flex items-center gap-2">
-                        <Progress value={data.trendingScore} className="flex-1" />
-                        <span className="text-sm font-medium">{data.trendingScore}%</span>
+                      <p className="text-sm font-medium text-white mb-2">Trending Topics</p>
+                      <div className="flex flex-wrap gap-2">
+                        {listeningResult.summary.trendingTopics.slice(0, 5).map((topic: string, index: number) => (
+                          <Badge key={index} className="bg-electric-cyan/20 text-electric-cyan border-electric-cyan/30">
+                            {topic}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Engagement Rate</p>
-                      <p className="text-lg font-semibold text-green-400">{data.engagement}%</p>
-                    </div>
-                  </div>
-
-                  <Separator className="bg-gray-700" />
-
-                  <div>
-                    <p className="text-sm font-medium mb-2">Top Mentions</p>
-                    <div className="space-y-2">
-                      {data.topMentions.slice(0, 2).map((mention, index) => (
-                        <div key={index} className="p-2 bg-gray-800 rounded">
-                          <p className="text-sm">{mention.content}</p>
-                          <div className="flex items-center justify-between mt-1">
-                            <span className="text-xs text-gray-400">@{mention.author}</span>
-                            <span className="text-xs text-gray-400">{mention.engagement} engagements</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium mb-2">Viral Potential</p>
-                    <div className="flex items-center gap-2">
-                      <Progress value={data.viralPotential.score} className="flex-1" />
-                      <span className="text-sm font-medium text-purple-400">{data.viralPotential.score}%</span>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
+
+              {/* Brand Mentions */}
+              <Card className="bg-cosmic-void/40 border-asteroid-silver/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <MessageSquare className="w-5 h-5 text-electric-cyan" />
+                    Recent Mentions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {listeningResult.insights?.brandMentions?.slice(0, 3).map((mention: any, index: number) => (
+                    <div key={index} className="p-3 bg-gray-800/50 rounded border border-gray-700">
+                      <p className="text-sm text-white mb-2">{mention.content}</p>
+                      <div className="flex items-center justify-between">
+                        <Badge className={`${getSentimentColor(mention.sentiment)} bg-transparent border`}>
+                          {mention.sentiment}
+                        </Badge>
+                        <span className="text-xs text-asteroid-silver">{mention.platform}</span>
+                      </div>
+                    </div>
+                  )) || (
+                    <p className="text-asteroid-silver text-center py-4">No recent mentions found</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recommendations */}
+              <Card className="bg-cosmic-void/40 border-asteroid-silver/30 lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <Sparkles className="w-5 h-5 text-electric-cyan" />
+                    AI Recommendations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {listeningResult.recommendations?.engagementOpportunities && (
+                    <div>
+                      <h4 className="font-medium text-electric-cyan mb-3">Engagement Opportunities</h4>
+                      <ul className="space-y-2">
+                        {listeningResult.recommendations.engagementOpportunities.slice(0, 3).map((opportunity: string, index: number) => (
+                          <li key={index} className="text-sm text-asteroid-silver flex items-start gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-electric-cyan mt-2 flex-shrink-0"></div>
+                            {opportunity}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {listeningResult.recommendations?.contentSuggestions && (
+                    <div>
+                      <h4 className="font-medium text-solar-gold mb-3">Content Suggestions</h4>
+                      <ul className="space-y-2">
+                        {listeningResult.recommendations.contentSuggestions.slice(0, 3).map((suggestion: string, index: number) => (
+                          <li key={index} className="text-sm text-asteroid-silver flex items-start gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-solar-gold mt-2 flex-shrink-0"></div>
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </TabsContent>
 
         {/* Alerts Tab */}

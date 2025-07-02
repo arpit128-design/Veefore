@@ -2050,6 +2050,108 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Creative Brief AI Generation
+  app.post('/api/ai/creative-brief', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const creditCost = 3; // 3 credits for creative brief generation
+      
+      // Check user credits
+      const user = await storage.getUser(userId);
+      if (!user || user.credits < creditCost) {
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          required: creditCost,
+          current: user?.credits || 0
+        });
+      }
+
+      console.log('[CREATIVE BRIEF AI] Generating creative brief for user:', userId);
+      console.log('[CREATIVE BRIEF AI] Request data:', req.body);
+
+      const { creativeBriefAI } = await import('./creative-brief-ai');
+      const briefResult = await creativeBriefAI.generateBrief(req.body);
+
+      // Deduct credits
+      await storage.updateUser(userId, { 
+        credits: user.credits - creditCost 
+      });
+
+      // Create credit transaction
+      await storage.createCreditTransaction({
+        userId,
+        type: 'spent',
+        amount: -creditCost,
+        description: 'AI Creative Brief Generation',
+        referenceId: `brief_${Date.now()}`
+      });
+
+      console.log('[CREATIVE BRIEF AI] Successfully generated brief, credits deducted:', creditCost);
+
+      res.json({
+        success: true,
+        generated: briefResult,
+        creditsUsed: creditCost,
+        remainingCredits: user.credits - creditCost
+      });
+
+    } catch (error: any) {
+      console.error('[CREATIVE BRIEF AI] Generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate creative brief' });
+    }
+  });
+
+  // Content Repurpose AI
+  app.post('/api/ai/content-repurpose', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const creditCost = 2; // 2 credits for content repurposing
+      
+      // Check user credits
+      const user = await storage.getUser(userId);
+      if (!user || user.credits < creditCost) {
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          required: creditCost,
+          current: user?.credits || 0
+        });
+      }
+
+      console.log('[CONTENT REPURPOSE AI] Repurposing content for user:', userId);
+      console.log('[CONTENT REPURPOSE AI] Request data:', req.body);
+
+      const { contentRepurposeAI } = await import('./content-repurpose-ai');
+      const repurposeResult = await contentRepurposeAI.repurposeContent(req.body);
+
+      // Deduct credits
+      await storage.updateUser(userId, { 
+        credits: user.credits - creditCost 
+      });
+
+      // Create credit transaction
+      await storage.createCreditTransaction({
+        userId,
+        type: 'spent',
+        amount: -creditCost,
+        description: 'AI Content Repurposing',
+        referenceId: `repurpose_${Date.now()}`
+      });
+
+      console.log('[CONTENT REPURPOSE AI] Successfully repurposed content, credits deducted:', creditCost);
+
+      res.json({
+        success: true,
+        repurposed: repurposeResult,
+        creditsUsed: creditCost,
+        remainingCredits: user.credits - creditCost
+      });
+
+    } catch (error: any) {
+      console.error('[CONTENT REPURPOSE AI] Repurposing failed:', error);
+      res.status(500).json({ error: 'Failed to repurpose content' });
+    }
+  });
+
   // Force complete data refresh - clears all caches and fetches live data
   app.post("/api/force-refresh", requireAuth, async (req: any, res: any) => {
     try {

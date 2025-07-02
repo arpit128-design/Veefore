@@ -238,6 +238,20 @@ export interface IStorage {
   updateCanvasSession(id: number, updates: any): Promise<any>;
   createThumbnailExport(exportData: any): Promise<any>;
   incrementExportDownload(exportId: number): Promise<void>;
+
+  // Creative Brief operations
+  createCreativeBrief(brief: InsertCreativeBrief): Promise<CreativeBrief>;
+  getCreativeBrief(id: number): Promise<CreativeBrief | undefined>;
+  getCreativeBriefsByWorkspace(workspaceId: number): Promise<CreativeBrief[]>;
+  updateCreativeBrief(id: number, updates: Partial<CreativeBrief>): Promise<CreativeBrief>;
+  deleteCreativeBrief(id: number): Promise<void>;
+
+  // Content Repurpose operations
+  createContentRepurpose(repurpose: InsertContentRepurpose): Promise<ContentRepurpose>;
+  getContentRepurpose(id: number): Promise<ContentRepurpose | undefined>;
+  getContentRepurposesByWorkspace(workspaceId: number): Promise<ContentRepurpose[]>;
+  updateContentRepurpose(id: number, updates: Partial<ContentRepurpose>): Promise<ContentRepurpose>;
+  deleteContentRepurpose(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {

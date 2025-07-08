@@ -91,7 +91,8 @@ export default function SubscriptionNew() {
   // Create Razorpay order mutation
   const createOrderMutation = useMutation({
     mutationFn: async ({ planId, interval }: { planId: string; interval: string }) => {
-      return await apiRequest('POST', '/api/subscription/create-order', { planId, interval });
+      const response = await apiRequest('POST', '/api/subscription/create-order', { planId, interval });
+      return await response.json();
     },
     onError: (error: any) => {
       toast({
@@ -105,7 +106,8 @@ export default function SubscriptionNew() {
   // Upgrade subscription mutation (after payment)
   const upgradeMutation = useMutation({
     mutationFn: async (paymentData: { planId: string; paymentId: string; orderId: string; signature: string }) => {
-      return await apiRequest('POST', '/api/subscription/upgrade', paymentData);
+      const response = await apiRequest('POST', '/api/subscription/upgrade', paymentData);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -126,7 +128,8 @@ export default function SubscriptionNew() {
   // Purchase credits mutation
   const purchaseCreditsMutation = useMutation({
     mutationFn: async (packageId: string) => {
-      return await apiRequest('POST', '/api/subscription/purchase-credits', { packageId });
+      const response = await apiRequest('POST', '/api/subscription/purchase-credits', { packageId });
+      return await response.json();
     },
     onSuccess: () => {
       toast({

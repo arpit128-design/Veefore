@@ -85,16 +85,23 @@ router.get('/current', requireAuth, async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Get user's current subscription
-    const currentSubscription = await storage.getUserSubscription(user.id);
     const currentPlan = getPlanById(user.plan || 'free');
-    
-    // Get user's addons
-    const userAddons = await storage.getUserAddons(user.id);
     
     // Calculate total credits
     const totalCredits = user.credits || 0;
     const monthlyCredits = currentPlan?.credits || 0;
+    
+    // Format subscription data for frontend
+    const subscriptionData = {
+      id: user.id,
+      userId: user.id,
+      plan: user.plan || 'free',
+      planStatus: user.planStatus || 'active',
+      credits: totalCredits,
+      nextBillingDate: null, // Will be set when payment system is integrated
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
     
     res.json({
       user: {
@@ -105,14 +112,20 @@ router.get('/current', requireAuth, async (req: Request, res: Response) => {
         planStatus: user.planStatus || 'active',
         credits: totalCredits
       },
-      subscription: currentSubscription,
+      subscription: subscriptionData,
       plan: currentPlan,
-      addons: userAddons,
+      addons: [],
       billing: {
         monthlyCredits,
         totalCredits,
-        nextBillingDate: currentSubscription?.nextBillingDate
+        nextBillingDate: subscriptionData.nextBillingDate
       }
+    });
+    
+    console.log('[SUBSCRIPTION] Returned subscription data:', {
+      plan: user.plan || 'free',
+      credits: totalCredits,
+      planStatus: user.planStatus || 'active'
     });
   } catch (error) {
     console.error('[SUBSCRIPTION] Error fetching current subscription:', error);
@@ -128,23 +141,56 @@ router.post('/validate-feature', requireAuth, async (req: Request, res: Response
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { featureId } = req.body;
+    const { featureId, creditsRequired = 0 } = req.body;
     if (!featureId) {
       return res.status(400).json({ error: 'Feature ID is required' });
     }
 
     const userPlan = user.plan || 'free';
-    const accessResult = validateFeatureAccess(userPlan, featureId);
+    const currentPlan = getPlanById(userPlan);
+    const userCredits = user.credits || 0;
     
-    // Check credits if feature requires them
-    const creditCost = calculateCreditDeduction(featureId);
-    const hasCredits = hasEnoughCredits(user.credits || 0, featureId);
+    // Check if feature is allowed on current plan
+    const featureConfig = currentPlan?.features?.[featureId];
+    const isFeatureAllowed = featureConfig?.allowed || false;
+    
+    // Check if user has enough credits
+    const hasEnoughCredits = userCredits >= creditsRequired;
+    
+    // Final access decision
+    const hasAccess = isFeatureAllowed && hasEnoughCredits;
+    
+    // Track feature usage if access is granted
+    if (hasAccess && creditsRequired > 0) {
+      try {
+        await storage.trackFeatureUsage(user.id, featureId, creditsRequired);
+      } catch (error) {
+        console.error('[FEATURE ACCESS] Error tracking usage:', error);
+      }
+    }
     
     res.json({
-      ...accessResult,
-      creditCost,
-      hasCredits,
-      currentCredits: user.credits || 0
+      hasAccess,
+      isFeatureAllowed,
+      hasEnoughCredits,
+      userCredits,
+      creditsRequired,
+      currentPlan: userPlan,
+      requiredPlan: featureConfig?.upgrade || null,
+      reason: !hasAccess ? 
+        (!isFeatureAllowed ? `Feature requires ${featureConfig?.upgrade || 'pro'} plan` : 'Insufficient credits') : 
+        'Access granted'
+    });
+    
+    console.log('[FEATURE ACCESS] Validation result:', {
+      featureId,
+      userId: user.id,
+      hasAccess,
+      isFeatureAllowed,
+      hasEnoughCredits,
+      userCredits,
+      creditsRequired,
+      currentPlan: userPlan
     });
   } catch (error) {
     console.error('[SUBSCRIPTION] Error validating feature access:', error);

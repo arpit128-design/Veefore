@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight, Lock, Unlock, AlertCircle } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight, AlertCircle, Sparkles, Infinity } from 'lucide-react';
 
 import { apiRequest } from '@/lib/queryClient';
 import { queryClient } from '@/lib/queryClient';
@@ -59,390 +59,380 @@ interface CreditTransaction {
 }
 
 export default function SubscriptionNew() {
-  const [activeTab, setActiveTab] = useState('overview');
   const { toast } = useToast();
+  const [isYearly, setIsYearly] = useState(false);
 
-  // Fetch subscription data with explicit authentication
-  const { data: subscription, isLoading: subscriptionLoading } = useQuery<SubscriptionData>({
-    queryKey: ['/api/subscription/current'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/subscription/current');
-      const data = await response.json();
-      console.log('[SUBSCRIPTION] Loaded subscription data:', data);
-      return data;
-    },
-    retry: 3,
-    staleTime: 30000,
+  // Fetch subscription data
+  const { data: subscriptionData, isLoading: subscriptionLoading } = useQuery({
+    queryKey: ['/api/subscription'],
+    refetchInterval: 30000,
   });
 
-  // Fetch pricing plans
-  const { data: pricingData, isLoading: pricingLoading } = useQuery<PlanData>({
+  // Fetch available plans
+  const { data: planData, isLoading: planLoading } = useQuery({
     queryKey: ['/api/subscription/plans'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/subscription/plans');
-      const data = await response.json();
-      console.log('[SUBSCRIPTION] Loaded pricing data:', data);
-      console.log('[SUBSCRIPTION] Pricing data plans:', data.plans);
-      console.log('[SUBSCRIPTION] Plan keys:', Object.keys(data.plans || {}));
-      return data;
-    },
-    retry: 2,
-    staleTime: 0, // Force refetch
-    cacheTime: 0, // Don't cache
-    staleTime: 60000,
+    refetchInterval: 30000,
   });
 
-  // Fetch credit transactions
-  const { data: creditTransactions, isLoading: transactionsLoading } = useQuery<CreditTransaction[]>({
+  // Fetch credit transaction history
+  const { data: creditHistory, isLoading: creditLoading } = useQuery({
     queryKey: ['/api/credit-transactions'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/credit-transactions');
-      const data = await response.json();
-      console.log('[SUBSCRIPTION] Loaded credit transactions:', data.length, 'transactions');
-      return data;
-    },
-    retry: 2,
-    staleTime: 30000,
+    refetchInterval: 30000,
   });
 
-  // Fetch feature usage data
-  const { data: usage, isLoading: usageLoading } = useQuery({
-    queryKey: ['/api/subscription/usage'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/subscription/usage');
-      const data = await response.json();
-      console.log('[SUBSCRIPTION] Loaded usage data:', data);
-      return data;
-    },
-    retry: 2,
-    staleTime: 30000,
-  });
-
-  // Calculate authentic credit balance with detailed logging
-  const authenticCredits = subscription?.credits || 0;
-  const transactionCredits = creditTransactions?.reduce((total, tx) => total + tx.amount, 0) || 0;
-  const displayCredits = authenticCredits > 0 ? authenticCredits : transactionCredits;
-
-  // Force display of server data
-  console.log('[NEW SUBSCRIPTION] Raw subscription object:', subscription);
-  console.log('[NEW SUBSCRIPTION] Raw credits property:', subscription?.credits);
-  console.log('[NEW SUBSCRIPTION] Raw pricing data:', pricingData);
-  console.log('[NEW SUBSCRIPTION] Pricing data plans:', pricingData?.plans);
-  console.log('[NEW SUBSCRIPTION] Credit calculation:', {
-    authenticCredits,
-    transactionCredits,
-    displayCredits,
-    subscriptionLoaded: !!subscription,
-    transactionsLoaded: !!creditTransactions,
-    pricingLoaded: !!pricingData,
-    rawSubscriptionData: subscription
-  });
-
-  // Ensure we always show the authentic credits from server
-  const finalCredits = subscription?.credits !== undefined ? subscription.credits : 148;
-
-  const currentPlan = subscription?.plan || 'free';
-  const planInfo = pricingData?.plans?.[currentPlan] || {
-    id: 'free',
-    name: 'Free Forever',
-    description: 'Perfect for getting started',
-    price: 0,
-    credits: 60,
-    features: ['Basic Features', 'Limited Analytics', '1 Social Account']
-  };
-
-  // Feature access validation
-  const validateFeatureAccess = useMutation({
-    mutationFn: async ({ featureId, creditsRequired }: { featureId: string; creditsRequired: number }) => {
-      const response = await apiRequest('POST', '/api/subscription/validate-feature', {
-        featureId,
-        creditsRequired,
+  // Upgrade subscription mutation
+  const upgradeMutation = useMutation({
+    mutationFn: async (planId: string) => {
+      return await apiRequest('/api/subscription/upgrade', {
+        method: 'POST',
+        body: { planId },
       });
-      const data = await response.json();
-      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Subscription Upgraded',
+        description: 'Your subscription has been upgraded successfully.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Access Denied",
-        description: "You need to upgrade your plan to access this feature.",
-        variant: "destructive",
+        title: 'Upgrade Failed',
+        description: error.message || 'Failed to upgrade subscription.',
+        variant: 'destructive',
       });
     },
   });
 
-  // Credit purchase mutation
+  // Purchase credits mutation
   const purchaseCreditsMutation = useMutation({
-    mutationFn: (packageId: string) => apiRequest('POST', '/api/subscription/purchase-credits', { packageId }),
+    mutationFn: async (packageId: string) => {
+      return await apiRequest('/api/subscription/purchase-credits', {
+        method: 'POST',
+        body: { packageId },
+      });
+    },
     onSuccess: () => {
-      toast({ title: "Credits Purchased", description: "Your credits have been added!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription/current'] });
+      toast({
+        title: 'Credits Purchased',
+        description: 'Your credits have been added successfully.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
       queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
     },
     onError: (error: any) => {
-      toast({ title: "Purchase Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: 'Purchase Failed',
+        description: error.message || 'Failed to purchase credits.',
+        variant: 'destructive',
+      });
     },
   });
 
-  if (subscriptionLoading) {
+  if (subscriptionLoading || planLoading) {
     return (
-      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
-        <div className="relative z-10 text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-asteroid-silver">Loading your subscription...</p>
-        </div>
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
+        <div className="text-white">Loading subscription data...</div>
       </div>
     );
   }
 
+  const isUpgrading = upgradeMutation.isPending;
+  const isPurchasing = purchaseCreditsMutation.isPending;
+
+  // Plan configurations with yearly discounts
+  const planConfigs = {
+    free: { icon: Zap, gradient: 'from-gray-400 to-gray-600', yearlyDiscount: 0 },
+    starter: { icon: Star, gradient: 'from-blue-400 to-blue-600', yearlyDiscount: 10 },
+    pro: { icon: Crown, gradient: 'from-purple-400 to-purple-600', yearlyDiscount: 15 },
+    business: { icon: Shield, gradient: 'from-amber-400 to-amber-600', yearlyDiscount: 20 }
+  };
+
+  const getPrice = (plan: any) => {
+    if (plan.id === 'free') return 0;
+    if (isYearly) {
+      const discount = planConfigs[plan.id as keyof typeof planConfigs]?.yearlyDiscount || 0;
+      return Math.round(plan.price * 12 * (1 - discount / 100));
+    }
+    return plan.price;
+  };
+
+  const getSavings = (plan: any) => {
+    if (plan.id === 'free') return 0;
+    const discount = planConfigs[plan.id as keyof typeof planConfigs]?.yearlyDiscount || 0;
+    return Math.round(plan.price * 12 * (discount / 100));
+  };
+
   return (
-    <div className="min-h-screen bg-transparent text-white p-8">
-      
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-transparent relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-purple-900/10 to-black/20 backdrop-blur-sm" />
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-cyan via-nebula-purple to-solar-gold bg-clip-text text-transparent">
-            Your Subscription
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full mb-6">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold text-white mb-4">
+            Choose Your <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">VeeFore</span> Plan
           </h1>
-          <p className="text-asteroid-silver text-lg">
-            Manage your plan, credits, and add-ons
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+            Unlock the full potential of AI-powered content creation with our flexible subscription plans designed for creators, agencies, and businesses.
           </p>
         </div>
 
-        {/* Current Plan Overview */}
-        <Card className="content-card holographic">
-          <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Plan Info */}
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-electric-cyan/20 to-nebula-purple/20 border border-electric-cyan/30 flex items-center justify-center">
-                  <Crown className="w-8 h-8 text-electric-cyan" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{planInfo.name}</h3>
-                <p className="text-asteroid-silver">
-                  {currentPlan === 'free' ? 'Free forever' : `₹${planInfo.price}/month`}
-                </p>
-              </div>
-
-              {/* Credits */}
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-electric-cyan/20 border border-electric-cyan/30 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-electric-cyan" />
-                </div>
-                <h3 className="text-2xl font-bold text-electric-cyan mb-2">
-                  {formatNumber(finalCredits)}
-                </h3>
-                <p className="text-asteroid-silver">Credits remaining</p>
-              </div>
-
-              {/* Status */}
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-green-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-green-400 mb-2">
-                  {subscription?.status === 'active' ? 'Active' : 'Inactive'}
-                </h3>
-                <p className="text-asteroid-silver">Plan status</p>
-              </div>
+        {/* Billing Toggle */}
+        <div className="flex items-center justify-center mb-12">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1">
+            <div className="flex items-center space-x-4 px-4 py-2">
+              <span className={`text-sm font-medium transition-colors ${!isYearly ? 'text-white' : 'text-gray-400'}`}>
+                Monthly
+              </span>
+              <Switch
+                checked={isYearly}
+                onCheckedChange={setIsYearly}
+                className="data-[state=checked]:bg-purple-600"
+              />
+              <span className={`text-sm font-medium transition-colors ${isYearly ? 'text-white' : 'text-gray-400'}`}>
+                Yearly
+              </span>
+              <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs px-2 py-1">
+                Save up to 20%
+              </Badge>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 glassmorphism">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              Plans
-            </TabsTrigger>
-            <TabsTrigger value="credits" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Credits
-            </TabsTrigger>
-            <TabsTrigger value="addons" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add-ons
-            </TabsTrigger>
-          </TabsList>
+        {/* Current Status */}
+        <div className="mb-12">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <Crown className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-xl">Current Plan</h3>
+                    <p className="text-gray-300 text-lg capitalize">
+                      {subscriptionData?.plan || 'Free'} • {formatNumber(subscriptionData?.credits || 0)} credits remaining
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-green-600 text-white text-sm px-4 py-2">
+                    {subscriptionData?.status || 'Active'}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Plans Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-              {pricingData?.plans && Object.values(pricingData.plans).map((plan) => (
-                <Card key={plan.id} className={`content-card relative ${plan.popular ? 'border-electric-cyan holographic' : ''}`}>
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-electric-cyan text-space-navy font-semibold">
-                        Most Popular
-                      </Badge>
-                    </div>
-                  )}
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-white">{plan.name}</CardTitle>
-                    <div className="text-3xl font-bold text-electric-cyan">
-                      {typeof plan.price === 'number' ? `₹${plan.price}` : plan.price}
-                      {typeof plan.price === 'number' && <span className="text-sm text-asteroid-silver">/month</span>}
-                    </div>
-                    <p className="text-asteroid-silver text-sm">{plan.description}</p>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-white">{formatNumber(plan.credits)}</div>
-                      <div className="text-xs text-asteroid-silver">Monthly Credits</div>
-                    </div>
-                    <div className="space-y-2">
-                      {plan.features.slice(0, 6).map((feature: string, index: number) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                          <span className="text-sm text-asteroid-silver">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <Button 
-                      className={`w-full ${currentPlan === plan.id ? 'bg-gray-600 cursor-not-allowed' : 'btn-primary'}`}
-                      disabled={currentPlan === plan.id}
-                    >
-                      {currentPlan === plan.id ? 'Current Plan' : 'Upgrade'}
-                      {currentPlan !== plan.id && <ArrowRight className="w-4 h-4 ml-2" />}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+        {/* Subscription Plans */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          {planData?.plans && Object.values(planData.plans).map((plan: any) => {
+            const config = planConfigs[plan.id as keyof typeof planConfigs];
+            const Icon = config?.icon || Zap;
+            const isCurrentPlan = subscriptionData?.plan === plan.id;
+            const isPopular = plan.id === 'pro';
+            const price = getPrice(plan);
+            const savings = getSavings(plan);
 
-          {/* Credits Tab */}
-          <TabsContent value="credits" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Credit Packages */}
-              <Card className="content-card holographic">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-electric-cyan">
-                    <Zap className="w-5 h-5" />
-                    Credit Packages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {pricingData?.creditPackages?.map((pkg) => (
-                    <div key={pkg.id} className="flex justify-between items-center p-4 rounded-lg bg-cosmic-void/20 border border-asteroid-silver/10">
-                      <div>
-                        <div className="font-semibold text-white">{pkg.name}</div>
-                        <div className="text-sm text-asteroid-silver">
-                          {formatNumber(pkg.totalCredits)} credits
-                          {pkg.savings && (
-                            <Badge variant="secondary" className="ml-2 text-xs">
-                              Save {pkg.savings}
-                            </Badge>
-                          )}
-                        </div>
+            return (
+              <Card
+                key={plan.id}
+                className={`relative bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-500 group shadow-2xl ${
+                  isPopular ? 'ring-2 ring-purple-400 ring-opacity-50 scale-105' : ''
+                } ${isCurrentPlan ? 'ring-2 ring-green-400 ring-opacity-50' : ''}`}
+              >
+                {isPopular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 text-sm font-medium">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+                
+                {isCurrentPlan && (
+                  <div className="absolute -top-4 right-4">
+                    <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 text-xs">
+                      Current
+                    </Badge>
+                  </div>
+                )}
+
+                <CardHeader className="text-center pb-4">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${config?.gradient} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  <CardTitle className="text-white text-2xl font-bold mb-2">{plan.name}</CardTitle>
+                  <div className="mb-4">
+                    <div className="text-4xl font-bold text-white">
+                      ₹{formatNumber(price)}
+                      {plan.id !== 'free' && (
+                        <span className="text-lg font-normal text-gray-300">
+                          /{isYearly ? 'year' : 'month'}
+                        </span>
+                      )}
+                    </div>
+                    {isYearly && savings > 0 && (
+                      <div className="text-sm text-green-400 mt-1">
+                        Save ₹{formatNumber(savings)} per year
                       </div>
-                      <Button
-                        onClick={() => purchaseCreditsMutation.mutate(pkg.id)}
-                        disabled={purchaseCreditsMutation.isPending}
-                        className="btn-primary"
-                      >
-                        ₹{pkg.price}
-                      </Button>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">{plan.description}</p>
+                </CardHeader>
+                
+                <CardContent className="flex-1 px-6 pb-6">
+                  <div className="text-center mb-6">
+                    <div className="text-2xl font-bold text-white">{formatNumber(plan.credits)}</div>
+                    <div className="text-sm text-gray-300">Monthly Credits</div>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    {plan.features?.slice(0, 6).map((feature: string, index: number) => (
+                      <li key={index} className="flex items-start text-gray-300 text-sm">
+                        <CheckCircle className="w-4 h-4 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                    {plan.features?.length > 6 && (
+                      <li className="flex items-center text-gray-400 text-sm">
+                        <Plus className="w-4 h-4 mr-3" />
+                        <span>+{plan.features.length - 6} more features</span>
+                      </li>
+                    )}
+                  </ul>
+                  
+                  <Button
+                    onClick={() => upgradeMutation.mutate(plan.id)}
+                    disabled={isUpgrading || isCurrentPlan}
+                    className={`w-full h-12 text-base font-medium transition-all duration-300 ${
+                      isCurrentPlan
+                        ? 'bg-gray-600 hover:bg-gray-700 cursor-not-allowed'
+                        : plan.id === 'free'
+                        ? 'bg-gray-600 hover:bg-gray-700'
+                        : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg hover:shadow-purple-500/25'
+                    }`}
+                  >
+                    {isCurrentPlan ? (
+                      <>
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        Current Plan
+                      </>
+                    ) : (
+                      <>
+                        {plan.id === 'free' ? 'Downgrade' : 'Upgrade Now'}
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
+            );
+          })}
+        </div>
 
-              {/* Transaction History */}
-              <Card className="content-card holographic">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-nebula-purple">
-                    <History className="w-5 h-5" />
-                    Recent Transactions
-                  </CardTitle>
+        {/* Credit Packages */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Need More Credits?</h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Purchase additional credits to supercharge your content creation without changing your plan
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {planData?.creditPackages?.map((pack: any) => (
+              <Card key={pack.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 group">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Plus className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle className="text-white text-xl">{pack.name}</CardTitle>
+                  <div className="text-3xl font-bold text-white">
+                    ₹{formatNumber(pack.price)}
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  {transactionsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full"></div>
-                    </div>
-                  ) : creditTransactions && creditTransactions.length > 0 ? (
-                    <div className="space-y-3">
-                      {creditTransactions.slice(0, 5).map((transaction) => (
-                        <div key={transaction.id} className="flex justify-between items-center p-3 rounded-lg bg-cosmic-void/20">
-                          <div>
-                            <div className="text-sm font-medium text-white">{transaction.description}</div>
-                            <div className="text-xs text-asteroid-silver">
-                              {new Date(transaction.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className={`font-medium ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                              {transaction.amount > 0 ? '+' : ''}{formatNumber(transaction.amount)}
-                            </div>
-                            <div className="text-xs text-asteroid-silver capitalize">
-                              {transaction.type}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-asteroid-silver">
-                      No transactions yet
-                    </div>
-                  )}
+                  <div className="text-center mb-6">
+                    <div className="text-2xl font-bold text-white">{formatNumber(pack.totalCredits)}</div>
+                    <div className="text-sm text-gray-300">Total Credits</div>
+                    {pack.savings && (
+                      <Badge className="mt-2 bg-gradient-to-r from-green-500 to-green-600 text-white">
+                        {pack.savings} Savings
+                      </Badge>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => purchaseCreditsMutation.mutate(pack.id)}
+                    disabled={isPurchasing}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-medium"
+                  >
+                    Purchase Credits
+                    <Plus className="w-4 h-4 ml-2" />
+                  </Button>
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
+            ))}
+          </div>
+        </div>
 
-          {/* Add-ons Tab */}
-          <TabsContent value="addons" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pricingData?.addons && Object.values(pricingData.addons).map((addon) => (
-                <Card key={addon.id} className="content-card">
-                  <CardHeader>
-                    <CardTitle className="text-white text-lg">{addon.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-electric-cyan">
-                        ₹{addon.price}
+        {/* Transaction History */}
+        <div>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Transaction History</h2>
+            <p className="text-gray-300 text-lg">
+              Track your subscription changes and credit purchases
+            </p>
+          </div>
+          
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardContent className="p-8">
+              {creditLoading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <div className="text-gray-300">Loading transaction history...</div>
+                </div>
+              ) : creditHistory?.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <div className="text-gray-300 text-lg">No transactions yet</div>
+                  <p className="text-gray-400 text-sm mt-2">Your subscription and credit purchase history will appear here</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {creditHistory?.map((transaction: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-6 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                          <History className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-lg">{transaction.type}</div>
+                          <div className="text-gray-300 text-sm">{transaction.description}</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-asteroid-silver">/{addon.interval}</div>
+                      <div className="text-right">
+                        <div className={`font-semibold text-lg ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {transaction.amount > 0 ? '+' : ''}{formatNumber(transaction.amount)} credits
+                        </div>
+                        <div className="text-gray-300 text-sm">{transaction.date}</div>
+                      </div>
                     </div>
-                    <Button className="w-full btn-primary">
-                      Add to Plan
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* FAQ Section */}
-        <Card className="content-card">
-          <CardHeader>
-            <CardTitle className="text-center text-2xl text-white">
-              Frequently Asked Questions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-white">What are credits?</h3>
-                <p className="text-asteroid-silver text-sm">
-                  Credits are used for AI features like content generation, image creation, and analytics. 
-                  Each feature consumes different amounts of credits based on complexity.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <h3 className="font-semibold text-white">Can I change plans anytime?</h3>
-                <p className="text-asteroid-silver text-sm">
-                  Yes! You can upgrade or downgrade your plan at any time. 
-                  Changes take effect immediately.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

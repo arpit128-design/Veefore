@@ -91,10 +91,7 @@ export default function SubscriptionNew() {
   // Upgrade subscription mutation
   const upgradeMutation = useMutation({
     mutationFn: async (planId: string) => {
-      return await apiRequest('/api/subscription/upgrade', {
-        method: 'POST',
-        body: { planId },
-      });
+      return await apiRequest('POST', '/api/subscription/upgrade', { planId });
     },
     onSuccess: () => {
       toast({
@@ -115,10 +112,7 @@ export default function SubscriptionNew() {
   // Purchase credits mutation
   const purchaseCreditsMutation = useMutation({
     mutationFn: async (packageId: string) => {
-      return await apiRequest('/api/subscription/purchase-credits', {
-        method: 'POST',
-        body: { packageId },
-      });
+      return await apiRequest('POST', '/api/subscription/purchase-credits', { packageId });
     },
     onSuccess: () => {
       toast({

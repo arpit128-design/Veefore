@@ -19,10 +19,17 @@ import Razorpay from 'razorpay';
 const router = Router();
 
 // Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+let razorpay: Razorpay;
+try {
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+  console.log('[SUBSCRIPTION] Razorpay initialized successfully');
+} catch (error) {
+  console.error('[SUBSCRIPTION] Failed to initialize Razorpay:', error);
+  throw error;
+}
 
 // Authentication middleware - Using the same system as main routes
 const requireAuth = async (req: any, res: Response, next: NextFunction) => {
@@ -450,8 +457,22 @@ router.post('/create-order', requireAuth, async (req: Request, res: Response) =>
       return res.status(400).json({ error: 'Cannot downgrade to free plan' });
     }
 
+    // Validate required environment variables
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error('[SUBSCRIPTION] Missing Razorpay credentials');
+      return res.status(500).json({ error: 'Payment system not configured' });
+    }
+
+    console.log('[SUBSCRIPTION] Creating order with details:', {
+      planId,
+      price,
+      amount: price * 100,
+      userId: user.id,
+      interval
+    });
+
     // Create Razorpay order
-    const order = await razorpay.orders.create({
+    const orderData = {
       amount: price * 100, // Razorpay expects amount in paisa
       currency: 'INR',
       receipt: `plan_${planId}_${user.id}_${Date.now()}`,
@@ -462,7 +483,11 @@ router.post('/create-order', requireAuth, async (req: Request, res: Response) =>
         planName: plan.name,
         currentPlan: user.plan || 'free'
       }
-    });
+    };
+
+    console.log('[SUBSCRIPTION] Razorpay order payload:', orderData);
+    
+    const order = await razorpay.orders.create(orderData);
 
     console.log('[SUBSCRIPTION] Created Razorpay order:', {
       orderId: order.id,

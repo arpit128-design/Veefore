@@ -2646,12 +2646,12 @@ export class MongoStorage implements IStorage {
       throw new Error(`Invalid plan ID: ${planId}`);
     }
     
-    // Update the user's subscription plan AND set the monthly credits
+    // Update the user's subscription plan AND ADD the monthly credits (additive)
     const updatedUser = await UserModel.findByIdAndUpdate(
       user._id,
       { 
         plan: planId, 
-        credits: plan.credits,  // Set to the plan's monthly credits
+        $inc: { credits: plan.credits },  // Add to existing credits instead of replacing
         updatedAt: new Date() 
       },
       { new: true }

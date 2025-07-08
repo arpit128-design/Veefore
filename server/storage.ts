@@ -137,6 +137,10 @@ export interface IStorage {
   getActiveAddonsByUser(userId: number): Promise<Addon[]>;
   createAddon(addon: InsertAddon): Promise<Addon>;
 
+  // Feature usage tracking
+  getFeatureUsage(userId: number | string): Promise<any[]>;
+  trackFeatureUsage(userId: number | string, featureId: string, usage: any): Promise<void>;
+
   // Content recommendation operations
   getContentRecommendation(id: number): Promise<ContentRecommendation | undefined>;
   getContentRecommendations(workspaceId: number, type?: string, limit?: number): Promise<ContentRecommendation[]>;
@@ -1502,6 +1506,15 @@ export class MemStorage implements IStorage {
   }
 
   async incrementExportDownload(exportId: number): Promise<void> {
+    // No-op for memory storage
+  }
+
+  // Feature usage tracking methods
+  async getFeatureUsage(userId: number | string): Promise<any[]> {
+    return [];
+  }
+
+  async trackFeatureUsage(userId: number | string, featureId: string, usage: any): Promise<void> {
     // No-op for memory storage
   }
 }

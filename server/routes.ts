@@ -27,6 +27,7 @@ import { abTestingAI } from './ab-testing-ai';
 import { personaSuggestionsAI } from './persona-suggestions-ai';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
+import subscriptionRoutes from './routes/subscription';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -11226,6 +11227,9 @@ Format the response as JSON with this structure:
 
   // AI Copilot Routes
   createCopilotRoutes(app, storage);
+
+  // Subscription Routes
+  app.use('/api/subscription', subscriptionRoutes);
 
   const httpServer = createServer(app);
   return httpServer;

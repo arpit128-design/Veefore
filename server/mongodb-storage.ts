@@ -249,6 +249,16 @@ const UserContentHistorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const FeatureUsageSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.Mixed, required: true },
+  featureId: { type: String, required: true },
+  usageCount: { type: Number, default: 0 },
+  lastUsed: { type: Date, default: Date.now },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // DM Conversation Memory Schemas
 const DmConversationSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
@@ -458,6 +468,7 @@ const UserModel = mongoose.model('User', UserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
 const ContentRecommendationModel = mongoose.model('ContentRecommendation', ContentRecommendationSchema);
 const UserContentHistoryModel = mongoose.model('UserContentHistory', UserContentHistorySchema);
+const FeatureUsageModel = mongoose.model('FeatureUsage', FeatureUsageSchema);
 const SocialAccountModel = mongoose.model('SocialAccount', SocialAccountSchema, 'socialaccounts');
 const ContentModel = mongoose.model('Content', ContentSchema, 'contents');
 const AnalyticsModel = mongoose.model('Analytics', AnalyticsSchema);
@@ -4130,5 +4141,46 @@ export class MongoStorage implements IStorage {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt
     };
+  }
+
+  // Feature usage tracking methods
+  async getFeatureUsage(userId: number | string): Promise<any[]> {
+    await this.connect();
+    try {
+      const docs = await FeatureUsageModel.find({ userId }).sort({ createdAt: -1 });
+      return docs.map(doc => ({
+        id: doc._id.toString(),
+        userId: doc.userId,
+        featureId: doc.featureId,
+        usageCount: doc.usageCount,
+        lastUsed: doc.lastUsed,
+        metadata: doc.metadata,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt
+      }));
+    } catch (error) {
+      console.error('Error fetching feature usage:', error);
+      return [];
+    }
+  }
+
+  async trackFeatureUsage(userId: number | string, featureId: string, usage: any): Promise<void> {
+    await this.connect();
+    try {
+      await FeatureUsageModel.findOneAndUpdate(
+        { userId, featureId },
+        {
+          $inc: { usageCount: 1 },
+          $set: { 
+            lastUsed: new Date(),
+            metadata: usage,
+            updatedAt: new Date()
+          }
+        },
+        { upsert: true }
+      );
+    } catch (error) {
+      console.error('Error tracking feature usage:', error);
+    }
   }
 }

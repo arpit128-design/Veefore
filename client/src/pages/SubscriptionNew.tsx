@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight } from 'lucide-react';
+import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight, Lock, Unlock, AlertCircle } from 'lucide-react';
 import { SpaceBackground } from '@/components/layout/SpaceBackground';
 import { apiRequest } from '@/lib/queryClient';
 import { queryClient } from '@/lib/queryClient';
@@ -64,11 +64,11 @@ export default function SubscriptionNew() {
 
   // Fetch subscription data with explicit authentication
   const { data: subscription, isLoading: subscriptionLoading } = useQuery<SubscriptionData>({
-    queryKey: ['/api/subscription'],
+    queryKey: ['/api/subscription/current'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/subscription');
+      const response = await apiRequest('GET', '/api/subscription/current');
       const data = await response.json();
-      console.log('[NEW SUBSCRIPTION] Loaded subscription data:', data);
+      console.log('[SUBSCRIPTION] Loaded subscription data:', data);
       return data;
     },
     retry: 3,
@@ -81,7 +81,7 @@ export default function SubscriptionNew() {
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/subscription/plans');
       const data = await response.json();
-      console.log('[NEW SUBSCRIPTION] Loaded pricing data:', data);
+      console.log('[SUBSCRIPTION] Loaded pricing data:', data);
       return data;
     },
     retry: 2,
@@ -94,7 +94,20 @@ export default function SubscriptionNew() {
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/credit-transactions');
       const data = await response.json();
-      console.log('[NEW SUBSCRIPTION] Loaded credit transactions:', data.length, 'transactions');
+      console.log('[SUBSCRIPTION] Loaded credit transactions:', data.length, 'transactions');
+      return data;
+    },
+    retry: 2,
+    staleTime: 30000,
+  });
+
+  // Fetch feature usage data
+  const { data: usage, isLoading: usageLoading } = useQuery({
+    queryKey: ['/api/subscription/usage'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/subscription/usage');
+      const data = await response.json();
+      console.log('[SUBSCRIPTION] Loaded usage data:', data);
       return data;
     },
     retry: 2,
@@ -131,12 +144,31 @@ export default function SubscriptionNew() {
     features: ['Basic Features', 'Limited Analytics', '1 Social Account']
   };
 
+  // Feature access validation
+  const validateFeatureAccess = useMutation({
+    mutationFn: async ({ featureId, creditsRequired }: { featureId: string; creditsRequired: number }) => {
+      const response = await apiRequest('POST', '/api/subscription/validate-feature', {
+        featureId,
+        creditsRequired,
+      });
+      const data = await response.json();
+      return data;
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Access Denied",
+        description: "You need to upgrade your plan to access this feature.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Credit purchase mutation
   const purchaseCreditsMutation = useMutation({
-    mutationFn: (packageId: string) => apiRequest('POST', '/api/credits/purchase', { packageId }),
+    mutationFn: (packageId: string) => apiRequest('POST', '/api/subscription/purchase-credits', { packageId }),
     onSuccess: () => {
       toast({ title: "Credits Purchased", description: "Your credits have been added!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription/current'] });
       queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
     },
     onError: (error: any) => {

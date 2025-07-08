@@ -10,7 +10,8 @@ export const users = pgTable("users", {
   displayName: text("display_name"),
   avatar: text("avatar"),
   credits: integer("credits").default(50),
-  plan: text("plan").default("free"), // free, pro, agency, enterprise
+  plan: text("plan").default("free"), // free, starter, pro, business, agency
+  planStatus: text("plan_status").default("active"), // active, expired, canceled, past_due
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   referralCode: text("referral_code").unique(),
@@ -728,17 +729,22 @@ export const referrals = pgTable("referrals", {
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  plan: text("plan").notNull(), // free, creator-pro, agency-suite, enterprise
-  status: text("status").notNull(), // active, canceled, expired, trial
+  plan: text("plan").notNull(), // free, starter, pro, business, agency
+  status: text("status").notNull(), // active, canceled, expired, trial, past_due
+  interval: text("interval").default("month"), // month, year
   priceId: text("price_id"), // Razorpay price ID
   subscriptionId: text("subscription_id"), // Razorpay subscription ID
   currentPeriodStart: timestamp("current_period_start"),
   currentPeriodEnd: timestamp("current_period_end"),
   trialEnd: timestamp("trial_end"),
   canceledAt: timestamp("canceled_at"),
-  monthlyCredits: integer("monthly_credits").default(60),
-  extraCredits: integer("extra_credits").default(0),
+  monthlyCredits: integer("monthly_credits").default(0), // Plan-based monthly credits
+  extraCredits: integer("extra_credits").default(0), // Purchased credits
+  totalCredits: integer("total_credits").default(0), // Combined credits
   autoRenew: boolean("auto_renew").default(true),
+  lastPaymentFailed: boolean("last_payment_failed").default(false),
+  failureReason: text("failure_reason"), // Why payment failed
+  nextBillingDate: timestamp("next_billing_date"), // Next billing attempt
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -778,6 +784,32 @@ export const addons = pgTable("addons", {
   isActive: boolean("is_active").default(true),
   expiresAt: timestamp("expires_at"),
   metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Feature Usage Tracking
+export const featureUsage = pgTable("feature_usage", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  featureId: text("feature_id").notNull(), // creative-brief, ai-suggestions, etc.
+  usageCount: integer("usage_count").default(0),
+  lastUsed: timestamp("last_used"),
+  resetAt: timestamp("reset_at"), // When monthly limit resets
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// Feature Access Control
+export const featureAccess = pgTable("feature_access", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  featureId: text("feature_id").notNull(), // creative-brief, ai-suggestions, etc.
+  accessLevel: text("access_level").notNull(), // allowed, limited, blocked
+  limit: integer("limit"), // Monthly/usage limit
+  restriction: text("restriction"), // Any special restrictions
+  grantedAt: timestamp("granted_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });

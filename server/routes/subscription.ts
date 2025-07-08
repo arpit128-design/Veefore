@@ -15,8 +15,15 @@ import { SUBSCRIPTION_PLANS as PRICING_PLANS } from '../pricing-config';
 import { z } from 'zod';
 import { storage } from '../storage';
 import { firebaseAdmin } from '../firebase-admin';
+import Razorpay from 'razorpay';
 
 const router = Router();
+
+// Initialize Razorpay instance
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 
 // Authentication middleware
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
@@ -372,6 +379,167 @@ router.get('/usage', requireAuth, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('[SUBSCRIPTION] Error fetching usage:', error);
     res.status(500).json({ error: 'Failed to fetch usage data' });
+  }
+});
+
+// Create Razorpay order for subscription upgrade
+router.post('/create-order', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { planId, interval = 'month' } = req.body;
+    if (!planId) {
+      return res.status(400).json({ error: 'Plan ID is required' });
+    }
+
+    // Get plan details from pricing config
+    const plan = PRICING_PLANS[planId];
+    if (!plan) {
+      return res.status(400).json({ error: 'Invalid plan ID' });
+    }
+
+    // Calculate price based on interval
+    const price = interval === 'year' ? plan.yearlyPrice : plan.price;
+    
+    // Don't allow downgrades to free plan
+    if (planId === 'free') {
+      return res.status(400).json({ error: 'Cannot downgrade to free plan' });
+    }
+
+    // Create Razorpay order
+    const order = await razorpay.orders.create({
+      amount: price * 100, // Razorpay expects amount in paisa
+      currency: 'INR',
+      receipt: `plan_${planId}_${user.id}_${Date.now()}`,
+      notes: {
+        userId: user.id,
+        planId,
+        interval,
+        planName: plan.name,
+        currentPlan: user.plan || 'free'
+      }
+    });
+
+    console.log('[SUBSCRIPTION] Created Razorpay order:', {
+      orderId: order.id,
+      amount: price,
+      planId,
+      userId: user.id
+    });
+
+    res.json({
+      orderId: order.id,
+      amount: price,
+      currency: 'INR',
+      planId,
+      planName: plan.name,
+      interval,
+      key: process.env.RAZORPAY_KEY_ID
+    });
+  } catch (error) {
+    console.error('[SUBSCRIPTION] Error creating Razorpay order:', error);
+    res.status(500).json({ error: 'Failed to create payment order' });
+  }
+});
+
+// Upgrade subscription (requires payment verification)
+router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { planId, paymentId, orderId, signature } = req.body;
+    if (!planId || !paymentId || !orderId || !signature) {
+      return res.status(400).json({ 
+        error: 'Payment verification required. Please complete payment first.' 
+      });
+    }
+
+    // Verify payment signature
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(orderId + '|' + paymentId)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      console.error('[SUBSCRIPTION] Payment verification failed:', {
+        expected: expectedSignature,
+        received: signature,
+        orderId,
+        paymentId
+      });
+      return res.status(400).json({ error: 'Payment verification failed' });
+    }
+
+    // Get plan details
+    const plan = PRICING_PLANS[planId];
+    if (!plan) {
+      return res.status(400).json({ error: 'Invalid plan ID' });
+    }
+
+    // Verify payment with Razorpay
+    try {
+      const payment = await razorpay.payments.fetch(paymentId);
+      
+      if (payment.status !== 'captured') {
+        return res.status(400).json({ error: 'Payment not completed' });
+      }
+
+      if (payment.order_id !== orderId) {
+        return res.status(400).json({ error: 'Payment order mismatch' });
+      }
+    } catch (error) {
+      console.error('[SUBSCRIPTION] Razorpay payment verification failed:', error);
+      return res.status(500).json({ error: 'Payment verification failed' });
+    }
+
+    // Update user's plan
+    await storage.updateUserSubscription(user.id, planId);
+
+    // Add plan credits to user's account
+    const newCredits = (user.credits || 0) + plan.credits;
+    await storage.updateUserCredits(user.id, newCredits);
+
+    // Log transaction
+    await storage.createCreditTransaction({
+      userId: user.id,
+      type: 'subscription_upgrade',
+      amount: plan.credits,
+      description: `Upgraded to ${plan.name} plan`,
+      referenceId: paymentId
+    });
+
+    console.log('[SUBSCRIPTION] Successfully upgraded user:', {
+      userId: user.id,
+      planId,
+      planName: plan.name,
+      paymentId,
+      creditsAdded: plan.credits
+    });
+
+    res.json({ 
+      success: true, 
+      message: `Successfully upgraded to ${plan.name} plan`,
+      plan: {
+        id: planId,
+        name: plan.name,
+        credits: plan.credits
+      },
+      payment: {
+        id: paymentId,
+        orderId,
+        verified: true
+      }
+    });
+  } catch (error) {
+    console.error('[SUBSCRIPTION] Error upgrading subscription:', error);
+    res.status(500).json({ error: 'Failed to upgrade subscription' });
   }
 });
 

@@ -88,10 +88,24 @@ export default function SubscriptionNew() {
     refetchInterval: 30000,
   });
 
-  // Upgrade subscription mutation
+  // Create Razorpay order mutation
+  const createOrderMutation = useMutation({
+    mutationFn: async ({ planId, interval }: { planId: string; interval: string }) => {
+      return await apiRequest('POST', '/api/subscription/create-order', { planId, interval });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Payment Failed',
+        description: error.message || 'Failed to create payment order.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Upgrade subscription mutation (after payment)
   const upgradeMutation = useMutation({
-    mutationFn: async (planId: string) => {
-      return await apiRequest('POST', '/api/subscription/upgrade', { planId });
+    mutationFn: async (paymentData: { planId: string; paymentId: string; orderId: string; signature: string }) => {
+      return await apiRequest('POST', '/api/subscription/upgrade', paymentData);
     },
     onSuccess: () => {
       toast({
@@ -141,6 +155,62 @@ export default function SubscriptionNew() {
 
   const isUpgrading = upgradeMutation.isPending;
   const isPurchasing = purchaseCreditsMutation.isPending;
+  const isCreatingOrder = createOrderMutation.isPending;
+
+  // Handle secure payment upgrade
+  const handleUpgrade = async (planId: string) => {
+    try {
+      // Create Razorpay order
+      const orderData = await createOrderMutation.mutateAsync({ planId, interval: 'month' });
+      
+      // Initialize Razorpay payment
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount * 100, // Convert to paisa
+        currency: orderData.currency,
+        order_id: orderData.orderId,
+        name: 'VeeFore',
+        description: `Upgrade to ${orderData.planName} plan`,
+        theme: {
+          color: '#6366f1'
+        },
+        handler: async (response: any) => {
+          try {
+            // Verify payment and upgrade subscription
+            await upgradeMutation.mutateAsync({
+              planId,
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              signature: response.razorpay_signature
+            });
+          } catch (error) {
+            console.error('Payment verification failed:', error);
+          }
+        },
+        prefill: {
+          name: 'VeeFore User',
+          email: 'user@example.com'
+        },
+        notes: {
+          planId,
+          planName: orderData.planName
+        }
+      };
+
+      // Load and open Razorpay payment
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', (response: any) => {
+        toast({
+          title: 'Payment Failed',
+          description: 'Your payment could not be processed. Please try again.',
+          variant: 'destructive',
+        });
+      });
+      rzp.open();
+    } catch (error) {
+      console.error('Upgrade failed:', error);
+    }
+  };
 
   // Plan configurations with yearly discounts
   const planConfigs = {
@@ -314,8 +384,8 @@ export default function SubscriptionNew() {
                   </ul>
                   
                   <Button
-                    onClick={() => upgradeMutation.mutate(plan.id)}
-                    disabled={isUpgrading || isCurrentPlan}
+                    onClick={() => plan.id === 'free' ? null : handleUpgrade(plan.id)}
+                    disabled={isUpgrading || isCreatingOrder || isCurrentPlan || plan.id === 'free'}
                     className={`w-full h-12 text-base font-medium transition-all duration-300 ${
                       isCurrentPlan
                         ? 'bg-gray-600 hover:bg-gray-700 cursor-not-allowed'
@@ -331,8 +401,16 @@ export default function SubscriptionNew() {
                       </>
                     ) : (
                       <>
-                        {plan.id === 'free' ? 'Downgrade' : 'Upgrade Now'}
-                        <ArrowRight className="w-5 h-5 ml-2" />
+                        {isCreatingOrder ? (
+                          <>Creating Payment...</>
+                        ) : isUpgrading ? (
+                          <>Processing...</>
+                        ) : (
+                          <>
+                            {plan.id === 'free' ? 'Downgrade' : 'Upgrade Now'}
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                          </>
+                        )}
                       </>
                     )}
                   </Button>

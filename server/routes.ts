@@ -3423,41 +3423,44 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       const userId = req.user.id;
       
-      // Get subscription data
-      let subscription = await storage.getSubscription(userId);
-      
-      if (!subscription) {
-        // Create default free plan subscription
-        subscription = {
-          id: 0,
-          plan: 'free',
-          status: 'active',
-          userId: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          priceId: null,
-          subscriptionId: null,
-          currentPeriodStart: null,
-          currentPeriodEnd: null,
-          canceledAt: null,
-          trialEnd: null,
-          monthlyCredits: 50,
-          extraCredits: 0,
-          autoRenew: false
-        };
+      // Get user data to read current plan
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
       
-      // Get user's actual credit balance from database
-      const user = await storage.getUser(userId);
-      const creditBalance = user?.credits || 0;
+      const currentPlan = user.plan || 'free';
+      const creditBalance = user.credits || 0;
       
-      console.log(`[SUBSCRIPTION] User ${userId} has ${creditBalance} credits from database`);
+      console.log(`[SUBSCRIPTION] User ${userId} has plan: ${currentPlan} with ${creditBalance} credits`);
+      console.log(`[SUBSCRIPTION] User object plan field:`, user.plan);
+      console.log(`[SUBSCRIPTION] User object:`, JSON.stringify(user, null, 2));
       
-      res.json({
-        ...subscription,
+      // Create subscription response based on user's current plan
+      const subscription = {
+        id: 0,
+        plan: currentPlan,
+        status: 'active',
+        userId: userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        priceId: null,
+        subscriptionId: null,
+        currentPeriodStart: null,
+        currentPeriodEnd: null,
+        canceledAt: null,
+        trialEnd: null,
+        monthlyCredits: currentPlan === 'free' ? 20 : 
+                       currentPlan === 'starter' ? 300 :
+                       currentPlan === 'pro' ? 1100 : 
+                       currentPlan === 'business' ? 2000 : 50,
+        extraCredits: 0,
+        autoRenew: false,
         credits: creditBalance,
         lastUpdated: new Date()
-      });
+      };
+      
+      res.json(subscription);
     } catch (error: any) {
       console.error('[SUBSCRIPTION] Error:', error);
       res.status(500).json({ error: error.message || 'Failed to fetch subscription' });

@@ -120,7 +120,13 @@ export default function SubscriptionNew() {
         title: 'Subscription Upgraded',
         description: 'Your subscription has been upgraded successfully.',
       });
+      // Refresh all subscription-related data
       queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+      
+      // Refetch immediately to update UI
+      queryClient.refetchQueries({ queryKey: ['/api/subscription'] });
     },
     onError: (error: any) => {
       toast({

@@ -160,8 +160,23 @@ export default function SubscriptionNew() {
   // Handle secure payment upgrade
   const handleUpgrade = async (planId: string) => {
     try {
+      console.log('[UPGRADE] Starting upgrade process for plan:', planId);
+      
+      // Check if Razorpay is loaded
+      if (!(window as any).Razorpay) {
+        console.error('[UPGRADE] Razorpay library not loaded');
+        toast({
+          title: 'Payment Error',
+          description: 'Payment system is not ready. Please refresh the page.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       // Create Razorpay order
+      console.log('[UPGRADE] Creating Razorpay order...');
       const orderData = await createOrderMutation.mutateAsync({ planId, interval: 'month' });
+      console.log('[UPGRADE] Order created:', orderData);
       
       // Initialize Razorpay payment
       const options = {
@@ -176,6 +191,7 @@ export default function SubscriptionNew() {
         },
         handler: async (response: any) => {
           try {
+            console.log('[UPGRADE] Payment successful, verifying...');
             // Verify payment and upgrade subscription
             await upgradeMutation.mutateAsync({
               planId,
@@ -183,8 +199,18 @@ export default function SubscriptionNew() {
               orderId: response.razorpay_order_id,
               signature: response.razorpay_signature
             });
+            toast({
+              title: 'Upgrade Successful',
+              description: `Successfully upgraded to ${orderData.planName} plan!`,
+              variant: 'default',
+            });
           } catch (error) {
-            console.error('Payment verification failed:', error);
+            console.error('[UPGRADE] Payment verification failed:', error);
+            toast({
+              title: 'Payment Verification Failed',
+              description: 'Payment completed but verification failed. Please contact support.',
+              variant: 'destructive',
+            });
           }
         },
         prefill: {
@@ -197,18 +223,29 @@ export default function SubscriptionNew() {
         }
       };
 
+      console.log('[UPGRADE] Razorpay options:', options);
+      
       // Load and open Razorpay payment
       const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', (response: any) => {
+        console.error('[UPGRADE] Payment failed:', response);
         toast({
           title: 'Payment Failed',
           description: 'Your payment could not be processed. Please try again.',
           variant: 'destructive',
         });
       });
+      
+      console.log('[UPGRADE] Opening Razorpay payment dialog...');
       rzp.open();
+      
     } catch (error) {
-      console.error('Upgrade failed:', error);
+      console.error('[UPGRADE] Upgrade failed:', error);
+      toast({
+        title: 'Upgrade Failed',
+        description: 'Unable to start payment process. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 

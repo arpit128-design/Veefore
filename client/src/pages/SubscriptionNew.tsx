@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight, Lock, Unlock, AlertCircle } from 'lucide-react';
-import { SpaceBackground } from '@/components/layout/SpaceBackground';
+
 import { apiRequest } from '@/lib/queryClient';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -87,6 +87,8 @@ export default function SubscriptionNew() {
       return data;
     },
     retry: 2,
+    staleTime: 0, // Force refetch
+    cacheTime: 0, // Don't cache
     staleTime: 60000,
   });
 

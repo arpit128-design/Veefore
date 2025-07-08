@@ -11,6 +11,7 @@ import {
   hasEnoughCredits,
   calculateCreditDeduction
 } from '../subscription-config';
+import { SUBSCRIPTION_PLANS as PRICING_PLANS } from '../pricing-config';
 import { z } from 'zod';
 import { storage } from '../storage';
 import { firebaseAdmin } from '../firebase-admin';
@@ -45,13 +46,8 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 // Get all subscription plans
 router.get('/plans', async (req: Request, res: Response) => {
   try {
-    const plans = Object.values(SUBSCRIPTION_PLANS).map(plan => ({
-      ...plan,
-      yearlySavings: calculateYearlySavings(plan.id),
-      features: plan.features ? Object.keys(plan.features).filter(feature => 
-        plan.features[feature].allowed
-      ) : []
-    }));
+    // Use the pricing config directly for correct pricing display
+    const plans = Object.values(PRICING_PLANS);
     
     // Convert to object with plan IDs as keys for frontend compatibility
     const plansObject = {};

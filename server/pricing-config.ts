@@ -2,192 +2,94 @@
 export const SUBSCRIPTION_PLANS = {
   free: {
     id: 'free',
-    name: 'Free Forever',
-    description: 'Perfect for getting started with social media management',
+    name: 'Free',
+    description: 'For trial users, hobbyists',
     price: 0,
     currency: 'INR',
     interval: 'month',
-    credits: 60,
+    credits: 20,
     features: [
+      '1 Social Account',
       '1 Workspace',
-      '1 Social Account per Platform',
-      'Basic Scheduling',
-      'Limited Analytics',
-      'Chrome Extension (Limited)',
-      'Watermarked Content',
-      '7-day Calendar View'
+      '0 Team Members',
+      'Creative Brief Generator',
+      'AI Suggestions',
+      'AI Image Generator (8/month)',
+      'Low-res Image Studio',
+      'Scheduler (2 days, 4 posts/month)',
+      'Auto Comment Only'
     ]
   },
-  creator: {
-    id: 'creator',
-    name: 'Creator Pro',
-    description: 'Perfect for content creators and influencers',
-    price: 399,
+  starter: {
+    id: 'starter',
+    name: 'Starter Plan',
+    description: 'For beginner creators',
+    price: 699,
+    yearlyPrice: 4800, // Save 20% (₹1200)
     currency: 'INR',
     interval: 'month',
-    credits: 200,
+    credits: 300,
     popular: true,
     features: [
-      '3 Workspaces',
-      '3 Social Accounts per Platform',
-      'Advanced Scheduling',
-      'Full Analytics',
-      'Chrome Extension (Full)',
-      'No Watermarks',
-      '30-day Calendar View',
-      'Brand Voice Trainer',
-      'A/B Testing',
-      'Priority Publishing',
-      'Viral Content Adapter',
-      'Trend Explorer'
+      '2 Social Accounts per workspace',
+      '1 Workspace',
+      '0 Team Members',
+      'All Free Plan features',
+      'AI Image Generator (24/month)',
+      'Video Shortener (15s)',
+      'Content Repurposer',
+      'Scheduler (12 posts/month)',
+      'CTA/Hook/Title Generator',
+      'Gamified',
+      'Full Automation (Comment & DM)',
+      'Trend Calendar'
     ]
   },
   pro: {
     id: 'pro',
-    name: 'Agency Suite',
-    description: 'Designed for agencies and teams',
-    price: 899,
+    name: 'Pro Plan',
+    description: 'For influencers & marketers',
+    price: 1499,
+    yearlyPrice: 9999, // Save 25% (₹2000)
     currency: 'INR',
     interval: 'month',
-    credits: 750,
+    credits: 1100,
     features: [
-      'Unlimited Workspaces',
-      'Unlimited Social Accounts',
-      'Team Collaboration',
-      'Role-based Access',
-      'White Label',
-      'Auto Pilot Scheduling',
-      'AI Comment Replier',
-      'DM Agent',
-      'Unified Inbox',
-      'Weekly Reports',
-      'Trend Forecast',
-      'API Access'
+      '1 Social Account per workspace',
+      '2 Workspaces',
+      '2 Team Members',
+      'Everything in Starter',
+      'Short Video Generator (30s)',
+      'Persona Builder',
+      'Full Scheduler',
+      'Content Studio (SD)',
+      'YouTube SEO Tools',
+      'Full Automation (Comment & DM)'
     ]
   },
-  enterprise: {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'Custom solutions for large organizations',
-    price: 'custom',
+  business: {
+    id: 'business',
+    name: 'Business Plan',
+    description: 'For brands, teams',
+    price: 2199,
+    yearlyPrice: 16800, // Save 30% (₹7200)
     currency: 'INR',
     interval: 'month',
-    credits: 5000,
+    credits: 2000,
     features: [
-      'Dedicated Support',
-      'Custom Integrations',
-      'Bulk Generation',
-      'Private AI',
-      'Advanced Analytics',
-      'SOC2 Compliance',
-      'SLA',
-      'Custom Credits'
+      '4 Social Accounts per workspace',
+      'Unlimited Workspaces (up to 8)',
+      '3 Team Members',
+      'Everything in Pro',
+      'Trend Calendar (Full access)',
+      'Multi-day Campaign Scheduling'
     ]
   }
 };
 
-export const CREDIT_PACKAGES = [
-  {
-    id: 'credits-50',
-    name: '50 Credits',
-    baseCredits: 50,
-    bonusCredits: 0,
-    totalCredits: 50,
-    price: 50,
-  },
-  {
-    id: 'credits-150',
-    name: '150 Credits',
-    baseCredits: 150,
-    bonusCredits: 0,
-    totalCredits: 150,
-    price: 150,
-  },
-  {
-    id: 'credits-500',
-    name: '500 Credits + Bonus',
-    baseCredits: 500,
-    bonusCredits: 50,
-    totalCredits: 550,
-    price: 500,
-    savings: '10%',
-  },
-  {
-    id: 'credits-2000',
-    name: '2000 Credits + Bonus',
-    baseCredits: 2000,
-    bonusCredits: 200,
-    totalCredits: 2200,
-    price: 2000,
-    savings: '10%',
-  }
-];
+export const CREDIT_PACKAGES = [];
 
-export const ADDONS = {
-  'extra-workspace': {
-    id: 'extra-workspace',
-    name: 'Additional Brand Workspace',
-    price: 4900, // ₹49 in paise
-    type: 'workspace',
-    interval: 'month',
-  },
-  'extra-social-account': {
-    id: 'extra-social-account',
-    name: 'Extra Social Account',
-    price: 4900, // ₹49 in paise
-    type: 'social-account',
-    interval: 'month',
-  },
-  'viral-boost': {
-    id: 'viral-boost',
-    name: 'Boosted AI Content Generation',
-    price: 9900, // ₹99 in paise
-    type: 'ai-boost',
-    interval: 'month',
-  },
-  'affiliate-kit': {
-    id: 'affiliate-kit',
-    name: 'Affiliate Growth Kit Access',
-    price: 9900, // ₹99 in paise
-    type: 'affiliate',
-    interval: 'month',
-  },
-  'ai-visual': {
-    id: 'ai-visual',
-    name: 'Dedicated AI Visual Agent',
-    price: 14900, // ₹149 in paise
-    type: 'ai-visual',
-    interval: 'month',
-  },
-  'social-crm': {
-    id: 'social-crm',
-    name: 'Social CRM Expansion Pack',
-    price: 19900, // ₹199 in paise
-    type: 'crm',
-    interval: 'month',
-  },
-  'team-member': {
-    id: 'team-member',
-    name: 'Additional Team Member Seat',
-    price: 19900, // ₹199 in paise
-    type: 'team-member',
-    interval: 'month',
-  },
-  'advanced-analytics': {
-    id: 'advanced-analytics',
-    name: 'Advanced Analytics Package',
-    price: 19900, // ₹199 in paise
-    type: 'analytics',
-    interval: 'month',
-  },
-  'white-label-branding': {
-    id: 'white-label-branding',
-    name: 'White-label Branding',
-    price: 49900, // ₹499 in paise
-    type: 'branding',
-    interval: 'month',
-  }
-};
+export const ADDONS = {};
 
 // AI Feature Credit Costs
 export const CREDIT_COSTS = {

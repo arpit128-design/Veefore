@@ -47,10 +47,23 @@ router.get('/plans', async (req: Request, res: Response) => {
   try {
     const plans = Object.values(SUBSCRIPTION_PLANS).map(plan => ({
       ...plan,
-      yearlySavings: calculateYearlySavings(plan.id)
+      yearlySavings: calculateYearlySavings(plan.id),
+      features: plan.features ? Object.keys(plan.features).filter(feature => 
+        plan.features[feature].allowed
+      ) : []
     }));
     
-    res.json({ plans });
+    // Convert to object with plan IDs as keys for frontend compatibility
+    const plansObject = {};
+    plans.forEach(plan => {
+      plansObject[plan.id] = plan;
+    });
+    
+    res.json({ 
+      plans: plansObject,
+      creditPackages: CREDIT_PACKAGES,
+      addons: ADDONS
+    });
   } catch (error) {
     console.error('[SUBSCRIPTION] Error fetching plans:', error);
     res.status(500).json({ error: 'Failed to fetch subscription plans' });

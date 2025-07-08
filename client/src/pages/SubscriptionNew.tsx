@@ -189,7 +189,7 @@ export default function SubscriptionNew() {
   }
 
   return (
-    <div className="min-h-screen bg-space-navy text-white p-8">
+    <div className="min-h-screen bg-transparent text-white p-8">
       <SpaceBackground />
       
       <div className="relative z-10 max-w-7xl mx-auto space-y-8">

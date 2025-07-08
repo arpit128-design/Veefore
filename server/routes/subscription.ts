@@ -36,6 +36,8 @@ const requireAuth = async (req: any, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     
+    console.log('[SUBSCRIPTION AUTH] Auth header:', authHeader ? 'Present' : 'Missing');
+    
     if (!authHeader) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -46,6 +48,8 @@ const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     } else {
       token = authHeader;
     }
+    
+    console.log('[SUBSCRIPTION AUTH] Token extracted:', token ? 'Present' : 'Missing');
     
     if (!token || token.trim() === '') {
       console.error('[SUBSCRIPTION AUTH] No token found in authorization header');
@@ -61,6 +65,8 @@ const requireAuth = async (req: any, res: Response, next: NextFunction) => {
     // Handle malformed tokens by finding the actual JWT parts
     cleanToken = cleanToken.replace(/\s+/g, '').replace(/[^\w\-._]/g, '');
     
+    console.log('[SUBSCRIPTION AUTH] Clean token parts:', cleanToken.split('.').length);
+    
     const tokenParts = cleanToken.split('.');
     if (tokenParts.length > 3) {
       cleanToken = tokenParts.slice(0, 3).join('.');
@@ -73,6 +79,8 @@ const requireAuth = async (req: any, res: Response, next: NextFunction) => {
       const finalParts = cleanToken.split('.');
       const payload = JSON.parse(Buffer.from(finalParts[1], 'base64').toString());
       firebaseUid = payload.user_id || payload.sub;
+      
+      console.log('[SUBSCRIPTION AUTH] Firebase UID extracted:', firebaseUid ? 'Present' : 'Missing');
       
       if (!firebaseUid) {
         console.error('[SUBSCRIPTION AUTH] No Firebase UID found in token payload');

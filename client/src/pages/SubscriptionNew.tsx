@@ -137,28 +137,8 @@ export default function SubscriptionNew() {
     },
   });
 
-  // Purchase credits mutation
-  const purchaseCreditsMutation = useMutation({
-    mutationFn: async (packageId: string) => {
-      const response = await apiRequest('POST', '/api/subscription/purchase-credits', { packageId });
-      return await response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Credits Purchased',
-        description: 'Your credits have been added successfully.',
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Purchase Failed',
-        description: error.message || 'Failed to purchase credits.',
-        variant: 'destructive',
-      });
-    },
-  });
+  // REMOVED: Direct credit purchase mutation - all credit purchases must go through Razorpay payment verification
+  // Users should use the main subscription page for credit purchases with proper payment flow
 
   if (subscriptionLoading || planLoading) {
     return (
@@ -169,7 +149,6 @@ export default function SubscriptionNew() {
   }
 
   const isUpgrading = upgradeMutation.isPending;
-  const isPurchasing = purchaseCreditsMutation.isPending;
   const isCreatingOrder = createOrderMutation.isPending;
 
   // Handle secure payment upgrade
@@ -504,8 +483,13 @@ export default function SubscriptionNew() {
                     )}
                   </div>
                   <Button
-                    onClick={() => purchaseCreditsMutation.mutate(pack.id)}
-                    disabled={isPurchasing}
+                    onClick={() => {
+                      toast({
+                        title: 'Credit Purchase Redirected',
+                        description: 'Please visit the main subscription page for secure credit purchases.',
+                        variant: 'default',
+                      });
+                    }}
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-medium"
                   >
                     Purchase Credits

@@ -316,52 +316,8 @@ router.post('/update-plan', requireAuth, async (req: Request, res: Response) => 
   }
 });
 
-// Purchase credits
-router.post('/purchase-credits', requireAuth, async (req: Request, res: Response) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const { packageId } = req.body;
-    if (!packageId) {
-      return res.status(400).json({ error: 'Package ID is required' });
-    }
-
-    const creditPackage = getCreditPackageById(packageId);
-    if (!creditPackage) {
-      return res.status(400).json({ error: 'Invalid credit package ID' });
-    }
-
-    // For now, just add credits (payment integration would go here)
-    const newCredits = (user.credits || 0) + creditPackage.totalCredits;
-    
-    await storage.updateUserCredits(user.id, newCredits);
-    
-    // Log transaction
-    await storage.createCreditTransaction({
-      userId: user.id,
-      type: 'purchase',
-      amount: creditPackage.totalCredits,
-      description: `Purchased ${creditPackage.name}`,
-      referenceId: packageId
-    });
-
-    res.json({ 
-      success: true, 
-      message: `Successfully purchased ${creditPackage.totalCredits} credits`,
-      credits: {
-        previous: user.credits || 0,
-        added: creditPackage.totalCredits,
-        total: newCredits
-      }
-    });
-  } catch (error) {
-    console.error('[SUBSCRIPTION] Error purchasing credits:', error);
-    res.status(500).json({ error: 'Failed to purchase credits' });
-  }
-});
+// REMOVED: Direct credit purchase endpoint - all credit purchases must go through Razorpay payment verification
+// Use /api/razorpay/create-order and /api/razorpay/verify-payment instead
 
 // Purchase addon
 router.post('/purchase-addon', requireAuth, async (req: Request, res: Response) => {

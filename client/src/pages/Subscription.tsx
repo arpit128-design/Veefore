@@ -78,7 +78,7 @@ export default function Subscription() {
   }, []);
 
   // Fetch user data for accurate credit count
-  const { data: user } = useQuery({
+  const { data: userData } = useQuery({
     queryKey: ["/api/user"],
   });
 

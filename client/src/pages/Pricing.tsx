@@ -233,10 +233,7 @@ export default function Pricing() {
 
   // Handle credit purchase
   const handleCreditPurchase = (packageId: string) => {
-    toast({
-      title: "Coming Soon",
-      description: "Credit packages will be available soon!",
-    });
+    window.location.href = `/subscription?tab=credits&package=${packageId}`;
   };
 
   // Handle addon purchase

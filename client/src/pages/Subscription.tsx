@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { formatNumber } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Crown, 
   CreditCard, 
@@ -61,6 +62,7 @@ interface PricingData {
 export default function Subscription() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Fetch user data for accurate credit count
@@ -285,11 +287,98 @@ export default function Subscription() {
     },
   });
 
-  const handleCreditPurchase = (packageId: string) => {
-    toast({
-      title: "Coming Soon",
-      description: "Credit packages will be available soon!",
-    });
+  const handleCreditPurchase = async (packageId: string) => {
+    try {
+      const pkg = pricingData?.creditPackages.find(p => p.id === packageId);
+      if (!pkg) {
+        toast({
+          title: "Error",
+          description: "Package not found",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create Razorpay order
+      const orderResponse = await apiRequest('POST', '/api/razorpay/create-order', {
+        packageId: packageId,
+        type: 'credits'
+      });
+
+      const orderData = await orderResponse.json();
+      
+      if (!orderData.orderId) {
+        throw new Error('Failed to create payment order');
+      }
+
+      // Initialize Razorpay
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => {
+        const options = {
+          key: orderData.key,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: 'VeeFore',
+          description: `${pkg.name} - ${pkg.totalCredits} credits`,
+          order_id: orderData.orderId,
+          handler: async (response: any) => {
+            try {
+              // Verify payment
+              const verifyResponse = await apiRequest('POST', '/api/razorpay/verify-payment', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                type: 'credits',
+                packageId: packageId
+              });
+
+              if (verifyResponse.ok) {
+                toast({
+                  title: "Payment Successful!",
+                  description: `${pkg.totalCredits} credits added to your account`,
+                });
+                
+                // Refresh data
+                queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+              } else {
+                throw new Error('Payment verification failed');
+              }
+            } catch (error) {
+              console.error('Payment verification error:', error);
+              toast({
+                title: "Payment Error",
+                description: "Payment verification failed. Please contact support.",
+                variant: "destructive",
+              });
+            }
+          },
+          prefill: {
+            email: user?.email,
+            name: user?.displayName,
+          },
+          theme: {
+            color: '#00D9FF',
+          },
+        };
+
+        const razorpay = new (window as any).Razorpay(options);
+        razorpay.open();
+      };
+      
+      document.head.appendChild(script);
+      
+    } catch (error: any) {
+      console.error('Credit purchase error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initiate payment",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePlanUpgrade = () => {

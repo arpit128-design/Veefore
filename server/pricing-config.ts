@@ -89,43 +89,50 @@ export const SUBSCRIPTION_PLANS = {
 
 export const CREDIT_PACKAGES = [
   {
-    id: 'credits-50',
-    name: '50 Credits',
-    baseCredits: 50,
+    id: 'credits-100',
+    name: '100 Credits',
+    baseCredits: 100,
     bonusCredits: 0,
-    totalCredits: 50,
-    price: 99,
+    totalCredits: 100,
+    price: 299,
     description: 'Perfect for trying out AI features'
   },
   {
-    id: 'credits-150',
-    name: '150 Credits',
-    baseCredits: 150,
-    bonusCredits: 10,
-    totalCredits: 160,
-    price: 299,
+    id: 'credits-500',
+    name: '500 Credits',
+    baseCredits: 500,
+    bonusCredits: 0,
+    totalCredits: 500,
+    price: 999,
     description: 'Great for regular content creation'
   },
   {
-    id: 'credits-500',
-    name: '500 Credits + Bonus',
-    baseCredits: 500,
-    bonusCredits: 100,
-    totalCredits: 600,
-    price: 999,
-    savings: '20% Bonus',
+    id: 'credits-1000',
+    name: '1000 Credits',
+    baseCredits: 1000,
+    bonusCredits: 0,
+    totalCredits: 1000,
+    price: 1799,
     description: 'Best value for power users',
     popular: true
   },
   {
-    id: 'credits-1000',
-    name: '1000 Credits + Bonus',
-    baseCredits: 1000,
-    bonusCredits: 300,
-    totalCredits: 1300,
-    price: 1999,
-    savings: '30% Bonus',
-    description: 'Ultimate package for agencies'
+    id: 'credits-2500',
+    name: '2500 Credits',
+    baseCredits: 2500,
+    bonusCredits: 0,
+    totalCredits: 2500,
+    price: 3499,
+    description: 'For agencies and heavy users'
+  },
+  {
+    id: 'credits-5000',
+    name: '5000 Credits',
+    baseCredits: 5000,
+    bonusCredits: 0,
+    totalCredits: 5000,
+    price: 5999,
+    description: 'Ultimate package for large agencies'
   }
 ];
 

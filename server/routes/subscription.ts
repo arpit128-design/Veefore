@@ -483,7 +483,7 @@ router.post('/create-order', requireAuth, async (req: Request, res: Response) =>
     const orderData = {
       amount: price * 100, // Razorpay expects amount in paisa
       currency: 'INR',
-      receipt: `plan_${planId}_${user.id}_${Date.now()}`,
+      receipt: `${planId}_${Date.now()}`.substring(0, 40), // Razorpay requires max 40 characters
       notes: {
         userId: user.id,
         planId,

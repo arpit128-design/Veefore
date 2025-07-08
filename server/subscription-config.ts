@@ -7,7 +7,7 @@ export const SUBSCRIPTION_PLANS = {
     name: 'Free',
     price: 0,
     yearlyPrice: 0,
-    credits: 10,
+    credits: 20,
     description: 'Perfect for getting started',
     features: {
       // Basic features (always allowed)
@@ -15,7 +15,7 @@ export const SUBSCRIPTION_PLANS = {
       'content-scheduler': { allowed: true, limit: 5 },
       'analytics': { allowed: true, limit: 'basic' },
       'workspace': { allowed: true, limit: 1 },
-      'social-accounts': { allowed: true, limit: 2 },
+      'social-accounts': { allowed: true, limit: 1 },
       
       // Locked features (require upgrade)
       'creative-brief': { allowed: false, upgrade: 'starter' },
@@ -36,28 +36,28 @@ export const SUBSCRIPTION_PLANS = {
     },
     limits: {
       workspaces: 1,
-      socialAccounts: 2,
+      socialAccounts: 1,
       scheduledPosts: 5,
-      teamMembers: 1,
+      teamMembers: 0,
       automationRules: 0,
-      monthlyCredits: 10
+      monthlyCredits: 20
     }
   },
   
   starter: {
     id: 'starter',
     name: 'Starter',
-    price: 29,
-    yearlyPrice: 290, // 2 months free
-    credits: 100,
+    price: 699,
+    yearlyPrice: 4800, // 20% off
+    credits: 300,
     description: 'Ideal for solo creators',
     features: {
       // Basic features
       'dashboard': { allowed: true },
       'content-scheduler': { allowed: true, limit: 50 },
       'analytics': { allowed: true, limit: 'advanced' },
-      'workspace': { allowed: true, limit: 2 },
-      'social-accounts': { allowed: true, limit: 5 },
+      'workspace': { allowed: true, limit: 1 },
+      'social-accounts': { allowed: true, limit: 2 },
       
       // Newly unlocked features
       'creative-brief': { allowed: true, limit: 10 },
@@ -79,29 +79,29 @@ export const SUBSCRIPTION_PLANS = {
       'advanced-analytics': { allowed: false, upgrade: 'pro' }
     },
     limits: {
-      workspaces: 2,
-      socialAccounts: 5,
+      workspaces: 1,
+      socialAccounts: 2,
       scheduledPosts: 50,
-      teamMembers: 2,
+      teamMembers: 0,
       automationRules: 3,
-      monthlyCredits: 100
+      monthlyCredits: 300
     }
   },
   
   pro: {
     id: 'pro',
     name: 'Pro',
-    price: 79,
-    yearlyPrice: 790, // 2 months free
-    credits: 300,
+    price: 1499,
+    yearlyPrice: 9999, // 25% off
+    credits: 1100,
     description: 'Perfect for growing brands',
     features: {
       // Basic features
       'dashboard': { allowed: true },
       'content-scheduler': { allowed: true, limit: 200 },
       'analytics': { allowed: true, limit: 'pro' },
-      'workspace': { allowed: true, limit: 5 },
-      'social-accounts': { allowed: true, limit: 15 },
+      'workspace': { allowed: true, limit: 2 },
+      'social-accounts': { allowed: true, limit: 1 },
       
       // Starter features
       'creative-brief': { allowed: true, limit: 50 },
@@ -125,29 +125,29 @@ export const SUBSCRIPTION_PLANS = {
       'legal-assistant': { allowed: false, upgrade: 'business' }
     },
     limits: {
-      workspaces: 5,
-      socialAccounts: 15,
+      workspaces: 2,
+      socialAccounts: 1,
       scheduledPosts: 200,
-      teamMembers: 5,
+      teamMembers: 2,
       automationRules: 10,
-      monthlyCredits: 300
+      monthlyCredits: 1100
     }
   },
   
   business: {
     id: 'business',
     name: 'Business',
-    price: 149,
-    yearlyPrice: 1490, // 2 months free
-    credits: 500,
+    price: 2199,
+    yearlyPrice: 16800, // 30% off
+    credits: 2000,
     description: 'Built for teams and agencies',
     features: {
       // All features unlocked
       'dashboard': { allowed: true },
       'content-scheduler': { allowed: true, limit: 500 },
       'analytics': { allowed: true, limit: 'business' },
-      'workspace': { allowed: true, limit: 10 },
-      'social-accounts': { allowed: true, limit: 50 },
+      'workspace': { allowed: true, limit: 8 },
+      'social-accounts': { allowed: true, limit: 4 },
       'creative-brief': { allowed: true, limit: 200 },
       'content-repurpose': { allowed: true, limit: 300 },
       'trend-calendar': { allowed: true, limit: 300 },
@@ -165,52 +165,12 @@ export const SUBSCRIPTION_PLANS = {
       'legal-assistant': { allowed: true, limit: 30 }
     },
     limits: {
-      workspaces: 10,
-      socialAccounts: 50,
+      workspaces: 8,
+      socialAccounts: 4,
       scheduledPosts: 500,
-      teamMembers: 15,
+      teamMembers: 3,
       automationRules: 25,
-      monthlyCredits: 500
-    }
-  },
-  
-  agency: {
-    id: 'agency',
-    name: 'Agency',
-    price: 299,
-    yearlyPrice: 2990, // 2 months free
-    credits: 1000,
-    description: 'Enterprise-grade solution',
-    features: {
-      // All features with unlimited or high limits
-      'dashboard': { allowed: true },
-      'content-scheduler': { allowed: true, limit: 'unlimited' },
-      'analytics': { allowed: true, limit: 'enterprise' },
-      'workspace': { allowed: true, limit: 'unlimited' },
-      'social-accounts': { allowed: true, limit: 'unlimited' },
-      'creative-brief': { allowed: true, limit: 'unlimited' },
-      'content-repurpose': { allowed: true, limit: 'unlimited' },
-      'trend-calendar': { allowed: true, limit: 'unlimited' },
-      'user-persona': { allowed: true, limit: 'unlimited' },
-      'dm-automation': { allowed: true, limit: 'unlimited' },
-      'competitor-analysis': { allowed: true, limit: 'unlimited' },
-      'ab-testing': { allowed: true, limit: 'unlimited' },
-      'roi-calculator': { allowed: true, limit: 'unlimited' },
-      'social-listening': { allowed: true, limit: 'unlimited' },
-      'emotion-analysis': { allowed: true, limit: 'unlimited' },
-      'thumbnails-pro': { allowed: true, limit: 'unlimited' },
-      'advanced-analytics': { allowed: true },
-      'affiliate-program': { allowed: true, limit: 'unlimited' },
-      'content-protection': { allowed: true, limit: 'unlimited' },
-      'legal-assistant': { allowed: true, limit: 'unlimited' }
-    },
-    limits: {
-      workspaces: 'unlimited',
-      socialAccounts: 'unlimited',
-      scheduledPosts: 'unlimited',
-      teamMembers: 'unlimited',
-      automationRules: 'unlimited',
-      monthlyCredits: 1000
+      monthlyCredits: 2000
     }
   }
 };

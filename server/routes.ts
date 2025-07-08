@@ -675,14 +675,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       // Check user's current subscription plan and workspace count
       const userWorkspaces = await storage.getWorkspacesByUserId(userId);
-      const currentPlan = req.user.plan || 'Free';
+      const currentPlan = req.user.plan || 'free';
       
       // Define base workspace limits per plan
       const planLimits = {
-        'Free': 1,
-        'Creator': 3,
-        'Agency': 10,
-        'Enterprise': 50
+        'free': 1,
+        'starter': 1,
+        'pro': 2,
+        'business': 8
       };
       
       let maxWorkspaces = planLimits[currentPlan as keyof typeof planLimits] || 1;

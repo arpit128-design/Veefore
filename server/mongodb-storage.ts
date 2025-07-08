@@ -2618,18 +2618,38 @@ export class MongoStorage implements IStorage {
 
   async updateUserSubscription(userId: number | string, planId: string): Promise<User> {
     await this.connect();
-    const userIdStr = userId.toString();
+    console.log(`[SUBSCRIPTION UPDATE] Looking for user with ID: ${userId} (type: ${typeof userId})`);
     
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { id: userIdStr },
+    let user;
+    try {
+      // Try by MongoDB _id first (ObjectId format)
+      user = await UserModel.findById(userId);
+      console.log(`[SUBSCRIPTION UPDATE] Find by _id result:`, user ? 'Found' : 'Not found');
+    } catch (objectIdError) {
+      console.log(`[SUBSCRIPTION UPDATE] ObjectId lookup failed, trying by 'id' field`);
+      
+      // If ObjectId fails, try by the 'id' field
+      const userIdStr = userId.toString();
+      user = await UserModel.findOne({ id: userIdStr });
+      console.log(`[SUBSCRIPTION UPDATE] Find by id field result:`, user ? 'Found' : 'Not found');
+    }
+    
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    // Update the user's subscription plan
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      user._id,
       { plan: planId, updatedAt: new Date() },
       { new: true }
     );
     
     if (!updatedUser) {
-      throw new Error(`User with id ${userId} not found`);
+      throw new Error(`Failed to update user subscription for id ${userId}`);
     }
     
+    console.log(`[SUBSCRIPTION UPDATE] Successfully updated user ${userId} to plan ${planId}`);
     return this.convertUser(updatedUser);
   }
 

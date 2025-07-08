@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +64,18 @@ export default function Subscription() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   // Fetch user data for accurate credit count
   const { data: user } = useQuery({
@@ -265,10 +277,66 @@ export default function Subscription() {
     ]
   };
 
-  // Credit purchase mutation
+  // Credit purchase with proper Razorpay payment flow
   const purchaseCreditsMutation = useMutation({
-    mutationFn: (packageId: string) => {
-      return apiRequest('POST', '/api/credits/purchase', { packageId });
+    mutationFn: async (packageId: string) => {
+      // Create Razorpay order for credit purchase
+      const orderResponse = await apiRequest('POST', '/api/razorpay/create-order', {
+        packageId,
+        type: 'credits'
+      });
+      
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Failed to create payment order');
+      }
+      
+      const orderData = await orderResponse.json();
+      
+      // Return promise that resolves when payment is complete
+      return new Promise((resolve, reject) => {
+        // Initialize Razorpay payment
+        const options = {
+          key: orderData.key,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          order_id: orderData.orderId,
+          name: 'VeeFore',
+          description: orderData.description,
+          theme: {
+            color: '#6366f1'
+          },
+          handler: async (response: any) => {
+            try {
+              // Verify payment and add credits
+              const verifyResponse = await apiRequest('POST', '/api/razorpay/verify-payment', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                type: 'credits',
+                packageId: packageId
+              });
+              
+              if (!verifyResponse.ok) {
+                throw new Error('Payment verification failed');
+              }
+              
+              const verifyData = await verifyResponse.json();
+              resolve(verifyData);
+            } catch (error) {
+              reject(error);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              reject(new Error('Payment cancelled'));
+            }
+          }
+        };
+        
+        const razorpay = new (window as any).Razorpay(options);
+        razorpay.open();
+      });
     },
     onSuccess: () => {
       toast({
@@ -277,6 +345,7 @@ export default function Subscription() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
       queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
     },
     onError: (error: any) => {
       toast({

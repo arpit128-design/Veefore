@@ -541,6 +541,14 @@ router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
       .update(orderId + '|' + paymentId)
       .digest('hex');
 
+    console.log('[SUBSCRIPTION] Payment verification details:', {
+      orderId,
+      paymentId,
+      receivedSignature: signature,
+      expectedSignature,
+      match: signature === expectedSignature
+    });
+
     if (signature !== expectedSignature) {
       console.error('[SUBSCRIPTION] Payment verification failed:', {
         expected: expectedSignature,
@@ -573,29 +581,37 @@ router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
       return res.status(500).json({ error: 'Payment verification failed' });
     }
 
-    // Update user's plan
-    await storage.updateUserSubscription(user.id, planId);
+    try {
+      // Update user's plan
+      console.log('[SUBSCRIPTION] Updating user plan:', { userId: user.id, planId });
+      await storage.updateUserSubscription(user.id, planId);
 
-    // Add plan credits to user's account
-    const newCredits = (user.credits || 0) + plan.credits;
-    await storage.updateUserCredits(user.id, newCredits);
+      // Add plan credits to user's account
+      const newCredits = (user.credits || 0) + plan.credits;
+      console.log('[SUBSCRIPTION] Updating user credits:', { userId: user.id, currentCredits: user.credits, newCredits });
+      await storage.updateUserCredits(user.id, newCredits);
 
-    // Log transaction
-    await storage.createCreditTransaction({
-      userId: user.id,
-      type: 'subscription_upgrade',
-      amount: plan.credits,
-      description: `Upgraded to ${plan.name} plan`,
-      referenceId: paymentId
-    });
+      // Log transaction
+      console.log('[SUBSCRIPTION] Creating credit transaction:', { userId: user.id, amount: plan.credits });
+      await storage.createCreditTransaction({
+        userId: user.id,
+        type: 'subscription_upgrade',
+        amount: plan.credits,
+        description: `Upgraded to ${plan.name} plan`,
+        referenceId: paymentId
+      });
 
-    console.log('[SUBSCRIPTION] Successfully upgraded user:', {
-      userId: user.id,
-      planId,
-      planName: plan.name,
-      paymentId,
-      creditsAdded: plan.credits
-    });
+      console.log('[SUBSCRIPTION] Successfully upgraded user:', {
+        userId: user.id,
+        planId,
+        planName: plan.name,
+        paymentId,
+        creditsAdded: plan.credits
+      });
+    } catch (storageError) {
+      console.error('[SUBSCRIPTION] Storage operation failed:', storageError);
+      return res.status(500).json({ error: 'Failed to update subscription' });
+    }
 
     res.json({ 
       success: true, 

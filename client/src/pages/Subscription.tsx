@@ -1,69 +1,77 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Crown, Zap, Shield, Star, Plus, History, CheckCircle, ArrowRight, AlertCircle, Sparkles, Infinity } from 'lucide-react';
+
+import { apiRequest } from '@/lib/queryClient';
+import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { formatNumber } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Crown, 
-  CreditCard, 
-  Calendar, 
-  TrendingUp, 
-  Zap, 
-  Shield, 
-  Star,
-  Plus,
-  Gift,
-  History,
-  ChevronRight,
-  Sparkles
-} from 'lucide-react';
 
-interface UserSubscription {
-  id?: string;
+// Function to format prices and credits with commas instead of K/L abbreviations
+const formatPrice = (value: number): string => {
+  if (value === null || value === undefined || isNaN(value)) {
+    return "0";
+  }
+  return new Intl.NumberFormat('en-IN').format(value);
+};
+
+interface SubscriptionData {
+  id: number;
   plan: string;
   status: string;
-  credits?: number;
-  currentPeriodStart?: string;
-  currentPeriodEnd?: string;
-  priceId?: string;
-  subscriptionId?: string;
-  canceledAt?: string;
-  trialEnd?: string;
+  credits: number;
+  transactionCount?: number;
+  lastUpdated?: string;
 }
 
-interface CreditTransaction {
-  id: string;
-  amount: number;
-  purpose: string;
-  status: string;
-  createdAt: string;
-  metadata?: any;
-}
-
-interface PricingData {
-  plans: Record<string, any>;
+interface PlanData {
+  plans: {
+    [key: string]: {
+      id: string;
+      name: string;
+      description: string;
+      price: number | string;
+      credits: number;
+      features: string[];
+      popular?: boolean;
+    };
+  };
   creditPackages: Array<{
     id: string;
     name: string;
-    baseCredits: number;
-    bonusCredits: number;
     totalCredits: number;
     price: number;
-    popular?: boolean;
+    savings?: string;
   }>;
-  addons: Record<string, any>;
+  addons: {
+    [key: string]: {
+      id: string;
+      name: string;
+      description: string;
+      price: number;
+      type: string;
+    };
+  };
+}
+
+// Declare Razorpay for TypeScript
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
 }
 
 export default function Subscription() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [isYearly, setIsYearly] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
   // Load Razorpay script
   useEffect(() => {
@@ -73,89 +81,110 @@ export default function Subscription() {
     document.body.appendChild(script);
     
     return () => {
-      document.body.removeChild(script);
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
     };
   }, []);
 
-  // Fetch user data for accurate credit count
-  const { data: userData } = useQuery({
-    queryKey: ["/api/user"],
-  });
-
-  // Fetch user subscription
+  // Fetch subscription data
   const { data: subscription, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['/api/subscription'],
     queryFn: () => apiRequest('GET', '/api/subscription').then(res => res.json()),
   });
 
-  // Fetch pricing data from correct endpoint
-  const { data: pricingData, isLoading: pricingLoading } = useQuery<PricingData>({
+  // Fetch plan data
+  const { data: planData, isLoading: planLoading } = useQuery<PlanData>({
     queryKey: ['/api/subscription/plans'],
     queryFn: () => apiRequest('GET', '/api/subscription/plans').then(res => res.json()),
   });
-  
-  console.log('[PRICING DEBUG] Full pricing data:', pricingData);
-  console.log('[PRICING DEBUG] Addons data:', pricingData?.addons);
-  console.log('[PRICING DEBUG] Addons keys:', pricingData?.addons ? Object.keys(pricingData.addons) : 'No addons');
-  console.log('[SUBSCRIPTION PAGE] Component rendered, pricingLoading:', pricingLoading);
 
-  // Fetch credit transactions with enhanced authentication
-  const { data: creditTransactions, isLoading: transactionsLoading, error: transactionsError } = useQuery<CreditTransaction[]>({
+  // Fetch credit history
+  const { data: creditHistory, isLoading: creditLoading } = useQuery({
     queryKey: ['/api/credit-transactions'],
-    queryFn: async () => {
-      try {
-        // Get fresh Firebase token
-        const { auth } = await import('../lib/firebase');
-        let token = localStorage.getItem('veefore_auth_token');
-        
-        if (auth?.currentUser) {
-          const freshToken = await auth.currentUser.getIdToken(true);
-          if (freshToken && freshToken.split('.').length === 3) {
-            localStorage.setItem('veefore_auth_token', freshToken);
-            token = freshToken;
-          }
-        }
-        
-        const response = await fetch('/api/credit-transactions', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch transactions: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('[CREDIT TRANSACTIONS] Successfully loaded:', data.length, 'transactions');
-        return data;
-      } catch (error) {
-        console.error('[CREDIT TRANSACTIONS] Error:', error);
-        throw error;
-      }
-    },
-    retry: 2,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-    staleTime: 60000,
+    queryFn: () => apiRequest('GET', '/api/credit-transactions').then(res => res.json()),
   });
 
-  const userSubscription = subscription as UserSubscription;
-  const currentPlan = userSubscription?.plan || 'free';
-  const [addonPurchasing, setAddonPurchasing] = useState(false);
+  // Upgrade subscription mutation (after payment)
+  const upgradeMutation = useMutation({
+    mutationFn: async (paymentData: { planId: string; paymentId: string; orderId: string; signature: string }) => {
+      const response = await apiRequest('POST', '/api/razorpay/verify-payment', {
+        razorpay_order_id: paymentData.orderId,
+        razorpay_payment_id: paymentData.paymentId,
+        razorpay_signature: paymentData.signature,
+        type: 'subscription',
+        planId: paymentData.planId
+      });
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Subscription Upgraded',
+        description: 'Your subscription has been upgraded successfully.',
+      });
+      // Refresh all subscription-related data
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+      
+      // Refetch immediately to update UI
+      queryClient.refetchQueries({ queryKey: ['/api/subscription'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Upgrade Failed',
+        description: error.message || 'Failed to upgrade subscription.',
+        variant: 'destructive',
+      });
+    },
+  });
 
-  // Handle add-on purchase
-  const handleAddonPurchase = async (addonId: string) => {
-    if (addonPurchasing) return;
+  // Credit purchase mutation (with Razorpay)
+  const creditPurchaseMutation = useMutation({
+    mutationFn: async (paymentData: { packageId: string; paymentId: string; orderId: string; signature: string }) => {
+      const response = await apiRequest('POST', '/api/razorpay/verify-payment', {
+        razorpay_order_id: paymentData.orderId,
+        razorpay_payment_id: paymentData.paymentId,
+        razorpay_signature: paymentData.signature,
+        type: 'credits',
+        packageId: paymentData.packageId
+      });
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Credits Purchased',
+        description: 'Your credits have been added successfully.',
+      });
+      // Refresh all subscription-related data
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
+      
+      // Refetch immediately to update UI
+      queryClient.refetchQueries({ queryKey: ['/api/subscription'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Purchase Failed',
+        description: error.message || 'Failed to purchase credits.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Handle subscription upgrade
+  const handleUpgrade = async (planId: string) => {
+    if (isUpgrading || isCreatingOrder) return;
     
-    console.log('[ADDON PURCHASE] Starting purchase for addon:', addonId);
-    setAddonPurchasing(true);
+    setIsUpgrading(true);
+    setIsCreatingOrder(true);
     
     try {
-      // Create Razorpay order for addon
-      console.log('[ADDON PURCHASE] Creating order...');
-      const orderResponse = await apiRequest('POST', '/api/razorpay/create-addon-order', {
-        addonId
+      // Create Razorpay order
+      const orderResponse = await apiRequest('POST', '/api/razorpay/create-subscription-order', {
+        planId: planId
       });
       
       if (!orderResponse.ok) {
@@ -164,201 +193,55 @@ export default function Subscription() {
       }
       
       const orderData = await orderResponse.json();
-      console.log('[ADDON PURCHASE] Order created:', orderData);
       
       if (!orderData.orderId) {
         throw new Error('Failed to create order');
       }
 
-      // Load Razorpay script
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        console.log('[ADDON PURCHASE] Razorpay script loaded, key:', import.meta.env.VITE_RAZORPAY_KEY_ID ? 'Present' : 'Missing');
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: orderData.amount * 100,
-          currency: 'INR',
-          name: 'VeeFore',
-          description: `${orderData.addon.name} Purchase`,
-          order_id: orderData.orderId,
-          handler: async (response: any) => {
-            try {
-              // Verify payment on backend
-              await apiRequest('POST', '/api/razorpay/verify-payment', {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                type: 'addon',
-                packageId: addonId
-              });
-
-              // Emergency failsafe: Create addon if automatic creation failed
-              if (addonId === 'team-member') {
-                try {
-                  await apiRequest('POST', '/api/emergency-addon-creation', {
-                    razorpayOrderId: response.razorpay_order_id
-                  });
-                  console.log('[EMERGENCY ADDON] Failsafe addon creation triggered');
-                } catch (emergencyError) {
-                  console.log('[EMERGENCY ADDON] Failsafe not needed or failed:', emergencyError);
-                }
-              }
-
-              toast({
-                title: "Add-on Purchased!",
-                description: `${orderData.addon.name} has been added to your account.`,
-              });
-
-              // Refresh user data
-              queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-              queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-              queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
-            } catch (error) {
-              console.error('Payment verification failed:', error);
-              toast({
-                title: "Payment Verification Failed",
-                description: "Please contact support if amount was deducted.",
-                variant: "destructive",
-              });
-            }
-          },
-          modal: {
-            ondismiss: () => {
-              console.log('Payment modal dismissed');
-            }
-          },
-          theme: {
-            color: '#8B5CF6'
-          }
-        };
-
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
+      // Initialize Razorpay payment
+      const options = {
+        key: 'rzp_test_YOUR_KEY_ID', // Replace with your actual key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'VeeFore',
+        description: orderData.description || `${planId} Subscription`,
+        order_id: orderData.orderId,
+        handler: function (response: any) {
+          upgradeMutation.mutate({
+            planId: planId,
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature
+          });
+        },
+        prefill: {
+          name: user?.displayName || '',
+          email: user?.email || '',
+        },
+        theme: {
+          color: '#3b82f6'
+        }
       };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+      
     } catch (error: any) {
-      console.error('Add-on purchase error:', error);
       toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to initiate add-on purchase",
-        variant: "destructive",
+        title: 'Order Creation Failed',
+        description: error.message || 'Failed to create payment order.',
+        variant: 'destructive',
       });
     } finally {
-      setAddonPurchasing(false);
+      setIsUpgrading(false);
+      setIsCreatingOrder(false);
     }
   };
-  
-  // Use authentic user credits from database - same source as header
-  const currentCredits = user?.credits || 0;
 
-  // Debug logging
-  console.log('[SUBSCRIPTION DEBUG] Raw subscription object:', subscription);
-  console.log('[SUBSCRIPTION DEBUG] Subscription credits property:', subscription?.credits);
-  console.log('[SUBSCRIPTION DEBUG] Current credits calculated:', currentCredits);
-  console.log('[SUBSCRIPTION DEBUG] User credits from database:', user?.credits);
-
-  const planData = pricingData?.plans?.[currentPlan] || {
-    id: 'free',
-    name: 'Free Forever',
-    description: 'Perfect for getting started with social media management',
-    price: 0,
-    credits: 60,
-    features: [
-      '1 Workspace',
-      '1 Social Account per Platform',
-      'Basic Scheduling',
-      'Limited Analytics',
-      'Chrome Extension (Limited)',
-      'Watermarked Content',
-      '7-day Calendar View'
-    ]
-  };
-
-  // Credit purchase with proper Razorpay payment flow
-  const purchaseCreditsMutation = useMutation({
-    mutationFn: async (packageId: string) => {
-      // Create Razorpay order for credit purchase
-      const orderResponse = await apiRequest('POST', '/api/razorpay/create-order', {
-        packageId,
-        type: 'credits'
-      });
-      
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json();
-        throw new Error(errorData.error || 'Failed to create payment order');
-      }
-      
-      const orderData = await orderResponse.json();
-      
-      // Return promise that resolves when payment is complete
-      return new Promise((resolve, reject) => {
-        // Initialize Razorpay payment
-        const options = {
-          key: orderData.key,
-          amount: orderData.amount,
-          currency: orderData.currency,
-          order_id: orderData.orderId,
-          name: 'VeeFore',
-          description: orderData.description,
-          theme: {
-            color: '#6366f1'
-          },
-          handler: async (response: any) => {
-            try {
-              // Verify payment and add credits
-              const verifyResponse = await apiRequest('POST', '/api/razorpay/verify-payment', {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                type: 'credits',
-                packageId: packageId
-              });
-              
-              if (!verifyResponse.ok) {
-                throw new Error('Payment verification failed');
-              }
-              
-              const verifyData = await verifyResponse.json();
-              resolve(verifyData);
-            } catch (error) {
-              reject(error);
-            }
-          },
-          modal: {
-            ondismiss: () => {
-              reject(new Error('Payment cancelled'));
-            }
-          }
-        };
-        
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Credits Purchased",
-        description: "Your credits have been added to your account!",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to purchase credits",
-        variant: "destructive",
-      });
-    },
-  });
-
+  // Handle credit purchase
   const handleCreditPurchase = async (packageId: string) => {
     try {
-      const pkg = pricingData?.creditPackages.find(p => p.id === packageId);
+      const pkg = planData?.creditPackages.find(p => p.id === packageId);
       if (!pkg) {
         toast({
           title: "Error",
@@ -380,399 +263,313 @@ export default function Subscription() {
         throw new Error('Failed to create payment order');
       }
 
-      // Initialize Razorpay
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      script.onload = () => {
-        const options = {
-          key: orderData.key,
-          amount: orderData.amount,
-          currency: orderData.currency,
-          name: 'VeeFore',
-          description: `${pkg.name} - ${pkg.totalCredits} credits`,
-          order_id: orderData.orderId,
-          handler: async (response: any) => {
-            try {
-              // Verify payment
-              const verifyResponse = await apiRequest('POST', '/api/razorpay/verify-payment', {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                type: 'credits',
-                packageId: packageId
-              });
-
-              if (verifyResponse.ok) {
-                toast({
-                  title: "Payment Successful!",
-                  description: `${pkg.totalCredits} credits added to your account`,
-                });
-                
-                // Refresh data
-                queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-                queryClient.invalidateQueries({ queryKey: ['/api/subscription'] });
-                queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
-              } else {
-                throw new Error('Payment verification failed');
-              }
-            } catch (error) {
-              console.error('Payment verification error:', error);
-              toast({
-                title: "Payment Error",
-                description: "Payment verification failed. Please contact support.",
-                variant: "destructive",
-              });
-            }
-          },
-          prefill: {
-            email: user?.email,
-            name: user?.displayName,
-          },
-          theme: {
-            color: '#00D9FF',
-          },
-        };
-
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
+      // Initialize Razorpay payment
+      const options = {
+        key: 'rzp_test_YOUR_KEY_ID', // Replace with your actual key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'VeeFore',
+        description: orderData.description || `${pkg.name} Credits`,
+        order_id: orderData.orderId,
+        handler: function (response: any) {
+          creditPurchaseMutation.mutate({
+            packageId: packageId,
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature
+          });
+        },
+        prefill: {
+          name: user?.displayName || '',
+          email: user?.email || '',
+        },
+        theme: {
+          color: '#3b82f6'
+        }
       };
-      
-      document.head.appendChild(script);
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
       
     } catch (error: any) {
-      console.error('Credit purchase error:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to initiate payment",
-        variant: "destructive",
+        title: 'Payment Failed',
+        description: error.message || 'Failed to process payment.',
+        variant: 'destructive',
       });
     }
   };
 
-  const handlePlanUpgrade = () => {
-    window.location.href = '/pricing';
-  };
-
-  // Test function to create sample transactions
-  const seedTransactionsMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/seed-credit-transactions');
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Sample Transactions Created",
-        description: "Credit transaction history has been populated with sample data",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/credit-transactions'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create sample transactions",
-        variant: "destructive",
-      });
-    },
-  });
-
-  if (subscriptionLoading || pricingLoading) {
+  if (subscriptionLoading || planLoading) {
     return (
-      <div className="min-h-screen bg-space-navy text-white p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full"></div>
+          <div className="text-center py-16">
+            <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="text-white text-lg">Loading subscription data...</div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show content even if transactions are loading
-  if (!subscription || !pricingData) {
-    return (
-      <div className="min-h-screen bg-space-navy text-white p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-asteroid-silver">Loading subscription data...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const currentPlan = subscription?.plan || 'free';
+  const currentCredits = subscription?.credits || 0;
 
   return (
-    <div className="min-h-screen bg-space-navy text-white p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-cyan via-nebula-purple to-solar-gold bg-clip-text text-transparent">
-            Your Subscription
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-white mb-4">
+            Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">VeeFore</span> Plan
           </h1>
-          <p className="text-asteroid-silver text-lg">
-            Manage your plan, credits, and add-ons
+          <p className="text-gray-300 text-xl max-w-3xl mx-auto">
+            Unlock powerful AI-driven content creation tools with flexible plans designed for creators of all sizes
           </p>
-          
-
         </div>
 
-        {/* Current Plan Overview */}
-        <Card className="content-card holographic">
-          <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-electric-cyan/20 to-nebula-purple/20 border border-electric-cyan/30 flex items-center justify-center">
-                  <Crown className="w-8 h-8 text-electric-cyan" />
+        {/* Current Plan Status */}
+        <div className="mb-12">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Current Plan</h2>
+                  <div className="flex items-center gap-4">
+                    <Badge className="bg-purple-500/20 text-purple-200 text-lg px-4 py-2">
+                      {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan
+                    </Badge>
+                    <div className="text-gray-300">
+                      {formatPrice(currentCredits)} credits available
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{planData.name}</h3>
-                <p className="text-asteroid-silver">
-                  {currentPlan === 'free' ? 'Free forever' : `₹${planData.price}/month`}
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-electric-cyan/20 border border-electric-cyan/30 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-electric-cyan" />
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-white mb-1">
+                    ₹{formatPrice(planData?.plans[currentPlan]?.price || 0)}/month
+                  </div>
+                  <div className="text-sm text-gray-300">Credits remaining</div>
                 </div>
-                <h3 className="text-2xl font-bold text-electric-cyan mb-2">
-                  {subscriptionLoading ? 'Loading...' : formatNumber(currentCredits)} credits
-                </h3>
-                <p className="text-asteroid-silver">Credits remaining</p>
               </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-green-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-green-400 mb-2">
-                  {userSubscription?.status === 'active' ? 'Active' : 'Inactive'}
-                </h3>
-                <p className="text-asteroid-silver">
-                  {userSubscription?.currentPeriodEnd 
-                    ? `Renews ${new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}`
-                    : 'No renewal date'
-                  }
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Billing Toggle */}
+        <div className="flex items-center justify-center mb-12">
+          <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-full p-2 border border-white/20">
+            <span className={`px-4 py-2 rounded-full transition-all duration-300 ${!isYearly ? 'text-white bg-purple-500' : 'text-gray-300'}`}>
+              Monthly
+            </span>
+            <Switch
+              checked={isYearly}
+              onCheckedChange={setIsYearly}
+              className="data-[state=checked]:bg-purple-500"
+            />
+            <span className={`px-4 py-2 rounded-full transition-all duration-300 ${isYearly ? 'text-white bg-purple-500' : 'text-gray-300'}`}>
+              Yearly
+              <Badge className="ml-2 bg-green-500/20 text-green-200">Save 20%</Badge>
+            </span>
+          </div>
+        </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 glassmorphism">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              Plans
-            </TabsTrigger>
-            <TabsTrigger value="credits" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Credits
-            </TabsTrigger>
-            <TabsTrigger value="addons" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add-ons
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Plans Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <Card className="content-card holographic">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-electric-cyan">
-                  <Crown className="w-5 h-5" />
-                  Current Plan Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-white">Plan Features</h4>
-                    <div className="space-y-2">
-                      {planData.features?.slice(0, 5).map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                          <span className="text-asteroid-silver">{feature}</span>
-                        </div>
+        {/* Subscription Plans */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Subscription Plans</h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Choose the perfect plan for your content creation needs
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {planData?.plans && Object.values(planData.plans).map((plan: any) => {
+              const isCurrentPlan = currentPlan === plan.id;
+              const price = isYearly ? (plan.yearlyPrice || plan.price * 10) : plan.price;
+              
+              return (
+                <Card key={plan.id} className={`relative bg-white/10 backdrop-blur-sm border transition-all duration-300 hover:scale-105 ${
+                  plan.popular 
+                    ? 'border-purple-400 shadow-lg shadow-purple-400/20' 
+                    : isCurrentPlan 
+                    ? 'border-green-400 shadow-lg shadow-green-400/20'
+                    : 'border-white/20 hover:border-purple-300/50'
+                }`}>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-purple-500 text-white font-semibold">
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
+                  {isCurrentPlan && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-green-500 text-white font-semibold">
+                        Current Plan
+                      </Badge>
+                    </div>
+                  )}
+                  <CardHeader className="text-center pb-4">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                      plan.id === 'free' ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
+                      plan.id === 'starter' ? 'bg-gradient-to-br from-blue-400 to-blue-600' :
+                      plan.id === 'pro' ? 'bg-gradient-to-br from-purple-400 to-purple-600' :
+                      'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                    }`}>
+                      {plan.id === 'free' ? <Shield className="w-8 h-8 text-white" /> :
+                       plan.id === 'starter' ? <Star className="w-8 h-8 text-white" /> :
+                       plan.id === 'pro' ? <Zap className="w-8 h-8 text-white" /> :
+                       <Crown className="w-8 h-8 text-white" />}
+                    </div>
+                    <CardTitle className="text-white text-2xl">{plan.name}</CardTitle>
+                    <p className="text-gray-300 text-sm">{plan.description}</p>
+                    <div className="text-4xl font-bold text-white">
+                      ₹{formatPrice(price)}
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      {isYearly ? 'per year' : 'per month'}
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      {formatPrice(plan.credits)} Monthly Credits
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3 mb-8">
+                      {plan.features?.slice(0, 6).map((feature: string, index: number) => (
+                        <li key={index} className="flex items-start text-gray-300 text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
                       ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-white">Billing Information</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-asteroid-silver">Status:</span>
-                        <Badge variant={userSubscription?.status === 'active' ? 'default' : 'secondary'}>
-                          {userSubscription?.status || 'Inactive'}
-                        </Badge>
-                      </div>
-                      {userSubscription?.currentPeriodEnd && (
-                        <div className="flex justify-between">
-                          <span className="text-asteroid-silver">Next billing:</span>
-                          <span className="text-white">{new Date(userSubscription.currentPeriodEnd).toLocaleDateString()}</span>
-                        </div>
+                      {plan.features?.length > 6 && (
+                        <li className="flex items-center text-gray-400 text-sm">
+                          <Plus className="w-4 h-4 mr-3" />
+                          <span>+{plan.features.length - 6} more features</span>
+                        </li>
                       )}
-                    </div>
+                    </ul>
+                    
+                    <Button
+                      onClick={() => plan.id === 'free' ? null : handleUpgrade(plan.id)}
+                      disabled={isUpgrading || isCreatingOrder || isCurrentPlan || plan.id === 'free'}
+                      className={`w-full h-12 text-base font-medium transition-all duration-300 ${
+                        isCurrentPlan
+                          ? 'bg-green-600 hover:bg-green-700 cursor-not-allowed'
+                          : plan.id === 'free'
+                          ? 'bg-gray-600 hover:bg-gray-700 cursor-not-allowed'
+                          : plan.popular
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                          : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
+                      }`}
+                    >
+                      {isCurrentPlan ? 'Current Plan' : 
+                       plan.id === 'free' ? 'Free Plan' :
+                       isUpgrading ? 'Processing...' : 'Upgrade Now'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Credit Packages */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Need More Credits?</h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Purchase additional credits to supercharge your content creation without changing your plan
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {planData?.creditPackages?.map((pack: any) => (
+              <Card key={pack.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 group">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Plus className="w-6 h-6 text-white" />
                   </div>
-                </div>
-
-                <div className="pt-6 border-t border-cosmic-void/30">
-                  <Button onClick={handlePlanUpgrade} className="w-full md:w-auto glassmorphism">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Upgrade Plan
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Credits Tab */}
-          <TabsContent value="credits" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Credit Packages */}
-              <Card className="content-card holographic">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-electric-cyan">
-                    <Zap className="w-5 h-5" />
-                    Buy More Credits
-                  </CardTitle>
+                  <CardTitle className="text-white text-xl">{pack.name}</CardTitle>
+                  <div className="text-3xl font-bold text-white">
+                    ₹{formatPrice(pack.price)}
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {pricingData?.creditPackages?.map((pkg) => (
-                    <div key={pkg.id} className="p-4 rounded-lg bg-cosmic-void/30 border border-electric-cyan/20">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-semibold text-white">{pkg.name}</h4>
-                        {pkg.popular && (
-                          <Badge className="bg-solar-gold/20 text-solar-gold">Popular</Badge>
-                        )}
+                <CardContent>
+                  <div className="text-center mb-6">
+                    <div className="text-2xl font-bold text-white">{formatPrice(pack.totalCredits)}</div>
+                    <div className="text-sm text-gray-300">Total Credits</div>
+                  </div>
+                  
+                  <Button
+                    onClick={() => handleCreditPurchase(pack.id)}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold h-12 transition-all duration-300"
+                  >
+                    Purchase Credits
+                    <Plus className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Transaction History */}
+        <div>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Transaction History</h2>
+            <p className="text-gray-300 text-lg">
+              Track your subscription changes and credit purchases
+            </p>
+          </div>
+          
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardContent className="p-8">
+              {creditLoading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <div className="text-gray-300">Loading transaction history...</div>
+                </div>
+              ) : creditHistory?.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <div className="text-gray-300 text-lg">No transactions yet</div>
+                  <p className="text-gray-400 text-sm mt-2">Your subscription and credit purchase history will appear here</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {creditHistory?.map((transaction: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-6 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors duration-200">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          transaction.type === 'credit_purchase' ? 'bg-yellow-500/20' :
+                          transaction.type === 'subscription' ? 'bg-purple-500/20' :
+                          'bg-blue-500/20'
+                        }`}>
+                          {transaction.type === 'credit_purchase' ? <Plus className="w-5 h-5 text-yellow-400" /> :
+                           transaction.type === 'subscription' ? <Crown className="w-5 h-5 text-purple-400" /> :
+                           <Zap className="w-5 h-5 text-blue-400" />}
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">{transaction.description}</div>
+                          <div className="text-gray-400 text-sm">{new Date(transaction.createdAt).toLocaleDateString()}</div>
+                        </div>
                       </div>
-                      <div className="text-sm text-asteroid-silver mb-3">
-                        {formatNumber(pkg.baseCredits)} credits + {formatNumber(pkg.bonusCredits)} bonus = {formatNumber(pkg.totalCredits)} total
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-electric-cyan">₹{pkg.price}</span>
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleCreditPurchase(pkg.id)}
-                          className="glassmorphism"
-                        >
-                          Buy Now
-                        </Button>
+                      <div className="text-right">
+                        <div className={`text-lg font-medium ${
+                          transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {transaction.amount > 0 ? '+' : ''}{formatPrice(transaction.amount)}
+                        </div>
+                        <div className="text-gray-400 text-sm capitalize">{transaction.type}</div>
                       </div>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
-
-              {/* Credit History */}
-              <Card className="content-card holographic">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-nebula-purple">
-                    <History className="w-5 h-5" />
-                    Recent Transactions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {transactionsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin w-6 h-6 border-2 border-electric-cyan border-t-transparent rounded-full"></div>
-                    </div>
-                  ) : creditTransactions && creditTransactions.length > 0 ? (
-                    <div className="space-y-3">
-                      {creditTransactions.slice(0, 5).map((transaction) => (
-                        <div key={transaction.id} className="flex justify-between items-center p-3 rounded-lg bg-cosmic-void/20">
-                          <div>
-                            <div className="text-sm font-medium text-white">{transaction.description}</div>
-                            <div className="text-xs text-asteroid-silver">
-                              {new Date(transaction.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className={`font-medium ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                              {transaction.amount > 0 ? '+' : ''}{formatNumber(transaction.amount)}
-                            </div>
-                            <div className="text-xs text-asteroid-silver capitalize">
-                              {transaction.type}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-asteroid-silver">
-                      No transactions yet
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Add-ons Tab */}
-          <TabsContent value="addons" className="space-y-6">
-            <Card className="content-card holographic">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-solar-gold">
-                  <Sparkles className="w-5 h-5" />
-                  Available Add-ons
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pricingData?.addons ? (
-                    Object.entries(pricingData.addons).map(([key, addon]: [string, any]) => {
-                      const displayPrice = Math.floor(addon.price / 100);
-                      console.log('[ADDON DEBUG] Processing addon:', key, 'price:', addon.price, 'display price:', displayPrice);
-                      return (
-                        <div key={key} className="p-6 rounded-lg bg-cosmic-void/30 border border-solar-gold/20">
-                          <div className="text-center space-y-4">
-                            <div className="w-12 h-12 mx-auto rounded-full bg-solar-gold/20 border border-solar-gold/30 flex items-center justify-center">
-                              <Gift className="w-6 h-6 text-solar-gold" />
-                            </div>
-                            <h3 className="font-semibold text-white">{addon.name}</h3>
-                            <p className="text-sm text-asteroid-silver">{addon.benefit || addon.description}</p>
-                            <div className="text-lg font-bold text-solar-gold">₹{displayPrice}/month</div>
-                            <button
-                              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('[ADDON BUTTON] Raw click event triggered for addon:', key);
-                                window.alert(`Clicked addon: ${key} - Price: ₹${displayPrice}`);
-                                handleAddonPurchase(key);
-                              }}
-                              disabled={addonPurchasing}
-                              type="button"
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              {addonPurchasing ? "Processing..." : "Add Enhancement"}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="col-span-full text-center py-12 text-asteroid-silver">
-                      <div>No addons data available</div>
-                    </div>
-                  )}
-                  
-                  {(!pricingData?.addons || Object.keys(pricingData.addons).length === 0) && (
-                    <div className="col-span-full text-center py-12 text-asteroid-silver">
-                      <Sparkles className="w-12 h-12 mx-auto mb-4 text-solar-gold/50" />
-                      <h3 className="text-lg font-medium mb-2">Add-ons Coming Soon</h3>
-                      <p>Powerful add-ons will be available to enhance your VeeFore experience.</p>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

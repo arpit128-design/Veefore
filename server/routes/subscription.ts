@@ -506,7 +506,7 @@ router.post('/create-order', requireAuth, async (req: Request, res: Response) =>
 
     res.json({
       orderId: order.id,
-      amount: price,
+      amount: price * 100, // Return amount in paisa for Razorpay
       currency: 'INR',
       planId,
       planName: plan.name,

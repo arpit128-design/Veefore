@@ -166,7 +166,7 @@ export default function SubscriptionNew() {
       // Initialize Razorpay payment
       const options = {
         key: orderData.key,
-        amount: orderData.amount * 100, // Convert to paisa
+        amount: orderData.amount, // Backend already returns amount in paisa
         currency: orderData.currency,
         order_id: orderData.orderId,
         name: 'VeeFore',

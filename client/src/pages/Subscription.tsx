@@ -81,9 +81,13 @@ export default function Subscription() {
     document.body.appendChild(script);
     
     return () => {
-      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-      if (existingScript) {
-        document.body.removeChild(existingScript);
+      try {
+        const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+        if (existingScript && existingScript.parentNode) {
+          existingScript.parentNode.removeChild(existingScript);
+        }
+      } catch (error) {
+        console.log('Script cleanup error:', error);
       }
     };
   }, []);
@@ -200,7 +204,7 @@ export default function Subscription() {
 
       // Initialize Razorpay payment
       const options = {
-        key: 'rzp_test_YOUR_KEY_ID', // Replace with your actual key
+        key: orderData.keyId, // Use key from backend
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'VeeFore',
@@ -265,7 +269,7 @@ export default function Subscription() {
 
       // Initialize Razorpay payment
       const options = {
-        key: 'rzp_test_YOUR_KEY_ID', // Replace with your actual key
+        key: orderData.keyId, // Use key from backend
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'VeeFore',

@@ -3164,7 +3164,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         currency: order.currency,
         description: `${packageData.name} - ${packageData.totalCredits} Credits`,
         type: 'credits',
-        packageId: packageId
+        packageId: packageId,
+        keyId: process.env.RAZORPAY_KEY_ID
       });
     } catch (error: any) {
       console.error('[CREDIT PURCHASE] Error:', error);

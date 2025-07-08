@@ -87,7 +87,47 @@ export const SUBSCRIPTION_PLANS = {
   }
 };
 
-export const CREDIT_PACKAGES = [];
+export const CREDIT_PACKAGES = [
+  {
+    id: 'credits-50',
+    name: '50 Credits',
+    baseCredits: 50,
+    bonusCredits: 0,
+    totalCredits: 50,
+    price: 99,
+    description: 'Perfect for trying out AI features'
+  },
+  {
+    id: 'credits-150',
+    name: '150 Credits',
+    baseCredits: 150,
+    bonusCredits: 10,
+    totalCredits: 160,
+    price: 299,
+    description: 'Great for regular content creation'
+  },
+  {
+    id: 'credits-500',
+    name: '500 Credits + Bonus',
+    baseCredits: 500,
+    bonusCredits: 100,
+    totalCredits: 600,
+    price: 999,
+    savings: '20% Bonus',
+    description: 'Best value for power users',
+    popular: true
+  },
+  {
+    id: 'credits-1000',
+    name: '1000 Credits + Bonus',
+    baseCredits: 1000,
+    bonusCredits: 300,
+    totalCredits: 1300,
+    price: 1999,
+    savings: '30% Bonus',
+    description: 'Ultimate package for agencies'
+  }
+];
 
 export const ADDONS = {};
 

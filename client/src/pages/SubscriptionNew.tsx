@@ -106,7 +106,13 @@ export default function SubscriptionNew() {
   // Upgrade subscription mutation (after payment)
   const upgradeMutation = useMutation({
     mutationFn: async (paymentData: { planId: string; paymentId: string; orderId: string; signature: string }) => {
-      const response = await apiRequest('POST', '/api/subscription/upgrade', paymentData);
+      const response = await apiRequest('POST', '/api/razorpay/verify-payment', {
+        razorpay_order_id: paymentData.orderId,
+        razorpay_payment_id: paymentData.paymentId,
+        razorpay_signature: paymentData.signature,
+        type: 'subscription',
+        planId: paymentData.planId
+      });
       return await response.json();
     },
     onSuccess: () => {

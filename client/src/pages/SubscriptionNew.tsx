@@ -11,6 +11,14 @@ import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { formatNumber } from '@/lib/utils';
 
+// Function to format prices and credits with commas instead of K/L abbreviations
+const formatPrice = (value: number): string => {
+  if (value === null || value === undefined || isNaN(value)) {
+    return "0";
+  }
+  return new Intl.NumberFormat('en-IN').format(value);
+};
+
 interface SubscriptionData {
   id: number;
   plan: string;
@@ -274,7 +282,7 @@ export default function SubscriptionNew() {
                   <CardTitle className="text-white text-2xl font-bold mb-2">{plan.name}</CardTitle>
                   <div className="mb-4">
                     <div className="text-4xl font-bold text-white">
-                      ₹{formatNumber(price)}
+                      ₹{formatPrice(price)}
                       {plan.id !== 'free' && (
                         <span className="text-lg font-normal text-gray-300">
                           /{isYearly ? 'year' : 'month'}
@@ -283,7 +291,7 @@ export default function SubscriptionNew() {
                     </div>
                     {isYearly && savings > 0 && (
                       <div className="text-sm text-green-400 mt-1">
-                        Save ₹{formatNumber(savings)} per year
+                        Save ₹{formatPrice(savings)} per year
                       </div>
                     )}
                   </div>
@@ -292,7 +300,7 @@ export default function SubscriptionNew() {
                 
                 <CardContent className="flex-1 px-6 pb-6">
                   <div className="text-center mb-6">
-                    <div className="text-2xl font-bold text-white">{formatNumber(plan.credits)}</div>
+                    <div className="text-2xl font-bold text-white">{formatPrice(plan.credits)}</div>
                     <div className="text-sm text-gray-300">Monthly Credits</div>
                   </div>
                   
@@ -358,12 +366,12 @@ export default function SubscriptionNew() {
                   </div>
                   <CardTitle className="text-white text-xl">{pack.name}</CardTitle>
                   <div className="text-3xl font-bold text-white">
-                    ₹{formatNumber(pack.price)}
+                    ₹{formatPrice(pack.price)}
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-6">
-                    <div className="text-2xl font-bold text-white">{formatNumber(pack.totalCredits)}</div>
+                    <div className="text-2xl font-bold text-white">{formatPrice(pack.totalCredits)}</div>
                     <div className="text-sm text-gray-300">Total Credits</div>
                     {pack.savings && (
                       <Badge className="mt-2 bg-gradient-to-r from-green-500 to-green-600 text-white">

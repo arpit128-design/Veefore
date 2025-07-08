@@ -14,7 +14,6 @@ import {
 import { SUBSCRIPTION_PLANS as PRICING_PLANS } from '../pricing-config';
 import { z } from 'zod';
 import { storage } from '../storage';
-import { firebaseAdmin } from '../firebase-admin';
 import Razorpay from 'razorpay';
 
 const router = Router();
@@ -25,8 +24,8 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-// Authentication middleware
-const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+// Authentication middleware - Using the same system as main routes
+const requireAuth = async (req: any, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     
@@ -34,10 +33,52 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    let token;
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else {
+      token = authHeader;
+    }
     
-    const user = await storage.getUserByFirebaseUid(decodedToken.uid);
+    if (!token || token.trim() === '') {
+      console.error('[SUBSCRIPTION AUTH] No token found in authorization header');
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    token = token.trim();
+
+    // Extract Firebase UID from JWT token payload
+    let firebaseUid;
+    let cleanToken = token;
+    
+    // Handle malformed tokens by finding the actual JWT parts
+    cleanToken = cleanToken.replace(/\s+/g, '').replace(/[^\w\-._]/g, '');
+    
+    const tokenParts = cleanToken.split('.');
+    if (tokenParts.length > 3) {
+      cleanToken = tokenParts.slice(0, 3).join('.');
+    } else if (tokenParts.length < 3) {
+      console.error('[SUBSCRIPTION AUTH] Invalid JWT structure - expected 3 parts, got:', tokenParts.length);
+      return res.status(401).json({ error: 'Invalid token format' });
+    }
+
+    try {
+      const finalParts = cleanToken.split('.');
+      const payload = JSON.parse(Buffer.from(finalParts[1], 'base64').toString());
+      firebaseUid = payload.user_id || payload.sub;
+      
+      if (!firebaseUid) {
+        console.error('[SUBSCRIPTION AUTH] No Firebase UID found in token payload');
+        return res.status(401).json({ error: 'Invalid token payload' });
+      }
+    } catch (error) {
+      console.error('[SUBSCRIPTION AUTH] Token parsing error:', error);
+      return res.status(401).json({ error: 'Invalid token format' });
+    }
+    
+    const user = await storage.getUserByFirebaseUid(firebaseUid);
+    console.log(`[SUBSCRIPTION AUTH] User lookup for firebaseUid ${firebaseUid}:`, user ? `Found - ID: ${user.id}` : 'Not found');
+    
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
     }

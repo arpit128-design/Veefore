@@ -82,6 +82,8 @@ export default function SubscriptionNew() {
       const response = await apiRequest('GET', '/api/subscription/plans');
       const data = await response.json();
       console.log('[SUBSCRIPTION] Loaded pricing data:', data);
+      console.log('[SUBSCRIPTION] Pricing data plans:', data.plans);
+      console.log('[SUBSCRIPTION] Plan keys:', Object.keys(data.plans || {}));
       return data;
     },
     retry: 2,
@@ -122,12 +124,15 @@ export default function SubscriptionNew() {
   // Force display of server data
   console.log('[NEW SUBSCRIPTION] Raw subscription object:', subscription);
   console.log('[NEW SUBSCRIPTION] Raw credits property:', subscription?.credits);
+  console.log('[NEW SUBSCRIPTION] Raw pricing data:', pricingData);
+  console.log('[NEW SUBSCRIPTION] Pricing data plans:', pricingData?.plans);
   console.log('[NEW SUBSCRIPTION] Credit calculation:', {
     authenticCredits,
     transactionCredits,
     displayCredits,
     subscriptionLoaded: !!subscription,
     transactionsLoaded: !!creditTransactions,
+    pricingLoaded: !!pricingData,
     rawSubscriptionData: subscription
   });
 
@@ -176,10 +181,9 @@ export default function SubscriptionNew() {
     },
   });
 
-  if (subscriptionLoading || pricingLoading) {
+  if (subscriptionLoading) {
     return (
-      <div className="min-h-screen bg-space-navy text-white flex items-center justify-center">
-        <SpaceBackground />
+      <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
         <div className="relative z-10 text-center">
           <div className="animate-spin w-12 h-12 border-4 border-electric-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-asteroid-silver">Loading your subscription...</p>
@@ -190,7 +194,6 @@ export default function SubscriptionNew() {
 
   return (
     <div className="min-h-screen bg-transparent text-white p-8">
-      <SpaceBackground />
       
       <div className="relative z-10 max-w-7xl mx-auto space-y-8">
         {/* Header */}

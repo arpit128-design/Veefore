@@ -39,13 +39,13 @@ const mainTabs = [
     features: [
       { href: "/content-studio", icon: Brain, label: "Content Studio", color: "text-nebula-purple" },
       { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
-      { href: "/thumbnail-maker", icon: ImageIcon, label: "AI Thumbnails", color: "text-pink-400" },
-      { href: "/ai-thumbnails-pro", icon: Sparkles, label: "Thumbnails Pro", color: "text-purple-500" },
-      { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400" },
-      { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400" },
-      { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500" },
-      { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500" },
-      { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500" }
+      { href: "/thumbnail-maker", icon: ImageIcon, label: "AI Thumbnails", color: "text-pink-400", locked: true },
+      { href: "/ai-thumbnails-pro", icon: Sparkles, label: "Thumbnails Pro", color: "text-purple-500", locked: true },
+      { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400", locked: true },
+      { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400", locked: true },
+      { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500", locked: true },
+      { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500", locked: true },
+      { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500", locked: true }
     ]
   },
   {
@@ -66,7 +66,7 @@ const mainTabs = [
     color: "text-green-400",
     features: [
       { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
-      { href: "/ab-testing", icon: BarChart3, label: "A/B Testing", color: "text-blue-500" },
+      { href: "/ab-testing", icon: BarChart3, label: "A/B Testing", color: "text-blue-500", locked: true },
       { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500" }
     ]
   },
@@ -76,7 +76,7 @@ const mainTabs = [
     icon: DollarSign,
     color: "text-yellow-400",
     features: [
-      { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400" },
+      { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400", locked: true },
       { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
       { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-yellow-400" }
     ]
@@ -203,12 +203,17 @@ export function Sidebar() {
                     <div className="ml-6 space-y-1">
                       {tab.features.map((feature) => {
                         const isFeatureActiveState = isFeatureActive(feature.href);
+                        const isLocked = feature.locked || false;
+                        const featureName = feature.label.replace(/\s+/g, '-').toLowerCase();
+                        const href = isLocked ? `/feature-preview?feature=${featureName}` : feature.href;
+                        
                         return (
                           <Link
                             key={feature.href}
-                            href={feature.href}
+                            href={href}
                             className={cn(
                               "flex items-center space-x-2 p-2 rounded-lg transition-all group text-sm",
+                              isLocked && "locked opacity-40 cursor-pointer",
                               isFeatureActiveState 
                                 ? "holographic bg-opacity-30" 
                                 : "hover:bg-cosmic-blue/50"
@@ -216,6 +221,7 @@ export function Sidebar() {
                           >
                             <feature.icon className={cn("h-3 w-3 lg:h-4 lg:w-4", feature.color)} />
                             <span className="font-medium">{feature.label}</span>
+                            {isLocked && <span className="text-xs text-gray-400 ml-1">🔒</span>}
                           </Link>
                         );
                       })}

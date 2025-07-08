@@ -38,6 +38,7 @@ import Landing from "@/pages/Landing";
 import Subscribe from "@/pages/Subscribe";
 import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { TermsOfService } from "@/pages/TermsOfService";
+import FeaturePreview from "@/pages/FeaturePreview";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -143,6 +144,7 @@ function AuthenticatedApp() {
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/terms-of-service" component={TermsOfService} />
               <Route path="/about" component={About} />
+              <Route path="/feature-preview" component={FeaturePreview} />
               <Route path="/analytics/instagram" component={InstagramAnalytics} />
               <Route path="/analytics/youtube" component={YouTubeAnalytics} />
               <Route path="/solution/content-creators" component={SolutionContentCreators} />

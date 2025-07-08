@@ -2638,10 +2638,22 @@ export class MongoStorage implements IStorage {
       throw new Error(`User with id ${userId} not found`);
     }
     
-    // Update the user's subscription plan
+    // Get plan credits from pricing config
+    const { SUBSCRIPTION_PLANS } = await import('./pricing-config');
+    const plan = SUBSCRIPTION_PLANS[planId];
+    
+    if (!plan) {
+      throw new Error(`Invalid plan ID: ${planId}`);
+    }
+    
+    // Update the user's subscription plan AND set the monthly credits
     const updatedUser = await UserModel.findByIdAndUpdate(
       user._id,
-      { plan: planId, updatedAt: new Date() },
+      { 
+        plan: planId, 
+        credits: plan.credits,  // Set to the plan's monthly credits
+        updatedAt: new Date() 
+      },
       { new: true }
     );
     
@@ -2649,7 +2661,7 @@ export class MongoStorage implements IStorage {
       throw new Error(`Failed to update user subscription for id ${userId}`);
     }
     
-    console.log(`[SUBSCRIPTION UPDATE] Successfully updated user ${userId} to plan ${planId}`);
+    console.log(`[SUBSCRIPTION UPDATE] Successfully updated user ${userId} to plan ${planId} with ${plan.credits} credits`);
     return this.convertUser(updatedUser);
   }
 

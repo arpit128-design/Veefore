@@ -605,18 +605,19 @@ router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
       console.log('[SUBSCRIPTION] Updating user plan:', { userId: user.id, planId });
       await storage.updateUserSubscription(user.id, planId);
 
-      // Add plan credits to user's account
-      const newCredits = (user.credits || 0) + plan.credits;
-      console.log('[SUBSCRIPTION] Updating user credits:', { userId: user.id, currentCredits: user.credits, newCredits });
-      await storage.updateUserCredits(user.id, newCredits);
+      // Set user to the full plan credits (not additive)
+      const planCredits = plan.credits;
+      console.log('[SUBSCRIPTION] Setting user to full plan credits:', { userId: user.id, currentCredits: user.credits, planCredits });
+      await storage.updateUserCredits(user.id, planCredits);
 
-      // Log transaction
-      console.log('[SUBSCRIPTION] Creating credit transaction:', { userId: user.id, amount: plan.credits });
+      // Log transaction for the credit adjustment
+      const creditAdjustment = planCredits - (user.credits || 0);
+      console.log('[SUBSCRIPTION] Creating credit transaction:', { userId: user.id, amount: creditAdjustment });
       await storage.createCreditTransaction({
         userId: user.id,
         type: 'subscription_upgrade',
-        amount: plan.credits,
-        description: `Upgraded to ${plan.name} plan`,
+        amount: creditAdjustment,
+        description: `Upgraded to ${plan.name} plan - ${planCredits} monthly credits`,
         referenceId: paymentId
       });
 

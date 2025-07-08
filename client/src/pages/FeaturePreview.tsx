@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Lock, Star, Users, CheckCircle, Mail, Bell, Sparkles, Zap, Calendar, Trophy, Shield, Heart, FileText, BarChart3, Share2, ImageIcon, Languages, Target, Globe, Brain } from 'lucide-react';
+import { ArrowLeft, Lock, Star, Users, CheckCircle, Mail, Bell, Sparkles, Zap, Calendar, Trophy, Shield, Heart, FileText, BarChart3, Share2, ImageIcon, Languages, Target, Globe, Brain, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -144,6 +144,51 @@ const featureData = {
     color: 'text-emerald-400',
     bgColor: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/20'
+  },
+  'competitor-analysis': {
+    title: 'Competitor Analysis',
+    icon: <Users className="w-12 h-12" />,
+    description: 'Analyze competitors\' strategies and performance across platforms',
+    benefits: [
+      'Competitive intelligence gathering',
+      'Market positioning analysis',
+      'Content strategy insights',
+      'Performance benchmarking',
+      'Strategic advantage identification'
+    ],
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-500/10',
+    borderColor: 'border-orange-500/20'
+  },
+  'social-listening': {
+    title: 'Social Listening',
+    icon: <Globe className="w-12 h-12" />,
+    description: 'Monitor brand mentions and social media conversations in real-time',
+    benefits: [
+      'Real-time brand monitoring',
+      'Sentiment analysis',
+      'Trend identification',
+      'Crisis management alerts',
+      'Audience insights'
+    ],
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-500/10',
+    borderColor: 'border-cyan-500/20'
+  },
+  'roi-calculator': {
+    title: 'ROI Calculator',
+    icon: <CreditCard className="w-12 h-12" />,
+    description: 'Calculate return on investment for your marketing campaigns',
+    benefits: [
+      'Campaign ROI analysis',
+      'Investment tracking',
+      'Performance forecasting',
+      'Budget optimization',
+      'Financial reporting'
+    ],
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/20'
   }
 };
 

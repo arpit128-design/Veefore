@@ -27,8 +27,8 @@ const mainTabs = [
       { href: "/trend-calendar", icon: Calendar, label: "Trend Calendar", color: "text-purple-500" },
       { href: "/persona-suggestions", icon: Users, label: "Persona Builder", color: "text-purple-400" },
       { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-amber-400" },
-      { href: "/competitor-analysis", icon: Users, label: "Competitor Analysis", color: "text-orange-400" },
-      { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400" }
+      { href: "/competitor-analysis", icon: Users, label: "Competitor Analysis", color: "text-orange-400", locked: true },
+      { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400", locked: true }
     ]
   },
   {
@@ -39,7 +39,6 @@ const mainTabs = [
     features: [
       { href: "/content-studio", icon: Brain, label: "Content Studio", color: "text-nebula-purple" },
       { href: "/ai-suggestions", icon: Sparkles, label: "AI Suggestions", color: "text-electric-cyan" },
-      { href: "/thumbnail-maker", icon: ImageIcon, label: "AI Thumbnails", color: "text-pink-400", locked: true },
       { href: "/ai-thumbnails-pro", icon: Sparkles, label: "Thumbnails Pro", color: "text-purple-500", locked: true },
       { href: "/content-repurpose", icon: Languages, label: "Content Repurpose", color: "text-teal-400", locked: true },
       { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400", locked: true },
@@ -55,7 +54,6 @@ const mainTabs = [
     color: "text-solar-gold",
     features: [
       { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
-      { href: "/ai-intelligence", icon: Zap, label: "AI Intelligence", color: "text-purple-400" },
       { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" }
     ]
   },
@@ -67,7 +65,7 @@ const mainTabs = [
     features: [
       { href: "/analyzer", icon: BarChart3, label: "Analyzer", color: "text-green-400" },
       { href: "/ab-testing", icon: BarChart3, label: "A/B Testing", color: "text-blue-500", locked: true },
-      { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500" }
+      { href: "/roi-calculator", icon: CreditCard, label: "ROI Calculator", color: "text-green-500", locked: true }
     ]
   },
   {

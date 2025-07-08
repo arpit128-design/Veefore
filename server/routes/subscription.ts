@@ -522,13 +522,32 @@ router.post('/create-order', requireAuth, async (req: Request, res: Response) =>
 // Upgrade subscription (requires payment verification)
 router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
   try {
+    console.log('[SUBSCRIPTION] Upgrade request received:', { 
+      userId: req.user?.id, 
+      body: req.body 
+    });
+
     const user = req.user;
     if (!user) {
+      console.error('[SUBSCRIPTION] No user found in request');
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const { planId, paymentId, orderId, signature } = req.body;
+    console.log('[SUBSCRIPTION] Payment data received:', { 
+      planId, 
+      paymentId, 
+      orderId, 
+      hasSignature: !!signature 
+    });
+
     if (!planId || !paymentId || !orderId || !signature) {
+      console.error('[SUBSCRIPTION] Missing payment verification data:', {
+        planId: !!planId,
+        paymentId: !!paymentId,
+        orderId: !!orderId,
+        signature: !!signature
+      });
       return res.status(400).json({ 
         error: 'Payment verification required. Please complete payment first.' 
       });
@@ -628,7 +647,20 @@ router.post('/upgrade', requireAuth, async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('[SUBSCRIPTION] Error upgrading subscription:', error);
+    console.error('[SUBSCRIPTION] Error upgrading subscription - Full error:', error);
+    console.error('[SUBSCRIPTION] Error stack:', error.stack);
+    console.error('[SUBSCRIPTION] Error message:', error.message);
+    console.error('[SUBSCRIPTION] Error type:', typeof error);
+    
+    // More specific error handling
+    if (error.message && error.message.includes('RAZORPAY_KEY_SECRET')) {
+      return res.status(500).json({ error: 'Razorpay configuration missing' });
+    }
+    
+    if (error.message && error.message.includes('updateUserSubscription')) {
+      return res.status(500).json({ error: 'Database update failed' });
+    }
+    
     res.status(500).json({ error: 'Failed to upgrade subscription' });
   }
 });

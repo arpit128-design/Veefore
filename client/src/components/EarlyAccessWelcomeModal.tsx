@@ -25,10 +25,10 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-0 p-0 overflow-hidden">
-        <div className="relative">
+      <DialogContent className="max-w-2xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-0 p-0 overflow-hidden">
+        <div className="relative h-full max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
           {/* Animated Background */}
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
               className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl"
               animate={{
@@ -56,7 +56,7 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
           </div>
 
           {/* Content */}
-          <div className="relative z-10 p-8">
+          <div className="relative z-10 p-8 min-h-full">
             {/* Header */}
             <div className="text-center mb-8">
               <motion.div

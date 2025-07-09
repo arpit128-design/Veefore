@@ -1392,6 +1392,7 @@ function ResultsSection() {
 // Hootsuite-Style Pricing Section
 function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
 
   const plans = [
     {
@@ -1399,69 +1400,120 @@ function PricingSection() {
       monthlyPrice: "₹0",
       annualPrice: "₹0",
       period: "forever",
-      description: "Perfect for getting started",
+      description: "Perfect for getting started with AI-powered social media management",
       features: [
-        "Up to 1 social account",
-        "20 AI credits monthly", 
-        "Basic analytics",
-        "Email support"
+        "Up to 1 social account connection",
+        "20 AI credits monthly for content generation", 
+        "Basic analytics and performance tracking",
+        "Email support during business hours",
+        "Access to AI Content Generator",
+        "Basic post scheduling",
+        "Community support forum"
       ],
       isPopular: false,
       buttonText: "Free 30-day trial",
-      buttonVariant: "outline" as const
+      buttonVariant: "outline" as const,
+      detailedFeatures: [
+        "Connect 1 Instagram, Facebook, Twitter, LinkedIn, or YouTube account",
+        "Generate 20 AI-powered posts, captions, and hashtags per month",
+        "View basic engagement metrics and follower growth",
+        "Schedule up to 10 posts per month",
+        "Access to VeeFore community and knowledge base"
+      ]
     },
     {
       name: "Starter", 
       monthlyPrice: "₹699",
-      annualPrice: "₹524",
+      annualPrice: "₹489",
       period: "per user/mo*",
-      description: "Everything in Free, PLUS:",
+      description: "Everything in Free, PLUS advanced AI tools and analytics",
       features: [
         "Up to 2 social accounts",
         "300 AI credits monthly",
-        "Advanced analytics", 
-        "Priority support",
-        "Content scheduling"
+        "Advanced analytics dashboard", 
+        "Priority email support",
+        "Content calendar and scheduling",
+        "AI Image Generator access",
+        "Basic automation rules",
+        "Performance insights and recommendations"
       ],
       isPopular: true,
       buttonText: "Free 30-day trial",
-      buttonVariant: "default" as const
+      buttonVariant: "default" as const,
+      detailedFeatures: [
+        "Connect 2 social media accounts across all major platforms",
+        "Generate 300 AI-powered posts, images, and content pieces monthly",
+        "Advanced analytics with engagement tracking and competitor insights",
+        "Unlimited post scheduling with optimal timing suggestions",
+        "Create custom images with DALL-E 3 integration",
+        "Set up basic DM automation and auto-responses",
+        "Access to trend analysis and viral prediction tools"
+      ]
     },
     {
       name: "Pro",
       monthlyPrice: "₹1,499", 
-      annualPrice: "₹1,124",
+      annualPrice: "₹1,049",
       period: "per user/mo*",
-      description: "Everything in Starter, PLUS:",
+      description: "Everything in Starter, PLUS team collaboration and advanced AI tools",
       features: [
         "Up to 5 social accounts",
         "1,100 AI credits monthly",
-        "Team collaboration",
-        "Advanced AI tools",
-        "Custom analytics reports"
+        "Team collaboration workspace",
+        "Advanced AI tools (Thumbnail Maker Pro, ROI Calculator)",
+        "Custom analytics reports",
+        "Advanced automation rules",
+        "White-label content options",
+        "Phone and email support"
       ],
       isPopular: false,
       buttonText: "Free 30-day trial", 
-      buttonVariant: "outline" as const
+      buttonVariant: "outline" as const,
+      detailedFeatures: [
+        "Connect 5 social media accounts with full cross-platform management",
+        "1,100 AI credits for comprehensive content creation and analysis",
+        "Team workspace with role-based access and collaboration tools",
+        "Access to all AI tools including Thumbnail Maker Pro and Competitor Analysis",
+        "Generate custom analytics reports with advanced insights",
+        "Advanced automation with sentiment analysis and lead qualification",
+        "Priority phone support with dedicated account assistance"
+      ]
     },
     {
       name: "Business",
       monthlyPrice: "₹2,199",
-      annualPrice: "₹1,649", 
+      annualPrice: "₹1,539", 
       period: "per user/mo*",
-      description: "Everything in Pro, PLUS:",
+      description: "Everything in Pro, PLUS enterprise features and unlimited access",
       features: [
         "Unlimited social accounts",
         "2,000 AI credits monthly",
-        "White-label solution", 
-        "API access",
-        "Dedicated account manager"
+        "White-label solution with custom branding", 
+        "API access for integrations",
+        "Dedicated account manager",
+        "Custom AI model training",
+        "Advanced team management",
+        "24/7 priority support"
       ],
       isPopular: false,
       buttonText: "Request a Demo",
-      buttonVariant: "outline" as const
+      buttonVariant: "outline" as const,
+      detailedFeatures: [
+        "Connect unlimited social media accounts across all platforms",
+        "2,000 AI credits with option to purchase additional credits",
+        "Complete white-label solution with your branding and domain",
+        "Full API access for custom integrations and workflow automation",
+        "Dedicated account manager for strategic guidance and support",
+        "Custom AI model training for your specific brand voice and style",
+        "Advanced team management with detailed permissions and audit logs",
+        "24/7 phone, email, and chat support with 1-hour response time"
+      ]
     }
   ];
+
+  const togglePlan = (planName: string) => {
+    setExpandedPlan(expandedPlan === planName ? null : planName);
+  };
 
   return (
     <section id="pricing" className="py-20 bg-gray-50">
@@ -1493,12 +1545,13 @@ function PricingSection() {
             </button>
             <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
               Pay annually
-              <span className="ml-1 text-xs text-green-600 font-medium">(Save up to 38%)</span>
+              <span className="ml-1 text-xs text-green-600 font-medium">(Save up to 30%)</span>
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid grid-cols-4 gap-6">
           {plans.map((plan, index) => (
             <div key={index} className={`relative bg-white rounded-lg border ${plan.isPopular ? 'border-red-500' : 'border-gray-200'} p-6`}>
               {plan.isPopular && (
@@ -1560,10 +1613,81 @@ function PricingSection() {
           ))}
         </div>
 
+        {/* Mobile Layout - Accordion Style */}
+        <div className="lg:hidden space-y-4">
+          {plans.map((plan, index) => (
+            <div key={index} className={`bg-white rounded-lg border ${plan.isPopular ? 'border-red-500' : 'border-gray-200'} overflow-hidden`}>
+              {plan.isPopular && (
+                <div className="bg-red-500 text-white text-center py-2 text-sm font-medium">
+                  Most popular
+                </div>
+              )}
+              
+              <button 
+                onClick={() => togglePlan(plan.name)}
+                className="w-full p-4 flex items-center justify-between text-left"
+              >
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                  <div className="mt-1">
+                    <span className="text-2xl font-bold text-gray-900">
+                      {isAnnual ? plan.annualPrice : plan.monthlyPrice}
+                    </span>
+                    <span className="text-sm text-gray-500 ml-1">{plan.period}</span>
+                  </div>
+                </div>
+                <div className="text-gray-400">
+                  {expandedPlan === plan.name ? '−' : '+'}
+                </div>
+              </button>
+
+              {expandedPlan === plan.name && (
+                <div className="px-4 pb-4 border-t border-gray-100">
+                  <Button 
+                    variant={plan.buttonVariant}
+                    className={`w-full mb-4 mt-4 ${
+                      plan.isPopular 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-gray-900 hover:bg-gray-800 text-white'
+                    }`}
+                    onClick={() => plan.buttonText === 'Request a Demo' 
+                      ? window.open('mailto:contact@veefore.com?subject=Business Plan Demo Request', '_blank')
+                      : window.location.href = '/signup'
+                    }
+                  >
+                    {plan.buttonText}
+                  </Button>
+
+                  {/* Social Media Icons */}
+                  <div className="flex items-center justify-center space-x-2 mb-4">
+                    <Instagram className="w-4 h-4 text-gray-400" />
+                    <Facebook className="w-4 h-4 text-gray-400" />
+                    <Twitter className="w-4 h-4 text-gray-400" />
+                    <Youtube className="w-4 h-4 text-gray-400" />
+                    <Linkedin className="w-4 h-4 text-gray-400" />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 mb-3">Features included:</p>
+                    <ul className="space-y-2">
+                      {plan.detailedFeatures.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start text-sm text-gray-700">
+                          <span className="text-gray-400 mr-2">–</span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
         {/* Additional Information */}
         <div className="mt-12 text-center">
           <p className="text-sm text-gray-500">
-            * Pricing shown in Indian Rupees. All plans include a 30-day free trial.
+            * Prices displayed in INR, based on annual billing, but do not include applicable taxes.
           </p>
         </div>
       </div>

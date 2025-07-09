@@ -42,6 +42,15 @@ export function useAuth() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setFirebaseUser(firebaseUser);
       
+      if (!firebaseUser) {
+        // User is not authenticated - set loading to false immediately
+        console.log('[AUTH] No user authenticated, setting loading to false');
+        setUser(null);
+        setToken(null);
+        setLoading(false);
+        return;
+      }
+      
       if (firebaseUser) {
         try {
           // Clear any demo mode when real user is authenticated
@@ -62,7 +71,10 @@ export function useAuth() {
             setToken(null);
           }
           
-          // Check if user exists in our database
+          // Set loading to false immediately after token validation
+          setLoading(false);
+          
+          // Check if user exists in our database (async, won't block UI)
           try {
             console.log('[AUTH] Checking user in database with token:', idToken.substring(0, 20) + '...');
             const response = await fetch('/api/user', {
@@ -149,7 +161,8 @@ export function useAuth() {
         }
       }
       
-      setLoading(false);
+      // Loading is already set to false above for authenticated users
+      // and at the beginning for non-authenticated users
     });
 
     return unsubscribe;

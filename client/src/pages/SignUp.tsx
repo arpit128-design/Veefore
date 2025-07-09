@@ -5,7 +5,7 @@ import { useLocation, Link } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, User, Mail, Check, X } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Check, X, ArrowLeft, Rocket } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -303,8 +303,34 @@ export default function SignUp() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="min-h-screen bg-gray-50 flex"
+      className="min-h-screen bg-gray-50 flex flex-col"
     >
+      {/* Navigation Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                onClick={() => setLocation('/')}
+                className="text-gray-600 hover:text-gray-900 flex items-center"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Rocket className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">VeeFore</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-green-400 to-blue-500 text-white p-12 flex-col justify-center">
         <div className="max-w-md">
@@ -487,6 +513,7 @@ export default function SignUp() {
         onClose={() => setShowAccessRestrictedModal(false)}
         message={accessRestrictedMessage}
       />
+      </div>
     </motion.div>
   );
 }

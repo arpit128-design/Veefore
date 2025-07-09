@@ -31,6 +31,7 @@ import { SpaceBackground } from '@/components/ui/space-background';
 import { WaitlistModal } from '@/components/WaitlistModal';
 import { WaitlistStatusNotification } from '@/components/WaitlistStatusNotification';
 import { WaitlistStatusCard } from '@/components/WaitlistStatusCard';
+import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
 
 // Form schemas
 const signInSchema = z.object({
@@ -161,6 +162,8 @@ export default function Auth() {
     userEmail: string | null;
   }>({ isOnWaitlist: false, hasEarlyAccess: false, referralCode: null, userEmail: null });
   const [showWaitlistNotification, setShowWaitlistNotification] = useState(false);
+  const [showAccessRestrictedModal, setShowAccessRestrictedModal] = useState(false);
+  const [accessRestrictedMessage, setAccessRestrictedMessage] = useState('');
   const { toast } = useToast();
 
   const signInForm = useForm<SignInForm>({
@@ -435,35 +438,14 @@ export default function Auth() {
             await auth.signOut();
             
             if (errorData.requiresWaitlist) {
-              toast({
-                title: "Early Access Required",
-                description: `Please sign in with your approved email: ${userWaitlistStatus.userEmail || 'your waitlist email'}`,
-                variant: "destructive"
-              });
-              
-              // Show specific email if we know it from device status
-              if (userWaitlistStatus.userEmail) {
-                toast({
-                  title: "Use Your Approved Email",
-                  description: `You must sign in with: ${userWaitlistStatus.userEmail}`,
-                  variant: "destructive"
-                });
-              }
-              
-              setWaitlistError(`You need to sign in with your approved email address. Please use: ${userWaitlistStatus.userEmail || 'your waitlist email'}`);
-              setShowWaitlistModal(true);
+              setAccessRestrictedMessage("You need to sign in with your approved email address to access VeeFore.");
+              setShowAccessRestrictedModal(true);
               return;
             }
             
             if (errorData.requiresApproval) {
-              toast({
-                title: "Early Access Not Granted",
-                description: `You're on the waitlist but early access hasn't been granted yet. Please use: ${userWaitlistStatus.userEmail || 'your approved email'}`,
-                variant: "destructive"
-              });
-              
-              setWaitlistError(`You're on the waitlist but early access hasn't been granted yet. Please sign in with: ${userWaitlistStatus.userEmail || 'your approved email'}`);
-              setShowWaitlistModal(true);
+              setAccessRestrictedMessage("You're on the waitlist but early access hasn't been granted yet. Please sign in with your approved email address.");
+              setShowAccessRestrictedModal(true);
               return;
             }
             
@@ -482,19 +464,8 @@ export default function Auth() {
           // Sign out the user
           await auth.signOut();
           
-          toast({
-            title: "Access Restricted",
-            description: userWaitlistStatus.userEmail 
-              ? `Please sign in with your approved email: ${userWaitlistStatus.userEmail}`
-              : "Please sign in with your approved email address.",
-            variant: "destructive"
-          });
-          
-          setWaitlistError(userWaitlistStatus.userEmail 
-            ? `Please sign in with your approved email: ${userWaitlistStatus.userEmail}`
-            : "Please sign in with your approved email address."
-          );
-          setShowWaitlistModal(true);
+          setAccessRestrictedMessage("Access restricted. Please sign in with your approved email address.");
+          setShowAccessRestrictedModal(true);
           return;
         }
       }
@@ -991,6 +962,14 @@ export default function Auth() {
         userEmail={userWaitlistStatus.userEmail || undefined}
         show={showWaitlistNotification}
         onClose={() => setShowWaitlistNotification(false)}
+      />
+
+      {/* Access Restricted Modal */}
+      <AccessRestrictedModal
+        isOpen={showAccessRestrictedModal}
+        onClose={() => setShowAccessRestrictedModal(false)}
+        approvedEmail={userWaitlistStatus.userEmail || 'arpitchoudhary128@gmail.com'}
+        message={accessRestrictedMessage}
       />
     </div>
   );

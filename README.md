@@ -244,7 +244,6 @@ VITE_API_URL=http://localhost:5000
 - **SDK**: Meta Graph API v18.0
 - **Implementation**: `server/instagram-*.ts` files
 - **OAuth Flow**: `server/instagram-oauth.ts`
-- **Scopes**: `instagram_basic`, `instagram_content_publish`, `instagram_manage_messages`
 - **Features**: Post creation, story publishing, DM automation, analytics
 - **Webhook**: Real-time message processing at `/webhook/instagram`
 

@@ -11235,6 +11235,209 @@ Format the response as JSON with this structure:
   // Subscription Routes
   app.use('/api/subscription', subscriptionRoutes);
 
+  // ===== EARLY ACCESS SYSTEM API ROUTES =====
+  
+  // Add middleware to ensure API routes are handled before Vite
+  app.use('/api/early-access/*', (req, res, next) => {
+    // This middleware ensures early access routes are handled first
+    next();
+  });
+  
+  // Join Waitlist
+  app.post('/api/early-access/join', async (req: any, res: Response) => {
+    try {
+      const { name, email, referredBy } = req.body;
+      
+      console.log('[EARLY ACCESS] Waitlist join request:', { name, email, referredBy });
+      
+      // Validate required fields
+      if (!name || !email) {
+        return res.status(400).json({ error: 'Name and email are required' });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getWaitlistUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email already on waitlist' });
+      }
+      
+      // Create waitlist user
+      const waitlistUser = await storage.createWaitlistUser({
+        name,
+        email,
+        referredBy,
+        status: 'waitlisted',
+        credits: 0,
+        referralCount: 0,
+        dailyLogins: 0,
+        feedbackSubmitted: false
+      });
+      
+      console.log('[EARLY ACCESS] Created waitlist user:', waitlistUser);
+      
+      // Send welcome email
+      try {
+        await emailService.sendWelcomeToWaitlist(
+          email,
+          name,
+          waitlistUser.referralCode
+        );
+        console.log('[EARLY ACCESS] Welcome email sent to:', email);
+      } catch (emailError) {
+        console.error('[EARLY ACCESS] Email send failed:', emailError);
+        // Don't fail the request if email fails
+      }
+      
+      res.json({
+        success: true,
+        message: 'Successfully joined waitlist',
+        user: waitlistUser
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Join waitlist error:', error);
+      res.status(500).json({ error: error.message || 'Failed to join waitlist' });
+    }
+  });
+
+  // Check Waitlist Status
+  app.get('/api/early-access/status/:email', async (req: any, res: Response) => {
+    try {
+      const { email } = req.params;
+      
+      const waitlistUser = await storage.getWaitlistUserByEmail(email);
+      if (!waitlistUser) {
+        return res.status(404).json({ error: 'User not found on waitlist' });
+      }
+      
+      res.json({
+        success: true,
+        user: waitlistUser
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Status check error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check status' });
+    }
+  });
+
+  // Get Waitlist Stats (Public)
+  app.get('/api/early-access/stats', async (req: any, res: Response) => {
+    try {
+      const stats = await storage.getWaitlistStats();
+      
+      res.json({
+        success: true,
+        stats
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Stats error:', error);
+      res.status(500).json({ error: error.message || 'Failed to get stats' });
+    }
+  });
+
+  // Promote User to Early Access (Admin only)
+  app.post('/api/early-access/promote/:id', async (req: any, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // Note: In production, add admin authentication here
+      // For now, allow direct promotion for testing
+      
+      const result = await storage.promoteWaitlistUser(id);
+      
+      console.log('[EARLY ACCESS] User promoted:', result);
+      
+      // Send early access email
+      try {
+        await emailService.sendEarlyAccessInvite(
+          result.user.email,
+          result.user.displayName,
+          result.discountCode,
+          result.trialDays
+        );
+        console.log('[EARLY ACCESS] Invitation email sent to:', result.user.email);
+      } catch (emailError) {
+        console.error('[EARLY ACCESS] Email send failed:', emailError);
+      }
+      
+      res.json({
+        success: true,
+        message: 'User promoted to early access',
+        result
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Promotion error:', error);
+      res.status(500).json({ error: error.message || 'Failed to promote user' });
+    }
+  });
+
+  // Get All Waitlist Users (Admin only)
+  app.get('/api/early-access/users', async (req: any, res: Response) => {
+    try {
+      // Note: In production, add admin authentication here
+      
+      const users = await storage.getAllWaitlistUsers();
+      
+      res.json({
+        success: true,
+        users
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Get users error:', error);
+      res.status(500).json({ error: error.message || 'Failed to get users' });
+    }
+  });
+
+  // Update Waitlist User
+  app.put('/api/early-access/user/:id', async (req: any, res: Response) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const updatedUser = await storage.updateWaitlistUser(id, updates);
+      
+      res.json({
+        success: true,
+        message: 'User updated successfully',
+        user: updatedUser
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Update user error:', error);
+      res.status(500).json({ error: error.message || 'Failed to update user' });
+    }
+  });
+
+  // Get User by Referral Code
+  app.get('/api/early-access/referral/:code', async (req: any, res: Response) => {
+    try {
+      const { code } = req.params;
+      
+      const user = await storage.getWaitlistUserByReferralCode(code);
+      if (!user) {
+        return res.status(404).json({ error: 'Invalid referral code' });
+      }
+      
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          name: user.name,
+          referralCode: user.referralCode,
+          referralCount: user.referralCount
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Referral check error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check referral' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

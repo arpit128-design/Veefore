@@ -63,6 +63,7 @@ import ContentTheftDetection from "@/pages/ContentTheftDetection";
 import PersonaSuggestions from "@/pages/PersonaSuggestions";
 import Gamification from "@/pages/Gamification";
 import EmotionAnalysis from "@/pages/EmotionAnalysis";
+import EarlyAccessPage from "@/pages/EarlyAccessPage";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -236,6 +237,7 @@ function Router() {
           <Route path="/solution/enterprises" component={SolutionEnterprises} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
+          <Route path="/early-access" component={EarlyAccessPage} />
           <Route path="/" component={Landing} />
           <Route component={() => <Redirect to="/" />} />
         </Switch>

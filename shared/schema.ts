@@ -19,6 +19,15 @@ export const users = pgTable("users", {
   totalReferrals: integer("total_referrals").default(0),
   totalEarned: integer("total_earned").default(0),
   isOnboarded: boolean("is_onboarded").default(false),
+  // Early access system fields
+  status: text("status").default("waitlisted"), // waitlisted, early_access, launched
+  trialExpiresAt: timestamp("trial_expires_at"),
+  discountCode: text("discount_code"),
+  discountExpiresAt: timestamp("discount_expires_at"),
+  hasUsedWaitlistBonus: boolean("has_used_waitlist_bonus").default(false),
+  dailyLoginStreak: integer("daily_login_streak").default(0),
+  lastLoginAt: timestamp("last_login_at"),
+  feedbackSubmittedAt: timestamp("feedback_submitted_at"),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationCode: text("email_verification_code"),
   emailVerificationExpiry: timestamp("email_verification_expiry"),
@@ -963,6 +972,24 @@ export const thumbnailStyles = pgTable("thumbnail_styles", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+// Waitlist System for Early Access
+export const waitlistUsers = pgTable("waitlist_users", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  referralCode: text("referral_code").notNull().unique(),
+  referredBy: text("referred_by"), // referral code of referrer
+  referralCount: integer("referral_count").default(0),
+  credits: integer("credits").default(0),
+  status: text("status").default("waitlisted"), // waitlisted, early_access, launched
+  discountCode: text("discount_code"), // 50% off first month
+  discountExpiresAt: timestamp("discount_expires_at"),
+  dailyLogins: integer("daily_logins").default(0),
+  feedbackSubmitted: boolean("feedback_submitted").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   firebaseUid: true,
@@ -1486,3 +1513,13 @@ export type InsertPopup = z.infer<typeof insertPopupSchema>;
 export type InsertAppSetting = z.infer<typeof insertAppSettingSchema>;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 export type InsertFeedbackMessage = z.infer<typeof insertFeedbackMessageSchema>;
+
+// Waitlist Insert Schema
+export const insertWaitlistUserSchema = createInsertSchema(waitlistUsers).pick({
+  name: true,
+  email: true,
+  referredBy: true
+});
+
+export type WaitlistUser = typeof waitlistUsers.$inferSelect;
+export type InsertWaitlistUser = z.infer<typeof insertWaitlistUserSchema>;

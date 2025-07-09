@@ -12,7 +12,8 @@ import {
   InsertCreditTransaction, InsertReferral, InsertSubscription, InsertPayment, InsertAddon,
   InsertWorkspaceMember, InsertTeamInvitation, InsertContentRecommendation, InsertUserContentHistory,
   InsertAdmin, InsertAdminSession, InsertNotification, InsertPopup, InsertAppSetting, InsertAuditLog, InsertFeedbackMessage,
-  InsertCreativeBrief, InsertContentRepurpose, InsertCompetitorAnalysis
+  InsertCreativeBrief, InsertContentRepurpose, InsertCompetitorAnalysis,
+  WaitlistUser, InsertWaitlistUser
 } from "@shared/schema";
 
 // MongoDB Schemas
@@ -35,6 +36,32 @@ const UserSchema = new mongoose.Schema({
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationCode: String,
   emailVerificationExpiry: Date,
+  // Early access fields
+  status: { type: String, default: 'waitlisted' }, // waitlisted, early_access, launched
+  trialExpiresAt: Date,
+  discountCode: String,
+  discountExpiresAt: Date,
+  hasUsedWaitlistBonus: { type: Boolean, default: false },
+  dailyLoginStreak: { type: Number, default: 0 },
+  lastLoginAt: Date,
+  feedbackSubmittedAt: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Waitlist Users Schema
+const WaitlistUserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  referralCode: { type: String, required: true, unique: true },
+  referredBy: String, // referral code of referrer
+  referralCount: { type: Number, default: 0 },
+  credits: { type: Number, default: 0 },
+  status: { type: String, default: 'waitlisted' }, // waitlisted, early_access, launched
+  discountCode: String, // 50% off first month
+  discountExpiresAt: Date,
+  dailyLogins: { type: Number, default: 0 },
+  feedbackSubmitted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -465,6 +492,7 @@ const CompetitorAnalysisSchema = new mongoose.Schema({
 
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
+const WaitlistUserModel = mongoose.model('WaitlistUser', WaitlistUserSchema);
 const WorkspaceModel = mongoose.model('Workspace', WorkspaceSchema);
 const ContentRecommendationModel = mongoose.model('ContentRecommendation', ContentRecommendationSchema);
 const UserContentHistoryModel = mongoose.model('UserContentHistory', UserContentHistorySchema);
@@ -4214,5 +4242,227 @@ export class MongoStorage implements IStorage {
     } catch (error) {
       console.error('Error tracking feature usage:', error);
     }
+  }
+
+  // Waitlist Management Methods
+  async createWaitlistUser(insertWaitlistUser: InsertWaitlistUser): Promise<WaitlistUser> {
+    await this.connect();
+    
+    // Generate unique referral code
+    const referralCode = this.generateReferralCode();
+    
+    // Check if referred by someone
+    let referredByUserId = null;
+    if (insertWaitlistUser.referredBy) {
+      const referrer = await WaitlistUserModel.findOne({ 
+        referralCode: insertWaitlistUser.referredBy 
+      });
+      if (referrer) {
+        referredByUserId = referrer._id;
+        // Increment referrer's count
+        await WaitlistUserModel.findByIdAndUpdate(
+          referrer._id,
+          { $inc: { referralCount: 1 } }
+        );
+      }
+    }
+    
+    const waitlistUser = new WaitlistUserModel({
+      ...insertWaitlistUser,
+      referralCode,
+      referredBy: referredByUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    const savedUser = await waitlistUser.save();
+    return this.convertWaitlistUser(savedUser);
+  }
+
+  async getWaitlistUser(id: number | string): Promise<WaitlistUser | undefined> {
+    await this.connect();
+    
+    let query;
+    if (typeof id === 'string' && id.length === 24) {
+      query = { _id: id };
+    } else {
+      query = { $or: [{ id: id }, { _id: id.toString() }] };
+    }
+    
+    const user = await WaitlistUserModel.findOne(query);
+    return user ? this.convertWaitlistUser(user) : undefined;
+  }
+
+  async getWaitlistUserByEmail(email: string): Promise<WaitlistUser | undefined> {
+    await this.connect();
+    const user = await WaitlistUserModel.findOne({ email });
+    return user ? this.convertWaitlistUser(user) : undefined;
+  }
+
+  async getWaitlistUserByReferralCode(referralCode: string): Promise<WaitlistUser | undefined> {
+    await this.connect();
+    const user = await WaitlistUserModel.findOne({ referralCode });
+    return user ? this.convertWaitlistUser(user) : undefined;
+  }
+
+  async updateWaitlistUser(id: number | string, updates: Partial<WaitlistUser>): Promise<WaitlistUser> {
+    await this.connect();
+    
+    let user;
+    if (typeof id === 'string' && id.length === 24) {
+      user = await WaitlistUserModel.findByIdAndUpdate(
+        id,
+        { ...updates, updatedAt: new Date() },
+        { new: true }
+      );
+    } else {
+      user = await WaitlistUserModel.findOneAndUpdate(
+        { _id: id },
+        { ...updates, updatedAt: new Date() },
+        { new: true }
+      );
+    }
+    
+    if (!user) throw new Error('Waitlist user not found');
+    return this.convertWaitlistUser(user);
+  }
+
+  async getAllWaitlistUsers(): Promise<WaitlistUser[]> {
+    await this.connect();
+    const users = await WaitlistUserModel.find({}).sort({ createdAt: -1 });
+    return users.map(user => this.convertWaitlistUser(user));
+  }
+
+  async getWaitlistStats(): Promise<{ 
+    totalUsers: number; 
+    todaySignups: number; 
+    totalReferrals: number; 
+    averageReferrals: number;
+    statusBreakdown: { [key: string]: number };
+  }> {
+    await this.connect();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const [total, todayCount, pipeline] = await Promise.all([
+      WaitlistUserModel.countDocuments(),
+      WaitlistUserModel.countDocuments({ createdAt: { $gte: today } }),
+      WaitlistUserModel.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalReferrals: { $sum: '$referralCount' },
+            avgReferrals: { $avg: '$referralCount' }
+          }
+        }
+      ])
+    ]);
+    
+    const statusBreakdown = await WaitlistUserModel.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const statusMap = statusBreakdown.reduce((acc, item) => {
+      acc[item._id] = item.count;
+      return acc;
+    }, {} as { [key: string]: number });
+    
+    return {
+      totalUsers: total,
+      todaySignups: todayCount,
+      totalReferrals: pipeline[0]?.totalReferrals || 0,
+      averageReferrals: pipeline[0]?.avgReferrals || 0,
+      statusBreakdown: statusMap
+    };
+  }
+
+  async promoteWaitlistUser(id: number | string): Promise<{ 
+    user: User; 
+    workspace: Workspace; 
+    discountCode: string;
+    trialDays: number;
+  }> {
+    await this.connect();
+    
+    const waitlistUser = await this.getWaitlistUser(id);
+    if (!waitlistUser) {
+      throw new Error('Waitlist user not found');
+    }
+    
+    // Generate discount code (50% off first month)
+    const discountCode = `EARLY50_${Date.now().toString(36).toUpperCase()}`;
+    const discountExpiry = new Date();
+    discountExpiry.setDate(discountExpiry.getDate() + 30); // 30 days to use discount
+    
+    // Calculate trial period (14 days + 1 day per referral, max 30 days)
+    const trialDays = Math.min(14 + waitlistUser.referralCount, 30);
+    const trialExpiry = new Date();
+    trialExpiry.setDate(trialExpiry.getDate() + trialDays);
+    
+    // Create regular user account
+    const user = await this.createUser({
+      email: waitlistUser.email,
+      username: waitlistUser.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now(),
+      displayName: waitlistUser.name,
+      credits: 100 + (waitlistUser.referralCount * 20), // 100 base + 20 per referral
+      plan: 'Free',
+      referredBy: waitlistUser.referredBy,
+      isEmailVerified: true,
+      status: 'early_access',
+      trialExpiresAt: trialExpiry,
+      discountCode,
+      discountExpiresAt: discountExpiry,
+      hasUsedWaitlistBonus: false
+    });
+    
+    // Get or create default workspace
+    let workspace = await this.getDefaultWorkspace(user.id);
+    if (!workspace) {
+      workspace = await this.createWorkspace({
+        name: `${waitlistUser.name}'s Workspace`,
+        description: 'Early access workspace',
+        userId: user.id,
+        theme: 'space',
+        isDefault: true,
+        credits: 50 // Additional workspace credits
+      });
+    }
+    
+    // Update waitlist user status
+    await this.updateWaitlistUser(id, {
+      status: 'early_access'
+    });
+    
+    return {
+      user,
+      workspace,
+      discountCode,
+      trialDays
+    };
+  }
+
+  private convertWaitlistUser(mongoUser: any): WaitlistUser {
+    return {
+      id: mongoUser._id.toString(),
+      name: mongoUser.name,
+      email: mongoUser.email,
+      referralCode: mongoUser.referralCode,
+      referredBy: mongoUser.referredBy,
+      referralCount: mongoUser.referralCount || 0,
+      credits: mongoUser.credits || 0,
+      status: mongoUser.status || 'waitlisted',
+      discountCode: mongoUser.discountCode,
+      discountExpiresAt: mongoUser.discountExpiresAt,
+      dailyLogins: mongoUser.dailyLogins || 0,
+      feedbackSubmitted: mongoUser.feedbackSubmitted || false,
+      createdAt: mongoUser.createdAt,
+      updatedAt: mongoUser.updatedAt
+    };
   }
 }

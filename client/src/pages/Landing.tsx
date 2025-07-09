@@ -239,13 +239,22 @@ function Navigation({
             </Link>
             {!deviceStatus.isLoading && (
               <>
-                <Button 
-                  variant="ghost" 
-                  className="text-gray-300 hover:text-white"
-                  onClick={handleGetStarted}
-                >
-                  {getSecondaryButtonText()}
-                </Button>
+                {/* Only show secondary button for users NOT on waitlist or have early access */}
+                {(!deviceStatus.isOnWaitlist || deviceStatus.hasEarlyAccess) && (
+                  <Button 
+                    variant="ghost" 
+                    className="text-gray-300 hover:text-white"
+                    onClick={() => {
+                      if (deviceStatus.hasEarlyAccess) {
+                        window.location.href = '/auth';
+                      } else {
+                        onOpenWaitlist();
+                      }
+                    }}
+                  >
+                    {getSecondaryButtonText()}
+                  </Button>
+                )}
                 <Button 
                   className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                   onClick={handleGetStarted}

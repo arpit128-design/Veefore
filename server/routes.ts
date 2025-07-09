@@ -11678,6 +11678,29 @@ Format the response as JSON with this structure:
     }
   });
 
+  // Get Early Access Configuration
+  app.get('/api/early-access/config', async (req: any, res: Response) => {
+    try {
+      const stats = await storage.getWaitlistStats();
+      
+      res.json({
+        isEarlyAccessMode: true, // Always true for now - can be made configurable
+        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!',
+        totalWaitlist: stats.totalUsers,
+        earlyAccessCount: stats.earlyAccessCount
+      });
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Get config error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get early access config',
+        isEarlyAccessMode: true, // Default to early access mode on error
+        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!',
+        totalWaitlist: 0,
+        earlyAccessCount: 0
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

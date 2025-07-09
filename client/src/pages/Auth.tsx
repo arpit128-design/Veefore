@@ -19,13 +19,16 @@ import {
   Star,
   ChevronLeft,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Users,
+  Clock
 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithCustomToken, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
+import { WaitlistModal } from '@/components/WaitlistModal';
 
 // Form schemas
 const signInSchema = z.object({
@@ -147,6 +150,8 @@ export default function Auth() {
   const [signupData, setSignupData] = useState<SignUpForm | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
   const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistError, setWaitlistError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const signInForm = useForm<SignInForm>({
@@ -185,6 +190,19 @@ export default function Auth() {
         const result = await response.json();
 
         if (!response.ok) {
+          // Check for early access-related errors
+          if (result.requiresWaitlist) {
+            setWaitlistError('You need to join our waitlist first to create an account.');
+            setShowWaitlistModal(true);
+            return;
+          }
+          
+          if (result.requiresApproval) {
+            setWaitlistError(`You're on the waitlist but early access hasn't been granted yet. Status: ${result.waitlistStatus}`);
+            setShowWaitlistModal(true);
+            return;
+          }
+          
           throw new Error(result.message || 'Failed to send verification email');
         }
 
@@ -699,6 +717,29 @@ export default function Auth() {
           <p>Join thousands of creators transforming their social media</p>
         </motion.div>
       </div>
+
+      {/* Waitlist Modal */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => {
+          setShowWaitlistModal(false);
+          setWaitlistError(null);
+        }} 
+      />
+
+      {/* Waitlist Error Message */}
+      {waitlistError && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-4 left-4 right-4 bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center text-red-400 text-sm backdrop-blur-sm"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <AlertCircle className="w-4 h-4" />
+            <span>{waitlistError}</span>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -59,23 +59,25 @@
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and optimized builds
+### Frontend (client/)
+- **React 18** with TypeScript and Vite
 - **Tailwind CSS** with shadcn/ui components
 - **Framer Motion** for smooth animations
 - **Wouter** for client-side routing
 - **TanStack Query** for state management and caching
 - **React Hook Form** with Zod validation
+- **Vitest** for unit testing
+- **ESLint** and **Prettier** for code quality
 
-### Backend
-- **Node.js** with Express.js
-- **TypeScript** for type safety
+### Backend (server/)
+- **Node.js** with Express.js and TypeScript
 - **MongoDB** with Mongoose ODM
 - **JWT Authentication** with Firebase Admin SDK
 - **Multer** for file uploads
 - **Sharp** for image processing
 - **FFmpeg** for video processing
+- **Helmet** for security headers
+- **Rate limiting** and **CORS** protection
 
 ### AI Services
 - **OpenAI GPT-4o** - Text generation and analysis
@@ -97,14 +99,18 @@
 - **Nodemailer** - Email service integration
 
 ### Development Tools
+- **Vite** - Fast development and optimized builds
 - **ESBuild** - Fast bundling for production
 - **Drizzle ORM** - Type-safe database operations
 - **Zod** - Runtime type validation
 - **Prettier** & **ESLint** - Code formatting and linting
+- **Vitest** - Testing framework
+- **Husky** - Git hooks for code quality
 
 ## 📁 Folder Structure
 
 ```
+veefore/
 ├── client/                    # Frontend React application
 │   ├── src/
 │   │   ├── components/        # Reusable UI components
@@ -113,40 +119,73 @@
 │   │   ├── lib/              # Client-side utilities
 │   │   └── utils/            # Helper functions
 │   ├── public/               # Static assets
+│   ├── dist/                 # Build output
+│   ├── package.json          # Client dependencies
+│   ├── vite.config.ts        # Vite configuration
+│   ├── tsconfig.json         # TypeScript config
+│   ├── eslint.config.js      # ESLint configuration
+│   ├── .prettierrc           # Prettier config
 │   └── index.html            # HTML template
 ├── server/                   # Backend Node.js application
-│   ├── routes/               # API route handlers
-│   ├── middleware/           # Express middleware
-│   ├── public/               # Static file serving
-│   ├── *-service.ts          # Business logic services
-│   ├── *-ai.ts              # AI integration modules
-│   ├── firebase-admin.ts     # Firebase Admin SDK setup
-│   ├── mongodb-storage.ts    # MongoDB data layer
-│   ├── pricing-config.ts     # Subscription configuration
-│   └── index.ts             # Server entry point
+│   ├── src/
+│   │   ├── routes/           # API route handlers
+│   │   ├── middleware/       # Express middleware
+│   │   ├── services/         # Business logic services
+│   │   └── index.ts          # Server entry point
+│   ├── dist/                 # Compiled JavaScript
+│   ├── package.json          # Server dependencies
+│   ├── tsconfig.json         # TypeScript config
+│   ├── eslint.config.js      # ESLint configuration
+│   └── .prettierrc           # Prettier config
 ├── shared/                   # Shared TypeScript types
 │   └── schema.ts            # Database schema definitions
 ├── uploads/                  # File upload storage
+├── package.json             # Root workspace configuration
+├── vercel.json              # Vercel deployment config
+├── Dockerfile               # Docker containerization
+├── railway.toml             # Railway deployment config
+├── render.yaml              # Render deployment config
 ├── drizzle.config.ts        # Database configuration
-├── package.json             # Dependencies and scripts
 ├── tailwind.config.ts       # Tailwind CSS configuration
-├── tsconfig.json            # TypeScript configuration
-└── vite.config.ts           # Vite build configuration
+├── .env.example             # Environment variables template
+├── README.md                # Project documentation
+├── CURSOR_MIGRATION_GUIDE.md # Migration instructions
+└── VERCEL_DEPLOYMENT_GUIDE.md # Deployment guide
 ```
 
 ## 🔑 Environment Variables
 
-### Backend Environment Variables (server/.env)
+### Client Environment Variables (client/.env)
 ```bash
+# API Configuration
+VITE_API_URL=http://localhost:5000
+
+# Firebase (Client-side)
+VITE_FIREBASE_API_KEY=your-firebase-api-key
+VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+VITE_FIREBASE_APP_ID=your-firebase-app-id
+
+# Payment Gateways (Client-side)
+VITE_RAZORPAY_KEY_ID=rzp_test_your_key_id
+VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
+```
+
+### Server Environment Variables (server/.env)
+```bash
+# Server Configuration
+NODE_ENV=development
+PORT=5000
+BASE_URL=http://localhost:5000
+CORS_ORIGIN=http://localhost:3000
+
 # MongoDB Database
 DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/database
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 
 # Firebase Authentication
 FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"..."}
-VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
-VITE_FIREBASE_API_KEY=your-firebase-api-key
-VITE_FIREBASE_APP_ID=your-firebase-app-id
+JWT_SECRET=your-jwt-secret-here
+SESSION_SECRET=your-session-secret-here
 
 # AI Services
 OPENAI_API_KEY=sk-your-openai-api-key
@@ -324,134 +363,291 @@ User receives credits/subscription
 - **Workspace Limits**: Automatic enforcement during creation
 - **Team Limits**: Member invitation restrictions
 
-## 🚀 Running the App Locally
+## 🚀 Development Setup
 
 ### Prerequisites
 - Node.js 18+ and npm
 - MongoDB database (local or Atlas)
 - Firebase project with Authentication enabled
-- Required API keys (OpenAI, Razorpay, etc.)
+- Cursor IDE (recommended) or VS Code
 
-### Step-by-Step Setup
+### Cursor IDE Setup (Recommended)
 
-1. **Clone the repository**
+1. **Install Cursor IDE**
+   ```bash
+   # Download from https://cursor.sh/
+   # Or install via package managers
+   ```
+
+2. **Clone & Open Project**
+   ```bash
+   git clone https://github.com/your-username/veefore-app.git
+   cd veefore-app
+   cursor . # Open in Cursor IDE
+   ```
+
+3. **Install Dependencies**
+   ```bash
+   # Install all dependencies (client, server, and root)
+   npm run install:all
+   
+   # Or install individually
+   npm install            # Root dependencies
+   cd client && npm install
+   cd ../server && npm install
+   ```
+
+4. **Environment Configuration**
+   ```bash
+   # Copy environment files
+   cp client/.env.example client/.env
+   cp server/.env.example server/.env
+   
+   # Configure your API keys and database URLs
+   ```
+
+5. **Development Commands**
+   ```bash
+   # Run both client and server concurrently
+   npm run dev
+   
+   # Run individually
+   npm run dev:client    # Client only (port 3000)
+   npm run dev:server    # Server only (port 5000)
+   ```
+
+### Cursor IDE Extensions (Auto-configured)
+
+The project includes workspace configuration for optimal development:
+
+- **TypeScript**: Full type checking and IntelliSense
+- **Tailwind CSS**: Class name completion and linting
+- **Prettier**: Code formatting on save
+- **ESLint**: Real-time error detection
+- **AI Assistant**: Cursor's AI for code suggestions
+- **Git Integration**: Built-in version control
+
+### Local Development
+
+1. **Database Setup**
+   ```bash
+   # MongoDB Atlas (recommended)
+   # Create cluster at https://cloud.mongodb.com/
+   
+   # Or local MongoDB
+   mongod --dbpath ./data/db
+   ```
+
+2. **Firebase Setup**
+   ```bash
+   # Create Firebase project
+   # Enable Authentication
+   # Download service account key
+   # Configure environment variables
+   ```
+
+3. **Start Development**
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at:
+   - **Frontend**: http://localhost:3000
+   - **Backend**: http://localhost:5000
+   - **Health Check**: http://localhost:5000/api/health
+
+### Build & Testing
+
 ```bash
-git clone <your-repository-url>
-cd veefore
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Set up environment variables**
-```bash
-# Create .env file in the root directory
-cp .env.example .env
-
-# Edit .env with your actual API keys and configuration
-nano .env
-```
-
-4. **Configure Firebase**
-- Create a Firebase project at https://console.firebase.google.com
-- Enable Authentication with Email/Password
-- Generate a service account key
-- Add the service account JSON to `FIREBASE_SERVICE_ACCOUNT_KEY`
-
-5. **Set up MongoDB**
-- Create a MongoDB Atlas cluster or use local MongoDB
-- Create a database named `veeforedb`
-- Add connection string to `DATABASE_URL`
-
-6. **Configure payment gateways**
-- Sign up for Razorpay (Indian market) or Stripe (international)
-- Add test keys to environment variables
-- Configure webhooks for payment processing
-
-7. **Add AI service keys**
-- OpenAI API key for GPT-4o and DALL-E 3
-- Google API key for Gemini and YouTube
-- Other AI service keys as needed
-
-8. **Start the development server**
-```bash
-npm run dev
-```
-
-9. **Access the application**
-- Frontend: http://localhost:5000
-- Backend API: http://localhost:5000/api
-
-### Build for Production
-```bash
+# Build for production
 npm run build
-npm run start
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Testing
+npm run test
+
+# Format code
+npm run format
 ```
 
-## 🌐 Deployment Recommendations
+## 🌐 Production Deployment
 
-### Vercel Deployment
-1. **Connect repository to Vercel**
-2. **Set environment variables** in Vercel dashboard
-3. **Configure build settings**:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-   - Install Command: `npm install`
+### Vercel Deployment (Recommended)
+
+1. **Project Configuration**
+   ```bash
+   # Build command
+   npm run build:client
+   
+   # Output directory
+   client/dist
+   
+   # Install command
+   npm install && cd client && npm install && cd ../server && npm install
+   ```
+
+2. **Environment Variables**
+   - Add all client (`VITE_*`) and server variables in Vercel dashboard
+   - Use production API keys and URLs
+   - Configure proper CORS origins
+
+3. **Deployment Process**
+   ```bash
+   # Connect repository to Vercel
+   # Configure build settings
+   # Add environment variables
+   # Deploy
+   ```
 
 ### Railway Deployment
-1. **Connect GitHub repository**
-2. **Add environment variables** in Railway dashboard
-3. **Configure start command**: `npm run start`
-4. **Set up domain** and SSL certificates
 
-### Render Deployment
-1. **Create new Web Service**
-2. **Connect repository** and set environment variables
-3. **Configure build and start commands**
-4. **Set up database** and Redis (if needed)
+1. **Configuration**
+   ```toml
+   # railway.toml
+   [build]
+   builder = "NIXPACKS"
+   buildCommand = "npm run build"
+   
+   [deploy]
+   startCommand = "npm start"
+   ```
 
-### Environment Variables for Production
-- Set `NODE_ENV=production`
-- Use production API keys (remove `test_` prefixes)
-- Configure production domain in `DOMAIN` and `BASE_URL`
-- Set up proper CORS origins
-- Configure webhook URLs for payment gateways
+2. **Environment Setup**
+   - Add all required environment variables
+   - Configure PORT and NODE_ENV
+   - Set up database connections
+
+### Docker Deployment
+
+1. **Build Image**
+   ```bash
+   docker build -t veefore-app .
+   ```
+
+2. **Run Container**
+   ```bash
+   docker run -p 5000:5000 --env-file .env veefore-app
+   ```
+
+3. **Docker Compose**
+   ```yaml
+   version: '3.8'
+   services:
+     app:
+       build: .
+       ports:
+         - "5000:5000"
+       environment:
+         - NODE_ENV=production
+   ```
 
 ### Performance Optimizations
-- Enable Redis for caching (optional)
-- Set up CDN for static assets
-- Configure rate limiting for API endpoints
-- Set up monitoring and logging
-- Configure auto-scaling for high traffic
+
+- **Bundle Analysis**: Use webpack-bundle-analyzer
+- **Code Splitting**: Implement dynamic imports
+- **Caching**: Redis for session storage
+- **CDN**: CloudFront or Cloudflare for static assets
+- **Monitoring**: Sentry for error tracking
 
 ## 📧 Email Configuration
 
 ### SendGrid Setup
-- Create SendGrid account and verify domain
-- Generate API key with mail send permissions
-- Configure sender authentication
-- Set up email templates for verification
+```bash
+# Create SendGrid account
+# Generate API key with mail send permissions
+# Configure sender authentication
+# Set up email templates
+```
 
 ### Nodemailer Backup
-- Configure Gmail App Password or SMTP server
-- Set up email templates and styling
-- Configure rate limiting for email sending
+```bash
+# Configure Gmail App Password or SMTP server
+# Set up email templates and styling
+# Configure rate limiting for email sending
+```
 
 ## 🔐 Security Configuration
 
 ### Authentication
-- Firebase Admin SDK for token verification
-- JWT tokens for API authentication
-- Session management with secure cookies
-- Password hashing with bcrypt
+- **Firebase Admin SDK** for token verification
+- **JWT tokens** for API authentication
+- **Session management** with secure cookies
+- **Password hashing** with bcrypt
 
 ### API Security
-- Rate limiting on all endpoints
-- Input validation with Zod schemas
-- CORS configuration for production
-- Helmet.js for security headers
+- **Rate limiting** on all endpoints
+- **Input validation** with Zod schemas
+- **CORS configuration** for production
+- **Helmet.js** for security headers
+
+## 📚 Documentation
+
+### Project Documentation
+- **README.md** - Complete project overview and setup
+- **CURSOR_MIGRATION_GUIDE.md** - Migration from Replit to Cursor IDE
+- **VERCEL_DEPLOYMENT_GUIDE.md** - Detailed Vercel deployment instructions
+- **PRODUCTION_READINESS_REPORT.md** - Production deployment checklist
+
+### API Documentation
+- **Endpoints**: All API routes documented with request/response examples
+- **Authentication**: JWT token usage and Firebase integration
+- **Error Handling**: Standard error responses and codes
+- **Rate Limiting**: API usage limits and quotas
+
+### Development Documentation
+- **Code Style**: ESLint and Prettier configurations
+- **Testing**: Unit test setup with Vitest
+- **Deployment**: Multi-platform deployment configurations
+- **Environment**: Complete environment variable documentation
+
+## 🆘 Troubleshooting
+
+### Common Issues
+1. **Build Failures**: Check Node.js version and dependency conflicts
+2. **Database Connection**: Verify MongoDB connection string and IP whitelist
+3. **API Errors**: Check environment variables and API key validity
+4. **Authentication Issues**: Verify Firebase configuration and service account
+
+### Development Issues
+1. **Type Errors**: Run `npm run type-check` to identify TypeScript issues
+2. **Linting Errors**: Use `npm run lint:fix` to auto-fix code style issues
+3. **Build Performance**: Use `npm run build -- --analyze` for bundle analysis
+4. **Hot Reload Issues**: Restart development server with `npm run dev`
+
+### Production Issues
+1. **Deployment Failures**: Check build logs and environment variables
+2. **Performance Issues**: Monitor server resources and optimize queries
+3. **Security Alerts**: Update dependencies and review security policies
+4. **Scaling Issues**: Configure auto-scaling and load balancing
+
+## 📞 Support
+
+- **GitHub Issues**: Report bugs and feature requests
+- **Documentation**: Comprehensive guides and API reference
+- **Community**: Join our Discord for community support
+- **Enterprise**: Contact sales for enterprise support
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **OpenAI** - GPT-4o and DALL-E 3 integration
+- **Meta** - Instagram Business API
+- **Google** - Firebase and YouTube API
+- **Razorpay** - Payment gateway integration
+- **MongoDB** - Database hosting and management
+- **Vercel** - Deployment and hosting platform
+
+---
+
+**Built with ❤️ by VEEFED TECHNOLOGIES PRIVATE LIMITED**
 
 ### Data Protection
 - Environment variable encryption

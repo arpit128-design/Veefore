@@ -36,13 +36,21 @@ export default function Dashboard() {
     const checkWelcomeModal = async () => {
       if (user && user.email) {
         try {
+          // Check if modal has been dismissed for this user
+          const modalKey = `welcome-modal-dismissed-${user.email}`;
+          const hasModalBeenDismissed = localStorage.getItem(modalKey);
+          
+          if (hasModalBeenDismissed) {
+            return; // Don't show modal if it has been dismissed
+          }
+
           // Check if user has early access and hasn't claimed welcome bonus
           const response = await fetch('/api/early-access/check-device');
           if (response.ok) {
             const data = await response.json();
             if (data.success && data.user?.status === 'early_access') {
-              // Check if user has already claimed welcome bonus
-              if (!user.hasClaimedWelcomeBonus) {
+              // Check if user has already claimed welcome bonus or has starter plan
+              if (!user.hasClaimedWelcomeBonus && user.plan !== 'starter') {
                 setShowWelcomeModal(true);
               }
             }
@@ -133,6 +141,12 @@ export default function Dashboard() {
         description: `You now have full access to the Starter plan for 1 month. Enjoy ${data.bonusCredits} credits!`,
         variant: "default"
       });
+      
+      // Mark modal as dismissed for this user
+      if (user?.email) {
+        const modalKey = `welcome-modal-dismissed-${user.email}`;
+        localStorage.setItem(modalKey, 'true');
+      }
       
       // Refresh user data
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -477,6 +491,7 @@ export default function Dashboard() {
         open={showWelcomeModal}
         onOpenChange={setShowWelcomeModal}
         onClaim={() => claimWelcomeBonus.mutate()}
+        userEmail={user?.email}
       />
     </div>
   );

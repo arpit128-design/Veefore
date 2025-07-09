@@ -9,9 +9,10 @@ interface EarlyAccessWelcomeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onClaim: () => void;
+  userEmail?: string;
 }
 
-export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAccessWelcomeModalProps) {
+export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim, userEmail }: EarlyAccessWelcomeModalProps) {
   const [isClaimingReward, setIsClaimingReward] = useState(false);
 
   const handleClaimReward = async () => {
@@ -23,8 +24,17 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
     }
   };
 
+  const handleModalClose = (isOpen: boolean) => {
+    if (!isOpen && userEmail) {
+      // Mark modal as dismissed when closed
+      const modalKey = `welcome-modal-dismissed-${userEmail}`;
+      localStorage.setItem(modalKey, 'true');
+    }
+    onOpenChange(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleModalClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-0 p-0 overflow-hidden">
         <div className="relative h-full max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
           {/* Animated Background */}

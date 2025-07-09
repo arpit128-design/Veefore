@@ -266,102 +266,369 @@ function PlatformStats() {
   );
 }
 
-// AI Tools Features Section
-function AIToolsSection() {
-  const aiTools = [
-    {
-      icon: <BrainCircuit className="w-8 h-8 text-purple-600" />,
-      title: "AI Content Generator",
-      description: "Generate engaging posts, captions, and hashtags with advanced AI technology.",
-      features: ["Auto-hashtag generation", "Caption writing", "Content ideation", "Multi-platform optimization"]
-    },
-    {
-      icon: <Camera className="w-8 h-8 text-blue-600" />,
-      title: "AI Image Generator",
-      description: "Create stunning visual content with DALL-E 3 integration for your brand.",
-      features: ["DALL-E 3 integration", "Brand consistency", "Custom prompts", "High-quality output"]
-    },
-    {
-      icon: <Video className="w-8 h-8 text-red-600" />,
-      title: "AI Thumbnail Maker Pro",
-      description: "Design scroll-stopping YouTube thumbnails with 7-stage AI process.",
-      features: ["7-stage generation", "CTR optimization", "Professional layouts", "Canvas editor"]
-    },
-    {
-      icon: <TrendingUp className="w-8 h-8 text-green-600" />,
-      title: "Trend Intelligence Engine",
-      description: "Stay ahead of viral trends with real-time social media analysis.",
-      features: ["Real-time analysis", "Viral prediction", "Trend forecasting", "Competitor tracking"]
-    },
-    {
-      icon: <BarChart3 className="w-8 h-8 text-orange-600" />,
-      title: "Analytics & Insights",
-      description: "Deep dive into your social media performance with AI-powered analytics.",
-      features: ["Cross-platform analytics", "Growth tracking", "ROI calculation", "Performance insights"]
-    },
-    {
-      icon: <MessageSquare className="w-8 h-8 text-indigo-600" />,
-      title: "Smart DM Automation",
-      description: "Automate your direct messages with AI-powered responses.",
-      features: ["Auto-responses", "Smart filtering", "Personalization", "24/7 availability"]
-    },
-    {
-      icon: <Calendar className="w-8 h-8 text-cyan-600" />,
-      title: "Content Scheduler",
-      description: "Plan and schedule your content across multiple platforms.",
-      features: ["Multi-platform scheduling", "Optimal timing", "Content calendar", "Bulk scheduling"]
-    },
-    {
-      icon: <Eye className="w-8 h-8 text-pink-600" />,
-      title: "Social Listening",
-      description: "Monitor brand mentions, track competitors, and discover opportunities.",
-      features: ["Brand monitoring", "Competitor analysis", "Sentiment tracking", "Opportunity detection"]
-    },
-    {
-      icon: <Target className="w-8 h-8 text-yellow-600" />,
-      title: "Competitor Analysis",
-      description: "Analyze your competitors' strategies and performance.",
-      features: ["Strategy analysis", "Performance comparison", "Content gaps", "Market positioning"]
-    }
-  ];
-
+// Dashboard Preview Section - Hootsuite Style
+function DashboardPreview() {
   return (
-    <section id="features" className="py-20 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            15+ AI-Powered Tools in One Platform
+            What's in the VeeFore dashboard?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Everything you need to dominate social media. From content creation to analytics, 
-            our AI tools work together to grow your audience and boost engagement.
+            Schedule, engage, monitor, and analyze social media posts. All in one user-friendly dashboard.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {aiTools.map((tool, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-              <CardHeader>
-                <div className="flex items-center space-x-3 mb-3">
-                  {tool.icon}
-                  <CardTitle className="text-xl">{tool.title}</CardTitle>
+        {/* Dashboard Interface Mockup */}
+        <div className="bg-gray-100 rounded-lg p-8 mb-16">
+          <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
+            {/* Dashboard Header */}
+            <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">V</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">VeeFore Dashboard</h3>
                 </div>
-                <CardDescription className="text-gray-600">
-                  {tool.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {tool.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+                <div className="flex items-center space-x-4">
+                  <Button size="sm" variant="outline">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Schedule
+                  </Button>
+                  <Button size="sm" className="bg-blue-600 text-white">
+                    <BrainCircuit className="w-4 h-4 mr-2" />
+                    AI Generate
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Dashboard Content */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Content Creation */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* AI Content Generator */}
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <BrainCircuit className="w-6 h-6 text-purple-600" />
+                        <h4 className="text-lg font-semibold text-gray-900">AI Content Generator</h4>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-800">Active</Badge>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 mb-4">
+                      <p className="text-sm text-gray-600 mb-2">Generated Caption:</p>
+                      <p className="text-gray-900 font-medium">
+                        "🚀 Ready to transform your social media game? Our AI-powered platform helps you create engaging content in seconds! #SocialMediaMarketing #AIContent #VeeFore"
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
+                        Hashtags optimized
+                      </div>
+                      <div className="flex items-center">
+                        <TrendingUp className="w-4 h-4 text-blue-500 mr-1" />
+                        Viral potential: 85%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content Calendar */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-gray-900">Content Calendar</h4>
+                      <Button size="sm" variant="outline">View All</Button>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm font-medium">Instagram Post</span>
+                          <Badge variant="outline" className="text-xs">Scheduled</Badge>
+                        </div>
+                        <span className="text-sm text-gray-600">2:00 PM</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <span className="text-sm font-medium">LinkedIn Article</span>
+                          <Badge variant="outline" className="text-xs">Draft</Badge>
+                        </div>
+                        <span className="text-sm text-gray-600">4:30 PM</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                          <span className="text-sm font-medium">Twitter Thread</span>
+                          <Badge variant="outline" className="text-xs">AI Generated</Badge>
+                        </div>
+                        <span className="text-sm text-gray-600">6:00 PM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Analytics & Insights */}
+                <div className="space-y-6">
+                  {/* Analytics Widget */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-gray-900">Analytics</h4>
+                      <BarChart3 className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">12.5K</div>
+                        <div className="text-sm text-gray-600">Total Engagement</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">+45%</div>
+                          <div className="text-xs text-gray-600">Growth</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-purple-600">89%</div>
+                          <div className="text-xs text-gray-600">Reach</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trending Topics */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-gray-900">Trending Now</h4>
+                      <TrendingUp className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">#AIContent</span>
+                        <span className="text-sm font-semibold text-green-600">+250%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">#SocialMedia</span>
+                        <span className="text-sm font-semibold text-blue-600">+180%</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">#Marketing</span>
+                        <span className="text-sm font-semibold text-purple-600">+120%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Assistant */}
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-xs">AI</span>
+                        </div>
+                        <span className="font-semibold text-gray-900">VeeGPT</span>
+                      </div>
+                      <Button size="sm" variant="outline">Chat</Button>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 mb-3">
+                      <p className="text-sm text-gray-700">💡 Try: "Create a viral Instagram post about productivity tips"</p>
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      <p>✨ AI suggestions ready</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Feature Detail Sections - Hootsuite Style
+function FeatureDetailSections() {
+  return (
+    <section id="features" className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-24">
+          {/* Feature 1: AI Content Creation */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                  <BrainCircuit className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Create smarter with AI-powered content</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Generate engaging posts, captions, and hashtags instantly. Our AI understands your brand voice and creates content that resonates with your audience across all platforms.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Auto-generate captions and hashtags</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Brand voice consistency</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Multi-platform optimization</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">AI Content Generator</span>
+                  <Badge className="bg-purple-100 text-purple-800">Active</Badge>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600 mb-2">Generated Caption:</p>
+                  <p className="text-gray-900 font-medium">
+                    "Ready to level up your content game? 🚀 Our AI tools help you create scroll-stopping posts that actually convert. #ContentCreation #AIMarketing"
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4 text-sm">
+                  <div className="flex items-center text-green-600">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    Viral Score: 92%
+                  </div>
+                  <div className="flex items-center text-blue-600">
+                    <Target className="w-4 h-4 mr-1" />
+                    Engagement: High
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 2: Analytics & Insights */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900">Social Media Performance</h4>
+                    <Button size="sm" variant="outline">View Report</Button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">12.5K</div>
+                      <div className="text-sm text-gray-600">Engagement</div>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">+45%</div>
+                      <div className="text-sm text-gray-600">Growth</div>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">89%</div>
+                      <div className="text-sm text-gray-600">Reach</div>
+                    </div>
+                  </div>
+                  <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-8 h-8 text-gray-400" />
+                    <span className="ml-2 text-gray-500">Analytics Chart</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Analyze social media performance</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Track your success across all platforms with detailed analytics. Understand what content performs best and optimize your strategy with AI-powered insights.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Real-time performance tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Cross-platform analytics</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">AI-powered recommendations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: Content Scheduling */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                  <Calendar className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Schedule posts and create content</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Plan your content calendar with AI-suggested optimal posting times. Schedule across all platforms and let our automation handle the rest.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Multi-platform scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">AI-optimized timing</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Bulk content upload</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-gray-900">Content Calendar</h4>
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Instagram Post</span>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">Scheduled</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm font-medium">LinkedIn Article</span>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">Draft</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Twitter Thread</span>
+                    </div>
+                    <Badge className="bg-purple-100 text-purple-800">AI Generated</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -629,7 +896,8 @@ export default function HootsuiteLanding() {
       <VeeForeNavigation />
       <HeroSection />
       <PlatformStats />
-      <AIToolsSection />
+      <DashboardPreview />
+      <FeatureDetailSections />
       <ResultsSection />
       <PricingSection />
       <VeeForeFooter />

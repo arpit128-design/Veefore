@@ -200,6 +200,7 @@ function Router() {
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/admin/users" component={AdminUserManagement} />
+          <Route path="/admin/waitlist" component={AdminUserManagement} />
           <Route path="/admin/early-access" component={AdminEarlyAccess} />
           <Route component={() => <Redirect to="/admin/login" />} />
         </Switch>

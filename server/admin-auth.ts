@@ -110,8 +110,8 @@ export async function logAdminAction(
     await storage.createAuditLog({
       adminId,
       action,
-      entity,
-      entityId,
+      resource: entity || 'unknown', // Fix: provide resource field
+      resourceId: entityId || '',
       oldValues,
       newValues,
       ipAddress,

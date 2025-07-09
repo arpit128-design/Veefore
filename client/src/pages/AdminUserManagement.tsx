@@ -37,7 +37,11 @@ interface WaitlistUser {
 export default function AdminUserManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [waitlistUsers, setWaitlistUsers] = useState<WaitlistUser[]>([]);
-  const [activeTab, setActiveTab] = useState('users');
+  // Detect current route to set appropriate tab
+  const [activeTab, setActiveTab] = useState(() => {
+    const path = window.location.pathname;
+    return path.includes('/admin/waitlist') ? 'waitlist' : 'users';
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');

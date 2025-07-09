@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Users, CreditCard, Activity, LogOut } from 'lucide-react';
+import { Shield, Users, CreditCard, Activity, LogOut, Settings, DollarSign, UserPlus } from 'lucide-react';
 
 interface AdminStats {
   totalUsers: number;
@@ -177,20 +177,30 @@ export default function AdminDashboard() {
             <CardContent className="space-y-4">
               <Button 
                 onClick={() => window.location.href = '/admin/users'}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
               >
+                <Users className="h-4 w-4" />
                 Manage Users
               </Button>
               <Button 
-                onClick={() => window.location.href = '/admin/transactions'}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={() => window.location.href = '/admin/waitlist'}
+                className="w-full bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
               >
+                <UserPlus className="h-4 w-4" />
+                Waitlist Management
+              </Button>
+              <Button 
+                onClick={() => window.location.href = '/admin/transactions'}
+                className="w-full bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+              >
+                <DollarSign className="h-4 w-4" />
                 View Transactions
               </Button>
               <Button 
                 onClick={() => window.location.href = '/admin/settings'}
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full bg-green-600 hover:bg-green-700 flex items-center gap-2"
               >
+                <Settings className="h-4 w-4" />
                 System Settings
               </Button>
             </CardContent>

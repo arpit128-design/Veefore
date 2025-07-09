@@ -8,6 +8,7 @@ interface SmartCTAButtonProps {
   size?: 'sm' | 'lg' | 'default';
   variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link' | 'destructive';
   onWaitlistAction?: () => void;
+  onStatusAction?: () => void;
   showArrow?: boolean;
   children?: React.ReactNode;
 }
@@ -17,6 +18,7 @@ export function SmartCTAButton({
   size = "lg",
   variant = "default",
   onWaitlistAction,
+  onStatusAction,
   showArrow = true,
   children
 }: SmartCTAButtonProps) {
@@ -36,8 +38,13 @@ export function SmartCTAButton({
     if (deviceStatus.hasEarlyAccess) {
       // User has early access, redirect to auth page
       window.location.href = '/auth';
+    } else if (deviceStatus.isOnWaitlist) {
+      // User is on waitlist, show status card
+      if (onStatusAction) {
+        onStatusAction();
+      }
     } else {
-      // User needs to join waitlist or check status
+      // User needs to join waitlist
       if (onWaitlistAction) {
         onWaitlistAction();
       }

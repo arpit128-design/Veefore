@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'wouter';
 import { motion, useInView } from 'framer-motion';
 import { WaitlistModal } from '@/components/WaitlistModal';
+import { WaitlistStatusCard } from '@/components/WaitlistStatusCard';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { SmartCTAButton } from '@/components/SmartCTAButton';
 import { 
@@ -149,9 +150,11 @@ function LoadingSkeleton() {
 
 // Navigation Component
 function Navigation({ 
-  onOpenWaitlist
+  onOpenWaitlist,
+  onOpenStatus
 }: { 
   onOpenWaitlist: () => void;
+  onOpenStatus: () => void;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const deviceStatus = useDeviceWaitlistStatus();
@@ -177,8 +180,8 @@ function Navigation({
       // User has early access, redirect to auth page
       window.location.href = '/auth';
     } else if (deviceStatus.isOnWaitlist) {
-      // User is on waitlist but no early access, show waitlist modal
-      onOpenWaitlist();
+      // User is on waitlist but no early access, show status card
+      onOpenStatus();
     } else {
       // User not on waitlist, show waitlist modal
       onOpenWaitlist();
@@ -328,6 +331,7 @@ function StarfieldBackground() {
 // Hero Section with seamless blending
 function HeroSection() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showStatusCard, setShowStatusCard] = useState(false);
   
   const scrollToFeatures = () => {
     const element = document.getElementById('features');
@@ -463,6 +467,7 @@ function HeroSection() {
               size="lg"
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6"
               onWaitlistAction={() => setShowWaitlistModal(true)}
+              onStatusAction={() => setShowStatusCard(true)}
             />
           </motion.div>
           <Link href="/watch-demo">
@@ -569,6 +574,12 @@ function HeroSection() {
         isOpen={showWaitlistModal} 
         onClose={() => setShowWaitlistModal(false)} 
         initialReferralCode=""
+      />
+      
+      {/* Waitlist Status Card */}
+      <WaitlistStatusCard 
+        isOpen={showStatusCard} 
+        onClose={() => setShowStatusCard(false)} 
       />
     </section>
   );
@@ -1522,6 +1533,7 @@ function FAQSection() {
 // CTA Section with seamless blending
 function CTASection() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showStatusCard, setShowStatusCard] = useState(false);
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
       {/* Gradient overlay for seamless blending */}
@@ -1555,6 +1567,7 @@ function CTASection() {
               size="lg"
               className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl"
               onWaitlistAction={() => setShowWaitlistModal(true)}
+              onStatusAction={() => setShowStatusCard(true)}
             />
             <Link href="/watch-demo">
               <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
@@ -1577,6 +1590,12 @@ function CTASection() {
         isOpen={showWaitlistModal} 
         onClose={() => setShowWaitlistModal(false)} 
         initialReferralCode=""
+      />
+      
+      {/* Waitlist Status Card */}
+      <WaitlistStatusCard 
+        isOpen={showStatusCard} 
+        onClose={() => setShowStatusCard(false)} 
       />
     </section>
   );
@@ -1639,6 +1658,7 @@ function ScrollToTopButton() {
 // Main Landing Page Component with Lazy Loading
 export default function Landing() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showStatusCard, setShowStatusCard] = useState(false);
   const [referralCode, setReferralCode] = useState('');
 
   // Check for referral code in URL parameters
@@ -1660,10 +1680,15 @@ export default function Landing() {
     setShowWaitlistModal(true);
   };
 
+  const handleOpenStatus = () => {
+    setShowStatusCard(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
       <Navigation 
         onOpenWaitlist={handleOpenWaitlist} 
+        onOpenStatus={handleOpenStatus}
       />
       <HeroSection />
       
@@ -1711,6 +1736,12 @@ export default function Landing() {
         isOpen={showWaitlistModal} 
         onClose={() => setShowWaitlistModal(false)} 
         initialReferralCode={referralCode}
+      />
+      
+      {/* Waitlist Status Card */}
+      <WaitlistStatusCard 
+        isOpen={showStatusCard} 
+        onClose={() => setShowStatusCard(false)} 
       />
     </div>
   );

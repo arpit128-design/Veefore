@@ -345,29 +345,29 @@ function DashboardPreview() {
                       <Button size="sm" variant="outline">View All</Button>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center space-x-3">
                           <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                          <span className="text-sm font-medium">Instagram Post</span>
+                          <span className="text-sm font-medium text-gray-900">Instagram Post</span>
                           <Badge variant="outline" className="text-xs">Scheduled</Badge>
                         </div>
-                        <span className="text-sm text-gray-600">2:00 PM</span>
+                        <span className="text-sm text-gray-800 font-medium">2:00 PM</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center space-x-3">
                           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="text-sm font-medium">LinkedIn Article</span>
+                          <span className="text-sm font-medium text-gray-900">LinkedIn Article</span>
                           <Badge variant="outline" className="text-xs">Draft</Badge>
                         </div>
-                        <span className="text-sm text-gray-600">4:30 PM</span>
+                        <span className="text-sm text-gray-800 font-medium">4:30 PM</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center space-x-3">
                           <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                          <span className="text-sm font-medium">Twitter Thread</span>
+                          <span className="text-sm font-medium text-gray-900">Twitter Thread</span>
                           <Badge variant="outline" className="text-xs">AI Generated</Badge>
                         </div>
-                        <span className="text-sm text-gray-600">6:00 PM</span>
+                        <span className="text-sm text-gray-800 font-medium">6:00 PM</span>
                       </div>
                     </div>
                   </div>
@@ -523,24 +523,24 @@ function FeatureDetailSections() {
                     <h4 className="text-lg font-semibold text-gray-900">AI Image Generator</h4>
                     <Badge className="bg-blue-100 text-blue-800">DALL-E 3</Badge>
                   </div>
-                  <div className="bg-gray-100 rounded-lg h-40 flex items-center justify-center">
+                  <div className="bg-gray-100 rounded-lg h-40 flex items-center justify-center border border-gray-300">
                     <div className="text-center">
-                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600">Generated Image Preview</p>
+                      <Camera className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                      <p className="text-sm text-gray-800 font-medium">Generated Image Preview</p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Style</span>
-                      <span className="text-sm font-medium">Professional</span>
+                      <span className="text-sm text-gray-800 font-medium">Style</span>
+                      <span className="text-sm font-medium text-gray-900">Professional</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Resolution</span>
-                      <span className="text-sm font-medium">1080x1080</span>
+                      <span className="text-sm text-gray-800 font-medium">Resolution</span>
+                      <span className="text-sm font-medium text-gray-900">1080x1080</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Brand Colors</span>
-                      <span className="text-sm font-medium">Applied</span>
+                      <span className="text-sm text-gray-800 font-medium">Brand Colors</span>
+                      <span className="text-sm font-medium text-gray-900">Applied</span>
                     </div>
                   </div>
                 </div>
@@ -1050,12 +1050,12 @@ function FeatureDetailSections() {
                   </div>
                 </div>
                 <div className="pt-4 border-t">
-                  <div className="bg-cyan-50 p-3 rounded-lg">
+                  <div className="bg-cyan-50 p-3 rounded-lg border border-cyan-200">
                     <div className="flex items-center space-x-2 mb-2">
                       <Target className="w-4 h-4 text-cyan-600" />
-                      <span className="text-sm font-medium">Market Opportunity</span>
+                      <span className="text-sm font-medium text-cyan-900">Market Opportunity</span>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-800">
                       Video content shows 40% higher engagement than competitors
                     </p>
                   </div>

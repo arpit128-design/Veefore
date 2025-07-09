@@ -12,75 +12,39 @@ import {
   Shield, 
   Globe, 
   TrendingUp,
-  Clock,
+  Timer,
   Target,
   CheckCircle,
-  ChevronRight,
   Play,
   Instagram,
   Youtube,
   Twitter,
   Linkedin,
   Facebook,
-  ArrowDown,
+  Camera,
+  Video,
+  BrainCircuit,
+  Eye,
+  Heart,
+  Menu,
+  X,
+  Star,
+  BookOpen,
   Award,
   Building,
-  Camera,
-  Code,
-  Database,
-  FileText,
-  Headphones,
-  Lock,
-  Mail,
   Monitor,
-  PieChart,
-  Search,
-  Settings,
   Smartphone,
-  Timer,
-  UserCheck,
-  Video,
-  Wifi,
-  Bot,
-  BrainCircuit,
-  Palette,
-  BarChart2,
-  Activity,
-  BookOpen,
-  Briefcase,
-  ChevronUp,
-  ChevronDown,
-  Star,
-  ExternalLink,
-  Download,
-  Layers,
-  Megaphone,
-  TrendingDown,
-  Eye,
-  MousePointer,
-  Repeat,
-  Hash,
-  Filter,
-  Share2,
-  Bell,
-  Bookmark,
-  MessageCircle,
-  Heart,
-  MoreHorizontal,
-  Maximize,
-  RotateCcw,
-  Layout,
-  Lightbulb,
-  Puzzle,
-  Gauge
+  Mail,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-// Professional Navigation Component
-function ProfessionalNavigation() {
+// Navigation Component
+function VeeForeNavigation() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [, setLocation] = useLocation();
   const deviceStatus = useDeviceWaitlistStatus();
 
@@ -101,12 +65,12 @@ function ProfessionalNavigation() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white'
+    <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">V</span>
@@ -114,47 +78,67 @@ function ProfessionalNavigation() {
               <span className="text-xl font-bold text-gray-900">VeeFore</span>
             </div>
           </div>
-          
+
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-blue-600 font-medium">
-                Top features
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </button>
-            </div>
-            <button className="text-gray-700 hover:text-blue-600 font-medium">Integrations</button>
-            <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-blue-600 font-medium">
-                Industries
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </button>
-            </div>
-            <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-blue-600 font-medium">
-                Resources
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </button>
-            </div>
-            <button className="text-gray-700 hover:text-blue-600 font-medium">Pricing</button>
-            <button className="text-gray-700 hover:text-blue-600 font-medium">Enterprise</button>
-          </div>
-          
-          <div className="flex items-center space-x-4">
+            <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
+            <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
+            <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">About</a>
             <Button 
-              variant="ghost" 
-              className="text-gray-700 hover:text-blue-600 font-medium"
+              variant="outline" 
+              size="sm"
               onClick={() => setLocation('/signin')}
             >
-              Log in
+              Sign In
             </Button>
             <Button 
-              className="bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-md font-medium"
+              size="sm"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               onClick={handleGetStarted}
             >
-              Start your free trial
+              Get Started
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <a href="#features" className="block px-3 py-2 text-gray-600 hover:text-blue-600">Features</a>
+              <a href="#pricing" className="block px-3 py-2 text-gray-600 hover:text-blue-600">Pricing</a>
+              <a href="#about" className="block px-3 py-2 text-gray-600 hover:text-blue-600">About</a>
+              <div className="pt-2 space-y-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => setLocation('/signin')}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
+                  onClick={handleGetStarted}
+                >
+                  Get Started
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
@@ -165,7 +149,7 @@ function HeroSection() {
   const [, setLocation] = useLocation();
 
   return (
-    <section className="pt-24 pb-16 bg-white">
+    <section className="pt-24 pb-16 bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <motion.div
@@ -174,30 +158,57 @@ function HeroSection() {
             transition={{ duration: 0.8 }}
             className="max-w-4xl mx-auto"
           >
+            <Badge className="mb-6 bg-blue-100 text-blue-800 px-4 py-2 text-sm font-medium">
+              🚀 15+ AI-Powered Tools Available Now
+            </Badge>
+            
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              Drive real business impact with{' '}
-              <span className="text-blue-900">real-time social insights.</span>
-              <br />
-              <span className="text-red-500">VeeFore makes it easy.</span>
+              Transform Your Social Media with{' '}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                AI-Powered Intelligence
+              </span>
             </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              VeeFore combines 15+ advanced AI tools to automate content creation, scheduling, 
+              analytics, and engagement across all your social media platforms. Save hours daily 
+              while growing your audience faster than ever before.
+            </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
               <Button 
                 size="lg" 
-                className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-4 text-lg font-semibold rounded-md"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300"
                 onClick={() => setLocation('/signup')}
               >
-                Start your free trial
+                Start Free Trial
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-blue-900 text-blue-900 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-md"
+                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-lg"
                 onClick={() => setLocation('/demo')}
               >
-                Request a demo
+                <Play className="w-5 h-5 mr-2" />
+                Watch Demo
               </Button>
+            </div>
+            
+            <div className="mt-12 flex items-center justify-center space-x-8 text-sm text-gray-500">
+              <div className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                No Credit Card Required
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                14-Day Free Trial
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                Cancel Anytime
+              </div>
             </div>
           </motion.div>
         </div>
@@ -206,370 +217,177 @@ function HeroSection() {
   );
 }
 
-// Awards Section
-function AwardsSection() {
-  return (
-    <section className="py-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center space-x-12">
-          <div className="flex items-center space-x-2">
-            <Award className="w-8 h-8 text-blue-900" />
-            <div>
-              <div className="text-2xl font-bold text-gray-900">2025</div>
-              <div className="text-sm text-red-500">#1 Social Media Suites</div>
-              <div className="text-sm text-red-500">#1 Social Media Analytics</div>
-              <div className="text-sm text-red-500">#1 Social Media Listening</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Main Dashboard Preview
-function DashboardPreview() {
-  return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-pink-100 to-blue-100 rounded-3xl p-8 lg:p-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <img 
-                src="/api/placeholder/600/400" 
-                alt="Professional using VeeFore dashboard" 
-                className="rounded-lg shadow-lg"
-              />
-            </div>
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-medium text-gray-600">Publish to</span>
-                  <div className="flex space-x-2">
-                    <Instagram className="w-5 h-5 text-pink-500" />
-                    <Facebook className="w-5 h-5 text-blue-600" />
-                    <Twitter className="w-5 h-5 text-blue-400" />
-                    <Linkedin className="w-5 h-5 text-blue-700" />
-                    <Youtube className="w-5 h-5 text-red-600" />
-                  </div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Lightbulb className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-700">Start from scratch</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Generate new captions to engage, delight, or sell</p>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Engagement Rate</span>
-                    <span className="text-sm font-semibold text-gray-900">15.38%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Reach</span>
-                    <span className="text-sm font-semibold text-gray-900">6,783</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Followers</span>
-                    <span className="text-sm font-semibold text-gray-900">2.3K</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Trusted By Section
-function TrustedBySection() {
-  const companies = [
-    "The University of Chicago",
-    "Adobe",
-    "U-HAUL",
-    "IKEA",
-    "World Health Organization"
+// Platform Stats Section
+function PlatformStats() {
+  const stats = [
+    {
+      icon: <BrainCircuit className="w-8 h-8 text-purple-600" />,
+      number: "15+",
+      label: "AI-Powered Tools",
+      description: "Advanced automation suite"
+    },
+    {
+      icon: <Users className="w-8 h-8 text-blue-600" />,
+      number: "500K+",
+      label: "Active Users",
+      description: "Growing community worldwide"
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8 text-green-600" />,
+      number: "95%",
+      label: "Time Saved",
+      description: "Automated workflows"
+    },
+    {
+      icon: <Globe className="w-8 h-8 text-orange-600" />,
+      number: "50+",
+      label: "Countries",
+      description: "Global reach"
+    }
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Trusted by leading organizations worldwide
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center opacity-60">
-            {companies.map((company, index) => (
-              <div key={index} className="text-center">
-                <div className="text-lg font-semibold text-gray-600">{company}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="flex justify-center mb-4">
+                {stat.icon}
               </div>
-            ))}
-          </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">{stat.number}</div>
+              <div className="text-lg font-semibold text-gray-700 mb-1">{stat.label}</div>
+              <div className="text-sm text-gray-500">{stat.description}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// Features Section
-function FeaturesSection() {
+// AI Tools Features Section
+function AIToolsSection() {
+  const aiTools = [
+    {
+      icon: <BrainCircuit className="w-8 h-8 text-purple-600" />,
+      title: "AI Content Generator",
+      description: "Generate engaging posts, captions, and hashtags with advanced AI technology.",
+      features: ["Auto-hashtag generation", "Caption writing", "Content ideation", "Multi-platform optimization"]
+    },
+    {
+      icon: <Camera className="w-8 h-8 text-blue-600" />,
+      title: "AI Image Generator",
+      description: "Create stunning visual content with DALL-E 3 integration for your brand.",
+      features: ["DALL-E 3 integration", "Brand consistency", "Custom prompts", "High-quality output"]
+    },
+    {
+      icon: <Video className="w-8 h-8 text-red-600" />,
+      title: "AI Thumbnail Maker Pro",
+      description: "Design scroll-stopping YouTube thumbnails with 7-stage AI process.",
+      features: ["7-stage generation", "CTR optimization", "Professional layouts", "Canvas editor"]
+    },
+    {
+      icon: <TrendingUp className="w-8 h-8 text-green-600" />,
+      title: "Trend Intelligence Engine",
+      description: "Stay ahead of viral trends with real-time social media analysis.",
+      features: ["Real-time analysis", "Viral prediction", "Trend forecasting", "Competitor tracking"]
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8 text-orange-600" />,
+      title: "Analytics & Insights",
+      description: "Deep dive into your social media performance with AI-powered analytics.",
+      features: ["Cross-platform analytics", "Growth tracking", "ROI calculation", "Performance insights"]
+    },
+    {
+      icon: <MessageSquare className="w-8 h-8 text-indigo-600" />,
+      title: "Smart DM Automation",
+      description: "Automate your direct messages with AI-powered responses.",
+      features: ["Auto-responses", "Smart filtering", "Personalization", "24/7 availability"]
+    },
+    {
+      icon: <Calendar className="w-8 h-8 text-cyan-600" />,
+      title: "Content Scheduler",
+      description: "Plan and schedule your content across multiple platforms.",
+      features: ["Multi-platform scheduling", "Optimal timing", "Content calendar", "Bulk scheduling"]
+    },
+    {
+      icon: <Eye className="w-8 h-8 text-pink-600" />,
+      title: "Social Listening",
+      description: "Monitor brand mentions, track competitors, and discover opportunities.",
+      features: ["Brand monitoring", "Competitor analysis", "Sentiment tracking", "Opportunity detection"]
+    },
+    {
+      icon: <Target className="w-8 h-8 text-yellow-600" />,
+      title: "Competitor Analysis",
+      description: "Analyze your competitors' strategies and performance.",
+      features: ["Strategy analysis", "Performance comparison", "Content gaps", "Market positioning"]
+    }
+  ];
+
   return (
-    <section className="py-20 bg-white">
+    <section id="features" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Explore VeeFore features: What's in the dashboard?
+            15+ AI-Powered Tools in One Platform
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Schedule, engage, monitor, and analyze social media posts. All in one user-friendly dashboard.
+            Everything you need to dominate social media. From content creation to analytics, 
+            our AI tools work together to grow your audience and boost engagement.
           </p>
         </div>
 
-        <div className="space-y-16">
-          {/* Feature 1 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
-                  <BrainCircuit className="w-6 h-6 text-red-600" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {aiTools.map((tool, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <CardHeader>
+                <div className="flex items-center space-x-3 mb-3">
+                  {tool.icon}
+                  <CardTitle className="text-xl">{tool.title}</CardTitle>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Strategize smarter with social-first AI</h3>
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Supercharge content creation, ideation, and engagement with your very own 
-                social media AI assistant. Get personalized strategy advice and learn what 
-                people think and feel about your brand, competitors, and hot topics. Know 
-                what's trending today and anticipate what's next.
-              </p>
-              <Button variant="link" className="text-blue-600 hover:text-blue-800 p-0">
-                Learn more →
-              </Button>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                      <span className="text-red-600 font-bold text-sm">V</span>
-                    </div>
-                    <span className="font-semibold text-gray-900">VeeGPT</span>
-                  </div>
-                  <Button variant="outline" size="sm">+ New chat</Button>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm text-gray-700">How can VeeGPT help?</p>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Lightbulb className="w-4 h-4" />
-                      <span>Inspire me</span>
-                    </div>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Target className="w-4 h-4" />
-                      <span>I need a campaign idea</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>Draft a posting schedule for next month</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-gray-900">Social Media Performance</h4>
-                    <Button variant="outline" size="sm">Create report</Button>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-bold">6,783</span>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Post reach • Post type</p>
-                          <p className="text-sm font-semibold text-gray-900">15.38%</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">Add metric</Button>
-                    </div>
-                    <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="w-8 h-8 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Analyze social media performance</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                  <Calendar className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Schedule posts and create content</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="bg-blue-100 rounded-lg p-4 mb-2">
-                      <Calendar className="w-6 h-6 text-blue-600 mx-auto" />
-                    </div>
-                    <span className="text-sm text-gray-600">Calendar</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-purple-100 rounded-lg p-4 mb-2">
-                      <FileText className="w-6 h-6 text-purple-600 mx-auto" />
-                    </div>
-                    <span className="text-sm text-gray-600">Content</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-green-100 rounded-lg p-4 mb-2">
-                      <CheckCircle className="w-6 h-6 text-green-600 mx-auto" />
-                    </div>
-                    <span className="text-sm text-gray-600">Approvals</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium">Schedule multiple</span>
-                    <MousePointer className="w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 mb-4">Message Management</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <MessageSquare className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm text-gray-700">Respond to messages and comments</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Bell className="w-5 h-5 text-green-600" />
-                      <span className="text-sm text-gray-700">Real-time notifications</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Users className="w-5 h-5 text-purple-600" />
-                      <span className="text-sm text-gray-700">Team collaboration</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                  <MessageSquare className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Respond to messages and comments</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 5 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
-                  <TrendingUp className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Track mentions, keywords, and trends</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-gray-900">Trending Topics</h4>
-                  <Search className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">#TechTrends</span>
-                    <span className="text-sm font-semibold text-green-600">+450%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">#SocialMedia</span>
-                    <span className="text-sm font-semibold text-blue-600">+322%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">#AI</span>
-                    <span className="text-sm font-semibold text-purple-600">+268%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                <CardDescription className="text-gray-600">
+                  {tool.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {tool.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// Statistics Section
-function StatisticsSection() {
+// Results Section
+function ResultsSection() {
   const stats = [
     {
-      number: "80%",
-      description: "reduction in workload using VeeFore's AI capabilities",
-      logo: "VeeFore"
+      number: "95%",
+      description: "Average time saved on content creation with VeeFore's AI automation",
+      icon: <Timer className="w-8 h-8 text-blue-600" />,
+      color: "text-blue-600"
     },
     {
-      number: "500%",
-      description: "growth across all social channels using VeeFore Enterprise",
-      logo: "Enterprise"
+      number: "300%",
+      description: "Average engagement increase within first 30 days of using VeeFore",
+      icon: <TrendingUp className="w-8 h-8 text-green-600" />,
+      color: "text-green-600"
     },
     {
-      number: "2M+",
-      description: "new followers on social media using VeeFore Enterprise",
-      logo: "Enterprise"
+      number: "15+",
+      description: "AI-powered tools working together to optimize your social media strategy",
+      icon: <BrainCircuit className="w-8 h-8 text-purple-600" />,
+      color: "text-purple-600"
     }
   ];
 
@@ -578,73 +396,40 @@ function StatisticsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            What can VeeFore do for you?
+            Real Results from VeeFore Users
           </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Join thousands of creators, businesses, and agencies who are already transforming 
+            their social media presence with VeeFore's AI-powered platform.
+          </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center border-r border-gray-200 last:border-r-0">
-              <div className="text-6xl font-bold text-red-500 mb-4">{stat.number}</div>
-              <p className="text-gray-600 mb-4">{stat.description}</p>
-              <div className="text-sm text-gray-400">{stat.logo}</div>
+            <div key={index} className="text-center bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+              <div className="flex justify-center mb-6">
+                {stat.icon}
+              </div>
+              <div className={`text-5xl font-bold ${stat.color} mb-4`}>{stat.number}</div>
+              <p className="text-gray-600 text-lg leading-relaxed">{stat.description}</p>
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-// AI Assistant Section
-function AIAssistantSection() {
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Introducing <span className="text-purple-600">VeeGPT</span>: The AI trained on real-time social trends
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Introducing VeeGPT, our all-new AI assistant that scours live social 
-              feeds to help you create content, analyze performance, and build 
-              campaigns based on what's happening online right now.
+        
+        <div className="mt-16 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+            <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Social Media?</h3>
+            <p className="text-lg mb-6 opacity-90">
+              Join the AI revolution and discover what VeeFore can do for your brand
             </p>
-            <div className="flex space-x-4">
-              <Button className="bg-blue-900 hover:bg-blue-800 text-white">
-                Try it for free
-              </Button>
-              <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                Learn more
-              </Button>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-8 text-white">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">V</span>
-                  </div>
-                  <span className="font-semibold">VeeGPT</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-white/20 rounded-lg p-3">
-                  <p className="text-sm">What's trending in my industry?</p>
-                </div>
-                <div className="bg-white/20 rounded-lg p-3">
-                  <p className="text-sm">How can I boost engagement?</p>
-                </div>
-                <div className="bg-white/20 rounded-lg p-3">
-                  <p className="text-sm">Draft a posting schedule for next month</p>
-                </div>
-                <div className="bg-white/20 rounded-lg p-3">
-                  <p className="text-sm">I need a campaign idea</p>
-                </div>
-              </div>
-            </div>
+            <Button 
+              size="lg" 
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 font-semibold rounded-lg"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Start Your Free Trial
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
         </div>
       </div>
@@ -652,334 +437,112 @@ function AIAssistantSection() {
   );
 }
 
-// Feature Detail Sections
-function FeatureDetailSections() {
-  return (
-    <div className="bg-white">
-      {/* Content Creation Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Save time, simplify, and grow faster on social media
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              VeeFore is designed to help you manage social media faster, smarter, and with way less effort.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-            <div className="bg-gray-50 rounded-lg p-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex space-x-2">
-                    <div className="bg-blue-100 rounded-lg px-3 py-1 text-sm font-medium text-blue-800">Calendar</div>
-                    <div className="bg-purple-100 rounded-lg px-3 py-1 text-sm font-medium text-purple-800">Content</div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Lightbulb className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-700">Start from scratch</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Generate new captions to engage, delight, or sell</p>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="bg-gradient-to-r from-pink-400 to-purple-400 rounded-lg h-20"></div>
-                  <div className="bg-gradient-to-r from-blue-400 to-cyan-400 rounded-lg h-20"></div>
-                  <div className="bg-gradient-to-r from-green-400 to-blue-400 rounded-lg h-20"></div>
-                </div>
-                <Button variant="outline" size="sm" className="w-full">
-                  Schedule multiple
-                </Button>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                Save hours posting, creating, and analyzing content
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Schedule posts to go live anytime — even if you're fast asleep or on the beach. 
-                Plus, create content quickly with Canva templates and have AI write your 
-                captions and hashtags for you. Then get the full picture with straightforward 
-                performance reports. Oh, and did we mention it's all in one (1) tab?
-              </p>
-              <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                Learn more
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Analytics Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                Boost engagement, reach, and follower count with less effort
-              </h3>
-              <p className="text-gray-600 mb-6">
-                See the content that brings in the most engagement and revenue and measure 
-                how you're performing against your competitors. Plus, get personalized 
-                suggestions for how to win in your industry. And, with reports that show you the 
-                best time to post for every network, you can say goodbye to hop-scotching 
-                between network tabs for good.
-              </p>
-              <div className="flex space-x-4">
-                <Button className="bg-blue-900 hover:bg-blue-800 text-white">
-                  Try it for free
-                </Button>
-                <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                  Learn more
-                </Button>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-8 shadow-sm">
-              <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">6,783</div>
-                  <div className="text-sm text-gray-600">All-time reach</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-green-600 mb-2">15.38%</div>
-                  <div className="text-sm text-gray-600">Engagement rate</div>
-                </div>
-              </div>
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Post performance</h4>
-                <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-8 h-8 text-gray-400" />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <Button variant="outline" size="sm">Add metric</Button>
-                <Button variant="outline" size="sm">Create report</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Listening Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="bg-gray-50 rounded-lg p-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h4 className="font-semibold text-gray-900 mb-4">Results over time</h4>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Engagement</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-green-600">7.5M</span>
-                      <span className="text-sm text-green-600">↗ 7.9%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Sentiment</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-green-600">62.9%</span>
-                      <span className="text-sm text-green-600">Positive</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Negative</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-red-600">4.2%</span>
-                      <span className="text-sm text-red-600">Negative</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Suspend posts
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                Safeguard your reputation and never miss a chance to engage
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Keep an eye on what people are saying about your brand or industry with social 
-                listening tools. Track mentions and conversations to find opportunities to engage, 
-                discover new trends, or get ahead of feedback. Plus, easily suspend scheduled 
-                posts in case of a potential crisis or unexpected opportunity.
-              </p>
-              <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                Learn more
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trends Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                Stay ahead of the latest trends and boost your chances of going viral
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Figure out exactly what engages your audience with trend tracking and discovery 
-                streams. View hot topics by industry and then have AI instantly draft posts based 
-                on those trends. You can also search by topic, company, and hashtag to discover 
-                what's getting the most action in your niche.
-              </p>
-              <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                Learn more
-              </Button>
-            </div>
-            <div className="bg-white rounded-lg p-8 shadow-sm">
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-4">Top Themes</h4>
-                <div className="relative">
-                  <div className="flex flex-wrap gap-3">
-                    <div className="bg-blue-100 rounded-full px-4 py-2 text-sm font-medium text-blue-800">#crypto</div>
-                    <div className="bg-purple-100 rounded-full px-4 py-2 text-sm font-medium text-purple-800">#Bitcoin</div>
-                    <div className="bg-green-100 rounded-full px-4 py-2 text-sm font-medium text-green-800">#fintech</div>
-                    <div className="bg-red-100 rounded-full px-4 py-2 text-sm font-medium text-red-800">#banking</div>
-                    <div className="bg-yellow-100 rounded-full px-4 py-2 text-sm font-medium text-yellow-800 text-xl">#banking</div>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">TikTok</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">450%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">Facebook</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">322%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">YouTube</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">329%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                    <span className="text-sm text-gray-700">Instagram</span>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-900">180%</span>
-                </div>
-              </div>
-              <div className="mt-6">
-                <div className="flex items-center space-x-2">
-                  <Search className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-500">Search for a brand, topic or person</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-// Why Choose Us Section
-function WhyChooseSection() {
-  const reasons = [
+// Pricing Section
+function PricingSection() {
+  const plans = [
     {
-      icon: <Clock className="w-12 h-12 text-blue-600" />,
-      title: "17 years and 25 million users",
-      description: "VeeFore was the first, and we're still the most popular 17 years later. Over 25 million users have used VeeFore to post, track, and find out-performing competitors on social media."
+      name: "Free",
+      price: "₹0",
+      period: "forever",
+      description: "Perfect for getting started",
+      features: [
+        "20 AI credits monthly",
+        "1 social account",
+        "Basic analytics",
+        "Email support"
+      ],
+      highlighted: false
     },
     {
-      icon: <BrainCircuit className="w-12 h-12 text-purple-600" />,
-      title: "The ultimate social media AI",
-      description: "VeeFore helps you automate every part of social media management — posting, writing, messaging, and social listening. Our AI was designed for social pros."
+      name: "Starter",
+      price: "₹699",
+      period: "per month",
+      description: "Ideal for individual creators",
+      features: [
+        "300 AI credits monthly",
+        "2 social accounts",
+        "Advanced analytics",
+        "Priority support",
+        "Content scheduling"
+      ],
+      highlighted: true
     },
     {
-      icon: <Puzzle className="w-12 h-12 text-green-600" />,
-      title: "The largest library of integrations",
-      description: "Connect over 100 integrations to bring all your favorite tools into the VeeFore dashboard. That's more than any other social media management platform (by far)."
+      name: "Pro",
+      price: "₹1,499",
+      period: "per month",
+      description: "Perfect for growing businesses",
+      features: [
+        "1,100 AI credits monthly",
+        "5 social accounts",
+        "Team collaboration",
+        "Advanced AI tools",
+        "Custom analytics"
+      ],
+      highlighted: false
+    },
+    {
+      name: "Business",
+      price: "₹2,199",
+      period: "per month",
+      description: "For agencies and enterprises",
+      features: [
+        "2,000 AI credits monthly",
+        "Unlimited social accounts",
+        "White-label solution",
+        "API access",
+        "Dedicated support"
+      ],
+      highlighted: false
     }
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section id="pricing" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Why VeeFore?</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Choose Your Plan
+          </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Don't worry, we won't make you read our 2,000+ five-star reviews. A few highlights: 
-            superior customer service, top-notch security features, and the best blog, webinars, 
-            and social media academy in the industry.
+            Start free and upgrade as you grow. All plans include our core AI tools 
+            and 24/7 support to help you succeed.
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {reasons.map((reason, index) => (
-            <div key={index} className="text-center">
-              <div className="flex justify-center mb-6">
-                {reason.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{reason.title}</h3>
-              <p className="text-gray-600 mb-6">{reason.description}</p>
-              <Button variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
-                {index === 0 ? 'More about us' : index === 1 ? 'Learn more' : 'Explore integrations'}
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// Resources Section
-function ResourcesSection() {
-  const resources = [
-    {
-      icon: <Award className="w-12 h-12 text-red-500" />,
-      title: "How a retail brand used VeeFore to increase sales by 750%",
-      description: "See how legendary candy-maker Stuckey's leveraged VeeFore to skyrocket their online sales and following."
-    },
-    {
-      icon: <BarChart3 className="w-12 h-12 text-blue-500" />,
-      title: "Social media competitor analysis: Free template for 2025",
-      description: "Find out how to beat the competition with the ultimate guide to competitive analysis and a free template to get started."
-    },
-    {
-      icon: <Briefcase className="w-12 h-12 text-green-500" />,
-      title: "Take the VeeFore Social Media Marketing Certification Course",
-      description: "Become a social media expert — and slap a shiny new certification on your résumé — with the industry standard in social media education."
-    }
-  ];
-
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Resources for social media pros</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {resources.map((resource, index) => (
-            <div key={index} className="bg-white rounded-lg p-8 shadow-sm">
-              <div className="mb-6">
-                {resource.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{resource.title}</h3>
-              <p className="text-gray-600 mb-6">{resource.description}</p>
-              <Button variant="link" className="text-blue-600 hover:text-blue-800 p-0">
-                {index === 0 ? 'Read now' : index === 1 ? 'Read now' : 'Sign up now'} →
-              </Button>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {plans.map((plan, index) => (
+            <Card key={index} className={`relative ${plan.highlighted ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
+              {plan.highlighted && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-blue-500 text-white">Most Popular</Badge>
+                </div>
+              )}
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                  <span className="text-gray-600 ml-2">/{plan.period}</span>
+                </div>
+                <CardDescription className="mt-2">{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  className={`w-full mt-6 ${plan.highlighted ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-900 hover:bg-gray-800'}`}
+                  onClick={() => window.location.href = '/signup'}
+                >
+                  Get Started
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -988,56 +551,65 @@ function ResourcesSection() {
 }
 
 // Footer
-function ProfessionalFooter() {
+function VeeForeFooter() {
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-2 mb-6">
+            <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">V</span>
               </div>
               <span className="text-xl font-bold">VeeFore</span>
             </div>
-            <p className="text-gray-400 mb-6">
-              The ultimate social media management platform for professionals and businesses.
+            <p className="text-gray-400 mb-4">
+              Transform your social media with AI-powered intelligence. 
+              Save time, grow faster, engage better.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Instagram className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Linkedin className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <Button variant="ghost" size="sm">
+                <Instagram className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Twitter className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Linkedin className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Youtube className="w-5 h-5" />
+              </Button>
             </div>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
+            <h3 className="text-lg font-semibold mb-4">Product</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white">Features</a></li>
-              <li><a href="#" className="hover:text-white">Integrations</a></li>
-              <li><a href="#" className="hover:text-white">Pricing</a></li>
-              <li><a href="#" className="hover:text-white">Enterprise</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+              <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+              <li><a href="/demo" className="hover:text-white transition-colors">Demo</a></li>
+              <li><a href="/api" className="hover:text-white transition-colors">API</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h3 className="text-lg font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white">Blog</a></li>
-              <li><a href="#" className="hover:text-white">Help Center</a></li>
-              <li><a href="#" className="hover:text-white">Academy</a></li>
-              <li><a href="#" className="hover:text-white">Webinars</a></li>
+              <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+              <li><a href="/careers" className="hover:text-white transition-colors">Careers</a></li>
+              <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
+              <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white">About</a></li>
-              <li><a href="#" className="hover:text-white">Careers</a></li>
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white">Terms of Service</a></li>
+              <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="/security" className="hover:text-white transition-colors">Security</a></li>
             </ul>
           </div>
         </div>
@@ -1050,22 +622,17 @@ function ProfessionalFooter() {
   );
 }
 
-// Main Landing Component
+// Main Landing Page Component
 export default function HootsuiteLanding() {
   return (
     <div className="min-h-screen bg-white">
-      <ProfessionalNavigation />
+      <VeeForeNavigation />
       <HeroSection />
-      <AwardsSection />
-      <DashboardPreview />
-      <TrustedBySection />
-      <FeaturesSection />
-      <StatisticsSection />
-      <AIAssistantSection />
-      <FeatureDetailSections />
-      <WhyChooseSection />
-      <ResourcesSection />
-      <ProfessionalFooter />
+      <PlatformStats />
+      <AIToolsSection />
+      <ResultsSection />
+      <PricingSection />
+      <VeeForeFooter />
     </div>
   );
 }

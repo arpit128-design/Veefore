@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
@@ -23,6 +23,7 @@ export function SmartCTAButton({
   children
 }: SmartCTAButtonProps) {
   const deviceStatus = useDeviceWaitlistStatus();
+  const [, setLocation] = useLocation();
 
   const getButtonText = () => {
     if (deviceStatus.hasEarlyAccess) {
@@ -37,7 +38,7 @@ export function SmartCTAButton({
   const handleClick = () => {
     if (deviceStatus.hasEarlyAccess) {
       // User has early access, redirect to signup page since they haven't registered yet
-      window.location.href = '/signup';
+      setLocation('/signup');
     } else if (deviceStatus.isOnWaitlist) {
       // User is on waitlist, show status card
       if (onStatusAction) {
@@ -63,10 +64,10 @@ export function SmartCTAButton({
     );
   }
 
-  // If user has early access, render as Link to /auth
+  // If user has early access, render as Link to /signup
   if (deviceStatus.hasEarlyAccess) {
     return (
-      <Link href="/auth">
+      <Link href="/signup">
         <Button size={size} className={className} variant={variant}>
           {children || getButtonText()}
           {showArrow && <ArrowRight className="ml-2 w-4 h-4" />}

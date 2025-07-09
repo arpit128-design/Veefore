@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { useLocation } from 'wouter';
+import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
 import { 
   ArrowRight, 
   Calendar, 
@@ -73,9 +74,11 @@ function VeeForeNavigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
               <span className="text-xl font-bold text-gray-900">VeeFore</span>
             </div>
           </div>
@@ -1704,9 +1707,11 @@ function VeeForeFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
               <span className="text-xl font-bold">VeeFore</span>
             </div>
             <p className="text-gray-400 mb-4">

@@ -222,11 +222,46 @@ export default function Auth() {
         
       } else {
         const signInData = data as SignInForm;
-        await signInWithEmailAndPassword(auth, signInData.email, signInData.password);
-        toast({
-          title: "Welcome Back!",
-          description: "Signing you in to VeeFore..."
-        });
+        try {
+          await signInWithEmailAndPassword(auth, signInData.email, signInData.password);
+          toast({
+            title: "Welcome Back!",
+            description: "Signing you in to VeeFore..."
+          });
+        } catch (firebaseError: any) {
+          // Check if Firebase authentication succeeded but early access failed
+          if (firebaseError.code === 'auth/user-not-found' || firebaseError.code === 'auth/wrong-password') {
+            throw firebaseError; // Let Firebase handle these errors
+          }
+          
+          // For other errors, assume early access issue and check with backend
+          try {
+            const checkResponse = await fetch('/api/user', {
+              headers: {
+                'Authorization': `Bearer ${await (auth.currentUser?.getIdToken() || '')}`,
+              }
+            });
+            
+            if (!checkResponse.ok) {
+              const errorData = await checkResponse.json();
+              if (errorData.requiresWaitlist) {
+                setWaitlistError('You need to join our waitlist first to access VeeFore.');
+                setShowWaitlistModal(true);
+                return;
+              }
+              
+              if (errorData.requiresApproval) {
+                setWaitlistError('You are on the waitlist but early access has not been granted yet.');
+                setShowWaitlistModal(true);
+                return;
+              }
+            }
+          } catch (checkError) {
+            console.error('Error checking early access status:', checkError);
+          }
+          
+          throw firebaseError; // Re-throw the original error
+        }
       }
     } catch (error: any) {
       toast({

@@ -43,6 +43,7 @@ import FeaturePreview from "@/pages/FeaturePreview";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminUserManagement from "@/pages/AdminUserManagement";
 import InstagramAnalytics from "@/pages/InstagramAnalytics";
 import YouTubeAnalytics from "@/pages/YouTubeAnalytics";
 import ThumbnailAIMaker from "@/pages/ThumbnailAIMaker";
@@ -198,6 +199,7 @@ function Router() {
         <Switch>
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/admin/users" component={AdminUserManagement} />
           <Route path="/admin/early-access" component={AdminEarlyAccess} />
           <Route component={() => <Redirect to="/admin/login" />} />
         </Switch>

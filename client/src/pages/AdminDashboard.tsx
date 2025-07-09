@@ -36,20 +36,31 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('/api/admin/dashboard/stats', {
+      const response = await fetch('/api/admin/stats', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setStats(data);
+        setStats({
+          totalUsers: data.totalUsers || 0,
+          activeUsers: data.activeUsers || 0,
+          totalCredits: data.totalCreditsUsed || 0,
+          totalRevenue: data.revenueThisMonth || 0,
+          pendingPayments: 0,
+          recentSignups: data.totalUsers || 0
+        });
+        setError('');
       } else {
-        setError('Failed to fetch dashboard statistics');
+        const errorData = await response.json();
+        setError(`Failed to fetch dashboard statistics: ${errorData.error || response.statusText}`);
       }
     } catch (err) {
-      setError('Network error occurred');
+      console.error('Admin stats fetch error:', err);
+      setError(`Network error occurred: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -164,13 +175,22 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button 
+                onClick={() => window.location.href = '/admin/users'}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
                 Manage Users
               </Button>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button 
+                onClick={() => window.location.href = '/admin/transactions'}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
                 View Transactions
               </Button>
-              <Button className="w-full bg-green-600 hover:bg-green-700">
+              <Button 
+                onClick={() => window.location.href = '/admin/settings'}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
                 System Settings
               </Button>
             </CardContent>

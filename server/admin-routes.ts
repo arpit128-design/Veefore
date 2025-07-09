@@ -92,7 +92,12 @@ export function registerAdminRoutes(app: Express) {
       const limitNum = parseInt(limit as string);
       
       // Get users from MongoDB with pagination and search
-      const result = await storage.getAdminUsers(pageNum, limitNum, search as string);
+      const result = await storage.getAdminUsers({
+        page: pageNum,
+        limit: limitNum,
+        search: search as string,
+        filter: filter as string
+      });
       
       res.json(result);
     } catch (error) {
@@ -391,6 +396,106 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error('[ADMIN DELETE POPUP] Error:', error);
       res.status(500).json({ error: "Failed to delete popup" });
+    }
+  });
+
+  // Waitlist Management
+  app.get("/api/admin/waitlist", requireAdminAuth, async (req: AdminRequest, res) => {
+    try {
+      const { page = 1, limit = 10, search, filter } = req.query;
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      
+      // Get all waitlist users
+      const allUsers = await storage.getAllWaitlistUsers();
+      
+      // Apply search filter
+      let filteredUsers = allUsers;
+      if (search) {
+        const searchTerm = (search as string).toLowerCase();
+        filteredUsers = allUsers.filter(user => 
+          user.name.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm) ||
+          user.referralCode.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Apply status filter
+      if (filter && filter !== 'all') {
+        filteredUsers = filteredUsers.filter(user => user.status === filter);
+      }
+      
+      // Apply pagination
+      const startIndex = (pageNum - 1) * limitNum;
+      const paginatedUsers = filteredUsers.slice(startIndex, startIndex + limitNum);
+      
+      res.json({
+        users: paginatedUsers,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total: filteredUsers.length,
+          pages: Math.ceil(filteredUsers.length / limitNum)
+        }
+      });
+    } catch (error) {
+      console.error('[ADMIN WAITLIST] Error:', error);
+      res.status(500).json({ error: "Failed to fetch waitlist users" });
+    }
+  });
+
+  app.post("/api/admin/waitlist/:id/grant-early-access", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      
+      const updatedUser = await storage.updateWaitlistUser(id, {
+        status: 'early_access',
+        updatedAt: new Date()
+      });
+
+      await logAdminAction(
+        req.admin!.id,
+        "GRANT_EARLY_ACCESS",
+        "waitlist_user",
+        id,
+        undefined,
+        { status: 'early_access' },
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "Early access granted successfully", user: updatedUser });
+    } catch (error) {
+      console.error('[ADMIN GRANT ACCESS] Error:', error);
+      res.status(500).json({ error: "Failed to grant early access" });
+    }
+  });
+
+  app.post("/api/admin/waitlist/:id/remove", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Note: Since there's no delete method, we'll mark as removed
+      const updatedUser = await storage.updateWaitlistUser(id, {
+        status: 'removed',
+        updatedAt: new Date()
+      });
+
+      await logAdminAction(
+        req.admin!.id,
+        "REMOVE_WAITLIST_USER",
+        "waitlist_user",
+        id,
+        undefined,
+        { status: 'removed' },
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "User removed from waitlist successfully", user: updatedUser });
+    } catch (error) {
+      console.error('[ADMIN REMOVE WAITLIST] Error:', error);
+      res.status(500).json({ error: "Failed to remove user from waitlist" });
     }
   });
 

@@ -11882,6 +11882,7 @@ Format the response as JSON with this structure:
         credits: newCredits,
         hasClaimedWelcomeBonus: true,
         welcomeBonusClaimedAt: new Date(),
+        plan: 'starter', // Main plan field that subscription endpoint reads
         subscriptionPlan: 'starter',
         subscriptionStatus: 'trial',
         trialExpiresAt: trialExpirationDate,

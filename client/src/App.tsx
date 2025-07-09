@@ -36,7 +36,7 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import OnboardingPremium from "@/pages/OnboardingPremium";
 
-import TestLanding from "@/pages/TestLanding";
+import OptimizedLanding from "@/pages/OptimizedLanding";
 import Subscribe from "@/pages/Subscribe";
 import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { TermsOfService } from "@/pages/TermsOfService";
@@ -234,7 +234,7 @@ function Router() {
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/early-access" component={EarlyAccessPage} />
-          <Route path="/" component={TestLanding} />
+          <Route path="/" component={OptimizedLanding} />
           <Route component={() => <Redirect to="/" />} />
         </Switch>
         <Footer />

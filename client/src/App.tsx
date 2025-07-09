@@ -33,6 +33,8 @@ import Pricing from "@/pages/Pricing";
 import Subscription from "@/pages/Subscription";
 import SubscriptionNew from "@/pages/SubscriptionNew";
 import Auth from "@/pages/Auth";
+import SignIn from "@/pages/SignIn";
+import SignUp from "@/pages/SignUp";
 import OnboardingPremium from "@/pages/OnboardingPremium";
 
 import Landing from "@/pages/Landing";
@@ -223,6 +225,8 @@ function Router() {
         <OptimizedSpaceBackground />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/signin" component={SignIn} />
+          <Route path="/signup" component={SignUp} />
           <Route path="/features" component={Features} />
           <Route path="/solutions" component={Solutions} />
           <Route path="/reviews" component={Reviews} />

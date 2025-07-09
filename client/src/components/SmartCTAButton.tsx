@@ -36,8 +36,8 @@ export function SmartCTAButton({
 
   const handleClick = () => {
     if (deviceStatus.hasEarlyAccess) {
-      // User has early access, redirect to auth page
-      window.location.href = '/auth';
+      // User has early access, redirect to signup page since they haven't registered yet
+      window.location.href = '/signup';
     } else if (deviceStatus.isOnWaitlist) {
       // User is on waitlist, show status card
       if (onStatusAction) {

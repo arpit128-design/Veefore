@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'wouter';
 import { motion, useInView } from 'framer-motion';
 import { WaitlistModal } from '@/components/WaitlistModal';
+import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
+import { SmartCTAButton } from '@/components/SmartCTAButton';
 import { 
   ArrowRight, 
   Calendar, 
@@ -147,19 +149,12 @@ function LoadingSkeleton() {
 
 // Navigation Component
 function Navigation({ 
-  onOpenWaitlist, 
-  deviceWaitlistStatus, 
-  isCheckingDevice 
+  onOpenWaitlist
 }: { 
   onOpenWaitlist: () => void;
-  deviceWaitlistStatus: {
-    isOnWaitlist: boolean;
-    userEmail?: string;
-    referralCode?: string;
-  };
-  isCheckingDevice: boolean;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const deviceStatus = useDeviceWaitlistStatus();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -178,12 +173,33 @@ function Navigation({
   };
 
   const handleGetStarted = () => {
-    if (deviceWaitlistStatus.isOnWaitlist) {
-      // User is on waitlist, redirect to auth page
+    if (deviceStatus.hasEarlyAccess) {
+      // User has early access, redirect to auth page
       window.location.href = '/auth';
+    } else if (deviceStatus.isOnWaitlist) {
+      // User is on waitlist but no early access, show waitlist modal
+      onOpenWaitlist();
     } else {
       // User not on waitlist, show waitlist modal
       onOpenWaitlist();
+    }
+  };
+
+  const getButtonText = () => {
+    if (deviceStatus.hasEarlyAccess) {
+      return 'Start Free Trial';
+    } else if (deviceStatus.isOnWaitlist) {
+      return 'Check Status';
+    } else {
+      return 'Get Early Access';
+    }
+  };
+
+  const getSecondaryButtonText = () => {
+    if (deviceStatus.hasEarlyAccess) {
+      return 'Sign In';
+    } else {
+      return 'Join Waitlist';
     }
   };
 
@@ -218,20 +234,20 @@ function Navigation({
             <Link href="/reviews">
               <button className="text-gray-300 hover:text-white transition-colors">Reviews</button>
             </Link>
-            {!isCheckingDevice && (
+            {!deviceStatus.isLoading && (
               <>
                 <Button 
                   variant="ghost" 
                   className="text-gray-300 hover:text-white"
                   onClick={handleGetStarted}
                 >
-                  {deviceWaitlistStatus.isOnWaitlist ? 'Sign In' : 'Join Waitlist'}
+                  {getSecondaryButtonText()}
                 </Button>
                 <Button 
                   className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                   onClick={handleGetStarted}
                 >
-                  {deviceWaitlistStatus.isOnWaitlist ? 'Sign Up' : 'Get Early Access'}
+                  {getButtonText()}
                 </Button>
               </>
             )}
@@ -311,6 +327,8 @@ function StarfieldBackground() {
 
 // Hero Section with seamless blending
 function HeroSection() {
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  
   const scrollToFeatures = () => {
     const element = document.getElementById('features');
     if (element) {
@@ -434,26 +452,19 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
         >
-          <Link href="/auth">
-            <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
-            >
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6">
-                Start Free Trial
-                <motion.div
-                  className="ml-2 w-5 h-5 inline-block"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.div>
-              </Button>
-            </motion.div>
-          </Link>
+          <motion.div
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+          >
+            <SmartCTAButton
+              size="lg"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-6"
+              onWaitlistAction={() => setShowWaitlistModal(true)}
+            />
+          </motion.div>
           <Link href="/watch-demo">
             <motion.div
               whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
@@ -552,6 +563,13 @@ function HeroSection() {
           </motion.div>
         </div>
       </motion.div>
+      
+      {/* Waitlist Modal */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => setShowWaitlistModal(false)} 
+        initialReferralCode=""
+      />
     </section>
   );
 }
@@ -1085,6 +1103,7 @@ function SolutionsSection() {
 
 // Pricing Section
 function PricingSection() {
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const plans = [
     {
       name: "Starter",
@@ -1195,16 +1214,17 @@ function PricingSection() {
                       </div>
                     ))}
                   </div>
-                  <Button 
+                  <SmartCTAButton
                     className={`w-full ${
                       plan.popular 
                         ? `bg-gradient-to-r ${plan.color} hover:opacity-90` 
                         : 'bg-slate-700 hover:bg-slate-600 text-white'
                     } transition-all duration-300`}
+                    onWaitlistAction={() => setShowWaitlistModal(true)}
+                    showArrow={true}
                   >
                     {plan.popular ? 'Start Free Trial' : 'Get Started'}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
+                  </SmartCTAButton>
                 </CardContent>
               </Card>
             </div>
@@ -1219,6 +1239,13 @@ function PricingSection() {
           </Button>
         </div>
       </div>
+      
+      {/* Waitlist Modal */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => setShowWaitlistModal(false)} 
+        initialReferralCode=""
+      />
     </section>
   );
 }
@@ -1494,6 +1521,7 @@ function FAQSection() {
 
 // CTA Section with seamless blending
 function CTASection() {
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-t from-black via-purple-950/80 to-slate-900/60">
       {/* Gradient overlay for seamless blending */}
@@ -1523,12 +1551,11 @@ function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/auth">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl">
-                Start Your Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
+            <SmartCTAButton
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white text-lg px-8 py-6 font-semibold shadow-2xl"
+              onWaitlistAction={() => setShowWaitlistModal(true)}
+            />
             <Link href="/watch-demo">
               <Button size="lg" variant="outline" className="border-purple-400 text-purple-200 hover:bg-purple-900/30 text-lg px-8 py-6">
                 <Play className="mr-2 w-5 h-5" />
@@ -1544,6 +1571,13 @@ function CTASection() {
           </div>
         </div>
       </div>
+      
+      {/* Waitlist Modal */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => setShowWaitlistModal(false)} 
+        initialReferralCode=""
+      />
     </section>
   );
 }
@@ -1606,12 +1640,6 @@ function ScrollToTopButton() {
 export default function Landing() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [referralCode, setReferralCode] = useState('');
-  const [deviceWaitlistStatus, setDeviceWaitlistStatus] = useState<{
-    isOnWaitlist: boolean;
-    userEmail?: string;
-    referralCode?: string;
-  }>({ isOnWaitlist: false });
-  const [isCheckingDevice, setIsCheckingDevice] = useState(true);
 
   // Check for referral code in URL parameters
   useEffect(() => {
@@ -1628,29 +1656,6 @@ export default function Landing() {
     }
   }, []);
 
-  // Check if device is already on waitlist
-  useEffect(() => {
-    async function checkDeviceStatus() {
-      try {
-        const response = await fetch('/api/early-access/check-device');
-        if (response.ok) {
-          const data = await response.json();
-          setDeviceWaitlistStatus({
-            isOnWaitlist: true,
-            userEmail: data.user.email,
-            referralCode: data.user.referralCode
-          });
-        }
-      } catch (error) {
-        console.log('Device not on waitlist or error checking:', error);
-      } finally {
-        setIsCheckingDevice(false);
-      }
-    }
-
-    checkDeviceStatus();
-  }, []);
-
   const handleOpenWaitlist = () => {
     setShowWaitlistModal(true);
   };
@@ -1659,8 +1664,6 @@ export default function Landing() {
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
       <Navigation 
         onOpenWaitlist={handleOpenWaitlist} 
-        deviceWaitlistStatus={deviceWaitlistStatus}
-        isCheckingDevice={isCheckingDevice}
       />
       <HeroSection />
       

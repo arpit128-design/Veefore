@@ -1391,220 +1391,180 @@ function ResultsSection() {
 
 // Hootsuite-Style Pricing Section
 function PricingSection() {
+  const [isAnnual, setIsAnnual] = useState(false);
+
+  const plans = [
+    {
+      name: "Free",
+      monthlyPrice: "₹0",
+      annualPrice: "₹0",
+      period: "forever",
+      description: "Perfect for getting started",
+      features: [
+        "Up to 1 social account",
+        "20 AI credits monthly", 
+        "Basic analytics",
+        "Email support"
+      ],
+      isPopular: false,
+      buttonText: "Free 30-day trial",
+      buttonVariant: "outline" as const
+    },
+    {
+      name: "Starter", 
+      monthlyPrice: "₹699",
+      annualPrice: "₹524",
+      period: "per user/mo*",
+      description: "Everything in Free, PLUS:",
+      features: [
+        "Up to 2 social accounts",
+        "300 AI credits monthly",
+        "Advanced analytics", 
+        "Priority support",
+        "Content scheduling"
+      ],
+      isPopular: true,
+      buttonText: "Free 30-day trial",
+      buttonVariant: "default" as const
+    },
+    {
+      name: "Pro",
+      monthlyPrice: "₹1,499", 
+      annualPrice: "₹1,124",
+      period: "per user/mo*",
+      description: "Everything in Starter, PLUS:",
+      features: [
+        "Up to 5 social accounts",
+        "1,100 AI credits monthly",
+        "Team collaboration",
+        "Advanced AI tools",
+        "Custom analytics reports"
+      ],
+      isPopular: false,
+      buttonText: "Free 30-day trial", 
+      buttonVariant: "outline" as const
+    },
+    {
+      name: "Business",
+      monthlyPrice: "₹2,199",
+      annualPrice: "₹1,649", 
+      period: "per user/mo*",
+      description: "Everything in Pro, PLUS:",
+      features: [
+        "Unlimited social accounts",
+        "2,000 AI credits monthly",
+        "White-label solution", 
+        "API access",
+        "Dedicated account manager"
+      ],
+      isPopular: false,
+      buttonText: "Request a Demo",
+      buttonVariant: "outline" as const
+    }
+  ];
+
   return (
-    <section id="pricing" className="py-20 bg-white">
+    <section id="pricing" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Choose Your Plan
+            Pick the plan that's right for you
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Start free and upgrade as you grow. All plans include our core AI tools and 24/7 support to help you succeed.
+          <p className="text-xl text-gray-600 mb-8">
+            Manage all of your social media in one place.
           </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Free Plan */}
-          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Free</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold text-blue-400">₹0</span>
-                <span className="text-gray-400 ml-2">/forever</span>
-              </div>
-              <p className="text-gray-300">Perfect for getting started</p>
-            </div>
-            
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>20 AI credits monthly</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>1 social account</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Basic analytics</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Email support</span>
-              </li>
-            </ul>
-            
-            <Button 
-              variant="outline" 
-              className="w-full border-gray-600 text-white hover:bg-gray-800"
-              onClick={() => window.location.href = '/signup'}
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center space-x-4 mb-12">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Pay monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                isAnnual ? 'bg-gray-900' : 'bg-gray-300'
+              }`}
             >
-              Get Started
-            </Button>
-          </div>
-
-          {/* Starter Plan - Most Popular */}
-          <div className="bg-gray-900 text-white rounded-lg p-8 relative border-2 border-blue-500">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <Badge className="bg-blue-500 text-white px-4 py-1">Most Popular</Badge>
-            </div>
-            
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Starter</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold text-blue-400">₹699</span>
-                <span className="text-gray-400 ml-2">/per month</span>
-              </div>
-              <p className="text-gray-300">Ideal for individual creators</p>
-            </div>
-            
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>300 AI credits monthly</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>2 social accounts</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Advanced analytics</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Priority support</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Content scheduling</span>
-              </li>
-            </ul>
-            
-            <Button 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => window.location.href = '/signup'}
-            >
-              Get Started
-            </Button>
-          </div>
-
-          {/* Pro Plan */}
-          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Pro</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold text-blue-400">₹1,499</span>
-                <span className="text-gray-400 ml-2">/per month</span>
-              </div>
-              <p className="text-gray-300">Perfect for growing businesses</p>
-            </div>
-            
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>1,100 AI credits monthly</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>5 social accounts</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Team collaboration</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Advanced AI tools</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Custom analytics</span>
-              </li>
-            </ul>
-            
-            <Button 
-              variant="outline" 
-              className="w-full border-gray-600 text-white hover:bg-gray-800"
-              onClick={() => window.location.href = '/signup'}
-            >
-              Get Started
-            </Button>
-          </div>
-
-          {/* Business Plan */}
-          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">Business</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold text-blue-400">₹2,199</span>
-                <span className="text-gray-400 ml-2">/per month</span>
-              </div>
-              <p className="text-gray-300">For agencies and enterprises</p>
-            </div>
-            
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>2,000 AI credits monthly</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Unlimited social accounts</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>White-label solution</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>API access</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                <span>Dedicated support</span>
-              </li>
-            </ul>
-            
-            <Button 
-              variant="outline" 
-              className="w-full border-gray-600 text-white hover:bg-gray-800"
-              onClick={() => window.location.href = '/signup'}
-            >
-              Get Started
-            </Button>
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  isAnnual ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Pay annually
+              <span className="ml-1 text-xs text-green-600 font-medium">(Save up to 38%)</span>
+            </span>
           </div>
         </div>
 
-        {/* Additional Credit Packages */}
-        <div className="mt-16 bg-gray-50 rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Need More Credits?</h3>
-            <p className="text-gray-600">Purchase additional credit packages to boost your AI capabilities</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg p-6 text-center border">
-              <div className="text-2xl font-bold text-blue-600 mb-2">50</div>
-              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
-              <Button size="sm" variant="outline" className="w-full">₹199</Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {plans.map((plan, index) => (
+            <div key={index} className={`relative bg-white rounded-lg border ${plan.isPopular ? 'border-red-500' : 'border-gray-200'} p-6`}>
+              {plan.isPopular && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-red-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                    Most popular
+                  </span>
+                </div>
+              )}
+              
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                <div className="mb-2">
+                  <span className="text-3xl font-bold text-gray-900">
+                    {isAnnual ? plan.annualPrice : plan.monthlyPrice}
+                  </span>
+                  <span className="text-sm text-gray-500 ml-1">{plan.period}</span>
+                </div>
+                
+                <Button 
+                  variant={plan.buttonVariant}
+                  className={`w-full mb-4 ${
+                    plan.isPopular 
+                      ? 'bg-red-500 hover:bg-red-600 text-white' 
+                      : plan.buttonVariant === 'outline' 
+                        ? 'border-gray-900 text-gray-900 hover:bg-gray-50'
+                        : 'bg-gray-900 hover:bg-gray-800 text-white'
+                  }`}
+                  onClick={() => plan.buttonText === 'Request a Demo' 
+                    ? window.open('mailto:contact@veefore.com?subject=Business Plan Demo Request', '_blank')
+                    : window.location.href = '/signup'
+                  }
+                >
+                  {plan.buttonText}
+                </Button>
+
+                {/* Social Media Icons */}
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <Instagram className="w-4 h-4 text-gray-400" />
+                  <Facebook className="w-4 h-4 text-gray-400" />
+                  <Twitter className="w-4 h-4 text-gray-400" />
+                  <Youtube className="w-4 h-4 text-gray-400" />
+                  <Linkedin className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-3">{plan.description}</p>
+                <ul className="space-y-2">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start text-sm text-gray-700">
+                      <span className="text-gray-400 mr-2">–</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="bg-white rounded-lg p-6 text-center border">
-              <div className="text-2xl font-bold text-green-600 mb-2">150</div>
-              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
-              <Button size="sm" variant="outline" className="w-full">₹499</Button>
-            </div>
-            <div className="bg-white rounded-lg p-6 text-center border">
-              <div className="text-2xl font-bold text-purple-600 mb-2">500</div>
-              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
-              <Button size="sm" variant="outline" className="w-full">₹1,499</Button>
-            </div>
-            <div className="bg-white rounded-lg p-6 text-center border">
-              <div className="text-2xl font-bold text-red-600 mb-2">1000</div>
-              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
-              <Button size="sm" variant="outline" className="w-full">₹2,799</Button>
-            </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Additional Information */}
+        <div className="mt-12 text-center">
+          <p className="text-sm text-gray-500">
+            * Pricing shown in Indian Rupees. All plans include a 30-day free trial.
+          </p>
         </div>
       </div>
     </section>

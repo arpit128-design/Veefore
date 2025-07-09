@@ -199,10 +199,15 @@ export default function Auth() {
             signInForm.setValue('email', data.user.email);
             signUpForm.setValue('email', data.user.email);
             
-            // Show waitlist notification after a short delay
-            setTimeout(() => {
-              setShowWaitlistNotification(true);
-            }, 1000);
+            // Show waitlist notification only once after initial signup
+            const notificationKey = `early-access-notification-dismissed-${data.user.email}`;
+            const hasSeenNotification = localStorage.getItem(notificationKey);
+            
+            if (!hasSeenNotification) {
+              setTimeout(() => {
+                setShowWaitlistNotification(true);
+              }, 1000);
+            }
           }
         } else {
           // Device not on waitlist - show normal auth flow
@@ -855,49 +860,7 @@ export default function Auth() {
           <p>Join thousands of creators transforming their social media</p>
         </motion.div>
 
-        {/* Referral Code Display for Waitlist Users */}
-        {userWaitlistStatus.isOnWaitlist && userWaitlistStatus.referralCode && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="mt-6 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20 backdrop-blur-sm"
-          >
-            <div className="text-center space-y-3">
-              <div className="flex items-center justify-center space-x-2">
-                <Users className="w-5 h-5 text-blue-400" />
-                <h3 className="text-white font-semibold">Your Referral Code</h3>
-              </div>
-              
-              <div className="bg-black/30 rounded-lg p-3 border border-white/10">
-                <div className="flex items-center justify-center space-x-2">
-                  <code className="text-blue-400 font-mono text-lg tracking-wider">
-                    {userWaitlistStatus.referralCode}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const referralLink = `${window.location.origin}/?ref=${userWaitlistStatus.referralCode}`;
-                      navigator.clipboard.writeText(referralLink);
-                      toast({
-                        title: "Copied!",
-                        description: "Referral link copied to clipboard"
-                      });
-                    }}
-                    className="text-blue-400 hover:text-blue-300"
-                  >
-                    Copy Link
-                  </Button>
-                </div>
-              </div>
-              
-              <p className="text-white/60 text-sm">
-                Share this link with friends to help them join VeeFore early access
-              </p>
-            </div>
-          </motion.div>
-        )}
+
 
         {/* Waitlist Status Display */}
         {userWaitlistStatus.isOnWaitlist && (

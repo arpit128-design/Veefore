@@ -25,6 +25,12 @@ export function WaitlistStatusNotification({
   }, [show]);
 
   const handleClose = () => {
+    // Mark notification as dismissed in localStorage
+    if (userEmail) {
+      const notificationKey = `early-access-notification-dismissed-${userEmail}`;
+      localStorage.setItem(notificationKey, 'true');
+    }
+    
     setIsVisible(false);
     setTimeout(onClose, 300); // Wait for animation to complete
   };

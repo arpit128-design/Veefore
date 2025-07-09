@@ -608,16 +608,6 @@ export const insertUserPersonaSchema = createInsertSchema(userPersonas);
 export const insertAffiliateApplicationSchema = createInsertSchema(affiliateApplications);
 export const insertSocialListeningSchema = createInsertSchema(socialListening);
 export const insertEmotionAnalysisSchema = createInsertSchema(emotionAnalyses);
-  engagementRate: integer("engagement_rate"), // stored as percentage * 100 (e.g., 3.45% = 345)
-  // Instagram Business API engagement totals
-  totalLikes: integer("total_likes"),
-  totalComments: integer("total_comments"),
-  totalReach: integer("total_reach"),
-  avgEngagement: integer("avg_engagement"), // stored as percentage * 100
-  lastSyncAt: timestamp("last_sync_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
 
 export const content = pgTable("content", {
   id: serial("id").primaryKey(),

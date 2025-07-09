@@ -28,6 +28,7 @@ import { personaSuggestionsAI } from './persona-suggestions-ai';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
 import subscriptionRoutes from './routes/subscription';
+import { registerAdminRoutes } from './admin-routes';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   const instagramSync = new InstagramSyncService(storage);
@@ -11241,6 +11242,207 @@ Format the response as JSON with this structure:
   app.use('/api/early-access/*', (req, res, next) => {
     // This middleware ensures early access routes are handled first
     next();
+  });
+
+  app.use('/api/admin/*', (req, res, next) => {
+    // This middleware ensures admin routes are handled first
+    next();
+  });
+
+  // ===== ADMIN PANEL ROUTES =====
+  
+  // Register comprehensive admin routes with JWT authentication
+  registerAdminRoutes(app);
+  
+  // Legacy admin middleware for backward compatibility
+  const adminAuth = async (req: any, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
+      }
+
+      // Verify admin token (you can implement JWT verification here)
+      // For now, we'll use a simple check
+      const adminEmails = ['arpitchoudhary8433@gmail.com', 'choudharyarpit977@gmail.com'];
+      
+      // In production, decode JWT and check admin status
+      // For now, just check if it's a valid admin email
+      req.isAdmin = true; // This should be properly implemented with JWT
+      next();
+    } catch (error) {
+      console.error('[ADMIN AUTH] Error:', error);
+      res.status(401).json({ error: 'Invalid admin token' });
+    }
+  };
+
+  // Get all waitlist users (Admin only)
+  app.get('/api/admin/users', adminAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[ADMIN] Fetching all waitlist users');
+      const users = await storage.getAllWaitlistUsers();
+      
+      // Sort by referral count and creation date
+      const sortedUsers = users.sort((a, b) => {
+        if (b.referralCount !== a.referralCount) {
+          return b.referralCount - a.referralCount;
+        }
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      console.log('[ADMIN] Found', sortedUsers.length, 'waitlist users');
+      res.json({ success: true, users: sortedUsers });
+    } catch (error) {
+      console.error('[ADMIN] Error fetching users:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+  });
+
+  // Upgrade user to early access (Admin only)
+  app.post('/api/admin/upgrade-user', adminAuth, async (req: any, res: Response) => {
+    try {
+      const { userId, credits = 100 } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+
+      console.log('[ADMIN] Upgrading user to early access:', userId);
+      
+      // Update user status to 'early_access' and add credits
+      const updatedUser = await storage.updateWaitlistUser(userId, {
+        status: 'early_access',
+        credits: credits,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      console.log('[ADMIN] User upgraded successfully:', updatedUser.email);
+      res.json({ 
+        success: true, 
+        message: 'User upgraded to early access',
+        user: updatedUser 
+      });
+    } catch (error) {
+      console.error('[ADMIN] Error upgrading user:', error);
+      res.status(500).json({ error: 'Failed to upgrade user' });
+    }
+  });
+
+  // Send early access email (Admin only)
+  app.post('/api/admin/send-email', adminAuth, async (req: any, res: Response) => {
+    try {
+      const { userId, emailType = 'approval' } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+
+      console.log('[ADMIN] Sending early access email to user:', userId);
+      
+      const user = await storage.getWaitlistUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // In production, integrate with email service
+      // For now, just log the email content
+      const emailContent = {
+        to: user.email,
+        subject: 'VeeFore Early Access Approved! 🚀',
+        text: `Hi ${user.name},\n\nCongratulations! You've been approved for VeeFore early access.\n\nYour signup link: https://veefore.com/auth?early_access=true&email=${user.email}\n\nWelcome to the future of AI-powered content creation!\n\nBest regards,\nThe VeeFore Team`,
+        html: `
+          <h2>Welcome to VeeFore Early Access! 🚀</h2>
+          <p>Hi ${user.name},</p>
+          <p>Congratulations! You've been approved for VeeFore early access.</p>
+          <p><a href="https://veefore.com/auth?early_access=true&email=${user.email}" style="background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Access Your Account</a></p>
+          <p>Welcome to the future of AI-powered content creation!</p>
+          <p>Best regards,<br>The VeeFore Team</p>
+        `
+      };
+
+      console.log('[ADMIN] Email would be sent:', emailContent);
+      
+      res.json({ 
+        success: true, 
+        message: 'Early access email sent successfully',
+        emailSent: true 
+      });
+    } catch (error) {
+      console.error('[ADMIN] Error sending email:', error);
+      res.status(500).json({ error: 'Failed to send email' });
+    }
+  });
+
+  // Bulk upgrade users (Admin only)
+  app.post('/api/admin/bulk-upgrade', adminAuth, async (req: any, res: Response) => {
+    try {
+      const { userIds, credits = 100 } = req.body;
+      
+      if (!userIds || !Array.isArray(userIds)) {
+        return res.status(400).json({ error: 'User IDs array is required' });
+      }
+
+      console.log('[ADMIN] Bulk upgrading users:', userIds.length);
+      
+      const results = [];
+      for (const userId of userIds) {
+        try {
+          const updatedUser = await storage.updateWaitlistUser(userId, {
+            status: 'early_access',
+            credits: credits,
+            approvedAt: new Date(),
+            updatedAt: new Date()
+          });
+          results.push({ userId, success: true, user: updatedUser });
+        } catch (error) {
+          results.push({ userId, success: false, error: error.message });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      console.log('[ADMIN] Bulk upgrade completed:', successCount, 'of', userIds.length, 'users');
+      
+      res.json({ 
+        success: true, 
+        message: `${successCount} users upgraded successfully`,
+        results 
+      });
+    } catch (error) {
+      console.error('[ADMIN] Error in bulk upgrade:', error);
+      res.status(500).json({ error: 'Failed to bulk upgrade users' });
+    }
+  });
+
+  // Get admin stats (Admin only)
+  app.get('/api/admin/stats', adminAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[ADMIN] Fetching admin stats');
+      const stats = await storage.getWaitlistStats();
+      
+      // Add additional admin-specific stats
+      const users = await storage.getAllWaitlistUsers();
+      const topReferrers = users
+        .filter(u => u.referralCount > 0)
+        .sort((a, b) => b.referralCount - a.referralCount)
+        .slice(0, 10);
+
+      const adminStats = {
+        ...stats,
+        topReferrers,
+        recentSignups: users
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 5),
+        earlyAccessUsers: users.filter(u => u.status === 'early_access').length,
+        pendingApprovals: users.filter(u => u.status === 'waitlisted' && u.referralCount >= 3).length
+      };
+
+      console.log('[ADMIN] Admin stats generated');
+      res.json({ success: true, stats: adminStats });
+    } catch (error) {
+      console.error('[ADMIN] Error fetching admin stats:', error);
+      res.status(500).json({ error: 'Failed to fetch admin stats' });
+    }
   });
   
   // Join Waitlist

@@ -64,6 +64,7 @@ import PersonaSuggestions from "@/pages/PersonaSuggestions";
 import Gamification from "@/pages/Gamification";
 import EmotionAnalysis from "@/pages/EmotionAnalysis";
 import EarlyAccessPage from "@/pages/EarlyAccessPage";
+import AdminEarlyAccess from "@/pages/AdminEarlyAccess";
 
 // New landing page related pages
 import Features from "@/pages/Features";
@@ -197,6 +198,7 @@ function Router() {
         <Switch>
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/admin/early-access" component={AdminEarlyAccess} />
           <Route component={() => <Redirect to="/admin/login" />} />
         </Switch>
       </div>

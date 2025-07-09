@@ -7,7 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { OptimizedSpaceBackground } from "@/components/layout/OptimizedSpaceBackground";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Footer } from "@/components/layout/Footer";
 import { SpaceLoader } from "@/components/ui/space-loader";
 import { useAuth } from "@/hooks/useAuth";
 import { WorkspaceProvider } from "@/hooks/useWorkspace";
@@ -159,7 +158,6 @@ function AuthenticatedApp() {
             </Switch>
           </main>
         </div>
-        <Footer />
         <GlobalWorkspaceSwitchingOverlay />
         <AICopilotWidget />
       </div>
@@ -237,7 +235,6 @@ function Router() {
           <Route path="/" component={HootsuiteLanding} />
           <Route component={() => <Redirect to="/" />} />
         </Switch>
-        <Footer />
       </div>
     );
   }

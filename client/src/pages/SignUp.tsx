@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
 import { motion } from 'framer-motion';
+import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -320,9 +321,11 @@ export default function SignUp() {
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-8 h-8 object-contain"
+              />
               <span className="text-xl font-bold text-gray-900">VeeFore</span>
             </div>
           </div>
@@ -335,9 +338,11 @@ export default function SignUp() {
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-green-400 to-blue-500 text-white p-12 flex-col justify-center">
         <div className="max-w-md">
           <div className="flex items-center mb-8">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-3">
-              <span className="text-blue-600 font-bold text-xl">V</span>
-            </div>
+            <img 
+              src={veeforeLogo} 
+              alt="VeeFore Logo" 
+              className="w-10 h-10 object-contain mr-3"
+            />
             <span className="text-2xl font-bold">VeeFore</span>
           </div>
           

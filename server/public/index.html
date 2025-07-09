@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeeFore - AI-Powered Social Media Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4f46e5, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .status-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+        .api-list {
+            list-style: none;
+            text-align: left;
+        }
+        .api-list li {
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .footer {
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">VeeFore</div>
+        <div class="subtitle">AI-Powered Social Media Management Platform</div>
+        
+        <div class="status">
+            <div class="status-title">✅ Backend Server Running</div>
+            <p>Your VeeFore backend is successfully running on port 5000!</p>
+            <p>Connected to MongoDB Atlas database.</p>
+        </div>
+
+        <div class="status">
+            <div class="status-title">🔌 Available API Endpoints</div>
+            <ul class="api-list">
+                <li>GET /api/health - Health check</li>
+                <li>GET /api/user - User management</li>
+                <li>GET /api/workspaces - Workspace operations</li>
+                <li>GET /api/content - Content management</li>
+                <li>GET /api/analytics - Analytics dashboard</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>VeeFore v1.0 - Your Social Media Command Center</p>
+        </div>
+    </div>
+
+    <script>
+        // Test API connectivity
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Health Check:', data);
+            })
+            .catch(error => {
+                console.error('API Error:', error);
+            });
+    </script>
+</body>
+</html>

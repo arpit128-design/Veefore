@@ -62,7 +62,7 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.8, ease: "back.out(1.7)" }}
+                transition={{ duration: 0.8, ease: "backOut" }}
                 className="mx-auto mb-4"
               >
                 <div className="relative">

@@ -13,6 +13,7 @@ import {
   Globe, 
   TrendingUp,
   Timer,
+  Clock,
   Target,
   CheckCircle,
   Play,
@@ -448,13 +449,13 @@ function DashboardPreview() {
   );
 }
 
-// Feature Detail Sections - Hootsuite Style
+// Comprehensive Feature Detail Sections - All 9 Features
 function FeatureDetailSections() {
   return (
     <section id="features" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-24">
-          {/* Feature 1: AI Content Creation */}
+        <div className="space-y-32">
+          {/* Feature 1: AI Content Generator */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="flex items-center mb-6">
@@ -481,6 +482,10 @@ function FeatureDetailSections() {
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
                   <span className="text-gray-700">Multi-platform optimization</span>
                 </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Viral content suggestions</span>
+                </div>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-xl p-8">
@@ -492,7 +497,7 @@ function FeatureDetailSections() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-2">Generated Caption:</p>
                   <p className="text-gray-900 font-medium">
-                    "Ready to level up your content game? 🚀 Our AI tools help you create scroll-stopping posts that actually convert. #ContentCreation #AIMarketing"
+                    "Ready to level up your content game? 🚀 Our AI tools help you create scroll-stopping posts that actually convert. #ContentCreation #AIMarketing #VeeFore"
                   </p>
                 </div>
                 <div className="flex items-center space-x-4 text-sm">
@@ -509,32 +514,34 @@ function FeatureDetailSections() {
             </div>
           </div>
 
-          {/* Feature 2: Analytics & Insights */}
+          {/* Feature 2: AI Image Generator */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <div className="bg-white rounded-lg shadow-xl p-8">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-lg font-semibold text-gray-900">Social Media Performance</h4>
-                    <Button size="sm" variant="outline">View Report</Button>
+                    <h4 className="text-lg font-semibold text-gray-900">AI Image Generator</h4>
+                    <Badge className="bg-blue-100 text-blue-800">DALL-E 3</Badge>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">12.5K</div>
-                      <div className="text-sm text-gray-600">Engagement</div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">+45%</div>
-                      <div className="text-sm text-gray-600">Growth</div>
-                    </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">89%</div>
-                      <div className="text-sm text-gray-600">Reach</div>
+                  <div className="bg-gray-100 rounded-lg h-40 flex items-center justify-center">
+                    <div className="text-center">
+                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Generated Image Preview</p>
                     </div>
                   </div>
-                  <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-8 h-8 text-gray-400" />
-                    <span className="ml-2 text-gray-500">Analytics Chart</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Style</span>
+                      <span className="text-sm font-medium">Professional</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Resolution</span>
+                      <span className="text-sm font-medium">1080x1080</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Brand Colors</span>
+                      <span className="text-sm font-medium">Applied</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -542,7 +549,177 @@ function FeatureDetailSections() {
             <div className="order-1 lg:order-2">
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                  <Camera className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Generate stunning visuals with AI</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Create professional-quality images with DALL-E 3 integration. Generate custom visuals that match your brand aesthetic and engage your audience.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">DALL-E 3 powered generation</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Brand-consistent styling</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Multiple format support</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Custom prompt optimization</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: AI Thumbnail Maker Pro */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                  <Video className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Create scroll-stopping YouTube thumbnails</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Design professional YouTube thumbnails with our 7-stage AI process. Maximize your click-through rates with data-driven thumbnail optimization.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">7-stage AI generation process</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">CTR optimization algorithms</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Professional canvas editor</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Multiple layout variants</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Thumbnail Maker Pro</span>
+                  <Badge className="bg-red-100 text-red-800">7-Stage Process</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-100 rounded-lg h-24 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">Layout 1</span>
+                  </div>
+                  <div className="bg-gray-100 rounded-lg h-24 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">Layout 2</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">CTR Prediction</span>
+                    <span className="text-sm font-medium text-green-600">89%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Viral Potential</span>
+                    <span className="text-sm font-medium text-blue-600">High</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 4: Content Scheduler */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900">Content Calendar</h4>
+                    <Calendar className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span className="text-sm font-medium">Instagram Post</span>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800">Scheduled</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <span className="text-sm font-medium">LinkedIn Article</span>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">Draft</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        <span className="text-sm font-medium">Twitter Thread</span>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-800">AI Generated</Badge>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Optimal posting time</span>
+                      <span className="font-medium text-green-600">2:00 PM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                  <Calendar className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Schedule posts and manage content</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Plan your content calendar with AI-suggested optimal posting times. Schedule across all platforms and let our automation handle the rest.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Multi-platform scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">AI-optimized timing</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Bulk content upload</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Content approval workflow</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 5: Analytics & Insights */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                  <BarChart3 className="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold text-gray-900">Analyze social media performance</h3>
@@ -564,66 +741,323 @@ function FeatureDetailSections() {
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
                   <span className="text-gray-700">AI-powered recommendations</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3: Content Scheduling */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                  <Calendar className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Schedule posts and create content</h3>
-                </div>
-              </div>
-              <p className="text-lg text-gray-600 mb-6">
-                Plan your content calendar with AI-suggested optimal posting times. Schedule across all platforms and let our automation handle the rest.
-              </p>
-              <div className="space-y-3">
                 <div className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Multi-platform scheduling</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">AI-optimized timing</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Bulk content upload</span>
+                  <span className="text-gray-700">Custom report generation</span>
                 </div>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-xl p-8">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold text-gray-900">Content Calendar</h4>
-                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <h4 className="text-lg font-semibold text-gray-900">Performance Dashboard</h4>
+                  <Button size="sm" variant="outline">Export Report</Button>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">12.5K</div>
+                    <div className="text-sm text-gray-600">Engagement</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">+45%</div>
+                    <div className="text-sm text-gray-600">Growth</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">89%</div>
+                    <div className="text-sm text-gray-600">Reach</div>
+                  </div>
+                </div>
+                <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <BarChart3 className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <span className="text-sm text-gray-500">Analytics Chart</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 6: Smart DM Automation */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900">DM Automation</h4>
+                    <Badge className="bg-indigo-100 text-indigo-800">AI Powered</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <MessageSquare className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium">Auto-Response Rule</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        "Thanks for reaching out! We'll get back to you within 24 hours."
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Users className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium">Lead Qualification</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        AI detects potential customers and tags them automatically
+                      </p>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Response Rate</span>
+                      <span className="font-medium text-green-600">95%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                  <MessageSquare className="w-6 h-6 text-indigo-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Automate messages and engagement</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Never miss a message with intelligent DM automation. Our AI responds to inquiries, qualifies leads, and maintains engagement 24/7.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Smart auto-responses</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Lead qualification</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">24/7 availability</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Sentiment analysis</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 7: Social Listening */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
+                  <Eye className="w-6 h-6 text-pink-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Monitor mentions and track trends</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Stay ahead of the conversation with comprehensive social listening. Track brand mentions, monitor competitors, and discover trending topics.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Brand mention tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Competitor analysis</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Sentiment tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Trending topic discovery</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-gray-900">Social Listening Dashboard</h4>
+                  <Badge className="bg-pink-100 text-pink-800">Live</Badge>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Instagram Post</span>
+                      <span className="text-sm font-medium">Brand Mentions</span>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">Scheduled</Badge>
+                    <span className="text-sm font-semibold text-green-600">+25</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm font-medium">LinkedIn Article</span>
+                      <span className="text-sm font-medium">Sentiment Score</span>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-800">Draft</Badge>
+                    <span className="text-sm font-semibold text-blue-600">89% Positive</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Twitter Thread</span>
+                      <span className="text-sm font-medium">Trending Topics</span>
                     </div>
-                    <Badge className="bg-purple-100 text-purple-800">AI Generated</Badge>
+                    <span className="text-sm font-semibold text-purple-600">12 New</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 8: Trend Intelligence */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-gray-900">Trend Intelligence</h4>
+                    <Badge className="bg-yellow-100 text-yellow-800">Real-time</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">#AIContent</span>
+                      <span className="text-sm font-semibold text-green-600">+250%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">#SocialMedia</span>
+                      <span className="text-sm font-semibold text-blue-600">+180%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">#Marketing</span>
+                      <span className="text-sm font-semibold text-purple-600">+120%</span>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t">
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-yellow-600" />
+                        <span className="text-sm font-medium">Viral Prediction</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        AI predicts 85% chance of viral success for #TechTrends
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                  <TrendingUp className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Stay ahead with trend intelligence</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Discover trending topics before they explode. Our AI analyzes millions of posts to identify emerging trends and predict viral content.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Real-time trend analysis</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Viral prediction algorithms</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Content optimization suggestions</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Trend forecasting</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 9: Competitor Analysis */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                  <Target className="w-6 h-6 text-cyan-600" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">Analyze competitors and market positioning</h3>
+                </div>
+              </div>
+              <p className="text-lg text-gray-600 mb-6">
+                Understand your competitive landscape with comprehensive competitor analysis. Track their strategies, performance, and identify opportunities.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Competitor content analysis</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Performance benchmarking</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Market gap identification</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span className="text-gray-700">Strategic recommendations</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-gray-900">Competitor Analysis</h4>
+                  <Badge className="bg-cyan-100 text-cyan-800">Advanced</Badge>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">A</span>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium">Competitor A</span>
+                        <p className="text-xs text-gray-600">Engagement: 5.2K</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold text-blue-600">+15%</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">B</span>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium">Competitor B</span>
+                        <p className="text-xs text-gray-600">Engagement: 3.8K</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold text-green-600">+8%</span>
+                  </div>
+                </div>
+                <div className="pt-4 border-t">
+                  <div className="bg-cyan-50 p-3 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Target className="w-4 h-4 text-cyan-600" />
+                      <span className="text-sm font-medium">Market Opportunity</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Video content shows 40% higher engagement than competitors
+                    </p>
                   </div>
                 </div>
               </div>
@@ -683,6 +1117,257 @@ function ResultsSection() {
           ))}
         </div>
         
+        {/* Detailed User Testimonials */}
+        <div className="mt-20 bg-gray-50 rounded-3xl p-12">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">What Our Users Say</h3>
+            <p className="text-lg text-gray-600">Trusted by creators, marketers, and agencies worldwide</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex text-yellow-400 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-6 text-lg">
+                "VeeFore's AI content generator has completely transformed my workflow. I'm creating better content in half the time and my engagement has tripled!"
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">SJ</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Sarah Johnson</h4>
+                  <p className="text-sm text-gray-600">Content Creator • 150K followers</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex text-yellow-400 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-6 text-lg">
+                "The analytics insights are incredible. I finally understand what content resonates with my audience. ROI tracking has improved our campaigns by 200%."
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">MC</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Mike Chen</h4>
+                  <p className="text-sm text-gray-600">Digital Marketing Director • Tech Startup</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="flex text-yellow-400 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-6 text-lg">
+                "Managing 15+ clients is effortless now. The automation features and team collaboration tools have revolutionized our agency operations."
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">ER</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Emma Rodriguez</h4>
+                  <p className="text-sm text-gray-600">Agency Owner • Social Media Agency</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Success Stories Grid */}
+        <div className="mt-20">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">Success Stories</h3>
+            <p className="text-lg text-gray-600">Real results from businesses of all sizes</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-200">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">TechStartup Inc.</h4>
+                  <p className="text-gray-600">B2B SaaS Company</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-blue-600">450%</div>
+                  <p className="text-sm text-gray-600">Lead increase</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "After implementing VeeFore's AI content strategy, our LinkedIn engagement skyrocketed. We went from 50 leads/month to 275 leads/month in just 3 months."
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <Users className="w-4 h-4 mr-1" />
+                  Team: 5 people
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  Timeline: 3 months
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-8 border border-green-200">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">Fashion Forward</h4>
+                  <p className="text-gray-600">E-commerce Brand</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-green-600">280%</div>
+                  <p className="text-sm text-gray-600">Sales growth</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "VeeFore's trend intelligence helped us identify viral fashion trends early. Our Instagram sales increased by 280% using AI-generated content."
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  Revenue: $2.8M
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  Timeline: 6 months
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">Creative Agency Pro</h4>
+                  <p className="text-gray-600">Digital Marketing Agency</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-purple-600">15</div>
+                  <p className="text-sm text-gray-600">Hours saved/week</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "VeeFore's automation and team collaboration features allow us to manage 3x more clients with the same team size. Game-changer for our productivity."
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <Users className="w-4 h-4 mr-1" />
+                  Clients: 45+
+                </div>
+                <div className="flex items-center">
+                  <Clock className="w-4 h-4 mr-1" />
+                  Time saved: 60hrs/month
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-8 border border-orange-200">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">FitLife Coach</h4>
+                  <p className="text-gray-600">Fitness Influencer</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-orange-600">500K</div>
+                  <p className="text-sm text-gray-600">New followers</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4">
+                "Using VeeFore's viral prediction AI, I consistently create content that hits 100K+ views. Grew from 50K to 550K followers in 8 months."
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  Avg views: 250K
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  Timeline: 8 months
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Platform Comparison */}
+        <div className="mt-20 bg-gradient-to-r from-gray-900 to-black rounded-3xl p-12 text-white">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4">Why Choose VeeFore Over Traditional Tools?</h3>
+            <p className="text-lg opacity-90">See how VeeFore's AI-powered approach outperforms legacy social media tools</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <X className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="text-xl font-bold mb-4">Traditional Tools</h4>
+              <ul className="space-y-3 text-gray-300">
+                <li>• Manual content creation</li>
+                <li>• Basic scheduling only</li>
+                <li>• Limited analytics</li>
+                <li>• No AI assistance</li>
+                <li>• Platform silos</li>
+                <li>• Time-consuming workflows</li>
+              </ul>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="text-xl font-bold mb-4 text-blue-400">VeeFore AI Platform</h4>
+              <ul className="space-y-3 text-blue-200">
+                <li>• AI-powered content generation</li>
+                <li>• Smart scheduling optimization</li>
+                <li>• Advanced analytics & insights</li>
+                <li>• 9+ AI tools integrated</li>
+                <li>• Unified platform experience</li>
+                <li>• Automated workflows</li>
+              </ul>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="text-xl font-bold mb-4">The VeeFore Advantage</h4>
+              <ul className="space-y-3 text-gray-300">
+                <li>• 95% time savings</li>
+                <li>• 300% engagement boost</li>
+                <li>• Real-time trend analysis</li>
+                <li>• Viral prediction AI</li>
+                <li>• Complete automation</li>
+                <li>• ROI optimization</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Industry Recognition */}
+        <div className="mt-20 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-8">Trusted by Industry Leaders</h3>
+          <div className="flex items-center justify-center space-x-12 opacity-60">
+            <div className="text-2xl font-bold text-gray-600">TechCrunch</div>
+            <div className="text-2xl font-bold text-gray-600">Forbes</div>
+            <div className="text-2xl font-bold text-gray-600">Entrepreneur</div>
+            <div className="text-2xl font-bold text-gray-600">Inc.</div>
+            <div className="text-2xl font-bold text-gray-600">Wired</div>
+          </div>
+        </div>
+
         <div className="mt-16 text-center">
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Social Media?</h3>
@@ -704,113 +1389,222 @@ function ResultsSection() {
   );
 }
 
-// Pricing Section
+// Hootsuite-Style Pricing Section
 function PricingSection() {
-  const plans = [
-    {
-      name: "Free",
-      price: "₹0",
-      period: "forever",
-      description: "Perfect for getting started",
-      features: [
-        "20 AI credits monthly",
-        "1 social account",
-        "Basic analytics",
-        "Email support"
-      ],
-      highlighted: false
-    },
-    {
-      name: "Starter",
-      price: "₹699",
-      period: "per month",
-      description: "Ideal for individual creators",
-      features: [
-        "300 AI credits monthly",
-        "2 social accounts",
-        "Advanced analytics",
-        "Priority support",
-        "Content scheduling"
-      ],
-      highlighted: true
-    },
-    {
-      name: "Pro",
-      price: "₹1,499",
-      period: "per month",
-      description: "Perfect for growing businesses",
-      features: [
-        "1,100 AI credits monthly",
-        "5 social accounts",
-        "Team collaboration",
-        "Advanced AI tools",
-        "Custom analytics"
-      ],
-      highlighted: false
-    },
-    {
-      name: "Business",
-      price: "₹2,199",
-      period: "per month",
-      description: "For agencies and enterprises",
-      features: [
-        "2,000 AI credits monthly",
-        "Unlimited social accounts",
-        "White-label solution",
-        "API access",
-        "Dedicated support"
-      ],
-      highlighted: false
-    }
-  ];
-
   return (
-    <section id="pricing" className="py-20 bg-gray-50">
+    <section id="pricing" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Choose Your Plan
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Start free and upgrade as you grow. All plans include our core AI tools 
-            and 24/7 support to help you succeed.
+            Start free and upgrade as you grow. All plans include our core AI tools and 24/7 support to help you succeed.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {plans.map((plan, index) => (
-            <Card key={index} className={`relative ${plan.highlighted ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
-              {plan.highlighted && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-blue-500 text-white">Most Popular</Badge>
-                </div>
-              )}
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                  <span className="text-gray-600 ml-2">/{plan.period}</span>
-                </div>
-                <CardDescription className="mt-2">{plan.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button 
-                  className={`w-full mt-6 ${plan.highlighted ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-900 hover:bg-gray-800'}`}
-                  onClick={() => window.location.href = '/signup'}
-                >
-                  Get Started
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Free Plan */}
+          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Free</h3>
+              <div className="mb-4">
+                <span className="text-4xl font-bold text-blue-400">₹0</span>
+                <span className="text-gray-400 ml-2">/forever</span>
+              </div>
+              <p className="text-gray-300">Perfect for getting started</p>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>20 AI credits monthly</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>1 social account</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Basic analytics</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Email support</span>
+              </li>
+            </ul>
+            
+            <Button 
+              variant="outline" 
+              className="w-full border-gray-600 text-white hover:bg-gray-800"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Get Started
+            </Button>
+          </div>
+
+          {/* Starter Plan - Most Popular */}
+          <div className="bg-gray-900 text-white rounded-lg p-8 relative border-2 border-blue-500">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <Badge className="bg-blue-500 text-white px-4 py-1">Most Popular</Badge>
+            </div>
+            
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Starter</h3>
+              <div className="mb-4">
+                <span className="text-4xl font-bold text-blue-400">₹699</span>
+                <span className="text-gray-400 ml-2">/per month</span>
+              </div>
+              <p className="text-gray-300">Ideal for individual creators</p>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>300 AI credits monthly</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>2 social accounts</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Advanced analytics</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Priority support</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Content scheduling</span>
+              </li>
+            </ul>
+            
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Get Started
+            </Button>
+          </div>
+
+          {/* Pro Plan */}
+          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Pro</h3>
+              <div className="mb-4">
+                <span className="text-4xl font-bold text-blue-400">₹1,499</span>
+                <span className="text-gray-400 ml-2">/per month</span>
+              </div>
+              <p className="text-gray-300">Perfect for growing businesses</p>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>1,100 AI credits monthly</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>5 social accounts</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Team collaboration</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Advanced AI tools</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Custom analytics</span>
+              </li>
+            </ul>
+            
+            <Button 
+              variant="outline" 
+              className="w-full border-gray-600 text-white hover:bg-gray-800"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Get Started
+            </Button>
+          </div>
+
+          {/* Business Plan */}
+          <div className="bg-gray-900 text-white rounded-lg p-8 relative">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">Business</h3>
+              <div className="mb-4">
+                <span className="text-4xl font-bold text-blue-400">₹2,199</span>
+                <span className="text-gray-400 ml-2">/per month</span>
+              </div>
+              <p className="text-gray-300">For agencies and enterprises</p>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>2,000 AI credits monthly</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Unlimited social accounts</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>White-label solution</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>API access</span>
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
+                <span>Dedicated support</span>
+              </li>
+            </ul>
+            
+            <Button 
+              variant="outline" 
+              className="w-full border-gray-600 text-white hover:bg-gray-800"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
+
+        {/* Additional Credit Packages */}
+        <div className="mt-16 bg-gray-50 rounded-2xl p-8">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Need More Credits?</h3>
+            <p className="text-gray-600">Purchase additional credit packages to boost your AI capabilities</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg p-6 text-center border">
+              <div className="text-2xl font-bold text-blue-600 mb-2">50</div>
+              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
+              <Button size="sm" variant="outline" className="w-full">₹199</Button>
+            </div>
+            <div className="bg-white rounded-lg p-6 text-center border">
+              <div className="text-2xl font-bold text-green-600 mb-2">150</div>
+              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
+              <Button size="sm" variant="outline" className="w-full">₹499</Button>
+            </div>
+            <div className="bg-white rounded-lg p-6 text-center border">
+              <div className="text-2xl font-bold text-purple-600 mb-2">500</div>
+              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
+              <Button size="sm" variant="outline" className="w-full">₹1,499</Button>
+            </div>
+            <div className="bg-white rounded-lg p-6 text-center border">
+              <div className="text-2xl font-bold text-red-600 mb-2">1000</div>
+              <div className="text-sm text-gray-600 mb-4">Extra Credits</div>
+              <Button size="sm" variant="outline" className="w-full">₹2,799</Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -889,6 +1683,161 @@ function VeeForeFooter() {
   );
 }
 
+// AI Tools Showcase Section
+function AIToolsShowcase() {
+  const aiTools = [
+    {
+      name: "AI Content Generator",
+      description: "Generate engaging posts, captions, and hashtags instantly with brand voice consistency",
+      icon: <BrainCircuit className="w-8 h-8 text-purple-600" />,
+      credits: "2 credits",
+      features: ["Multi-platform optimization", "Brand voice learning", "Hashtag generation", "Content calendar integration"],
+      color: "from-purple-500 to-indigo-600"
+    },
+    {
+      name: "AI Image Generator", 
+      description: "Create stunning visuals with DALL-E 3 integration for professional-quality content",
+      icon: <Camera className="w-8 h-8 text-blue-600" />,
+      credits: "4 credits",
+      features: ["DALL-E 3 powered", "Custom brand styling", "Multiple formats", "Instant generation"],
+      color: "from-blue-500 to-cyan-600"
+    },
+    {
+      name: "AI Thumbnail Maker Pro",
+      description: "7-stage AI process for creating high-CTR YouTube thumbnails with professional layouts",
+      icon: <Video className="w-8 h-8 text-red-600" />,
+      credits: "8 credits", 
+      features: ["7-stage generation", "CTR optimization", "Canvas editor", "Multiple variants"],
+      color: "from-red-500 to-pink-600"
+    },
+    {
+      name: "Content Scheduler",
+      description: "AI-optimized scheduling across platforms with intelligent timing recommendations",
+      icon: <Calendar className="w-8 h-8 text-green-600" />,
+      credits: "1 credit",
+      features: ["Smart timing", "Multi-platform", "Bulk scheduling", "Analytics integration"],
+      color: "from-green-500 to-teal-600"
+    },
+    {
+      name: "Analytics & Insights",
+      description: "Comprehensive performance tracking with AI-powered recommendations",
+      icon: <BarChart3 className="w-8 h-8 text-orange-600" />,
+      credits: "Free",
+      features: ["Real-time metrics", "Cross-platform analytics", "AI insights", "Custom reports"],
+      color: "from-orange-500 to-red-600"
+    },
+    {
+      name: "Smart DM Automation",
+      description: "24/7 intelligent message automation with lead qualification and sentiment analysis",
+      icon: <MessageSquare className="w-8 h-8 text-indigo-600" />,
+      credits: "1 credit",
+      features: ["Auto responses", "Lead qualification", "Sentiment analysis", "24/7 availability"],
+      color: "from-indigo-500 to-purple-600"
+    },
+    {
+      name: "Social Listening",
+      description: "Monitor brand mentions, track competitors, and discover trending topics in real-time",
+      icon: <Eye className="w-8 h-8 text-pink-600" />,
+      credits: "4 credits",
+      features: ["Brand monitoring", "Competitor analysis", "Sentiment tracking", "Trend discovery"],
+      color: "from-pink-500 to-rose-600"
+    },
+    {
+      name: "Trend Intelligence",
+      description: "AI-powered trend analysis with viral prediction and content optimization",
+      icon: <TrendingUp className="w-8 h-8 text-yellow-600" />,
+      credits: "6 credits",
+      features: ["Viral prediction", "Trend forecasting", "Content optimization", "Real-time analysis"],
+      color: "from-yellow-500 to-orange-600"
+    },
+    {
+      name: "Competitor Analysis",
+      description: "Comprehensive competitive intelligence with strategic recommendations",
+      icon: <Target className="w-8 h-8 text-cyan-600" />,
+      credits: "7 credits",
+      features: ["Performance benchmarking", "Content analysis", "Market gaps", "Strategic insights"],
+      color: "from-cyan-500 to-blue-600"
+    }
+  ];
+
+  return (
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            9 Powerful AI Tools, One Unified Platform
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Experience the complete suite of AI-powered social media tools designed to transform your content strategy and maximize engagement.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {aiTools.map((tool, index) => (
+            <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <div className={`w-16 h-16 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-6`}>
+                {tool.icon}
+              </div>
+              
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold text-gray-900">{tool.name}</h3>
+                  <Badge className="bg-gray-100 text-gray-700">{tool.credits}</Badge>
+                </div>
+                <p className="text-gray-600 mb-4">{tool.description}</p>
+              </div>
+
+              <ul className="space-y-2">
+                {tool.features.map((feature, featureIndex) => (
+                  <li key={featureIndex} className="flex items-center text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              <Button 
+                variant="outline" 
+                className="w-full mt-6 border-gray-300 hover:bg-gray-50"
+                onClick={() => window.location.href = '/signup'}
+              >
+                Try {tool.name}
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-white">
+            <h3 className="text-3xl font-bold mb-4">Ready to Experience All 9 AI Tools?</h3>
+            <p className="text-xl mb-8 opacity-90">
+              Start with our free plan and explore the complete AI-powered social media toolkit
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-4 font-bold rounded-xl"
+                onClick={() => window.location.href = '/signup'}
+              >
+                Start Free Trial
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 font-bold rounded-xl"
+                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View Pricing
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Main Landing Page Component
 export default function HootsuiteLanding() {
   return (
@@ -898,6 +1847,7 @@ export default function HootsuiteLanding() {
       <PlatformStats />
       <DashboardPreview />
       <FeatureDetailSections />
+      <AIToolsShowcase />
       <ResultsSection />
       <PricingSection />
       <VeeForeFooter />

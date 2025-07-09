@@ -418,10 +418,85 @@ export default function Auth() {
       const result = await signInWithPopup(auth, provider);
       
       if (result.user) {
-        toast({
-          title: "Welcome to VeeFore!",
-          description: "Successfully signed in with Google."
-        });
+        // Check early access status after successful Google auth
+        try {
+          const token = await result.user.getIdToken();
+          const userResponse = await fetch('/api/user', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (!userResponse.ok) {
+            const errorData = await userResponse.json();
+            
+            // Sign out the user since they don't have early access
+            await auth.signOut();
+            
+            if (errorData.requiresWaitlist) {
+              toast({
+                title: "Early Access Required",
+                description: `Please sign in with your approved email: ${userWaitlistStatus.userEmail || 'your waitlist email'}`,
+                variant: "destructive"
+              });
+              
+              // Show specific email if we know it from device status
+              if (userWaitlistStatus.userEmail) {
+                toast({
+                  title: "Use Your Approved Email",
+                  description: `You must sign in with: ${userWaitlistStatus.userEmail}`,
+                  variant: "destructive"
+                });
+              }
+              
+              setWaitlistError(`You need to sign in with your approved email address. Please use: ${userWaitlistStatus.userEmail || 'your waitlist email'}`);
+              setShowWaitlistModal(true);
+              return;
+            }
+            
+            if (errorData.requiresApproval) {
+              toast({
+                title: "Early Access Not Granted",
+                description: `You're on the waitlist but early access hasn't been granted yet. Please use: ${userWaitlistStatus.userEmail || 'your approved email'}`,
+                variant: "destructive"
+              });
+              
+              setWaitlistError(`You're on the waitlist but early access hasn't been granted yet. Please sign in with: ${userWaitlistStatus.userEmail || 'your approved email'}`);
+              setShowWaitlistModal(true);
+              return;
+            }
+            
+            throw new Error(errorData.message || 'Access denied');
+          }
+          
+          // Success - user has early access
+          toast({
+            title: "Welcome to VeeFore!",
+            description: "Successfully signed in with Google."
+          });
+          
+        } catch (accessError: any) {
+          console.error('Early access check failed:', accessError);
+          
+          // Sign out the user
+          await auth.signOut();
+          
+          toast({
+            title: "Access Restricted",
+            description: userWaitlistStatus.userEmail 
+              ? `Please sign in with your approved email: ${userWaitlistStatus.userEmail}`
+              : "Please sign in with your approved email address.",
+            variant: "destructive"
+          });
+          
+          setWaitlistError(userWaitlistStatus.userEmail 
+            ? `Please sign in with your approved email: ${userWaitlistStatus.userEmail}`
+            : "Please sign in with your approved email address."
+          );
+          setShowWaitlistModal(true);
+          return;
+        }
       }
     } catch (error: any) {
       console.error('Google Sign-In Error:', error);
@@ -440,6 +515,7 @@ export default function Auth() {
           variant: "destructive"
         });
       }
+    } finally {
       setIsLoading(false);
     }
   };

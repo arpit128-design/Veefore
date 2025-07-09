@@ -11518,21 +11518,50 @@ Format the response as JSON with this structure:
   app.post('/api/early-access/join', async (req: any, res: Response) => {
     try {
       const { name, email, referredBy } = req.body;
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
       
-      console.log('[EARLY ACCESS] Waitlist join request:', { name, email, referredBy });
+      console.log('[EARLY ACCESS] Waitlist join request:', { name, email, referredBy, clientIP, userAgent: userAgent.substring(0, 50) });
       
       // Validate required fields
       if (!name || !email) {
         return res.status(400).json({ error: 'Name and email are required' });
       }
       
-      // Check if user already exists
+      // Check if user already exists by email
       const existingUser = await storage.getWaitlistUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ error: 'Email already on waitlist' });
+        return res.status(400).json({ 
+          error: 'Email already on waitlist',
+          existingUser: {
+            email: existingUser.email,
+            name: existingUser.name,
+            status: existingUser.status,
+            referralCode: existingUser.referralCode
+          }
+        });
       }
       
-      // Create waitlist user
+      // Check if device/IP already joined waitlist
+      const allUsers = await storage.getAllWaitlistUsers();
+      const deviceUser = allUsers.find(user => 
+        user.metadata?.ipAddress === clientIP &&
+        user.metadata?.userAgent === userAgent
+      );
+      
+      if (deviceUser) {
+        return res.status(400).json({ 
+          error: 'Device already joined waitlist',
+          existingUser: {
+            email: deviceUser.email,
+            name: deviceUser.name,
+            status: deviceUser.status,
+            referralCode: deviceUser.referralCode
+          }
+        });
+      }
+      
+      // Create waitlist user with device fingerprint
       const waitlistUser = await storage.createWaitlistUser({
         name,
         email,
@@ -11541,7 +11570,12 @@ Format the response as JSON with this structure:
         credits: 0,
         referralCount: 0,
         dailyLogins: 0,
-        feedbackSubmitted: false
+        feedbackSubmitted: false,
+        metadata: {
+          ipAddress: clientIP,
+          userAgent: userAgent,
+          joinedAt: new Date().toISOString()
+        }
       });
       
       console.log('[EARLY ACCESS] Created waitlist user:', waitlistUser);
@@ -11638,10 +11672,8 @@ Format the response as JSON with this structure:
         const ipMatches = user.metadata?.ipAddress === clientIP || 
                          user.metadata?.alternateIPs?.includes(clientIP);
         
-        // Require user agent match and early access status
-        return ipMatches && 
-               user.metadata?.userAgent === userAgent &&
-               user.status === 'early_access';
+        // Require user agent match (any status on waitlist)
+        return ipMatches && user.metadata?.userAgent === userAgent;
       });
       
       if (deviceUser) {

@@ -64,11 +64,25 @@ export function WaitlistModal({ isOpen, onClose, initialReferralCode = '' }: Wai
           description: "You've been added to our waitlist. Check your email for updates!",
         });
       } else {
-        toast({
-          title: "Error joining waitlist",
-          description: data.error || "Something went wrong. Please try again.",
-          variant: "destructive",
-        });
+        // Handle existing user cases
+        if (data.existingUser) {
+          toast({
+            title: "Already on waitlist",
+            description: `${data.existingUser.email} is already on our waitlist!`,
+            variant: "default",
+          });
+          // Set the existing user as result to show their info
+          setResult({
+            user: data.existingUser,
+            message: data.error
+          });
+        } else {
+          toast({
+            title: "Error joining waitlist",
+            description: data.error || "Something went wrong. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({

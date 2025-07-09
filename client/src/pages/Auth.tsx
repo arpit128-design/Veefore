@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
 import { WaitlistModal } from '@/components/WaitlistModal';
 import { WaitlistStatusNotification } from '@/components/WaitlistStatusNotification';
+import { WaitlistStatusCard } from '@/components/WaitlistStatusCard';
 
 // Form schemas
 const signInSchema = z.object({
@@ -182,14 +183,18 @@ export default function Auth() {
         if (response.ok) {
           const data = await response.json();
           
-          // Only show notification if user is actually on waitlist with early access
-          if (data.user && data.user.status === 'early_access') {
+          // Show waitlist status for any user on waitlist
+          if (data.user) {
             setUserWaitlistStatus({
               isOnWaitlist: true,
-              hasEarlyAccess: true,
+              hasEarlyAccess: data.user.status === 'early_access',
               referralCode: data.user.referralCode,
               userEmail: data.user.email
             });
+            
+            // Pre-fill the email field
+            signInForm.setValue('email', data.user.email);
+            signUpForm.setValue('email', data.user.email);
             
             // Show waitlist notification after a short delay
             setTimeout(() => {
@@ -524,6 +529,15 @@ export default function Auth() {
             {isSignUp ? 'Join the AI-Powered Social Galaxy' : 'Welcome Back to Your Galaxy'}
           </motion.p>
         </motion.div>
+
+        {/* Waitlist Status Card */}
+        {userWaitlistStatus.isOnWaitlist && (
+          <WaitlistStatusCard
+            userEmail={userWaitlistStatus.userEmail || ''}
+            status={userWaitlistStatus.hasEarlyAccess ? 'early_access' : 'waitlisted'}
+            referralCode={userWaitlistStatus.referralCode || ''}
+          />
+        )}
 
         {/* Auth Form */}
         <AuthCard>

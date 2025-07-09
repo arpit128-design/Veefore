@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
+import { EarlyAccessWelcomeModal } from "@/components/EarlyAccessWelcomeModal";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
@@ -25,9 +26,35 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // Initialize instant data prefetching
   useInstantData();
+
+  // Check if user should see welcome modal
+  useEffect(() => {
+    const checkWelcomeModal = async () => {
+      if (user && user.email) {
+        try {
+          // Check if user has early access and hasn't claimed welcome bonus
+          const response = await fetch('/api/early-access/check-device');
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.user?.status === 'early_access') {
+              // Check if user has already claimed welcome bonus
+              if (!user.hasClaimedWelcomeBonus) {
+                setShowWelcomeModal(true);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error checking welcome modal:', error);
+        }
+      }
+    };
+
+    checkWelcomeModal();
+  }, [user]);
 
   // Real-time analytics query - always fetch fresh data with cache busting
   const { data: analyticsData, isLoading: analyticsLoading, error } = useQuery({
@@ -92,6 +119,32 @@ export default function Dashboard() {
     timeZone: 'Asia/Kolkata',
     hour: '2-digit',
     minute: '2-digit'
+  });
+
+  // Welcome bonus claim mutation
+  const claimWelcomeBonus = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/early-access/claim-welcome-bonus', {});
+      return response;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Welcome Bonus Claimed!",
+        description: `You've received ${data.bonusCredits} credits. Total: ${data.totalCredits} credits`,
+        variant: "default"
+      });
+      
+      // Refresh user data
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      setShowWelcomeModal(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to claim welcome bonus",
+        variant: "destructive"
+      });
+    }
   });
 
   // Force complete data refresh mutation - clears all caches and fetches live data
@@ -418,6 +471,13 @@ export default function Dashboard() {
           <ContentStudio />
         </div>
       </div>
+
+      {/* Early Access Welcome Modal */}
+      <EarlyAccessWelcomeModal 
+        open={showWelcomeModal}
+        onOpenChange={setShowWelcomeModal}
+        onClaim={() => claimWelcomeBonus.mutate()}
+      />
     </div>
   );
 }

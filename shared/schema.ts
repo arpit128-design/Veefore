@@ -25,6 +25,8 @@ export const users = pgTable("users", {
   discountCode: text("discount_code"),
   discountExpiresAt: timestamp("discount_expires_at"),
   hasUsedWaitlistBonus: boolean("has_used_waitlist_bonus").default(false),
+  hasClaimedWelcomeBonus: boolean("has_claimed_welcome_bonus").default(false),
+  welcomeBonusClaimedAt: timestamp("welcome_bonus_claimed_at"),
   dailyLoginStreak: integer("daily_login_streak").default(0),
   lastLoginAt: timestamp("last_login_at"),
   feedbackSubmittedAt: timestamp("feedback_submitted_at"),

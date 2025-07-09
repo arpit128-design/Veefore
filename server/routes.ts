@@ -11838,9 +11838,64 @@ Format the response as JSON with this structure:
       res.status(500).json({ 
         error: 'Failed to get early access config',
         isEarlyAccessMode: true, // Default to early access mode on error
-        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!',
-        totalWaitlist: 0,
-        earlyAccessCount: 0
+        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!'
+      });
+    }
+  });
+
+  // Claim Early Access Welcome Bonus
+  app.post('/api/early-access/claim-welcome-bonus', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      
+      console.log(`[EARLY ACCESS] Claiming welcome bonus for user: ${user.email}`);
+      
+      // Check if user has already claimed welcome bonus
+      const existingUser = await storage.getUser(user.id);
+      if (existingUser.hasClaimedWelcomeBonus) {
+        return res.status(400).json({ 
+          error: 'Welcome bonus already claimed',
+          message: 'You have already claimed your early access welcome bonus'
+        });
+      }
+      
+      // Verify user has early access
+      const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
+      if (!waitlistUser || waitlistUser.status !== 'early_access') {
+        return res.status(403).json({ 
+          error: 'Early access required',
+          message: 'Only early access users can claim welcome bonus'
+        });
+      }
+      
+      // Grant welcome bonus credits (300 credits)
+      const welcomeBonusCredits = 300;
+      const currentCredits = existingUser.credits || 0;
+      const newCredits = currentCredits + welcomeBonusCredits;
+      
+      // Update user with welcome bonus
+      const updatedUser = await storage.updateUser(user.id, {
+        credits: newCredits,
+        hasClaimedWelcomeBonus: true,
+        welcomeBonusClaimedAt: new Date()
+      });
+      
+      console.log(`[EARLY ACCESS] Welcome bonus granted: ${welcomeBonusCredits} credits to user ${user.email}`);
+      console.log(`[EARLY ACCESS] User credits updated: ${currentCredits} → ${newCredits}`);
+      
+      res.json({
+        success: true,
+        message: 'Welcome bonus claimed successfully!',
+        bonusCredits: welcomeBonusCredits,
+        totalCredits: newCredits,
+        user: updatedUser
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Welcome bonus claim error:', error);
+      res.status(500).json({ 
+        error: 'Failed to claim welcome bonus',
+        message: error.message || 'An error occurred while claiming your welcome bonus'
       });
     }
   });

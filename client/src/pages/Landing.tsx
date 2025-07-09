@@ -146,7 +146,19 @@ function LoadingSkeleton() {
 }
 
 // Navigation Component
-function Navigation({ onOpenWaitlist }: { onOpenWaitlist: () => void }) {
+function Navigation({ 
+  onOpenWaitlist, 
+  deviceWaitlistStatus, 
+  isCheckingDevice 
+}: { 
+  onOpenWaitlist: () => void;
+  deviceWaitlistStatus: {
+    isOnWaitlist: boolean;
+    userEmail?: string;
+    referralCode?: string;
+  };
+  isCheckingDevice: boolean;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -166,7 +178,13 @@ function Navigation({ onOpenWaitlist }: { onOpenWaitlist: () => void }) {
   };
 
   const handleGetStarted = () => {
-    onOpenWaitlist();
+    if (deviceWaitlistStatus.isOnWaitlist) {
+      // User is on waitlist, redirect to auth page
+      window.location.href = '/auth';
+    } else {
+      // User not on waitlist, show waitlist modal
+      onOpenWaitlist();
+    }
   };
 
   return (
@@ -200,19 +218,23 @@ function Navigation({ onOpenWaitlist }: { onOpenWaitlist: () => void }) {
             <Link href="/reviews">
               <button className="text-gray-300 hover:text-white transition-colors">Reviews</button>
             </Link>
-            <Button 
-              variant="ghost" 
-              className="text-gray-300 hover:text-white"
-              onClick={handleGetStarted}
-            >
-              Join Waitlist
-            </Button>
-            <Button 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-              onClick={handleGetStarted}
-            >
-              Get Early Access
-            </Button>
+            {!isCheckingDevice && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="text-gray-300 hover:text-white"
+                  onClick={handleGetStarted}
+                >
+                  {deviceWaitlistStatus.isOnWaitlist ? 'Sign In' : 'Join Waitlist'}
+                </Button>
+                <Button 
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  onClick={handleGetStarted}
+                >
+                  {deviceWaitlistStatus.isOnWaitlist ? 'Sign Up' : 'Get Early Access'}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -1584,6 +1606,12 @@ function ScrollToTopButton() {
 export default function Landing() {
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [referralCode, setReferralCode] = useState('');
+  const [deviceWaitlistStatus, setDeviceWaitlistStatus] = useState<{
+    isOnWaitlist: boolean;
+    userEmail?: string;
+    referralCode?: string;
+  }>({ isOnWaitlist: false });
+  const [isCheckingDevice, setIsCheckingDevice] = useState(true);
 
   // Check for referral code in URL parameters
   useEffect(() => {
@@ -1600,13 +1628,40 @@ export default function Landing() {
     }
   }, []);
 
+  // Check if device is already on waitlist
+  useEffect(() => {
+    async function checkDeviceStatus() {
+      try {
+        const response = await fetch('/api/early-access/check-device');
+        if (response.ok) {
+          const data = await response.json();
+          setDeviceWaitlistStatus({
+            isOnWaitlist: true,
+            userEmail: data.user.email,
+            referralCode: data.user.referralCode
+          });
+        }
+      } catch (error) {
+        console.log('Device not on waitlist or error checking:', error);
+      } finally {
+        setIsCheckingDevice(false);
+      }
+    }
+
+    checkDeviceStatus();
+  }, []);
+
   const handleOpenWaitlist = () => {
     setShowWaitlistModal(true);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
-      <Navigation onOpenWaitlist={handleOpenWaitlist} />
+      <Navigation 
+        onOpenWaitlist={handleOpenWaitlist} 
+        deviceWaitlistStatus={deviceWaitlistStatus}
+        isCheckingDevice={isCheckingDevice}
+      />
       <HeroSection />
       
       {/* Core sections load immediately */}

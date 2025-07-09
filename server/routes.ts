@@ -11592,6 +11592,74 @@ Format the response as JSON with this structure:
     }
   });
 
+  // Check waitlist status by email (query parameter)
+  app.get('/api/early-access/check-status', async (req: any, res: Response) => {
+    try {
+      const { email } = req.query;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+      
+      const waitlistUser = await storage.getWaitlistUserByEmail(email as string);
+      if (!waitlistUser) {
+        return res.status(404).json({ error: 'User not found on waitlist' });
+      }
+      
+      res.json({
+        success: true,
+        user: {
+          email: waitlistUser.email,
+          name: waitlistUser.name,
+          status: waitlistUser.status,
+          referralCode: waitlistUser.referralCode,
+          joinedAt: waitlistUser.joinedAt
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Check status error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check status' });
+    }
+  });
+
+  // Check waitlist status by device/IP
+  app.get('/api/early-access/check-device', async (req: any, res: Response) => {
+    try {
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
+      
+      console.log('[EARLY ACCESS] Checking device - IP:', clientIP, 'UA:', userAgent.substring(0, 50));
+      
+      // Check if this device has already joined the waitlist
+      const users = await storage.getAllWaitlistUsers();
+      const deviceUser = users.find(user => 
+        user.metadata?.ipAddress === clientIP || 
+        (user.metadata?.userAgent && user.metadata.userAgent.includes(userAgent.substring(0, 50)))
+      );
+      
+      if (deviceUser) {
+        console.log('[EARLY ACCESS] Device found on waitlist:', deviceUser.email);
+        res.json({
+          success: true,
+          user: {
+            email: deviceUser.email,
+            name: deviceUser.name,
+            status: deviceUser.status,
+            referralCode: deviceUser.referralCode,
+            joinedAt: deviceUser.joinedAt
+          }
+        });
+      } else {
+        console.log('[EARLY ACCESS] Device not found on waitlist');
+        res.status(404).json({ error: 'Device not found on waitlist' });
+      }
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] Check device error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check device status' });
+    }
+  });
+
   // Get Waitlist Stats (Public)
   app.get('/api/early-access/stats', async (req: any, res: Response) => {
     try {

@@ -29,6 +29,7 @@ import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { SpaceBackground } from '@/components/ui/space-background';
 import { WaitlistModal } from '@/components/WaitlistModal';
+import { WaitlistStatusNotification } from '@/components/WaitlistStatusNotification';
 
 // Form schemas
 const signInSchema = z.object({
@@ -152,6 +153,13 @@ export default function Auth() {
   const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [waitlistError, setWaitlistError] = useState<string | null>(null);
+  const [userWaitlistStatus, setUserWaitlistStatus] = useState<{
+    isOnWaitlist: boolean;
+    hasEarlyAccess: boolean;
+    referralCode: string | null;
+    userEmail: string | null;
+  }>({ isOnWaitlist: false, hasEarlyAccess: false, referralCode: null, userEmail: null });
+  const [showWaitlistNotification, setShowWaitlistNotification] = useState(false);
   const { toast } = useToast();
 
   const signInForm = useForm<SignInForm>({
@@ -165,6 +173,33 @@ export default function Auth() {
   });
 
   const currentForm = isSignUp ? signUpForm : signInForm;
+
+  // Check device waitlist status on component mount
+  useEffect(() => {
+    async function checkDeviceWaitlistStatus() {
+      try {
+        const response = await fetch('/api/early-access/check-device');
+        if (response.ok) {
+          const data = await response.json();
+          setUserWaitlistStatus({
+            isOnWaitlist: true,
+            hasEarlyAccess: data.user.status === 'early_access',
+            referralCode: data.user.referralCode,
+            userEmail: data.user.email
+          });
+          
+          // Show waitlist notification after a short delay
+          setTimeout(() => {
+            setShowWaitlistNotification(true);
+          }, 1000);
+        }
+      } catch (error) {
+        console.log('Device not on waitlist:', error);
+      }
+    }
+
+    checkDeviceWaitlistStatus();
+  }, []);
 
   // Handle email/password authentication
   const handleEmailAuth = async (data: SignInForm | SignUpForm) => {
@@ -751,6 +786,82 @@ export default function Auth() {
         >
           <p>Join thousands of creators transforming their social media</p>
         </motion.div>
+
+        {/* Referral Code Display for Waitlist Users */}
+        {userWaitlistStatus.isOnWaitlist && userWaitlistStatus.referralCode && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+            className="mt-6 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20 backdrop-blur-sm"
+          >
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center space-x-2">
+                <Users className="w-5 h-5 text-blue-400" />
+                <h3 className="text-white font-semibold">Your Referral Code</h3>
+              </div>
+              
+              <div className="bg-black/30 rounded-lg p-3 border border-white/10">
+                <div className="flex items-center justify-center space-x-2">
+                  <code className="text-blue-400 font-mono text-lg tracking-wider">
+                    {userWaitlistStatus.referralCode}
+                  </code>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const referralLink = `${window.location.origin}/?ref=${userWaitlistStatus.referralCode}`;
+                      navigator.clipboard.writeText(referralLink);
+                      toast({
+                        title: "Copied!",
+                        description: "Referral link copied to clipboard"
+                      });
+                    }}
+                    className="text-blue-400 hover:text-blue-300"
+                  >
+                    Copy Link
+                  </Button>
+                </div>
+              </div>
+              
+              <p className="text-white/60 text-sm">
+                Share this link with friends to help them join VeeFore early access
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Waitlist Status Display */}
+        {userWaitlistStatus.isOnWaitlist && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.8 }}
+            className="mt-4 p-3 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg border border-green-500/20 backdrop-blur-sm"
+          >
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-green-400 font-medium">
+                  {userWaitlistStatus.hasEarlyAccess ? 'Early Access Granted!' : 'On Waitlist'}
+                </span>
+              </div>
+              
+              <p className="text-white/60 text-sm">
+                {userWaitlistStatus.hasEarlyAccess 
+                  ? 'You have early access to VeeFore. Sign in to get started!' 
+                  : 'You\'re on the waitlist! Early access launching soon.'
+                }
+              </p>
+              
+              {userWaitlistStatus.userEmail && (
+                <p className="text-white/40 text-xs">
+                  Registered: {userWaitlistStatus.userEmail}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Waitlist Modal */}
@@ -775,6 +886,15 @@ export default function Auth() {
           </div>
         </motion.div>
       )}
+
+      {/* Waitlist Status Notification */}
+      <WaitlistStatusNotification
+        isOnWaitlist={userWaitlistStatus.isOnWaitlist}
+        hasEarlyAccess={userWaitlistStatus.hasEarlyAccess}
+        userEmail={userWaitlistStatus.userEmail || undefined}
+        show={showWaitlistNotification}
+        onClose={() => setShowWaitlistNotification(false)}
+      />
     </div>
   );
 }

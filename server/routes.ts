@@ -11868,26 +11868,39 @@ Format the response as JSON with this structure:
         });
       }
       
-      // Grant welcome bonus credits (300 credits)
-      const welcomeBonusCredits = 300;
+      // Grant starter plan trial (1 month) for early access users
+      const starterPlanCredits = 300; // Starter plan monthly credits
       const currentCredits = existingUser.credits || 0;
-      const newCredits = currentCredits + welcomeBonusCredits;
+      const newCredits = currentCredits + starterPlanCredits;
       
-      // Update user with welcome bonus
+      // Set trial expiration date (1 month from now)
+      const trialExpirationDate = new Date();
+      trialExpirationDate.setMonth(trialExpirationDate.getMonth() + 1);
+      
+      // Update user with starter plan trial
       const updatedUser = await storage.updateUser(user.id, {
         credits: newCredits,
         hasClaimedWelcomeBonus: true,
-        welcomeBonusClaimedAt: new Date()
+        welcomeBonusClaimedAt: new Date(),
+        subscriptionPlan: 'starter',
+        subscriptionStatus: 'trial',
+        trialExpiresAt: trialExpirationDate,
+        planStartDate: new Date()
       });
       
-      console.log(`[EARLY ACCESS] Welcome bonus granted: ${welcomeBonusCredits} credits to user ${user.email}`);
+      console.log(`[EARLY ACCESS] Starter plan trial granted to user ${user.email}`);
+      console.log(`[EARLY ACCESS] Trial expires: ${trialExpirationDate.toISOString()}`);
       console.log(`[EARLY ACCESS] User credits updated: ${currentCredits} → ${newCredits}`);
       
       res.json({
         success: true,
-        message: 'Welcome bonus claimed successfully!',
-        bonusCredits: welcomeBonusCredits,
+        message: 'Starter plan trial activated successfully!',
+        trialType: 'starter_plan',
+        trialDuration: '1 month',
+        bonusCredits: starterPlanCredits,
         totalCredits: newCredits,
+        trialExpiresAt: trialExpirationDate,
+        subscriptionPlan: 'starter',
         user: updatedUser
       });
       

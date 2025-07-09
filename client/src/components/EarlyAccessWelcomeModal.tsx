@@ -113,7 +113,7 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-slate-300">300 bonus credits</span>
+                    <span className="text-slate-300">Starter plan trial (1 month)</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -130,21 +130,21 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
                 </div>
               </div>
 
-              {/* Bonus Credits Offer */}
+              {/* Starter Plan Trial Offer */}
               <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-xl p-6 border border-green-500/20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-full">
-                      <Gift className="w-6 h-6 text-white" />
+                      <Crown className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-white">Welcome Bonus</h3>
-                      <p className="text-slate-300">Get 300 free credits to start creating</p>
+                      <h3 className="text-xl font-semibold text-white">Starter Plan Trial</h3>
+                      <p className="text-slate-300">Full access to Starter plan features for 1 month</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-green-400">+300</div>
-                    <div className="text-sm text-slate-400">Credits</div>
+                    <div className="text-2xl font-bold text-green-400">1 Month</div>
+                    <div className="text-sm text-slate-400">Free Trial</div>
                   </div>
                 </div>
               </div>
@@ -199,12 +199,12 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim }: EarlyAc
                   transition={{ duration: 2, repeat: Infinity }}
                 />
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  <Gift className="w-5 h-5" />
-                  {isClaimingReward ? 'Claiming Reward...' : 'Claim My 300 Credits'}
+                  <Crown className="w-5 h-5" />
+                  {isClaimingReward ? 'Activating Trial...' : 'Activate Starter Plan Trial'}
                 </span>
               </Button>
               <p className="text-sm text-slate-400 mt-3">
-                One-time welcome bonus • Credits added instantly
+                One-time early access benefit • Full starter plan access for 1 month
               </p>
             </motion.div>
           </div>

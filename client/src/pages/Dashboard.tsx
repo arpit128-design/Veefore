@@ -129,8 +129,8 @@ export default function Dashboard() {
     },
     onSuccess: (data) => {
       toast({
-        title: "Welcome Bonus Claimed!",
-        description: `You've received ${data.bonusCredits} credits. Total: ${data.totalCredits} credits`,
+        title: "Starter Plan Trial Activated!",
+        description: `You now have full access to the Starter plan for 1 month. Enjoy ${data.bonusCredits} credits!`,
         variant: "default"
       });
       

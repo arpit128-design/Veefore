@@ -8236,6 +8236,25 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'Email is required' });
       }
 
+      // EARLY ACCESS VALIDATION - Check if user has early access
+      const waitlistUser = await storage.getWaitlistUserByEmail(email);
+      if (!waitlistUser) {
+        return res.status(403).json({ 
+          message: 'Early access required. Please join our waitlist first.',
+          requiresWaitlist: true
+        });
+      }
+
+      if (waitlistUser.status !== 'early_access') {
+        return res.status(403).json({ 
+          message: 'Early access not yet granted. You are currently on the waitlist.',
+          waitlistStatus: waitlistUser.status,
+          requiresApproval: true
+        });
+      }
+
+      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification email`);
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser && existingUser.isEmailVerified) {
@@ -8290,6 +8309,25 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       if (!email || !otp) {
         return res.status(400).json({ message: 'Email and verification code are required' });
       }
+
+      // EARLY ACCESS VALIDATION - Check if user has early access
+      const waitlistUser = await storage.getWaitlistUserByEmail(email);
+      if (!waitlistUser) {
+        return res.status(403).json({ 
+          message: 'Early access required. Please join our waitlist first.',
+          requiresWaitlist: true
+        });
+      }
+
+      if (waitlistUser.status !== 'early_access') {
+        return res.status(403).json({ 
+          message: 'Early access not yet granted. You are currently on the waitlist.',
+          waitlistStatus: waitlistUser.status,
+          requiresApproval: true
+        });
+      }
+
+      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification`);
 
       // Find user by email
       const user = await storage.getUserByEmail(email);

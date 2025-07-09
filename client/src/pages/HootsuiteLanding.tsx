@@ -282,37 +282,38 @@ function DashboardPreview() {
         </div>
 
         {/* Dashboard Interface Mockup */}
-        <div className="bg-gray-100 rounded-lg p-8 mb-16">
+        <div className="bg-gray-100 rounded-lg p-4 sm:p-8 mb-16">
           <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
             {/* Dashboard Header */}
-            <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+            <div className="bg-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">V</span>
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-xs sm:text-sm">V</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">VeeFore Dashboard</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">VeeFore Dashboard</h3>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <Button size="sm" variant="outline">
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <Button size="sm" variant="outline" className="hidden sm:flex">
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule
                   </Button>
                   <Button size="sm" className="bg-blue-600 text-white">
                     <BrainCircuit className="w-4 h-4 mr-2" />
-                    AI Generate
+                    <span className="hidden sm:inline">AI Generate</span>
+                    <span className="sm:hidden">AI</span>
                   </Button>
                 </div>
               </div>
             </div>
 
             {/* Dashboard Content */}
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column - Content Creation */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                   {/* AI Content Generator */}
-                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 sm:p-6 border border-purple-200">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <BrainCircuit className="w-6 h-6 text-purple-600" />
@@ -339,46 +340,46 @@ function DashboardPreview() {
                   </div>
 
                   {/* Content Calendar */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold text-gray-900">Content Calendar</h4>
-                      <Button size="sm" variant="outline">View All</Button>
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900">Content Calendar</h4>
+                      <Button size="sm" variant="outline" className="text-xs sm:text-sm">View All</Button>
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                          <span className="text-sm font-medium text-gray-900">Instagram Post</span>
-                          <Badge variant="outline" className="text-xs">Scheduled</Badge>
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-xs sm:text-sm font-medium text-gray-900">Instagram Post</span>
+                          <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-300">Scheduled</Badge>
                         </div>
-                        <span className="text-sm text-gray-800 font-medium">2:00 PM</span>
+                        <span className="text-xs sm:text-sm text-gray-800 font-medium flex-shrink-0">2:00 PM</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="text-sm font-medium text-gray-900">LinkedIn Article</span>
-                          <Badge variant="outline" className="text-xs">Draft</Badge>
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
+                          <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-xs sm:text-sm font-medium text-gray-900">LinkedIn Article</span>
+                          <Badge className="text-xs bg-orange-100 text-orange-800 border-orange-300">Draft</Badge>
                         </div>
-                        <span className="text-sm text-gray-800 font-medium">4:30 PM</span>
+                        <span className="text-xs sm:text-sm text-gray-800 font-medium flex-shrink-0">4:30 PM</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                          <span className="text-sm font-medium text-gray-900">Twitter Thread</span>
-                          <Badge variant="outline" className="text-xs">AI Generated</Badge>
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-xs sm:text-sm font-medium text-gray-900">Twitter Thread</span>
+                          <Badge className="text-xs bg-purple-100 text-purple-800 border-purple-300">AI Generated</Badge>
                         </div>
-                        <span className="text-sm text-gray-800 font-medium">6:00 PM</span>
+                        <span className="text-xs sm:text-sm text-gray-800 font-medium flex-shrink-0">6:00 PM</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Right Column - Analytics & Insights */}
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {/* Analytics Widget */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold text-gray-900">Analytics</h4>
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900">Analytics</h4>
                       <BarChart3 className="w-5 h-5 text-gray-400" />
                     </div>
                     <div className="space-y-4">
@@ -400,9 +401,9 @@ function DashboardPreview() {
                   </div>
 
                   {/* Trending Topics */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold text-gray-900">Trending Now</h4>
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900">Trending Now</h4>
                       <TrendingUp className="w-5 h-5 text-gray-400" />
                     </div>
                     <div className="space-y-3">
@@ -422,18 +423,18 @@ function DashboardPreview() {
                   </div>
 
                   {/* AI Assistant */}
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 sm:p-6 border border-blue-200">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-xs">AI</span>
                         </div>
-                        <span className="font-semibold text-gray-900">VeeGPT</span>
+                        <span className="text-sm sm:text-base font-semibold text-gray-900">VeeGPT</span>
                       </div>
-                      <Button size="sm" variant="outline">Chat</Button>
+                      <Button size="sm" variant="outline" className="text-xs sm:text-sm">Chat</Button>
                     </div>
                     <div className="bg-white rounded-lg p-3 mb-3">
-                      <p className="text-sm text-gray-700">💡 Try: "Create a viral Instagram post about productivity tips"</p>
+                      <p className="text-xs sm:text-sm text-gray-700">💡 Try: "Create a viral Instagram post about productivity tips"</p>
                     </div>
                     <div className="text-xs text-gray-600">
                       <p>✨ AI suggestions ready</p>
@@ -452,21 +453,21 @@ function DashboardPreview() {
 // Comprehensive Feature Detail Sections - All 9 Features
 function FeatureDetailSections() {
   return (
-    <section id="features" className="py-20 bg-gray-50">
+    <section id="features" className="py-16 sm:py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-32">
+        <div className="space-y-16 sm:space-y-24 lg:space-y-32">
           {/* Feature 1: AI Content Generator */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                  <BrainCircuit className="w-6 h-6 text-purple-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                  <BrainCircuit className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Create smarter with AI-powered content</h3>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">Create smarter with AI-powered content</h3>
                 </div>
               </div>
-              <p className="text-lg text-gray-600 mb-6">
+              <p className="text-base sm:text-lg text-gray-600 mb-6">
                 Generate engaging posts, captions, and hashtags instantly. Our AI understands your brand voice and creates content that resonates with your audience across all platforms.
               </p>
               <div className="space-y-3">
@@ -1093,54 +1094,54 @@ function ResultsSection() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-16 sm:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Real Results from VeeFore Users
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
             Join thousands of creators, businesses, and agencies who are already transforming 
             their social media presence with VeeFore's AI-powered platform.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
-              <div className="flex justify-center mb-6">
+            <div key={index} className="text-center bg-gray-50 rounded-2xl p-6 sm:p-8 hover:shadow-lg transition-shadow duration-300">
+              <div className="flex justify-center mb-4 sm:mb-6">
                 {stat.icon}
               </div>
-              <div className={`text-5xl font-bold ${stat.color} mb-4`}>{stat.number}</div>
-              <p className="text-gray-600 text-lg leading-relaxed">{stat.description}</p>
+              <div className={`text-4xl sm:text-5xl font-bold ${stat.color} mb-4`}>{stat.number}</div>
+              <p className="text-gray-600 text-base sm:text-lg leading-relaxed">{stat.description}</p>
             </div>
           ))}
         </div>
         
         {/* Detailed User Testimonials */}
-        <div className="mt-20 bg-gray-50 rounded-3xl p-12">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">What Our Users Say</h3>
-            <p className="text-lg text-gray-600">Trusted by creators, marketers, and agencies worldwide</p>
+        <div className="mt-16 sm:mt-20 bg-gray-50 rounded-3xl p-6 sm:p-8 lg:p-12">
+          <div className="text-center mb-8 sm:mb-12">
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">What Our Users Say</h3>
+            <p className="text-base sm:text-lg text-gray-600">Trusted by creators, marketers, and agencies worldwide</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl p-8 shadow-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
               <div className="flex text-yellow-400 mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
+                  <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                 ))}
               </div>
-              <p className="text-gray-700 mb-6 text-lg">
+              <p className="text-gray-700 mb-6 text-base sm:text-lg">
                 "VeeFore's AI content generator has completely transformed my workflow. I'm creating better content in half the time and my engagement has tripled!"
               </p>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">SJ</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm sm:text-base">SJ</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Sarah Johnson</h4>
-                  <p className="text-sm text-gray-600">Content Creator • 150K followers</p>
+                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Sarah Johnson</h4>
+                  <p className="text-xs sm:text-sm text-gray-600">Content Creator • 150K followers</p>
                 </div>
               </div>
             </div>
@@ -1628,15 +1629,15 @@ function PricingSection() {
                 className="w-full p-4 flex items-center justify-between text-left"
               >
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">{plan.name}</h3>
                   <div className="mt-1">
-                    <span className="text-2xl font-bold text-gray-900">
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">
                       {isAnnual ? plan.annualPrice : plan.monthlyPrice}
                     </span>
-                    <span className="text-sm text-gray-500 ml-1">{plan.period}</span>
+                    <span className="text-xs sm:text-sm text-gray-500 ml-1">{plan.period}</span>
                   </div>
                 </div>
-                <div className="text-gray-400">
+                <div className="text-gray-400 text-xl">
                   {expandedPlan === plan.name ? '−' : '+'}
                 </div>
               </button>
@@ -1845,30 +1846,30 @@ function AIToolsShowcase() {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             9 Powerful AI Tools, One Unified Platform
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the complete suite of AI-powered social media tools designed to transform your content strategy and maximize engagement.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {aiTools.map((tool, index) => (
-            <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className={`w-16 h-16 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-6`}>
+            <div key={index} className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-4 sm:mb-6`}>
                 {tool.icon}
               </div>
               
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-gray-900">{tool.name}</h3>
-                  <Badge className="bg-gray-100 text-gray-700">{tool.credits}</Badge>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">{tool.name}</h3>
+                  <Badge className="bg-gray-100 text-gray-700 text-xs">{tool.credits}</Badge>
                 </div>
-                <p className="text-gray-600 mb-4">{tool.description}</p>
+                <p className="text-sm sm:text-base text-gray-600 mb-4">{tool.description}</p>
               </div>
 
               <ul className="space-y-2">

@@ -120,7 +120,7 @@ export default function Solutions() {
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -229,7 +229,7 @@ export default function Solutions() {
             Choose the solution that fits your needs and start transforming your social media presence today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

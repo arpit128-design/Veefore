@@ -27,7 +27,7 @@ export default function Referrals() {
 
   const copyReferralLink = async () => {
     if (user?.referralCode) {
-      const referralUrl = `${window.location.origin}/auth?ref=${user.referralCode}`;
+      const referralUrl = `${window.location.origin}/signup?ref=${user.referralCode}`;
       try {
         await navigator.clipboard.writeText(referralUrl);
         toast({
@@ -46,14 +46,14 @@ export default function Referrals() {
 
   const shareOnTwitter = () => {
     if (user?.referralCode) {
-      const referralUrl = `${window.location.origin}/auth?ref=${user.referralCode}`;
+      const referralUrl = `${window.location.origin}/signup?ref=${user.referralCode}`;
       const text = "Check out VeeFore - the AI-powered content creation platform that's revolutionizing social media! 🚀";
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(referralUrl)}`;
       window.open(twitterUrl, '_blank');
     }
   };
 
-  const referralUrl = user?.referralCode ? `${window.location.origin}/auth?ref=${user.referralCode}` : '';
+  const referralUrl = user?.referralCode ? `${window.location.origin}/signup?ref=${user.referralCode}` : '';
 
   return (
     <div className="space-y-8">

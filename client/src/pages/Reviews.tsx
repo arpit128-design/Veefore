@@ -121,7 +121,7 @@ export default function Reviews() {
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -280,7 +280,7 @@ export default function Reviews() {
             Experience why thousands of creators and businesses choose VeeFore for their social media success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

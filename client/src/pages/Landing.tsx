@@ -177,8 +177,8 @@ function Navigation({
 
   const handleGetStarted = () => {
     if (deviceStatus.hasEarlyAccess) {
-      // User has early access, redirect to auth page
-      window.location.href = '/auth';
+      // User has early access, redirect to signup page
+      window.location.href = '/signup';
     } else if (deviceStatus.isOnWaitlist) {
       // User is on waitlist but no early access, show status card
       onOpenStatus();
@@ -246,7 +246,7 @@ function Navigation({
                     className="text-gray-300 hover:text-white"
                     onClick={() => {
                       if (deviceStatus.hasEarlyAccess) {
-                        window.location.href = '/auth';
+                        window.location.href = '/signin';
                       } else {
                         onOpenWaitlist();
                       }

@@ -191,7 +191,7 @@ export default function FeatureScheduling() {
               <Link href="/features">
                 <Button variant="ghost" className="text-gray-300 hover:text-white">Features</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
                   Try Free
                 </Button>
@@ -236,7 +236,7 @@ export default function FeatureScheduling() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-lg px-10 py-6">
                   Start Automating
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -487,7 +487,7 @@ export default function FeatureScheduling() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-lg px-10 py-6">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />

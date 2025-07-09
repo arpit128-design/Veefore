@@ -144,7 +144,7 @@ export default function Blog() {
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>

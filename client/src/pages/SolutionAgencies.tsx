@@ -210,7 +210,7 @@ export default function SolutionAgencies() {
               <Link href="/solutions">
                 <Button variant="ghost">All Solutions</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -491,7 +491,7 @@ export default function SolutionAgencies() {
             Join thousands of agencies that are already using VeeFore to manage more clients, deliver better results, and increase profitability.
           </p>
           <div className="flex items-center justify-center space-x-4">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700">
                 Start Agency Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

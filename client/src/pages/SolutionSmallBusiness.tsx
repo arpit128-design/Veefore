@@ -203,7 +203,7 @@ export default function SolutionSmallBusiness() {
               <Link href="/solutions">
                 <Button variant="ghost" className="text-gray-300 hover:text-white">All Solutions</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700">
                   Start Growing
                 </Button>
@@ -248,7 +248,7 @@ export default function SolutionSmallBusiness() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-lg px-10 py-6">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -543,7 +543,7 @@ export default function SolutionSmallBusiness() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-lg px-10 py-6">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />

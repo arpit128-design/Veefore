@@ -102,7 +102,7 @@ export default function Contact() {
               <Link href="/support">
                 <Button variant="ghost">Support</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>

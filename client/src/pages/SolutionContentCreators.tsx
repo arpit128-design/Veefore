@@ -148,7 +148,7 @@ export default function SolutionContentCreators() {
               <Link href="/solutions">
                 <Button variant="ghost">All Solutions</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -365,7 +365,7 @@ export default function SolutionContentCreators() {
             Join thousands of creators who are already using VeeFore to grow their audience and create amazing content.
           </p>
           <div className="flex items-center justify-center space-x-4">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

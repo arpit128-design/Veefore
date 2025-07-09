@@ -32,7 +32,6 @@ import Settings from "@/pages/Settings";
 import Pricing from "@/pages/Pricing";
 import Subscription from "@/pages/Subscription";
 import SubscriptionNew from "@/pages/SubscriptionNew";
-import Auth from "@/pages/Auth";
 import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import OnboardingPremium from "@/pages/OnboardingPremium";
@@ -107,7 +106,6 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-56 lg:ml-64 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
-              <Route path="/auth" component={() => <Redirect to="/dashboard" />} />
               <Route path="/onboarding" component={OnboardingPremium} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
@@ -224,7 +222,6 @@ function Router() {
       <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
         <OptimizedSpaceBackground />
         <Switch>
-          <Route path="/auth" component={Auth} />
           <Route path="/signin" component={SignIn} />
           <Route path="/signup" component={SignUp} />
           <Route path="/features" component={Features} />

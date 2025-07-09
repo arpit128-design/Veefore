@@ -108,7 +108,7 @@ export default function WatchDemo() {
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -296,7 +296,7 @@ export default function WatchDemo() {
               <Play className="mr-2 h-5 w-5" />
               Watch Demo Now
             </Button>
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" variant="outline">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

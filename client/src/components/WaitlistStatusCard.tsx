@@ -205,7 +205,7 @@ export function WaitlistStatusCard({ isOpen, onClose }: WaitlistStatusCardProps)
                     <Button
                       className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                       onClick={() => {
-                        window.location.href = '/auth';
+                        window.location.href = '/signup';
                       }}
                     >
                       Start Free Trial

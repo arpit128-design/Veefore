@@ -98,7 +98,7 @@ export default function Features() {
               <Link href="/pricing">
                 <Button variant="ghost">Pricing</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -182,7 +182,7 @@ export default function Features() {
             Join thousands of creators and businesses who have revolutionized their social media strategy with VeeFore.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

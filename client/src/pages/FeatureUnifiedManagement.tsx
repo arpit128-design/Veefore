@@ -216,7 +216,7 @@ export default function FeatureUnifiedManagement() {
               <Link href="/features">
                 <Button variant="ghost" className="text-gray-300 hover:text-white">Features</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700">
                   Try Free
                 </Button>
@@ -261,7 +261,7 @@ export default function FeatureUnifiedManagement() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-lg px-10 py-6">
                   Start Managing
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -553,7 +553,7 @@ export default function FeatureUnifiedManagement() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-lg px-10 py-6">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />

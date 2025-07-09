@@ -202,7 +202,7 @@ export default function FeatureAnalytics() {
               <Link href="/features">
                 <Button variant="ghost" className="text-gray-300 hover:text-white">Features</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700">
                   Try Free
                 </Button>
@@ -247,7 +247,7 @@ export default function FeatureAnalytics() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-lg px-10 py-6">
                   Start Analyzing
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -483,7 +483,7 @@ export default function FeatureAnalytics() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button size="lg" className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-lg px-10 py-6">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5" />

@@ -142,7 +142,7 @@ export default function HelpCenter() {
               <Link href="/contact">
                 <Button variant="ghost">Contact</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>

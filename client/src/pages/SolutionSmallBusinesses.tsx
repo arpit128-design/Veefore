@@ -153,7 +153,7 @@ export default function SolutionSmallBusinesses() {
               <Link href="/solutions">
                 <Button variant="ghost">All Solutions</Button>
               </Link>
-              <Link href="/auth">
+              <Link href="/signup">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -374,7 +374,7 @@ export default function SolutionSmallBusinesses() {
             Join thousands of small businesses already using VeeFore to increase revenue and build stronger customer relationships.
           </p>
           <div className="flex items-center justify-center space-x-4">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />

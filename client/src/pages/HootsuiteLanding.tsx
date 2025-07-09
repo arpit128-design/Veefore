@@ -650,32 +650,32 @@ function FeatureDetailSections() {
                     <Calendar className="w-5 h-5 text-gray-400" />
                   </div>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center space-x-3">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="text-sm font-medium">Instagram Post</span>
+                        <span className="text-sm font-medium text-green-900">Instagram Post</span>
                       </div>
                       <Badge className="bg-green-100 text-green-800">Scheduled</Badge>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center space-x-3">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        <span className="text-sm font-medium">LinkedIn Article</span>
+                        <span className="text-sm font-medium text-blue-900">LinkedIn Article</span>
                       </div>
                       <Badge className="bg-blue-100 text-blue-800">Draft</Badge>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
                       <div className="flex items-center space-x-3">
                         <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                        <span className="text-sm font-medium">Twitter Thread</span>
+                        <span className="text-sm font-medium text-purple-900">Twitter Thread</span>
                       </div>
                       <Badge className="bg-purple-100 text-purple-800">AI Generated</Badge>
                     </div>
                   </div>
                   <div className="pt-4 border-t">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Optimal posting time</span>
-                      <span className="font-medium text-green-600">2:00 PM</span>
+                      <span className="text-gray-800 font-medium">Optimal posting time</span>
+                      <span className="font-medium text-green-700">2:00 PM</span>
                     </div>
                   </div>
                 </div>
@@ -888,26 +888,26 @@ function FeatureDetailSections() {
                   <Badge className="bg-pink-100 text-pink-800">Live</Badge>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Brand Mentions</span>
+                      <span className="text-sm font-medium text-green-900">Brand Mentions</span>
                     </div>
-                    <span className="text-sm font-semibold text-green-600">+25</span>
+                    <span className="text-sm font-semibold text-green-700">+25</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Sentiment Score</span>
+                      <span className="text-sm font-medium text-blue-900">Sentiment Score</span>
                     </div>
-                    <span className="text-sm font-semibold text-blue-600">89% Positive</span>
+                    <span className="text-sm font-semibold text-blue-700">89% Positive</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <span className="text-sm font-medium">Trending Topics</span>
+                      <span className="text-sm font-medium text-purple-900">Trending Topics</span>
                     </div>
-                    <span className="text-sm font-semibold text-purple-600">12 New</span>
+                    <span className="text-sm font-semibold text-purple-700">12 New</span>
                   </div>
                 </div>
               </div>
@@ -1024,29 +1024,29 @@ function FeatureDetailSections() {
                   <Badge className="bg-cyan-100 text-cyan-800">Advanced</Badge>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-xs">A</span>
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Competitor A</span>
-                        <p className="text-xs text-gray-600">Engagement: 5.2K</p>
+                        <span className="text-sm font-medium text-blue-900">Competitor A</span>
+                        <p className="text-xs text-gray-700">Engagement: 5.2K</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-blue-600">+15%</span>
+                    <span className="text-sm font-semibold text-blue-700">+15%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-xs">B</span>
                       </div>
                       <div>
-                        <span className="text-sm font-medium">Competitor B</span>
-                        <p className="text-xs text-gray-600">Engagement: 3.8K</p>
+                        <span className="text-sm font-medium text-green-900">Competitor B</span>
+                        <p className="text-xs text-gray-700">Engagement: 3.8K</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-green-600">+8%</span>
+                    <span className="text-sm font-semibold text-green-700">+8%</span>
                   </div>
                 </div>
                 <div className="pt-4 border-t">

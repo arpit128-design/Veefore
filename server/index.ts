@@ -99,6 +99,98 @@ app.use((req, res, next) => {
   const storage = new MongoStorage();
   await storage.connect();
   
+  // Database reset endpoint for fresh starts
+  app.post('/api/admin/reset-database', async (req, res) => {
+    try {
+      console.log('🔄 Starting complete database reset...');
+      
+      // Wait for storage to be connected
+      await storage.connect();
+      
+      let totalDeleted = 0;
+      const resetResults = [];
+      
+      // Clear all data through the storage interface
+      try {
+        // Clear users
+        const userResult = await storage.clearAllUsers();
+        if (userResult > 0) {
+          console.log(`🗑️  Cleared users: ${userResult} documents`);
+          resetResults.push({ collection: 'users', deleted: userResult });
+          totalDeleted += userResult;
+        }
+      } catch (error) {
+        console.log(`⚠️  Error clearing users: ${error.message}`);
+      }
+      
+      try {
+        // Clear waitlist users
+        const waitlistResult = await storage.clearAllWaitlistUsers();
+        if (waitlistResult > 0) {
+          console.log(`🗑️  Cleared waitlist_users: ${waitlistResult} documents`);
+          resetResults.push({ collection: 'waitlist_users', deleted: waitlistResult });
+          totalDeleted += waitlistResult;
+        }
+      } catch (error) {
+        console.log(`⚠️  Error clearing waitlist_users: ${error.message}`);
+      }
+      
+      try {
+        // Clear workspaces
+        const workspaceResult = await storage.clearAllWorkspaces();
+        if (workspaceResult > 0) {
+          console.log(`🗑️  Cleared workspaces: ${workspaceResult} documents`);
+          resetResults.push({ collection: 'workspaces', deleted: workspaceResult });
+          totalDeleted += workspaceResult;
+        }
+      } catch (error) {
+        console.log(`⚠️  Error clearing workspaces: ${error.message}`);
+      }
+      
+      try {
+        // Clear social accounts
+        const socialResult = await storage.clearAllSocialAccounts();
+        if (socialResult > 0) {
+          console.log(`🗑️  Cleared social_accounts: ${socialResult} documents`);
+          resetResults.push({ collection: 'social_accounts', deleted: socialResult });
+          totalDeleted += socialResult;
+        }
+      } catch (error) {
+        console.log(`⚠️  Error clearing social_accounts: ${error.message}`);
+      }
+      
+      try {
+        // Clear content
+        const contentResult = await storage.clearAllContent();
+        if (contentResult > 0) {
+          console.log(`🗑️  Cleared content: ${contentResult} documents`);
+          resetResults.push({ collection: 'content', deleted: contentResult });
+          totalDeleted += contentResult;
+        }
+      } catch (error) {
+        console.log(`⚠️  Error clearing content: ${error.message}`);
+      }
+      
+      console.log(`✅ DATABASE RESET COMPLETED - Total documents deleted: ${totalDeleted}`);
+      
+      res.json({
+        success: true,
+        message: 'Database reset completed successfully',
+        totalDeleted,
+        resetResults,
+        note: 'Fresh database - ready for new accounts'
+      });
+      
+    } catch (error) {
+      console.error('❌ Database reset failed:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Database reset failed',
+        message: error.message
+      });
+    }
+  });
+  
   // Start the background scheduler service
   startSchedulerService(storage);
   

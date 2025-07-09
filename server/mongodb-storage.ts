@@ -4469,4 +4469,35 @@ export class MongoStorage implements IStorage {
       metadata: mongoUser.metadata || {}
     };
   }
+
+  // Database reset methods for fresh starts
+  async clearAllUsers(): Promise<number> {
+    await this.connect();
+    const result = await UserModel.deleteMany({});
+    return result.deletedCount || 0;
+  }
+
+  async clearAllWaitlistUsers(): Promise<number> {
+    await this.connect();
+    const result = await WaitlistUserModel.deleteMany({});
+    return result.deletedCount || 0;
+  }
+
+  async clearAllWorkspaces(): Promise<number> {
+    await this.connect();
+    const result = await WorkspaceModel.deleteMany({});
+    return result.deletedCount || 0;
+  }
+
+  async clearAllSocialAccounts(): Promise<number> {
+    await this.connect();
+    const result = await SocialAccountModel.deleteMany({});
+    return result.deletedCount || 0;
+  }
+
+  async clearAllContent(): Promise<number> {
+    await this.connect();
+    const result = await ContentModel.deleteMany({});
+    return result.deletedCount || 0;
+  }
 }

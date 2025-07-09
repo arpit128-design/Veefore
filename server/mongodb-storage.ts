@@ -62,8 +62,10 @@ const WaitlistUserSchema = new mongoose.Schema({
   discountExpiresAt: Date,
   dailyLogins: { type: Number, default: 0 },
   feedbackSubmitted: { type: Boolean, default: false },
+  joinedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} }
 });
 
 const WorkspaceSchema = new mongoose.Schema({
@@ -4461,8 +4463,10 @@ export class MongoStorage implements IStorage {
       discountExpiresAt: mongoUser.discountExpiresAt,
       dailyLogins: mongoUser.dailyLogins || 0,
       feedbackSubmitted: mongoUser.feedbackSubmitted || false,
+      joinedAt: mongoUser.joinedAt || mongoUser.createdAt,
       createdAt: mongoUser.createdAt,
-      updatedAt: mongoUser.updatedAt
+      updatedAt: mongoUser.updatedAt,
+      metadata: mongoUser.metadata || {}
     };
   }
 }

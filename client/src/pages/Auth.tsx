@@ -147,6 +147,7 @@ AnimatedInput.displayName = 'AnimatedInput';
 export default function Auth() {
   const [, setLocation] = useLocation();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
@@ -178,13 +179,19 @@ export default function Auth() {
 
   const currentForm = isSignUp ? signUpForm : signInForm;
 
-  // Check device waitlist status on component mount
+  // Check device waitlist status and redirect to appropriate page
   useEffect(() => {
     async function checkDeviceWaitlistStatus() {
       try {
         const response = await fetch('/api/early-access/check-device');
         if (response.ok) {
           const data = await response.json();
+          
+          // Redirect early access users to signup page
+          if (data.user?.status === 'early_access') {
+            setLocation('/signup');
+            return;
+          }
           
           // Show waitlist status for any user on waitlist
           if (data.user) {
@@ -210,16 +217,23 @@ export default function Auth() {
             }
           }
         } else {
-          // Device not on waitlist - show normal auth flow
-          console.log('Device not on waitlist or error checking:', await response.json().catch(() => ({})));
+          // Device not on waitlist - redirect to signin page for existing users
+          setLocation('/signin');
+          return;
         }
       } catch (error) {
         console.log('Device not on waitlist or error checking:', error);
+        // On error, redirect to signin page
+        setLocation('/signin');
+        return;
       }
+      
+      // If we get here, show the legacy auth page
+      setIsRedirecting(false);
     }
 
     checkDeviceWaitlistStatus();
-  }, []);
+  }, [setLocation]);
 
   // Handle email/password authentication
   const handleEmailAuth = async (data: SignInForm | SignUpForm) => {
@@ -495,6 +509,19 @@ export default function Auth() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state while redirecting
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-space-navy text-white overflow-hidden relative flex items-center justify-center">
+        <SpaceBackground />
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/70">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-space-navy text-white overflow-hidden relative flex items-center justify-center">

@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Rocket } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 export default function TestLanding() {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white flex items-center justify-center">
       <div className="text-center">
@@ -42,10 +45,16 @@ export default function TestLanding() {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="flex gap-4 justify-center"
         >
-          <button className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all">
+          <button 
+            onClick={() => setLocation('/signin')}
+            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all"
+          >
             Sign In
           </button>
-          <button className="px-8 py-3 bg-transparent border border-purple-500 rounded-lg font-semibold hover:bg-purple-500/10 transition-all">
+          <button 
+            onClick={() => setLocation('/signup')}
+            className="px-8 py-3 bg-transparent border border-purple-500 rounded-lg font-semibold hover:bg-purple-500/10 transition-all"
+          >
             Sign Up
           </button>
         </motion.div>

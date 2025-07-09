@@ -12,6 +12,7 @@ import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
+import { PageTransition, AuthPageSkeleton } from '@/components/ui/page-transition';
 
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -141,7 +142,8 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <PageTransition>
+      <div className="min-h-screen bg-gray-50 flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 to-purple-700 text-white p-12 flex-col justify-center">
         <div className="max-w-md">
@@ -279,6 +281,7 @@ export default function SignIn() {
         onClose={() => setShowAccessRestrictedModal(false)}
         message={accessRestrictedMessage}
       />
-    </div>
+      </div>
+    </PageTransition>
   );
 }

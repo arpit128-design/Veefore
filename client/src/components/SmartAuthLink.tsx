@@ -1,6 +1,8 @@
-import { Link } from 'wouter';
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface SmartAuthLinkProps {
@@ -17,6 +19,8 @@ export function SmartAuthLink({
   size = "default"
 }: SmartAuthLinkProps) {
   const deviceStatus = useDeviceWaitlistStatus();
+  const [, setLocation] = useLocation();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Determine the appropriate route based on early access status
   const getAuthRoute = () => {
@@ -29,15 +33,36 @@ export function SmartAuthLink({
     }
   };
 
-  return (
-    <Link href={getAuthRoute()}>
+  const handleClick = async () => {
+    setIsNavigating(true);
+    // Add a small delay to show loading state
+    await new Promise(resolve => setTimeout(resolve, 100));
+    setLocation(getAuthRoute());
+  };
+
+  if (deviceStatus.isLoading || isNavigating) {
+    return (
       <Button 
         className={className} 
         variant={variant}
         size={size}
+        disabled
       >
-        {children}
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {isNavigating ? 'Redirecting...' : 'Loading...'}
       </Button>
-    </Link>
+    );
+  }
+
+  return (
+    <Button 
+      className={className} 
+      variant={variant}
+      size={size}
+      onClick={handleClick}
+      disabled={isNavigating}
+    >
+      {children}
+    </Button>
   );
 }

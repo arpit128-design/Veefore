@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 
 interface SmartCTAButtonProps {
@@ -24,6 +25,7 @@ export function SmartCTAButton({
 }: SmartCTAButtonProps) {
   const deviceStatus = useDeviceWaitlistStatus();
   const [, setLocation] = useLocation();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const getButtonText = () => {
     if (deviceStatus.hasEarlyAccess) {
@@ -35,9 +37,12 @@ export function SmartCTAButton({
     }
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (deviceStatus.hasEarlyAccess) {
       // User has early access, redirect to signup page since they haven't registered yet
+      setIsNavigating(true);
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 100));
       setLocation('/signup');
     } else if (deviceStatus.isOnWaitlist) {
       // User is on waitlist, show status card
@@ -52,27 +57,32 @@ export function SmartCTAButton({
     }
   };
 
-  if (deviceStatus.isLoading) {
+  if (deviceStatus.isLoading || isNavigating) {
     return (
       <Button 
         size={size} 
         className={className}
         disabled
       >
-        Loading...
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {isNavigating ? 'Redirecting...' : 'Loading...'}
       </Button>
     );
   }
 
-  // If user has early access, render as Link to /signup
+  // If user has early access, render as button with navigation handler
   if (deviceStatus.hasEarlyAccess) {
     return (
-      <Link href="/signup">
-        <Button size={size} className={className} variant={variant}>
-          {children || getButtonText()}
-          {showArrow && <ArrowRight className="ml-2 w-4 h-4" />}
-        </Button>
-      </Link>
+      <Button 
+        size={size} 
+        className={className} 
+        variant={variant}
+        onClick={handleClick}
+        disabled={isNavigating}
+      >
+        {children || getButtonText()}
+        {showArrow && <ArrowRight className="ml-2 w-4 h-4" />}
+      </Button>
     );
   }
 

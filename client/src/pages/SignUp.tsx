@@ -13,6 +13,7 @@ import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
+import { PageTransition, AuthPageSkeleton } from '@/components/ui/page-transition';
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -298,7 +299,8 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <PageTransition>
+      <div className="min-h-screen bg-gray-50 flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-green-400 to-blue-500 text-white p-12 flex-col justify-center">
         <div className="max-w-md">
@@ -481,6 +483,7 @@ export default function SignUp() {
         onClose={() => setShowAccessRestrictedModal(false)}
         message={accessRestrictedMessage}
       />
-    </div>
+      </div>
+    </PageTransition>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, User, Users, Rocket, CheckCircle, Copy, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialReferralCode?: string;
 }
 
 interface WaitlistResult {
@@ -23,14 +24,19 @@ interface WaitlistResult {
   message: string;
 }
 
-export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
+export function WaitlistModal({ isOpen, onClose, initialReferralCode = '' }: WaitlistModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [referralCode, setReferralCode] = useState('');
+  const [referralCode, setReferralCode] = useState(initialReferralCode);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<WaitlistResult | null>(null);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  // Update referral code when initialReferralCode changes
+  useEffect(() => {
+    setReferralCode(initialReferralCode);
+  }, [initialReferralCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

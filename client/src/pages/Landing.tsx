@@ -146,9 +146,8 @@ function LoadingSkeleton() {
 }
 
 // Navigation Component
-function Navigation() {
+function Navigation({ onOpenWaitlist }: { onOpenWaitlist: () => void }) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -167,64 +166,57 @@ function Navigation() {
   };
 
   const handleGetStarted = () => {
-    setShowWaitlistModal(true);
+    onOpenWaitlist();
   };
 
   return (
-    <>
-      <motion.nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-slate-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-        }`}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">VeeFore</span>
+    <motion.nav 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-slate-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Rocket className="w-5 h-5 text-white" />
             </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/features">
-                <button className="text-gray-300 hover:text-white transition-colors">Features</button>
-              </Link>
-              <Link href="/solutions">
-                <button className="text-gray-300 hover:text-white transition-colors">Solutions</button>
-              </Link>
-              <Link href="/pricing">
-                <button className="text-gray-300 hover:text-white transition-colors">Pricing</button>
-              </Link>
-              <Link href="/reviews">
-                <button className="text-gray-300 hover:text-white transition-colors">Reviews</button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                className="text-gray-300 hover:text-white"
-                onClick={handleGetStarted}
-              >
-                Join Waitlist
-              </Button>
-              <Button 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                onClick={handleGetStarted}
-              >
-                Get Early Access
-              </Button>
-            </div>
+            <span className="text-xl font-bold text-white">VeeFore</span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/features">
+              <button className="text-gray-300 hover:text-white transition-colors">Features</button>
+            </Link>
+            <Link href="/solutions">
+              <button className="text-gray-300 hover:text-white transition-colors">Solutions</button>
+            </Link>
+            <Link href="/pricing">
+              <button className="text-gray-300 hover:text-white transition-colors">Pricing</button>
+            </Link>
+            <Link href="/reviews">
+              <button className="text-gray-300 hover:text-white transition-colors">Reviews</button>
+            </Link>
+            <Button 
+              variant="ghost" 
+              className="text-gray-300 hover:text-white"
+              onClick={handleGetStarted}
+            >
+              Join Waitlist
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              onClick={handleGetStarted}
+            >
+              Get Early Access
+            </Button>
           </div>
         </div>
-      </motion.nav>
-
-      <WaitlistModal 
-        isOpen={showWaitlistModal} 
-        onClose={() => setShowWaitlistModal(false)} 
-      />
-    </>
+      </div>
+    </motion.nav>
   );
 }
 
@@ -1590,9 +1582,31 @@ function ScrollToTopButton() {
 
 // Main Landing Page Component with Lazy Loading
 export default function Landing() {
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
+
+  // Check for referral code in URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    
+    if (refCode) {
+      setReferralCode(refCode);
+      setShowWaitlistModal(true);
+      
+      // Clean up URL without refreshing page
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, []);
+
+  const handleOpenWaitlist = () => {
+    setShowWaitlistModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white overflow-x-hidden">
-      <Navigation />
+      <Navigation onOpenWaitlist={handleOpenWaitlist} />
       <HeroSection />
       
       {/* Core sections load immediately */}
@@ -1633,6 +1647,13 @@ export default function Landing() {
       
       <CTASection />
       <ScrollToTopButton />
+      
+      {/* Waitlist Modal for referral links */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => setShowWaitlistModal(false)} 
+        initialReferralCode={referralCode}
+      />
     </div>
   );
 }

@@ -181,20 +181,27 @@ export default function Auth() {
         const response = await fetch('/api/early-access/check-device');
         if (response.ok) {
           const data = await response.json();
-          setUserWaitlistStatus({
-            isOnWaitlist: true,
-            hasEarlyAccess: data.user.status === 'early_access',
-            referralCode: data.user.referralCode,
-            userEmail: data.user.email
-          });
           
-          // Show waitlist notification after a short delay
-          setTimeout(() => {
-            setShowWaitlistNotification(true);
-          }, 1000);
+          // Only show notification if user is actually on waitlist with early access
+          if (data.user && data.user.status === 'early_access') {
+            setUserWaitlistStatus({
+              isOnWaitlist: true,
+              hasEarlyAccess: true,
+              referralCode: data.user.referralCode,
+              userEmail: data.user.email
+            });
+            
+            // Show waitlist notification after a short delay
+            setTimeout(() => {
+              setShowWaitlistNotification(true);
+            }, 1000);
+          }
+        } else {
+          // Device not on waitlist - show normal auth flow
+          console.log('Device not on waitlist or error checking:', await response.json().catch(() => ({})));
         }
       } catch (error) {
-        console.log('Device not on waitlist:', error);
+        console.log('Device not on waitlist or error checking:', error);
       }
     }
 

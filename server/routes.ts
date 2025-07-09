@@ -11631,12 +11631,18 @@ Format the response as JSON with this structure:
       
       console.log('[EARLY ACCESS] Checking device - IP:', clientIP, 'UA:', userAgent.substring(0, 50));
       
-      // Check if this device has already joined the waitlist
+      // Check if this device has already joined the waitlist with flexible IP matching
       const users = await storage.getAllWaitlistUsers();
-      const deviceUser = users.find(user => 
-        user.metadata?.ipAddress === clientIP || 
-        (user.metadata?.userAgent && user.metadata.userAgent.includes(userAgent.substring(0, 50)))
-      );
+      const deviceUser = users.find(user => {
+        // Check if the current IP matches either the primary IP or any alternate IPs
+        const ipMatches = user.metadata?.ipAddress === clientIP || 
+                         user.metadata?.alternateIPs?.includes(clientIP);
+        
+        // Require user agent match and early access status
+        return ipMatches && 
+               user.metadata?.userAgent === userAgent &&
+               user.status === 'early_access';
+      });
       
       if (deviceUser) {
         console.log('[EARLY ACCESS] Device found on waitlist:', deviceUser.email);

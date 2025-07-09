@@ -11672,8 +11672,15 @@ Format the response as JSON with this structure:
         const ipMatches = user.metadata?.ipAddress === clientIP || 
                          user.metadata?.alternateIPs?.includes(clientIP);
         
-        // Require user agent match (any status on waitlist)
-        return ipMatches && user.metadata?.userAgent === userAgent;
+        // Flexible user agent matching - check for similar browsers/patterns
+        const userAgentMatches = user.metadata?.userAgent === userAgent ||
+                                user.metadata?.alternateUserAgents?.includes(userAgent) ||
+                                // Also check if both user agents contain key identifiers (Chrome, WebKit, etc.)
+                                (user.metadata?.userAgent?.includes('Chrome') && userAgent.includes('Chrome') && 
+                                 user.metadata?.userAgent?.includes('WebKit') && userAgent.includes('WebKit'));
+        
+        // Require both IP and user agent match
+        return ipMatches && userAgentMatches;
       });
       
       if (deviceUser) {

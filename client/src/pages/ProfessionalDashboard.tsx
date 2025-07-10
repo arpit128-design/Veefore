@@ -214,7 +214,7 @@ const ProfessionalDashboard: React.FC = () => {
                     Your content insights for this week
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50">
                   View Analytics
                 </Button>
               </div>
@@ -288,7 +288,7 @@ const ProfessionalDashboard: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
                         <h4 className="font-bold text-gray-900">{rec.title}</h4>
-                        <Badge variant={rec.priority === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                        <Badge variant={rec.priority === 'high' ? 'destructive' : 'outline'} className="text-xs border-gray-300">
                           {rec.priority} priority
                         </Badge>
                       </div>
@@ -304,14 +304,14 @@ const ProfessionalDashboard: React.FC = () => {
           </Card>
 
           {/* Listening Section */}
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Search className="w-5 h-5 text-blue-500" />
                   Listening
                 </CardTitle>
-                <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700">
+                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
                   See more insights
                 </Button>
               </div>
@@ -324,7 +324,7 @@ const ProfessionalDashboard: React.FC = () => {
                   
                   <div className="mb-4">
                     <label className="text-sm font-medium text-gray-700">Interest</label>
-                    <select className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                    <select className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                       <option>Business and Finance</option>
                       <option>Technology</option>
                       <option>Marketing</option>
@@ -336,7 +336,7 @@ const ProfessionalDashboard: React.FC = () => {
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
                     <h5 className="font-medium text-gray-900 mb-2">{topic.topic}</h5>
                     <p className="text-sm text-gray-600 mb-3 leading-relaxed">{topic.description}</p>
-                    <Button variant="outline" size="sm" className="text-xs">
+                    <Button variant="outline" size="sm" className="text-xs border-gray-300 text-gray-700 hover:bg-gray-50">
                       <FileText className="w-3 h-3 mr-1" />
                       Create draft post
                     </Button>
@@ -347,14 +347,14 @@ const ProfessionalDashboard: React.FC = () => {
           </Card>
 
           {/* Scheduled Posts */}
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Scheduled posts</CardTitle>
+                  <CardTitle className="text-gray-900">Scheduled posts</CardTitle>
                   <p className="text-sm text-gray-600">Created in VeeFore</p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700">
+                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
                   View all scheduled
                 </Button>
               </div>
@@ -363,7 +363,7 @@ const ProfessionalDashboard: React.FC = () => {
               <div className="text-center py-8">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 mb-4">No scheduled posts</p>
-                <Button variant="outline" className="mb-4">
+                <Button variant="outline" className="mb-4 border-gray-300 text-gray-700 hover:bg-gray-50">
                   Create a post
                 </Button>
               </div>
@@ -371,14 +371,14 @@ const ProfessionalDashboard: React.FC = () => {
           </Card>
 
           {/* Drafts */}
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Drafts</CardTitle>
+                  <CardTitle className="text-gray-900">Drafts</CardTitle>
                   <p className="text-sm text-gray-600">Created in VeeFore</p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700">
+                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
                   View all drafts
                 </Button>
               </div>
@@ -388,8 +388,8 @@ const ProfessionalDashboard: React.FC = () => {
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 mb-4">Start drafting content to edit and publish whenever you'd like.</p>
                 <div className="space-x-2">
-                  <Button variant="outline">Create a draft</Button>
-                  <Button variant="outline" className="bg-cyan-600 text-white hover:bg-cyan-700">
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">Create a draft</Button>
+                  <Button className="bg-blue-600 text-white hover:bg-blue-700">
                     Draft post with AI
                   </Button>
                 </div>
@@ -552,7 +552,7 @@ const ProfessionalDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-indigo-200 text-indigo-600 hover:bg-indigo-50 h-12">
+                  <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 h-12">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Connect Another Account
                   </Button>

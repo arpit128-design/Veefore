@@ -127,7 +127,7 @@ function AuthenticatedApp() {
               <main className="flex-1 h-full overflow-hidden veefore-main-content">
                 <div className="h-full overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
-                  <Route path="/dashboard" component={ProfessionalDashboard} />
+                  <Route path="/dashboard" component={Dashboard} />
                   <Route path="/content-studio" component={ContentStudio} />
                   <Route path="/scheduler" component={ProfessionalScheduler} />
                   <Route path="/advanced-scheduler" component={AdvancedScheduler} />
@@ -172,7 +172,7 @@ function AuthenticatedApp() {
                   <Route path="/admin/early-access" component={AdminEarlyAccess} />
                   <Route path="/feature-preview" component={FeaturePreview} />
                   <Route path="/onboarding" component={OnboardingPremium} />
-                  <Route path="/" component={ProfessionalDashboard} />
+                  <Route path="/" component={Dashboard} />
                   <Route component={NotFound} />
                 </Switch>
                 </div>

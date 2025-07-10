@@ -301,24 +301,23 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Grid */}
+      {/* Quick Actions Grid - Hootsuite Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {quickActions.map((action, index) => (
           <Card 
             key={index} 
-            className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border-0 shadow-sm"
+            className="group cursor-pointer transition-all duration-200 hover:shadow-md bg-white border border-gray-200 shadow-sm"
             onClick={action.action}
           >
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                {action.icon}
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <div className="text-gray-600">
+                  {React.cloneElement(action.icon, { className: "w-6 h-6" })}
+                </div>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">
+              <h3 className="font-semibold text-gray-900 text-base">
                 {action.title}
               </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                {action.description}
-              </p>
             </CardContent>
           </Card>
         ))}

@@ -850,7 +850,17 @@ button[data-state="checked"],
   color: #ffffff !important;
   fill: none !important;
   stroke: #ffffff !important;
-  stroke-width: 2.5 !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,0.8)) !important;
+}
+
+/* Enhanced icon visibility for selected state */
+.view-mode-buttons button[data-selected="true"] svg,
+.view-mode-buttons button[style*="background-color:#000000"] svg {
+  opacity: 1 !important;
+  stroke: #ffffff !important;
+  stroke-width: 3 !important;
+  fill: none !important;
 }
 
 /* Override any button component styles */

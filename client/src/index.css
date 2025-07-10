@@ -2446,4 +2446,58 @@ canvas {
   border: 1px solid #e2e8f0 !important;
 }
 
+/* Ultra-Comprehensive Yellow Prevention System */
+.team-management-page *[style*="yellow"],
+.team-management-page *[style*="amber"],
+.team-management-page *[style*="#fef"],
+.team-management-page *[style*="#fde"],
+.team-management-page *[style*="#fcd"],
+.team-management-page *[style*="#f59"],
+.team-management-page *[style*="#d97"],
+.team-management-page *[style*="#b45"],
+.team-management-page *[style*="#924"],
+.team-management-page *[style*="#783"] {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Force Professional Button Styling */
+.team-management-page button[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.team-management-page button[class*="border-slate"] {
+  border-color: #e2e8f0 !important;
+}
+
+.team-management-page button[class*="text-slate"] {
+  color: #334155 !important;
+}
+
+.team-management-page button:hover[class*="bg-slate"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Professional Badge Overrides */
+.team-management-page .badge[class*="bg-emerald"] {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.team-management-page .badge[class*="bg-blue"] {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.team-management-page .badge[class*="bg-purple"] {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
 /* End Team Management Styling */

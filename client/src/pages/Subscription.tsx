@@ -370,30 +370,30 @@ export default function Subscription() {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 rounded-3xl opacity-50" />
           <div className="relative bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-12 shadow-2xl">
             <div className="text-center">
-              <div className="inline-flex items-center gap-4 mb-8">
+              <div className="inline-flex items-center gap-3 mb-6">
                 <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <CreditCard className="w-10 h-10 text-white" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-xl">
+                    <CreditCard className="w-7 h-7 text-white" />
                   </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-white" />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-white" />
                   </div>
                 </div>
                 <div className="text-left">
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                     Billing & Subscription
                   </h1>
-                  <div className="flex items-center gap-3 mt-2">
-                    <Badge className="bg-green-100 text-green-800 border-green-200">
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge className="bg-green-100 text-green-800 border-green-200 text-xs px-2 py-1">
                       Active Account
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-2 py-1">
                       Enterprise Ready
                     </Badge>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-700 text-xl max-w-4xl mx-auto leading-relaxed font-medium">
+              <p className="text-gray-700 text-base max-w-4xl mx-auto leading-relaxed">
                 Advanced subscription management with real-time usage analytics, flexible billing options, and enterprise-grade security
               </p>
               
@@ -454,30 +454,30 @@ export default function Subscription() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-3xl overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-8 text-white">
+                <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                          <Crown className="w-8 h-8 text-white" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                          <Crown className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold mb-2">Current Plan</h2>
-                          <div className="flex items-center gap-3">
-                            <Badge className="bg-white/20 backdrop-blur-sm text-white border-0 text-lg px-4 py-2 rounded-full">
+                          <h2 className="text-xl font-bold mb-1">Current Plan</h2>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-white/20 backdrop-blur-sm text-white border-0 text-sm px-3 py-1 rounded-full">
                               {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan
                             </Badge>
-                            <div className="text-white/90 font-medium">
+                            <div className="text-white/90 text-sm font-medium">
                               {formatPrice(currentCredits)} credits available
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-4xl font-bold mb-1">
+                        <div className="text-2xl font-bold mb-1">
                           ₹{formatPrice(planData?.plans[currentPlan]?.price || 0)}
                         </div>
-                        <div className="text-white/90">per month</div>
+                        <div className="text-white/90 text-sm">per month</div>
                       </div>
                     </div>
                   </div>

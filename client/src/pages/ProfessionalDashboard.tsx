@@ -21,7 +21,13 @@ import {
   CheckCircle,
   Star,
   Globe,
-  Eye
+  Eye,
+  ArrowRight,
+  Rocket,
+  Heart,
+  MessageCircle,
+  PlayCircle,
+  Settings
 } from 'lucide-react';
 
 interface DashboardData {

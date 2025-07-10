@@ -1,6 +1,25 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { log } from "./vite";
+
+// Production-safe log function
+let log: (message: string, source?: string) => void;
+
+try {
+  // Try to import log from vite module
+  const viteModule = await import("./vite");
+  log = viteModule.log;
+} catch (error) {
+  // Fallback log function for production
+  log = (message: string, source = "express") => {
+    const formattedTime = new Date().toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+    console.log(`${formattedTime} [${source}] ${message}`);
+  };
+}
 
 // Dynamic imports for production-safe Vite setup
 let setupVite: any;
@@ -8,18 +27,24 @@ let serveStatic: any;
 
 const isProduction = process.env.NODE_ENV === "production";
 
-if (!isProduction) {
-  try {
-    const viteModule = await import("./vite");
-    setupVite = viteModule.setupVite;
-    serveStatic = viteModule.serveStatic;
-    console.log("[DEV] Vite modules loaded successfully");
-  } catch (error) {
-    console.warn("[DEV] Vite modules not available, will use fallback static serving");
+// Only import Vite modules in development
+async function loadViteModules() {
+  if (!isProduction) {
+    try {
+      const viteModule = await import("./vite");
+      setupVite = viteModule.setupVite;
+      serveStatic = viteModule.serveStatic;
+      console.log("[DEV] Vite modules loaded successfully");
+    } catch (error) {
+      console.warn("[DEV] Vite modules not available, will use fallback static serving");
+    }
+  } else {
+    console.log("[PRODUCTION] Skipping Vite module imports for production build");
   }
-} else {
-  console.log("[PRODUCTION] Skipping Vite module imports for production build");
 }
+
+// Load Vite modules asynchronously
+await loadViteModules();
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
 import { AutoSyncService } from "./auto-sync-service";

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { EarlyAccessWelcomeModal } from "@/components/EarlyAccessWelcomeModal";
+import WelcomePopup from "@/components/WelcomePopup";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
@@ -36,24 +36,13 @@ export default function Dashboard() {
     const checkWelcomeModal = async () => {
       if (user && user.email) {
         try {
-          // Check if modal has been dismissed for this user
-          const modalKey = `welcome-modal-dismissed-${user.email}`;
-          const hasModalBeenDismissed = localStorage.getItem(modalKey);
+          // Check if this is the first time after onboarding completion
+          const shouldShowWelcomePopup = localStorage.getItem('should_show_welcome_popup');
           
-          if (hasModalBeenDismissed) {
-            return; // Don't show modal if it has been dismissed
-          }
-
-          // Check if user has early access and hasn't claimed welcome bonus
-          const response = await fetch('/api/early-access/check-device');
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.user?.status === 'early_access') {
-              // Check if user has already claimed welcome bonus or has starter plan
-              if (!user.hasClaimedWelcomeBonus && user.plan !== 'starter') {
-                setShowWelcomeModal(true);
-              }
-            }
+          if (shouldShowWelcomePopup === 'true') {
+            // Show welcome popup and then remove the flag
+            setShowWelcomeModal(true);
+            localStorage.removeItem('should_show_welcome_popup');
           }
         } catch (error) {
           console.error('Error checking welcome modal:', error);
@@ -129,37 +118,11 @@ export default function Dashboard() {
     minute: '2-digit'
   });
 
-  // Welcome bonus claim mutation
-  const claimWelcomeBonus = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/early-access/claim-welcome-bonus', {});
-      return response;
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Starter Plan Trial Activated!",
-        description: `You now have full access to the Starter plan for 1 month. Enjoy ${data.bonusCredits} credits!`,
-        variant: "default"
-      });
-      
-      // Mark modal as dismissed for this user
-      if (user?.email) {
-        const modalKey = `welcome-modal-dismissed-${user.email}`;
-        localStorage.setItem(modalKey, 'true');
-      }
-      
-      // Refresh user data
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      setShowWelcomeModal(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to claim welcome bonus",
-        variant: "destructive"
-      });
-    }
-  });
+  // Handle welcome popup close
+  const handleWelcomePopupClose = () => {
+    setShowWelcomeModal(false);
+    // No need to store anything in localStorage as this is a one-time popup
+  };
 
   // Force complete data refresh mutation - clears all caches and fetches live data
   const forceRefreshData = useMutation({
@@ -486,12 +449,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Early Access Welcome Modal */}
-      <EarlyAccessWelcomeModal 
-        open={showWelcomeModal}
-        onOpenChange={setShowWelcomeModal}
-        onClaim={() => claimWelcomeBonus.mutate()}
-        userEmail={user?.email}
+      {/* Welcome Popup */}
+      <WelcomePopup
+        isOpen={showWelcomeModal}
+        onClose={handleWelcomePopupClose}
       />
     </div>
   );

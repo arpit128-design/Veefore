@@ -59,7 +59,11 @@ import {
   Timer,
   BarChart3,
   BrainCircuit,
-  Send
+  Send,
+  Plus,
+  Minus,
+  CreditCard,
+  Gift
 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
@@ -191,6 +195,8 @@ export default function SignUpWithOnboarding() {
   const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
   const [preferences, setPreferences] = useState({
     selectedNiches: [] as string[],
     contentTypes: [] as string[],
@@ -355,6 +361,15 @@ export default function SignUpWithOnboarding() {
       return;
     }
 
+    const selectedPlanData = plans.find(p => p.id === selectedPlan);
+    
+    // If it's a paid plan, show payment first
+    if (selectedPlanData && selectedPlanData.price > 0) {
+      setShowPayment(true);
+      return;
+    }
+
+    // If it's free plan, proceed directly
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/select-plan', {
@@ -386,6 +401,41 @@ export default function SignUpWithOnboarding() {
     }
   };
 
+  // Handle Payment Success
+  const handlePaymentSuccess = async () => {
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/select-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          planId: selectedPlan,
+          billingPeriod: billingPeriod
+        })
+      });
+
+      if (response.ok) {
+        setShowPayment(false);
+        nextStep();
+        toast({
+          title: "Payment successful!",
+          description: "Your plan has been activated. Let's connect your social accounts."
+        });
+      } else {
+        throw new Error('Failed to confirm payment');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Payment confirmation failed",
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Step 4: Connect Social Accounts
   const handleInstagramConnect = () => {
     localStorage.setItem('onboarding_current_step', '4');
@@ -404,7 +454,9 @@ export default function SignUpWithOnboarding() {
       });
 
       if (response.ok) {
+        // Mark onboarding as completed and show welcome popup
         localStorage.setItem('onboarding_just_completed', 'true');
+        localStorage.setItem('should_show_welcome_popup', 'true');
         queryClient.invalidateQueries({ queryKey: ['/api/user'] });
         toast({
           title: "Welcome to VeeFore!",
@@ -512,6 +564,57 @@ export default function SignUpWithOnboarding() {
 
         {/* Main Content */}
         <div className="flex-1 px-8 py-8 overflow-y-auto">
+          {/* Payment Modal */}
+          {showPayment && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CreditCard className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Complete Payment
+                  </h3>
+                  <p className="text-gray-600">
+                    Secure payment to activate your {plans.find(p => p.id === selectedPlan)?.name} plan
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700">Plan:</span>
+                    <span className="font-semibold">{plans.find(p => p.id === selectedPlan)?.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700">Credits:</span>
+                    <span className="font-semibold">{plans.find(p => p.id === selectedPlan)?.credits}/month</span>
+                  </div>
+                  <div className="flex justify-between items-center text-lg font-bold">
+                    <span className="text-gray-900">Total:</span>
+                    <span className="text-blue-600">₹{plans.find(p => p.id === selectedPlan)?.price}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    onClick={handlePaymentSuccess}
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Processing...' : 'Complete Payment'}
+                  </Button>
+                  <Button
+                    onClick={() => setShowPayment(false)}
+                    variant="outline"
+                    className="w-full h-12 border-gray-300"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             {/* Step 1: Sign Up */}
             {currentStep === 0 && (
@@ -793,8 +896,7 @@ export default function SignUpWithOnboarding() {
                     {plans.map((plan) => (
                       <div
                         key={plan.id}
-                        onClick={() => setSelectedPlan(plan.id)}
-                        className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md ${
+                        className={`relative rounded-xl border-2 transition-all hover:shadow-md ${
                           selectedPlan === plan.id
                             ? 'border-blue-500 bg-blue-50 shadow-lg'
                             : 'border-gray-200 hover:border-gray-300 bg-white'
@@ -806,47 +908,118 @@ export default function SignUpWithOnboarding() {
                           </div>
                         )}
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                              plan.id === 'free' ? 'bg-gray-100' :
-                              plan.id === 'starter' ? 'bg-blue-100' :
-                              plan.id === 'pro' ? 'bg-purple-100' :
-                              'bg-orange-100'
-                            }`}>
-                              <span className="text-2xl font-bold text-gray-700">
-                                {plan.id === 'free' ? '🆓' :
-                                 plan.id === 'starter' ? '🚀' :
-                                 plan.id === 'pro' ? '⭐' : '👑'}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
-                              <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
-                              <div className="flex items-center space-x-4 mt-2">
-                                <span className="text-sm text-gray-500">
-                                  {plan.features[0]} • {plan.features[1]}
+                        <div 
+                          onClick={() => setSelectedPlan(plan.id)}
+                          className="p-6 cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                                plan.id === 'free' ? 'bg-gray-100' :
+                                plan.id === 'starter' ? 'bg-blue-100' :
+                                plan.id === 'pro' ? 'bg-purple-100' :
+                                'bg-orange-100'
+                              }`}>
+                                <span className="text-2xl font-bold text-gray-700">
+                                  {plan.id === 'free' ? '🆓' :
+                                   plan.id === 'starter' ? '🚀' :
+                                   plan.id === 'pro' ? '⭐' : '👑'}
                                 </span>
                               </div>
-                            </div>
-                          </div>
-                          
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-gray-900">
-                              ₹{plan.monthlyPrice}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {plan.period}
-                            </div>
-                            {selectedPlan === plan.id && (
-                              <div className="mt-2">
-                                <div className="bg-blue-500 text-white rounded-full p-1">
-                                  <Check className="w-4 h-4" />
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                                <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
+                                <div className="flex items-center space-x-4 mt-2">
+                                  <span className="text-sm text-gray-500">
+                                    {plan.features[0]} • {plan.features[1]}
+                                  </span>
                                 </div>
                               </div>
-                            )}
+                            </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              <div className="text-right">
+                                <div className="text-2xl font-bold text-gray-900">
+                                  ₹{plan.monthlyPrice}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {plan.period}
+                                </div>
+                                {selectedPlan === plan.id && (
+                                  <div className="mt-2">
+                                    <div className="bg-blue-500 text-white rounded-full p-1">
+                                      <Check className="w-4 h-4" />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedPlan(expandedPlan === plan.id ? null : plan.id);
+                                }}
+                                className="p-2 rounded-lg border border-gray-300 hover:border-gray-400 transition-colors"
+                              >
+                                {expandedPlan === plan.id ? (
+                                  <Minus className="w-4 h-4 text-gray-600" />
+                                ) : (
+                                  <Plus className="w-4 h-4 text-gray-600" />
+                                )}
+                              </button>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Expanded Details */}
+                        {expandedPlan === plan.id && (
+                          <div className="px-6 pb-6 border-t border-gray-200 pt-4">
+                            <div className="grid md:grid-cols-2 gap-6">
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-3">All Features</h4>
+                                <div className="space-y-2">
+                                  {plan.features.map((feature, index) => (
+                                    <div key={index} className="flex items-center text-sm text-gray-600">
+                                      <Check className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                                      {feature}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-3">What's Included</h4>
+                                <div className="space-y-3 text-sm text-gray-600">
+                                  <div className="flex items-center">
+                                    <Zap className="w-4 h-4 text-blue-600 mr-2" />
+                                    <span>{plan.credits} AI credits monthly</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <Building className="w-4 h-4 text-purple-600 mr-2" />
+                                    <span>
+                                      {plan.id === 'free' || plan.id === 'starter' ? '1 workspace' :
+                                       plan.id === 'pro' ? '2 workspaces' : '8 workspaces'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <Users className="w-4 h-4 text-green-600 mr-2" />
+                                    <span>
+                                      {plan.id === 'free' || plan.id === 'starter' ? 'Solo account' :
+                                       plan.id === 'pro' ? 'Team of 2 members' : 'Team of 3 members'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <Shield className="w-4 h-4 text-orange-600 mr-2" />
+                                    <span>
+                                      {plan.id === 'free' ? 'Community support' : 
+                                       plan.id === 'starter' ? 'Priority support' : 'Premium support'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -902,33 +1075,44 @@ export default function SignUpWithOnboarding() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                            <Instagram className="w-5 h-5 text-pink-600" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900">Instagram</h3>
-                            <p className="text-sm text-gray-600">Connect your Instagram account</p>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={handleInstagramConnect}
-                          className="bg-pink-600 hover:bg-pink-700 text-white"
-                        >
-                          Connect
-                        </Button>
-                      </div>
-
-                      {socialAccounts.length > 0 && (
+                      {socialAccounts.length > 0 ? (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                          <h4 className="font-medium text-green-900 mb-2">Connected Accounts</h4>
+                          <h4 className="font-medium text-green-900 mb-3">Connected Accounts</h4>
                           {socialAccounts.map((account: any) => (
-                            <div key={account.id} className="flex items-center space-x-2 text-sm text-green-800">
-                              <Check className="w-4 h-4" />
-                              <span>@{account.username}</span>
+                            <div key={account.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                  <Instagram className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                  <h3 className="font-medium text-gray-900">@{account.username}</h3>
+                                  <p className="text-sm text-green-600">Connected successfully</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Check className="w-5 h-5 text-green-600" />
+                                <span className="text-sm text-green-600 font-medium">Connected</span>
+                              </div>
                             </div>
                           ))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                              <Instagram className="w-5 h-5 text-pink-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-gray-900">Instagram</h3>
+                              <p className="text-sm text-gray-600">Connect your Instagram account</p>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={handleInstagramConnect}
+                            className="bg-pink-600 hover:bg-pink-700 text-white"
+                          >
+                            Connect
+                          </Button>
                         </div>
                       )}
                     </div>

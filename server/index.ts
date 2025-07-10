@@ -1,6 +1,18 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { log } from "./vite";
+
+// Dynamic imports for production-safe Vite setup
+let setupVite: any;
+let serveStatic: any;
+
+try {
+  const viteModule = await import("./vite");
+  setupVite = viteModule.setupVite;
+  serveStatic = viteModule.serveStatic;
+} catch (error) {
+  console.warn("[PRODUCTION] Vite modules not available, using fallback static serving");
+}
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
 import { AutoSyncService } from "./auto-sync-service";
@@ -208,17 +220,19 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Setup Vite in development and static serving in production
   if (app.get("env") === "development") {
     // Temporarily disable REPL_ID to prevent cartographer plugin from loading
     const originalReplId = process.env.REPL_ID;
     delete process.env.REPL_ID;
     
     try {
-      await setupVite(app, server);
-      console.log('[DEBUG] Vite setup completed successfully - serving React application');
+      if (setupVite) {
+        await setupVite(app, server);
+        console.log('[DEBUG] Vite setup completed successfully - serving React application');
+      } else {
+        throw new Error('setupVite not available');
+      }
     } catch (error) {
       console.error('[DEBUG] Vite setup failed:', error);
       console.log('[DEBUG] Falling back to static file serving');
@@ -250,7 +264,39 @@ app.use((req, res, next) => {
       }
     }
   } else {
-    serveStatic(app);
+    // Production mode - use static file serving
+    try {
+      if (serveStatic) {
+        serveStatic(app);
+        console.log('[PRODUCTION] Static file serving enabled');
+      } else {
+        throw new Error('serveStatic not available');
+      }
+    } catch (error) {
+      console.error('[PRODUCTION] Static serving failed, using fallback:', error);
+      // Fallback static serving for production
+      const distPath = path.join(process.cwd(), 'dist/public');
+      
+      // Check if dist directory exists
+      if (fs.existsSync(distPath)) {
+        app.use(express.static(distPath));
+        
+        // Handle SPA routes
+        app.get('*', (_req, res) => {
+          res.sendFile(path.join(distPath, "index.html"));
+        });
+        
+        console.log('[PRODUCTION] Fallback static serving enabled');
+      } else {
+        console.error('[PRODUCTION] Build directory not found:', distPath);
+        app.get('*', (_req, res) => {
+          res.status(500).json({ 
+            error: 'Application not built for production',
+            message: 'Please run build command first'
+          });
+        });
+      }
+    }
   }
 
   // ALWAYS serve the app on port 5000

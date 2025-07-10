@@ -553,9 +553,9 @@ export default function SignUpWithOnboarding() {
   ];
 
   return (
-    <div className="min-h-screen bg-green-50 flex">
+    <div className="h-screen bg-green-50 flex overflow-hidden">
       {/* Left Side - Mascot/Illustration - Fixed */}
-      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative fixed left-0 top-0 h-screen">
+      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative">
         {/* Back to Home Button - Desktop Only */}
         <div className="absolute top-8 left-8">
           <Link 
@@ -587,7 +587,7 @@ export default function SignUpWithOnboarding() {
       </div>
 
       {/* Right Side - Form - Scrollable */}
-      <div className="w-full lg:w-1/2 lg:ml-auto bg-white flex flex-col min-h-screen">
+      <div className="w-full lg:w-1/2 bg-white flex flex-col h-screen overflow-hidden">
         {/* Header - Mobile Only */}
         <div className="lg:hidden px-8 py-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -629,8 +629,8 @@ export default function SignUpWithOnboarding() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 px-8 py-8 overflow-y-auto">
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 px-8 py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {/* Payment Modal */}
           {showPayment && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

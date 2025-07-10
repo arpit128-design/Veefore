@@ -1285,22 +1285,22 @@ export default function Messages() {
           </div>
 
           <TabsContent value="conversations" className="mt-0">
-            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6">
-              <div className="w-96 border-r border-slate-200">
+            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+              <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col h-full overflow-hidden">
                 {renderMessagesView()}
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="messages" className="mt-0">
-            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6">
-              <div className="w-96 border-r border-slate-200">
+            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+              <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col h-full overflow-hidden">
                 {renderMessagesView()}
               </div>
             </div>

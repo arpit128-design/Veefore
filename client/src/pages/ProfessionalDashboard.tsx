@@ -309,9 +309,9 @@ const ProfessionalDashboard: React.FC = () => {
             className="group cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={action.action}
           >
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-              <div className="text-gray-600">
-                {React.cloneElement(action.icon, { className: "w-6 h-6" })}
+            <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+              <div className="text-gray-600 group-hover:text-gray-800 transition-colors">
+                {React.cloneElement(action.icon, { className: "w-8 h-8" })}
               </div>
             </div>
             <h3 className="font-semibold text-gray-900 text-base">

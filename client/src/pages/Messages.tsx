@@ -649,103 +649,74 @@ export default function Messages() {
         </div>
       </div>
       
-      {/* Modern Conversations List */}
+      {/* Compact Conversations List */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3">
+        <div className="p-2 space-y-1">
           <AnimatePresence>
             {filteredConversations?.map((conversation, index) => (
               <motion.div
                 key={conversation.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, delay: index * 0.02 }}
+                className={`p-3 rounded-xl cursor-pointer transition-all duration-150 border ${
                   selectedConversation?.id === conversation.id
-                    ? 'bg-blue-50 border-blue-200 shadow-md'
+                    ? 'bg-blue-50 border-blue-200 shadow-sm'
                     : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300'
                 }`}
                 onClick={() => setSelectedConversation(conversation)}
               >
-                <div className="flex items-start space-x-4">
-                  {/* Modern Avatar */}
+                <div className="flex items-center space-x-3">
+                  {/* Compact Avatar */}
                   <div className="relative flex-shrink-0">
-                    <Avatar className="h-14 w-14 ring-2 ring-white shadow-lg">
+                    <Avatar className="h-12 w-12">
                       <AvatarImage src={conversation.participant.avatar} />
-                      <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                      <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                         {conversation.participant.displayName.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     
                     {/* Platform Badge */}
-                    <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center text-white text-xs shadow-lg ${getPlatformColor(conversation.participant.platform)}`}>
+                    <div className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center text-white text-xs ${getPlatformColor(conversation.participant.platform)}`}>
                       {getPlatformIcon(conversation.participant.platform)}
                     </div>
                     
-                    {/* Online Status */}
-                    <div className="absolute -top-1 -right-1">
-                      <div className="h-4 w-4 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
-                    </div>
+                    {/* Unread Badge */}
+                    {conversation.unreadCount > 0 && (
+                      <div className="absolute -top-1 -right-1 h-5 w-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        {conversation.unreadCount}
+                      </div>
+                    )}
                   </div>
                   
-                  {/* Content Area */}
+                  {/* Compact Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-bold text-slate-900 text-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center space-x-1">
+                        <h3 className="font-semibold text-slate-900 text-sm truncate">
                           {conversation.participant.displayName}
                         </h3>
                         {conversation.participant.verified && (
-                          <CheckCircle2 className="h-5 w-5 text-blue-500" />
-                        )}
-                        {conversation.isPinned && (
-                          <Pin className="h-4 w-4 text-amber-500" />
+                          <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-sm text-slate-500 font-medium">
-                          {new Date(conversation.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        {conversation.unreadCount > 0 && (
-                          <Badge className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 font-bold">
-                            {conversation.unreadCount}
-                          </Badge>
-                        )}
-                      </div>
+                      <span className="text-xs text-slate-500">
+                        {new Date(conversation.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
                     
-                    <div className="flex items-center space-x-3 mb-3">
-                      <span className="text-sm text-slate-600 font-medium">@{conversation.participant.username}</span>
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${getSentimentColor(conversation.sentiment)}`}>
-                        {conversation.sentiment}
-                      </div>
-                    </div>
-                    
-                    <p className="text-slate-700 text-base mb-3 line-clamp-2">
+                    <p className="text-slate-600 text-sm truncate mb-1">
                       {conversation.lastMessage.isAiGenerated && (
-                        <Sparkles className="inline h-4 w-4 mr-2 text-purple-500" />
+                        <Sparkles className="inline h-3 w-3 mr-1 text-purple-500" />
                       )}
                       {conversation.lastMessage.content}
                     </p>
                     
-                    {/* Enhanced Metadata */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        {conversation.tags.slice(0, 2).map((tag, i) => (
-                          <Badge key={i} variant="secondary" className="bg-slate-100 text-slate-700 border-slate-300 text-sm px-3 py-1">
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-slate-600">
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-4 w-4" />
-                          <span className="font-medium">{conversation.participant.followers.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <MessageSquare className="h-4 w-4" />
-                          <span className="font-medium">{conversation.totalMessages}</span>
-                        </div>
+                      <span className="text-xs text-slate-500">@{conversation.participant.username}</span>
+                      <div className={`px-2 py-0.5 rounded-full text-xs ${getSentimentColor(conversation.sentiment)}`}>
+                        {conversation.sentiment}
                       </div>
                     </div>
                   </div>
@@ -758,13 +729,13 @@ export default function Messages() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-12"
+              className="text-center py-8"
             >
-              <div className="bg-slate-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="h-10 w-10 text-slate-400" />
+              <div className="bg-slate-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                <MessageCircle className="h-6 w-6 text-slate-400" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">No conversations found</h3>
-              <p className="text-slate-600">Try adjusting your filters or start a new conversation</p>
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">No conversations</h3>
+              <p className="text-slate-600 text-sm">Try adjusting your filters</p>
             </motion.div>
           )}
         </div>
@@ -775,11 +746,11 @@ export default function Messages() {
   const renderMessagesView = () => {
     if (!selectedConversation) {
       return (
-        <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="flex-1 flex items-center justify-center bg-slate-50">
           <div className="text-center">
-            <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Select a conversation</h3>
-            <p className="text-gray-600">Choose a conversation from the list to start messaging</p>
+            <MessageCircle className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-slate-900 mb-2">Select a conversation</h3>
+            <p className="text-slate-600">Choose a conversation from the list to start messaging</p>
           </div>
         </div>
       );
@@ -788,7 +759,7 @@ export default function Messages() {
     return (
       <div className="flex-1 flex flex-col bg-white">
         {/* Chat Header */}
-        <div className="p-4 border-b border-gray-200 bg-white">
+        <div className="p-4 border-b border-slate-200 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -805,7 +776,7 @@ export default function Messages() {
               
               <div>
                 <div className="flex items-center space-x-2">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-slate-900">
                     {selectedConversation.participant.displayName}
                   </h3>
                   {selectedConversation.participant.verified && (
@@ -846,45 +817,31 @@ export default function Messages() {
           </div>
         </div>
         
-        {/* Messages Area */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
+        {/* Compact Messages Area */}
+        <ScrollArea className="flex-1 p-3">
+          <div className="space-y-2">
             <AnimatePresence>
               {messages?.map((message, index) => (
                 <motion.div
                   key={message.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  transition={{ duration: 0.2, delay: index * 0.02 }}
                   className={`flex ${message.isFromUser ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                  <div className={`max-w-sm px-3 py-2 rounded-2xl text-sm ${
                     message.isFromUser
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      : 'bg-slate-100 text-slate-900'
                   }`}>
                     {message.isAiGenerated && (
                       <div className="flex items-center space-x-1 mb-1">
                         <Sparkles className="h-3 w-3 text-purple-400" />
-                        <span className="text-xs opacity-75">AI Generated</span>
+                        <span className="text-xs opacity-75">AI</span>
                       </div>
                     )}
                     
-                    <p className="text-sm">{message.content}</p>
-                    
-                    {message.attachments && message.attachments.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {message.attachments.map((attachment, i) => (
-                          <div key={i} className="flex items-center space-x-2 text-xs opacity-75">
-                            {attachment.type === 'image' && <Image className="h-3 w-3" />}
-                            {attachment.type === 'video' && <Video className="h-3 w-3" />}
-                            {attachment.type === 'audio' && <Mic className="h-3 w-3" />}
-                            {attachment.type === 'document' && <Paperclip className="h-3 w-3" />}
-                            <span>{attachment.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <p>{message.content}</p>
                     
                     <div className="flex items-center justify-between mt-1 text-xs opacity-75">
                       <span>
@@ -892,30 +849,12 @@ export default function Messages() {
                       </span>
                       {message.isFromUser && (
                         <div className="flex items-center space-x-1">
-                          {message.status === 'sent' && <Clock className="h-3 w-3" />}
-                          {message.status === 'delivered' && <CheckCircle2 className="h-3 w-3" />}
                           {message.status === 'read' && <Eye className="h-3 w-3" />}
-                          {message.status === 'failed' && <AlertCircle className="h-3 w-3 text-red-400" />}
+                          {message.status === 'delivered' && <CheckCircle2 className="h-3 w-3" />}
+                          {message.status === 'sent' && <Clock className="h-3 w-3" />}
                         </div>
                       )}
                     </div>
-                    
-                    {message.engagement && (
-                      <div className="flex items-center space-x-3 mt-2 text-xs opacity-75">
-                        <div className="flex items-center space-x-1">
-                          <Heart className="h-3 w-3" />
-                          <span>{message.engagement.likes}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Reply className="h-3 w-3" />
-                          <span>{message.engagement.replies}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Share2 className="h-3 w-3" />
-                          <span>{message.engagement.shares}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </motion.div>
               ))}
@@ -924,24 +863,24 @@ export default function Messages() {
           </div>
         </ScrollArea>
         
-        {/* Modern Message Input */}
-        <div className="p-6 border-t border-slate-200 bg-white">
+        {/* Compact Message Input */}
+        <div className="p-4 border-t border-slate-200 bg-white">
           {aiAssistant && (
-            <div className="mb-4">
+            <div className="mb-3">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => generateAiResponseMutation.mutate({ conversationId: selectedConversation.id })}
                 disabled={generateAiResponseMutation.isPending}
-                className="text-purple-600 border-purple-200 hover:bg-purple-50 bg-white"
+                className="text-purple-600 border-purple-200 hover:bg-purple-50 bg-white text-sm"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                {generateAiResponseMutation.isPending ? 'Generating...' : 'Generate AI Response'}
+                {generateAiResponseMutation.isPending ? 'Generating...' : 'AI Response'}
               </Button>
             </div>
           )}
           
-          <div className="flex items-end space-x-4">
+          <div className="flex items-end space-x-3">
             <div className="flex-1">
               <Textarea
                 placeholder="Type your direct message..."
@@ -959,8 +898,8 @@ export default function Messages() {
                     }
                   }
                 }}
-                className="resize-none bg-white border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-slate-900 rounded-2xl"
-                rows={3}
+                className="resize-none bg-white border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-slate-900 rounded-xl text-sm"
+                rows={2}
               />
             </div>
             
@@ -968,16 +907,9 @@ export default function Messages() {
               <Button 
                 size="sm" 
                 variant="outline"
-                className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl"
+                className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 h-8 w-8 p-0"
               >
                 <Paperclip className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl"
-              >
-                <Smile className="h-4 w-4" />
               </Button>
               <Button
                 onClick={() => {
@@ -990,7 +922,7 @@ export default function Messages() {
                   }
                 }}
                 disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white h-8 px-4"
               >
                 <Send className="h-4 w-4" />
               </Button>
@@ -1353,16 +1285,24 @@ export default function Messages() {
           </div>
 
           <TabsContent value="conversations" className="mt-0">
-            <div className="h-[calc(100vh-120px)] flex">
-              {renderConversationsList()}
-              {renderMessagesView()}
+            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6">
+              <div className="w-96 border-r border-slate-200">
+                {renderConversationsList()}
+              </div>
+              <div className="flex-1">
+                {renderMessagesView()}
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="messages" className="mt-0">
-            <div className="h-[calc(100vh-120px)] flex">
-              {renderConversationsList()}
-              {renderMessagesView()}
+            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6">
+              <div className="w-96 border-r border-slate-200">
+                {renderConversationsList()}
+              </div>
+              <div className="flex-1">
+                {renderMessagesView()}
+              </div>
             </div>
           </TabsContent>
 

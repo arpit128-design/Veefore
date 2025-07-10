@@ -150,8 +150,8 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
               <SidebarItem
                 icon={BarChart3}
                 label="Analytics"
-                href="/analyzer"
-                isActive={location === "/analyzer"}
+                href="/analytics"
+                isActive={location === "/analytics"}
               />
               <SidebarItem
                 icon={TrendingUp}

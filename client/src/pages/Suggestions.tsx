@@ -228,7 +228,7 @@ export default function Suggestions() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="ai-growth-assistant suggestions-page min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6" style={{background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%)'}}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

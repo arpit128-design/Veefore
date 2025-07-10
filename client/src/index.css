@@ -52,6 +52,51 @@
 
 /* Dark mode completely removed - Light theme only */
 
+/* AI Growth Assistant - Complete Yellow Elimination */
+.ai-growth-assistant,
+.ai-growth-assistant *,
+.suggestions-page,
+.suggestions-page * {
+  background-color: white !important;
+  border-color: rgb(203 213 225) !important; /* slate-300 */
+}
+
+.ai-growth-assistant .bg-yellow-50,
+.ai-growth-assistant .bg-yellow-100,
+.ai-growth-assistant .bg-yellow-200,
+.ai-growth-assistant .bg-yellow-300,
+.ai-growth-assistant .bg-yellow-400,
+.ai-growth-assistant .bg-yellow-500,
+.suggestions-page .bg-yellow-50,
+.suggestions-page .bg-yellow-100,
+.suggestions-page .bg-yellow-200,
+.suggestions-page .bg-yellow-300,
+.suggestions-page .bg-yellow-400,
+.suggestions-page .bg-yellow-500 {
+  background-color: white !important;
+}
+
+.ai-growth-assistant .text-yellow-600,
+.ai-growth-assistant .text-yellow-700,
+.ai-growth-assistant .text-yellow-800,
+.ai-growth-assistant .text-yellow-900,
+.suggestions-page .text-yellow-600,
+.suggestions-page .text-yellow-700,
+.suggestions-page .text-yellow-800,
+.suggestions-page .text-yellow-900 {
+  color: rgb(59 130 246) !important; /* blue-500 */
+}
+
+/* Force enterprise-grade design for AI Growth Assistant */
+.ai-growth-assistant {
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%) !important;
+}
+
+.enterprise-tabs [data-state="active"] {
+  background: white !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+}
+
 /* Base styles */
 * {
   border-color: hsl(var(--border));

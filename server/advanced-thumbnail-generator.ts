@@ -3,16 +3,13 @@
  * Replicate and surpass ni3.app with professional grade thumbnail creation
  */
 
-import OpenAI from "openai";
+import { getOpenAIClient, isOpenAIAvailable } from './openai-client';
 import { createCanvas, loadImage, registerFont, CanvasRenderingContext2D } from "canvas";
 import sharp from "sharp";
 import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
-
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface ThumbnailInputData {
   title: string;

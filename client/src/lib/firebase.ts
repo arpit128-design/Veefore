@@ -6,12 +6,12 @@ let firebaseConfig: any = null;
 
 try {
   firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
+    authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project'}.firebaseapp.com`,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+    storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project'}.appspot.com`,
     messagingSenderId: "123456789",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || 'demo-app-id',
   };
 } catch (error) {
   console.error('Failed to create Firebase configuration:', error);

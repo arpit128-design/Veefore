@@ -18,18 +18,21 @@ import Razorpay from 'razorpay';
 
 const router = Router();
 
-// Initialize Razorpay instance
-let razorpay: Razorpay;
-try {
-  razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID!,
-    key_secret: process.env.RAZORPAY_KEY_SECRET!,
-  });
-  console.log('[SUBSCRIPTION] Razorpay initialized successfully');
-} catch (error) {
-  console.error('[SUBSCRIPTION] Failed to initialize Razorpay:', error);
-  throw error;
-}
+// Initialize Razorpay only when needed and credentials are available
+let razorpay: Razorpay | null = null;
+const getRazorpayInstance = () => {
+  if (!razorpay) {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      throw new Error('Razorpay credentials not configured');
+    }
+    razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+    console.log('[SUBSCRIPTION] Razorpay initialized successfully');
+  }
+  return razorpay;
+};
 
 // Authentication middleware - Using the same system as main routes
 const requireAuth = async (req: any, res: Response, next: NextFunction) => {

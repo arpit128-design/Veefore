@@ -1,6 +1,4 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { getOpenAIClient, isOpenAIAvailable } from './openai-client';
 
 export interface PersonaInput {
   industry: string;

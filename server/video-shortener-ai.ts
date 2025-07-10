@@ -5,7 +5,13 @@
 
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize OpenAI client only when needed and API key is available
+const getOpenAIClient = () => {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OpenAI API key is not configured');
+  }
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+};
 
 interface VideoSegment {
   startTime: number;

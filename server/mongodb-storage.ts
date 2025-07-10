@@ -533,7 +533,7 @@ export class MongoStorage implements IStorage {
   private isConnected = false;
 
   async connect() {
-    if (this.isConnected && mongoose.connection.readyState === 1 && mongoose.connection.db?.databaseName === 'veeforedb') return;
+    if (this.isConnected && mongoose.connection.readyState === 1) return;
     
     try {
       // Force disconnect and reconnect to ensure correct database
@@ -541,35 +541,25 @@ export class MongoStorage implements IStorage {
         await mongoose.disconnect();
       }
       
-      await mongoose.connect(process.env.MONGODB_URI!, {
-        dbName: 'veeforedb'
-      });
+      // Use environment variable or fallback to default local MongoDB
+      const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URL || 'mongodb://localhost:27017/veefore';
+      console.log('[MONGODB] Attempting to connect to:', mongoUri);
       
-      // Wait for connection to be fully established
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Connection timeout')), 10000);
-        
-        if (mongoose.connection.readyState === 1) {
-          clearTimeout(timeout);
-          resolve();
-        } else {
-          mongoose.connection.once('connected', () => {
-            clearTimeout(timeout);
-            resolve();
-          });
-          mongoose.connection.once('error', (err) => {
-            clearTimeout(timeout);
-            reject(err);
-          });
-        }
+      await mongoose.connect(mongoUri, {
+        dbName: 'veeforedb',
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+        bufferCommands: false
       });
       
       this.isConnected = true;
-      console.log(`Connected to MongoDB Atlas - ${mongoose.connection.db?.databaseName} database`);
+      console.log(`✅ Connected to MongoDB - ${mongoose.connection.db?.databaseName} database`);
     } catch (error) {
-      console.error('MongoDB connection error:', error);
+      console.error('❌ MongoDB connection error:', error);
       this.isConnected = false;
-      throw error;
+      // Don't throw the error - allow the server to continue with limited functionality
+      console.log('⚠️  Server will continue with limited functionality');
     }
   }
 

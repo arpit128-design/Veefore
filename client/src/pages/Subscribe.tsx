@@ -9,11 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Zap, Crown, Rocket, Star } from "lucide-react";
 import { SpaceBackground } from "@/components/layout/SpaceBackground";
 
-// Load Stripe
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Load Stripe with fallback for development
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_demo_key_for_development';
+const stripePromise = loadStripe(stripeKey);
 
 function SubscribeForm() {
   const stripe = useStripe();

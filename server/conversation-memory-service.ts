@@ -1,11 +1,6 @@
 import { MongoStorage } from './mongodb-storage';
-import OpenAI from 'openai';
+import { getOpenAIClient, isOpenAIAvailable } from './openai-client';
 import { DmConversation, DmMessage, ConversationContext, InsertDmConversation, InsertDmMessage, InsertConversationContext } from '@shared/schema';
-
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || process.env.GOOGLE_API_KEY, // Fallback to Google API key if OpenAI not available
-});
 
 export class ConversationMemoryService {
   private storage: MongoStorage;

@@ -58,8 +58,8 @@ class AIResponseGenerator {
   };
 
   constructor() {
-    if (!process.env.GOOGLE_API_KEY) {
-      throw new Error('GOOGLE_API_KEY is required for AI response generation');
+    if (!process.env.GOOGLE_API_KEY && !process.env.OPENAI_API_KEY) {
+      console.warn('⚠️  No AI API keys configured - AI response generation will be limited');
     }
     this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
   }

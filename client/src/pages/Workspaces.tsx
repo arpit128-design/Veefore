@@ -546,11 +546,11 @@ export default function Workspaces() {
                   onClick={() => setViewMode('grid')}
                   className={`h-8 px-3 transition-all duration-200 border ${
                     viewMode === 'grid' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
-                  <Grid3X3 className="w-4 h-4" />
+                  <Grid3X3 className="w-4 h-4 text-current" />
                 </Button>
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -558,11 +558,11 @@ export default function Workspaces() {
                   onClick={() => setViewMode('list')}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'list' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-4 h-4 text-current" />
                 </Button>
                 <Button
                   variant={viewMode === 'kanban' ? 'default' : 'ghost'}
@@ -570,11 +570,11 @@ export default function Workspaces() {
                   onClick={() => setViewMode('kanban')}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'kanban' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
-                  <Database className="w-4 h-4" />
+                  <Database className="w-4 h-4 text-current" />
                 </Button>
                 <Button
                   variant={viewMode === 'analytics' ? 'default' : 'ghost'}
@@ -582,11 +582,11 @@ export default function Workspaces() {
                   onClick={() => setViewMode('analytics')}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'analytics' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
-                  <BarChart3 className="w-4 h-4" />
+                  <BarChart3 className="w-4 h-4 text-current" />
                 </Button>
               </div>
             </div>

@@ -467,14 +467,9 @@ export default function SignUpWithOnboarding() {
                 <span className="text-xl font-bold text-gray-900">VeeFore</span>
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">
-                Back to Home
-              </Link>
-              <Link href="/signin" className="text-gray-600 hover:text-gray-900 text-sm">
-                Already have an account? Sign in
-              </Link>
-            </div>
+            <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">
+              Back to Home
+            </Link>
           </div>
         </div>
 
@@ -583,7 +578,7 @@ export default function SignUpWithOnboarding() {
                       </label>
                       <Input
                         {...form.register('fullName')}
-                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500"
                       />
                       {form.formState.errors.fullName && (
                         <p className="text-red-500 text-sm mt-1">
@@ -602,7 +597,7 @@ export default function SignUpWithOnboarding() {
                       <Input
                         type="email"
                         {...form.register('email')}
-                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500"
                       />
                       {form.formState.errors.email && (
                         <p className="text-red-500 text-sm mt-1">
@@ -619,7 +614,7 @@ export default function SignUpWithOnboarding() {
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           {...form.register('password')}
-                          className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10"
+                          className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 pr-10"
                         />
                         <button
                           type="button"
@@ -680,16 +675,24 @@ export default function SignUpWithOnboarding() {
                     </Button>
                   </form>
 
-                  <p className="text-xs text-gray-500 text-center mt-6">
-                    By creating an account, you agree to our{' '}
-                    <Link href="/terms-of-service" className="text-blue-600 hover:underline">
-                      Terms of Service
-                    </Link>{' '}
-                    and{' '}
-                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </p>
+                  <div className="text-center mt-6">
+                    <p className="text-xs text-gray-500 mb-4">
+                      By creating an account, you agree to our{' '}
+                      <Link href="/terms-of-service" className="text-blue-600 hover:underline">
+                        Terms of Service
+                      </Link>{' '}
+                      and{' '}
+                      <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                        Privacy Policy
+                      </Link>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Already have an account?{' '}
+                      <Link href="/signin" className="text-blue-600 hover:underline font-medium">
+                        Sign in
+                      </Link>
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -730,7 +733,7 @@ export default function SignUpWithOnboarding() {
                       placeholder="Enter 6-digit code"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
-                      className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center text-lg font-mono"
+                      className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 text-center text-lg font-mono"
                       maxLength={6}
                     />
                   </div>

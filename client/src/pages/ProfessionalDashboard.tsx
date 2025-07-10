@@ -193,25 +193,25 @@ const ProfessionalDashboard: React.FC = () => {
     {
       title: 'Create with AI',
       description: 'Generate content instantly with AI',
-      icon: <Zap className="w-8 h-8" />,
+      icon: <Zap className="w-8 h-8 text-purple-600" />,
       action: () => {},
     },
     {
       title: 'Schedule Posts',
       description: 'Plan your content calendar',
-      icon: <Calendar className="w-8 h-8" />,
+      icon: <Calendar className="w-8 h-8 text-blue-600" />,
       action: () => {},
     },
     {
       title: 'Analyze Trends',
       description: 'Discover what is trending now',
-      icon: <TrendingUp className="w-8 h-8" />,
+      icon: <TrendingUp className="w-8 h-8 text-green-600" />,
       action: () => {},
     },
     {
       title: 'Multi-Platform',
       description: 'Post to all social networks',
-      icon: <Globe className="w-8 h-8" />,
+      icon: <Globe className="w-8 h-8 text-orange-600" />,
       action: () => {},
     },
   ];
@@ -310,9 +310,7 @@ const ProfessionalDashboard: React.FC = () => {
             onClick={action.action}
           >
             <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
-              <div className="text-gray-600 group-hover:text-gray-800 transition-colors">
-                {React.cloneElement(action.icon, { className: "w-8 h-8" })}
-              </div>
+              {action.icon}
             </div>
             <h3 className="font-semibold text-gray-900 text-base">
               {action.title}

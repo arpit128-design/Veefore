@@ -10,7 +10,7 @@ import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useInstantData } from "@/hooks/useInstantData";
-import { Eye, Heart, Users, TrendingUp, RefreshCw } from "lucide-react";
+import { Eye, Heart, Users, TrendingUp, RefreshCw, Gift } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { formatNumber, formatEngagement } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -203,6 +203,15 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button 
+            onClick={() => setShowWelcomeModal(true)}
+            variant="outline"
+            size="sm"
+            className="bg-purple-600/20 border-purple-400/30 text-purple-400 hover:bg-purple-600/30 hover:border-purple-400/50 transition-all duration-300"
+          >
+            <Gift className="w-4 h-4 mr-2" />
+            Preview Welcome
+          </Button>
           <Button 
             onClick={() => forceRefreshData.mutate()}
             disabled={isRefreshing || forceRefreshData.isPending}

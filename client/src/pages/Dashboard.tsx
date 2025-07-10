@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import WelcomePopup from "@/components/WelcomePopup";
 
 export default function Dashboard() {
@@ -192,19 +191,7 @@ export default function Dashboard() {
   console.log('[DASHBOARD DEBUG] Formatted followers:', formatNumber(analytics.newFollowers));
 
   return (
-    <div className="h-full w-full bg-gray-50 p-6 space-y-6">
-        {/* Welcome Modal */}
-        <WelcomePopup
-          isOpen={showWelcomeModal}
-          onClose={handleWelcomePopupClose}
-        />
-        
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden relative z-10"
-        >
+    <div className="space-y-4 md:space-y-8 w-full max-w-full overflow-x-hidden relative z-10">
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
@@ -459,18 +446,23 @@ export default function Dashboard() {
         </div>
       </div>
 
-          {/* Additional Dashboard Sections */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <TrendingHashtags />
-              <ContentPerformance />
-            </div>
-            <div className="space-y-6">
-              <DailySuggestions />
-              <ContentStudio />
-            </div>
-          </div>
-        </motion.div>
+      {/* Additional Dashboard Sections */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 space-y-6">
+          <TrendingHashtags />
+          <ContentPerformance />
+        </div>
+        <div className="space-y-6">
+          <DailySuggestions />
+          <ContentStudio />
+        </div>
+      </div>
+
+      {/* Welcome Popup */}
+      <WelcomePopup
+        isOpen={showWelcomeModal}
+        onClose={handleWelcomePopupClose}
+      />
     </div>
   );
 }

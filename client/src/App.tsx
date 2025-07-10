@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -98,7 +98,6 @@ import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
   const [location] = useLocation();
-  const [showAnalyticsSidebar, setShowAnalyticsSidebar] = useState(false);
   const isAnalyticsRoute = location.startsWith('/analytics') || 
                           location === '/social-insights' || 
                           location === '/performance-analytics' || 
@@ -122,11 +121,11 @@ function AuthenticatedApp() {
         ) : (
           <>
             <ProfessionalHeader />
-            <div className="flex h-[calc(100vh-64px)] overflow-hidden veefore-app-container">
+            <div className="flex h-[calc(100vh-64px)] overflow-hidden">
               <ProfessionalSidebar />
-              <main className="flex-1 h-full overflow-y-auto veefore-main-content">
+              <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
-                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/dashboard" component={ProfessionalDashboard} />
                   <Route path="/content-studio" component={ContentStudio} />
                   <Route path="/scheduler" component={ProfessionalScheduler} />
                   <Route path="/advanced-scheduler" component={AdvancedScheduler} />
@@ -171,7 +170,7 @@ function AuthenticatedApp() {
                   <Route path="/admin/early-access" component={AdminEarlyAccess} />
                   <Route path="/feature-preview" component={FeaturePreview} />
                   <Route path="/onboarding" component={OnboardingPremium} />
-                  <Route path="/" component={Dashboard} />
+                  <Route path="/" component={ProfessionalDashboard} />
                   <Route component={NotFound} />
                 </Switch>
               </main>

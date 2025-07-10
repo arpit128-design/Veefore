@@ -111,6 +111,61 @@ import {
   Gauge
 } from "lucide-react";
 
+// Helper function for active tab classes
+function getActiveTabClasses(color: string) {
+  const colorMap = {
+    indigo: "bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white scale-105 shadow-lg",
+    blue: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
+    purple: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg",
+    green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
+    orange: "bg-orange-600 hover:bg-orange-700 border-orange-600 text-white scale-105 shadow-lg",
+    rose: "bg-rose-600 hover:bg-rose-700 border-rose-600 text-white scale-105 shadow-lg",
+    amber: "bg-amber-600 hover:bg-amber-700 border-amber-600 text-white scale-105 shadow-lg"
+  };
+  return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
+}
+
+// Helper function for tool button classes
+function getToolButtonClasses(color: string, isSelected: boolean) {
+  if (!isSelected) return "bg-white hover:bg-slate-50 border-slate-200 text-slate-700";
+  
+  const colorMap = {
+    rose: "bg-rose-600 hover:bg-rose-700 border-rose-600 text-white scale-105 shadow-lg",
+    blue: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
+    green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
+    purple: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg",
+    orange: "bg-orange-600 hover:bg-orange-700 border-orange-600 text-white scale-105 shadow-lg",
+    amber: "bg-amber-600 hover:bg-amber-700 border-amber-600 text-white scale-105 shadow-lg"
+  };
+  return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
+}
+
+// Helper function for badge classes
+function getBadgeClasses(color: string) {
+  const colorMap = {
+    rose: "bg-rose-100 text-rose-700 border-rose-200",
+    blue: "bg-blue-100 text-blue-700 border-blue-200",
+    green: "bg-green-100 text-green-700 border-green-200",
+    purple: "bg-purple-100 text-purple-700 border-purple-200",
+    orange: "bg-orange-100 text-orange-700 border-orange-200",
+    amber: "bg-amber-100 text-amber-700 border-amber-200"
+  };
+  return colorMap[color as keyof typeof colorMap] || "bg-slate-100 text-slate-700 border-slate-200";
+}
+
+// Helper function for icon background classes
+function getIconBgClasses(color: string) {
+  const colorMap = {
+    rose: "bg-rose-600",
+    blue: "bg-blue-600",
+    green: "bg-green-600",
+    purple: "bg-purple-600",
+    orange: "bg-orange-600",
+    amber: "bg-amber-600"
+  };
+  return colorMap[color as keyof typeof colorMap] || "bg-slate-600";
+}
+
 // Professional Enterprise Header
 function ProfessionalStudioHeader() {
   const [realTimeStats, setRealTimeStats] = useState({
@@ -260,8 +315,8 @@ function ProfessionalTabNavigation({ activeTab, setActiveTab }: { activeTab: str
           onClick={() => setActiveTab(tab.id)}
           className={`h-20 p-4 border-2 transition-all duration-200 ${
             activeTab === tab.id 
-              ? `bg-${tab.color}-600 hover:bg-${tab.color}-700 border-${tab.color}-600 text-white scale-105 shadow-lg` 
-              : `bg-white hover:bg-slate-50 border-slate-200 hover:border-${tab.color}-300 text-slate-700`
+              ? getActiveTabClasses(tab.color)
+              : `bg-white hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300`
           }`}
         >
           <div className="flex flex-col items-center space-y-2">
@@ -380,9 +435,7 @@ function ProfessionalAICreator() {
                 variant={selectedTool === tool.id ? "default" : "outline"}
                 onClick={() => setSelectedTool(tool.id)}
                 className={`h-24 p-3 flex flex-col border-2 transition-all duration-200 ${
-                  selectedTool === tool.id 
-                    ? `bg-${tool.color}-600 hover:bg-${tool.color}-700 border-${tool.color}-600 text-white scale-105 shadow-lg` 
-                    : `bg-white hover:bg-slate-50 border-slate-200 hover:border-${tool.color}-300 text-slate-700`
+                  getToolButtonClasses(tool.color, selectedTool === tool.id)
                 }`}
               >
                 <tool.icon className="h-6 w-6 mb-2" />
@@ -399,7 +452,7 @@ function ProfessionalAICreator() {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className={`w-12 h-12 bg-${selectedToolData?.color}-600 rounded-xl flex items-center justify-center`}>
+              <div className={`w-12 h-12 ${getIconBgClasses(selectedToolData?.color || 'slate')} rounded-xl flex items-center justify-center`}>
                 {selectedToolData && <selectedToolData.icon className="h-6 w-6 text-white" />}
               </div>
               <div>
@@ -408,7 +461,7 @@ function ProfessionalAICreator() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Badge className={`bg-${selectedToolData?.color}-100 text-${selectedToolData?.color}-700 border-${selectedToolData?.color}-200`}>
+              <Badge className={getBadgeClasses(selectedToolData?.color || 'slate')}>
                 {selectedToolData?.credits} Credits
               </Badge>
               <Badge className="bg-green-100 text-green-700 border-green-200">

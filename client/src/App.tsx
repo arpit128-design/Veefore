@@ -15,6 +15,7 @@ import { AICopilotWidget } from "@/components/ai-copilot/AICopilotWidget";
 // Pages
 import Dashboard from "@/pages/Dashboard";
 import ProfessionalDashboard from "@/pages/ProfessionalDashboard";
+import VeeForeHomeDashboard from "@/pages/VeeForeHomeDashboard";
 import ContentStudio from "@/pages/ContentStudio";
 import AdvancedScheduler from "@/pages/AdvancedScheduler";
 import Analyzer from "@/pages/Analyzer";

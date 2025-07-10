@@ -425,6 +425,7 @@ export default function Messages() {
   const [notifications, setNotifications] = useState(true);
   const [aiAssistant, setAiAssistant] = useState(true);
   const [selectedTab, setSelectedTab] = useState('conversations');
+  const [showMobileChat, setShowMobileChat] = useState(false);
 
   // Use mock data for comprehensive demonstration
   const conversations = mockConversations;
@@ -665,7 +666,10 @@ export default function Messages() {
                     ? 'bg-blue-50 border-blue-200 shadow-sm'
                     : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300'
                 }`}
-                onClick={() => setSelectedConversation(conversation)}
+                onClick={() => {
+                  setSelectedConversation(conversation);
+                  setShowMobileChat(true);
+                }}
               >
                 <div className="flex items-center space-x-3">
                   {/* Compact Avatar */}
@@ -762,6 +766,15 @@ export default function Messages() {
         <div className="flex-shrink-0 p-4 border-b border-slate-200 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              {/* Mobile Back Button */}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowMobileChat(false)}
+                className="sm:hidden p-1 h-8 w-8"
+              >
+                <ChevronDown className="h-4 w-4 rotate-90" />
+              </Button>
               <div className="relative">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={selectedConversation.participant.avatar} />
@@ -1254,11 +1267,11 @@ export default function Messages() {
   );
 
   return (
-    <div className="veefore-app-container h-full">
+    <div className="veefore-app-container h-full overflow-hidden">
       <div className="flex flex-col h-full">
         {/* Modern Navigation Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full overflow-hidden">
-          <div className="flex-shrink-0 p-4 pb-0 bg-white border-b border-slate-200">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full">
+          <div className="flex-shrink-0 p-4 pb-2 bg-white border-b border-slate-200">
             <TabsList className="grid w-full grid-cols-3 bg-slate-100 border border-slate-200 rounded-lg p-1">
               <TabsTrigger 
                 value="conversations" 
@@ -1286,10 +1299,13 @@ export default function Messages() {
 
           <TabsContent value="conversations" className="flex-1 overflow-hidden">
             <div className="flex h-full bg-white overflow-hidden">
-              <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+              {/* Mobile: Show conversations or chat based on state */}
+              <div className={`${showMobileChat ? 'hidden' : 'flex'} sm:flex w-full sm:w-80 md:w-96 border-r border-slate-200 flex-col h-full overflow-hidden`}>
                 {renderConversationsList()}
               </div>
-              <div className="flex-1 flex flex-col h-full overflow-hidden">
+              
+              {/* Mobile: Show chat when conversation selected */}
+              <div className={`${showMobileChat ? 'flex' : 'hidden'} sm:flex flex-1 flex-col h-full overflow-hidden`}>
                 {renderMessagesView()}
               </div>
             </div>
@@ -1297,10 +1313,10 @@ export default function Messages() {
 
           <TabsContent value="messages" className="flex-1 overflow-hidden">
             <div className="flex h-full bg-white overflow-hidden">
-              <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
+              <div className="w-full sm:w-80 md:w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
-              <div className="flex-1 flex flex-col h-full overflow-hidden">
+              <div className="hidden sm:flex flex-1 flex-col h-full overflow-hidden">
                 {renderMessagesView()}
               </div>
             </div>

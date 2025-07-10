@@ -434,66 +434,71 @@ export default function SignUpWithOnboarding() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
-            <span className="text-xl font-bold text-gray-900">VeeFore</span>
+    <div className="min-h-screen bg-green-50 flex">
+      {/* Left Side - Mascot/Illustration */}
+      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8">
+        <div className="text-center">
+          <div className="w-80 h-80 bg-red-500 rounded-full flex items-center justify-center mb-8 mx-auto relative">
+            {/* VeeFore Rocket Mascot */}
+            <div className="text-white text-8xl">
+              <Rocket className="w-32 h-32" />
+            </div>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+              <div className="w-24 h-3 bg-red-400 rounded-full opacity-50"></div>
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-              Step {currentStep + 1} of 5
-            </Badge>
-            <Link href="/signin" className="text-gray-600 hover:text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Launch Your Social Media Success
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Join thousands of creators using AI to grow their social media presence
+          </p>
+        </div>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 bg-white flex flex-col">
+        {/* Header */}
+        <div className="px-8 py-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
+              <span className="text-xl font-bold text-gray-900">VeeFore</span>
+            </div>
+            <Link href="/signin" className="text-gray-600 hover:text-gray-900 text-sm">
               Already have an account? Sign in
             </Link>
           </div>
         </div>
-      </header>
 
-      {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex justify-between items-center mb-4">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === currentStep;
-              const isCompleted = index < currentStep;
-              
-              return (
-                <div key={step.id} className="flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                    isActive ? 'bg-blue-600 text-white' : 
-                    isCompleted ? 'bg-green-600 text-white' : 
-                    'bg-gray-200 text-gray-500'
-                  }`}>
-                    {isCompleted ? <Check className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    isActive ? 'text-blue-600' : 
-                    isCompleted ? 'text-green-600' : 
-                    'text-gray-500'
-                  }`}>
-                    {step.title}
-                  </span>
-                </div>
-              );
-            })}
+        {/* Step Progress */}
+        <div className="px-8 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600">
+              Step {currentStep + 1} of {steps.length}
+            </span>
+            {currentStep > 0 && (
+              <Button
+                onClick={prevStep}
+                variant="ghost"
+                size="sm"
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back
+              </Button>
+            )}
           </div>
-          <div className="h-2 bg-gray-200 rounded-full">
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
-              className="h-2 bg-blue-600 rounded-full transition-all duration-300"
-              style={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             />
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 py-12 px-4">
-        <div className="max-w-2xl mx-auto">
+        {/* Main Content */}
+        <div className="flex-1 px-8 py-8 overflow-y-auto">
           <AnimatePresence mode="wait">
             {/* Step 1: Sign Up */}
             {currentStep === 0 && (
@@ -504,72 +509,110 @@ export default function SignUpWithOnboarding() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="border-0 shadow-lg bg-white">
-                  <CardHeader className="text-center pb-6">
-                    <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Rocket className="w-10 h-10 text-white" />
-                    </div>
-                    <CardTitle className="text-2xl text-gray-900">
-                      Create your VeeFore account
-                    </CardTitle>
-                    <p className="text-gray-600 mt-2">
-                      Join thousands of creators using AI to grow their social media
+                <div className="max-w-md mx-auto">
+                  <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                      Let's create your account
+                    </h1>
+                    <p className="text-gray-600">
+                      Sign up with social and add your first social account in one step
                     </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+                  </div>
+
+                  {/* Social Login Options */}
+                  <div className="flex justify-center space-x-4 mb-6">
                     <Button
                       onClick={handleGoogleSignUp}
                       variant="outline"
-                      className="w-full h-12 border-gray-300 hover:bg-gray-50"
+                      size="lg"
+                      className="w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-blue-500 p-0"
                       disabled={isLoading}
                     >
-                      <FcGoogle className="w-5 h-5 mr-2" />
-                      Continue with Google
+                      <FcGoogle className="w-6 h-6" />
                     </Button>
-                    
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300" />
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-blue-500 p-0"
+                      disabled
+                    >
+                      <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">f</span>
                       </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="bg-white px-2 text-gray-500">or</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-blue-500 p-0"
+                      disabled
+                    >
+                      <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">in</span>
                       </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-blue-500 p-0"
+                      disabled
+                    >
+                      <X className="w-6 h-6" />
+                    </Button>
+                  </div>
+
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                  </div>
+
+                  <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Full name
+                      </label>
+                      <Input
+                        {...form.register('fullName')}
+                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      {form.formState.errors.fullName && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {form.formState.errors.fullName.message}
+                        </p>
+                      )}
                     </div>
 
-                    <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
-                      <div>
-                        <Input
-                          placeholder="Full Name"
-                          {...form.register('fullName')}
-                          className="h-12 border-gray-300 focus:border-blue-500"
-                        />
-                        {form.formState.errors.fullName && (
-                          <p className="text-red-500 text-sm mt-1">
-                            {form.formState.errors.fullName.message}
-                          </p>
-                        )}
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Business email address
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Note that you will be required to verify this email address.
+                      </p>
+                      <Input
+                        type="email"
+                        {...form.register('email')}
+                        className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      {form.formState.errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {form.formState.errors.email.message}
+                        </p>
+                      )}
+                    </div>
 
-                      <div>
-                        <Input
-                          type="email"
-                          placeholder="Email Address"
-                          {...form.register('email')}
-                          className="h-12 border-gray-300 focus:border-blue-500"
-                        />
-                        {form.formState.errors.email && (
-                          <p className="text-red-500 text-sm mt-1">
-                            {form.formState.errors.email.message}
-                          </p>
-                        )}
-                      </div>
-
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                      </label>
                       <div className="relative">
                         <Input
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Password"
                           {...form.register('password')}
-                          className="h-12 border-gray-300 focus:border-blue-500 pr-10"
+                          className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10"
                         />
                         <button
                           type="button"
@@ -579,84 +622,68 @@ export default function SignUpWithOnboarding() {
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
-
-                      {/* Password Requirements */}
+                      
                       {watchedPassword && (
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            {watchedPassword.length >= 8 ? (
-                              <Check className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-500" />
-                            )}
-                            <span className={`text-sm ${watchedPassword.length >= 8 ? 'text-green-600' : 'text-red-500'}`}>
-                              At least 8 characters
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {/[a-z]/.test(watchedPassword) ? (
-                              <Check className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-500" />
-                            )}
-                            <span className={`text-sm ${/[a-z]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
-                              One lowercase letter
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {/[A-Z]/.test(watchedPassword) ? (
-                              <Check className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-500" />
-                            )}
-                            <span className={`text-sm ${/[A-Z]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
-                              One uppercase letter
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {/[0-9]/.test(watchedPassword) ? (
-                              <Check className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-500" />
-                            )}
-                            <span className={`text-sm ${/[0-9]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
-                              One number
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {/[^a-zA-Z0-9]/.test(watchedPassword) ? (
-                              <Check className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-500" />
-                            )}
-                            <span className={`text-sm ${/[^a-zA-Z0-9]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
-                              One special character
-                            </span>
+                        <div className="mt-2 text-xs text-gray-500">
+                          <p className="mb-1">Passwords must contain:</p>
+                          <div className="space-y-1">
+                            <div className={`flex items-center space-x-2 ${watchedPassword.length >= 8 ? 'text-green-600' : 'text-red-500'}`}>
+                              {watchedPassword.length >= 8 ? (
+                                <Check className="w-3 h-3" />
+                              ) : (
+                                <X className="w-3 h-3" />
+                              )}
+                              <span>At least 8 characters</span>
+                            </div>
+                            <div className={`flex items-center space-x-2 ${/[a-z]/.test(watchedPassword) && /[A-Z]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
+                              {/[a-z]/.test(watchedPassword) && /[A-Z]/.test(watchedPassword) ? (
+                                <Check className="w-3 h-3" />
+                              ) : (
+                                <X className="w-3 h-3" />
+                              )}
+                              <span>A mix of uppercase and lowercase letters</span>
+                            </div>
+                            <div className={`flex items-center space-x-2 ${/[0-9]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
+                              {/[0-9]/.test(watchedPassword) ? (
+                                <Check className="w-3 h-3" />
+                              ) : (
+                                <X className="w-3 h-3" />
+                              )}
+                              <span>At least one number</span>
+                            </div>
+                            <div className={`flex items-center space-x-2 ${/[^a-zA-Z0-9]/.test(watchedPassword) ? 'text-green-600' : 'text-red-500'}`}>
+                              {/[^a-zA-Z0-9]/.test(watchedPassword) ? (
+                                <Check className="w-3 h-3" />
+                              ) : (
+                                <X className="w-3 h-3" />
+                              )}
+                              <span>At least one symbol</span>
+                            </div>
                           </div>
                         </div>
                       )}
+                    </div>
 
-                      <Button
-                        type="submit"
-                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? 'Creating account...' : 'Create Account'}
-                      </Button>
-                    </form>
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg mt-6"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Creating account...' : 'Create my account'}
+                    </Button>
+                  </form>
 
-                    <p className="text-sm text-gray-500 text-center">
-                      By creating an account, you agree to our{' '}
-                      <Link href="/terms-of-service" className="text-blue-600 hover:underline">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                        Privacy Policy
-                      </Link>
-                    </p>
-                  </CardContent>
-                </Card>
+                  <p className="text-xs text-gray-500 text-center mt-6">
+                    By creating an account, you agree to our{' '}
+                    <Link href="/terms-of-service" className="text-blue-600 hover:underline">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </p>
+                </div>
               </motion.div>
             )}
 
@@ -669,57 +696,53 @@ export default function SignUpWithOnboarding() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="border-0 shadow-lg bg-white">
-                  <CardHeader className="text-center pb-6">
-                    <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Mail className="w-10 h-10 text-white" />
+                <div className="max-w-md mx-auto text-center">
+                  <div className="mb-8">
+                    <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-2xl text-gray-900">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
                       Verify your email
-                    </CardTitle>
-                    <p className="text-gray-600 mt-2">
-                      We've sent a 6-digit code to {signupData?.email}
+                    </h1>
+                    <p className="text-gray-600">
+                      We've sent a 6-digit verification code to<br />
+                      <span className="font-medium">{signupData?.email}</span>
                     </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {developmentOtp && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p className="text-sm text-yellow-800">
-                          <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <Input
-                        placeholder="Enter 6-digit code"
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value)}
-                        className="h-12 border-gray-300 focus:border-blue-500 text-center text-lg font-mono"
-                        maxLength={6}
-                      />
-                    </div>
+                  </div>
 
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={prevStep}
-                        variant="outline"
-                        className="flex-1 h-12 border-gray-300"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        onClick={handleVerifyEmail}
-                        className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                        disabled={isLoading || verificationCode.length !== 6}
-                      >
-                        {isLoading ? 'Verifying...' : 'Verify Email'}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
+                  {developmentOtp && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  )}
+                  
+                  <div className="mb-6">
+                    <Input
+                      placeholder="Enter 6-digit code"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center text-lg font-mono"
+                      maxLength={6}
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleVerifyEmail}
+                    className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
+                    disabled={isLoading || verificationCode.length !== 6}
+                  >
+                    {isLoading ? 'Verifying...' : 'Verify Email'}
+                  </Button>
+
+                  <p className="text-sm text-gray-500 mt-4">
+                    Didn't receive the code?{' '}
+                    <button className="text-blue-600 hover:underline">
+                      Resend code
+                    </button>
+                  </p>
+                </div>
               </motion.div>
             )}
 
@@ -1081,6 +1104,22 @@ export default function SignUpWithOnboarding() {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+
+        {/* Footer */}
+        <div className="px-8 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center space-x-4">
+              <select className="text-sm border-none bg-transparent">
+                <option>English</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/privacy-policy" className="hover:text-gray-700">Privacy</Link>
+              <Link href="/terms-of-service" className="hover:text-gray-700">Terms</Link>
+              <Link href="/help" className="hover:text-gray-700">Help</Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

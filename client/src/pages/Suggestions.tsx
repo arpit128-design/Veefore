@@ -84,7 +84,7 @@ export default function Suggestions() {
     creditsRequired: 0,
     currentCredits: 0
   });
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("analysis");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
@@ -220,10 +220,10 @@ export default function Suggestions() {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'high': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'low': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      default: return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'high': return 'bg-red-500/20 text-red-600 border-red-500/30';
+      case 'medium': return 'bg-orange-500/20 text-orange-600 border-orange-500/30';
+      case 'low': return 'bg-green-500/20 text-green-600 border-green-500/30';
+      default: return 'bg-blue-500/20 text-blue-600 border-blue-500/30';
     }
   };
 
@@ -325,40 +325,57 @@ export default function Suggestions() {
           </div>
         )}
 
-        {/* AI Analysis Tabs */}
+        {/* Enterprise AI Analysis Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              Overview
+          <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-slate-50 to-slate-100 p-1 rounded-xl border border-slate-200">
+            <TabsTrigger 
+              value="analysis" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600 rounded-lg transition-all"
+            >
+              <Brain className="w-4 h-4" />
+              AI Analysis
             </TabsTrigger>
-            <TabsTrigger value="growth" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="growth" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 rounded-lg transition-all"
+            >
               <TrendingUp className="w-4 h-4" />
               Growth Insights
             </TabsTrigger>
-            <TabsTrigger value="viral" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="viral" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-orange-600 rounded-lg transition-all"
+            >
               <Flame className="w-4 h-4" />
               Viral Opportunities
             </TabsTrigger>
-            <TabsTrigger value="strategy" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="strategy" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-purple-600 rounded-lg transition-all"
+            >
               <Rocket className="w-4 h-4" />
               Content Strategy
             </TabsTrigger>
-            <TabsTrigger value="competitors" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="competitors" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-red-600 rounded-lg transition-all"
+            >
               <Trophy className="w-4 h-4" />
-              Competitor Analysis
+              Competitor Intel
             </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Analysis Tab */}
+          <TabsContent value="analysis" className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Account Health */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-900">
-                    <Target className="w-5 h-5 text-blue-500" />
-                    Account Health Score
+              <Card className="bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-3 text-slate-900 text-lg font-semibold">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                      <Target className="w-5 h-5 text-white" />
+                    </div>
+                    Account Health Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -387,11 +404,13 @@ export default function Suggestions() {
               </Card>
 
               {/* Growth Predictions */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-900">
-                    <TrendingUp className="w-5 h-5 text-green-500" />
-                    Growth Predictions
+              <Card className="bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-3 text-slate-900 text-lg font-semibold">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    AI Growth Predictions
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">

@@ -68,6 +68,8 @@ import PersonaSuggestions from "@/pages/PersonaSuggestions";
 import Gamification from "@/pages/Gamification";
 import EmotionAnalysis from "@/pages/EmotionAnalysis";
 import EarlyAccessPage from "@/pages/EarlyAccessPage";
+import Analytics from "@/pages/Analytics";
+import AnalyticsLayout from "@/components/layout/AnalyticsLayout";
 
 // Landing page related pages
 import Features from "@/pages/Features";
@@ -91,63 +93,77 @@ import SolutionAgencies from "@/pages/SolutionAgencies";
 import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
+  const [location] = useLocation();
+  const isAnalyticsRoute = location.startsWith('/analytics');
+  
   return (
     <WorkspaceProvider>
       <div className="min-h-screen bg-background text-foreground">
-        <ProfessionalHeader />
-        <div className="flex">
-          <ProfessionalSidebar />
-          <main className="flex-1 p-6 space-y-6">
+        {isAnalyticsRoute ? (
+          <AnalyticsLayout>
             <Switch>
-              <Route path="/dashboard" component={ProfessionalDashboard} />
-              <Route path="/content-studio" component={ContentStudio} />
-              <Route path="/scheduler" component={ProfessionalScheduler} />
-              <Route path="/advanced-scheduler" component={AdvancedScheduler} />
-              <Route path="/professional-scheduler" component={ProfessionalScheduler} />
-              <Route path="/analyzer" component={Analyzer} />
-              <Route path="/suggestions" component={Suggestions} />
-              <Route path="/content-recommendations" component={ContentRecommendations} />
-              <Route path="/ai-features" component={AIFeatures} />
-              <Route path="/automation" component={Automation} />
-              <Route path="/conversations" component={Conversations} />
-              <Route path="/workspaces" component={Workspaces} />
-              <Route path="/team" component={TeamManagement} />
-              <Route path="/integrations" component={Integrations} />
-              <Route path="/referrals" component={Referrals} />
-              <Route path="/settings" component={Settings} />
-              <Route path="/pricing" component={Pricing} />
-              <Route path="/subscription" component={Subscription} />
-              <Route path="/subscription-new" component={SubscriptionNew} />
-              <Route path="/instagram-analytics" component={InstagramAnalytics} />
-              <Route path="/youtube-analytics" component={YouTubeAnalytics} />
-              <Route path="/thumbnail-ai-maker" component={ThumbnailAIMaker} />
-              <Route path="/thumbnail-ai-maker-pro" component={ThumbnailAIMakerProComplete} />
-              <Route path="/thumbnail-maker-pro" component={ThumbnailMakerPro} />
-              <Route path="/creative-brief-generator" component={CreativeBriefGenerator} />
-              <Route path="/content-repurpose" component={ContentRepurpose} />
-              <Route path="/ai-intelligence" component={AIIntelligence} />
-              <Route path="/trend-calendar" component={TrendCalendar} />
-              <Route path="/ab-testing" component={ABTesting} />
-              <Route path="/ab-testing-ai" component={ABTestingAI} />
-              <Route path="/competitor-analysis" component={CompetitorAnalysis} />
-              <Route path="/roi-calculator" component={ROICalculator} />
-              <Route path="/affiliate-engine" component={AffiliateEngine} />
-              <Route path="/social-listening" component={SocialListening} />
-              <Route path="/smart-legal-assistant" component={SmartLegalAssistant} />
-              <Route path="/content-theft-detection" component={ContentTheftDetection} />
-              <Route path="/persona-suggestions" component={PersonaSuggestions} />
-              <Route path="/gamification" component={Gamification} />
-              <Route path="/emotion-analysis" component={EmotionAnalysis} />
-              <Route path="/admin" component={AdminDashboard} />
-              <Route path="/admin/users" component={AdminUserManagement} />
-              <Route path="/admin/early-access" component={AdminEarlyAccess} />
-              <Route path="/feature-preview" component={FeaturePreview} />
-              <Route path="/onboarding" component={OnboardingPremium} />
-              <Route path="/" component={ProfessionalDashboard} />
-              <Route component={NotFound} />
+              <Route path="/analytics" component={Analytics} />
+              <Route path="/analytics/:tab" component={Analytics} />
             </Switch>
-          </main>
-        </div>
+          </AnalyticsLayout>
+        ) : (
+          <>
+            <ProfessionalHeader />
+            <div className="flex">
+              <ProfessionalSidebar />
+              <main className="flex-1 p-6 space-y-6">
+                <Switch>
+                  <Route path="/dashboard" component={ProfessionalDashboard} />
+                  <Route path="/content-studio" component={ContentStudio} />
+                  <Route path="/scheduler" component={ProfessionalScheduler} />
+                  <Route path="/advanced-scheduler" component={AdvancedScheduler} />
+                  <Route path="/professional-scheduler" component={ProfessionalScheduler} />
+                  <Route path="/analyzer" component={Analyzer} />
+                  <Route path="/suggestions" component={Suggestions} />
+                  <Route path="/content-recommendations" component={ContentRecommendations} />
+                  <Route path="/ai-features" component={AIFeatures} />
+                  <Route path="/automation" component={Automation} />
+                  <Route path="/conversations" component={Conversations} />
+                  <Route path="/workspaces" component={Workspaces} />
+                  <Route path="/team" component={TeamManagement} />
+                  <Route path="/integrations" component={Integrations} />
+                  <Route path="/referrals" component={Referrals} />
+                  <Route path="/settings" component={Settings} />
+                  <Route path="/pricing" component={Pricing} />
+                  <Route path="/subscription" component={Subscription} />
+                  <Route path="/subscription-new" component={SubscriptionNew} />
+                  <Route path="/instagram-analytics" component={InstagramAnalytics} />
+                  <Route path="/youtube-analytics" component={YouTubeAnalytics} />
+                  <Route path="/thumbnail-ai-maker" component={ThumbnailAIMaker} />
+                  <Route path="/thumbnail-ai-maker-pro" component={ThumbnailAIMakerProComplete} />
+                  <Route path="/thumbnail-maker-pro" component={ThumbnailMakerPro} />
+                  <Route path="/creative-brief-generator" component={CreativeBriefGenerator} />
+                  <Route path="/content-repurpose" component={ContentRepurpose} />
+                  <Route path="/ai-intelligence" component={AIIntelligence} />
+                  <Route path="/trend-calendar" component={TrendCalendar} />
+                  <Route path="/ab-testing" component={ABTesting} />
+                  <Route path="/ab-testing-ai" component={ABTestingAI} />
+                  <Route path="/competitor-analysis" component={CompetitorAnalysis} />
+                  <Route path="/roi-calculator" component={ROICalculator} />
+                  <Route path="/affiliate-engine" component={AffiliateEngine} />
+                  <Route path="/social-listening" component={SocialListening} />
+                  <Route path="/smart-legal-assistant" component={SmartLegalAssistant} />
+                  <Route path="/content-theft-detection" component={ContentTheftDetection} />
+                  <Route path="/persona-suggestions" component={PersonaSuggestions} />
+                  <Route path="/gamification" component={Gamification} />
+                  <Route path="/emotion-analysis" component={EmotionAnalysis} />
+                  <Route path="/admin" component={AdminDashboard} />
+                  <Route path="/admin/users" component={AdminUserManagement} />
+                  <Route path="/admin/early-access" component={AdminEarlyAccess} />
+                  <Route path="/feature-preview" component={FeaturePreview} />
+                  <Route path="/onboarding" component={OnboardingPremium} />
+                  <Route path="/" component={ProfessionalDashboard} />
+                  <Route component={NotFound} />
+                </Switch>
+              </main>
+            </div>
+          </>
+        )}
         <GlobalWorkspaceSwitchingOverlay />
         <AICopilotWidget />
       </div>

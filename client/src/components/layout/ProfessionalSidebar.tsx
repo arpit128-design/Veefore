@@ -31,6 +31,10 @@ interface SidebarItemProps {
   isActive?: boolean;
 }
 
+interface ProfessionalSidebarProps {
+  onAnalyticsToggle?: () => void;
+}
+
 function SidebarItem({ icon: Icon, label, href, badge, isActive }: SidebarItemProps) {
   return (
     <Link href={href}>
@@ -82,7 +86,7 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
   );
 }
 
-export function ProfessionalSidebar() {
+export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarProps = {}) {
   const [location] = useLocation();
   const credits = 0; // Will be dynamically loaded
 
@@ -132,24 +136,37 @@ export function ProfessionalSidebar() {
 
         {/* Analytics & Insights */}
         <SidebarSection title="Analytics">
-          <SidebarItem
-            icon={BarChart3}
-            label="Analytics"
-            href="/analyzer"
-            isActive={location === "/analyzer"}
-          />
-          <SidebarItem
-            icon={TrendingUp}
-            label="Performance"
-            href="/content-recommendations"
-            isActive={location === "/content-recommendations"}
-          />
-          <SidebarItem
-            icon={Target}
-            label="Competitor Analysis"
-            href="/competitor-analysis"
-            isActive={location === "/competitor-analysis"}
-          />
+          {onAnalyticsToggle ? (
+            <Button
+              variant="ghost"
+              onClick={onAnalyticsToggle}
+              className="w-full justify-start text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white"
+            >
+              <BarChart3 className="h-5 w-5 mr-3" />
+              <span className="text-sm font-medium">Analytics Dashboard</span>
+            </Button>
+          ) : (
+            <>
+              <SidebarItem
+                icon={BarChart3}
+                label="Analytics"
+                href="/analyzer"
+                isActive={location === "/analyzer"}
+              />
+              <SidebarItem
+                icon={TrendingUp}
+                label="Performance"
+                href="/content-recommendations"
+                isActive={location === "/content-recommendations"}
+              />
+              <SidebarItem
+                icon={Target}
+                label="Competitor Analysis"
+                href="/competitor-analysis"
+                isActive={location === "/competitor-analysis"}
+              />
+            </>
+          )}
         </SidebarSection>
 
         {/* Automation & Engagement */}

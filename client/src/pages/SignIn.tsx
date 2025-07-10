@@ -1,16 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocation, Link } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, ArrowLeft, Rocket } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Rocket, Check, X } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
-// Early access system removed - components no longer needed
 import { motion } from 'framer-motion';
 import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
 
@@ -137,175 +136,177 @@ export default function SignIn() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="min-h-screen bg-gray-50 flex flex-col"
-    >
-      {/* Navigation Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() => setLocation('/')}
-                className="text-gray-600 hover:text-gray-900 flex items-center"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Button>
+    <div className="h-screen bg-green-50 flex overflow-hidden">
+      {/* Left Side - Mascot/Illustration - Fixed */}
+      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative">
+        {/* Back to Home Button - Desktop Only */}
+        <div className="absolute top-8 left-8">
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Home</span>
+          </Link>
+        </div>
+        
+        <div className="text-center">
+          <div className="w-80 h-80 bg-red-500 rounded-full flex items-center justify-center mb-8 mx-auto relative">
+            {/* VeeFore Rocket Mascot */}
+            <div className="text-white text-8xl">
+              <Rocket className="w-32 h-32" />
             </div>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+              <div className="w-24 h-3 bg-red-400 rounded-full opacity-50"></div>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Welcome Back to VeeFore
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Continue your AI-powered social media journey
+          </p>
+        </div>
+      </div>
+
+      {/* Right Side - Form - Scrollable */}
+      <div className="w-full lg:w-1/2 bg-white flex flex-col h-screen overflow-hidden">
+        {/* Header - Mobile Only */}
+        <div className="lg:hidden px-8 py-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <img 
-                src={veeforeLogo} 
-                alt="VeeFore Logo" 
-                className="w-8 h-8 object-contain"
-              />
-              <span className="text-xl font-bold text-gray-900">VeeFore</span>
+              <Link href="/" className="flex items-center space-x-2 hover:opacity-80">
+                <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
+                <span className="text-xl font-bold text-gray-900">VeeFore</span>
+              </Link>
             </div>
+            <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">
+              Back to Home
+            </Link>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex">
-      {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 to-purple-700 text-white p-12 flex-col justify-center">
-        <div className="max-w-md">
-          <div className="flex items-center mb-8">
-            <img 
-              src={veeforeLogo} 
-              alt="VeeFore Logo" 
-              className="w-10 h-10 object-contain mr-3"
-            />
-            <span className="text-2xl font-bold">VeeFore</span>
-          </div>
-          
-          <h1 className="text-4xl font-bold mb-6 leading-tight">
-            Gets social.<br />
-            Knows your brand.<br />
-            Ready to jam.
-          </h1>
-          
-          <p className="text-lg text-blue-100 mb-8">
-            Meet VeeFore — your AI-powered social media assistant. Built on real-time social media conversations and set to your brand voice, it's ready to help you spot post-worthy trends, write posts tailored to your brand, and build campaign strategies based on what's happening online right now.
-          </p>
-          
-          <p className="text-blue-200">
-            Free for a limited time.
-          </p>
-        </div>
-      </div>
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 px-8 py-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="max-w-md mx-auto">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="text-white text-3xl">👋</div>
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+                  Sign in to your account
+                </h1>
+                <p className="text-gray-600 text-center">
+                  Welcome back! Please enter your details.
+                </p>
+              </div>
 
-      {/* Right side - Sign in form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in</h2>
-            </div>
+              {/* Google Sign In */}
+              <div className="mb-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                  className="w-full h-12 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <FcGoogle className="w-5 h-5 mr-3" />
+                  Continue with Google
+                </Button>
+              </div>
 
-            <form onSubmit={form.handleSubmit(handleEmailSignIn)} className="space-y-6">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <div className="relative">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500">or</span>
+                </div>
+              </div>
+
+              {/* Email/Password Form */}
+              <form onSubmit={form.handleSubmit(handleEmailSignIn)} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Business email address
+                  </label>
                   <Input
-                    id="email"
                     type="email"
                     placeholder="Enter your email"
                     {...form.register('email')}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500"
                   />
+                  {form.formState.errors.email && (
+                    <p className="mt-2 text-sm text-red-600">{form.formState.errors.email.message}</p>
+                  )}
                 </div>
-                {form.formState.errors.email && (
-                  <p className="mt-2 text-sm text-red-600">{form.formState.errors.email.message}</p>
-                )}
-              </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
-                    Forgot password?
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Password
+                    </label>
+                    <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter your password"
+                      {...form.register('password')}
+                      className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {form.formState.errors.password && (
+                    <p className="mt-2 text-sm text-red-600">{form.formState.errors.password.message}</p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Signing in...' : 'Sign in'}
+                </Button>
+              </form>
+
+              <div className="text-center mt-6">
+                <p className="text-xs text-gray-500 mb-4">
+                  By signing in, you agree to our{' '}
+                  <Link href="/terms-of-service" className="text-blue-600 hover:underline">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                    Privacy Policy
                   </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    {...form.register('password')}
-                    className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {form.formState.errors.password && (
-                  <p className="mt-2 text-sm text-red-600">{form.formState.errors.password.message}</p>
-                )}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{' '}
+                  <Link href="/signup" className="text-blue-600 hover:underline font-medium">
+                    Sign up
+                  </Link>
+                </p>
               </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md font-medium transition-colors"
-              >
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </Button>
-            </form>
-
-            <div className="mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-3 rounded-md font-medium transition-colors"
-              >
-                <FcGoogle className="w-5 h-5 mr-2" />
-                Single sign on
-              </Button>
             </div>
-
-            <div className="mt-8 text-center">
-              <Link href="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
-                Sign up
-              </Link>
-            </div>
-
-            <div className="mt-6 text-center text-sm text-gray-600">
-              By selecting Sign in, I agree to{' '}
-              <Link href="/terms" className="text-blue-600 hover:text-blue-500">
-                VeeFore's Terms
-              </Link>
-              , including the payment terms, and{' '}
-              <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
-                Privacy Policy
-              </Link>
-            </div>
-
-            <div className="mt-4 text-center">
-              <span className="text-blue-600 hover:text-blue-500 cursor-pointer text-sm">
-                Use Social Sign In
-              </span>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-
-      {/* Early access system removed - modal no longer needed */}
-      </div>
-    </motion.div>
+    </div>
   );
 }

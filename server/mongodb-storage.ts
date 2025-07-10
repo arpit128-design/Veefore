@@ -1134,34 +1134,7 @@ export class MongoStorage implements IStorage {
     return accounts.map(account => this.convertSocialAccount(account));
   }
 
-  async updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount> {
-    await this.connect();
-    
-    const updateData = { ...updates, updatedAt: new Date() };
-    
-    // Try updating by MongoDB _id first
-    let result;
-    try {
-      result = await SocialAccountModel.findByIdAndUpdate(
-        id,
-        updateData,
-        { new: true }
-      );
-    } catch (error) {
-      // If ObjectId fails, try by the 'id' field
-      result = await SocialAccountModel.findOneAndUpdate(
-        { id: id },
-        updateData,
-        { new: true }
-      );
-    }
-    
-    if (!result) {
-      throw new Error(`Social account with id ${id} not found`);
-    }
-    
-    return this.convertSocialAccount(result);
-  }
+
 
   async getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined> {
     await this.connect();
@@ -1651,93 +1624,10 @@ export class MongoStorage implements IStorage {
   }
 
   // Conversation Management Methods
-  async createDmConversation(conversation: any): Promise<any> {
-    await this.connect();
-    
-    const ConversationModel = mongoose.models.DmConversation || mongoose.model('DmConversation', new mongoose.Schema({
-      workspaceId: String,
-      participantId: String,
-      participantUsername: String,
-      platform: String,
-      messageCount: { type: Number, default: 0 },
-      lastMessageAt: Date,
-      createdAt: { type: Date, default: Date.now },
-      updatedAt: { type: Date, default: Date.now }
-    }));
-    
-    const newConversation = new ConversationModel(conversation);
-    const saved = await newConversation.save();
-    
-    return {
-      id: saved._id.toString(),
-      workspaceId: saved.workspaceId,
-      participantId: saved.participantId,
-      participantUsername: saved.participantUsername,
-      platform: saved.platform,
-      messageCount: saved.messageCount,
-      lastMessageAt: saved.lastMessageAt,
-      createdAt: saved.createdAt,
-      updatedAt: saved.updatedAt
-    };
-  }
 
-  async createDmMessage(message: any): Promise<any> {
-    await this.connect();
-    
-    const MessageModel = mongoose.models.DmMessage || mongoose.model('DmMessage', new mongoose.Schema({
-      conversationId: String,
-      messageId: String,
-      sender: String,
-      content: String,
-      messageType: String,
-      sentiment: String,
-      topics: [String],
-      aiResponse: Boolean,
-      createdAt: { type: Date, default: Date.now }
-    }));
-    
-    const newMessage = new MessageModel(message);
-    const saved = await newMessage.save();
-    
-    return {
-      id: saved._id.toString(),
-      conversationId: saved.conversationId,
-      messageId: saved.messageId,
-      sender: saved.sender,
-      content: saved.content,
-      messageType: saved.messageType,
-      sentiment: saved.sentiment,
-      topics: saved.topics,
-      aiResponse: saved.aiResponse,
-      createdAt: saved.createdAt
-    };
-  }
 
-  async createConversationContext(context: any): Promise<any> {
-    await this.connect();
-    
-    const ContextModel = mongoose.models.ConversationContext || mongoose.model('ConversationContext', new mongoose.Schema({
-      conversationId: String,
-      contextType: String,
-      contextValue: String,
-      confidence: Number,
-      extractedAt: Date,
-      expiresAt: Date
-    }));
-    
-    const newContext = new ContextModel(context);
-    const saved = await newContext.save();
-    
-    return {
-      id: saved._id.toString(),
-      conversationId: saved.conversationId,
-      contextType: saved.contextType,
-      contextValue: saved.contextValue,
-      confidence: saved.confidence,
-      extractedAt: saved.extractedAt,
-      expiresAt: saved.expiresAt
-    };
-  }
+
+
 
   async clearWorkspaceConversations(workspaceId: string): Promise<void> {
     await this.connect();

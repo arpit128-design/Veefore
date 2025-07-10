@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
   PenTool, 
@@ -19,7 +22,22 @@ import {
   Target,
   TrendingUp,
   Bot,
-  Sparkles
+  Sparkles,
+  Home,
+  Palette,
+  Send,
+  TrendingDown,
+  DollarSign,
+  Bell,
+  User,
+  LogOut,
+  Search,
+  Plus,
+  Activity,
+  Shield,
+  Globe,
+  Star,
+  Rocket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,21 +56,42 @@ interface ProfessionalSidebarProps {
 function SidebarItem({ icon: Icon, label, href, badge, isActive }: SidebarItemProps) {
   return (
     <Link href={href}>
-      <Button
-        variant="ghost"
-        className={cn(
-          "w-full justify-start text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white",
-          isActive && "bg-cyan-50 text-cyan-700 border-r-2 border-cyan-500"
-        )}
+      <motion.div
+        whileHover={{ x: 4 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.2 }}
       >
-        <Icon className="h-5 w-5 mr-3" />
-        <span className="text-sm font-medium">{label}</span>
-        {badge && (
-          <Badge variant="secondary" className="ml-auto text-xs bg-cyan-100 text-cyan-700">
-            {badge}
-          </Badge>
-        )}
-      </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+            isActive && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+          )}
+        >
+          <div className={cn(
+            "p-1.5 rounded-lg mr-3 transition-colors duration-200",
+            isActive 
+              ? "bg-blue-100 text-blue-600" 
+              : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700"
+          )}>
+            <Icon className="h-4 w-4" />
+          </div>
+          <span className="text-sm font-medium flex-1 text-left">{label}</span>
+          {badge && (
+            <Badge 
+              variant="secondary" 
+              className={cn(
+                "ml-2 text-xs h-5 px-2 font-medium",
+                isActive 
+                  ? "bg-blue-100 text-blue-700" 
+                  : "bg-slate-200 text-slate-600 group-hover:bg-slate-300"
+              )}
+            >
+              {badge}
+            </Badge>
+          )}
+        </Button>
+      </motion.div>
     </Link>
   );
 }
@@ -67,21 +106,35 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="space-y-2">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="mb-6">
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full justify-between text-slate-500 hover:text-slate-700 px-3 py-2 h-8 font-medium uppercase text-xs tracking-wide bg-white"
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-700 transition-colors duration-200 group"
+        whileHover={{ x: 2 }}
+        transition={{ duration: 0.2 }}
       >
-        {title}
-        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-      </Button>
-      {isOpen && (
-        <div className="space-y-1 pl-2">
-          {children}
-        </div>
-      )}
+        <span>{title}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight className="h-3 w-3" />
+        </motion.div>
+      </motion.button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="space-y-1 mt-2"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -91,20 +144,62 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
   const credits = 0; // Will be dynamically loaded
 
   return (
-    <aside className="bg-white border-r border-slate-200 w-64 h-full flex flex-col overflow-hidden">
-      <div className="flex-shrink-0 p-6">
-        {/* Credits display */}
-        <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-700 font-medium">Credits</span>
-            <span className="text-lg font-bold text-cyan-600">{credits}</span>
+    <aside className="bg-white border-r border-slate-200 w-72 h-full flex flex-col overflow-hidden shadow-sm veefore-sidebar">
+      {/* Professional Header with Brand */}
+      <div className="flex-shrink-0 p-6 border-b border-slate-100 veefore-sidebar-header">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+            <Rocket className="h-5 w-5 text-white" />
           </div>
-          <div className="text-xs text-slate-500 mt-1">Available for AI tools</div>
+          <div>
+            <h1 className="text-lg font-bold text-slate-900">VeeFore</h1>
+            <p className="text-xs text-slate-500">AI Social Media Suite</p>
+          </div>
+        </div>
+
+        {/* User Profile Section */}
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+          <div className="flex items-center space-x-3 mb-3">
+            <Avatar className="h-10 w-10 ring-2 ring-blue-100">
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-semibold">
+                AK
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 truncate">arpit9996363</p>
+              <p className="text-xs text-slate-500">Starter Plan</p>
+            </div>
+            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600">
+              <Bell className="h-3 w-3" />
+            </Button>
+          </div>
+
+          {/* Enhanced Credits Display */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Sparkles className="h-3 w-3 text-white" />
+              </div>
+              <span className="text-sm font-medium text-slate-700">Credits</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg font-bold text-blue-600">{credits}</span>
+              <Button size="sm" variant="outline" className="h-6 px-2 text-xs">
+                <Plus className="h-3 w-3 mr-1" />
+                Buy
+              </Button>
+            </div>
+          </div>
+          
+          <div className="mt-2 bg-slate-200 rounded-full h-1.5">
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full h-1.5 w-0"></div>
+          </div>
+          <p className="text-xs text-slate-500 mt-1">0 of 300 monthly credits used</p>
         </div>
       </div>
       
       {/* Independent Scrollable Navigation Area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6 veefore-sidebar-nav">
         {/* Main Navigation */}
         <div className="space-y-1 mb-6">
           <SidebarItem
@@ -141,14 +236,22 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
         {/* Analytics & Insights */}
         <SidebarSection title="Analytics">
           {onAnalyticsToggle ? (
-            <Button
-              variant="ghost"
-              onClick={onAnalyticsToggle}
-              className="w-full justify-start text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white"
+            <motion.div
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
             >
-              <BarChart3 className="h-5 w-5 mr-3" />
-              <span className="text-sm font-medium">Analytics Dashboard</span>
-            </Button>
+              <Button
+                variant="ghost"
+                onClick={onAnalyticsToggle}
+                className="w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group"
+              >
+                <div className="p-1.5 rounded-lg mr-3 transition-colors duration-200 bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700">
+                  <BarChart3 className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium flex-1 text-left">Analytics Dashboard</span>
+              </Button>
+            </motion.div>
           ) : (
             <>
               <SidebarItem
@@ -218,14 +321,47 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
           />
         </SidebarSection>
 
-        {/* Settings */}
-        <div className="pt-4 border-t border-slate-200">
+        {/* Settings & Support */}
+        <div className="mt-auto pt-6 space-y-2">
+          <Separator className="mb-4" />
+          
           <SidebarItem
             icon={Settings}
             label="Settings"
             href="/settings"
             isActive={location === "/settings"}
           />
+          
+          <motion.div 
+            className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Star className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Upgrade Plan</p>
+                <p className="text-xs text-slate-600">Get unlimited credits</p>
+              </div>
+            </div>
+            <Button size="sm" className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white">
+              Upgrade Now
+            </Button>
+          </motion.div>
+
+          {/* Quick Actions */}
+          <div className="flex space-x-2">
+            <Button size="sm" variant="outline" className="flex-1 h-8">
+              <Search className="h-3 w-3 mr-1" />
+              Search
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1 h-8">
+              <Activity className="h-3 w-3 mr-1" />
+              Activity
+            </Button>
+          </div>
         </div>
       </div>
     </aside>

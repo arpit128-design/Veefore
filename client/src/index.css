@@ -2500,4 +2500,131 @@ canvas {
   border: none !important;
 }
 
+/* Enhanced Text Contrast and Visibility */
+.team-management-page h1,
+.team-management-page h2,
+.team-management-page h3,
+.team-management-page h4,
+.team-management-page h5,
+.team-management-page h6 {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+.team-management-page p,
+.team-management-page span,
+.team-management-page div {
+  color: #475569 !important;
+}
+
+.team-management-page .text-slate-900 {
+  color: #0f172a !important;
+}
+
+.team-management-page .text-slate-800 {
+  color: #1e293b !important;
+}
+
+.team-management-page .text-slate-700 {
+  color: #334155 !important;
+}
+
+.team-management-page .text-slate-600 {
+  color: #475569 !important;
+}
+
+.team-management-page .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Tab Enhanced Styling */
+.team-management-page [data-state="active"] {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.team-management-page [data-state="inactive"] {
+  color: #475569 !important;
+  background-color: transparent !important;
+}
+
+/* Select Dropdown Enhancement */
+.team-management-page .select-trigger {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.team-management-page .select-content {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Input Enhancement */
+.team-management-page input {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.team-management-page input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.team-management-page input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Label Enhancement */
+.team-management-page label {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+/* Card Content Enhancement */
+.team-management-page .card {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.team-management-page .card-content {
+  color: #1e293b !important;
+}
+
+/* Button Text Enhancement */
+.team-management-page button {
+  font-weight: 500 !important;
+}
+
+.team-management-page button[class*="text-slate"] {
+  color: #334155 !important;
+}
+
+.team-management-page button:hover[class*="text-slate"] {
+  color: #1e293b !important;
+}
+
+/* Progress Bar Enhancement */
+.team-management-page .progress {
+  background-color: #f1f5f9 !important;
+}
+
+.team-management-page .progress > div {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6) !important;
+}
+
+/* Avatar Enhancement */
+.team-management-page .avatar {
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.team-management-page .avatar-fallback {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
 /* End Team Management Styling */

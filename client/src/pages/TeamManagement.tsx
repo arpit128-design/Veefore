@@ -694,7 +694,7 @@ export default function TeamManagement() {
                     placeholder="Search team members by name, role, skills, or department..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-14 h-14 text-lg bg-white/70 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-2xl"
+                    className="pl-14 h-14 text-lg bg-white border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 rounded-2xl text-slate-900 placeholder:text-slate-500"
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <Badge variant="secondary" className="bg-blue-100 text-blue-700">
@@ -706,16 +706,16 @@ export default function TeamManagement() {
                 
                 <div className="flex gap-3">
                   <Select value={filterRole} onValueChange={setFilterRole}>
-                    <SelectTrigger className="w-56 h-14 bg-white/70 border-slate-200 rounded-2xl">
+                    <SelectTrigger className="w-56 h-14 bg-white border-slate-300 rounded-2xl text-slate-800">
                       <div className="flex items-center space-x-2">
-                        <Shield className="w-4 h-4 text-slate-500" />
-                        <SelectValue placeholder="All Roles" />
+                        <Shield className="w-4 h-4 text-slate-600" />
+                        <SelectValue placeholder="All Roles" className="text-slate-800" />
                       </div>
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
+                    <SelectContent className="bg-white border-slate-200">
+                      <SelectItem value="all" className="text-slate-800">All Roles</SelectItem>
                       {Object.entries(advancedRolePermissions).map(([key, role]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={key} value={key} className="text-slate-800">
                           <div className="flex items-center space-x-2">
                             <role.icon className="w-4 h-4" />
                             <span>{role.label}</span>
@@ -726,19 +726,19 @@ export default function TeamManagement() {
                   </Select>
 
                   <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-                    <SelectTrigger className="w-56 h-14 bg-white/70 border-slate-200 rounded-2xl">
+                    <SelectTrigger className="w-56 h-14 bg-white border-slate-300 rounded-2xl text-slate-800">
                       <div className="flex items-center space-x-2">
-                        <Building className="w-4 h-4 text-slate-500" />
-                        <SelectValue placeholder="All Departments" />
+                        <Building className="w-4 h-4 text-slate-600" />
+                        <SelectValue placeholder="All Departments" className="text-slate-800" />
                       </div>
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Departments</SelectItem>
-                      <SelectItem value="content">Content & Marketing</SelectItem>
-                      <SelectItem value="design">Design & Creative</SelectItem>
-                      <SelectItem value="analytics">Analytics & Data</SelectItem>
-                      <SelectItem value="development">Development & Tech</SelectItem>
-                      <SelectItem value="management">Management</SelectItem>
+                    <SelectContent className="bg-white border-slate-200">
+                      <SelectItem value="all" className="text-slate-800">All Departments</SelectItem>
+                      <SelectItem value="content" className="text-slate-800">Content & Marketing</SelectItem>
+                      <SelectItem value="design" className="text-slate-800">Design & Creative</SelectItem>
+                      <SelectItem value="analytics" className="text-slate-800">Analytics & Data</SelectItem>
+                      <SelectItem value="development" className="text-slate-800">Development & Tech</SelectItem>
+                      <SelectItem value="management" className="text-slate-800">Management</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -756,12 +756,16 @@ export default function TeamManagement() {
 
               {/* View Controls & Actions */}
               <div className="flex items-center gap-4">
-                <div className="flex bg-slate-100 rounded-2xl p-2">
+                <div className="flex bg-white rounded-2xl p-2 border border-slate-200 shadow-sm">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('grid')}
-                    className="rounded-xl px-4 py-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    className={`rounded-xl px-4 py-2 border font-medium ${
+                      viewMode === 'grid' 
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
+                        : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                   >
                     <Grid3X3 className="w-4 h-4 mr-2" />
                     Grid
@@ -770,7 +774,11 @@ export default function TeamManagement() {
                     variant={viewMode === 'list' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('list')}
-                    className="rounded-xl px-4 py-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    className={`rounded-xl px-4 py-2 border font-medium ml-1 ${
+                      viewMode === 'list' 
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
+                        : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                   >
                     <List className="w-4 h-4 mr-2" />
                     List
@@ -779,7 +787,11 @@ export default function TeamManagement() {
                     variant={viewMode === 'kanban' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('kanban')}
-                    className="rounded-xl px-4 py-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    className={`rounded-xl px-4 py-2 border font-medium ml-1 ${
+                      viewMode === 'kanban' 
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
+                        : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                   >
                     <Layout className="w-4 h-4 mr-2" />
                     Kanban
@@ -788,7 +800,11 @@ export default function TeamManagement() {
                     variant={viewMode === 'analytics' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('analytics')}
-                    className="rounded-xl px-4 py-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    className={`rounded-xl px-4 py-2 border font-medium ml-1 ${
+                      viewMode === 'analytics' 
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
+                        : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Analytics
@@ -864,24 +880,24 @@ export default function TeamManagement() {
 
         {/* Main Content Area */}
         <Tabs defaultValue="members" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-white/70 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
-            <TabsTrigger value="members" className="rounded-xl">
+          <TabsList className="grid w-full grid-cols-5 bg-white rounded-2xl p-2 shadow-lg border border-slate-200">
+            <TabsTrigger value="members" className="rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-700 font-medium">
               <Users className="w-4 h-4 mr-2" />
               Team Members
             </TabsTrigger>
-            <TabsTrigger value="invitations" className="rounded-xl">
+            <TabsTrigger value="invitations" className="rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-700 font-medium">
               <Mail className="w-4 h-4 mr-2" />
               Invitations
             </TabsTrigger>
-            <TabsTrigger value="roles" className="rounded-xl">
+            <TabsTrigger value="roles" className="rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-700 font-medium">
               <Shield className="w-4 h-4 mr-2" />
               Roles & Permissions
             </TabsTrigger>
-            <TabsTrigger value="activity" className="rounded-xl">
+            <TabsTrigger value="activity" className="rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-700 font-medium">
               <Activity className="w-4 h-4 mr-2" />
               Activity Feed
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-xl">
+            <TabsTrigger value="settings" className="rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-700 font-medium">
               <Settings className="w-4 h-4 mr-2" />
               Team Settings
             </TabsTrigger>

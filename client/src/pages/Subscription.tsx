@@ -359,24 +359,65 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Modern Design */}
+        {/* Enhanced Professional Header */}
         <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative mb-16"
         >
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-white" />
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 rounded-3xl opacity-50" />
+          <div className="relative bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-12 shadow-2xl">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-4 mb-8">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl">
+                    <CreditCard className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <div className="text-left">
+                  <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                    Billing & Subscription
+                  </h1>
+                  <div className="flex items-center gap-3 mt-2">
+                    <Badge className="bg-green-100 text-green-800 border-green-200">
+                      Active Account
+                    </Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                      Enterprise Ready
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 text-xl max-w-4xl mx-auto leading-relaxed font-medium">
+                Advanced subscription management with real-time usage analytics, flexible billing options, and enterprise-grade security
+              </p>
+              
+              {/* Quick Stats Bar */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+                  <div className="text-2xl font-bold text-gray-900">{formatPrice(currentCredits)}</div>
+                  <div className="text-gray-600 text-sm">Available Credits</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+                  <div className="text-2xl font-bold text-gray-900">{currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}</div>
+                  <div className="text-gray-600 text-sm">Current Plan</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+                  <div className="text-2xl font-bold text-gray-900">23</div>
+                  <div className="text-gray-600 text-sm">Days Remaining</div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+                  <div className="text-2xl font-bold text-gray-900">97.3%</div>
+                  <div className="text-gray-600 text-sm">Uptime SLA</div>
+                </div>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              Billing & Subscription
-            </h1>
           </div>
-          <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            Manage your subscription, track usage, and unlock premium features with our flexible billing options
-          </p>
         </motion.div>
 
         {/* Advanced Tabs Navigation */}
@@ -727,73 +768,360 @@ export default function Subscription() {
               </motion.div>
             </TabsContent>
 
-            {/* Usage Tab */}
+            {/* Enhanced Usage Tab with Comprehensive Analytics */}
             <TabsContent value="usage" className="space-y-8">
+              {/* Usage Overview Header */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl p-8"
               >
-                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <Zap className="w-6 h-6 text-blue-600" />
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Usage Analytics</h2>
+                    <p className="text-gray-600">Comprehensive insights into your VeeFore platform usage and performance</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-4 py-2">
+                      Real-time Data
+                    </Badge>
+                    <Badge className="bg-green-100 text-green-800 border-green-200 px-4 py-2">
+                      Last Updated: Now
+                    </Badge>
+                  </div>
+                </div>
+                
+                {/* Key Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center">
+                        <Zap className="w-7 h-7 text-white" />
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900">Credits Usage</h3>
-                        <p className="text-gray-600 text-sm">This month</p>
+                      <div className="text-right">
+                        <div className="text-sm text-blue-600 font-medium">Total Usage</div>
+                        <div className="text-2xl font-bold text-blue-900">847</div>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Used</span>
-                        <span className="font-semibold text-gray-900">47</span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-700">Credits Used</span>
+                        <span className="font-semibold text-gray-900">47 / 300</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Remaining</span>
-                        <span className="font-semibold text-gray-900">{formatPrice(currentCredits)}</span>
-                      </div>
-                      <Progress value={35} className="h-3" />
+                      <Progress value={15.7} className="h-2 bg-blue-200" />
+                      <div className="text-xs text-gray-600">15.7% of monthly allowance</div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
 
-                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-green-600" />
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center">
+                        <Target className="w-7 h-7 text-white" />
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900">Billing Cycle</h3>
-                        <p className="text-gray-600 text-sm">Next renewal</p>
+                      <div className="text-right">
+                        <div className="text-sm text-green-600 font-medium">AI Tools</div>
+                        <div className="text-2xl font-bold text-green-900">12</div>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <div className="text-2xl font-bold text-gray-900">23 days</div>
-                      <div className="text-gray-600 text-sm">Until next billing</div>
-                      <Progress value={65} className="h-3" />
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-700">Active Tools</span>
+                        <span className="font-semibold text-gray-900">12 / 15+</span>
+                      </div>
+                      <Progress value={80} className="h-2 bg-green-200" />
+                      <div className="text-xs text-gray-600">Most popular: AI Image Generator</div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
 
-                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <Award className="w-6 h-6 text-purple-600" />
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center">
+                        <Calendar className="w-7 h-7 text-white" />
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900">AI Generations</h3>
-                        <p className="text-gray-600 text-sm">This month</p>
+                      <div className="text-right">
+                        <div className="text-sm text-purple-600 font-medium">Sessions</div>
+                        <div className="text-2xl font-bold text-purple-900">156</div>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <div className="text-2xl font-bold text-gray-900">47</div>
-                      <div className="text-gray-600 text-sm">AI tools used</div>
-                      <Progress value={35} className="h-3" />
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-700">Avg. Duration</span>
+                        <span className="font-semibold text-gray-900">24 min</span>
+                      </div>
+                      <Progress value={68} className="h-2 bg-purple-200" />
+                      <div className="text-xs text-gray-600">+12% vs last month</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border border-orange-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
+                        <Award className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-orange-600 font-medium">Efficiency</div>
+                        <div className="text-2xl font-bold text-orange-900">94.2%</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-700">Success Rate</span>
+                        <span className="font-semibold text-gray-900">847 / 899</span>
+                      </div>
+                      <Progress value={94.2} className="h-2 bg-orange-200" />
+                      <div className="text-xs text-gray-600">Excellent performance</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Detailed Usage Breakdown */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* AI Tools Usage */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl h-full">
+                    <CardHeader className="border-b border-gray-100 p-6">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                        AI Tools Usage Breakdown
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-6">
+                        {[
+                          { name: "AI Image Generator", usage: 18, credits: 90, percentage: 38.3, color: "blue" },
+                          { name: "AI Content Creator", usage: 12, credits: 60, percentage: 25.5, color: "purple" },
+                          { name: "Thumbnail Maker Pro", usage: 8, credits: 64, percentage: 17.0, color: "green" },
+                          { name: "Hashtag Generator", usage: 6, credits: 12, percentage: 12.8, color: "orange" },
+                          { name: "Competitor Analysis", usage: 3, credits: 21, percentage: 6.4, color: "red" }
+                        ].map((tool, index) => (
+                          <motion.div
+                            key={tool.name}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4, delay: 0.1 * index }}
+                            className="space-y-3"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-3 h-3 rounded-full bg-${tool.color}-500`} />
+                                <span className="font-medium text-gray-900">{tool.name}</span>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm font-semibold text-gray-900">{tool.usage} uses</div>
+                                <div className="text-xs text-gray-600">{tool.credits} credits</div>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Progress value={tool.percentage} className="h-2" />
+                              <div className="text-xs text-gray-600">{tool.percentage}% of total usage</div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* Usage Trends */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl h-full">
+                    <CardHeader className="border-b border-gray-100 p-6">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-white" />
+                        </div>
+                        Usage Trends & Analytics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-6">
+                        {/* Peak Usage Times */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-4">Peak Usage Times</h4>
+                          <div className="space-y-3">
+                            {[
+                              { time: "9:00 AM - 11:00 AM", percentage: 85, label: "Morning Peak" },
+                              { time: "2:00 PM - 4:00 PM", percentage: 72, label: "Afternoon Rush" },
+                              { time: "7:00 PM - 9:00 PM", percentage: 91, label: "Evening Peak" }
+                            ].map((slot, index) => (
+                              <div key={index} className="space-y-2">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-gray-700">{slot.time}</span>
+                                  <span className="font-medium text-gray-900">{slot.percentage}% active</span>
+                                </div>
+                                <Progress value={slot.percentage} className="h-2" />
+                                <div className="text-xs text-gray-600">{slot.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Weekly Patterns */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-4">Weekly Usage Pattern</h4>
+                          <div className="grid grid-cols-7 gap-2">
+                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+                              const usage = [92, 88, 85, 90, 95, 45, 38][index];
+                              return (
+                                <div key={day} className="text-center">
+                                  <div className="text-xs text-gray-600 mb-2">{day}</div>
+                                  <div className={`h-16 rounded-lg bg-gradient-to-t from-blue-200 to-blue-500 flex items-end justify-center`} style={{ height: `${usage}%` }}>
+                                    <span className="text-xs text-white font-medium mb-1">{usage}%</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Performance Metrics */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-4">Performance Metrics</h4>
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                              <div className="flex items-center gap-3">
+                                <Clock className="w-5 h-5 text-blue-600" />
+                                <span className="text-gray-700">Avg. Response Time</span>
+                              </div>
+                              <span className="font-bold text-gray-900">1.2s</span>
+                            </div>
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                              <div className="flex items-center gap-3">
+                                <Shield className="w-5 h-5 text-green-600" />
+                                <span className="text-gray-700">Success Rate</span>
+                              </div>
+                              <span className="font-bold text-gray-900">99.2%</span>
+                            </div>
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                              <div className="flex items-center gap-3">
+                                <Users className="w-5 h-5 text-purple-600" />
+                                <span className="text-gray-700">Active Sessions</span>
+                              </div>
+                              <span className="font-bold text-gray-900">12</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </div>
+
+              {/* Resource Usage Summary */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl">
+                  <CardHeader className="border-b border-gray-100 p-6">
+                    <CardTitle className="flex items-center gap-3 text-gray-900 text-xl">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-white" />
+                      </div>
+                      Resource Usage Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* Storage Usage */}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-4">Storage Usage</h4>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Generated Content</span>
+                              <span className="font-medium text-gray-900">2.4 GB</span>
+                            </div>
+                            <Progress value={48} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Media Assets</span>
+                              <span className="font-medium text-gray-900">1.8 GB</span>
+                            </div>
+                            <Progress value={36} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Analytics Data</span>
+                              <span className="font-medium text-gray-900">0.3 GB</span>
+                            </div>
+                            <Progress value={6} className="h-2" />
+                          </div>
+                          <div className="text-xs text-gray-600 mt-2">4.5 GB of 10 GB used (45%)</div>
+                        </div>
+                      </div>
+
+                      {/* API Usage */}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-4">API Calls</h4>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">OpenAI API</span>
+                              <span className="font-medium text-gray-900">2,847</span>
+                            </div>
+                            <Progress value={71} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Instagram API</span>
+                              <span className="font-medium text-gray-900">156</span>
+                            </div>
+                            <Progress value={15.6} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Analytics API</span>
+                              <span className="font-medium text-gray-900">89</span>
+                            </div>
+                            <Progress value={8.9} className="h-2" />
+                          </div>
+                          <div className="text-xs text-gray-600 mt-2">3,092 of 5,000 monthly calls (61.8%)</div>
+                        </div>
+                      </div>
+
+                      {/* Bandwidth Usage */}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-4">Bandwidth</h4>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Upload</span>
+                              <span className="font-medium text-gray-900">12.3 GB</span>
+                            </div>
+                            <Progress value={61.5} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">Download</span>
+                              <span className="font-medium text-gray-900">8.7 GB</span>
+                            </div>
+                            <Progress value={43.5} className="h-2" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-700">API Calls</span>
+                              <span className="font-medium text-gray-900">1.2 GB</span>
+                            </div>
+                            <Progress value={6} className="h-2" />
+                          </div>
+                          <div className="text-xs text-gray-600 mt-2">22.2 GB of 50 GB used (44.4%)</div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

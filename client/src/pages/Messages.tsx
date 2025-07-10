@@ -1254,12 +1254,12 @@ export default function Messages() {
   );
 
   return (
-    <div className="veefore-app-container bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="veefore-app-container h-full">
       <div className="flex flex-col h-full">
         {/* Modern Navigation Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full overflow-hidden">
-          <div className="flex-shrink-0 p-6 pb-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-2 shadow-xl">
+          <div className="flex-shrink-0 p-4 pb-0 bg-white border-b border-slate-200">
+            <TabsList className="grid w-full grid-cols-3 bg-slate-100 border border-slate-200 rounded-lg p-1">
               <TabsTrigger 
                 value="conversations" 
                 className="text-slate-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-semibold hover:text-slate-900 transition-all"
@@ -1284,8 +1284,8 @@ export default function Messages() {
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="flex-1 overflow-hidden p-6 pt-0">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+          <TabsContent value="conversations" className="flex-1 overflow-hidden">
+            <div className="flex h-full bg-white overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1295,8 +1295,8 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="flex-1 overflow-hidden p-6 pt-0">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+          <TabsContent value="messages" className="flex-1 overflow-hidden">
+            <div className="flex h-full bg-white overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1306,14 +1306,14 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="flex-1 overflow-hidden p-6 pt-0">
-            <div className="veefore-main-content" style={{ height: 'calc(100vh - 180px)' }}>
+          <TabsContent value="analytics" className="flex-1 overflow-hidden">
+            <div className="veefore-main-content h-full bg-white">
               {renderAnalyticsView()}
             </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="flex-1 overflow-hidden p-6 pt-0">
-            <div className="veefore-main-content" style={{ height: 'calc(100vh - 180px)' }}>
+          <TabsContent value="settings" className="flex-1 overflow-hidden">
+            <div className="veefore-main-content h-full bg-white">
               {renderSettingsView()}
             </div>
           </TabsContent>

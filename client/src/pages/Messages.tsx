@@ -159,6 +159,296 @@ interface ConversationAnalytics {
   }[];
 }
 
+// Mock data for comprehensive platform and message type demonstration
+const mockConversations: Conversation[] = [
+  {
+    id: 'conv-1',
+    participant: {
+      id: 'user-1',
+      username: 'sarah_creative',
+      displayName: 'Sarah Johnson',
+      avatar: 'https://i.pravatar.cc/150?img=1',
+      platform: 'instagram',
+      verified: true,
+      followers: 12500,
+      lastSeen: '2025-07-10T16:45:00Z'
+    },
+    lastMessage: {
+      id: 'msg-1',
+      content: 'Love your latest post! The colors are amazing 🎨',
+      timestamp: '2025-07-10T16:45:00Z',
+      platform: 'instagram',
+      type: 'dm',
+      author: {
+        id: 'user-1',
+        username: 'sarah_creative',
+        displayName: 'Sarah Johnson',
+        verified: true,
+        followers: 12500
+      },
+      isFromUser: false,
+      status: 'delivered',
+      sentiment: 'positive',
+      isAiGenerated: false,
+      engagement: { likes: 0, replies: 0, shares: 0 }
+    },
+    unreadCount: 2,
+    isPinned: true,
+    isArchived: false,
+    tags: ['design', 'collaboration'],
+    sentiment: 'positive',
+    priority: 'high',
+    totalMessages: 8,
+    createdAt: '2025-07-09T10:30:00Z',
+    updatedAt: '2025-07-10T16:45:00Z'
+  },
+  {
+    id: 'conv-2',
+    participant: {
+      id: 'user-2',
+      username: 'tech_guru_mike',
+      displayName: 'Mike Chen',
+      avatar: 'https://i.pravatar.cc/150?img=2',
+      platform: 'youtube',
+      verified: false,
+      followers: 5420,
+      lastSeen: '2025-07-10T16:30:00Z'
+    },
+    lastMessage: {
+      id: 'msg-2',
+      content: 'Great tutorial! Could you make one about React hooks next?',
+      timestamp: '2025-07-10T16:30:00Z',
+      platform: 'youtube',
+      type: 'comment',
+      author: {
+        id: 'user-2',
+        username: 'tech_guru_mike',
+        displayName: 'Mike Chen',
+        verified: false,
+        followers: 5420
+      },
+      isFromUser: false,
+      status: 'read',
+      sentiment: 'positive',
+      isAiGenerated: false,
+      engagement: { likes: 15, replies: 3, shares: 2 }
+    },
+    unreadCount: 0,
+    isPinned: false,
+    isArchived: false,
+    tags: ['tutorial', 'react'],
+    sentiment: 'positive',
+    priority: 'medium',
+    totalMessages: 4,
+    createdAt: '2025-07-10T14:00:00Z',
+    updatedAt: '2025-07-10T16:30:00Z'
+  },
+  {
+    id: 'conv-3',
+    participant: {
+      id: 'user-3',
+      username: 'business_pro',
+      displayName: 'Emma Rodriguez',
+      avatar: 'https://i.pravatar.cc/150?img=3',
+      platform: 'linkedin',
+      verified: true,
+      followers: 8900,
+      lastSeen: '2025-07-10T16:15:00Z'
+    },
+    lastMessage: {
+      id: 'msg-3',
+      content: 'Would love to discuss a potential partnership opportunity',
+      timestamp: '2025-07-10T16:15:00Z',
+      platform: 'linkedin',
+      type: 'dm',
+      author: {
+        id: 'user-3',
+        username: 'business_pro',
+        displayName: 'Emma Rodriguez',
+        verified: true,
+        followers: 8900
+      },
+      isFromUser: false,
+      status: 'delivered',
+      sentiment: 'neutral',
+      isAiGenerated: false,
+      engagement: { likes: 0, replies: 0, shares: 0 }
+    },
+    unreadCount: 1,
+    isPinned: false,
+    isArchived: false,
+    tags: ['business', 'partnership'],
+    sentiment: 'neutral',
+    priority: 'high',
+    totalMessages: 2,
+    createdAt: '2025-07-10T16:00:00Z',
+    updatedAt: '2025-07-10T16:15:00Z'
+  },
+  {
+    id: 'conv-4',
+    participant: {
+      id: 'user-4',
+      username: 'foodie_alex',
+      displayName: 'Alex Thompson',
+      avatar: 'https://i.pravatar.cc/150?img=4',
+      platform: 'twitter',
+      verified: false,
+      followers: 3200,
+      lastSeen: '2025-07-10T15:45:00Z'
+    },
+    lastMessage: {
+      id: 'msg-4',
+      content: '@veefore This recipe didn\'t work for me. Instructions unclear 😕',
+      timestamp: '2025-07-10T15:45:00Z',
+      platform: 'twitter',
+      type: 'mention',
+      author: {
+        id: 'user-4',
+        username: 'foodie_alex',
+        displayName: 'Alex Thompson',
+        verified: false,
+        followers: 3200
+      },
+      isFromUser: false,
+      status: 'read',
+      sentiment: 'negative',
+      isAiGenerated: false,
+      engagement: { likes: 2, replies: 1, shares: 0 }
+    },
+    unreadCount: 1,
+    isPinned: false,
+    isArchived: false,
+    tags: ['feedback', 'recipe'],
+    sentiment: 'negative',
+    priority: 'medium',
+    totalMessages: 3,
+    createdAt: '2025-07-10T15:30:00Z',
+    updatedAt: '2025-07-10T15:45:00Z'
+  },
+  {
+    id: 'conv-5',
+    participant: {
+      id: 'user-5',
+      username: 'marketing_maven',
+      displayName: 'Lisa Kim',
+      avatar: 'https://i.pravatar.cc/150?img=5',
+      platform: 'facebook',
+      verified: true,
+      followers: 15600,
+      lastSeen: '2025-07-10T15:30:00Z'
+    },
+    lastMessage: {
+      id: 'msg-5',
+      content: 'Thanks for the quick response! Your customer service is excellent 👍',
+      timestamp: '2025-07-10T15:30:00Z',
+      platform: 'facebook',
+      type: 'reply',
+      author: {
+        id: 'user-5',
+        username: 'marketing_maven',
+        displayName: 'Lisa Kim',
+        verified: true,
+        followers: 15600
+      },
+      isFromUser: false,
+      status: 'read',
+      sentiment: 'positive',
+      isAiGenerated: false,
+      engagement: { likes: 8, replies: 2, shares: 1 }
+    },
+    unreadCount: 0,
+    isPinned: false,
+    isArchived: false,
+    tags: ['customer-service', 'positive'],
+    sentiment: 'positive',
+    priority: 'low',
+    totalMessages: 6,
+    createdAt: '2025-07-10T12:00:00Z',
+    updatedAt: '2025-07-10T15:30:00Z'
+  },
+  {
+    id: 'conv-6',
+    participant: {
+      id: 'user-6',
+      username: 'content_creator_pro',
+      displayName: 'David Wilson',
+      avatar: 'https://i.pravatar.cc/150?img=6',
+      platform: 'instagram',
+      verified: false,
+      followers: 7800,
+      lastSeen: '2025-07-10T15:00:00Z'
+    },
+    lastMessage: {
+      id: 'msg-6',
+      content: 'Could you share the preset you used for this edit?',
+      timestamp: '2025-07-10T15:00:00Z',
+      platform: 'instagram',
+      type: 'comment',
+      author: {
+        id: 'user-6',
+        username: 'content_creator_pro',
+        displayName: 'David Wilson',
+        verified: false,
+        followers: 7800
+      },
+      isFromUser: false,
+      status: 'delivered',
+      sentiment: 'neutral',
+      isAiGenerated: false,
+      engagement: { likes: 5, replies: 0, shares: 0 }
+    },
+    unreadCount: 1,
+    isPinned: false,
+    isArchived: false,
+    tags: ['editing', 'preset'],
+    sentiment: 'neutral',
+    priority: 'low',
+    totalMessages: 1,
+    createdAt: '2025-07-10T15:00:00Z',
+    updatedAt: '2025-07-10T15:00:00Z'
+  }
+];
+
+const mockAnalytics: ConversationAnalytics = {
+  totalConversations: 6,
+  activeConversations: 4,
+  totalMessages: 24,
+  unreadMessages: 5,
+  responseRate: 92.5,
+  averageResponseTime: '2h 15m',
+  sentimentDistribution: {
+    positive: 50,
+    negative: 17,
+    neutral: 33
+  },
+  platformBreakdown: {
+    instagram: 33,
+    facebook: 17,
+    twitter: 17,
+    youtube: 17,
+    linkedin: 16
+  },
+  messageTypes: {
+    dms: 42,
+    comments: 25,
+    mentions: 17,
+    replies: 16
+  },
+  topTopics: [
+    { topic: 'Design', count: 8, sentiment: 'positive' },
+    { topic: 'Tutorial', count: 6, sentiment: 'positive' },
+    { topic: 'Business', count: 4, sentiment: 'neutral' },
+    { topic: 'Support', count: 3, sentiment: 'positive' },
+    { topic: 'Feedback', count: 3, sentiment: 'negative' }
+  ],
+  peakHours: [
+    { hour: 9, count: 5 },
+    { hour: 14, count: 8 },
+    { hour: 16, count: 11 },
+    { hour: 20, count: 7 }
+  ]
+};
+
 export default function Messages() {
   const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
@@ -177,38 +467,13 @@ export default function Messages() {
   const [aiAssistant, setAiAssistant] = useState(true);
   const [selectedTab, setSelectedTab] = useState('conversations');
 
-  // Fetch conversations
-  const { data: conversations, isLoading: conversationsLoading } = useQuery({
-    queryKey: ['messages', 'conversations', currentWorkspace?.id],
-    queryFn: async () => {
-      const response = await apiRequest('GET', `/api/conversations/${currentWorkspace?.id}`);
-      return response.json() as Conversation[];
-    },
-    enabled: !!currentWorkspace?.id,
-    refetchInterval: autoRefresh ? 5000 : false
-  });
-
-  // Fetch messages for selected conversation
-  const { data: messages, isLoading: messagesLoading } = useQuery({
-    queryKey: ['messages', 'conversation', selectedConversation?.id],
-    queryFn: async () => {
-      const response = await apiRequest('GET', `/api/conversations/${selectedConversation?.id}/messages`);
-      return response.json() as Message[];
-    },
-    enabled: !!selectedConversation?.id,
-    refetchInterval: autoRefresh ? 2000 : false
-  });
-
-  // Fetch analytics
-  const { data: analytics, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['messages', 'analytics', currentWorkspace?.id],
-    queryFn: async () => {
-      const response = await apiRequest('GET', `/api/conversations/${currentWorkspace?.id}/analytics`);
-      return response.json() as ConversationAnalytics;
-    },
-    enabled: !!currentWorkspace?.id,
-    refetchInterval: 30000
-  });
+  // Use mock data for comprehensive demonstration
+  const conversations = mockConversations;
+  const conversationsLoading = false;
+  const analytics = mockAnalytics;
+  const analyticsLoading = false;
+  const messages: Message[] = [];
+  const messagesLoading = false;
 
   // Send message mutation
   const sendMessageMutation = useMutation({

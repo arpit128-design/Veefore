@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,10 +49,20 @@ interface SocialAccount {
 
 const ProfessionalDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second for live clock
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Dynamic greeting based on time of day
   const getTimeBasedGreeting = () => {
-    const hour = new Date().getHours();
+    const hour = currentTime.getHours();
     
     if (hour >= 5 && hour < 12) {
       return { greeting: "Good morning", emoji: "☀️" };
@@ -66,6 +76,25 @@ const ProfessionalDashboard: React.FC = () => {
   };
 
   const { greeting, emoji } = getTimeBasedGreeting();
+
+  // Format current date and time
+  const formatDateTime = () => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+    const date = currentTime.toLocaleDateString('en-US', options);
+    const time = currentTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    return { date, time };
+  };
+
+  const { date, time } = formatDateTime();
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery<DashboardData>({
@@ -174,7 +203,7 @@ const ProfessionalDashboard: React.FC = () => {
           </h1>
           <p className="text-gray-500 mt-2 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            Today is July 10, 2025 • Let's create something amazing
+            Today is {date} • {time} • Let's create something amazing
           </p>
         </div>
         <div className="flex items-center gap-4">

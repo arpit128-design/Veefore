@@ -547,6 +547,96 @@ button[data-state="checked"],
   @apply text-xs text-muted-foreground uppercase tracking-wide font-medium;
 }
 
+/* ENHANCED WORKSPACE PAGE - COMPLETE YELLOW ELIMINATION */
+.workspace-container,
+.workspace-container *,
+.workspace-container *::before,
+.workspace-container *::after {
+  /* Force white backgrounds everywhere */
+  background-color: #ffffff !important;
+}
+
+/* Override any potential yellow/amber colors specifically for workspaces */
+.workspace-container .bg-yellow-50,
+.workspace-container .bg-yellow-100,
+.workspace-container .bg-yellow-200,
+.workspace-container .bg-amber-50,
+.workspace-container .bg-amber-100,
+.workspace-container .bg-amber-200,
+.workspace-container .text-yellow-600,
+.workspace-container .text-yellow-700,
+.workspace-container .text-yellow-800,
+.workspace-container .text-amber-600,
+.workspace-container .text-amber-700,
+.workspace-container .text-amber-800,
+.workspace-container .border-yellow-200,
+.workspace-container .border-amber-200 {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Enhanced card backgrounds for workspace page */
+.workspace-container .bg-slate-50,
+.workspace-container .bg-gray-50,
+.workspace-container .bg-neutral-50 {
+  background-color: #ffffff !important;
+}
+
+/* Badge overrides specifically for workspace page */
+.workspace-container .badge,
+.workspace-container [class*="badge"] {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+/* Input and form overrides for workspace page */
+.workspace-container input,
+.workspace-container textarea,
+.workspace-container select,
+.workspace-container [role="combobox"],
+.workspace-container [data-radix-select-trigger] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Dialog and modal backgrounds for workspace page */
+.workspace-container [data-radix-dialog-content],
+.workspace-container [role="dialog"] {
+  background-color: #ffffff !important;
+}
+
+/* Tab content backgrounds for workspace page */
+.workspace-container [data-radix-tabs-content] {
+  background-color: #ffffff !important;
+}
+
+/* Dropdown and select backgrounds for workspace page */
+.workspace-container [data-radix-select-content],
+.workspace-container [data-radix-dropdown-menu-content] {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* Force specific workspace backgrounds to be white */
+[data-route="/workspaces"] *,
+[data-route="/workspaces"] *::before,
+[data-route="/workspaces"] *::after {
+  background-color: #ffffff !important;
+}
+
+/* WORKSPACE ROUTE SPECIFIC OVERRIDES */
+[data-route="/workspaces"] .bg-yellow-50,
+[data-route="/workspaces"] .bg-yellow-100,
+[data-route="/workspaces"] .bg-yellow-200,
+[data-route="/workspaces"] .bg-amber-50,
+[data-route="/workspaces"] .bg-amber-100,
+[data-route="/workspaces"] .bg-amber-200 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
 /* Professional spacing system */
 .space-y-professional > * + * {
   margin-top: 1.5rem;

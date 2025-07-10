@@ -297,7 +297,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
         <SidebarSection title="Business">
           <SidebarItem
             icon={CreditCard}
-            label="Subscription"
+            label="Billing & Subscription"
             href="/subscription"
             isActive={location === "/subscription"}
           />

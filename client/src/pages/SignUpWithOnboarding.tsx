@@ -776,120 +776,106 @@ export default function SignUpWithOnboarding() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="border-0 shadow-lg bg-white">
-                  <CardHeader className="text-center pb-6">
-                    <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Crown className="w-10 h-10 text-white" />
+                <div className="max-w-2xl mx-auto">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Crown className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-2xl text-gray-900">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
                       Choose your plan
-                    </CardTitle>
-                    <p className="text-gray-600 mt-2">
-                      Select the plan that best fits your needs
+                    </h2>
+                    <p className="text-gray-600">
+                      Start with the perfect plan for your social media journey
                     </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex justify-center">
-                      <div className="bg-gray-100 rounded-lg p-1 flex">
-                        <button
-                          onClick={() => setBillingPeriod('monthly')}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            billingPeriod === 'monthly' 
-                              ? 'bg-white text-gray-900 shadow-sm' 
-                              : 'text-gray-600 hover:text-gray-900'
-                          }`}
-                        >
-                          Monthly
-                        </button>
-                        <button
-                          onClick={() => setBillingPeriod('yearly')}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            billingPeriod === 'yearly' 
-                              ? 'bg-white text-gray-900 shadow-sm' 
-                              : 'text-gray-600 hover:text-gray-900'
-                          }`}
-                        >
-                          Yearly
-                          <span className="ml-2 text-green-600 font-semibold">Save 30%</span>
-                        </button>
-                      </div>
-                    </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {plans.map((plan) => (
-                        <div
-                          key={plan.id}
-                          onClick={() => setSelectedPlan(plan.id)}
-                          className={`relative p-6 rounded-lg border-2 cursor-pointer transition-all ${
-                            selectedPlan === plan.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                        >
-                          {plan.popular && (
-                            <Badge className="absolute -top-2 left-4 bg-red-500 text-white">
-                              Most Popular
-                            </Badge>
-                          )}
+                  <div className="space-y-4">
+                    {plans.map((plan) => (
+                      <div
+                        key={plan.id}
+                        onClick={() => setSelectedPlan(plan.id)}
+                        className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md ${
+                          selectedPlan === plan.id
+                            ? 'border-blue-500 bg-blue-50 shadow-lg'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        }`}
+                      >
+                        {plan.popular && (
+                          <div className="absolute -top-3 left-6 bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+                            Most Popular
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                              plan.id === 'free' ? 'bg-gray-100' :
+                              plan.id === 'starter' ? 'bg-blue-100' :
+                              plan.id === 'pro' ? 'bg-purple-100' :
+                              'bg-orange-100'
+                            }`}>
+                              <span className="text-2xl font-bold text-gray-700">
+                                {plan.id === 'free' ? '🆓' :
+                                 plan.id === 'starter' ? '🚀' :
+                                 plan.id === 'pro' ? '⭐' : '👑'}
+                              </span>
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                              <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
+                              <div className="flex items-center space-x-4 mt-2">
+                                <span className="text-sm text-gray-500">
+                                  {plan.features[0]} • {plan.features[1]}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                           
-                          <div className="text-center">
-                            <h3 className="font-semibold text-lg text-gray-900">{plan.name}</h3>
-                            <div className="mt-2">
-                              <span className="text-3xl font-bold text-gray-900">
-                                ₹{billingPeriod === 'yearly' ? Math.round(plan.yearlyPrice / 12) : plan.monthlyPrice}
-                              </span>
-                              <span className="text-gray-600 ml-1">
-                                /{billingPeriod === 'yearly' ? 'month' : plan.period}
-                              </span>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-gray-900">
+                              ₹{plan.monthlyPrice}
                             </div>
-                            {billingPeriod === 'yearly' && plan.price > 0 && (
-                              <p className="text-sm text-green-600 mt-1">
-                                Save ₹{Math.round((plan.monthlyPrice * 12) - plan.yearlyPrice)} per year
-                              </p>
+                            <div className="text-sm text-gray-500">
+                              {plan.period}
+                            </div>
+                            {selectedPlan === plan.id && (
+                              <div className="mt-2">
+                                <div className="bg-blue-500 text-white rounded-full p-1">
+                                  <Check className="w-4 h-4" />
+                                </div>
+                              </div>
                             )}
-                            <p className="text-gray-600 text-sm mt-2">{plan.description}</p>
                           </div>
-
-                          <div className="mt-4 space-y-2">
-                            {plan.features.map((feature, index) => (
-                              <div key={index} className="flex items-center text-sm text-gray-600">
-                                <Check className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
-                                {feature}
-                              </div>
-                            ))}
-                          </div>
-
-                          {selectedPlan === plan.id && (
-                            <div className="absolute inset-0 rounded-lg border-2 border-blue-500 bg-blue-50 bg-opacity-10 flex items-center justify-center">
-                              <div className="bg-blue-500 text-white rounded-full p-2">
-                                <Check className="w-6 h-6" />
-                              </div>
-                            </div>
-                          )}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+                  </div>
 
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={prevStep}
-                        variant="outline"
-                        className="flex-1 h-12 border-gray-300"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        onClick={handlePlanSelection}
-                        className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                        disabled={isLoading || !selectedPlan}
-                      >
-                        {isLoading ? 'Selecting...' : 'Continue'}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-500">
+                      You can upgrade or downgrade anytime from your account settings
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 mt-8">
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      className="flex-1 h-12 border-gray-300"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handlePlanSelection}
+                      className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                      disabled={isLoading || !selectedPlan}
+                    >
+                      {isLoading ? 'Selecting...' : 'Continue'}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
               </motion.div>
             )}
 

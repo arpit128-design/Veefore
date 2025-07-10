@@ -1849,3 +1849,427 @@ canvas {
   background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, rgba(124, 58, 237, 0.2) 50%, transparent 70%);
   filter: blur(40px);
 }
+
+/* ============================================================
+   TEAM MANAGEMENT ENHANCED STYLING AND YELLOW COLOR PREVENTION
+   ============================================================ */
+
+/* Team Management Page Container */
+.team-management-page {
+  background-color: #ffffff !important;
+  min-height: 100vh !important;
+}
+
+/* Enhanced text contrast for all slate colors */
+.team-management-page .text-slate-900 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+.team-management-page .text-slate-800 {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+.team-management-page .text-slate-700 {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+.team-management-page .text-slate-600 {
+  color: #475569 !important;
+  font-weight: 400 !important;
+}
+
+.team-management-page .text-slate-500 {
+  color: #64748b !important;
+  font-weight: 400 !important;
+}
+
+/* PREVENT ANY YELLOW COLORS - Replace with blue alternatives */
+.team-management-page .bg-yellow-100,
+.team-management-page .text-yellow-800,
+.team-management-page .border-yellow-200,
+.team-management-page .bg-yellow-50,
+.team-management-page .bg-amber-100,
+.team-management-page .text-amber-800,
+.team-management-page .border-amber-200 {
+  background-color: #dbeafe !important; /* blue-100 */
+  color: #1e40af !important; /* blue-800 */
+  border-color: #bfdbfe !important; /* blue-200 */
+}
+
+/* Enhanced role badge styling with proper colors */
+.team-role-badge-owner,
+.role-badge-owner {
+  background-color: #faf5ff !important; /* purple-50 */
+  color: #7c3aed !important; /* purple-600 */
+  border: 1px solid #e9d5ff !important; /* purple-200 */
+  font-weight: 600 !important;
+}
+
+.team-role-badge-admin,
+.role-badge-admin {
+  background-color: #dbeafe !important; /* blue-50 */
+  color: #2563eb !important; /* blue-600 */
+  border: 1px solid #bfdbfe !important; /* blue-200 */
+  font-weight: 600 !important;
+}
+
+.team-role-badge-editor,
+.role-badge-editor {
+  background-color: #d1fae5 !important; /* emerald-50 */
+  color: #059669 !important; /* emerald-600 */
+  border: 1px solid #a7f3d0 !important; /* emerald-200 */
+  font-weight: 600 !important;
+}
+
+.team-role-badge-viewer,
+.role-badge-viewer {
+  background-color: #f8fafc !important; /* slate-50 */
+  color: #475569 !important; /* slate-600 */
+  border: 1px solid #e2e8f0 !important; /* slate-200 */
+  font-weight: 600 !important;
+}
+
+/* Team stats cards enhancement */
+.team-stats-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-stats-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Team member cards styling */
+.team-member-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-member-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Enhanced gradient header */
+.team-gradient-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.75rem !important;
+}
+
+/* Tab styling enhancements */
+.team-tabs-list {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.25rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.team-tab-trigger {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.375rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-tab-trigger[data-state="active"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Button enhancements */
+.team-button-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-button-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.team-button-secondary {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-button-secondary:hover {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  border-color: #94a3b8 !important;
+}
+
+/* Search and filter input enhancements */
+.team-search-input {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.team-search-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+.team-search-input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+}
+
+/* Avatar styling */
+.team-avatar {
+  border: 2px solid #e2e8f0 !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.team-avatar:hover {
+  border-color: #3b82f6 !important;
+}
+
+/* Status indicators */
+.team-status-online {
+  background-color: #10b981 !important;
+  width: 0.5rem !important;
+  height: 0.5rem !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+.team-status-offline {
+  background-color: #6b7280 !important;
+  width: 0.5rem !important;
+  height: 0.5rem !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/* Analytics cards styling */
+.team-analytics-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 1.5rem !important;
+  border-radius: 0.75rem !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.team-analytics-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Progress bar styling */
+.team-progress-bar {
+  background-color: #f1f5f9 !important;
+  height: 0.75rem !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+}
+
+.team-progress-indicator {
+  background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%) !important;
+  height: 100% !important;
+  border-radius: 9999px !important;
+  transition: width 0.3s ease !important;
+}
+
+/* Dialog and modal enhancements */
+.team-dialog {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 0.75rem !important;
+}
+
+.team-dialog-header {
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.team-dialog-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  font-size: 1.125rem !important;
+}
+
+.team-dialog-description {
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+/* Dropdown menu styling */
+.team-dropdown {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.25rem !important;
+}
+
+.team-dropdown-item {
+  color: #374151 !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.375rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.team-dropdown-item:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+.team-dropdown-item.destructive {
+  color: #dc2626 !important;
+}
+
+.team-dropdown-item.destructive:hover {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+}
+
+/* Badge styling enhancements */
+.team-badge {
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.375rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Activity indicator */
+.team-activity-indicator {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+.team-activity-dot {
+  width: 0.5rem !important;
+  height: 0.5rem !important;
+  border-radius: 50% !important;
+  background-color: #10b981 !important;
+  animation: team-pulse 2s infinite !important;
+}
+
+@keyframes team-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Form styling enhancements */
+.team-form-label {
+  color: #374151 !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+}
+
+.team-form-input {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #111827 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.375rem !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.team-form-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+/* Loading skeleton animation */
+.team-loading-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+  background-size: 200% 100% !important;
+  animation: team-loading 1.5s infinite !important;
+}
+
+@keyframes team-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Empty state styling */
+.team-empty-state {
+  text-align: center !important;
+  padding: 3rem 1.5rem !important;
+}
+
+.team-empty-state-icon {
+  color: #9ca3af !important;
+  margin-bottom: 1rem !important;
+}
+
+.team-empty-state-title {
+  color: #111827 !important;
+  font-weight: 600 !important;
+  font-size: 1.125rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.team-empty-state-description {
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+}
+
+/* Force light theme backgrounds for all components */
+.team-management-page * {
+  background-color: inherit !important;
+}
+
+.team-management-page .bg-white,
+.team-management-page [style*="backgroundColor: '#ffffff'"] {
+  background-color: #ffffff !important;
+}
+
+/* Ensure all cards have proper white backgrounds */
+.team-management-page .shadow-sm {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* End Team Management Styling */

@@ -421,13 +421,13 @@ function ProfessionalAICreator() {
   const selectedToolData = aiTools.find(tool => tool.id === selectedTool);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-gray-50 min-h-screen p-6">
       {/* Professional Tool Grid */}
-      <Card className="border-2 border-slate-200 shadow-sm">
-        <CardHeader className="pb-4">
+      <Card className="border-2 border-slate-200 shadow-sm bg-white">
+        <CardHeader className="pb-4 bg-white">
           <CardTitle className="text-xl text-slate-900">AI Generation Tools</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-white">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {aiTools.map((tool) => (
               <Button
@@ -448,8 +448,8 @@ function ProfessionalAICreator() {
       </Card>
 
       {/* Professional Generation Interface */}
-      <Card className="border-2 border-slate-200 shadow-sm">
-        <CardHeader className="pb-4">
+      <Card className="border-2 border-slate-200 shadow-sm bg-white">
+        <CardHeader className="pb-4 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className={`w-12 h-12 ${getIconBgClasses(selectedToolData?.color || 'slate')} rounded-xl flex items-center justify-center`}>
@@ -471,17 +471,17 @@ function ProfessionalAICreator() {
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 bg-white">
           {/* Professional Prompt Interface */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-lg font-semibold text-slate-900">Generation Prompt</Label>
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm" className="border-slate-300">
+                <Button variant="outline" size="sm" className="border-slate-300 bg-white">
                   <Wand2 className="h-4 w-4 mr-2" />
                   AI Enhance
                 </Button>
-                <Button variant="outline" size="sm" className="border-slate-300">
+                <Button variant="outline" size="sm" className="border-slate-300 bg-white">
                   <FolderOpen className="h-4 w-4 mr-2" />
                   Templates
                 </Button>
@@ -493,7 +493,7 @@ function ProfessionalAICreator() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
-              className="border-2 border-slate-200 focus:border-indigo-500 rounded-lg text-base resize-none"
+              className="border-2 border-slate-200 focus:border-indigo-500 rounded-lg text-base resize-none bg-white"
             />
           </div>
 
@@ -502,7 +502,7 @@ function ProfessionalAICreator() {
             <div className="space-y-3">
               <Label className="font-semibold text-slate-900">Output Quality</Label>
               <Select defaultValue="ultra">
-                <SelectTrigger className="border-2 border-slate-200">
+                <SelectTrigger className="border-2 border-slate-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -516,7 +516,7 @@ function ProfessionalAICreator() {
             <div className="space-y-3">
               <Label className="font-semibold text-slate-900">Style Preset</Label>
               <Select defaultValue="professional">
-                <SelectTrigger className="border-2 border-slate-200">
+                <SelectTrigger className="border-2 border-slate-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -532,7 +532,7 @@ function ProfessionalAICreator() {
             <div className="space-y-3">
               <Label className="font-semibold text-slate-900">Format</Label>
               <Select defaultValue="1920x1080">
-                <SelectTrigger className="border-2 border-slate-200">
+                <SelectTrigger className="border-2 border-slate-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -547,7 +547,7 @@ function ProfessionalAICreator() {
             <div className="space-y-3">
               <Label className="font-semibold text-slate-900">Priority</Label>
               <Select defaultValue="normal">
-                <SelectTrigger className="border-2 border-slate-200">
+                <SelectTrigger className="border-2 border-slate-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

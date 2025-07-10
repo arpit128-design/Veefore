@@ -50,6 +50,23 @@ interface SocialAccount {
 const ProfessionalDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState('overview');
 
+  // Dynamic greeting based on time of day
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    
+    if (hour >= 5 && hour < 12) {
+      return { greeting: "Good morning", emoji: "☀️" };
+    } else if (hour >= 12 && hour < 17) {
+      return { greeting: "Good afternoon", emoji: "🌤️" };
+    } else if (hour >= 17 && hour < 21) {
+      return { greeting: "Good evening", emoji: "🌅" };
+    } else {
+      return { greeting: "Ready to create magic", emoji: "✨" };
+    }
+  };
+
+  const { greeting, emoji } = getTimeBasedGreeting();
+
   // Fetch dashboard data
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery<DashboardData>({
     queryKey: ['/api/dashboard/analytics'],
@@ -153,7 +170,7 @@ const ProfessionalDashboard: React.FC = () => {
       <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm border">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Good morning, Arpit! ☀️
+            {greeting}, Arpit! {emoji}
           </h1>
           <p className="text-gray-500 mt-2 flex items-center gap-2">
             <Calendar className="w-4 h-4" />

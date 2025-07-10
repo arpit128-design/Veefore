@@ -2,15 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+/* Professional Hootsuite-inspired Design System */
+:root {
+  /* Light theme colors - Professional Hootsuite palette */
+  --background: 248 250 252; /* slate-50 */
+  --foreground: 15 23 42; /* slate-900 */
+  --card: 255 255 255; /* white */
+  --card-foreground: 15 23 42; /* slate-900 */
+  --popover: 255 255 255; /* white */
+  --popover-foreground: 15 23 42; /* slate-900 */
+  --primary: 15 118 110; /* teal-700 - Hootsuite primary */
+  --primary-foreground: 255 255 255; /* white */
+  --secondary: 241 245 249; /* slate-100 */
+  --secondary-foreground: 30 41 59; /* slate-800 */
+  --muted: 241 245 249; /* slate-100 */
+  --muted-foreground: 100 116 139; /* slate-500 */
+  --accent: 241 245 249; /* slate-100 */
+  --accent-foreground: 30 41 59; /* slate-800 */
+  --destructive: 239 68 68; /* red-500 */
+  --destructive-foreground: 255 255 255; /* white */
+  --border: 226 232 240; /* slate-200 */
+  --input: 226 232 240; /* slate-200 */
+  --ring: 15 118 110; /* teal-700 */
+  --chart-1: 15 118 110; /* teal-700 */
+  --chart-2: 45 212 191; /* teal-400 */
+  --chart-3: 20 184 166; /* teal-500 */
+  --chart-4: 13 148 136; /* teal-600 */
+  --chart-5: 17 94 89; /* teal-800 */
+  
+  /* Professional grays for text hierarchy */
+  --text-primary: 15 23 42; /* slate-900 */
+  --text-secondary: 51 65 85; /* slate-700 */
+  --text-tertiary: 100 116 139; /* slate-500 */
+  --text-quaternary: 148 163 184; /* slate-400 */
+  
+  /* Professional brand accents */
+  --brand-orange: 245 158 11; /* amber-500 */
+  --brand-blue: 59 130 246; /* blue-500 */
+  --brand-green: 34 197 94; /* green-500 */
+  --brand-purple: 147 51 234; /* purple-600 */
+  
+  /* Professional shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-@keyframes fadeInUp {
+.dark {
+  /* Dark theme colors - Professional dark palette */
+  --background: 2 8 23; /* slate-950 */
+  --foreground: 248 250 252; /* slate-50 */
+  --card: 15 23 42; /* slate-900 */
+  --card-foreground: 248 250 252; /* slate-50 */
+  --popover: 15 23 42; /* slate-900 */
+  --popover-foreground: 248 250 252; /* slate-50 */
+  --primary: 45 212 191; /* teal-400 - Brighter for dark mode */
+  --primary-foreground: 2 8 23; /* slate-950 */
+  --secondary: 30 41 59; /* slate-800 */
+  --secondary-foreground: 248 250 252; /* slate-50 */
+  --muted: 30 41 59; /* slate-800 */
+  --muted-foreground: 148 163 184; /* slate-400 */
+  --accent: 30 41 59; /* slate-800 */
+  --accent-foreground: 248 250 252; /* slate-50 */
+  --destructive: 239 68 68; /* red-500 */
+  --destructive-foreground: 248 250 252; /* slate-50 */
+  --border: 30 41 59; /* slate-800 */
+  --input: 30 41 59; /* slate-800 */
+  --ring: 45 212 191; /* teal-400 */
+  --chart-1: 45 212 191; /* teal-400 */
+  --chart-2: 20 184 166; /* teal-500 */
+  --chart-3: 15 118 110; /* teal-700 */
+  --chart-4: 13 148 136; /* teal-600 */
+  --chart-5: 17 94 89; /* teal-800 */
+  
+  /* Dark mode text hierarchy */
+  --text-primary: 248 250 252; /* slate-50 */
+  --text-secondary: 203 213 225; /* slate-300 */
+  --text-tertiary: 148 163 184; /* slate-400 */
+  --text-quaternary: 100 116 139; /* slate-500 */
+  
+  /* Dark mode shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.25);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.25), 0 1px 2px -1px rgb(0 0 0 / 0.25);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.25), 0 4px 6px -4px rgb(0 0 0 / 0.25);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.25), 0 8px 10px -6px rgb(0 0 0 / 0.25);
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Professional animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -18,70 +122,21 @@
   }
 }
 
-/* Optimized animations for space loader */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes spin-reverse {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-
-@keyframes pulse-slow {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.05);
-    opacity: 1;
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% { 
-    transform: scale(1.2);
-    opacity: 0.6;
-  }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes slideInFromLeft {
+@keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
-@keyframes slideInFromRight {
+@keyframes scaleIn {
   from {
     opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -89,93 +144,288 @@
   }
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Custom scrollbar styling */
+/* Professional scrollbar styling */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: #1e293b;
-  border-radius: 3px;
+  background: hsl(var(--muted));
+  border-radius: 4px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 3px;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+  border: 1px solid hsl(var(--muted));
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+.scrollbar-thin::-webkit-scrollbar-corner {
+  background: hsl(var(--muted));
 }
 
 /* Firefox scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #475569 #1e293b;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
 }
 
-/* Space theme text effect */
-.space-theme-text {
-  background: linear-gradient(45deg, #60a5fa, #a855f7, #f59e0b, #60a5fa);
-  background-size: 400% 400%;
-  animation: gradientShift 4s ease infinite;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Professional component styles with dark mode support */
+.professional-card {
+  @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm dark:bg-card dark:text-card-foreground dark:border-border;
 }
 
-/* 3D Perspective and Transform Utilities */
-.perspective-1000 {
-  perspective: 1000px;
+.professional-button-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors dark:bg-primary dark:text-primary-foreground;
 }
 
-.perspective-2000 {
-  perspective: 2000px;
+.professional-button-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors border border-border dark:bg-secondary dark:text-secondary-foreground dark:border-border;
 }
 
-.transform-style-3d {
-  transform-style: preserve-3d;
+.professional-input {
+  @apply bg-background border border-input rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-colors dark:bg-background dark:border-input dark:text-foreground;
 }
 
-.backface-hidden {
-  backface-visibility: hidden;
+.professional-text-primary {
+  @apply text-foreground dark:text-foreground;
 }
 
-:root {
-  --background: 11 20% 8%; /* #0B1426 */
-  --foreground: 0 0% 98%;
-  --muted: 217 19% 15%; /* #1A2332 */
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 11 20% 8%;
-  --popover-foreground: 0 0% 98%;
-  --card: 11 20% 8%;
-  --card-foreground: 0 0% 98%;
-  --border: 217 19% 15%;
-  --input: 217 19% 15%;
-  --primary: 195 100% 50%; /* #00D4FF */
-  --primary-foreground: 217 100% 99%;
-  --secondary: 217 19% 15%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 217 19% 15%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 195 100% 50%;
-  --radius: 0.5rem;
+.professional-text-secondary {
+  @apply text-muted-foreground dark:text-muted-foreground;
+}
+
+.professional-sidebar {
+  @apply bg-card border-r border-border dark:bg-card dark:border-border;
+}
+
+.professional-header {
+  @apply bg-card border-b border-border dark:bg-card dark:border-border;
+}
+
+/* Dark mode toggle button styling */
+.dark-mode-toggle {
+  @apply hover:bg-muted dark:hover:bg-muted;
+}
+
+/* Professional navigation */
+.nav-link {
+  @apply flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground;
+}
+
+.nav-link.active {
+  @apply bg-primary text-primary-foreground;
+}
+
+/* Professional typography */
+.text-heading-1 {
+  @apply text-3xl font-bold tracking-tight text-foreground;
+}
+
+.text-heading-2 {
+  @apply text-2xl font-semibold tracking-tight text-foreground;
+}
+
+.text-heading-3 {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.text-heading-4 {
+  @apply text-lg font-medium text-foreground;
+}
+
+.text-body-large {
+  @apply text-base text-foreground;
+}
+
+.text-body {
+  @apply text-sm text-foreground;
+}
+
+.text-body-small {
+  @apply text-xs text-muted-foreground;
+}
+
+.text-caption {
+  @apply text-xs text-muted-foreground uppercase tracking-wide font-medium;
+}
+
+/* Professional spacing system */
+.space-y-professional > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-tight > * + * {
+  margin-top: 0.75rem;
+}
+
+/* Professional shadows */
+.shadow-professional {
+  box-shadow: var(--shadow);
+}
+
+.shadow-professional-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-professional-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Status indicators */
+.status-online {
+  @apply bg-green-500;
+}
+
+.status-offline {
+  @apply bg-gray-400;
+}
+
+.status-busy {
+  @apply bg-red-500;
+}
+
+.status-away {
+  @apply bg-yellow-500;
+}
+
+/* Professional badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-primary/10 text-primary;
+}
+
+.badge-secondary {
+  @apply bg-secondary text-secondary-foreground;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
+}
+
+/* Professional form controls */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply text-sm font-medium text-foreground;
+}
+
+.form-input {
+  @apply professional-input w-full;
+}
+
+.form-textarea {
+  @apply professional-input w-full min-h-[80px] resize-y;
+}
+
+.form-select {
+  @apply professional-input w-full appearance-none bg-no-repeat bg-right bg-[length:16px_16px] pr-8;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Professional tables */
+.table-professional {
+  @apply w-full border-collapse;
+}
+
+.table-professional th {
+  @apply px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50;
+}
+
+.table-professional td {
+  @apply px-4 py-3 text-sm text-foreground border-b border-border;
+}
+
+.table-professional tr:hover {
+  @apply bg-muted/50;
+}
+
+/* Professional loading states */
+.skeleton {
+  @apply animate-pulse bg-muted rounded;
+}
+
+.spinner {
+  @apply animate-spin h-4 w-4 border-2 border-muted border-t-primary rounded-full;
+}
+
+/* Professional focus states */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* Professional transitions */
+.transition-professional {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Dark mode utilities */
+.dark-mode-toggle {
+  @apply p-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors;
+}
+
+/* Professional layout utilities */
+.container-professional {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.grid-professional {
+  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.flex-professional {
+  @apply flex items-center justify-between;
+}
+
+/* Professional responsive utilities */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    @apply hidden;
+  }
   
-  /* Space theme colors */
-  --space-navy: 11 20% 8%; /* #0B1426 */
-  --space-black: 0 0% 5%; /* #0D0D0D */
-  --deep-purple: 256 71% 25%; /* #2D1B69 */
-  --cosmic-blue: 217 50% 30%; /* #3B5998 */
-  --electric-cyan: 195 100% 50%; /* #00D4FF */
-  --neon-pink: 320 100% 60%; /* #FF33CC */
+  .mobile-full {
+    @apply w-full;
+  }
+}
+
+/* Remove space theme elements for professional look */
+.space-theme-text {
+  @apply text-foreground;
+}
+
+/* Professional animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
 }
 
 /* Fix date and time input styling */

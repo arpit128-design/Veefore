@@ -359,50 +359,43 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Enhanced Professional Header */}
+        {/* Compact Professional Header */}
         <motion.div 
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative mb-16"
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="relative mb-8"
         >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 rounded-3xl opacity-50" />
-          <div className="relative bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-12 shadow-2xl">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-3 mb-6">
+          <div className="relative bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-xl p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-xl">
-                    <CreditCard className="w-7 h-7 text-white" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md">
+                    <CreditCard className="w-5 h-5 text-white" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 text-white" />
+                  <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-2 h-2 text-white" />
                   </div>
                 </div>
-                <div className="text-left">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                <div>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                     Billing & Subscription
                   </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className="bg-green-100 text-green-800 border-green-200 text-xs px-2 py-1">
-                      Active Account
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Badge className="bg-green-100 text-green-800 border-green-200 text-xs px-1.5 py-0.5">
+                      Active
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-2 py-1">
-                      Enterprise Ready
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-1.5 py-0.5">
+                      Enterprise
                     </Badge>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-700 text-base max-w-4xl mx-auto leading-relaxed">
-                Advanced subscription management with real-time usage analytics, flexible billing options, and enterprise-grade security
-              </p>
               
               {/* Uptime SLA */}
-              <div className="flex justify-center mt-10">
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 text-center">
-                  <div className="text-3xl font-bold text-gray-900">97.3%</div>
-                  <div className="text-gray-600 text-sm font-medium">Uptime SLA</div>
-                </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-gray-200/50 text-center">
+                <div className="text-lg font-bold text-gray-900">97.3%</div>
+                <div className="text-gray-600 text-xs">Uptime SLA</div>
               </div>
             </div>
           </div>

@@ -28,7 +28,11 @@ import {
   Clock,
   Settings,
   FileText,
-  TrendingDown
+  TrendingDown,
+  Trophy,
+  Trending,
+  BarChart,
+  LineChart
 } from 'lucide-react';
 
 interface AnalyticsProps {
@@ -44,43 +48,72 @@ const Analytics: React.FC<AnalyticsProps> = ({
   const [selectedAccount, setSelectedAccount] = useState('veefore');
 
   const renderOverview = () => (
-    <div className="space-y-6">
-      {/* Modern Control Bar */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 border border-gray-200">
-        <div className="flex items-center space-x-4">
-          <Select value={selectedView} onValueChange={setSelectedView}>
-            <SelectTrigger className="w-48 bg-white border-gray-300">
-              <Calendar className="h-4 w-4 mr-2 text-cyan-600" />
-              <SelectValue placeholder="Select time range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="weekly">Last 7 days</SelectItem>
-              <SelectItem value="monthly">Last 30 days</SelectItem>
-              <SelectItem value="quarterly">Last 90 days</SelectItem>
-              <SelectItem value="yearly">Last 12 months</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-            <SelectTrigger className="w-48 bg-white border-gray-300">
-              <div className="flex items-center">
-                <div className="w-6 h-6 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full mr-2 flex items-center justify-center text-white text-xs font-bold">
-                  V
-                </div>
-                <SelectValue placeholder="Select account" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="veefore">VeeFore</SelectItem>
-              <SelectItem value="personal">Personal Account</SelectItem>
-              <SelectItem value="business">Business Account</SelectItem>
-            </SelectContent>
-          </Select>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header Section with Gradient */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Analytics Overview</h1>
+            <p className="text-blue-100 mt-1">Real-time insights and performance metrics</p>
+          </div>
+          <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+            <span className="text-sm font-medium">Live Data</span>
+            <div className="w-2 h-2 bg-green-400 rounded-full ml-2 inline-block animate-pulse"></div>
+          </div>
         </div>
+      </div>
 
-        <span className="text-sm font-medium text-gray-600 bg-white px-3 py-2 rounded-lg border">
-          Real-time data • Updated 2 min ago
-        </span>
+      {/* Social Performance Score */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Social Performance Score</h3>
+          <div className="flex items-center mb-4">
+            <div className="text-3xl font-bold text-emerald-600">87</div>
+            <div className="ml-3">
+              <div className="text-sm text-gray-500">out of 100</div>
+              <div className="text-sm text-emerald-600">+12 from last week</div>
+            </div>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="bg-gradient-to-r from-emerald-500 to-blue-500 h-3 rounded-full" style={{ width: '87%' }}></div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">94%</div>
+              <div className="text-sm text-gray-500">Engagement</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">82%</div>
+              <div className="text-sm text-gray-500">Reach</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">91%</div>
+              <div className="text-sm text-gray-500">Growth</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Insights</h3>
+          <div className="space-y-4">
+            <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+              <div className="text-sm font-medium text-emerald-800">Top Performing Post</div>
+              <div className="text-xs text-emerald-600">Video content +248% engagement</div>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="text-sm font-medium text-blue-800">Best Posting Time</div>
+              <div className="text-xs text-blue-600">Tuesdays at 2:00 PM</div>
+            </div>
+            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <div className="text-sm font-medium text-purple-800">Trending Hashtag</div>
+              <div className="text-xs text-purple-600">#ContentCreator +156% reach</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Modern Performance Score */}
@@ -292,7 +325,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 
   const renderSocialInsights = () => (
@@ -375,42 +408,384 @@ const Analytics: React.FC<AnalyticsProps> = ({
   );
 
   const renderReports = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">All Reports</h1>
+        <p className="text-emerald-100 mt-1">Comprehensive analytics reports and custom insights</p>
+      </div>
+
+      {/* Quick Report Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <BarChart3 className="h-6 w-6 text-blue-600" />
+              </div>
+              <Button size="sm" variant="outline">Generate</Button>
+            </div>
+            <h3 className="font-semibold text-gray-900">Weekly Performance</h3>
+            <p className="text-sm text-gray-600 mt-2">Complete overview of last 7 days activity</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-purple-600" />
+              </div>
+              <Button size="sm" variant="outline">Generate</Button>
+            </div>
+            <h3 className="font-semibold text-gray-900">Growth Analysis</h3>
+            <p className="text-sm text-gray-600 mt-2">Detailed follower and engagement growth</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-emerald-100 rounded-lg">
+                <PieChart className="h-6 w-6 text-emerald-600" />
+              </div>
+              <Button size="sm" variant="outline">Generate</Button>
+            </div>
+            <h3 className="font-semibold text-gray-900">Content Breakdown</h3>
+            <p className="text-sm text-gray-600 mt-2">Post types and performance analysis</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Reports */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Custom Reports</CardTitle>
+          <CardTitle className="flex items-center">
+            <FileText className="h-5 w-5 text-gray-600 mr-2" />
+            Recent Reports
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Advanced reporting features coming soon. Create custom analytics reports tailored to your needs.</p>
+          <div className="space-y-4">
+            {[
+              { name: "January 2025 Performance Report", date: "Jan 31, 2025", size: "2.4 MB", type: "Monthly" },
+              { name: "Holiday Campaign Analysis", date: "Jan 15, 2025", size: "1.8 MB", type: "Campaign" },
+              { name: "Q4 2024 Growth Summary", date: "Dec 31, 2024", size: "3.1 MB", type: "Quarterly" }
+            ].map((report, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">{report.name}</h4>
+                    <p className="text-sm text-gray-500">{report.date} • {report.size} • {report.type}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="ghost">View</Button>
+                  <Button size="sm" variant="ghost">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 
   const renderPostPerformance = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Post Performance Analysis</h1>
+        <p className="text-purple-100 mt-1">Detailed post performance metrics and optimization suggestions</p>
+      </div>
+
+      {/* Top Performing Posts */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Post Performance Analysis</CardTitle>
+          <CardTitle className="flex items-center">
+            <Trophy className="h-5 w-5 text-purple-600 mr-2" />
+            Top Performing Posts (Last 30 Days)
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Detailed post performance metrics and optimization suggestions.</p>
+          <div className="space-y-4">
+            {[
+              { 
+                content: "Tips for creating engaging social media content",
+                platform: "Instagram",
+                engagement: "12.4%",
+                reach: "2.1K",
+                likes: 156,
+                comments: 23,
+                date: "2 days ago"
+              },
+              {
+                content: "Behind the scenes of our content creation process",
+                platform: "YouTube",
+                engagement: "8.7%",
+                reach: "1.8K",
+                likes: 89,
+                comments: 45,
+                date: "5 days ago"
+              },
+              {
+                content: "Quick tutorial: Setting up automated posting",
+                platform: "Twitter",
+                engagement: "6.2%",
+                reach: "950",
+                likes: 67,
+                comments: 12,
+                date: "1 week ago"
+              }
+            ].map((post, index) => (
+              <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900 mb-2">{post.content}</h4>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span className="flex items-center">
+                        <div className={`w-3 h-3 rounded mr-2 ${
+                          post.platform === 'Instagram' ? 'bg-gradient-to-r from-pink-500 to-purple-600' :
+                          post.platform === 'YouTube' ? 'bg-red-600' : 'bg-sky-500'
+                        }`}></div>
+                        {post.platform}
+                      </span>
+                      <span>{post.date}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-right">
+                    <div>
+                      <div className="text-sm font-medium text-purple-600">{post.engagement}</div>
+                      <div className="text-xs text-gray-500">Engagement</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-emerald-600">{post.reach}</div>
+                      <div className="text-xs text-gray-500">Reach</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+
+      {/* Performance Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <Heart className="h-5 w-5 text-pink-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">8.7%</div>
+            <div className="text-sm text-gray-500">Avg. Engagement Rate</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <Eye className="h-5 w-5 text-blue-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">2.4K</div>
+            <div className="text-sm text-gray-500">Avg. Reach</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <MessageCircle className="h-5 w-5 text-emerald-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">27</div>
+            <div className="text-sm text-gray-500">Avg. Comments</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <Share2 className="h-5 w-5 text-purple-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">156</div>
+            <div className="text-sm text-gray-500">Total Shares</div>
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
   );
 
   const renderBestTimes = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Best Times to Post</h1>
+        <p className="text-cyan-100 mt-1">AI-powered optimal posting time recommendations based on your audience behavior</p>
+      </div>
+
+      {/* Optimal Times Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg">
+              <Clock className="h-5 w-5 text-cyan-600 mr-2" />
+              Monday - Friday
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-cyan-50 rounded-lg">
+                <span className="font-medium">9:00 AM</span>
+                <Badge className="bg-cyan-600 text-white">Peak</Badge>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                <span className="font-medium">12:30 PM</span>
+                <Badge variant="secondary">Good</Badge>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                <span className="font-medium">7:00 PM</span>
+                <Badge className="bg-purple-600 text-white">Peak</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg">
+              <Calendar className="h-5 w-5 text-emerald-600 mr-2" />
+              Weekends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
+                <span className="font-medium">10:00 AM</span>
+                <Badge className="bg-emerald-600 text-white">Peak</Badge>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                <span className="font-medium">2:00 PM</span>
+                <Badge variant="secondary">Good</Badge>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-pink-50 rounded-lg">
+                <span className="font-medium">8:30 PM</span>
+                <Badge className="bg-pink-600 text-white">Peak</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg">
+              <Target className="h-5 w-5 text-purple-600 mr-2" />
+              Platform Specific
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-3 border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-sm">Instagram</span>
+                  <span className="text-xs text-gray-500">11 AM - 1 PM</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+              </div>
+              <div className="p-3 border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-sm">YouTube</span>
+                  <span className="text-xs text-gray-500">2 PM - 4 PM</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-red-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+                </div>
+              </div>
+              <div className="p-3 border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-sm">Twitter</span>
+                  <span className="text-xs text-gray-500">9 AM - 10 AM</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-sky-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Weekly Heatmap */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Best Times to Post</CardTitle>
+          <CardTitle>Weekly Engagement Heatmap</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">AI-powered optimal posting time recommendations based on your audience behavior.</p>
+          <div className="grid grid-cols-7 gap-2">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, dayIndex) => (
+              <div key={day} className="text-center">
+                <div className="text-sm font-medium text-gray-700 mb-2">{day}</div>
+                <div className="space-y-1">
+                  {Array.from({ length: 24 }, (_, hour) => {
+                    const intensity = Math.random();
+                    return (
+                      <div
+                        key={hour}
+                        className={`h-3 rounded ${
+                          intensity > 0.7 ? 'bg-emerald-500' :
+                          intensity > 0.4 ? 'bg-emerald-300' :
+                          intensity > 0.2 ? 'bg-emerald-100' : 'bg-gray-100'
+                        }`}
+                        title={`${hour}:00 - ${intensity > 0.7 ? 'High' : intensity > 0.4 ? 'Medium' : 'Low'} engagement`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-center mt-4 space-x-4 text-sm text-gray-500">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-gray-100 rounded mr-2"></div>
+              <span>Low</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-emerald-300 rounded mr-2"></div>
+              <span>Medium</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-emerald-500 rounded mr-2"></div>
+              <span>High</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 
   const renderIndustry = () => (

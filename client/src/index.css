@@ -163,13 +163,29 @@ body {
   background-color: #0f172a !important;
 }
 
-/* Eliminate ALL yellow/amber backgrounds */
+/* COMPLETE YELLOW/AMBER ELIMINATION - GLOBAL OVERRIDE */
 .bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400,
 .bg-yellow-500, .bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300,
 .bg-amber-400, .bg-amber-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800,
-.bg-yellow-900, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900 {
+.bg-yellow-900, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
+div[class*="bg-yellow"], div[class*="bg-amber"], span[class*="bg-yellow"],
+span[class*="bg-amber"], section[class*="bg-yellow"], section[class*="bg-amber"],
+header[class*="bg-yellow"], header[class*="bg-amber"], nav[class*="bg-yellow"],
+nav[class*="bg-amber"] {
   background-color: rgb(255 255 255) !important;
+  background: rgb(255 255 255) !important;
   color: rgb(30 41 59) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+/* Force emerald green instead of yellow for any accent colors */
+.text-yellow-600, .text-yellow-700, .text-yellow-800, .text-yellow-900,
+.text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900 {
+  color: rgb(5 150 105) !important; /* emerald-600 */
+}
+
+.border-yellow-200, .border-yellow-300, .border-amber-200, .border-amber-300 {
+  border-color: rgb(209 213 219) !important; /* gray-300 */
 }
 
 /* Force white backgrounds for all dashboard components */

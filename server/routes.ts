@@ -267,36 +267,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
       }
       
-      // EARLY ACCESS VALIDATION - Check if user has early access before allowing any authenticated requests
-      try {
-        const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
-        if (!waitlistUser) {
-          console.log(`[EARLY ACCESS] User ${user.email} not found on waitlist, blocking access`);
-          return res.status(403).json({ 
-            error: 'Early access required. Please join our waitlist first.',
-            requiresWaitlist: true,
-            isEarlyAccessMode: true
-          });
-        }
-
-        if (waitlistUser.status !== 'early_access') {
-          console.log(`[EARLY ACCESS] User ${user.email} has status: ${waitlistUser.status}, blocking access`);
-          return res.status(403).json({ 
-            error: 'Early access not yet granted. You are currently on the waitlist.',
-            waitlistStatus: waitlistUser.status,
-            requiresApproval: true,
-            isEarlyAccessMode: true
-          });
-        }
-
-        console.log(`[EARLY ACCESS] User ${user.email} has early access, allowing request`);
-      } catch (earlyAccessError) {
-        console.error('[EARLY ACCESS] Error checking early access status:', earlyAccessError);
-        return res.status(500).json({ 
-          error: 'Failed to verify early access status',
-          isEarlyAccessMode: true
-        });
-      }
+      // Early access system removed - all authenticated users now have access
+      console.log(`[AUTH] User ${user.email} authenticated successfully, allowing request`);
       
       console.log(`[AUTH] Setting req.user - ID: ${user.id}, isOnboarded: ${user.isOnboarded}`);
       req.user = user;

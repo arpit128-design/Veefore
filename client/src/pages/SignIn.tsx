@@ -10,8 +10,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
-import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
+// Early access system removed - components no longer needed
 import { motion } from 'framer-motion';
 import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
 
@@ -26,22 +25,14 @@ export default function SignIn() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showAccessRestrictedModal, setShowAccessRestrictedModal] = useState(false);
-  const [accessRestrictedMessage, setAccessRestrictedMessage] = useState('');
   const { toast } = useToast();
-  const deviceStatus = useDeviceWaitlistStatus();
 
   const form = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '' }
   });
 
-  // Pre-fill email for early access users
-  useEffect(() => {
-    if (deviceStatus.userEmail) {
-      form.setValue('email', deviceStatus.userEmail);
-    }
-  }, [deviceStatus.userEmail, form]);
+  // Early access system removed - no pre-filling needed
 
   const handleEmailSignIn = async (data: SignInForm) => {
     setIsLoading(true);
@@ -107,11 +98,14 @@ export default function SignIn() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Access denied' }));
+        const errorData = await response.json().catch(() => ({ message: 'Authentication failed' }));
         await auth.signOut();
         
-        setAccessRestrictedMessage("Access restricted. Please sign in with your approved email address.");
-        setShowAccessRestrictedModal(true);
+        toast({
+          title: "Authentication failed",
+          description: errorData.message || "Please try again.",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -310,12 +304,7 @@ export default function SignIn() {
         </div>
       </div>
 
-      {/* Access Restricted Modal */}
-      <AccessRestrictedModal
-        isOpen={showAccessRestrictedModal}
-        onClose={() => setShowAccessRestrictedModal(false)}
-        message={accessRestrictedMessage}
-      />
+      {/* Early access system removed - modal no longer needed */}
       </div>
     </motion.div>
   );

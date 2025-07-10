@@ -11,8 +11,7 @@ import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
-import { AccessRestrictedModal } from '@/components/AccessRestrictedModal';
+// Early access system removed - components no longer needed
 import { motion } from 'framer-motion';
 import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
 
@@ -43,10 +42,7 @@ export default function SignUp() {
   const [signupData, setSignupData] = useState<SignUpForm | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
   const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
-  const [showAccessRestrictedModal, setShowAccessRestrictedModal] = useState(false);
-  const [accessRestrictedMessage, setAccessRestrictedMessage] = useState('');
   const { toast } = useToast();
-  const deviceStatus = useDeviceWaitlistStatus();
 
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
@@ -55,12 +51,7 @@ export default function SignUp() {
 
   const watchedPassword = form.watch('password');
 
-  // Pre-fill email for early access users
-  useEffect(() => {
-    if (deviceStatus.userEmail) {
-      form.setValue('email', deviceStatus.userEmail);
-    }
-  }, [deviceStatus.userEmail, form]);
+  // Early access system removed - no pre-filling needed
 
   // Password validation indicators
   const passwordRequirements = [
@@ -93,14 +84,6 @@ export default function SignUp() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (result.requiresWaitlist) {
-          toast({
-            title: "Join our waitlist",
-            description: "You need to join our waitlist first to create an account.",
-            variant: "destructive"
-          });
-          return;
-        }
         throw new Error(result.message || 'Failed to send verification email');
       }
 
@@ -195,11 +178,14 @@ export default function SignUp() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Access denied' }));
+        const errorData = await response.json().catch(() => ({ message: 'Authentication failed' }));
         await auth.signOut();
         
-        setAccessRestrictedMessage("Access restricted. Please sign up with your approved email address.");
-        setShowAccessRestrictedModal(true);
+        toast({
+          title: "Authentication failed",
+          description: errorData.message || "Please try again.",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -512,12 +498,7 @@ export default function SignUp() {
         </div>
       </div>
 
-      {/* Access Restricted Modal */}
-      <AccessRestrictedModal
-        isOpen={showAccessRestrictedModal}
-        onClose={() => setShowAccessRestrictedModal(false)}
-        message={accessRestrictedMessage}
-      />
+      {/* Early access system removed - modal no longer needed */}
       </div>
     </motion.div>
   );

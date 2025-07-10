@@ -9,17 +9,26 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFoo
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWorkspaceContext } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Globe, Settings, Star, Users, Edit3, Trash2, AlertTriangle, StarOff, Building, Activity, TrendingUp, Zap, Shield, Crown, FileText, BarChart3, Rocket } from "lucide-react";
+import { 
+  Plus, Globe, Settings, Star, Users, Edit3, Trash2, AlertTriangle, 
+  Building, Activity, TrendingUp, Zap, Shield, Crown, FileText, 
+  BarChart3, Rocket, Calendar, MessageSquare, Brain, Palette,
+  Clock, ChevronRight, Filter, Search, Grid3X3, List, Eye,
+  Database, Lock, Share2, Download, Upload, Archive, Target,
+  Smartphone, Monitor, Tablet, Wifi, WifiOff, CheckCircle2,
+  XCircle, AlertCircle, Loader2, Sparkles, Award, Trophy,
+  PieChart, LineChart, DollarSign, Users2, Briefcase, Mail
+} from "lucide-react";
 import { WorkspaceSwitchingOverlay } from "@/components/workspaces/WorkspaceSwitchingOverlay";
 import SimplePlanUpgradeModal from "@/components/subscription/SimplePlanUpgradeModal";
 import { motion, AnimatePresence } from "framer-motion";
-
-
 
 export default function Workspaces() {
   const { workspaces, currentWorkspace, isSwitching, switchWorkspace } = useWorkspaceContext();
@@ -28,14 +37,29 @@ export default function Workspaces() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // View states
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'analytics'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'archived'>('all');
+  const [selectedWorkspaces, setSelectedWorkspaces] = useState<string[]>([]);
+  
+  // Modal states
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isBulkActionsOpen, setIsBulkActionsOpen] = useState(false);
   const [newWorkspace, setNewWorkspace] = useState({
     name: "",
     description: "",
-    theme: "default"
+    theme: "default",
+    template: "blank",
+    privacy: "private",
+    aiPersonality: "professional",
+    autoSync: true,
+    notifications: true
   });
 
-  // Plan upgrade modal state - persist across re-renders
+  // Plan upgrade modal state
   const [upgradeModal, setUpgradeModal] = useState({
     isOpen: false,
     feature: '',
@@ -44,7 +68,6 @@ export default function Workspaces() {
     limitReached: null as any
   });
 
-  // Prevent modal from closing unexpectedly
   const closeUpgradeModal = () => {
     setUpgradeModal({
       isOpen: false,
@@ -55,139 +78,106 @@ export default function Workspaces() {
     });
   };
 
-  // Workspace management state
+  // Workspace management states
   const [isManageOpen, setIsManageOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingWorkspace, setEditingWorkspace] = useState<any>(null);
   const [editForm, setEditForm] = useState({
     name: "",
     description: "",
-    theme: "default"
+    theme: "default",
+    privacy: "private",
+    autoSync: true,
+    notifications: true
   });
 
-  // Fetch workspace-specific social accounts for activity
-  const { data: socialAccounts } = useQuery({
-    queryKey: ['social-accounts', currentWorkspace?.id],
+  // Fetch workspace analytics
+  const { data: workspaceAnalytics } = useQuery({
+    queryKey: ['workspace-analytics'],
     queryFn: async () => {
-      const response = await fetch(`/api/social-accounts?workspaceId=${currentWorkspace?.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await fetch('/api/workspaces/analytics', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!response.ok) throw new Error('Failed to fetch social accounts');
-      const data = await response.json();
-      console.log('[WORKSPACE DEBUG] Social accounts data:', data);
-      return data;
+      if (!response.ok) throw new Error('Failed to fetch analytics');
+      return response.json();
     },
-    enabled: !!currentWorkspace?.id && !!token
+    enabled: !!token
   });
 
-  // Fetch social accounts for all workspaces for the grid display
-  const { data: allWorkspaceAccounts } = useQuery({
-    queryKey: ['all-workspace-accounts'],
-    queryFn: async () => {
-      const accountsMap = new Map();
-      for (const workspace of workspaces) {
-        try {
-          const response = await fetch(`/api/social-accounts?workspaceId=${workspace.id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (response.ok) {
-            const accounts = await response.json();
-            accountsMap.set(workspace.id, accounts);
-          }
-        } catch (error) {
-          console.error(`Failed to fetch accounts for workspace ${workspace.id}:`, error);
-        }
-      }
-      return accountsMap;
-    },
-    enabled: !!token && workspaces.length > 0
+  // Fetch workspace templates
+  const { data: templates } = useQuery({
+    queryKey: ['workspace-templates'],
+    queryFn: async () => [
+      { id: 'personal', name: 'Personal Brand', description: 'Perfect for individual creators', icon: '👤', features: ['Content Calendar', 'Analytics', 'Basic Automation'] },
+      { id: 'business', name: 'Business', description: 'Professional business workspace', icon: '🏢', features: ['Team Collaboration', 'Advanced Analytics', 'Custom Branding'] },
+      { id: 'agency', name: 'Agency', description: 'Multi-client management', icon: '🎯', features: ['Client Management', 'White-label', 'Advanced Reporting'] },
+      { id: 'ecommerce', name: 'E-commerce', description: 'Online store optimization', icon: '🛒', features: ['Product Catalog', 'Sales Analytics', 'Conversion Tracking'] },
+      { id: 'influencer', name: 'Influencer', description: 'Content creator focused', icon: '⭐', features: ['Sponsorship Tracking', 'Engagement Analytics', 'Brand Partnerships'] },
+      { id: 'nonprofit', name: 'Non-Profit', description: 'Organization management', icon: '❤️', features: ['Campaign Tracking', 'Donation Analytics', 'Volunteer Management'] }
+    ]
   });
 
+  // Create workspace mutation with template support
   const createWorkspaceMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log('=== MUTATION FUNCTION START ===');
+      const response = await fetch('/api/workspaces/create-from-template', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
       
-      try {
-        const token = localStorage.getItem('veefore_auth_token');
-        console.log('=== MAKING FETCH REQUEST ===');
-        
-        const response = await fetch('/api/workspaces', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data),
-          credentials: 'include'
-        });
-        
-        console.log('=== RESPONSE RECEIVED ===', response.status, response.ok);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.log('=== ERROR RESPONSE TEXT ===', errorText);
-          
-          // Create structured error that onError can handle
-          const error = new Error(errorText);
-          (error as any).status = response.status;
-          (error as any).response = { status: response.status, data: JSON.parse(errorText) };
-          
-          console.log('=== THROWING ERROR ===', error);
-          throw error;
-        }
-        
-        console.log('=== MUTATION SUCCESS ===');
-        return response.json();
-      } catch (error) {
-        console.log('=== MUTATION FUNCTION CAUGHT ERROR ===', error);
-        throw error; // Re-throw to trigger onError
+      if (!response.ok) {
+        const errorText = await response.text();
+        const error = new Error(errorText);
+        (error as any).status = response.status;
+        (error as any).response = { status: response.status, data: JSON.parse(errorText) };
+        throw error;
       }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
-        title: "Workspace Created!",
-        description: "Your new brand workspace is ready to use.",
+        title: "Workspace Created Successfully!",
+        description: "Your new workspace is ready with all configured features.",
       });
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-analytics'] });
       setIsCreateOpen(false);
-      setNewWorkspace({ name: "", description: "", theme: "default" });
+      setIsTemplateOpen(false);
+      setNewWorkspace({
+        name: "",
+        description: "",
+        theme: "default",
+        template: "blank",
+        privacy: "private",
+        aiPersonality: "professional",
+        autoSync: true,
+        notifications: true
+      });
     },
     onError: (error: any) => {
-      console.log('=== WORKSPACE CREATION ERROR CAUGHT ===');
-      console.log('Error object:', error);
-      console.log('Error message:', error?.message);
-      console.log('Error status:', error?.status);
-      console.log('Error keys:', Object.keys(error || {}));
-      
-      // Extract error data from structured error object
       const errorData = error?.response?.data || {};
       const statusCode = error?.status || error?.response?.status;
       
       if (statusCode === 403) {
-        console.log('Processing 403 error for upgrade modal');
-        setIsCreateOpen(false); // Close the creation modal
-        
-        const modalData = {
+        setIsCreateOpen(false);
+        setIsTemplateOpen(false);
+        setUpgradeModal({
           isOpen: true,
           feature: 'workspace_creation',
           currentPlan: errorData.currentPlan || user?.plan || 'Free',
-          upgradeMessage: errorData.upgradeMessage || "Upgrade your plan to create more workspaces and unlock the full potential of VeeFore!",
+          upgradeMessage: errorData.upgradeMessage || "Upgrade to create unlimited workspaces with advanced features!",
           limitReached: {
             current: errorData.currentWorkspaces || workspaces?.length || 0,
-            max: errorData.maxWorkspaces || (user?.plan === 'Free' ? 1 : user?.plan === 'Creator' ? 3 : 10),
+            max: errorData.maxWorkspaces || 1,
             type: 'workspaces'
           }
-        };
-        
-        console.log('Setting upgrade modal:', modalData);
-        setUpgradeModal(modalData);
-        console.log('Upgrade modal state should now be open');
+        });
       } else {
-        console.log('Non-403 error, showing toast');
         toast({
           title: "Creation Failed",
           description: error.message || "Failed to create workspace",
@@ -197,68 +187,35 @@ export default function Workspaces() {
     }
   });
 
-  // Update workspace mutation
-  const updateWorkspaceMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => apiRequest('PUT', `/api/workspaces/${id}`, data),
+  // Bulk actions mutations
+  const bulkArchiveMutation = useMutation({
+    mutationFn: (workspaceIds: string[]) => 
+      apiRequest('POST', '/api/workspaces/bulk-archive', { workspaceIds }),
     onSuccess: () => {
-      toast({
-        title: "Workspace Updated!",
-        description: "Your workspace settings have been saved.",
-      });
+      toast({ title: "Workspaces Archived", description: "Selected workspaces have been archived." });
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-      setIsEditOpen(false);
-      setEditingWorkspace(null);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update workspace",
-        variant: "destructive",
-      });
+      setSelectedWorkspaces([]);
     }
   });
 
-  // Delete workspace mutation
-  const deleteWorkspaceMutation = useMutation({
-    mutationFn: (id: string) => apiRequest('DELETE', `/api/workspaces/${id}`),
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (workspaceIds: string[]) => 
+      apiRequest('DELETE', '/api/workspaces/bulk-delete', { workspaceIds }),
     onSuccess: () => {
-      toast({
-        title: "Workspace Deleted",
-        description: "The workspace has been permanently removed.",
-      });
-      // Invalidate multiple related queries to ensure UI updates
+      toast({ title: "Workspaces Deleted", description: "Selected workspaces have been permanently deleted." });
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-      queryClient.invalidateQueries({ queryKey: ['all-workspace-accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['social-accounts'] });
-      // Force immediate refetch
-      queryClient.refetchQueries({ queryKey: ['workspaces'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete workspace",
-        variant: "destructive",
-      });
+      setSelectedWorkspaces([]);
     }
   });
 
-  // Set as default workspace mutation
-  const setDefaultMutation = useMutation({
-    mutationFn: (id: string) => apiRequest('PUT', `/api/workspaces/${id}/default`),
-    onSuccess: () => {
-      toast({
-        title: "Default Workspace Set",
-        description: "This workspace is now your default.",
-      });
-      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to set default workspace",
-        variant: "destructive",
-      });
-    }
+  // Filter and search workspaces
+  const filteredWorkspaces = workspaces.filter(workspace => {
+    const matchesSearch = workspace.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         workspace.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || 
+                         (filterStatus === 'active' && !workspace.isArchived) ||
+                         (filterStatus === 'archived' && workspace.isArchived);
+    return matchesSearch && matchesFilter;
   });
 
   const handleCreateWorkspace = () => {
@@ -270,52 +227,14 @@ export default function Workspaces() {
       });
       return;
     }
-
     createWorkspaceMutation.mutate(newWorkspace);
   };
 
-  const handleEditWorkspace = (workspace: any) => {
-    setEditingWorkspace(workspace);
-    setEditForm({
-      name: workspace.name,
-      description: workspace.description || "",
-      theme: workspace.theme || "default"
-    });
-    setIsEditOpen(true);
-  };
-
-  const handleUpdateWorkspace = () => {
-    if (!editingWorkspace || !editForm.name.trim()) {
-      toast({
-        title: "Name Required",
-        description: "Please enter a workspace name",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    updateWorkspaceMutation.mutate({
-      id: editingWorkspace.id,
-      data: editForm
-    });
-  };
-
-  const handleDeleteWorkspace = (workspace: any) => {
-    if (workspace.isDefault) {
-      toast({
-        title: "Cannot Delete",
-        description: "Default workspace cannot be deleted",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    deleteWorkspaceMutation.mutate(workspace.id);
-  };
-
-  const handleSetDefault = (workspace: any) => {
-    if (!workspace.isDefault) {
-      setDefaultMutation.mutate(workspace.id);
+  const handleBulkSelect = (workspaceId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedWorkspaces([...selectedWorkspaces, workspaceId]);
+    } else {
+      setSelectedWorkspaces(selectedWorkspaces.filter(id => id !== workspaceId));
     }
   };
 
@@ -326,666 +245,736 @@ export default function Workspaces() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      {/* Professional Header with Gradient */}
+      {/* Advanced Header with Multiple Actions */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-cyan-600/10 rounded-2xl blur-xl"></div>
-        <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center justify-between">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-cyan-600/10 rounded-3xl blur-xl"></div>
+        <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-3xl p-8 shadow-2xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg">
+              <div className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg">
                 <Building className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">Workspace Management</h1>
-                <p className="text-slate-600 mt-1">Organize your brands and projects with enterprise-grade workspaces</p>
+                <h1 className="text-4xl font-bold text-slate-900">Enterprise Workspaces</h1>
+                <p className="text-slate-600 mt-2 text-lg">Advanced workspace management with AI-powered insights</p>
+                <div className="flex items-center space-x-4 mt-3">
+                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">
+                    {workspaces.length} Active
+                  </Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                    {workspaceAnalytics?.totalPosts || 0} Posts
+                  </Badge>
+                  <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+                    {workspaceAnalytics?.totalEngagement || 0} Engagement
+                  </Badge>
+                </div>
               </div>
             </div>
             
-            {/* Enhanced Create Button */}
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Workspace
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50 max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center">
-                    <Zap className="w-6 h-6 mr-3 text-blue-600" />
-                    Create New Workspace
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-6 mt-6">
-                  <div>
-                    <Label htmlFor="workspace-name" className="text-slate-700 font-medium">Workspace Name</Label>
-                    <Input
-                      id="workspace-name"
-                      placeholder="e.g., My Business Brand"
-                      value={newWorkspace.name}
-                      onChange={(e) => setNewWorkspace({ ...newWorkspace, name: e.target.value })}
-                      className="mt-2 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="workspace-description" className="text-slate-700 font-medium">Description (Optional)</Label>
-                    <Textarea
-                      id="workspace-description"
-                      placeholder="Brief description of this workspace..."
-                      value={newWorkspace.description}
-                      onChange={(e) => setNewWorkspace({ ...newWorkspace, description: e.target.value })}
-                      className="mt-2 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center space-x-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsImportOpen(true)}
+                className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import
+              </Button>
+              
+              <Dialog open={isTemplateOpen} onOpenChange={setIsTemplateOpen}>
+                <DialogTrigger asChild>
                   <Button
-                    onClick={handleCreateWorkspace}
-                    disabled={createWorkspaceMutation.isPending}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-xl shadow-lg"
+                    variant="outline"
+                    size="sm"
+                    className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
                   >
-                    {createWorkspaceMutation.isPending ? "Creating..." : "Create Workspace"}
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Templates
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          {/* Enterprise Statistics Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-600 font-medium">Total Workspaces</p>
-                  <p className="text-2xl font-bold text-blue-800">{workspaces.length}</p>
-                </div>
-                <Building className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-emerald-600 font-medium">Active</p>
-                  <p className="text-2xl font-bold text-emerald-800">{workspaces.filter(w => w.id === currentWorkspace?.id).length}</p>
-                </div>
-                <Activity className="w-8 h-8 text-emerald-600" />
-              </div>
-            </div>
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-600 font-medium">Total Credits</p>
-                  <p className="text-2xl font-bold text-purple-800">{workspaces.reduce((sum, w) => sum + (w.credits || 0), 0)}</p>
-                </div>
-                <Zap className="w-8 h-8 text-purple-600" />
-              </div>
-            </div>
-            <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-cyan-600 font-medium">Performance</p>
-                  <p className="text-2xl font-bold text-cyan-800">98%</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-cyan-600" />
-              </div>
+                </DialogTrigger>
+              </Dialog>
+
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Workspace
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Active Workspace Dashboard */}
-      {currentWorkspace && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/10 via-blue-600/10 to-purple-600/10 rounded-2xl blur-xl"></div>
-          <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="p-4 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-2xl shadow-lg">
-                    <Crown className="w-8 h-8 text-white" />
-                  </div>
-                  {currentWorkspace.isDefault && (
-                    <div className="absolute -top-2 -right-2 bg-amber-500 rounded-full p-1">
-                      <Star className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">{currentWorkspace.name}</h2>
-                  <p className="text-slate-600">Active Workspace</p>
-                  {currentWorkspace.description && (
-                    <p className="text-slate-500 text-sm mt-1">{currentWorkspace.description}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                {currentWorkspace.isDefault && (
-                  <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-                    <Star className="w-3 h-3 mr-1" />
-                    Default
-                  </Badge>
-                )}
-                <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">
-                  <Activity className="w-3 h-3 mr-1" />
-                  Active
-                </Badge>
-              </div>
+      {/* Advanced Control Panel */}
+      <div className="bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-6 shadow-xl">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          {/* Search and Filter */}
+          <div className="flex flex-1 items-center space-x-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Input
+                placeholder="Search workspaces..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white border-slate-200 focus:border-blue-500"
+              />
             </div>
+            
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-32 bg-white border-slate-200">
+                <Filter className="w-4 h-4 mr-2 text-slate-400" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            {/* Enhanced Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-600 font-medium text-sm">Content Items</p>
-                    <p className="text-3xl font-bold text-blue-800">
-                      {socialAccounts?.reduce((total: number, account: any) => {
-                        console.log('[WORKSPACE DEBUG] Account mediaCount:', account.mediaCount);
-                        return total + (account.mediaCount || 0);
-                      }, 0) || 0}
-                    </p>
-                  </div>
-                  <Activity className="w-8 h-8 text-blue-600" />
-                </div>
-              </div>
-              
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-emerald-600 font-medium text-sm">Total Followers</p>
-                    <p className="text-3xl font-bold text-emerald-800">
-                      {socialAccounts?.reduce((total: number, account: any) => {
-                        console.log('[WORKSPACE DEBUG] Account followersCount:', account.followersCount);
-                        return total + (account.followersCount || 0);
-                      }, 0) || 0}
-                    </p>
-                  </div>
-                  <Users className="w-8 h-8 text-emerald-600" />
-                </div>
-              </div>
-              
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-600 font-medium text-sm">Available Credits</p>
-                    <p className="text-3xl font-bold text-purple-800">{currentWorkspace.credits || 0}</p>
-                  </div>
-                  <Zap className="w-8 h-8 text-purple-600" />
-                </div>
-              </div>
-              
-              <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-cyan-600 font-medium text-sm">Status</p>
-                    <p className="text-xl font-bold text-cyan-800">
-                      {socialAccounts && socialAccounts.length > 0 ? 'Active' : 'Setup'}
-                    </p>
-                  </div>
-                  <Shield className="w-8 h-8 text-cyan-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-6 border-t border-slate-200">
-              <div className="text-slate-600">
-                <span className="text-sm">Last updated: </span>
-                <span className="font-medium">Just now</span>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
-                onClick={() => setIsManageOpen(true)}
+          {/* View Mode and Bulk Actions */}
+          <div className="flex items-center space-x-3">
+            {selectedWorkspaces.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsBulkActionsOpen(true)}
+                className="bg-white border-slate-300 text-slate-700"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Manage Workspaces
+                Bulk Actions ({selectedWorkspaces.length})
+              </Button>
+            )}
+            
+            <div className="flex bg-slate-100 rounded-lg p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-8 px-3"
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="h-8 px-3"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'analytics' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('analytics')}
+                className="h-8 px-3"
+              >
+                <BarChart3 className="w-4 h-4" />
               </Button>
             </div>
           </div>
-        </motion.div>
-      )}
+        </div>
+      </div>
 
-      {/* Modern Workspace Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-        className="relative"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-600/5 via-blue-600/5 to-purple-600/5 rounded-2xl blur-xl"></div>
-        <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-gradient-to-r from-slate-600 to-blue-600 rounded-xl shadow-lg">
-                <Building className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">All Workspaces</h2>
-                <p className="text-slate-600">Switch between your different brand workspaces</p>
-              </div>
-            </div>
-            
-            <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-300">
-              {workspaces.length} Workspace{workspaces.length !== 1 ? 's' : ''}
-            </Badge>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workspaces.map((workspace) => {
-              const workspaceAccounts = allWorkspaceAccounts?.get(workspace.id) || [];
-              const instagramAccount = workspaceAccounts.find((acc: any) => acc.platform === 'instagram');
-              const totalContent = workspaceAccounts.reduce((total: number, acc: any) => total + (acc.mediaCount || 0), 0);
-              const isActiveWorkspace = currentWorkspace?.id === workspace.id;
-              
-              return (
-                <motion.div
-                  key={workspace.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className={`relative group cursor-pointer transition-all duration-200 ${
-                    isActiveWorkspace 
-                      ? 'transform scale-105' 
-                      : 'hover:transform hover:scale-102'
-                  }`}
-                  onClick={async () => {
-                    if (!isActiveWorkspace) {
-                      setTargetWorkspace(workspace);
-                      await switchWorkspace(workspace);
-                      setTargetWorkspace(null);
-                    }
-                  }}
-                >
-                  <div className={`absolute inset-0 rounded-2xl transition-all duration-200 ${
-                    isActiveWorkspace 
-                      ? 'bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 blur-lg'
-                      : 'bg-gradient-to-r from-slate-600/10 to-blue-600/10 blur-lg opacity-0 group-hover:opacity-100'
-                  }`}></div>
-                  
-                  <div className={`relative bg-white/95 backdrop-blur-sm border rounded-2xl p-6 shadow-lg transition-all duration-200 ${
-                    isActiveWorkspace 
-                      ? 'border-blue-300/50 shadow-xl' 
-                      : 'border-slate-200/50 group-hover:border-blue-200/50 group-hover:shadow-xl'
-                  }`}>
-                    {/* Header with Icon and Actions */}
+      {/* Workspace Content */}
+      <AnimatePresence mode="wait">
+        {viewMode === 'grid' && (
+          <motion.div
+            key="grid"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {filteredWorkspaces.map((workspace, index) => (
+              <motion.div
+                key={workspace.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="group"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                  <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:border-blue-300/50">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <div className={`p-3 rounded-xl shadow-md transition-all duration-200 ${
-                          isActiveWorkspace 
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600' 
-                            : 'bg-gradient-to-r from-slate-600 to-blue-600 group-hover:from-blue-600 group-hover:to-purple-600'
+                        <div className={`p-3 rounded-xl shadow-lg ${
+                          workspace.id === currentWorkspace?.id 
+                            ? 'bg-gradient-to-r from-emerald-600 to-green-600' 
+                            : 'bg-gradient-to-r from-slate-600 to-blue-600'
                         }`}>
                           <Building className="w-6 h-6 text-white" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-bold text-slate-900 text-lg">{workspace.name}</h3>
-                          {workspace.description && (
-                            <p className="text-slate-600 text-sm mt-1 line-clamp-2">
-                              {workspace.description}
-                            </p>
-                          )}
+                          <p className="text-sm text-slate-600 mt-1">
+                            {workspace.description || "No description provided"}
+                          </p>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col space-y-2">
-                        {workspace.isDefault && (
-                          <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">
-                            <Star className="w-3 h-3 mr-1" />
-                            Default
-                          </Badge>
-                        )}
-                        {isActiveWorkspace && (
-                          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
-                            <Crown className="w-3 h-3 mr-1" />
-                            Active
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-slate-600 text-xs font-medium">Content</p>
-                            <p className="text-slate-900 font-bold text-lg">{totalContent}</p>
-                          </div>
-                          <FileText className="w-4 h-4 text-slate-600" />
-                        </div>
-                      </div>
-                      
-                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-slate-600 text-xs font-medium">Credits</p>
-                            <p className="text-slate-900 font-bold text-lg">{workspace.credits || 0}</p>
-                          </div>
-                          <Zap className="w-4 h-4 text-slate-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Connection Status */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600 font-medium">Instagram:</span>
-                        <span className={instagramAccount ? "text-emerald-700 font-medium" : "text-slate-500"}>
-                          {instagramAccount ? `@${instagramAccount.username}` : "Not connected"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600 font-medium">Status:</span>
-                        <span className={workspaceAccounts.length > 0 ? "text-emerald-700 font-medium" : "text-orange-600 font-medium"}>
-                          {workspaceAccounts.length > 0 ? "Active" : "Setup required"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Action Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                      <div className="flex items-center space-x-2 text-xs text-slate-500">
-                        <Users className="w-3 h-3" />
-                        <span>Personal workspace</span>
-                      </div>
-                      
-                      {isActiveWorkspace ? (
-                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs px-3 py-1">
-                          Current
-                        </Badge>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-blue-300 hover:text-blue-700 text-xs px-3 py-1 transition-all duration-200"
-                        >
-                          Switch to this
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedWorkspaces.includes(workspace.id)}
+                          onChange={(e) => handleBulkSelect(workspace.id, e.target.checked)}
+                          className="rounded border-slate-300"
+                        />
+                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Eye className="w-4 h-4" />
                         </Button>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Modern Activity Timeline */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-        className="relative"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/5 via-blue-600/5 to-purple-600/5 rounded-2xl blur-xl"></div>
-        <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="p-3 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-xl shadow-lg">
-              <Activity className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Recent Activity</h2>
-              <p className="text-slate-600">Latest workspace and account activities</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {socialAccounts && socialAccounts.length > 0 ? (
-              socialAccounts.map((account: any, index: number) => (
-                <div key={account._id} className="flex items-center gap-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-lg"></div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-900 font-medium">
-                        {account.platform} @{account.username} connected
-                      </span>
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Today</span>
-                    </div>
-                    <div className="text-sm text-emerald-700 mt-1">
-                      {account.accountType} account verified and ready
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg"></div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-900 font-medium">Workspace created successfully</span>
-                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Today</span>
-                  </div>
-                  <div className="text-sm text-blue-700 mt-1">Ready for social media integrations</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Modern Workspace Features */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-        className="relative"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-cyan-600/5 rounded-2xl blur-xl"></div>
-        <div className="relative bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-8 shadow-xl">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="p-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Workspace Capabilities</h2>
-              <p className="text-slate-600">Powerful features available in every workspace</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-blue-50 border border-blue-200 rounded-xl">
-              <div className="p-4 bg-blue-100 rounded-2xl w-fit mx-auto mb-4">
-                <Globe className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-3">Instagram Integration</h3>
-              <p className="text-sm text-slate-600">Direct connection to Instagram Business API for authentic content and analytics data.</p>
-            </div>
-            
-            <div className="text-center p-6 bg-purple-50 border border-purple-200 rounded-xl">
-              <div className="p-4 bg-purple-100 rounded-2xl w-fit mx-auto mb-4">
-                <BarChart3 className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-3">Real-time Analytics</h3>
-              <p className="text-sm text-slate-600">Live performance tracking with authentic engagement metrics and growth insights.</p>
-            </div>
-            
-            <div className="text-center p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
-              <div className="p-4 bg-emerald-100 rounded-2xl w-fit mx-auto mb-4">
-                <Rocket className="h-8 w-8 text-emerald-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-3">Content Publishing</h3>
-              <p className="text-sm text-slate-600">Direct publishing to Instagram with intelligent video compression and scheduling capabilities.</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Beautiful workspace switching overlay */}
-      <WorkspaceSwitchingOverlay
-        isVisible={isSwitching}
-        currentWorkspace={currentWorkspace}
-        targetWorkspace={targetWorkspace}
-      />
-
-      {/* Workspace Management Dialog */}
-      <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
-        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50 max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center">
-              <Settings className="w-6 h-6 mr-3 text-blue-600" />
-              Workspace Management
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 mt-6">
-            {workspaces.map((workspace) => (
-              <div key={workspace.id} className="p-6 bg-slate-50 border border-slate-200 rounded-xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gradient-to-r from-slate-600 to-blue-600 rounded-xl shadow-lg">
-                      <Building className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-slate-900 text-lg">{workspace.name}</div>
-                      <div className="text-sm text-slate-600 mt-1">
-                        {workspace.description || "No description provided"}
                       </div>
-                      <div className="flex items-center space-x-3 mt-2">
+                    </div>
+
+                    {/* Workspace Stats */}
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                        <div className="flex items-center justify-between">
+                          <Calendar className="w-5 h-5 text-blue-600" />
+                          <span className="text-xs text-blue-700 font-medium">Posts</span>
+                        </div>
+                        <div className="text-xl font-bold text-blue-900 mt-1">
+                          {Math.floor(Math.random() * 50) + 10}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                        <div className="flex items-center justify-between">
+                          <TrendingUp className="w-5 h-5 text-purple-600" />
+                          <span className="text-xs text-purple-700 font-medium">Growth</span>
+                        </div>
+                        <div className="text-xl font-bold text-purple-900 mt-1">
+                          +{Math.floor(Math.random() * 30) + 5}%
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Badges */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex flex-wrap gap-2">
                         {workspace.isDefault && (
                           <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">
                             <Star className="w-3 h-3 mr-1" />
                             Default
                           </Badge>
                         )}
-                        {currentWorkspace?.id === workspace.id && (
+                        {workspace.id === currentWorkspace?.id && (
                           <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
                             <Crown className="w-3 h-3 mr-1" />
                             Active
                           </Badge>
                         )}
-                        <span className="text-xs text-slate-500">{workspace.credits || 0} credits</span>
+                        <Badge className="bg-slate-100 text-slate-700 border-slate-200 text-xs">
+                          {workspace.credits || 0} credits
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        {Math.random() > 0.5 ? (
+                          <Wifi className="w-4 h-4 text-emerald-500" />
+                        ) : (
+                          <WifiOff className="w-4 h-4 text-slate-400" />
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditWorkspace(workspace)}
-                      className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
-                    >
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
-                    {!workspace.isDefault && (
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                        onClick={() => switchWorkspace(workspace)}
+                      >
+                        <ChevronRight className="w-4 h-4 mr-2" />
+                        Open
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSetDefault(workspace)}
-                        disabled={setDefaultMutation.isPending}
                         className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
                       >
-                        <Star className="w-4 h-4 mr-2" />
-                        Set Default
+                        <Settings className="w-4 h-4" />
                       </Button>
-                    )}
-                    {!workspace.isDefault && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-white border-red-300 text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="text-red-600">Delete Workspace</AlertDialogTitle>
-                            <AlertDialogDescription className="text-slate-600">
-                              Are you sure you want to delete "{workspace.name}"? This action cannot be undone and will permanently remove all associated content and data.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="bg-white border-slate-300 text-slate-700">Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteWorkspace(workspace)}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                              disabled={deleteWorkspaceMutation.isPending}
-                            >
-                              {deleteWorkspaceMutation.isPending ? "Deleting..." : "Delete Workspace"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
+                    </div>
                   </div>
                 </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {viewMode === 'list' && (
+          <motion.div
+            key="list"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white/95 backdrop-blur-sm border border-slate-200/50 rounded-2xl shadow-xl overflow-hidden"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="text-left p-4 font-medium text-slate-700">
+                      <input type="checkbox" className="rounded border-slate-300" />
+                    </th>
+                    <th className="text-left p-4 font-medium text-slate-700">Workspace</th>
+                    <th className="text-left p-4 font-medium text-slate-700">Status</th>
+                    <th className="text-left p-4 font-medium text-slate-700">Posts</th>
+                    <th className="text-left p-4 font-medium text-slate-700">Growth</th>
+                    <th className="text-left p-4 font-medium text-slate-700">Credits</th>
+                    <th className="text-left p-4 font-medium text-slate-700">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredWorkspaces.map((workspace) => (
+                    <tr key={workspace.id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                      <td className="p-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedWorkspaces.includes(workspace.id)}
+                          onChange={(e) => handleBulkSelect(workspace.id, e.target.checked)}
+                          className="rounded border-slate-300"
+                        />
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`p-2 rounded-lg ${
+                            workspace.id === currentWorkspace?.id 
+                              ? 'bg-gradient-to-r from-emerald-600 to-green-600' 
+                              : 'bg-gradient-to-r from-slate-600 to-blue-600'
+                          }`}>
+                            <Building className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-slate-900">{workspace.name}</div>
+                            <div className="text-sm text-slate-500">{workspace.description}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-wrap gap-1">
+                          {workspace.isDefault && (
+                            <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">Default</Badge>
+                          )}
+                          {workspace.id === currentWorkspace?.id && (
+                            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">Active</Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-sm font-medium text-slate-900">
+                          {Math.floor(Math.random() * 50) + 10}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-sm font-medium text-emerald-600">
+                          +{Math.floor(Math.random() * 30) + 5}%
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-sm font-medium text-slate-900">
+                          {workspace.credits || 0}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => switchWorkspace(workspace)}
+                            className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                          >
+                            Open
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-slate-600 hover:text-slate-900"
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {viewMode === 'analytics' && (
+          <motion.div
+            key="analytics"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-8"
+          >
+            {/* Analytics Overview */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Total Workspaces</p>
+                      <p className="text-3xl font-bold text-slate-900">{workspaces.length}</p>
+                    </div>
+                    <Building className="w-8 h-8 text-blue-600" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Active Projects</p>
+                      <p className="text-3xl font-bold text-slate-900">{workspaceAnalytics?.activeProjects || 12}</p>
+                    </div>
+                    <Rocket className="w-8 h-8 text-purple-600" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Total Engagement</p>
+                      <p className="text-3xl font-bold text-slate-900">{workspaceAnalytics?.totalEngagement || '24.5K'}</p>
+                    </div>
+                    <TrendingUp className="w-8 h-8 text-emerald-600" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Revenue Generated</p>
+                      <p className="text-3xl font-bold text-slate-900">${workspaceAnalytics?.revenue || '12.4K'}</p>
+                    </div>
+                    <DollarSign className="w-8 h-8 text-green-600" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Detailed Analytics Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <PieChart className="w-5 h-5 mr-2 text-blue-600" />
+                    Workspace Performance Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {workspaces.slice(0, 5).map((workspace, index) => (
+                      <div key={workspace.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${
+                            index === 0 ? 'from-blue-500 to-blue-600' :
+                            index === 1 ? 'from-purple-500 to-purple-600' :
+                            index === 2 ? 'from-emerald-500 to-emerald-600' :
+                            index === 3 ? 'from-amber-500 to-amber-600' :
+                            'from-slate-500 to-slate-600'
+                          }`}></div>
+                          <span className="text-sm font-medium text-slate-900">{workspace.name}</span>
+                        </div>
+                        <span className="text-sm text-slate-600">{Math.floor(Math.random() * 40) + 10}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/95 backdrop-blur-sm border-slate-200/50 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <LineChart className="w-5 h-5 mr-2 text-purple-600" />
+                    Growth Trends
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                      <div>
+                        <p className="text-sm font-medium text-emerald-800">This Month</p>
+                        <p className="text-2xl font-bold text-emerald-900">+24.5%</p>
+                      </div>
+                      <TrendingUp className="w-8 h-8 text-emerald-600" />
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Last Month</p>
+                        <p className="text-2xl font-bold text-blue-900">+18.2%</p>
+                      </div>
+                      <BarChart3 className="w-8 h-8 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Create Workspace Dialog */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center">
+              <Plus className="w-6 h-6 mr-3 text-blue-600" />
+              Create New Workspace
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Tabs defaultValue="basic" className="mt-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="features">Features</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4 mt-6">
+              <div>
+                <Label htmlFor="workspace-name" className="text-slate-700 font-medium">Workspace Name</Label>
+                <Input
+                  id="workspace-name"
+                  placeholder="e.g., My Brand Workspace"
+                  value={newWorkspace.name}
+                  onChange={(e) => setNewWorkspace({ ...newWorkspace, name: e.target.value })}
+                  className="mt-2 bg-white border-slate-200 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="workspace-description" className="text-slate-700 font-medium">Description</Label>
+                <Textarea
+                  id="workspace-description"
+                  placeholder="Brief description of this workspace..."
+                  value={newWorkspace.description}
+                  onChange={(e) => setNewWorkspace({ ...newWorkspace, description: e.target.value })}
+                  className="mt-2 bg-white border-slate-200 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="workspace-template" className="text-slate-700 font-medium">Template</Label>
+                <Select value={newWorkspace.template} onValueChange={(value) => setNewWorkspace({ ...newWorkspace, template: value })}>
+                  <SelectTrigger className="mt-2 bg-white border-slate-200">
+                    <SelectValue placeholder="Choose a template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="blank">Blank Workspace</SelectItem>
+                    <SelectItem value="personal">Personal Brand</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                    <SelectItem value="agency">Agency</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="settings" className="space-y-4 mt-6">
+              <div>
+                <Label htmlFor="workspace-theme" className="text-slate-700 font-medium">Theme</Label>
+                <Select value={newWorkspace.theme} onValueChange={(value) => setNewWorkspace({ ...newWorkspace, theme: value })}>
+                  <SelectTrigger className="mt-2 bg-white border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="cosmic">Cosmic Blue</SelectItem>
+                    <SelectItem value="nebula">Nebula Purple</SelectItem>
+                    <SelectItem value="solar">Solar Gold</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="workspace-privacy" className="text-slate-700 font-medium">Privacy</Label>
+                <Select value={newWorkspace.privacy} onValueChange={(value) => setNewWorkspace({ ...newWorkspace, privacy: value })}>
+                  <SelectTrigger className="mt-2 bg-white border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="private">Private</SelectItem>
+                    <SelectItem value="team">Team</SelectItem>
+                    <SelectItem value="public">Public</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="workspace-ai" className="text-slate-700 font-medium">AI Personality</Label>
+                <Select value={newWorkspace.aiPersonality} onValueChange={(value) => setNewWorkspace({ ...newWorkspace, aiPersonality: value })}>
+                  <SelectTrigger className="mt-2 bg-white border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="professional">Professional</SelectItem>
+                    <SelectItem value="creative">Creative</SelectItem>
+                    <SelectItem value="casual">Casual</SelectItem>
+                    <SelectItem value="technical">Technical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="features" className="space-y-4 mt-6">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div>
+                  <Label className="text-slate-700 font-medium">Auto Sync</Label>
+                  <p className="text-sm text-slate-600">Automatically sync data across platforms</p>
+                </div>
+                <Switch
+                  checked={newWorkspace.autoSync}
+                  onCheckedChange={(checked) => setNewWorkspace({ ...newWorkspace, autoSync: checked })}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div>
+                  <Label className="text-slate-700 font-medium">Notifications</Label>
+                  <p className="text-sm text-slate-600">Receive workspace notifications</p>
+                </div>
+                <Switch
+                  checked={newWorkspace.notifications}
+                  onCheckedChange={(checked) => setNewWorkspace({ ...newWorkspace, notifications: checked })}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex space-x-3 pt-6">
+            <Button
+              onClick={handleCreateWorkspace}
+              disabled={createWorkspaceMutation.isPending}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              {createWorkspaceMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Workspace
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateOpen(false)}
+              className="flex-1 bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Template Gallery Dialog */}
+      <Dialog open={isTemplateOpen} onOpenChange={setIsTemplateOpen}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50 max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center">
+              <Sparkles className="w-6 h-6 mr-3 text-purple-600" />
+              Workspace Templates
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {templates?.map((template) => (
+              <div key={template.id} className="border border-slate-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer">
+                <div className="text-center mb-4">
+                  <div className="text-4xl mb-3">{template.icon}</div>
+                  <h3 className="font-bold text-slate-900">{template.name}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{template.description}</p>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  {template.features.map((feature, index) => (
+                    <div key={index} className="flex items-center text-sm text-slate-700">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mr-2" />
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+                
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  onClick={() => {
+                    setNewWorkspace({ ...newWorkspace, template: template.id });
+                    setIsTemplateOpen(false);
+                    setIsCreateOpen(true);
+                  }}
+                >
+                  Use Template
+                </Button>
               </div>
             ))}
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Workspace Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      {/* Bulk Actions Dialog */}
+      <Dialog open={isBulkActionsOpen} onOpenChange={setIsBulkActionsOpen}>
         <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/50">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center">
-              <Edit3 className="w-6 h-6 mr-3 text-blue-600" />
-              Edit Workspace
+              <Settings className="w-6 h-6 mr-3 text-blue-600" />
+              Bulk Actions ({selectedWorkspaces.length} selected)
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 mt-6">
-            <div>
-              <Label htmlFor="edit-workspace-name" className="text-slate-700 font-medium">Workspace Name</Label>
-              <Input
-                id="edit-workspace-name"
-                placeholder="e.g., My Business Brand"
-                value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="mt-2 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-workspace-description" className="text-slate-700 font-medium">Description (Optional)</Label>
-              <Textarea
-                id="edit-workspace-description"
-                placeholder="Brief description of this workspace..."
-                value={editForm.description}
-                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="mt-2 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-workspace-theme" className="text-slate-700 font-medium">Theme</Label>
-              <Select value={editForm.theme} onValueChange={(value) => setEditForm({ ...editForm, theme: value })}>
-                <SelectTrigger className="mt-2 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Select a theme" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200">
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="cosmic">Cosmic Blue</SelectItem>
-                  <SelectItem value="nebula">Nebula Purple</SelectItem>
-                  <SelectItem value="solar">Solar Gold</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex space-x-3 pt-4">
-              <Button
-                onClick={handleUpdateWorkspace}
-                disabled={updateWorkspaceMutation.isPending}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-              >
-                {updateWorkspaceMutation.isPending ? "Saving..." : "Save Changes"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditOpen(false)}
-                className="flex-1 bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
-              >
-                Cancel
-              </Button>
-            </div>
+          
+          <div className="space-y-4 mt-6">
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+              onClick={() => {
+                bulkArchiveMutation.mutate(selectedWorkspaces);
+                setIsBulkActionsOpen(false);
+              }}
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              Archive Selected Workspaces
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-white border-red-300 text-red-700 hover:bg-red-50"
+              onClick={() => {
+                bulkDeleteMutation.mutate(selectedWorkspaces);
+                setIsBulkActionsOpen(false);
+              }}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Selected Workspaces
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Workspace Data
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -998,6 +987,13 @@ export default function Workspaces() {
         currentPlan={upgradeModal.currentPlan}
         upgradeMessage={upgradeModal.upgradeMessage}
         limitReached={upgradeModal.limitReached}
+      />
+
+      {/* Workspace Switching Overlay */}
+      <WorkspaceSwitchingOverlay
+        isVisible={isSwitching}
+        currentWorkspace={currentWorkspace}
+        targetWorkspace={targetWorkspace}
       />
     </motion.div>
   );

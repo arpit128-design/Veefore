@@ -1284,7 +1284,7 @@ export default function Messages() {
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="flex-1 overflow-hidden mt-0">
+          <TabsContent value="conversations" className="flex-1 overflow-hidden mt-6">
             <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
@@ -1295,7 +1295,7 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="flex-1 overflow-hidden mt-0">
+          <TabsContent value="messages" className="flex-1 overflow-hidden mt-6">
             <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}

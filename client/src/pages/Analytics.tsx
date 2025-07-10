@@ -32,7 +32,11 @@ import {
   Trophy,
   Trending,
   BarChart,
-  LineChart
+  LineChart,
+  DollarSign,
+  MousePointer,
+  Database,
+  Trash2
 } from 'lucide-react';
 
 interface AnalyticsProps {
@@ -281,7 +285,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
                 <div>
                   <h4 className="font-semibold text-gray-900">Optimize Posting Times</h4>
                   <p className="text-sm text-gray-600">Your audience is most active between 9-11 AM and 7-9 PM.</p>
-                  <Button size="sm" className="mt-2 bg-cyan-600 hover:bg-cyan-700">
+                  <Button size="sm" className="mt-2 bg-cyan-600 hover:bg-cyan-700 text-white">
                     View Best Times
                   </Button>
                 </div>
@@ -292,7 +296,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
                 <div>
                   <h4 className="font-semibold text-gray-900">Content Performance</h4>
                   <p className="text-sm text-gray-600">Video content gets 3x more engagement than static posts.</p>
-                  <Button size="sm" className="mt-2 bg-purple-600 hover:bg-purple-700">
+                  <Button size="sm" className="mt-2 bg-purple-600 hover:bg-purple-700 text-white">
                     Create Video
                   </Button>
                 </div>
@@ -305,18 +309,18 @@ const Analytics: React.FC<AnalyticsProps> = ({
                 <div>
                   <h4 className="font-semibold text-gray-900">Audience Growth</h4>
                   <p className="text-sm text-gray-600">Use trending hashtags to reach 40% more potential followers.</p>
-                  <Button size="sm" className="mt-2 bg-emerald-600 hover:bg-emerald-700">
+                  <Button size="sm" className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white">
                     Explore Trends
                   </Button>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500">
-                <Activity className="h-5 w-5 text-orange-600 mt-1" />
+              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500">
+                <Activity className="h-5 w-5 text-blue-600 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-900">Engagement Strategy</h4>
                   <p className="text-sm text-gray-600">Respond to comments within 2 hours for better reach.</p>
-                  <Button size="sm" className="mt-2 bg-orange-600 hover:bg-orange-700">
+                  <Button size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700 text-white">
                     Set Alerts
                   </Button>
                 </div>
@@ -789,55 +793,585 @@ const Analytics: React.FC<AnalyticsProps> = ({
   );
 
   const renderIndustry = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Industry Benchmarks</h1>
+        <p className="text-blue-100 mt-1">Compare your performance against industry standards and competitors</p>
+      </div>
+
+      {/* Benchmark Comparison Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
+              Engagement Rate Benchmark
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
+                <span className="font-medium">Your Performance</span>
+                <span className="text-emerald-600 font-bold">8.7%</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Industry Average</span>
+                <span className="text-gray-600 font-bold">6.2%</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                <span className="font-medium">Top Performers</span>
+                <span className="text-blue-600 font-bold">12.4%</span>
+              </div>
+              <Badge className="bg-emerald-600 text-white w-full justify-center py-2">
+                Above Industry Average (+2.5%)
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="h-5 w-5 text-purple-600 mr-2" />
+              Follower Growth Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                <span className="font-medium">Your Performance</span>
+                <span className="text-purple-600 font-bold">12.3%</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Industry Average</span>
+                <span className="text-gray-600 font-bold">8.7%</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                <span className="font-medium">Top Performers</span>
+                <span className="text-blue-600 font-bold">18.9%</span>
+              </div>
+              <Badge className="bg-purple-600 text-white w-full justify-center py-2">
+                Above Industry Average (+3.6%)
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Platform Comparison */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Industry Benchmarks</CardTitle>
+          <CardTitle>Platform Performance vs Industry</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Compare your performance against industry standards and competitors.</p>
+          <div className="space-y-6">
+            {[
+              { platform: 'Instagram', your: 8.7, industry: 6.2, color: 'from-pink-500 to-purple-600' },
+              { platform: 'YouTube', your: 12.4, industry: 9.8, color: 'bg-red-600' },
+              { platform: 'Twitter', your: 5.3, industry: 4.1, color: 'bg-sky-500' },
+              { platform: 'LinkedIn', your: 7.8, industry: 5.9, color: 'bg-blue-600' }
+            ].map((data, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{data.platform}</span>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-500">You: {data.your}%</span>
+                    <span className="text-sm text-gray-500">Industry: {data.industry}%</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className={`${data.color.startsWith('from-') ? `bg-gradient-to-r ${data.color}` : data.color} h-3 rounded-full transition-all duration-300`}
+                      style={{ width: `${(data.your / 20) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div 
+                    className="absolute top-0 h-3 w-1 bg-gray-400 rounded"
+                    style={{ left: `${(data.industry / 20) * 100}%` }}
+                    title="Industry Average"
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 
   const renderCompetitive = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Competitive Analysis</h1>
+        <p className="text-indigo-100 mt-1">Monitor competitor performance and identify growth opportunities</p>
+      </div>
+
+      {/* Competitor Overview */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Competitive Analysis</CardTitle>
+          <CardTitle className="flex items-center">
+            <Target className="h-5 w-5 text-indigo-600 mr-2" />
+            Competitor Performance Overview
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Monitor competitor performance and identify growth opportunities.</p>
+          <div className="space-y-4">
+            {[
+              { 
+                name: '@socialmedia_expert', 
+                followers: '45.2K', 
+                engagement: '9.3%', 
+                posts: '156',
+                growth: '+12%',
+                status: 'growing'
+              },
+              { 
+                name: '@content_master', 
+                followers: '38.7K', 
+                engagement: '7.8%', 
+                posts: '203',
+                growth: '+8%',
+                status: 'stable'
+              },
+              { 
+                name: '@digital_guru', 
+                followers: '52.1K', 
+                engagement: '6.4%', 
+                posts: '89',
+                growth: '+3%',
+                status: 'declining'
+              }
+            ].map((competitor, index) => (
+              <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {competitor.name.charAt(1).toUpperCase()}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{competitor.name}</h4>
+                    <p className="text-sm text-gray-500">{competitor.followers} followers • {competitor.posts} posts</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-right">
+                  <div>
+                    <div className="text-sm font-medium text-indigo-600">{competitor.engagement}</div>
+                    <div className="text-xs text-gray-500">Engagement</div>
+                  </div>
+                  <div>
+                    <div className={`text-sm font-medium ${
+                      competitor.status === 'growing' ? 'text-emerald-600' :
+                      competitor.status === 'stable' ? 'text-blue-600' : 'text-red-600'
+                    }`}>
+                      {competitor.growth}
+                    </div>
+                    <div className="text-xs text-gray-500">Growth</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+
+      {/* Content Strategy Comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <BarChart3 className="h-5 w-5 text-purple-600 mr-2" />
+              Content Type Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { type: 'Videos', you: 35, competitors: 42, color: 'bg-purple-600' },
+                { type: 'Images', you: 50, competitors: 38, color: 'bg-blue-600' },
+                { type: 'Carousels', you: 15, competitors: 20, color: 'bg-emerald-600' }
+              ].map((content, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium">{content.type}</span>
+                    <div className="text-sm text-gray-500">
+                      You: {content.you}% | Competitors: {content.competitors}%
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <div className="flex-1">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`${content.color} h-2 rounded-full`}
+                          style={{ width: `${content.you}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-gray-400 h-2 rounded-full"
+                          style={{ width: `${content.competitors}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Clock className="h-5 w-5 text-emerald-600 mr-2" />
+              Posting Frequency
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-center p-4 bg-emerald-50 rounded-lg">
+                <div className="text-2xl font-bold text-emerald-600">12</div>
+                <div className="text-sm text-gray-600">Your Posts/Week</div>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-600">18</div>
+                <div className="text-sm text-gray-600">Competitor Average</div>
+              </div>
+              <Badge variant="outline" className="w-full justify-center py-2 border-emerald-200 text-emerald-700">
+                Opportunity: Increase posting frequency by 50%
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
   );
 
   const renderAdvertising = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Advertising Performance</h1>
+        <p className="text-emerald-100 mt-1">Track and optimize your social media advertising campaigns</p>
+      </div>
+
+      {/* Campaign Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <DollarSign className="h-5 w-5 text-emerald-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">₹12,450</div>
+            <div className="text-sm text-gray-500">Total Ad Spend</div>
+            <div className="text-xs text-emerald-600 mt-1">+15% from last month</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <Eye className="h-5 w-5 text-blue-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">245K</div>
+            <div className="text-sm text-gray-500">Impressions</div>
+            <div className="text-xs text-emerald-600 mt-1">+23% from last month</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <MousePointer className="h-5 w-5 text-purple-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">3.2%</div>
+            <div className="text-sm text-gray-500">Click-through Rate</div>
+            <div className="text-xs text-emerald-600 mt-1">+0.8% from last month</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <TrendingUp className="h-5 w-5 text-cyan-600" />
+              <ArrowUp className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div className="text-2xl font-bold text-gray-900">4.8x</div>
+            <div className="text-sm text-gray-500">ROAS</div>
+            <div className="text-xs text-emerald-600 mt-1">+1.2x from last month</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Active Campaigns */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Advertising Performance</CardTitle>
+          <CardTitle className="flex items-center">
+            <Zap className="h-5 w-5 text-emerald-600 mr-2" />
+            Active Campaigns
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">Track and optimize your social media advertising campaigns.</p>
+          <div className="space-y-4">
+            {[
+              {
+                name: 'Summer Collection Launch',
+                platform: 'Instagram',
+                budget: '₹5,000',
+                spent: '₹3,240',
+                impressions: '89.2K',
+                clicks: '2,847',
+                conversions: '156',
+                status: 'active'
+              },
+              {
+                name: 'Brand Awareness Campaign',
+                platform: 'Facebook',
+                budget: '₹3,500',
+                spent: '₹3,500',
+                impressions: '125.6K',
+                clicks: '4,132',
+                conversions: '89',
+                status: 'completed'
+              },
+              {
+                name: 'Video Ad Series',
+                platform: 'YouTube',
+                budget: '₹4,000',
+                spent: '₹1,890',
+                impressions: '30.4K',
+                clicks: '967',
+                conversions: '45',
+                status: 'active'
+              }
+            ].map((campaign, index) => (
+              <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h4 className="font-semibold text-gray-900">{campaign.name}</h4>
+                      <Badge className={`${
+                        campaign.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {campaign.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span className="flex items-center">
+                        <div className={`w-3 h-3 rounded mr-2 ${
+                          campaign.platform === 'Instagram' ? 'bg-gradient-to-r from-pink-500 to-purple-600' :
+                          campaign.platform === 'Facebook' ? 'bg-blue-600' : 'bg-red-600'
+                        }`}></div>
+                        {campaign.platform}
+                      </span>
+                      <span>Budget: {campaign.budget}</span>
+                      <span>Spent: {campaign.spent}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-right">
+                    <div>
+                      <div className="text-sm font-medium text-blue-600">{campaign.impressions}</div>
+                      <div className="text-xs text-gray-500">Impressions</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-purple-600">{campaign.clicks}</div>
+                      <div className="text-xs text-gray-500">Clicks</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-emerald-600">{campaign.conversions}</div>
+                      <div className="text-xs text-gray-500">Conversions</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
-    </div>
+
+      {/* ROI Analysis */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader>
+          <CardTitle>Return on Investment Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-4 bg-emerald-50 rounded-lg">
+              <div className="text-3xl font-bold text-emerald-600">₹59,760</div>
+              <div className="text-sm text-gray-600 mt-1">Revenue Generated</div>
+            </div>
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600">₹12,450</div>
+              <div className="text-sm text-gray-600 mt-1">Total Investment</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600">4.8x</div>
+              <div className="text-sm text-gray-600 mt-1">Return on Ad Spend</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 
   const renderSettings = () => (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-gray-600 to-slate-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold">Analytics Settings</h1>
+        <p className="text-gray-100 mt-1">Configure your analytics preferences and data collection settings</p>
+      </div>
+
+      {/* Data Collection Settings */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Analytics Settings</CardTitle>
+          <CardTitle className="flex items-center">
+            <Settings className="h-5 w-5 text-gray-600 mr-2" />
+            Data Collection Preferences
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">Configure your analytics preferences and data collection settings.</p>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div>
+              <h4 className="font-semibold text-gray-900">Real-time Analytics</h4>
+              <p className="text-sm text-gray-600">Get live updates for engagement metrics and follower changes</p>
+            </div>
+            <div className="w-11 h-6 bg-blue-600 rounded-full p-1 cursor-pointer">
+              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div>
+              <h4 className="font-semibold text-gray-900">Advanced Tracking</h4>
+              <p className="text-sm text-gray-600">Track detailed user behavior and content performance</p>
+            </div>
+            <div className="w-11 h-6 bg-blue-600 rounded-full p-1 cursor-pointer">
+              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div>
+              <h4 className="font-semibold text-gray-900">Email Reports</h4>
+              <p className="text-sm text-gray-600">Receive weekly analytics summaries via email</p>
+            </div>
+            <div className="w-11 h-6 bg-gray-300 rounded-full p-1 cursor-pointer">
+              <div className="w-4 h-4 bg-white rounded-full"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div>
+              <h4 className="font-semibold text-gray-900">Data Export</h4>
+              <p className="text-sm text-gray-600">Allow exporting analytics data to external tools</p>
+            </div>
+            <div className="w-11 h-6 bg-blue-600 rounded-full p-1 cursor-pointer">
+              <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
+            </div>
+          </div>
         </CardContent>
       </Card>
-    </div>
+
+      {/* Report Preferences */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <FileText className="h-5 w-5 text-blue-600 mr-2" />
+            Report Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Default Report Period</label>
+            <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+              <option>Custom range</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Time Zone</label>
+            <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option>India Standard Time (IST)</option>
+              <option>Pacific Standard Time (PST)</option>
+              <option>Eastern Standard Time (EST)</option>
+              <option>Coordinated Universal Time (UTC)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Report Format</label>
+            <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option>PDF</option>
+              <option>Excel (.xlsx)</option>
+              <option>CSV</option>
+              <option>JSON</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Retention */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Database className="h-5 w-5 text-purple-600 mr-2" />
+            Data Retention & Privacy
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-semibold text-blue-900 mb-2">Data Retention Period</h4>
+            <p className="text-sm text-blue-700">Analytics data is retained for 24 months. After this period, aggregated data is kept for historical analysis.</p>
+          </div>
+
+          <div className="p-4 bg-emerald-50 rounded-lg">
+            <h4 className="font-semibold text-emerald-900 mb-2">Privacy Compliance</h4>
+            <p className="text-sm text-emerald-700">All data collection complies with GDPR, CCPA, and Indian data protection regulations.</p>
+          </div>
+
+          <div className="flex space-x-4">
+            <Button variant="outline" className="flex-1">
+              <Download className="h-4 w-4 mr-2" />
+              Export My Data
+            </Button>
+            <Button variant="outline" className="flex-1 text-red-600 border-red-300 hover:bg-red-50">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete All Data
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 
   const renderCurrentPage = () => {

@@ -37,14 +37,14 @@ function SidebarItem({ icon: Icon, label, href, badge, isActive }: SidebarItemPr
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100",
-          isActive && "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 border-r-2 border-cyan-500"
+          "w-full justify-start text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white",
+          isActive && "bg-cyan-50 text-cyan-700 border-r-2 border-cyan-500"
         )}
       >
         <Icon className="h-5 w-5 mr-3" />
         <span className="text-sm font-medium">{label}</span>
         {badge && (
-          <Badge variant="secondary" className="ml-auto text-xs bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">
+          <Badge variant="secondary" className="ml-auto text-xs bg-cyan-100 text-cyan-700">
             {badge}
           </Badge>
         )}
@@ -68,7 +68,7 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full justify-between text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 px-3 py-2 h-8 font-medium uppercase text-xs tracking-wide"
+        className="w-full justify-between text-slate-500 hover:text-slate-700 px-3 py-2 h-8 font-medium uppercase text-xs tracking-wide bg-white"
       >
         {title}
         {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -87,15 +87,15 @@ export function ProfessionalSidebar() {
   const credits = 0; // Will be dynamically loaded
 
   return (
-    <aside className="bg-white border-r border-slate-200 dark:bg-slate-900 dark:border-slate-700 w-64 min-h-screen">
+    <aside className="bg-white border-r border-slate-200 w-64 min-h-screen">
       <div className="p-6">
         {/* Credits display */}
-        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 mb-6 border border-slate-200 dark:border-slate-700">
+        <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">Credits</span>
-            <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{credits}</span>
+            <span className="text-sm text-slate-700 font-medium">Credits</span>
+            <span className="text-lg font-bold text-cyan-600">{credits}</span>
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Available for AI tools</div>
+          <div className="text-xs text-slate-500 mt-1">Available for AI tools</div>
         </div>
         {/* Main Navigation */}
         <div className="space-y-1">
@@ -198,7 +198,7 @@ export function ProfessionalSidebar() {
         </SidebarSection>
 
         {/* Settings */}
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="pt-4 border-t border-slate-200">
           <SidebarItem
             icon={Settings}
             label="Settings"

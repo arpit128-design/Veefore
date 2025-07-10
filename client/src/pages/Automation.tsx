@@ -369,12 +369,12 @@ export default function Automation() {
             </Badge>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{mockStats.totalExecutions.toLocaleString()}</h3>
-          <p className="text-gray-600 text-sm">Total Executions</p>
+          <p className="text-gray-800 text-sm font-medium">Total Executions</p>
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div className="bg-blue-600 h-2 rounded-full" style={{ width: '87%' }}></div>
             </div>
-            <span className="text-xs text-gray-500">87%</span>
+            <span className="text-xs text-gray-700 font-medium">87%</span>
           </div>
         </motion.div>
 
@@ -392,12 +392,12 @@ export default function Automation() {
             </Badge>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{mockStats.savedTime}</h3>
-          <p className="text-gray-600 text-sm">Time Saved by AI</p>
+          <p className="text-gray-800 text-sm font-medium">Time Saved by AI</p>
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div className="bg-emerald-600 h-2 rounded-full" style={{ width: '95%' }}></div>
             </div>
-            <span className="text-xs text-gray-500">95%</span>
+            <span className="text-xs text-gray-700 font-medium">95%</span>
           </div>
         </motion.div>
 
@@ -415,12 +415,12 @@ export default function Automation() {
             </Badge>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{mockStats.trendsDetected}</h3>
-          <p className="text-gray-600 text-sm">Trends Detected</p>
+          <p className="text-gray-800 text-sm font-medium">Trends Detected</p>
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div className="bg-purple-600 h-2 rounded-full" style={{ width: '78%' }}></div>
             </div>
-            <span className="text-xs text-gray-500">78%</span>
+            <span className="text-xs text-gray-700 font-medium">78%</span>
           </div>
         </motion.div>
 
@@ -438,12 +438,12 @@ export default function Automation() {
             </Badge>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{mockStats.revenueGenerated}</h3>
-          <p className="text-gray-600 text-sm">Revenue Generated</p>
+          <p className="text-gray-800 text-sm font-medium">Revenue Generated</p>
           <div className="mt-4 flex items-center space-x-2">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div className="bg-orange-600 h-2 rounded-full" style={{ width: '92%' }}></div>
             </div>
-            <span className="text-xs text-gray-500">92%</span>
+            <span className="text-xs text-gray-700 font-medium">92%</span>
           </div>
         </motion.div>
       </div>
@@ -456,7 +456,7 @@ export default function Automation() {
               <Crown className="h-7 w-7 text-yellow-500" />
               <span>Enterprise AI Capabilities</span>
             </h3>
-            <p className="text-gray-600 mt-2">Advanced automation features powered by cutting-edge AI technology</p>
+            <p className="text-gray-800 mt-2 font-medium">Advanced automation features powered by cutting-edge AI technology</p>
           </div>
           <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 text-lg">
             <Crown className="h-4 w-4 mr-2" />
@@ -475,7 +475,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Neural Learning Engine</h4>
-                <p className="text-gray-600 text-sm mb-4">Advanced machine learning algorithms that continuously optimize automation performance</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">Advanced machine learning algorithms that continuously optimize automation performance</p>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white group-hover:scale-105 transition-transform">
                   Configure AI
                 </Button>
@@ -493,7 +493,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Predictive Analytics</h4>
-                <p className="text-gray-600 text-sm mb-4">AI-powered trend prediction and opportunity identification with 94% accuracy</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">AI-powered trend prediction and opportunity identification with 94% accuracy</p>
                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white group-hover:scale-105 transition-transform">
                   View Predictions
                 </Button>
@@ -511,7 +511,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Real-time Optimization</h4>
-                <p className="text-gray-600 text-sm mb-4">Instant performance adjustments and A/B testing for maximum efficiency</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">Instant performance adjustments and A/B testing for maximum efficiency</p>
                 <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white group-hover:scale-105 transition-transform">
                   Optimize Now
                 </Button>
@@ -529,7 +529,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Crisis Protection</h4>
-                <p className="text-gray-600 text-sm mb-4">24/7 brand monitoring with automatic crisis detection and response protocols</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">24/7 brand monitoring with automatic crisis detection and response protocols</p>
                 <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white group-hover:scale-105 transition-transform">
                   Setup Alerts
                 </Button>
@@ -547,7 +547,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Multi-Platform Sync</h4>
-                <p className="text-gray-600 text-sm mb-4">Seamless automation across all social media platforms with unified analytics</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">Seamless automation across all social media platforms with unified analytics</p>
                 <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white group-hover:scale-105 transition-transform">
                   Connect Platforms
                 </Button>
@@ -565,7 +565,7 @@ export default function Automation() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-gray-900 text-lg mb-2">Infinite Scalability</h4>
-                <p className="text-gray-600 text-sm mb-4">Enterprise-grade infrastructure that scales with your business growth</p>
+                <p className="text-gray-800 text-sm mb-4 font-medium">Enterprise-grade infrastructure that scales with your business growth</p>
                 <Button size="sm" className="bg-gray-600 hover:bg-gray-700 text-white group-hover:scale-105 transition-transform">
                   Scale Up
                 </Button>
@@ -588,7 +588,7 @@ export default function Automation() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Automation Rules</h2>
-          <p className="text-gray-600 mt-1">Manage your intelligent automation workflows</p>
+          <p className="text-gray-800 mt-1 font-medium">Manage your intelligent automation workflows</p>
         </div>
         <div className="flex items-center space-x-3">
           <Select value={viewMode} onValueChange={setViewMode}>

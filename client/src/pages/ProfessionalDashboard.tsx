@@ -336,7 +336,7 @@ const ProfessionalDashboard: React.FC = () => {
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
                     <h5 className="font-medium text-gray-900 mb-2">{topic.topic}</h5>
                     <p className="text-sm text-gray-600 mb-3 leading-relaxed">{topic.description}</p>
-                    <Button variant="outline" size="sm" className="text-xs border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Button variant="outline" size="sm" className="text-xs border-gray-300 text-gray-700 hover:bg-gray-50 bg-white">
                       <FileText className="w-3 h-3 mr-1" />
                       Create draft post
                     </Button>
@@ -363,7 +363,7 @@ const ProfessionalDashboard: React.FC = () => {
               <div className="text-center py-8">
                 <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 mb-4">No scheduled posts</p>
-                <Button variant="outline" className="mb-4 border-gray-300 text-gray-700 hover:bg-gray-50">
+                <Button variant="outline" className="mb-4 border-gray-300 text-gray-700 hover:bg-gray-50 bg-white">
                   Create a post
                 </Button>
               </div>
@@ -388,7 +388,7 @@ const ProfessionalDashboard: React.FC = () => {
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 mb-4">Start drafting content to edit and publish whenever you'd like.</p>
                 <div className="space-x-2">
-                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">Create a draft</Button>
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 bg-white">Create a draft</Button>
                   <Button className="bg-blue-600 text-white hover:bg-blue-700">
                     Draft post with AI
                   </Button>
@@ -496,7 +496,7 @@ const ProfessionalDashboard: React.FC = () => {
                   <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{width: '65%'}}></div>
                 </div>
               </div>
-              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50">
+              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-white">
                 <PlayCircle className="w-4 h-4 mr-2" />
                 View Full Analytics
               </Button>
@@ -552,7 +552,7 @@ const ProfessionalDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 h-12">
+                  <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 h-12 bg-white">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Connect Another Account
                   </Button>

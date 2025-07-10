@@ -116,12 +116,16 @@ const ProfessionalDashboard: React.FC = () => {
 
   // Calculate subscription status
   const getSubscriptionStatus = () => {
-    if (!userData) return { status: 'Free Trial Active', type: 'trial', color: 'blue' };
+    if (!userData) return { status: 'Loading...', type: 'loading', color: 'gray' };
     
     const plan = userData.plan || 'free';
     const trialExpiresAt = userData.trialExpiresAt;
+    const planStatus = userData.planStatus || 'active';
     
-    if (plan === 'free' && trialExpiresAt) {
+
+    
+    // Check if user has an active trial
+    if (trialExpiresAt) {
       const trialDate = new Date(trialExpiresAt);
       const today = new Date();
       const daysLeft = Math.ceil((trialDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -138,8 +142,8 @@ const ProfessionalDashboard: React.FC = () => {
       }
     }
     
-    if (plan !== 'free') {
-      // For paid plans, show plan name and any renewal info
+    // Check for paid plans
+    if (plan && plan.toLowerCase() !== 'free') {
       const planNames = {
         starter: 'Starter Plan',
         pro: 'Pro Plan', 
@@ -147,14 +151,27 @@ const ProfessionalDashboard: React.FC = () => {
         agency: 'Agency Plan'
       };
       
+      const planName = planNames[plan.toLowerCase()] || 'Premium Plan';
+      
+      // Check plan status for paid plans
+      if (planStatus === 'expired' || planStatus === 'canceled') {
+        return { 
+          status: `${planName} - Expired`, 
+          type: 'expired', 
+          color: 'red',
+          plan: plan
+        };
+      }
+      
       return { 
-        status: planNames[plan] || 'Premium Plan', 
+        status: planName, 
         type: 'paid', 
         color: 'green',
         plan: plan
       };
     }
     
+    // Default free plan
     return { status: 'Free Plan', type: 'free', color: 'gray' };
   };
 

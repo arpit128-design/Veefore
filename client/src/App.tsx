@@ -18,6 +18,7 @@ import ProfessionalDashboard from "@/pages/ProfessionalDashboard";
 import VeeForeHomeDashboard from "@/pages/VeeForeHomeDashboard";
 import ContentStudio from "@/pages/ContentStudio";
 import AdvancedScheduler from "@/pages/AdvancedScheduler";
+import ProfessionalScheduler from "@/pages/ProfessionalScheduler";
 import Analyzer from "@/pages/Analyzer";
 import Suggestions from "@/pages/Suggestions";
 import ContentRecommendations from "@/pages/ContentRecommendations";
@@ -101,6 +102,7 @@ function AuthenticatedApp() {
               <Route path="/dashboard" component={ProfessionalDashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={AdvancedScheduler} />
+              <Route path="/professional-scheduler" component={ProfessionalScheduler} />
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/suggestions" component={Suggestions} />
               <Route path="/content-recommendations" component={ContentRecommendations} />

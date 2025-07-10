@@ -101,7 +101,8 @@ function AuthenticatedApp() {
             <Switch>
               <Route path="/dashboard" component={ProfessionalDashboard} />
               <Route path="/content-studio" component={ContentStudio} />
-              <Route path="/scheduler" component={AdvancedScheduler} />
+              <Route path="/scheduler" component={ProfessionalScheduler} />
+              <Route path="/advanced-scheduler" component={AdvancedScheduler} />
               <Route path="/professional-scheduler" component={ProfessionalScheduler} />
               <Route path="/analyzer" component={Analyzer} />
               <Route path="/suggestions" component={Suggestions} />

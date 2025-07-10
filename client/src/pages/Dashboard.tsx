@@ -195,9 +195,10 @@ export default function Dashboard() {
     <div className="h-full overflow-y-auto overflow-x-hidden">
       <div className="h-full p-6 space-y-6 bg-gray-50">
         {/* Welcome Modal */}
-        {showWelcomeModal && (
-          <WelcomePopup onClose={handleWelcomePopupClose} />
-        )}
+        <WelcomePopup
+          isOpen={showWelcomeModal}
+          onClose={handleWelcomePopupClose}
+        />
         
         <motion.div
           initial={{ opacity: 0, y: -20 }}

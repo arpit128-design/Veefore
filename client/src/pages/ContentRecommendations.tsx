@@ -396,7 +396,7 @@ const ContentRecommendations = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+            <div className="flex items-center justify-between pt-2 border-t border-gray-200/50">
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"

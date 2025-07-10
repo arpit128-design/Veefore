@@ -544,10 +544,10 @@ export default function Workspaces() {
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className={`h-8 px-3 transition-all duration-200 ${
+                  className={`h-8 px-3 transition-all duration-200 border ${
                     viewMode === 'grid' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
                   <Grid3X3 className="w-4 h-4" />
@@ -556,10 +556,10 @@ export default function Workspaces() {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className={`h-8 px-3 transition-all duration-200 ${
+                  className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'list' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -568,10 +568,10 @@ export default function Workspaces() {
                   variant={viewMode === 'kanban' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('kanban')}
-                  className={`h-8 px-3 transition-all duration-200 ${
+                  className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'kanban' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
                   <Database className="w-4 h-4" />
@@ -580,10 +580,10 @@ export default function Workspaces() {
                   variant={viewMode === 'analytics' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('analytics')}
-                  className={`h-8 px-3 transition-all duration-200 ${
+                  className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'analytics' 
-                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      ? 'bg-slate-800 text-white shadow-sm hover:bg-slate-700 border-slate-800' 
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4" />

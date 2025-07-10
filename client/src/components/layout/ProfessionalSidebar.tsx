@@ -69,14 +69,12 @@ function SidebarItem({ icon: Icon, label, href, badge, isActive }: SidebarItemPr
             isActive && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
           )}
         >
-          <div className={cn(
-            "p-1.5 rounded-lg mr-3 transition-colors duration-200",
+          <Icon className={cn(
+            "h-4 w-4 mr-3 transition-colors duration-200",
             isActive 
-              ? "bg-blue-100 text-blue-600" 
-              : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700"
-          )}>
-            <Icon className="h-4 w-4" />
-          </div>
+              ? "text-blue-600" 
+              : "text-slate-500 group-hover:text-slate-700"
+          )} />
           <span className="text-sm font-medium flex-1 text-left">{label}</span>
           {badge && (
             <Badge 
@@ -244,9 +242,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
                 onClick={onAnalyticsToggle}
                 className="w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group"
               >
-                <div className="p-1.5 rounded-lg mr-3 transition-colors duration-200 bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700">
-                  <BarChart3 className="h-4 w-4" />
-                </div>
+                <BarChart3 className="h-4 w-4 mr-3 transition-colors duration-200 text-slate-500 group-hover:text-slate-700" />
                 <span className="text-sm font-medium flex-1 text-left">Analytics Dashboard</span>
               </Button>
             </motion.div>

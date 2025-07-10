@@ -820,29 +820,63 @@ button[data-state="checked"],
   justify-content: center !important;
 }
 
-/* Selected view mode button styling */
-[data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-primary"],
-[data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-default"] {
-  background-color: #1e293b !important;
+/* Force black background for selected view mode buttons */
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] {
+  background-color: #000000 !important;
   color: #ffffff !important;
-  border: 1px solid #1e293b !important;
+  border: 1px solid #000000 !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Non-selected view mode button styling */
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] svg {
+  color: #ffffff !important;
+}
+
+/* Force white background for unselected view mode buttons */
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-white"] svg {
+  color: #64748b !important;
+}
+
+/* Hover states */
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"]:hover {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border: 1px solid #1f2937 !important;
+}
+
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-white"]:hover {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border: 1px solid #94a3b8 !important;
+}
+
+/* Legacy selectors for backward compatibility */
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-primary"],
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-default"] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}
+
 [data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-transparent"],
 [data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-ghost"] {
   background-color: #ffffff !important;
   color: #64748b !important;
-  border: 1px solid transparent !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
-/* Hover for non-selected buttons */
 [data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-transparent"]:hover,
 [data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-ghost"]:hover {
   background-color: #f1f5f9 !important;
   color: #1e293b !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid #94a3b8 !important;
 }
 
 /* Professional spacing system */

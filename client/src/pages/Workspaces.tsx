@@ -549,8 +549,17 @@ export default function Workspaces() {
                       ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
+                  style={viewMode === 'grid' ? { 
+                    backgroundColor: '#000000 !important', 
+                    color: '#ffffff !important',
+                    borderColor: '#000000 !important'
+                  } : {
+                    backgroundColor: '#ffffff !important',
+                    color: '#64748b !important',
+                    borderColor: '#cbd5e1 !important'
+                  }}
                 >
-                  <Grid3X3 className="w-4 h-4 text-current" />
+                  <Grid3X3 className="w-4 h-4" style={{ color: viewMode === 'grid' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -561,8 +570,17 @@ export default function Workspaces() {
                       ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
+                  style={viewMode === 'list' ? { 
+                    backgroundColor: '#000000 !important', 
+                    color: '#ffffff !important',
+                    borderColor: '#000000 !important'
+                  } : {
+                    backgroundColor: '#ffffff !important',
+                    color: '#64748b !important',
+                    borderColor: '#cbd5e1 !important'
+                  }}
                 >
-                  <List className="w-4 h-4 text-current" />
+                  <List className="w-4 h-4" style={{ color: viewMode === 'list' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
                   variant={viewMode === 'kanban' ? 'default' : 'ghost'}
@@ -573,8 +591,17 @@ export default function Workspaces() {
                       ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
+                  style={viewMode === 'kanban' ? { 
+                    backgroundColor: '#000000 !important', 
+                    color: '#ffffff !important',
+                    borderColor: '#000000 !important'
+                  } : {
+                    backgroundColor: '#ffffff !important',
+                    color: '#64748b !important',
+                    borderColor: '#cbd5e1 !important'
+                  }}
                 >
-                  <Database className="w-4 h-4 text-current" />
+                  <Database className="w-4 h-4" style={{ color: viewMode === 'kanban' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
                   variant={viewMode === 'analytics' ? 'default' : 'ghost'}
@@ -585,8 +612,17 @@ export default function Workspaces() {
                       ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
                   }`}
+                  style={viewMode === 'analytics' ? { 
+                    backgroundColor: '#000000 !important', 
+                    color: '#ffffff !important',
+                    borderColor: '#000000 !important'
+                  } : {
+                    backgroundColor: '#ffffff !important',
+                    color: '#64748b !important',
+                    borderColor: '#cbd5e1 !important'
+                  }}
                 >
-                  <BarChart3 className="w-4 h-4 text-current" />
+                  <BarChart3 className="w-4 h-4" style={{ color: viewMode === 'analytics' ? '#ffffff' : '#64748b' }} />
                 </Button>
               </div>
             </div>

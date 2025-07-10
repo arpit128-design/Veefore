@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +51,7 @@ interface SocialAccount {
 const ProfessionalDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [, setLocation] = useLocation();
 
   // Update time every second for live clock
   useEffect(() => {
@@ -194,7 +196,7 @@ const ProfessionalDashboard: React.FC = () => {
       title: 'Create with AI',
       description: 'Generate content instantly with AI',
       icon: <Zap className="w-8 h-8 text-purple-600" />,
-      action: () => {},
+      action: () => setLocation('/create-post'),
     },
     {
       title: 'Schedule Posts',

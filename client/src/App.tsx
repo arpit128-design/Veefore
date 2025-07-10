@@ -74,6 +74,7 @@ import PerformanceAnalytics from "@/pages/PerformanceAnalytics";
 import AdvancedAnalytics from "@/pages/AdvancedAnalytics";
 import ContentPerformanceAnalytics from "@/pages/ContentPerformanceAnalytics";
 import AnalyticsLayout from "@/components/layout/AnalyticsLayout";
+import CreatePost from "@/pages/CreatePost";
 
 // Landing page related pages
 import Features from "@/pages/Features";
@@ -126,6 +127,7 @@ function AuthenticatedApp() {
               <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
                   <Route path="/dashboard" component={ProfessionalDashboard} />
+                  <Route path="/create-post" component={CreatePost} />
                   <Route path="/content-studio" component={ContentStudio} />
                   <Route path="/scheduler" component={ProfessionalScheduler} />
                   <Route path="/advanced-scheduler" component={AdvancedScheduler} />

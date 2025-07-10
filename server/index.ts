@@ -1,56 +1,31 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-
-// Production-safe log function
-let log: (message: string, source?: string) => void;
-
-try {
-  // Try to import log from vite module
-  const viteModule = await import("./vite");
-  log = viteModule.log;
-} catch (error) {
-  // Fallback log function for production
-  log = (message: string, source = "express") => {
-    const formattedTime = new Date().toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
-    console.log(`${formattedTime} [${source}] ${message}`);
-  };
-}
-
-// Dynamic imports for production-safe Vite setup
-let setupVite: any;
-let serveStatic: any;
-
-const isProduction = process.env.NODE_ENV === "production";
-
-// Only import Vite modules in development
-async function loadViteModules() {
-  if (!isProduction) {
-    try {
-      const viteModule = await import("./vite");
-      setupVite = viteModule.setupVite;
-      serveStatic = viteModule.serveStatic;
-      console.log("[DEV] Vite modules loaded successfully");
-    } catch (error) {
-      console.warn("[DEV] Vite modules not available, will use fallback static serving");
-    }
-  } else {
-    console.log("[PRODUCTION] Skipping Vite module imports for production build");
-  }
-}
-
-// Load Vite modules asynchronously
-await loadViteModules();
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
 import { AutoSyncService } from "./auto-sync-service";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+
+// Production-safe log function
+let log: (message: string, source?: string) => void;
+
+// Fallback log function for production
+const fallbackLog = (message: string, source = "express") => {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit", 
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+};
+
+// Dynamic imports for production-safe Vite setup
+let setupVite: any = null;
+let serveStatic: any = null;
+
+const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -140,6 +115,24 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Load Vite modules conditionally
+  try {
+    if (!isProduction) {
+      console.log('[DEV] Loading Vite modules for development...');
+      const viteModule = await import("./vite");
+      log = viteModule.log;
+      setupVite = viteModule.setupVite;
+      serveStatic = viteModule.serveStatic;
+      console.log('[DEV] Vite modules loaded successfully');
+    } else {
+      console.log('[PRODUCTION] Using production mode - Vite modules not loaded');
+      log = fallbackLog;
+    }
+  } catch (error) {
+    console.warn('[WARN] Vite modules not available, using fallback log function:', error.message);
+    log = fallbackLog;
+  }
+  
   const storage = new MongoStorage();
   await storage.connect();
   

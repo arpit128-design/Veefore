@@ -820,16 +820,33 @@ button[data-state="checked"],
   justify-content: center !important;
 }
 
-/* Force black background for selected view mode buttons */
+/* Force black background for selected view mode buttons - AGGRESSIVE OVERRIDE */
+.view-mode-buttons button[style*="background-color: rgb(0, 0, 0)"],
+.view-mode-buttons button[style*="background-color:#000000"],
+.view-mode-buttons button[style*="backgroundColor"],
 [data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] {
   background-color: #000000 !important;
+  background: #000000 !important;
   color: #ffffff !important;
   border: 1px solid #000000 !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
 }
 
+.view-mode-buttons button[style*="background-color: rgb(0, 0, 0)"] svg,
+.view-mode-buttons button[style*="background-color:#000000"] svg,
+.view-mode-buttons button[style*="backgroundColor"] svg,
 [data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] svg {
   color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Override any button component styles */
+.view-mode-buttons button.bg-black,
+.view-mode-buttons button[data-selected="true"] {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
 }
 
 /* Force white background for unselected view mode buttons */

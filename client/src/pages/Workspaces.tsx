@@ -541,85 +541,73 @@ export default function Workspaces() {
               
               <div className="flex bg-slate-100 rounded-lg p-1 view-mode-buttons">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('grid')}
+                  data-selected={viewMode === 'grid'}
                   className={`h-8 px-3 transition-all duration-200 border ${
                     viewMode === 'grid' 
-                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
+                      ? '!bg-black !text-white shadow-sm hover:!bg-gray-800 !border-black' 
+                      : '!bg-white !text-slate-600 hover:!bg-slate-50 hover:!text-slate-800 !border-slate-300'
                   }`}
-                  style={viewMode === 'grid' ? { 
-                    backgroundColor: '#000000 !important', 
-                    color: '#ffffff !important',
-                    borderColor: '#000000 !important'
-                  } : {
-                    backgroundColor: '#ffffff !important',
-                    color: '#64748b !important',
-                    borderColor: '#cbd5e1 !important'
+                  style={{
+                    backgroundColor: viewMode === 'grid' ? '#000000' : '#ffffff',
+                    color: viewMode === 'grid' ? '#ffffff' : '#64748b',
+                    borderColor: viewMode === 'grid' ? '#000000' : '#cbd5e1'
                   }}
                 >
                   <Grid3X3 className="w-4 h-4" style={{ color: viewMode === 'grid' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('list')}
+                  data-selected={viewMode === 'list'}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'list' 
-                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
+                      ? '!bg-black !text-white shadow-sm hover:!bg-gray-800 !border-black' 
+                      : '!bg-white !text-slate-600 hover:!bg-slate-50 hover:!text-slate-800 !border-slate-300'
                   }`}
-                  style={viewMode === 'list' ? { 
-                    backgroundColor: '#000000 !important', 
-                    color: '#ffffff !important',
-                    borderColor: '#000000 !important'
-                  } : {
-                    backgroundColor: '#ffffff !important',
-                    color: '#64748b !important',
-                    borderColor: '#cbd5e1 !important'
+                  style={{
+                    backgroundColor: viewMode === 'list' ? '#000000' : '#ffffff',
+                    color: viewMode === 'list' ? '#ffffff' : '#64748b',
+                    borderColor: viewMode === 'list' ? '#000000' : '#cbd5e1'
                   }}
                 >
                   <List className="w-4 h-4" style={{ color: viewMode === 'list' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
-                  variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('kanban')}
+                  data-selected={viewMode === 'kanban'}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'kanban' 
-                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
+                      ? '!bg-black !text-white shadow-sm hover:!bg-gray-800 !border-black' 
+                      : '!bg-white !text-slate-600 hover:!bg-slate-50 hover:!text-slate-800 !border-slate-300'
                   }`}
-                  style={viewMode === 'kanban' ? { 
-                    backgroundColor: '#000000 !important', 
-                    color: '#ffffff !important',
-                    borderColor: '#000000 !important'
-                  } : {
-                    backgroundColor: '#ffffff !important',
-                    color: '#64748b !important',
-                    borderColor: '#cbd5e1 !important'
+                  style={{
+                    backgroundColor: viewMode === 'kanban' ? '#000000' : '#ffffff',
+                    color: viewMode === 'kanban' ? '#ffffff' : '#64748b',
+                    borderColor: viewMode === 'kanban' ? '#000000' : '#cbd5e1'
                   }}
                 >
                   <Database className="w-4 h-4" style={{ color: viewMode === 'kanban' ? '#ffffff' : '#64748b' }} />
                 </Button>
                 <Button
-                  variant={viewMode === 'analytics' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('analytics')}
+                  data-selected={viewMode === 'analytics'}
                   className={`h-8 px-3 transition-all duration-200 border ml-1 ${
                     viewMode === 'analytics' 
-                      ? 'bg-black text-white shadow-sm hover:bg-gray-800 border-black' 
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 border-slate-300'
+                      ? '!bg-black !text-white shadow-sm hover:!bg-gray-800 !border-black' 
+                      : '!bg-white !text-slate-600 hover:!bg-slate-50 hover:!text-slate-800 !border-slate-300'
                   }`}
-                  style={viewMode === 'analytics' ? { 
-                    backgroundColor: '#000000 !important', 
-                    color: '#ffffff !important',
-                    borderColor: '#000000 !important'
-                  } : {
-                    backgroundColor: '#ffffff !important',
-                    color: '#64748b !important',
-                    borderColor: '#cbd5e1 !important'
+                  style={{
+                    backgroundColor: viewMode === 'analytics' ? '#000000' : '#ffffff',
+                    color: viewMode === 'analytics' ? '#ffffff' : '#64748b',
+                    borderColor: viewMode === 'analytics' ? '#000000' : '#cbd5e1'
                   }}
                 >
                   <BarChart3 className="w-4 h-4" style={{ color: viewMode === 'analytics' ? '#ffffff' : '#64748b' }} />

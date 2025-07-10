@@ -11302,6 +11302,380 @@ Format the response as JSON with this structure:
     }
   });
 
+  // ===== AI GROWTH ASSISTANT ROUTES =====
+
+  // Advanced AI Account Analysis - 5 credits
+  app.post('/api/ai/account-analysis', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId } = req.body;
+      const userId = req.user.id;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+
+      // Check credits before generating analysis
+      const creditCost = 5;
+      const hasCredits = await creditService.hasCredits(userId, 'ai_account_analysis');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'ai_account_analysis',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      console.log(`[AI ANALYSIS] Starting comprehensive analysis for workspace ${workspaceId}`);
+
+      // Get workspace and social accounts
+      const workspace = await storage.getWorkspace(workspaceId);
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+
+      if (!socialAccounts || socialAccounts.length === 0) {
+        return res.status(400).json({ error: 'No social accounts found for analysis' });
+      }
+
+      // Prepare analysis data
+      const analysisPrompt = `
+You are an expert social media growth strategist and data analyst. Analyze the following account data and provide comprehensive growth insights.
+
+ACCOUNT DATA:
+${socialAccounts.map(account => `
+Platform: ${account.platform}
+Username: @${account.username}
+Followers: ${account.followersCount || 0}
+Following: ${account.followingCount || 0}
+Posts: ${account.mediaCount || 0}
+Avg Engagement: ${account.avgEngagement || 0}%
+Total Likes: ${account.totalLikes || 0}
+Total Comments: ${account.totalComments || 0}
+Total Reach: ${account.totalReach || 0}
+`).join('\n')}
+
+WORKSPACE CONTEXT:
+Name: ${workspace?.name || 'Default Workspace'}
+Theme: ${workspace?.theme || 'professional'}
+AI Personality: ${workspace?.aiPersonality || 'professional'}
+
+Provide a comprehensive analysis in the following JSON format:
+{
+  "accountHealth": {
+    "score": number (0-100),
+    "factors": [
+      {
+        "name": "Factor name",
+        "score": number (0-100),
+        "impact": "Description of impact"
+      }
+    ]
+  },
+  "growthPredictions": {
+    "nextWeek": {
+      "followers": number,
+      "engagement": number
+    },
+    "nextMonth": {
+      "followers": number,
+      "engagement": number
+    },
+    "confidence": number (0-100)
+  },
+  "viralOpportunities": [
+    {
+      "type": "Opportunity type",
+      "probability": number (0-100),
+      "description": "Detailed description",
+      "expectedReach": number
+    }
+  ],
+  "competitorInsights": [
+    {
+      "competitor": "@username",
+      "advantage": "Their advantage",
+      "opportunity": "Your opportunity",
+      "urgency": "low|medium|high"
+    }
+  ],
+  "contentStrategy": {
+    "bestTimes": ["Time recommendations"],
+    "topHashtags": ["#hashtag recommendations"],
+    "contentTypes": [
+      {
+        "type": "Content type",
+        "performance": number (0-100)
+      }
+    ],
+    "trendingTopics": ["Topic recommendations"]
+  },
+  "actionableInsights": [
+    {
+      "priority": "high|medium|low",
+      "category": "engagement|growth|content|timing",
+      "recommendation": "Specific action to take",
+      "expectedImpact": "Expected outcome",
+      "timeframe": "When to implement"
+    }
+  ]
+}
+
+Base your analysis on real data patterns, industry benchmarks, and current social media trends. Be specific and actionable.`;
+
+      // Call OpenAI for comprehensive analysis
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert social media growth strategist. Provide detailed, actionable insights based on real account data. Always respond with valid JSON."
+          },
+          {
+            role: "user",
+            content: analysisPrompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7,
+        max_tokens: 2000
+      });
+
+      const analysis = JSON.parse(response.choices[0].message.content || '{}');
+
+      // Deduct credits
+      await creditService.consumeCredits(userId, 'ai_account_analysis', 1, 'AI account analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      console.log(`[AI ANALYSIS] Analysis completed for workspace ${workspaceId}, ${creditCost} credits used`);
+
+      res.json({
+        success: true,
+        analysis,
+        creditsUsed: creditCost,
+        remainingCredits,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error: any) {
+      console.error('[AI ANALYSIS] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate AI analysis',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Viral Content Opportunities - 3 credits
+  app.post('/api/ai/viral-opportunities', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId, platform = 'instagram' } = req.body;
+      const userId = req.user.id;
+
+      const creditCost = 3;
+      const hasCredits = await creditService.hasCredits(userId, 'viral_opportunities');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'viral_opportunities',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      
+      const viralPrompt = `
+Analyze current social media trends and identify viral content opportunities for ${platform}.
+
+Account Context:
+${socialAccounts.map(acc => `@${acc.username}: ${acc.followersCount} followers, ${acc.avgEngagement}% engagement`).join('\n')}
+
+Identify 3-5 viral opportunities with high probability of success. Consider:
+- Current trending topics and hashtags
+- Optimal content formats (reels, carousels, stories)
+- Timing strategies
+- Audience psychology
+- Platform algorithm preferences
+
+Return JSON format:
+{
+  "opportunities": [
+    {
+      "type": "Content type",
+      "title": "Opportunity title",
+      "description": "Detailed strategy",
+      "probability": number (0-100),
+      "expectedReach": number,
+      "bestTiming": "When to post",
+      "requiredElements": ["List of elements needed"],
+      "trendingHashtags": ["#relevant", "#hashtags"],
+      "estimatedEngagement": number
+    }
+  ],
+  "trendingNow": ["Current trending topics"],
+  "algorithmTips": ["Platform-specific tips"]
+}`;
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are a viral content strategist with deep knowledge of social media trends and algorithms."
+          },
+          {
+            role: "user",
+            content: viralPrompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.8
+      });
+
+      const opportunities = JSON.parse(response.choices[0].message.content || '{}');
+
+      await creditService.consumeCredits(userId, 'viral_opportunities', 1, 'Viral opportunities analysis');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        ...opportunities,
+        creditsUsed: creditCost,
+        remainingCredits
+      });
+
+    } catch (error: any) {
+      console.error('[VIRAL OPPORTUNITIES] Error:', error);
+      res.status(500).json({ error: 'Failed to analyze viral opportunities' });
+    }
+  });
+
+  // Growth Strategy Generator - 4 credits
+  app.post('/api/ai/growth-strategy', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { workspaceId, timeframe = '30days', goals } = req.body;
+      const userId = req.user.id;
+
+      const creditCost = 4;
+      const hasCredits = await creditService.hasCredits(userId, 'growth_strategy');
+      
+      if (!hasCredits) {
+        const currentCredits = await creditService.getUserCredits(userId);
+        return res.status(402).json({ 
+          error: 'Insufficient credits',
+          featureType: 'growth_strategy',
+          required: creditCost,
+          current: currentCredits,
+          upgradeModal: true
+        });
+      }
+
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      
+      const strategyPrompt = `
+Create a comprehensive ${timeframe} growth strategy for social media accounts.
+
+Current Account Status:
+${socialAccounts.map(acc => `
+Platform: ${acc.platform}
+@${acc.username}: ${acc.followersCount} followers
+Engagement: ${acc.avgEngagement}%
+Posts: ${acc.mediaCount}
+`).join('\n')}
+
+User Goals: ${Array.isArray(goals) ? goals.join(', ') : goals || 'Increase followers and engagement'}
+
+Create a detailed growth strategy in JSON format:
+{
+  "strategy": {
+    "overview": "Strategy summary",
+    "targetGrowth": {
+      "followers": number,
+      "engagement": number,
+      "reach": number
+    },
+    "weeklyActions": [
+      {
+        "week": number,
+        "focus": "Main focus area",
+        "actions": ["Specific actions to take"],
+        "contentTypes": ["Content to create"],
+        "metrics": ["KPIs to track"]
+      }
+    ],
+    "contentCalendar": {
+      "postsPerWeek": number,
+      "contentMix": {
+        "educational": "percentage",
+        "entertainment": "percentage",
+        "promotional": "percentage",
+        "behindScenes": "percentage"
+      },
+      "bestTimes": ["Optimal posting times"]
+    },
+    "engagementTactics": [
+      {
+        "tactic": "Engagement method",
+        "description": "How to implement",
+        "frequency": "How often",
+        "expectedImpact": "Expected result"
+      }
+    ],
+    "hashtagStrategy": {
+      "primaryTags": ["Main hashtags"],
+      "nicheTags": ["Niche-specific tags"],
+      "trendingTags": ["Current trending tags"],
+      "strategy": "How to use hashtags effectively"
+    }
+  }
+}`;
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are a professional social media growth strategist with expertise in building engaged communities and driving organic growth."
+          },
+          {
+            role: "user",
+            content: strategyPrompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7
+      });
+
+      const strategy = JSON.parse(response.choices[0].message.content || '{}');
+
+      await creditService.consumeCredits(userId, 'growth_strategy', 1, 'Growth strategy generation');
+      const remainingCredits = await creditService.getUserCredits(userId);
+
+      res.json({
+        success: true,
+        ...strategy,
+        creditsUsed: creditCost,
+        remainingCredits,
+        timeframe
+      });
+
+    } catch (error: any) {
+      console.error('[GROWTH STRATEGY] Error:', error);
+      res.status(500).json({ error: 'Failed to generate growth strategy' });
+    }
+  });
+
   // AI Copilot Routes
   createCopilotRoutes(app, storage);
 

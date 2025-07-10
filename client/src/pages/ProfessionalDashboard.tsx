@@ -401,102 +401,102 @@ const ProfessionalDashboard: React.FC = () => {
         {/* Right Column - Tasks & Social Accounts */}
         <div className="space-y-6">
           {/* Get Started Card */}
-          <Card className="bg-gradient-to-br from-emerald-500 to-green-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border border-gray-200 shadow-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-3 text-white text-lg">
-                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-white" />
+                <CardTitle className="flex items-center gap-3 text-gray-900 text-lg">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-blue-600" />
                   </div>
                   Quick Setup Tasks
                 </CardTitle>
-                <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
+                <div className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
                   1/3 Complete
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-                <div className="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center shadow-lg">
-                  <CheckCircle className="w-6 h-6 text-white" />
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-white">Connect Instagram ✓</p>
-                  <p className="text-sm text-green-100">Account successfully linked</p>
+                  <p className="font-semibold text-gray-900">Connect Instagram ✓</p>
+                  <p className="text-sm text-gray-600">Account successfully linked</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/40">
-                  <span className="text-white font-bold">2</span>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300">
+                  <span className="text-gray-700 font-bold">2</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-white">Create your first post</p>
-                  <p className="text-sm text-green-100">Start with AI-powered content</p>
+                  <p className="font-semibold text-gray-900">Create your first post</p>
+                  <p className="text-sm text-gray-600">Start with AI-powered content</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-white/60" />
+                <ArrowRight className="w-5 h-5 text-gray-400" />
               </div>
               
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/40">
-                  <span className="text-white font-bold">3</span>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300">
+                  <span className="text-gray-700 font-bold">3</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-white">Schedule content</p>
-                  <p className="text-sm text-green-100">Plan your posting strategy</p>
+                  <p className="font-semibold text-gray-900">Schedule content</p>
+                  <p className="text-sm text-gray-600">Plan your posting strategy</p>
                 </div>
               </div>
               
-              <div className="mt-6 p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <div className="flex items-center gap-3 mb-2">
-                  <Rocket className="w-5 h-5 text-white" />
-                  <span className="font-bold text-white">Almost there!</span>
+                  <Rocket className="w-5 h-5 text-blue-600" />
+                  <span className="font-bold text-blue-900">Almost there!</span>
                 </div>
-                <p className="text-sm text-green-100">Complete setup to unlock premium features</p>
+                <p className="text-sm text-blue-700">Complete setup to unlock premium features</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Analytics Preview */}
-          <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-br from-white to-slate-50 border border-gray-200 shadow-lg">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl flex items-center gap-3 text-white">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-white" />
+              <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-slate-100 to-gray-200 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-slate-600" />
                 </div>
                 Analytics Preview
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Eye className="w-4 h-4 text-white" />
-                    <span className="text-sm font-medium text-white">Views</span>
+                    <Eye className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm font-medium text-gray-600">Views</span>
                   </div>
-                  <div className="text-2xl font-bold text-white">2.4K</div>
-                  <div className="text-xs text-orange-100">+12% this week</div>
+                  <div className="text-2xl font-bold text-gray-900">2.4K</div>
+                  <div className="text-xs text-green-600 font-medium">+12% this week</div>
                 </div>
-                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-4 h-4 text-white" />
-                    <span className="text-sm font-medium text-white">Likes</span>
+                    <Heart className="w-4 h-4 text-pink-500" />
+                    <span className="text-sm font-medium text-gray-600">Likes</span>
                   </div>
-                  <div className="text-2xl font-bold text-white">186</div>
-                  <div className="text-xs text-orange-100">+8% this week</div>
+                  <div className="text-2xl font-bold text-gray-900">186</div>
+                  <div className="text-xs text-green-600 font-medium">+8% this week</div>
                 </div>
               </div>
-              <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <MessageCircle className="w-4 h-4 text-white" />
-                  <span className="text-sm font-medium text-white">Engagement Rate</span>
+                  <MessageCircle className="w-4 h-4 text-purple-500" />
+                  <span className="text-sm font-medium text-gray-600">Engagement Rate</span>
                 </div>
-                <div className="text-2xl font-bold text-white">8.5%</div>
-                <div className="w-full bg-white/20 rounded-full h-2 mt-2">
-                  <div className="bg-white h-2 rounded-full" style={{width: '65%'}}></div>
+                <div className="text-2xl font-bold text-gray-900">8.5%</div>
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{width: '65%'}}></div>
                 </div>
               </div>
-              <Button variant="ghost" className="w-full bg-white/20 text-white hover:bg-white/30 border-0">
+              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50">
                 <PlayCircle className="w-4 h-4 mr-2" />
                 View Full Analytics
               </Button>

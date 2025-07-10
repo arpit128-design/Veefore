@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -98,6 +98,7 @@ import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
   const [location] = useLocation();
+  const [showAnalyticsSidebar, setShowAnalyticsSidebar] = useState(false);
   const isAnalyticsRoute = location.startsWith('/analytics') || 
                           location === '/social-insights' || 
                           location === '/performance-analytics' || 
@@ -121,9 +122,10 @@ function AuthenticatedApp() {
         ) : (
           <>
             <ProfessionalHeader />
-            <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+            <div className="flex h-[calc(100vh-64px)] overflow-hidden veefore-app-container">
               <ProfessionalSidebar />
-              <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
+              <main className="flex-1 h-full overflow-hidden veefore-main-content">
+                <div className="h-full overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
                   <Route path="/dashboard" component={ProfessionalDashboard} />
                   <Route path="/content-studio" component={ContentStudio} />
@@ -173,6 +175,7 @@ function AuthenticatedApp() {
                   <Route path="/" component={ProfessionalDashboard} />
                   <Route component={NotFound} />
                 </Switch>
+                </div>
               </main>
             </div>
           </>

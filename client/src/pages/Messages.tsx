@@ -64,7 +64,8 @@ import {
   Calendar,
   Globe,
   Shield,
-  Sparkles
+  Sparkles,
+  Plus
 } from 'lucide-react';
 
 interface Message {
@@ -159,7 +160,7 @@ interface ConversationAnalytics {
   }[];
 }
 
-// Mock data for comprehensive platform and message type demonstration
+// Professional DM conversations - only direct messages
 const mockConversations: Conversation[] = [
   {
     id: 'conv-1',
@@ -175,7 +176,7 @@ const mockConversations: Conversation[] = [
     },
     lastMessage: {
       id: 'msg-1',
-      content: 'Love your latest post! The colors are amazing 🎨',
+      content: 'Hi! I love your latest post! The colors are amazing. Could we collaborate?',
       timestamp: '2025-07-10T16:45:00Z',
       platform: 'instagram',
       type: 'dm',
@@ -195,7 +196,7 @@ const mockConversations: Conversation[] = [
     unreadCount: 2,
     isPinned: true,
     isArchived: false,
-    tags: ['design', 'collaboration'],
+    tags: ['collaboration', 'content'],
     sentiment: 'positive',
     priority: 'high',
     totalMessages: 8,
@@ -206,47 +207,6 @@ const mockConversations: Conversation[] = [
     id: 'conv-2',
     participant: {
       id: 'user-2',
-      username: 'tech_guru_mike',
-      displayName: 'Mike Chen',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      platform: 'youtube',
-      verified: false,
-      followers: 5420,
-      lastSeen: '2025-07-10T16:30:00Z'
-    },
-    lastMessage: {
-      id: 'msg-2',
-      content: 'Great tutorial! Could you make one about React hooks next?',
-      timestamp: '2025-07-10T16:30:00Z',
-      platform: 'youtube',
-      type: 'comment',
-      author: {
-        id: 'user-2',
-        username: 'tech_guru_mike',
-        displayName: 'Mike Chen',
-        verified: false,
-        followers: 5420
-      },
-      isFromUser: false,
-      status: 'read',
-      sentiment: 'positive',
-      isAiGenerated: false,
-      engagement: { likes: 15, replies: 3, shares: 2 }
-    },
-    unreadCount: 0,
-    isPinned: false,
-    isArchived: false,
-    tags: ['tutorial', 'react'],
-    sentiment: 'positive',
-    priority: 'medium',
-    totalMessages: 4,
-    createdAt: '2025-07-10T14:00:00Z',
-    updatedAt: '2025-07-10T16:30:00Z'
-  },
-  {
-    id: 'conv-3',
-    participant: {
-      id: 'user-3',
       username: 'business_pro',
       displayName: 'Emma Rodriguez',
       avatar: 'https://i.pravatar.cc/150?img=3',
@@ -256,13 +216,13 @@ const mockConversations: Conversation[] = [
       lastSeen: '2025-07-10T16:15:00Z'
     },
     lastMessage: {
-      id: 'msg-3',
-      content: 'Would love to discuss a potential partnership opportunity',
+      id: 'msg-2',
+      content: 'Would love to discuss a potential partnership opportunity with your team.',
       timestamp: '2025-07-10T16:15:00Z',
       platform: 'linkedin',
       type: 'dm',
       author: {
-        id: 'user-3',
+        id: 'user-2',
         username: 'business_pro',
         displayName: 'Emma Rodriguez',
         verified: true,
@@ -285,50 +245,9 @@ const mockConversations: Conversation[] = [
     updatedAt: '2025-07-10T16:15:00Z'
   },
   {
-    id: 'conv-4',
+    id: 'conv-3',
     participant: {
-      id: 'user-4',
-      username: 'foodie_alex',
-      displayName: 'Alex Thompson',
-      avatar: 'https://i.pravatar.cc/150?img=4',
-      platform: 'twitter',
-      verified: false,
-      followers: 3200,
-      lastSeen: '2025-07-10T15:45:00Z'
-    },
-    lastMessage: {
-      id: 'msg-4',
-      content: '@veefore This recipe didn\'t work for me. Instructions unclear 😕',
-      timestamp: '2025-07-10T15:45:00Z',
-      platform: 'twitter',
-      type: 'mention',
-      author: {
-        id: 'user-4',
-        username: 'foodie_alex',
-        displayName: 'Alex Thompson',
-        verified: false,
-        followers: 3200
-      },
-      isFromUser: false,
-      status: 'read',
-      sentiment: 'negative',
-      isAiGenerated: false,
-      engagement: { likes: 2, replies: 1, shares: 0 }
-    },
-    unreadCount: 1,
-    isPinned: false,
-    isArchived: false,
-    tags: ['feedback', 'recipe'],
-    sentiment: 'negative',
-    priority: 'medium',
-    totalMessages: 3,
-    createdAt: '2025-07-10T15:30:00Z',
-    updatedAt: '2025-07-10T15:45:00Z'
-  },
-  {
-    id: 'conv-5',
-    participant: {
-      id: 'user-5',
+      id: 'user-3',
       username: 'marketing_maven',
       displayName: 'Lisa Kim',
       avatar: 'https://i.pravatar.cc/150?img=5',
@@ -338,13 +257,13 @@ const mockConversations: Conversation[] = [
       lastSeen: '2025-07-10T15:30:00Z'
     },
     lastMessage: {
-      id: 'msg-5',
-      content: 'Thanks for the quick response! Your customer service is excellent 👍',
+      id: 'msg-3',
+      content: 'Thanks for the quick response! Your customer service is excellent.',
       timestamp: '2025-07-10T15:30:00Z',
       platform: 'facebook',
-      type: 'reply',
+      type: 'dm',
       author: {
-        id: 'user-5',
+        id: 'user-3',
         username: 'marketing_maven',
         displayName: 'Lisa Kim',
         verified: true,
@@ -354,22 +273,22 @@ const mockConversations: Conversation[] = [
       status: 'read',
       sentiment: 'positive',
       isAiGenerated: false,
-      engagement: { likes: 8, replies: 2, shares: 1 }
+      engagement: { likes: 0, replies: 0, shares: 0 }
     },
     unreadCount: 0,
     isPinned: false,
     isArchived: false,
-    tags: ['customer-service', 'positive'],
+    tags: ['support', 'positive'],
     sentiment: 'positive',
-    priority: 'low',
+    priority: 'medium',
     totalMessages: 6,
     createdAt: '2025-07-10T12:00:00Z',
     updatedAt: '2025-07-10T15:30:00Z'
   },
   {
-    id: 'conv-6',
+    id: 'conv-4',
     participant: {
-      id: 'user-6',
+      id: 'user-4',
       username: 'content_creator_pro',
       displayName: 'David Wilson',
       avatar: 'https://i.pravatar.cc/150?img=6',
@@ -379,13 +298,13 @@ const mockConversations: Conversation[] = [
       lastSeen: '2025-07-10T15:00:00Z'
     },
     lastMessage: {
-      id: 'msg-6',
-      content: 'Could you share the preset you used for this edit?',
+      id: 'msg-4',
+      content: 'Hey! Could you share some tips about content creation? I\'m starting out.',
       timestamp: '2025-07-10T15:00:00Z',
       platform: 'instagram',
-      type: 'comment',
+      type: 'dm',
       author: {
-        id: 'user-6',
+        id: 'user-4',
         username: 'content_creator_pro',
         displayName: 'David Wilson',
         verified: false,
@@ -395,57 +314,97 @@ const mockConversations: Conversation[] = [
       status: 'delivered',
       sentiment: 'neutral',
       isAiGenerated: false,
-      engagement: { likes: 5, replies: 0, shares: 0 }
+      engagement: { likes: 0, replies: 0, shares: 0 }
     },
     unreadCount: 1,
     isPinned: false,
     isArchived: false,
-    tags: ['editing', 'preset'],
+    tags: ['tips', 'content'],
     sentiment: 'neutral',
     priority: 'low',
     totalMessages: 1,
     createdAt: '2025-07-10T15:00:00Z',
     updatedAt: '2025-07-10T15:00:00Z'
+  },
+  {
+    id: 'conv-5',
+    participant: {
+      id: 'user-5',
+      username: 'tech_enthusiast',
+      displayName: 'Mike Chen',
+      avatar: 'https://i.pravatar.cc/150?img=2',
+      platform: 'twitter',
+      verified: false,
+      followers: 5420,
+      lastSeen: '2025-07-10T14:30:00Z'
+    },
+    lastMessage: {
+      id: 'msg-5',
+      content: 'Just wanted to say your tutorials helped me learn so much! Thank you.',
+      timestamp: '2025-07-10T14:30:00Z',
+      platform: 'twitter',
+      type: 'dm',
+      author: {
+        id: 'user-5',
+        username: 'tech_enthusiast',
+        displayName: 'Mike Chen',
+        verified: false,
+        followers: 5420
+      },
+      isFromUser: false,
+      status: 'read',
+      sentiment: 'positive',
+      isAiGenerated: false,
+      engagement: { likes: 0, replies: 0, shares: 0 }
+    },
+    unreadCount: 0,
+    isPinned: false,
+    isArchived: false,
+    tags: ['tutorial', 'thanks'],
+    sentiment: 'positive',
+    priority: 'low',
+    totalMessages: 3,
+    createdAt: '2025-07-10T14:00:00Z',
+    updatedAt: '2025-07-10T14:30:00Z'
   }
 ];
 
 const mockAnalytics: ConversationAnalytics = {
-  totalConversations: 6,
-  activeConversations: 4,
-  totalMessages: 24,
-  unreadMessages: 5,
-  responseRate: 92.5,
-  averageResponseTime: '2h 15m',
+  totalConversations: 5,
+  activeConversations: 3,
+  totalMessages: 20,
+  unreadMessages: 4,
+  responseRate: 95.2,
+  averageResponseTime: '1h 45m',
   sentimentDistribution: {
-    positive: 50,
-    negative: 17,
-    neutral: 33
+    positive: 60,
+    negative: 0,
+    neutral: 40
   },
   platformBreakdown: {
-    instagram: 33,
-    facebook: 17,
-    twitter: 17,
-    youtube: 17,
-    linkedin: 16
+    instagram: 40,
+    facebook: 20,
+    twitter: 20,
+    youtube: 0,
+    linkedin: 20
   },
   messageTypes: {
-    dms: 42,
-    comments: 25,
-    mentions: 17,
-    replies: 16
+    dms: 100,
+    comments: 0,
+    mentions: 0,
+    replies: 0
   },
   topTopics: [
-    { topic: 'Design', count: 8, sentiment: 'positive' },
-    { topic: 'Tutorial', count: 6, sentiment: 'positive' },
-    { topic: 'Business', count: 4, sentiment: 'neutral' },
-    { topic: 'Support', count: 3, sentiment: 'positive' },
-    { topic: 'Feedback', count: 3, sentiment: 'negative' }
+    { topic: 'Collaboration', count: 8, sentiment: 'positive' },
+    { topic: 'Business', count: 5, sentiment: 'neutral' },
+    { topic: 'Support', count: 4, sentiment: 'positive' },
+    { topic: 'Content', count: 3, sentiment: 'positive' }
   ],
   peakHours: [
-    { hour: 9, count: 5 },
-    { hour: 14, count: 8 },
-    { hour: 16, count: 11 },
-    { hour: 20, count: 7 }
+    { hour: 10, count: 4 },
+    { hour: 14, count: 7 },
+    { hour: 16, count: 9 },
+    { hour: 19, count: 5 }
   ]
 };
 
@@ -604,77 +563,95 @@ export default function Messages() {
   });
 
   const renderConversationsList = () => (
-    <div className="h-full flex flex-col bg-white border-r border-gray-200">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-white">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Messages</h2>
-          <div className="flex items-center space-x-2">
-            <Button size="sm" variant="outline" onClick={() => setAutoRefresh(!autoRefresh)}>
+    <div className="h-full flex flex-col bg-white border-r border-slate-200">
+      {/* Professional Header */}
+      <div className="p-6 border-b border-slate-200 bg-white">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Direct Messages</h1>
+            <p className="text-sm text-slate-600 mt-1">Manage your private conversations</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700"
+            >
               <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
             </Button>
-            <Button size="sm" variant="outline">
-              <Settings className="h-4 w-4" />
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700"
+            >
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
         </div>
         
-        {/* Search Bar */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        {/* Modern Search Bar */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-slate-900"
           />
         </div>
         
-        {/* Filters */}
-        <div className="flex items-center space-x-2 mb-3">
+        {/* Clean Filters */}
+        <div className="flex items-center space-x-3 mb-4">
           <Select value={filterPlatform} onValueChange={setFilterPlatform}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
+            <SelectTrigger className="w-36 bg-white border-slate-300 text-slate-700">
+              <SelectValue placeholder="All Platforms" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border-slate-200">
               <SelectItem value="all">All Platforms</SelectItem>
               <SelectItem value="instagram">Instagram</SelectItem>
               <SelectItem value="facebook">Facebook</SelectItem>
               <SelectItem value="twitter">Twitter</SelectItem>
-              <SelectItem value="youtube">YouTube</SelectItem>
               <SelectItem value="linkedin">LinkedIn</SelectItem>
             </SelectContent>
           </Select>
           
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-28">
-              <SelectValue />
+          <Select value={filterSentiment} onValueChange={setFilterSentiment}>
+            <SelectTrigger className="w-32 bg-white border-slate-300 text-slate-700">
+              <SelectValue placeholder="Sentiment" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="dm">DMs</SelectItem>
-              <SelectItem value="comment">Comments</SelectItem>
-              <SelectItem value="mention">Mentions</SelectItem>
-              <SelectItem value="reply">Replies</SelectItem>
+            <SelectContent className="bg-white border-slate-200">
+              <SelectItem value="all">All Moods</SelectItem>
+              <SelectItem value="positive">Positive</SelectItem>
+              <SelectItem value="neutral">Neutral</SelectItem>
+              <SelectItem value="negative">Negative</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        {/* Quick Filters */}
+        {/* Status Bar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch checked={showOnlyUnread} onCheckedChange={setShowOnlyUnread} />
-            <Label className="text-sm text-gray-700">Unread only</Label>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <Switch 
+                checked={showOnlyUnread} 
+                onCheckedChange={setShowOnlyUnread}
+                className="data-[state=checked]:bg-blue-600"
+              />
+              <Label className="text-sm text-slate-700 font-medium">Unread only</Label>
+            </div>
           </div>
-          <Badge variant="secondary" className="text-xs">
-            {filteredConversations?.length || 0} conversations
-          </Badge>
+          <div className="flex items-center space-x-2">
+            <Badge variant="secondary" className="bg-slate-100 text-slate-700 border-slate-300">
+              {filteredConversations?.length || 0} conversations
+            </Badge>
+          </div>
         </div>
       </div>
       
-      {/* Conversations List */}
+      {/* Modern Conversations List */}
       <ScrollArea className="flex-1">
-        <div className="p-2">
+        <div className="p-4 space-y-3">
           <AnimatePresence>
             {filteredConversations?.map((conversation, index) => (
               <motion.div
@@ -682,80 +659,95 @@ export default function Messages() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2, delay: index * 0.05 }}
-                onClick={() => setSelectedConversation(conversation)}
-                className={`p-3 rounded-lg mb-2 cursor-pointer transition-all hover:bg-gray-50 ${
-                  selectedConversation?.id === conversation.id ? 'bg-blue-50 border border-blue-200' : 'border border-transparent'
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className={`p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                  selectedConversation?.id === conversation.id
+                    ? 'bg-blue-50 border-blue-200 shadow-md'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300'
                 }`}
+                onClick={() => setSelectedConversation(conversation)}
               >
-                <div className="flex items-start space-x-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
+                <div className="flex items-start space-x-4">
+                  {/* Modern Avatar */}
+                  <div className="relative flex-shrink-0">
+                    <Avatar className="h-14 w-14 ring-2 ring-white shadow-lg">
                       <AvatarImage src={conversation.participant.avatar} />
-                      <AvatarFallback>{conversation.participant.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                        {conversation.participant.displayName.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute -bottom-1 -right-1 p-1 rounded-full ${getPlatformColor(conversation.participant.platform)}`}>
+                    
+                    {/* Platform Badge */}
+                    <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center text-white text-xs shadow-lg ${getPlatformColor(conversation.participant.platform)}`}>
                       {getPlatformIcon(conversation.participant.platform)}
                     </div>
-                    {conversation.unreadCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
-                        {conversation.unreadCount}
-                      </Badge>
-                    )}
+                    
+                    {/* Online Status */}
+                    <div className="absolute -top-1 -right-1">
+                      <div className="h-4 w-4 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
+                    </div>
                   </div>
                   
+                  {/* Content Area */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-gray-900 truncate">
+                        <h3 className="font-bold text-slate-900 text-lg">
                           {conversation.participant.displayName}
-                        </span>
+                        </h3>
                         {conversation.participant.verified && (
-                          <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                          <CheckCircle2 className="h-5 w-5 text-blue-500" />
                         )}
                         {conversation.isPinned && (
-                          <Pin className="h-3 w-3 text-orange-500" />
+                          <Pin className="h-4 w-4 text-amber-500" />
                         )}
                       </div>
-                      <span className="text-xs text-gray-500">
-                        {new Date(conversation.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm text-gray-600">@{conversation.participant.username}</span>
-                      <Badge className={`px-1 py-0 text-xs ${getSentimentColor(conversation.sentiment)}`}>
-                        {conversation.sentiment}
-                      </Badge>
-                      <div className="flex items-center space-x-1">
-                        {getMessageTypeIcon(conversation.lastMessage.type)}
-                        <span className="text-xs text-gray-500 capitalize">
-                          {conversation.lastMessage.type}
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-slate-500 font-medium">
+                          {new Date(conversation.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
+                        {conversation.unreadCount > 0 && (
+                          <Badge className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 font-bold">
+                            {conversation.unreadCount}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     
-                    <p className="text-sm text-gray-600 truncate">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <span className="text-sm text-slate-600 font-medium">@{conversation.participant.username}</span>
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${getSentimentColor(conversation.sentiment)}`}>
+                        {conversation.sentiment}
+                      </div>
+                    </div>
+                    
+                    <p className="text-slate-700 text-base mb-3 line-clamp-2">
                       {conversation.lastMessage.isAiGenerated && (
-                        <Sparkles className="inline h-3 w-3 mr-1 text-purple-500" />
+                        <Sparkles className="inline h-4 w-4 mr-2 text-purple-500" />
                       )}
                       {conversation.lastMessage.content}
                     </p>
                     
-                    {conversation.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
+                    {/* Enhanced Metadata */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
                         {conversation.tags.slice(0, 2).map((tag, i) => (
-                          <Badge key={i} variant="outline" className="text-xs px-1 py-0">
-                            {tag}
+                          <Badge key={i} variant="secondary" className="bg-slate-100 text-slate-700 border-slate-300 text-sm px-3 py-1">
+                            #{tag}
                           </Badge>
                         ))}
-                        {conversation.tags.length > 2 && (
-                          <Badge variant="outline" className="text-xs px-1 py-0">
-                            +{conversation.tags.length - 2}
-                          </Badge>
-                        )}
                       </div>
-                    )}
+                      <div className="flex items-center space-x-4 text-sm text-slate-600">
+                        <div className="flex items-center space-x-1">
+                          <Users className="h-4 w-4" />
+                          <span className="font-medium">{conversation.participant.followers.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="font-medium">{conversation.totalMessages}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -763,11 +755,17 @@ export default function Messages() {
           </AnimatePresence>
           
           {filteredConversations?.length === 0 && !conversationsLoading && (
-            <div className="text-center py-12">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations found</h3>
-              <p className="text-gray-600">Try adjusting your filters or search query</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <div className="bg-slate-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-10 w-10 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No conversations found</h3>
+              <p className="text-slate-600">Try adjusting your filters or start a new conversation</p>
+            </motion.div>
           )}
         </div>
       </ScrollArea>
@@ -926,16 +924,16 @@ export default function Messages() {
           </div>
         </ScrollArea>
         
-        {/* Message Input */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        {/* Modern Message Input */}
+        <div className="p-6 border-t border-slate-200 bg-white">
           {aiAssistant && (
-            <div className="mb-3">
+            <div className="mb-4">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => generateAiResponseMutation.mutate({ conversationId: selectedConversation.id })}
                 disabled={generateAiResponseMutation.isPending}
-                className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                className="text-purple-600 border-purple-200 hover:bg-purple-50 bg-white"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 {generateAiResponseMutation.isPending ? 'Generating...' : 'Generate AI Response'}
@@ -943,10 +941,10 @@ export default function Messages() {
             </div>
           )}
           
-          <div className="flex items-end space-x-2">
+          <div className="flex items-end space-x-4">
             <div className="flex-1">
               <Textarea
-                placeholder="Type your message..."
+                placeholder="Type your direct message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => {
@@ -956,40 +954,47 @@ export default function Messages() {
                       sendMessageMutation.mutate({
                         conversationId: selectedConversation.id,
                         content: newMessage,
-                        type: 'reply'
+                        type: 'dm'
                       });
                     }
                   }
                 }}
-                className="resize-none"
-                rows={2}
+                className="resize-none bg-white border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-slate-900 rounded-2xl"
+                rows={3}
               />
             </div>
             
-            <div className="flex flex-col space-y-2">
-              <Button size="sm" variant="outline">
+            <div className="flex items-center space-x-2">
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl"
+              >
                 <Paperclip className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="outline">
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl"
+              >
                 <Smile className="h-4 w-4" />
               </Button>
+              <Button
+                onClick={() => {
+                  if (newMessage.trim()) {
+                    sendMessageMutation.mutate({
+                      conversationId: selectedConversation.id,
+                      content: newMessage,
+                      type: 'dm'
+                    });
+                  }
+                }}
+                disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
-            
-            <Button
-              onClick={() => {
-                if (newMessage.trim()) {
-                  sendMessageMutation.mutate({
-                    conversationId: selectedConversation.id,
-                    content: newMessage,
-                    type: 'reply'
-                  });
-                }
-              }}
-              disabled={!newMessage.trim() || sendMessageMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
@@ -1317,36 +1322,29 @@ export default function Messages() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto">
-        {/* Professional Navigation Tabs */}
+        {/* Modern Navigation Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
           <div className="p-6 pb-0">
-            <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-2 shadow-lg">
+            <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-2 shadow-xl">
               <TabsTrigger 
                 value="conversations" 
-                className="text-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-medium hover:text-gray-900"
+                className="text-slate-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-semibold hover:text-slate-900 transition-all"
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
-                Conversations
-              </TabsTrigger>
-              <TabsTrigger 
-                value="messages"
-                className="text-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-medium hover:text-gray-900"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Messages
+                Direct Messages
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics"
-                className="text-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-medium hover:text-gray-900"
+                className="text-slate-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-semibold hover:text-slate-900 transition-all"
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Analytics
               </TabsTrigger>
               <TabsTrigger 
                 value="settings"
-                className="text-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-medium hover:text-gray-900"
+                className="text-slate-700 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl font-semibold hover:text-slate-900 transition-all"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 Settings

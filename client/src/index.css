@@ -248,6 +248,81 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
 }
 
 /* Specific analytics page yellow elimination */
+.analytics-page .bg-yellow-100,
+.analytics-page .bg-yellow-200,
+.analytics-page .bg-yellow-300,
+.analytics-page .bg-yellow-400,
+.analytics-page .bg-yellow-500 {
+  background-color: white !important;
+}
+
+/* MESSAGES PAGE - COMPLETE YELLOW ELIMINATION */
+/* Target messages page specifically */
+[data-route="/conversations"] *,
+[data-route="/messages"] *,
+.messages-container *,
+.messages-page * {
+  background-color: white !important;
+}
+
+/* Input fields, search bars, and form controls */
+[data-route="/conversations"] input,
+[data-route="/conversations"] textarea,
+[data-route="/conversations"] button,
+[data-route="/messages"] input,
+[data-route="/messages"] textarea,
+[data-route="/messages"] button,
+input[placeholder*="Search"],
+input[placeholder*="search"],
+.search-input,
+.filter-button,
+.message-input {
+  background-color: white !important;
+  border-color: rgb(203 213 225) !important;
+}
+
+/* Select dropdowns and comboboxes */
+[role="combobox"],
+[data-state="open"],
+.select-trigger,
+.select-content,
+[data-radix-select-trigger],
+[data-radix-select-content] {
+  background-color: white !important;
+  border-color: rgb(203 213 225) !important;
+}
+
+/* Switch and Toggle components - blue when active */
+.switch-root,
+.toggle-root,
+[data-state="checked"] {
+  background-color: rgb(37 99 235) !important;
+}
+
+/* Textarea and all input types */
+textarea,
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"] {
+  background-color: white !important;
+  border-color: rgb(203 213 225) !important;
+}
+
+/* Force white for any remaining yellow elements */
+.bg-yellow-50,
+.bg-yellow-100,
+.bg-yellow-200,
+.bg-yellow-300,
+.bg-yellow-400,
+.bg-yellow-500,
+.bg-yellow-600,
+.bg-yellow-700,
+.bg-yellow-800,
+.bg-yellow-900 {
+  background-color: white !important;
+  border-color: rgb(203 213 225) !important;
+}
 [data-page="analytics"] *, 
 .analytics-container *,
 *[class*="recommendations"] *,

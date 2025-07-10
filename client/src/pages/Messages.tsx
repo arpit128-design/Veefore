@@ -1284,8 +1284,8 @@ export default function Messages() {
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="flex-1 overflow-hidden">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mt-6 mb-6 overflow-hidden">
+          <TabsContent value="conversations" className="flex-1 overflow-hidden p-6 pt-0">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1295,8 +1295,8 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="flex-1 overflow-hidden">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mt-6 mb-6 overflow-hidden">
+          <TabsContent value="messages" className="flex-1 overflow-hidden p-6 pt-0">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1306,14 +1306,14 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="flex-1 overflow-hidden mt-6">
-            <div className="veefore-main-content">
+          <TabsContent value="analytics" className="flex-1 overflow-hidden p-6 pt-0">
+            <div className="veefore-main-content" style={{ height: 'calc(100vh - 180px)' }}>
               {renderAnalyticsView()}
             </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="flex-1 overflow-hidden mt-6">
-            <div className="veefore-main-content">
+          <TabsContent value="settings" className="flex-1 overflow-hidden p-6 pt-0">
+            <div className="veefore-main-content" style={{ height: 'calc(100vh - 180px)' }}>
               {renderSettingsView()}
             </div>
           </TabsContent>

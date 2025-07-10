@@ -10,342 +10,250 @@
  * 4. Creating dist directory and ensuring proper file structure
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const esbuild = require('esbuild');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+console.log('🚀 Starting VeeFore production build...');
 
-const execAsync = promisify(exec);
-
-console.log('🚀 Starting VeeFore Production Build...');
-
-async function buildProduction() {
-  try {
-    // Step 1: Clean previous build
-    console.log('\n📁 Cleaning previous build...');
-    if (fs.existsSync('dist')) {
-      await execAsync('rm -rf dist');
-    }
-    
-    // Step 2: Build client with Vite
-    console.log('\n🔧 Building client with Vite...');
-    await execAsync('npm run build', { cwd: 'client' });
-    
-    // Step 3: Create server build directory
-    console.log('\n🏗️  Creating server build structure...');
-    fs.mkdirSync('dist', { recursive: true });
-    fs.mkdirSync('dist/server', { recursive: true });
-    
-    // Step 4: Build server with esbuild (excluding Vite)
-    console.log('\n⚙️  Building server with esbuild...');
-    
-    const esbuildConfig = {
-      entryPoints: ['server/index.ts'],
-      bundle: true,
-      platform: 'node',
-      target: 'node18',
-      outdir: 'dist/server',
-      format: 'esm',
-      sourcemap: true,
-      external: [
-        // Exclude Vite and development dependencies
-        'vite',
-        '@vitejs/plugin-react',
-        '@replit/vite-plugin-cartographer',
-        '@replit/vite-plugin-runtime-error-modal',
-        'esbuild',
-        // Keep Node.js modules external
-        'fsevents',
-        'lightningcss',
-        'rollup'
-      ],
-      define: {
-        'process.env.NODE_ENV': '"production"'
-      },
-      banner: {
-        js: `
-        import { createRequire } from 'module';
-        const require = createRequire(import.meta.url);
-        const __filename = new URL(import.meta.url).pathname;
-        const __dirname = path.dirname(__filename);
-        `
-      }
-    };
-    
-    // Use esbuild programmatically
-    const esbuild = await import('esbuild');
-    await esbuild.build(esbuildConfig);
-    
-    // Step 5: Copy necessary files
-    console.log('\n📋 Copying configuration files...');
-    
-    // Copy package.json with production dependencies only
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    const productionPackageJson = {
-      name: packageJson.name,
-      version: packageJson.version,
-      type: "module",
-      main: "server/index.js",
-      scripts: {
-        start: "node server/index.js"
-      },
-      dependencies: {
-        // Only include production dependencies
-        express: packageJson.dependencies.express,
-        mongoose: packageJson.dependencies.mongoose,
-        mongodb: packageJson.dependencies.mongodb,
-        multer: packageJson.dependencies.multer,
-        bcryptjs: packageJson.dependencies.bcryptjs,
-        jsonwebtoken: packageJson.dependencies.jsonwebtoken,
-        dotenv: packageJson.dependencies.dotenv,
-        axios: packageJson.dependencies.axios,
-        '@sendgrid/mail': packageJson.dependencies['@sendgrid/mail'],
-        stripe: packageJson.dependencies.stripe,
-        razorpay: packageJson.dependencies.razorpay,
-        openai: packageJson.dependencies.openai,
-        '@anthropic-ai/sdk': packageJson.dependencies['@anthropic-ai/sdk'],
-        '@google/generative-ai': packageJson.dependencies['@google/generative-ai'],
-        firebase: packageJson.dependencies.firebase,
-        'firebase-admin': packageJson.dependencies['firebase-admin'],
-        sharp: packageJson.dependencies.sharp,
-        jimp: packageJson.dependencies.jimp,
-        canvas: packageJson.dependencies.canvas,
-        'fluent-ffmpeg': packageJson.dependencies['fluent-ffmpeg'],
-        'ffmpeg-static': packageJson.dependencies['ffmpeg-static'],
-        puppeteer: packageJson.dependencies.puppeteer,
-        nodemailer: packageJson.dependencies.nodemailer,
-        ws: packageJson.dependencies.ws
-      }
-    };
-    
-    fs.writeFileSync('dist/package.json', JSON.stringify(productionPackageJson, null, 2));
-    
-    // Copy other necessary files
-    if (fs.existsSync('.env')) {
-      fs.copyFileSync('.env', 'dist/.env');
-    }
-    
-    // Create .env.example for deployment
-    const envExample = `# VeeFore Production Environment Variables
-NODE_ENV=production
-PORT=5000
-
-# Database
-DATABASE_URL=mongodb://localhost:27017/veefore
-
-# JWT
-JWT_SECRET=your-jwt-secret-here
-
-# Firebase
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY=your-firebase-private-key
-FIREBASE_CLIENT_EMAIL=your-firebase-client-email
-
-# OpenAI
-OPENAI_API_KEY=your-openai-api-key
-
-# Stripe
-STRIPE_SECRET_KEY=your-stripe-secret-key
-STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret
-
-# SendGrid
-SENDGRID_API_KEY=your-sendgrid-api-key
-
-# Instagram
-INSTAGRAM_CLIENT_ID=your-instagram-client-id
-INSTAGRAM_CLIENT_SECRET=your-instagram-client-secret
-
-# Other APIs
-ANTHROPIC_API_KEY=your-anthropic-api-key
-GOOGLE_API_KEY=your-google-api-key
-RAZORPAY_KEY_ID=your-razorpay-key-id
-RAZORPAY_KEY_SECRET=your-razorpay-key-secret
-`;
-    
-    fs.writeFileSync('dist/.env.example', envExample);
-    
-    // Step 6: Create deployment scripts
-    console.log('\n🔧 Creating deployment scripts...');
-    
-    // Docker deployment
-    const dockerfile = `FROM node:18-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built application
-COPY . .
-
-# Create uploads directory
-RUN mkdir -p uploads
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
-  CMD curl -f http://localhost:5000/api/health || exit 1
-
-# Expose port
-EXPOSE 5000
-
-# Start application
-CMD ["npm", "start"]
-`;
-    
-    fs.writeFileSync('dist/Dockerfile', dockerfile);
-    
-    // Step 7: Create production validation script
-    const validationScript = `#!/usr/bin/env node
-
-/**
- * Production Deployment Validation
- * Validates that all required components are present for deployment
- */
-
-import fs from 'fs';
-import path from 'path';
-
-console.log('🔍 Validating production build...');
-
-const requiredFiles = [
-  'package.json',
-  'server/index.js',
-  'public/index.html',
-  '.env.example',
-  'Dockerfile'
-];
-
-const requiredDirs = [
-  'server',
-  'public',
-  'public/assets'
-];
-
-let isValid = true;
-
-// Check required files
-console.log('\\n📋 Checking required files...');
-for (const file of requiredFiles) {
-  if (fs.existsSync(file)) {
-    console.log(\`✅ \${file}\`);
-  } else {
-    console.log(\`❌ \${file} - MISSING\`);
-    isValid = false;
-  }
+// Clean dist directory
+if (fs.existsSync('dist')) {
+  console.log('🧹 Cleaning dist directory...');
+  fs.rmSync('dist', { recursive: true, force: true });
 }
 
-// Check required directories
-console.log('\\n📁 Checking required directories...');
-for (const dir of requiredDirs) {
-  if (fs.existsSync(dir)) {
-    console.log(\`✅ \${dir}/\`);
-  } else {
-    console.log(\`❌ \${dir}/ - MISSING\`);
-    isValid = false;
-  }
-}
+// Create dist directory
+fs.mkdirSync('dist', { recursive: true });
 
-// Check package.json structure
-console.log('\\n📦 Validating package.json...');
 try {
-  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  // Step 1: Build client with Vite
+  console.log('📦 Building client with Vite...');
+  execSync('npm run build:client', { stdio: 'inherit' });
   
-  if (pkg.scripts && pkg.scripts.start) {
-    console.log('✅ Start script defined');
-  } else {
-    console.log('❌ Start script missing');
-    isValid = false;
-  }
+  // Step 2: Build server with esbuild
+  console.log('🛠️ Building server with esbuild...');
   
-  if (pkg.type === 'module') {
-    console.log('✅ ESM modules configured');
-  } else {
-    console.log('❌ ESM modules not configured');
-    isValid = false;
-  }
-  
-} catch (error) {
-  console.log('❌ Invalid package.json');
-  isValid = false;
-}
+  // External dependencies to exclude from bundling
+  const externals = [
+    'express',
+    'mongoose',
+    'mongodb',
+    'bcryptjs',
+    'jsonwebtoken',
+    'multer',
+    'sharp',
+    'canvas',
+    'fabric',
+    'nodemailer',
+    'axios',
+    'dotenv',
+    'cors',
+    'helmet',
+    'compression',
+    'cookie-parser',
+    'express-rate-limit',
+    'express-session',
+    'connect-mongo',
+    'passport',
+    'passport-local',
+    'passport-jwt',
+    'stripe',
+    'razorpay',
+    'openai',
+    '@anthropic-ai/sdk',
+    '@google/generative-ai',
+    'firebase-admin',
+    'twilio',
+    '@sendgrid/mail',
+    'ws',
+    'socket.io',
+    'puppeteer',
+    'ffmpeg-static',
+    'fluent-ffmpeg',
+    'jimp',
+    'html2canvas',
+    'vite',
+    '@vitejs/plugin-react',
+    '@replit/vite-plugin-cartographer',
+    '@replit/vite-plugin-runtime-error-modal'
+  ];
 
-// Final validation
-console.log('\\n🎯 Build Validation Result:');
-if (isValid) {
-  console.log('✅ Production build is valid and ready for deployment!');
-  process.exit(0);
-} else {
-  console.log('❌ Production build has issues that need to be fixed');
-  process.exit(1);
-}
-`;
-    
-    fs.writeFileSync('dist/validate-deployment.js', validationScript);
-    fs.chmodSync('dist/validate-deployment.js', 0o755);
-    
-    // Step 8: Create startup script
-    const startupScript = `#!/usr/bin/env node
+  // Build server
+  await esbuild.build({
+    entryPoints: ['server/index.ts'],
+    bundle: true,
+    outfile: 'dist/server.js',
+    platform: 'node',
+    target: 'node18',
+    format: 'cjs',
+    external: externals,
+    sourcemap: false,
+    minify: true,
+    define: {
+      'process.env.NODE_ENV': '"production"'
+    },
+    banner: {
+      js: '#!/usr/bin/env node'
+    }
+  });
+
+  // Step 3: Copy package.json and create production version
+  console.log('📋 Creating production package.json...');
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  
+  // Create production package.json with only runtime dependencies
+  const prodPackageJson = {
+    name: packageJson.name,
+    version: packageJson.version,
+    description: packageJson.description,
+    main: 'server.js',
+    scripts: {
+      start: 'node server.js'
+    },
+    dependencies: {
+      express: packageJson.dependencies.express,
+      mongoose: packageJson.dependencies.mongoose,
+      mongodb: packageJson.dependencies.mongodb,
+      bcryptjs: packageJson.dependencies.bcryptjs,
+      jsonwebtoken: packageJson.dependencies.jsonwebtoken,
+      multer: packageJson.dependencies.multer,
+      sharp: packageJson.dependencies.sharp,
+      canvas: packageJson.dependencies.canvas,
+      fabric: packageJson.dependencies.fabric,
+      nodemailer: packageJson.dependencies.nodemailer,
+      axios: packageJson.dependencies.axios,
+      dotenv: packageJson.dependencies.dotenv,
+      cors: packageJson.dependencies.cors,
+      helmet: packageJson.dependencies.helmet,
+      compression: packageJson.dependencies.compression,
+      'cookie-parser': packageJson.dependencies['cookie-parser'],
+      'express-rate-limit': packageJson.dependencies['express-rate-limit'],
+      'express-session': packageJson.dependencies['express-session'],
+      'connect-mongo': packageJson.dependencies['connect-mongo'],
+      passport: packageJson.dependencies.passport,
+      'passport-local': packageJson.dependencies['passport-local'],
+      'passport-jwt': packageJson.dependencies['passport-jwt'],
+      stripe: packageJson.dependencies.stripe,
+      razorpay: packageJson.dependencies.razorpay,
+      openai: packageJson.dependencies.openai,
+      '@anthropic-ai/sdk': packageJson.dependencies['@anthropic-ai/sdk'],
+      '@google/generative-ai': packageJson.dependencies['@google/generative-ai'],
+      'firebase-admin': packageJson.dependencies['firebase-admin'],
+      twilio: packageJson.dependencies.twilio,
+      '@sendgrid/mail': packageJson.dependencies['@sendgrid/mail'],
+      ws: packageJson.dependencies.ws,
+      'socket.io': packageJson.dependencies['socket.io'],
+      puppeteer: packageJson.dependencies.puppeteer,
+      'ffmpeg-static': packageJson.dependencies['ffmpeg-static'],
+      'fluent-ffmpeg': packageJson.dependencies['fluent-ffmpeg'],
+      jimp: packageJson.dependencies.jimp,
+      'html2canvas': packageJson.dependencies['html2canvas']
+    },
+    engines: {
+      node: '>=18.0.0'
+    }
+  };
+
+  fs.writeFileSync('dist/package.json', JSON.stringify(prodPackageJson, null, 2));
+
+  // Step 4: Copy necessary files
+  console.log('📁 Copying necessary files...');
+  
+  // Copy client build to dist/client
+  if (fs.existsSync('client/dist')) {
+    fs.cpSync('client/dist', 'dist/client', { recursive: true });
+  }
+  
+  // Copy shared directory
+  if (fs.existsSync('shared')) {
+    fs.cpSync('shared', 'dist/shared', { recursive: true });
+  }
+  
+  // Copy uploads directory (if exists)
+  if (fs.existsSync('uploads')) {
+    fs.cpSync('uploads', 'dist/uploads', { recursive: true });
+  }
+
+  // Step 5: Create startup script
+  console.log('🎯 Creating startup script...');
+  const startupScript = `#!/usr/bin/env node
 
 /**
  * Production Startup Script
  * Handles environment setup and graceful server startup
  */
 
-import { config } from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Environment validation
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'JWT_SECRET',
+  'FIREBASE_PROJECT_ID'
+];
 
-// Load environment variables
-config();
+console.log('🚀 Starting VeeFore production server...');
 
-console.log('🚀 Starting VeeFore in production mode...');
-console.log('📍 Environment:', process.env.NODE_ENV || 'development');
-console.log('🌐 Port:', process.env.PORT || 5000);
-
-// Import and start the server
-import('./server/index.js').then(() => {
-  console.log('✅ VeeFore server started successfully');
-}).catch((error) => {
-  console.error('❌ Failed to start VeeFore server:', error);
+// Check required environment variables
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingVars.join(', '));
   process.exit(1);
-});
-`;
-    
-    fs.writeFileSync('dist/start.js', startupScript);
-    fs.chmodSync('dist/start.js', 0o755);
-    
-    console.log('\n✅ Production build completed successfully!');
-    console.log('\n📦 Build output:');
-    console.log('  - dist/package.json (production dependencies)');
-    console.log('  - dist/server/index.js (bundled server)');
-    console.log('  - dist/public/ (static assets)');
-    console.log('  - dist/Dockerfile (container deployment)');
-    console.log('  - dist/validate-deployment.js (validation script)');
-    console.log('  - dist/start.js (production startup)');
-    
-    console.log('\n🚀 Next steps:');
-    console.log('1. cd dist');
-    console.log('2. npm install');
-    console.log('3. node validate-deployment.js');
-    console.log('4. node start.js');
-    
-    console.log('\n🐳 Docker deployment:');
-    console.log('1. cd dist');
-    console.log('2. docker build -t veefore .');
-    console.log('3. docker run -p 5000:5000 veefore');
-    
-  } catch (error) {
-    console.error('\n❌ Production build failed:', error);
-    process.exit(1);
-  }
 }
 
-buildProduction();
+// Set production environment
+process.env.NODE_ENV = 'production';
+
+// Start the server
+try {
+  require('./server.js');
+} catch (error) {
+  console.error('❌ Failed to start server:', error.message);
+  process.exit(1);
+}
+`;
+
+  fs.writeFileSync('dist/start.js', startupScript);
+  fs.chmodSync('dist/start.js', 0o755);
+
+  console.log('✅ Production build completed successfully!');
+  console.log('📦 Build artifacts:');
+  console.log('   - dist/server.js (bundled server)');
+  console.log('   - dist/client/ (static files)');
+  console.log('   - dist/package.json (production dependencies)');
+  console.log('   - dist/start.js (startup script)');
+  console.log('');
+  console.log('🚀 To run in production:');
+  console.log('   cd dist && npm install --production && node start.js');
+
+} catch (error) {
+  console.error('❌ Production build failed:', error.message);
+  process.exit(1);
+}
+
+/**
+ * Production Deployment Validation
+ * Validates that all required components are present for deployment
+ */
+function validateDeployment() {
+  const requiredFiles = [
+    'dist/server.js',
+    'dist/package.json',
+    'dist/start.js'
+  ];
+
+  const missingFiles = requiredFiles.filter(file => !fs.existsSync(file));
+  
+  if (missingFiles.length > 0) {
+    console.error('❌ Missing required files for deployment:', missingFiles);
+    return false;
+  }
+
+  console.log('✅ All required files present for deployment');
+  return true;
+}
+
+// Run validation
+validateDeployment();

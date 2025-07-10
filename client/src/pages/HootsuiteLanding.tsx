@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { useLocation } from 'wouter';
-import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
+// VeeFore logo will be text-based
 import { 
   ArrowRight, 
   Calendar, 
@@ -37,7 +37,8 @@ import {
   Monitor,
   Smartphone,
   Mail,
-  ExternalLink
+  ExternalLink,
+  Rocket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,11 +75,9 @@ function VeeForeNavigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <img 
-                src={veeforeLogo} 
-                alt="VeeFore Logo" 
-                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-              />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
               <span className="text-xl font-bold text-gray-900">VeeFore</span>
             </div>
           </div>
@@ -1707,11 +1706,9 @@ function VeeForeFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <img 
-                src={veeforeLogo} 
-                alt="VeeFore Logo" 
-                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-              />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
               <span className="text-xl font-bold">VeeFore</span>
             </div>
             <p className="text-gray-400 mb-4">

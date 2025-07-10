@@ -314,26 +314,64 @@ app.use((req, res, next) => {
       }
     } catch (error) {
       console.error('[PRODUCTION] Static serving failed, using fallback:', error);
-      // Fallback static serving for production
-      const distPath = path.join(process.cwd(), 'dist/public');
       
-      // Check if dist directory exists
-      if (fs.existsSync(distPath)) {
-        app.use(express.static(distPath));
+      // Enhanced fallback static serving for production
+      const possiblePaths = [
+        path.join(process.cwd(), 'dist/public'),
+        path.join(process.cwd(), 'client/dist'),
+        path.join(process.cwd(), 'public'),
+        path.join(process.cwd(), 'build')
+      ];
+      
+      let staticPath = null;
+      
+      for (const possiblePath of possiblePaths) {
+        if (fs.existsSync(possiblePath)) {
+          staticPath = possiblePath;
+          break;
+        }
+      }
+      
+      if (staticPath) {
+        console.log('[PRODUCTION] Serving static files from:', staticPath);
         
-        // Handle SPA routes
-        app.get('*', (_req, res) => {
-          res.sendFile(path.join(distPath, "index.html"));
+        // Serve static files with caching
+        app.use(express.static(staticPath, {
+          maxAge: '1y',
+          etag: true,
+          lastModified: true
+        }));
+        
+        // Handle SPA routes - serve index.html for all non-API routes
+        app.get('*', (req, res, next) => {
+          // Skip API routes and uploaded files
+          if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+            return next();
+          }
+          
+          const indexPath = path.join(staticPath, 'index.html');
+          if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+          } else {
+            res.status(404).json({ error: 'Application not found' });
+          }
         });
         
         console.log('[PRODUCTION] Fallback static serving enabled');
       } else {
-        console.error('[PRODUCTION] Build directory not found:', distPath);
-        app.get('*', (_req, res) => {
-          res.status(500).json({ 
-            error: 'Application not built for production',
-            message: 'Please run build command first'
-          });
+        console.error('[PRODUCTION] Build directory not found in any location');
+        console.error('[PRODUCTION] Searched paths:', possiblePaths);
+        
+        app.get('*', (req, res) => {
+          if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+            res.status(503).json({ 
+              error: 'Application not built for production',
+              message: 'Please run build command first',
+              searchedPaths: possiblePaths
+            });
+          } else {
+            res.status(404).json({ error: 'Not found' });
+          }
         });
       }
     }

@@ -238,15 +238,15 @@ body {
 
 /* Professional component styles with dark mode support */
 .professional-card {
-  @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm dark:bg-card dark:text-card-foreground dark:border-border;
+  @apply bg-white text-slate-900 border border-gray-200 rounded-lg shadow-sm;
 }
 
 .professional-button-primary {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors dark:bg-primary dark:text-primary-foreground;
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors dark:bg-blue-600 dark:text-white;
 }
 
 .professional-button-secondary {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-2 focus:ring-primary focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors border border-border dark:bg-secondary dark:text-secondary-foreground dark:border-border;
+  @apply bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors border border-gray-200;
 }
 
 /* CRITICAL FIX: Override any yellow/amber backgrounds with clean white */
@@ -481,70 +481,70 @@ button[data-state="checked"],
 }
 
 .professional-input {
-  @apply bg-background border border-input rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-colors dark:bg-background dark:border-input dark:text-foreground;
+  @apply bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
 }
 
 .professional-text-primary {
-  @apply text-foreground dark:text-foreground;
+  color: hsl(var(--foreground));
 }
 
 .professional-text-secondary {
-  @apply text-muted-foreground dark:text-muted-foreground;
+  color: hsl(var(--muted-foreground));
 }
 
 .professional-sidebar {
-  @apply bg-card border-r border-border dark:bg-card dark:border-border;
+  @apply bg-white border-r border-gray-200;
 }
 
 .professional-header {
-  @apply bg-card border-b border-border dark:bg-card dark:border-border;
+  @apply bg-white border-b border-gray-200;
 }
 
 /* Dark mode toggle button styling */
 .dark-mode-toggle {
-  @apply hover:bg-muted dark:hover:bg-muted;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-800;
 }
 
 /* Professional navigation */
 .nav-link {
-  @apply flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground;
+  @apply flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900;
 }
 
 .nav-link.active {
-  @apply bg-primary text-primary-foreground;
+  @apply bg-blue-600 text-white;
 }
 
 /* Professional typography */
 .text-heading-1 {
-  @apply text-3xl font-bold tracking-tight text-foreground;
+  @apply text-3xl font-bold tracking-tight text-slate-900;
 }
 
 .text-heading-2 {
-  @apply text-2xl font-semibold tracking-tight text-foreground;
+  @apply text-2xl font-semibold tracking-tight text-slate-900;
 }
 
 .text-heading-3 {
-  @apply text-xl font-semibold text-foreground;
+  @apply text-xl font-semibold text-slate-900;
 }
 
 .text-heading-4 {
-  @apply text-lg font-medium text-foreground;
+  @apply text-lg font-medium text-slate-900;
 }
 
 .text-body-large {
-  @apply text-base text-foreground;
+  @apply text-base text-slate-900;
 }
 
 .text-body {
-  @apply text-sm text-foreground;
+  @apply text-sm text-slate-900;
 }
 
 .text-body-small {
-  @apply text-xs text-muted-foreground;
+  @apply text-xs text-gray-500;
 }
 
 .text-caption {
-  @apply text-xs text-muted-foreground uppercase tracking-wide font-medium;
+  @apply text-xs text-gray-500 uppercase tracking-wide font-medium;
 }
 
 /* ENHANCED WORKSPACE PAGE - COMPLETE YELLOW ELIMINATION */
@@ -964,11 +964,11 @@ button[data-state="checked"],
 }
 
 .badge-primary {
-  @apply bg-primary/10 text-primary;
+  @apply bg-blue-50 text-blue-600;
 }
 
 .badge-secondary {
-  @apply bg-secondary text-secondary-foreground;
+  @apply bg-gray-100 text-gray-900;
 }
 
 .badge-success {
@@ -989,7 +989,7 @@ button[data-state="checked"],
 }
 
 .form-label {
-  @apply text-sm font-medium text-foreground;
+  @apply text-sm font-medium text-slate-900;
 }
 
 .form-input {
@@ -1011,29 +1011,29 @@ button[data-state="checked"],
 }
 
 .table-professional th {
-  @apply px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50;
+  @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-50;
 }
 
 .table-professional td {
-  @apply px-4 py-3 text-sm text-foreground border-b border-border;
+  @apply px-4 py-3 text-sm text-slate-900 border-b border-gray-200;
 }
 
 .table-professional tr:hover {
-  @apply bg-muted/50;
+  @apply bg-gray-50;
 }
 
 /* Professional loading states */
 .skeleton {
-  @apply animate-pulse bg-muted rounded;
+  @apply animate-pulse bg-gray-200 rounded;
 }
 
 .spinner {
-  @apply animate-spin h-4 w-4 border-2 border-muted border-t-primary rounded-full;
+  @apply animate-spin h-4 w-4 border-2 border-gray-200 border-t-blue-600 rounded-full;
 }
 
 /* Professional focus states */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white;
 }
 
 /* Professional transitions */
@@ -1043,7 +1043,7 @@ button[data-state="checked"],
 
 /* Dark mode utilities */
 .dark-mode-toggle {
-  @apply p-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors;
+  @apply p-2 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors;
 }
 
 /* Professional layout utilities */
@@ -1072,7 +1072,7 @@ button[data-state="checked"],
 
 /* Remove space theme elements for professional look */
 .space-theme-text {
-  @apply text-foreground;
+  @apply text-slate-900;
 }
 
 /* Professional animations */
@@ -1629,7 +1629,7 @@ canvas {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-200;
   }
 
   html {
@@ -1637,7 +1637,7 @@ canvas {
   }
 
   body {
-    @apply text-foreground;
+    @apply text-slate-900;
     font-family: 'Inter', sans-serif;
     background: transparent;
     margin: 0;

@@ -27,7 +27,7 @@ async function buildProduction() {
     
     // Step 2: Build server with esbuild, excluding Vite dependencies
     console.log('🔧 Building server with esbuild...');
-    await execAsync(`esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --define:process.env.NODE_ENV='"production"'`);
+    await execAsync(`esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --define:process.env.NODE_ENV='"production"' --external:vite --external:@vitejs/plugin-react --external:@replit/vite-plugin-cartographer --external:@replit/vite-plugin-runtime-error-modal --external:esbuild --external:fsevents --external:lightningcss --external:rollup --external:vite/client --external:vite/runtime`);
     console.log('✅ Server build completed');
     
     // Step 3: Copy necessary files

@@ -11,7 +11,7 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import veeforeLogo from "@assets/output-onlinepngtools_1752061059889.png";
+// VeeFore logo will be text-based
 
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -176,7 +176,9 @@ export default function SignIn() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link href="/" className="flex items-center space-x-2 hover:opacity-80">
-                <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Rocket className="w-5 h-5 text-white" />
+                </div>
                 <span className="text-xl font-bold text-gray-900">VeeFore</span>
               </Link>
             </div>

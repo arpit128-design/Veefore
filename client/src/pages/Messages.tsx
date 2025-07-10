@@ -1257,7 +1257,7 @@ export default function Messages() {
     <div className="veefore-app-container bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="flex flex-col h-full">
         {/* Modern Navigation Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full overflow-hidden">
           <div className="flex-shrink-0 p-6 pb-0">
             <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-2 shadow-xl">
               <TabsTrigger 
@@ -1284,8 +1284,8 @@ export default function Messages() {
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="flex-1 overflow-hidden mt-6">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+          <TabsContent value="conversations" className="flex-1 overflow-hidden">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mt-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1295,8 +1295,8 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="flex-1 overflow-hidden mt-6">
-            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+          <TabsContent value="messages" className="flex-1 overflow-hidden">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mt-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>

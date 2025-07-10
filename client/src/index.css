@@ -824,7 +824,8 @@ button[data-state="checked"],
 .view-mode-buttons button[style*="background-color: rgb(0, 0, 0)"],
 .view-mode-buttons button[style*="background-color:#000000"],
 .view-mode-buttons button[style*="backgroundColor"],
-[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] {
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"],
+.view-mode-buttons button[data-selected="true"] {
   background-color: #000000 !important;
   background: #000000 !important;
   color: #ffffff !important;
@@ -835,9 +836,21 @@ button[data-state="checked"],
 .view-mode-buttons button[style*="background-color: rgb(0, 0, 0)"] svg,
 .view-mode-buttons button[style*="background-color:#000000"] svg,
 .view-mode-buttons button[style*="backgroundColor"] svg,
-[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] svg {
+[data-route="/workspaces"] .view-mode-buttons button[class*="bg-black"] svg,
+.view-mode-buttons button[data-selected="true"] svg {
   color: #ffffff !important;
   fill: #ffffff !important;
+  stroke: #ffffff !important;
+  stroke-width: 2 !important;
+}
+
+/* Force white icons in selected buttons */
+.view-mode-buttons button[data-selected="true"] .lucide,
+.view-mode-buttons button[style*="backgroundColor: #000000"] .lucide {
+  color: #ffffff !important;
+  fill: none !important;
+  stroke: #ffffff !important;
+  stroke-width: 2.5 !important;
 }
 
 /* Override any button component styles */

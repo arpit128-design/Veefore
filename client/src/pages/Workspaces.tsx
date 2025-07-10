@@ -556,7 +556,7 @@ export default function Workspaces() {
                     borderColor: viewMode === 'grid' ? '#000000' : '#cbd5e1'
                   }}
                 >
-                  <Grid3X3 className="w-4 h-4" style={{ color: viewMode === 'grid' ? '#ffffff' : '#64748b' }} />
+                  <Grid3X3 className={`w-4 h-4 ${viewMode === 'grid' ? 'text-white' : 'text-slate-600'}`} style={{ color: viewMode === 'grid' ? '#ffffff !important' : '#64748b', fill: viewMode === 'grid' ? '#ffffff' : 'none', stroke: viewMode === 'grid' ? '#ffffff' : 'currentColor', strokeWidth: viewMode === 'grid' ? '2' : '1.5' }} />
                 </Button>
                 <Button
                   variant="ghost"
@@ -574,7 +574,7 @@ export default function Workspaces() {
                     borderColor: viewMode === 'list' ? '#000000' : '#cbd5e1'
                   }}
                 >
-                  <List className="w-4 h-4" style={{ color: viewMode === 'list' ? '#ffffff' : '#64748b' }} />
+                  <List className={`w-4 h-4 ${viewMode === 'list' ? 'text-white' : 'text-slate-600'}`} style={{ color: viewMode === 'list' ? '#ffffff !important' : '#64748b', fill: viewMode === 'list' ? '#ffffff' : 'none', stroke: viewMode === 'list' ? '#ffffff' : 'currentColor', strokeWidth: viewMode === 'list' ? '2' : '1.5' }} />
                 </Button>
                 <Button
                   variant="ghost"
@@ -592,7 +592,7 @@ export default function Workspaces() {
                     borderColor: viewMode === 'kanban' ? '#000000' : '#cbd5e1'
                   }}
                 >
-                  <Database className="w-4 h-4" style={{ color: viewMode === 'kanban' ? '#ffffff' : '#64748b' }} />
+                  <Database className={`w-4 h-4 ${viewMode === 'kanban' ? 'text-white' : 'text-slate-600'}`} style={{ color: viewMode === 'kanban' ? '#ffffff !important' : '#64748b', fill: viewMode === 'kanban' ? '#ffffff' : 'none', stroke: viewMode === 'kanban' ? '#ffffff' : 'currentColor', strokeWidth: viewMode === 'kanban' ? '2' : '1.5' }} />
                 </Button>
                 <Button
                   variant="ghost"
@@ -610,7 +610,7 @@ export default function Workspaces() {
                     borderColor: viewMode === 'analytics' ? '#000000' : '#cbd5e1'
                   }}
                 >
-                  <BarChart3 className="w-4 h-4" style={{ color: viewMode === 'analytics' ? '#ffffff' : '#64748b' }} />
+                  <BarChart3 className={`w-4 h-4 ${viewMode === 'analytics' ? 'text-white' : 'text-slate-600'}`} style={{ color: viewMode === 'analytics' ? '#ffffff !important' : '#64748b', fill: viewMode === 'analytics' ? '#ffffff' : 'none', stroke: viewMode === 'analytics' ? '#ffffff' : 'currentColor', strokeWidth: viewMode === 'analytics' ? '2' : '1.5' }} />
                 </Button>
               </div>
             </div>

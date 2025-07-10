@@ -397,23 +397,11 @@ export default function Subscription() {
                 Advanced subscription management with real-time usage analytics, flexible billing options, and enterprise-grade security
               </p>
               
-              {/* Quick Stats Bar */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-                  <div className="text-2xl font-bold text-gray-900">{formatPrice(currentCredits)}</div>
-                  <div className="text-gray-600 text-sm">Available Credits</div>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-                  <div className="text-2xl font-bold text-gray-900">{currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}</div>
-                  <div className="text-gray-600 text-sm">Current Plan</div>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-                  <div className="text-2xl font-bold text-gray-900">23</div>
-                  <div className="text-gray-600 text-sm">Days Remaining</div>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-                  <div className="text-2xl font-bold text-gray-900">97.3%</div>
-                  <div className="text-gray-600 text-sm">Uptime SLA</div>
+              {/* Uptime SLA */}
+              <div className="flex justify-center mt-10">
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 text-center">
+                  <div className="text-3xl font-bold text-gray-900">97.3%</div>
+                  <div className="text-gray-600 text-sm font-medium">Uptime SLA</div>
                 </div>
               </div>
             </div>

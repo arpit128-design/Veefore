@@ -228,21 +228,21 @@ const ProfessionalDashboard: React.FC = () => {
       title: 'Ad',
       description: 'Create advertisement campaigns',
       icon: <Megaphone className="w-4 h-4 text-orange-600" />,
-      action: () => {},
+      action: () => setLocation('/scheduler'),
     },
     {
       title: 'Automated boost',
       description: 'Auto-boost high performing content',
       icon: <TrendingUp className="w-4 h-4 text-green-600" />,
       badge: 'New',
-      action: () => {},
+      action: () => setLocation('/scheduler'),
     },
     {
       title: 'Hootbio',
       description: 'Bio link management',
       icon: <Link className="w-4 h-4 text-emerald-600" />,
       badge: 'Upgrade',
-      action: () => {},
+      action: () => setLocation('/scheduler'),
     },
   ];
 

@@ -436,7 +436,18 @@ export default function SignUpWithOnboarding() {
   return (
     <div className="min-h-screen bg-green-50 flex">
       {/* Left Side - Mascot/Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8">
+      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative">
+        {/* Back to Home Button - Desktop Only */}
+        <div className="absolute top-8 left-8">
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to Home</span>
+          </Link>
+        </div>
+        
         <div className="text-center">
           <div className="w-80 h-80 bg-red-500 rounded-full flex items-center justify-center mb-8 mx-auto relative">
             {/* VeeFore Rocket Mascot */}
@@ -458,8 +469,8 @@ export default function SignUpWithOnboarding() {
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 bg-white flex flex-col">
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-200">
+        {/* Header - Mobile Only */}
+        <div className="lg:hidden px-8 py-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link href="/" className="flex items-center space-x-2 hover:opacity-80">
@@ -474,7 +485,7 @@ export default function SignUpWithOnboarding() {
         </div>
 
         {/* Step Progress */}
-        <div className="px-8 py-4 border-b border-gray-200">
+        <div className="px-8 py-4 lg:py-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600">
               Step {currentStep + 1} of {steps.length}

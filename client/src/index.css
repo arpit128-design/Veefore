@@ -784,6 +784,67 @@ button[data-state="checked"],
   color: #1e293b !important;
 }
 
+/* ENHANCED VIEW MODE BUTTON STYLING */
+/* Make selected state more obvious for view mode buttons */
+.view-mode-container button[data-state="active"],
+.view-mode-container .bg-primary,
+.view-mode-container [variant="default"] {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Non-selected view mode buttons */
+.view-mode-container button[data-state="inactive"],
+.view-mode-container .bg-transparent,
+.view-mode-container [variant="ghost"] {
+  background-color: #ffffff !important;
+  color: #64748b !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* Hover state for non-selected buttons */
+.view-mode-container button[data-state="inactive"]:hover,
+.view-mode-container .bg-transparent:hover,
+.view-mode-container [variant="ghost"]:hover {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* Workspace page view mode buttons specific styling */
+[data-route="/workspaces"] .flex.bg-slate-100 button {
+  transition: all 0.2s ease-in-out !important;
+  min-width: 40px !important;
+  justify-content: center !important;
+}
+
+/* Selected view mode button styling */
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-primary"],
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-default"] {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Non-selected view mode button styling */
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-transparent"],
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-ghost"] {
+  background-color: #ffffff !important;
+  color: #64748b !important;
+  border: 1px solid transparent !important;
+}
+
+/* Hover for non-selected buttons */
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="bg-transparent"]:hover,
+[data-route="/workspaces"] .flex.bg-slate-100 button[class*="variant-ghost"]:hover {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
 /* Professional spacing system */
 .space-y-professional > * + * {
   margin-top: 1.5rem;

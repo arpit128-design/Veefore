@@ -584,7 +584,19 @@ export class MongoStorage implements IStorage {
 
   async getUserByFirebaseUid(firebaseUid: string): Promise<User | undefined> {
     await this.connect();
+    console.log(`[MONGODB DEBUG] Looking up user by firebaseUid: ${firebaseUid}`);
     const user = await UserModel.findOne({ firebaseUid });
+    if (user) {
+      console.log(`[MONGODB DEBUG] Found user:`, {
+        id: user._id.toString(),
+        email: user.email,
+        username: user.username,
+        isOnboarded: user.isOnboarded,
+        firebaseUid: user.firebaseUid
+      });
+    } else {
+      console.log(`[MONGODB DEBUG] No user found with firebaseUid: ${firebaseUid}`);
+    }
     return user ? this.convertUser(user) : undefined;
   }
 

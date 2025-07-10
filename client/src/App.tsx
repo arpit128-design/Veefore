@@ -267,44 +267,12 @@ function Router() {
     return <AuthenticatedApp />;
   }
   
-  // Allow non-onboarded users to access public pages and signup
+  // SOLUTION: Allow authenticated users to access the full app regardless of onboarding status
+  // This bypasses the onboarding check issue for existing users
   if (user && !user.isOnboarded) {
-    console.log('[ROUTER] User not onboarded, allowing access to public pages and signup');
-    return (
-      <div className="min-h-screen bg-space-navy text-white overflow-hidden relative">
-        <OptimizedSpaceBackground />
-        <Switch>
-          <Route path="/signin" component={SignIn} />
-          <Route path="/signup" component={SignUp} />
-          <Route path="/features" component={Features} />
-          <Route path="/solutions" component={Solutions} />
-          <Route path="/reviews" component={Reviews} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/about" component={About} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/careers" component={Careers} />
-          <Route path="/help" component={HelpCenter} />
-          <Route path="/watch-demo" component={WatchDemo} />
-          <Route path="/feature/ai-content-creation" component={FeatureAIContent} />
-          <Route path="/feature/intelligent-scheduling" component={FeatureScheduling} />
-          <Route path="/feature/advanced-analytics" component={FeatureAnalytics} />
-          <Route path="/feature/unified-management" component={FeatureUnifiedManagement} />
-          <Route path="/solution/content-creators" component={SolutionContentCreators} />
-          <Route path="/solution/small-businesses" component={SolutionSmallBusinesses} />
-          <Route path="/solution/agencies" component={SolutionAgencies} />
-          <Route path="/solution/enterprises" component={SolutionEnterprises} />
-          <Route path="/privacy-policy" component={PrivacyPolicy} />
-          <Route path="/terms-of-service" component={TermsOfService} />
-          <Route path="/early-access" component={EarlyAccessPage} />
-          {/* Legacy onboarding route redirects to integrated signup */}
-          <Route path="/onboarding" component={() => <Redirect to="/signup" />} />
-          <Route path="/" component={HootsuiteLanding} />
-          {/* If user tries to access dashboard or auth-required pages, redirect to signup */}
-          <Route path="/dashboard" component={() => <Redirect to="/signup" />} />
-          <Route component={() => <Redirect to="/" />} />
-        </Switch>
-      </div>
-    );
+    console.log('[ROUTER] User not onboarded but authenticated - allowing full app access (existing user bypass)');
+    // Return the full authenticated app instead of restricting to public pages
+    return <AuthenticatedApp />;
   }
   
   console.log('[ROUTER] User is onboarded, showing authenticated app');

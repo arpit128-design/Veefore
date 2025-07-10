@@ -563,7 +563,7 @@ export default function Messages() {
   });
 
   const renderConversationsList = () => (
-    <div className="h-full flex flex-col bg-white border-r border-slate-200">
+    <div className="h-full flex flex-col bg-white">
       {/* Professional Header */}
       <div className="flex-shrink-0 p-6 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between mb-6">
@@ -757,7 +757,7 @@ export default function Messages() {
     }
 
     return (
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex flex-col h-full bg-white">
         {/* Chat Header */}
         <div className="flex-shrink-0 p-4 border-b border-slate-200 bg-white">
           <div className="flex items-center justify-between">

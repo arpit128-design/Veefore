@@ -1,1 +1,1 @@
-export { default } from './SignUpIntegrated';
+export { default } from './SignUpWithOnboarding';

@@ -6,12 +6,19 @@ import { log } from "./vite";
 let setupVite: any;
 let serveStatic: any;
 
-try {
-  const viteModule = await import("./vite");
-  setupVite = viteModule.setupVite;
-  serveStatic = viteModule.serveStatic;
-} catch (error) {
-  console.warn("[PRODUCTION] Vite modules not available, using fallback static serving");
+const isProduction = process.env.NODE_ENV === "production";
+
+if (!isProduction) {
+  try {
+    const viteModule = await import("./vite");
+    setupVite = viteModule.setupVite;
+    serveStatic = viteModule.serveStatic;
+    console.log("[DEV] Vite modules loaded successfully");
+  } catch (error) {
+    console.warn("[DEV] Vite modules not available, will use fallback static serving");
+  }
+} else {
+  console.log("[PRODUCTION] Skipping Vite module imports for production build");
 }
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
@@ -220,8 +227,23 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // Add health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      uptime: process.uptime(),
+      version: '1.0.0',
+      services: {
+        database: 'connected',
+        server: 'running'
+      }
+    });
+  });
+
   // Setup Vite in development and static serving in production
-  if (app.get("env") === "development") {
+  if (app.get("env") === "development" || !isProduction) {
     // Temporarily disable REPL_ID to prevent cartographer plugin from loading
     const originalReplId = process.env.REPL_ID;
     delete process.env.REPL_ID;

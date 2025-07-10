@@ -570,7 +570,7 @@ function VideoStudio() {
 
   const editingTools = [
     { id: "trim", name: "Trim", icon: Scissors, color: "blue" },
-    { id: "effects", name: "Effects", icon: Magic, color: "purple" },
+    { id: "effects", name: "Effects", icon: Wand2, color: "purple" },
     { id: "transitions", name: "Transitions", icon: RotateCw, color: "green" },
     { id: "audio", name: "Audio", icon: Volume2, color: "orange" },
     { id: "text", name: "Text", icon: Type, color: "pink" },

@@ -35,7 +35,6 @@ import {
   Target,
   TrendingUp,
   Settings,
-
   Wand2,
   Stars,
   Crown,
@@ -104,166 +103,182 @@ import {
   Underline,
   Link,
   Unlock,
-  Lock
+  Lock,
+  Cpu,
+  Database,
+  Shield,
+  Globe,
+  Gauge
 } from "lucide-react";
 
-// Advanced Studio Header with Real-Time Stats
-function AdvancedStudioHeader() {
+// Professional Enterprise Header
+function ProfessionalStudioHeader() {
   const [realTimeStats, setRealTimeStats] = useState({
-    activeProjects: 12,
-    todayGenerations: 47,
-    creditsUsed: 234,
-    renderTime: "2.3s"
+    activeProjects: 127,
+    todayGenerations: 2847,
+    creditsUsed: 18934,
+    renderTime: "1.2s",
+    success: "99.8%",
+    models: 8
   });
 
   return (
-    <div className="relative bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 rounded-2xl p-8 mb-8 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-      <div className="absolute inset-0 backdrop-blur-sm"></div>
-      
-      {/* Animated particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-        <div className="absolute top-20 right-20 w-1 h-1 bg-purple-400 rounded-full animate-ping"></div>
-        <div className="absolute bottom-10 left-1/3 w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce"></div>
-      </div>
-      
-      <div className="relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur-md opacity-75"></div>
-                <div className="relative p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
-                  <Sparkles className="h-8 w-8 text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                  VeeFore Studio Ultra
-                </h1>
-                <p className="text-slate-300 text-lg">Next-generation AI content creation suite</p>
-              </div>
+    <div className="relative bg-white border border-slate-200 rounded-xl p-8 mb-8 shadow-sm">
+      {/* Professional Header Content */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center space-x-6">
+          <div className="relative">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Cpu className="h-8 w-8 text-white" />
             </div>
-            
-            <div className="flex items-center space-x-6">
-              <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 text-sm">
-                <Crown className="h-4 w-4 mr-2" />
-                Ultra Premium
-              </Badge>
-              <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 text-sm">
-                <Zap className="h-4 w-4 mr-2" />
-                Real-time AI
-              </Badge>
-              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 text-sm">
-                <Bot className="h-4 w-4 mr-2" />
-                GPT-4 Turbo
-              </Badge>
-              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 text-sm">
-                <Stars className="h-4 w-4 mr-2" />
-                DALL-E 3
-              </Badge>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             </div>
           </div>
-          
-          <div className="grid grid-cols-2 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white">{realTimeStats.activeProjects}</div>
-              <div className="text-sm text-slate-300">Active Projects</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">{realTimeStats.todayGenerations}</div>
-              <div className="text-sm text-slate-300">Today's Generations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400">{realTimeStats.creditsUsed}</div>
-              <div className="text-sm text-slate-300">Credits Used</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">{realTimeStats.renderTime}</div>
-              <div className="text-sm text-slate-300">Avg Render Time</div>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">VeeFore Studio Enterprise</h1>
+            <p className="text-slate-600 text-lg">Professional AI Content Creation Platform</p>
           </div>
         </div>
+        
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-green-700">All Systems Operational</span>
+          </div>
+          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Button>
+        </div>
+      </div>
+
+      {/* Professional Status Badges */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-slate-900">{realTimeStats.activeProjects}</div>
+          <div className="text-sm text-slate-600">Active Projects</div>
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-blue-600">{realTimeStats.todayGenerations}</div>
+          <div className="text-sm text-slate-600">Today's Generations</div>
+        </div>
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-purple-600">{realTimeStats.creditsUsed}</div>
+          <div className="text-sm text-slate-600">Credits Consumed</div>
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-green-600">{realTimeStats.renderTime}</div>
+          <div className="text-sm text-slate-600">Avg Response</div>
+        </div>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-emerald-600">{realTimeStats.success}</div>
+          <div className="text-sm text-slate-600">Success Rate</div>
+        </div>
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-orange-600">{realTimeStats.models}</div>
+          <div className="text-sm text-slate-600">AI Models</div>
+        </div>
+      </div>
+
+      {/* Enterprise Feature Badges */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 px-3 py-1">
+          <Shield className="h-3 w-3 mr-1" />
+          Enterprise Security
+        </Badge>
+        <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1">
+          <Database className="h-3 w-3 mr-1" />
+          Cloud Infrastructure
+        </Badge>
+        <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1">
+          <Gauge className="h-3 w-3 mr-1" />
+          99.9% Uptime SLA
+        </Badge>
+        <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
+          <Globe className="h-3 w-3 mr-1" />
+          Global CDN
+        </Badge>
+        <Badge className="bg-orange-100 text-orange-700 border-orange-200 px-3 py-1">
+          <Bot className="h-3 w-3 mr-1" />
+          GPT-4 Turbo
+        </Badge>
+        <Badge className="bg-pink-100 text-pink-700 border-pink-200 px-3 py-1">
+          <Stars className="h-3 w-3 mr-1" />
+          DALL-E 3
+        </Badge>
       </div>
     </div>
   );
 }
 
-function AdvancedTabNavigation({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
+function ProfessionalTabNavigation({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
   const tabs = [
     { 
       id: "ai-creator", 
       label: "AI Creator", 
       icon: Wand2, 
-      gradient: "from-blue-500 via-purple-500 to-pink-500",
-      description: "Generate with advanced AI"
+      color: "indigo",
+      description: "Advanced AI Generation"
     },
     { 
       id: "video-studio", 
       label: "Video Studio", 
       icon: Video, 
-      gradient: "from-green-500 via-cyan-500 to-blue-500",
-      description: "Professional video editing"
+      color: "blue",
+      description: "Professional Video Editing"
     },
     { 
       id: "design-lab", 
       label: "Design Lab", 
       icon: Palette, 
-      gradient: "from-purple-500 via-pink-500 to-orange-500",
-      description: "Advanced design tools"
+      color: "purple",
+      description: "Creative Design Tools"
     },
     { 
-      id: "ai-automation", 
-      label: "AI Automation", 
+      id: "automation-hub", 
+      label: "Automation Hub", 
       icon: Bot, 
-      gradient: "from-indigo-500 via-purple-500 to-pink-500",
-      description: "Automated workflows"
+      color: "green",
+      description: "Workflow Automation"
     },
     { 
-      id: "analytics-hub", 
-      label: "Analytics Hub", 
+      id: "analytics-center", 
+      label: "Analytics Center", 
       icon: TrendingUp, 
-      gradient: "from-emerald-500 via-teal-500 to-cyan-500",
-      description: "Performance insights"
+      color: "orange",
+      description: "Performance Intelligence"
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
       {tabs.map((tab) => (
-        <div key={tab.id} className="relative group">
-          <Button
-            variant="ghost"
-            onClick={() => setActiveTab(tab.id)}
-            className={`w-full h-24 p-0 overflow-hidden transition-all duration-500 ${
-              activeTab === tab.id 
-                ? 'ring-2 ring-white/50 scale-105' 
-                : 'hover:scale-102'
-            }`}
-          >
-            <div className={`absolute inset-0 bg-gradient-to-br ${tab.gradient} ${
-              activeTab === tab.id ? 'opacity-100' : 'opacity-80 group-hover:opacity-90'
-            } transition-opacity duration-300`}></div>
-            
-            {activeTab !== tab.id && (
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-            )}
-            
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-              <tab.icon className="h-8 w-8 mb-2" />
-              <span className="text-sm font-semibold">{tab.label}</span>
-              <span className="text-xs opacity-90">{tab.description}</span>
+        <Button
+          key={tab.id}
+          variant={activeTab === tab.id ? "default" : "outline"}
+          onClick={() => setActiveTab(tab.id)}
+          className={`h-20 p-4 border-2 transition-all duration-200 ${
+            activeTab === tab.id 
+              ? `bg-${tab.color}-600 hover:bg-${tab.color}-700 border-${tab.color}-600 text-white scale-105 shadow-lg` 
+              : `bg-white hover:bg-slate-50 border-slate-200 hover:border-${tab.color}-300 text-slate-700`
+          }`}
+        >
+          <div className="flex flex-col items-center space-y-2">
+            <tab.icon className="h-6 w-6" />
+            <div className="text-center">
+              <div className="text-sm font-semibold">{tab.label}</div>
+              <div className="text-xs opacity-75">{tab.description}</div>
             </div>
-          </Button>
-        </div>
+          </div>
+        </Button>
       ))}
     </div>
   );
 }
 
-function AICreatorStudio() {
-  const [selectedTool, setSelectedTool] = useState("image-gen");
+function ProfessionalAICreator() {
+  const [selectedTool, setSelectedTool] = useState("image-generation");
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -271,52 +286,58 @@ function AICreatorStudio() {
 
   const aiTools = [
     { 
-      id: "image-gen", 
-      name: "AI Image Generator",
+      id: "image-generation", 
+      name: "Image Generation",
       icon: ImageIcon,
-      description: "DALL-E 3 powered image creation",
-      gradient: "from-pink-500 to-rose-500",
-      credits: 4
+      description: "DALL-E 3 Powered",
+      model: "DALL-E 3",
+      credits: 4,
+      color: "rose"
     },
     { 
-      id: "video-gen", 
-      name: "AI Video Generator",
+      id: "video-synthesis", 
+      name: "Video Synthesis",
       icon: Video,
-      description: "Runway ML video synthesis",
-      gradient: "from-blue-500 to-cyan-500",
-      credits: 15
+      description: "Runway ML",
+      model: "Gen-2",
+      credits: 15,
+      color: "blue"
     },
     { 
-      id: "voice-gen", 
-      name: "AI Voice Generator",
+      id: "voice-cloning", 
+      name: "Voice Cloning",
       icon: Mic,
-      description: "ElevenLabs voice synthesis",
-      gradient: "from-green-500 to-emerald-500",
-      credits: 3
+      description: "ElevenLabs",
+      model: "Prime Voice AI",
+      credits: 3,
+      color: "green"
     },
     { 
-      id: "music-gen", 
-      name: "AI Music Generator",
+      id: "music-composition", 
+      name: "Music Composition",
       icon: Music,
-      description: "Suno AI music creation",
-      gradient: "from-purple-500 to-indigo-500",
-      credits: 8
+      description: "Suno AI",
+      model: "Bark v2",
+      credits: 8,
+      color: "purple"
     },
     { 
-      id: "script-gen", 
-      name: "AI Script Writer",
+      id: "script-writing", 
+      name: "Script Writing",
       icon: Edit3,
-      description: "GPT-4 script generation",
-      gradient: "from-orange-500 to-red-500",
-      credits: 2
+      description: "GPT-4 Turbo",
+      model: "GPT-4-turbo",
+      credits: 2,
+      color: "orange"
     },
     { 
-      id: "thumbnail-gen", 
-      name: "Thumbnail Designer",
+      id: "thumbnail-design", 
+      name: "Thumbnail Design",
       icon: Layout,
-      description: "AI-powered thumbnail creation",
-      gradient: "from-yellow-500 to-orange-500",
-      credits: 6
+      description: "AI Designer",
+      model: "Stable Diffusion",
+      credits: 6,
+      color: "amber"
     }
   ];
 
@@ -326,7 +347,6 @@ function AICreatorStudio() {
     setIsGenerating(true);
     setGenerationProgress(0);
     
-    // Simulate advanced AI generation with progress updates
     const progressInterval = setInterval(() => {
       setGenerationProgress(prev => {
         if (prev >= 100) {
@@ -338,82 +358,110 @@ function AICreatorStudio() {
           ]);
           return 100;
         }
-        return prev + 5;
+        return prev + 3;
       });
-    }, 200);
+    }, 100);
   };
 
   const selectedToolData = aiTools.find(tool => tool.id === selectedTool);
 
   return (
     <div className="space-y-8">
-      {/* Tool Selection Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {aiTools.map((tool) => (
-          <Button
-            key={tool.id}
-            variant="ghost"
-            onClick={() => setSelectedTool(tool.id)}
-            className={`h-20 p-0 relative overflow-hidden transition-all duration-300 ${
-              selectedTool === tool.id 
-                ? 'ring-2 ring-blue-500 scale-105' 
-                : 'hover:scale-102'
-            }`}
-          >
-            <div className={`absolute inset-0 bg-gradient-to-br ${tool.gradient} ${
-              selectedTool === tool.id ? 'opacity-100' : 'opacity-70 hover:opacity-80'
-            }`}></div>
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
-              <tool.icon className="h-6 w-6 mb-1" />
-              <span className="text-xs font-medium text-center leading-tight">{tool.name}</span>
-            </div>
-          </Button>
-        ))}
-      </div>
+      {/* Professional Tool Grid */}
+      <Card className="border-2 border-slate-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl text-slate-900">AI Generation Tools</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {aiTools.map((tool) => (
+              <Button
+                key={tool.id}
+                variant={selectedTool === tool.id ? "default" : "outline"}
+                onClick={() => setSelectedTool(tool.id)}
+                className={`h-24 p-3 flex flex-col border-2 transition-all duration-200 ${
+                  selectedTool === tool.id 
+                    ? `bg-${tool.color}-600 hover:bg-${tool.color}-700 border-${tool.color}-600 text-white scale-105 shadow-lg` 
+                    : `bg-white hover:bg-slate-50 border-slate-200 hover:border-${tool.color}-300 text-slate-700`
+                }`}
+              >
+                <tool.icon className="h-6 w-6 mb-2" />
+                <span className="text-xs font-medium text-center leading-tight">{tool.name}</span>
+                <span className="text-xs opacity-75">{tool.model}</span>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Main Generation Interface */}
-      <Card className="border-0 shadow-2xl bg-gradient-to-br from-slate-50 to-white">
+      {/* Professional Generation Interface */}
+      <Card className="border-2 border-slate-200 shadow-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className={`p-3 bg-gradient-to-br ${selectedToolData?.gradient} rounded-xl`}>
+              <div className={`w-12 h-12 bg-${selectedToolData?.color}-600 rounded-xl flex items-center justify-center`}>
                 {selectedToolData && <selectedToolData.icon className="h-6 w-6 text-white" />}
               </div>
               <div>
-                <CardTitle className="text-2xl">{selectedToolData?.name}</CardTitle>
-                <p className="text-slate-600">{selectedToolData?.description}</p>
+                <CardTitle className="text-xl text-slate-900">{selectedToolData?.name}</CardTitle>
+                <p className="text-slate-600">{selectedToolData?.description} • {selectedToolData?.model}</p>
               </div>
             </div>
-            <Badge className={`bg-gradient-to-r ${selectedToolData?.gradient} text-white px-4 py-2`}>
-              {selectedToolData?.credits} Credits
-            </Badge>
+            <div className="flex items-center space-x-3">
+              <Badge className={`bg-${selectedToolData?.color}-100 text-${selectedToolData?.color}-700 border-${selectedToolData?.color}-200`}>
+                {selectedToolData?.credits} Credits
+              </Badge>
+              <Badge className="bg-green-100 text-green-700 border-green-200">
+                Enterprise Tier
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Advanced Prompt Interface */}
+          {/* Professional Prompt Interface */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="text-lg font-semibold">Creative Prompt</Label>
-              <Button variant="outline" size="sm">
-                <Wand2 className="h-4 w-4 mr-2" />
-                AI Enhance
-              </Button>
+              <Label className="text-lg font-semibold text-slate-900">Generation Prompt</Label>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" className="border-slate-300">
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  AI Enhance
+                </Button>
+                <Button variant="outline" size="sm" className="border-slate-300">
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Templates
+                </Button>
+              </div>
             </div>
             
             <Textarea
-              placeholder={`Describe your ${selectedTool.replace('-gen', '')} in detail. Be specific about style, mood, and elements you want to include.`}
+              placeholder={`Describe your ${selectedTool.replace('-', ' ')} requirements. Be specific about style, mood, format, and key elements.`}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
-              className="resize-none border-2 border-slate-200 focus:border-blue-500 rounded-xl text-lg"
+              className="border-2 border-slate-200 focus:border-indigo-500 rounded-lg text-base resize-none"
             />
           </div>
 
-          {/* Advanced Parameters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Professional Parameters Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-3">
-              <Label className="font-semibold">Style Preset</Label>
+              <Label className="font-semibold text-slate-900">Output Quality</Label>
+              <Select defaultValue="ultra">
+                <SelectTrigger className="border-2 border-slate-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Standard (2K)</SelectItem>
+                  <SelectItem value="high">High Quality (4K)</SelectItem>
+                  <SelectItem value="ultra">Ultra HD (8K)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="font-semibold text-slate-900">Style Preset</Label>
               <Select defaultValue="professional">
                 <SelectTrigger className="border-2 border-slate-200">
                   <SelectValue />
@@ -422,130 +470,137 @@ function AICreatorStudio() {
                   <SelectItem value="professional">Professional</SelectItem>
                   <SelectItem value="creative">Creative & Artistic</SelectItem>
                   <SelectItem value="minimal">Minimal & Clean</SelectItem>
-                  <SelectItem value="vibrant">Vibrant & Bold</SelectItem>
                   <SelectItem value="cinematic">Cinematic</SelectItem>
-                  <SelectItem value="retro">Retro & Vintage</SelectItem>
+                  <SelectItem value="corporate">Corporate</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-3">
-              <Label className="font-semibold">Quality Level</Label>
-              <Select defaultValue="ultra">
+              <Label className="font-semibold text-slate-900">Format</Label>
+              <Select defaultValue="1920x1080">
                 <SelectTrigger className="border-2 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="standard">Standard (Fast)</SelectItem>
-                  <SelectItem value="high">High Quality</SelectItem>
-                  <SelectItem value="ultra">Ultra HD (Best)</SelectItem>
+                  <SelectItem value="1920x1080">Full HD (16:9)</SelectItem>
+                  <SelectItem value="1080x1080">Square (1:1)</SelectItem>
+                  <SelectItem value="1080x1920">Vertical (9:16)</SelectItem>
+                  <SelectItem value="3840x2160">4K Ultra HD</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-3">
-              <Label className="font-semibold">Output Format</Label>
-              <Select defaultValue="1080p">
+              <Label className="font-semibold text-slate-900">Priority</Label>
+              <Select defaultValue="normal">
                 <SelectTrigger className="border-2 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="720p">HD (1280x720)</SelectItem>
-                  <SelectItem value="1080p">Full HD (1920x1080)</SelectItem>
-                  <SelectItem value="4k">4K (3840x2160)</SelectItem>
-                  <SelectItem value="square">Square (1080x1080)</SelectItem>
-                  <SelectItem value="portrait">Portrait (1080x1920)</SelectItem>
+                  <SelectItem value="low">Low Priority</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="high">High Priority (+50% credits)</SelectItem>
+                  <SelectItem value="urgent">Urgent (+100% credits)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Generation Controls */}
-          <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border-2 border-slate-200">
-            <div className="flex items-center space-x-6">
-              <div className="text-sm">
-                <span className="font-semibold">Estimated Time:</span>
-                <span className="text-blue-600 ml-2">30-45 seconds</span>
+          {/* Professional Generation Controls */}
+          <Card className="bg-slate-50 border-2 border-slate-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                  <div>
+                    <span className="font-semibold text-slate-700">Estimated Time:</span>
+                    <div className="text-indigo-600 font-medium">15-30 seconds</div>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-slate-700">Credit Cost:</span>
+                    <div className="text-purple-600 font-medium">{selectedToolData?.credits} credits</div>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-slate-700">Success Rate:</span>
+                    <div className="text-green-600 font-medium">99.8%</div>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-slate-700">Queue Position:</span>
+                    <div className="text-orange-600 font-medium">#3</div>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={generateContent}
+                  disabled={isGenerating || !prompt.trim()}
+                  size="lg"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 font-semibold"
+                >
+                  {isGenerating ? (
+                    <>
+                      <LoadingSpinner className="mr-3 h-5 w-5" />
+                      Generating... {generationProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-3 h-5 w-5" />
+                      Start Generation
+                    </>
+                  )}
+                </Button>
               </div>
-              <div className="text-sm">
-                <span className="font-semibold">Credits Required:</span>
-                <span className="text-purple-600 ml-2">{selectedToolData?.credits} credits</span>
-              </div>
-              <div className="text-sm">
-                <span className="font-semibold">Success Rate:</span>
-                <span className="text-green-600 ml-2">99.2%</span>
-              </div>
-            </div>
-            
-            <Button 
-              onClick={generateContent}
-              disabled={isGenerating || !prompt.trim()}
-              size="lg"
-              className={`bg-gradient-to-r ${selectedToolData?.gradient} hover:opacity-90 text-white px-8 py-3 text-lg font-semibold`}
-            >
-              {isGenerating ? (
-                <>
-                  <LoadingSpinner className="mr-3 h-5 w-5" />
-                  Generating... {generationProgress}%
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-3 h-5 w-5" />
-                  Generate Content
-                </>
+
+              {/* Professional Progress Display */}
+              {isGenerating && (
+                <div className="mt-6 space-y-4">
+                  <Progress value={generationProgress} className="h-3">
+                    <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-300 rounded-full" 
+                         style={{ width: `${generationProgress}%` }} />
+                  </Progress>
+                  <div className="flex justify-between text-sm text-slate-600">
+                    <span>Processing with {selectedToolData?.model}...</span>
+                    <span>{generationProgress}% Complete</span>
+                  </div>
+                </div>
               )}
-            </Button>
-          </div>
-
-          {/* Progress Visualization */}
-          {isGenerating && (
-            <div className="space-y-4">
-              <Progress value={generationProgress} className="h-3 bg-slate-200">
-                <div className={`h-full bg-gradient-to-r ${selectedToolData?.gradient} transition-all duration-300 rounded-full`} 
-                     style={{ width: `${generationProgress}%` }} />
-              </Progress>
-              <div className="flex justify-between text-sm text-slate-600">
-                <span>Initializing AI models...</span>
-                <span>{generationProgress}% Complete</span>
-              </div>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
 
-      {/* Results Gallery */}
+      {/* Professional Results Gallery */}
       {results.length > 0 && (
-        <Card className="border-0 shadow-2xl">
+        <Card className="border-2 border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-3">
+            <CardTitle className="flex items-center space-x-3 text-slate-900">
               <CheckCircle className="h-6 w-6 text-green-500" />
               <span>Generated Content</span>
-              <Badge variant="secondary">{results.length} items</Badge>
+              <Badge className="bg-green-100 text-green-700 border-green-200">{results.length} items</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.map((result) => (
                 <div key={result.id} className="relative group">
-                  <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden">
+                  <div className="aspect-square bg-slate-100 border-2 border-slate-200 rounded-lg overflow-hidden">
                     <img 
                       src={result.url} 
                       alt="Generated content" 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 rounded-xl flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-3">
-                      <Button size="sm" className="bg-white/90 text-black hover:bg-white">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 rounded-lg flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2">
+                      <Button size="sm" className="bg-white text-black hover:bg-slate-100">
+                        <Download className="h-4 w-4 mr-1" />
+                        Export
                       </Button>
-                      <Button size="sm" className="bg-white/90 text-black hover:bg-white">
-                        <Share className="h-4 w-4 mr-2" />
+                      <Button size="sm" className="bg-white text-black hover:bg-slate-100">
+                        <Share className="h-4 w-4 mr-1" />
                         Share
                       </Button>
-                      <Button size="sm" className="bg-white/90 text-black hover:bg-white">
-                        <Edit3 className="h-4 w-4 mr-2" />
+                      <Button size="sm" className="bg-white text-black hover:bg-slate-100">
+                        <Edit3 className="h-4 w-4 mr-1" />
                         Edit
                       </Button>
                     </div>
@@ -560,7 +615,7 @@ function AICreatorStudio() {
   );
 }
 
-function VideoStudio() {
+function ProfessionalVideoStudio() {
   const [selectedProject, setSelectedProject] = useState<File | null>(null);
   const [timelinePosition, setTimelinePosition] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -569,12 +624,12 @@ function VideoStudio() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editingTools = [
-    { id: "trim", name: "Trim", icon: Scissors, color: "blue" },
-    { id: "effects", name: "Effects", icon: Wand2, color: "purple" },
+    { id: "trim", name: "Trim & Cut", icon: Scissors, color: "blue" },
+    { id: "effects", name: "Visual Effects", icon: Wand2, color: "purple" },
     { id: "transitions", name: "Transitions", icon: RotateCw, color: "green" },
-    { id: "audio", name: "Audio", icon: Volume2, color: "orange" },
-    { id: "text", name: "Text", icon: Type, color: "pink" },
-    { id: "filters", name: "Filters", icon: Filter, color: "indigo" }
+    { id: "audio", name: "Audio Mixing", icon: Volume2, color: "orange" },
+    { id: "text", name: "Text & Titles", icon: Type, color: "pink" },
+    { id: "filters", name: "Color Grading", icon: Filter, color: "indigo" }
   ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -587,24 +642,27 @@ function VideoStudio() {
   return (
     <div className="space-y-6">
       {!selectedProject ? (
-        <Card className="border-0 shadow-2xl bg-gradient-to-br from-slate-900 to-indigo-900 text-white">
+        <Card className="border-2 border-slate-200 shadow-sm bg-white">
           <CardContent className="p-12 text-center">
-            <div className="max-w-md mx-auto space-y-6">
-              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center">
-                <Video className="h-12 w-12" />
+            <div className="max-w-lg mx-auto space-y-8">
+              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Video className="h-12 w-12 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-2">Professional Video Studio</h3>
-                <p className="text-slate-300">Upload your video to start editing with advanced AI-powered tools</p>
+                <h3 className="text-3xl font-bold text-slate-900 mb-3">Professional Video Studio</h3>
+                <p className="text-slate-600 text-lg">Upload your video file to begin editing with enterprise-grade tools and AI assistance</p>
               </div>
-              <Button 
-                onClick={() => fileInputRef.current?.click()}
-                size="lg"
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 text-lg"
-              >
-                <Upload className="mr-3 h-6 w-6" />
-                Upload Video
-              </Button>
+              <div className="space-y-4">
+                <Button 
+                  onClick={() => fileInputRef.current?.click()}
+                  size="lg"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg font-semibold"
+                >
+                  <Upload className="mr-3 h-6 w-6" />
+                  Upload Video File
+                </Button>
+                <p className="text-sm text-slate-500">Supports MP4, MOV, AVI, MKV up to 10GB</p>
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -616,84 +674,132 @@ function VideoStudio() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-12 gap-6 h-[800px]">
-          {/* Tools Panel */}
-          <div className="col-span-2 space-y-4">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Tools</CardTitle>
+        <div className="grid grid-cols-12 gap-6 h-[900px]">
+          {/* Professional Tools Panel */}
+          <div className="col-span-3 space-y-6">
+            <Card className="border-2 border-slate-200 shadow-sm h-fit">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-slate-900">Editing Tools</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 {editingTools.map((tool) => (
                   <Button
                     key={tool.id}
-                    variant={selectedTool === tool.id ? "default" : "ghost"}
+                    variant={selectedTool === tool.id ? "default" : "outline"}
                     onClick={() => setSelectedTool(tool.id)}
-                    className="w-full justify-start"
+                    className={`w-full justify-start h-12 border-2 ${
+                      selectedTool === tool.id 
+                        ? 'bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white' 
+                        : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                    }`}
                   >
-                    <tool.icon className="h-4 w-4 mr-3" />
+                    <tool.icon className="h-5 w-5 mr-3" />
                     {tool.name}
                   </Button>
                 ))}
               </CardContent>
             </Card>
+
+            <Card className="border-2 border-slate-200 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-slate-900">Export Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium text-slate-700">Resolution</Label>
+                  <Select defaultValue="1080p">
+                    <SelectTrigger className="mt-2 border-2 border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="720p">720p HD</SelectItem>
+                      <SelectItem value="1080p">1080p Full HD</SelectItem>
+                      <SelectItem value="4k">4K Ultra HD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-700">Format</Label>
+                  <Select defaultValue="mp4">
+                    <SelectTrigger className="mt-2 border-2 border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mp4">MP4 (H.264)</SelectItem>
+                      <SelectItem value="mov">MOV (ProRes)</SelectItem>
+                      <SelectItem value="webm">WebM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button className="w-full bg-green-600 hover:bg-green-700 text-white mt-4">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Video
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Video Preview */}
-          <div className="col-span-7 space-y-4">
-            <Card className="border-0 shadow-2xl">
+          {/* Professional Video Preview */}
+          <div className="col-span-6 space-y-6">
+            <Card className="border-2 border-slate-200 shadow-sm">
               <CardContent className="p-6">
-                <div className="aspect-video bg-black rounded-xl flex items-center justify-center mb-4">
+                <div className="aspect-video bg-black rounded-lg flex items-center justify-center mb-6 border-2 border-slate-300">
                   <div className="text-center text-white">
-                    <Play className="h-16 w-16 mx-auto mb-4 opacity-75" />
-                    <p className="text-lg">{selectedProject.name}</p>
+                    <Play className="h-20 w-20 mx-auto mb-4 opacity-75" />
+                    <p className="text-xl font-medium">{selectedProject.name}</p>
+                    <p className="text-sm opacity-75 mt-2">Click to preview</p>
                   </div>
                 </div>
                 
-                {/* Video Controls */}
-                <div className="flex items-center space-x-4">
-                  <Button size="sm" variant="outline">
-                    <SkipBack className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    {isPlaying ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <SkipForward className="h-4 w-4" />
-                  </Button>
-                  <div className="flex-1">
-                    <Slider
-                      value={[timelinePosition]}
-                      onValueChange={(value) => setTimelinePosition(value[0])}
-                      max={100}
-                      className="flex-1"
-                    />
+                {/* Professional Video Controls */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <Button size="sm" variant="outline" className="border-slate-300">
+                      <SkipBack className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      {isPlaying ? <PauseCircle className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-slate-300">
+                      <SkipForward className="h-4 w-4" />
+                    </Button>
+                    <div className="flex-1 px-3">
+                      <Slider
+                        value={[timelinePosition]}
+                        onValueChange={(value) => setTimelinePosition(value[0])}
+                        max={100}
+                        className="flex-1"
+                      />
+                    </div>
+                    <Button size="sm" variant="outline" className="border-slate-300">
+                      <Volume2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button size="sm" variant="outline">
-                    <Volume2 className="h-4 w-4" />
-                  </Button>
+                  <div className="text-center text-sm text-slate-600">
+                    00:01:23 / 00:05:47
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Timeline */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Timeline</CardTitle>
+            {/* Professional Timeline */}
+            <Card className="border-2 border-slate-200 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-slate-900">Timeline</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-32 bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg p-4">
-                  <div className="h-8 bg-blue-500 rounded mb-2 flex items-center px-3 text-white text-sm">
-                    Video Track
+                <div className="h-40 bg-slate-50 border-2 border-slate-200 rounded-lg p-4 space-y-3">
+                  <div className="h-10 bg-indigo-500 rounded-lg flex items-center px-4 text-white text-sm font-medium">
+                    Video Track 1
                   </div>
-                  <div className="h-8 bg-green-500 rounded mb-2 flex items-center px-3 text-white text-sm">
-                    Audio Track
+                  <div className="h-8 bg-green-500 rounded-lg flex items-center px-4 text-white text-sm font-medium">
+                    Audio Track 1
                   </div>
-                  <div className="h-8 bg-purple-500 rounded flex items-center px-3 text-white text-sm">
+                  <div className="h-8 bg-purple-500 rounded-lg flex items-center px-4 text-white text-sm font-medium">
                     Effects Track
                   </div>
                 </div>
@@ -701,26 +807,26 @@ function VideoStudio() {
             </Card>
           </div>
 
-          {/* Properties Panel */}
-          <div className="col-span-3 space-y-4">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Properties</CardTitle>
+          {/* Professional Properties Panel */}
+          <div className="col-span-3 space-y-6">
+            <Card className="border-2 border-slate-200 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-slate-900">Properties</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {selectedTool === "effects" && (
                   <>
                     <div>
-                      <Label className="text-sm font-medium">Brightness</Label>
-                      <Slider defaultValue={[50]} max={100} className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Brightness</Label>
+                      <Slider defaultValue={[50]} max={100} className="mt-3" />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Contrast</Label>
-                      <Slider defaultValue={[50]} max={100} className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Contrast</Label>
+                      <Slider defaultValue={[50]} max={100} className="mt-3" />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Saturation</Label>
-                      <Slider defaultValue={[50]} max={100} className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Saturation</Label>
+                      <Slider defaultValue={[50]} max={100} className="mt-3" />
                     </div>
                   </>
                 )}
@@ -728,12 +834,12 @@ function VideoStudio() {
                 {selectedTool === "trim" && (
                   <>
                     <div>
-                      <Label className="text-sm font-medium">Start Time</Label>
-                      <Input defaultValue="00:00:00" className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Start Time</Label>
+                      <Input defaultValue="00:00:00" className="mt-2 border-2 border-slate-200" />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">End Time</Label>
-                      <Input defaultValue="00:01:30" className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">End Time</Label>
+                      <Input defaultValue="00:01:30" className="mt-2 border-2 border-slate-200" />
                     </div>
                   </>
                 )}
@@ -741,17 +847,17 @@ function VideoStudio() {
                 {selectedTool === "text" && (
                   <>
                     <div>
-                      <Label className="text-sm font-medium">Text Content</Label>
-                      <Input placeholder="Enter text..." className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Text Content</Label>
+                      <Input placeholder="Enter text..." className="mt-2 border-2 border-slate-200" />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Font Size</Label>
-                      <Slider defaultValue={[24]} min={12} max={72} className="mt-2" />
+                      <Label className="text-sm font-medium text-slate-700">Font Size</Label>
+                      <Slider defaultValue={[24]} min={12} max={72} className="mt-3" />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Position</Label>
+                      <Label className="text-sm font-medium text-slate-700">Position</Label>
                       <Select defaultValue="center">
-                        <SelectTrigger className="mt-2">
+                        <SelectTrigger className="mt-2 border-2 border-slate-200">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -765,28 +871,6 @@ function VideoStudio() {
                 )}
               </CardContent>
             </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Export</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Select defaultValue="1080p">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="720p">720p HD</SelectItem>
-                    <SelectItem value="1080p">1080p Full HD</SelectItem>
-                    <SelectItem value="4k">4K Ultra HD</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Video
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       )}
@@ -794,37 +878,46 @@ function VideoStudio() {
   );
 }
 
-// Main Content Studio Component
+// Main Professional Content Studio Component
 export default function ContentStudio() {
   const [activeTab, setActiveTab] = useState("ai-creator");
   const { currentWorkspace } = useWorkspace();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <AdvancedStudioHeader />
-        <AdvancedTabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-6 py-8 max-w-7xl">
+        <ProfessionalStudioHeader />
+        <ProfessionalTabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <div className="space-y-8">
-          {activeTab === "ai-creator" && <AICreatorStudio />}
-          {activeTab === "video-studio" && <VideoStudio />}
+          {activeTab === "ai-creator" && <ProfessionalAICreator />}
+          {activeTab === "video-studio" && <ProfessionalVideoStudio />}
           {activeTab === "design-lab" && (
-            <div className="text-center py-20">
-              <h3 className="text-2xl font-bold text-slate-700 mb-4">Design Lab</h3>
-              <p className="text-slate-600">Advanced design tools coming soon...</p>
-            </div>
+            <Card className="border-2 border-slate-200 shadow-sm bg-white">
+              <CardContent className="p-20 text-center">
+                <Palette className="h-16 w-16 mx-auto text-slate-400 mb-6" />
+                <h3 className="text-2xl font-bold text-slate-700 mb-4">Design Lab</h3>
+                <p className="text-slate-600 text-lg">Advanced design tools and creative workflows coming soon</p>
+              </CardContent>
+            </Card>
           )}
-          {activeTab === "ai-automation" && (
-            <div className="text-center py-20">
-              <h3 className="text-2xl font-bold text-slate-700 mb-4">AI Automation</h3>
-              <p className="text-slate-600">Automated workflows coming soon...</p>
-            </div>
+          {activeTab === "automation-hub" && (
+            <Card className="border-2 border-slate-200 shadow-sm bg-white">
+              <CardContent className="p-20 text-center">
+                <Bot className="h-16 w-16 mx-auto text-slate-400 mb-6" />
+                <h3 className="text-2xl font-bold text-slate-700 mb-4">Automation Hub</h3>
+                <p className="text-slate-600 text-lg">Intelligent workflow automation and AI assistants coming soon</p>
+              </CardContent>
+            </Card>
           )}
-          {activeTab === "analytics-hub" && (
-            <div className="text-center py-20">
-              <h3 className="text-2xl font-bold text-slate-700 mb-4">Analytics Hub</h3>
-              <p className="text-slate-600">Performance insights coming soon...</p>
-            </div>
+          {activeTab === "analytics-center" && (
+            <Card className="border-2 border-slate-200 shadow-sm bg-white">
+              <CardContent className="p-20 text-center">
+                <TrendingUp className="h-16 w-16 mx-auto text-slate-400 mb-6" />
+                <h3 className="text-2xl font-bold text-slate-700 mb-4">Analytics Center</h3>
+                <p className="text-slate-600 text-lg">Advanced performance analytics and intelligence reports coming soon</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

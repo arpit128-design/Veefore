@@ -121,9 +121,9 @@ function AuthenticatedApp() {
         ) : (
           <>
             <ProfessionalHeader />
-            <div className="flex">
+            <div className="flex h-[calc(100vh-64px)] overflow-hidden">
               <ProfessionalSidebar />
-              <main className="flex-1 p-6 space-y-6">
+              <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
                   <Route path="/dashboard" component={ProfessionalDashboard} />
                   <Route path="/content-studio" component={ContentStudio} />

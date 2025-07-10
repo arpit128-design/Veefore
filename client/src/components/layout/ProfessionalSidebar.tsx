@@ -91,8 +91,8 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
   const credits = 0; // Will be dynamically loaded
 
   return (
-    <aside className="bg-white border-r border-slate-200 w-64 min-h-screen">
-      <div className="p-6">
+    <aside className="bg-white border-r border-slate-200 w-64 h-full flex flex-col overflow-hidden">
+      <div className="flex-shrink-0 p-6">
         {/* Credits display */}
         <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
           <div className="flex items-center justify-between">
@@ -101,8 +101,12 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
           </div>
           <div className="text-xs text-slate-500 mt-1">Available for AI tools</div>
         </div>
+      </div>
+      
+      {/* Independent Scrollable Navigation Area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6">
         {/* Main Navigation */}
-        <div className="space-y-1">
+        <div className="space-y-1 mb-6">
           <SidebarItem
             icon={LayoutDashboard}
             label="Dashboard"

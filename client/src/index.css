@@ -136,6 +136,61 @@ body {
   scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
 }
 
+/* VeeFore Independent Scrolling Architecture */
+.veefore-app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.veefore-main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.veefore-sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.veefore-sidebar-header {
+  flex-shrink: 0;
+}
+
+.veefore-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Enhanced scrollbar styling for main areas */
+.veefore-main-content::-webkit-scrollbar,
+.veefore-sidebar-nav::-webkit-scrollbar {
+  width: 8px;
+}
+
+.veefore-main-content::-webkit-scrollbar-track,
+.veefore-sidebar-nav::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.veefore-main-content::-webkit-scrollbar-thumb,
+.veefore-sidebar-nav::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  border: 2px solid #f1f5f9;
+}
+
+.veefore-main-content::-webkit-scrollbar-thumb:hover,
+.veefore-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 /* Professional component styles with dark mode support */
 .professional-card {
   @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm dark:bg-card dark:text-card-foreground dark:border-border;

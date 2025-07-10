@@ -739,32 +739,120 @@ export default function Automation() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { icon: Eye, label: 'Total Reach', value: '2.4M', color: 'blue' },
-          { icon: Heart, label: 'Engagement Rate', value: '24.7%', color: 'pink' },
-          { icon: Share2, label: 'Conversions', value: '8,924', color: 'green' },
-          { icon: TrendingUp, label: 'ROI', value: '+347%', color: 'purple' }
-        ].map((metric, index) => (
-          <motion.div
-            key={index}
-            whileHover={{ scale: 1.05 }}
-            className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg"
-            style={{ backgroundColor: '#ffffff !important' }}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`p-3 bg-${metric.color}-100 rounded-xl`}>
-                <metric.icon className={`h-6 w-6 text-${metric.color}-600`} />
+      {/* Analytics Header */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Automation Analytics</h2>
+        <p className="text-gray-700 mb-6">Comprehensive performance insights and detailed metrics for your automation workflows</p>
+        
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { icon: Eye, label: 'Total Reach', value: '2.4M', color: 'blue', bg: 'bg-blue-100', text: 'text-blue-600' },
+            { icon: Heart, label: 'Engagement Rate', value: '24.7%', color: 'pink', bg: 'bg-pink-100', text: 'text-pink-600' },
+            { icon: Share2, label: 'Conversions', value: '8,924', color: 'green', bg: 'bg-green-100', text: 'text-green-600' },
+            { icon: TrendingUp, label: 'ROI', value: '+347%', color: 'purple', bg: 'bg-purple-100', text: 'text-purple-600' }
+          ].map((metric, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.05 }}
+              className="bg-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all"
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 ${metric.bg} rounded-xl`}>
+                  <metric.icon className={`h-6 w-6 ${metric.text}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{metric.label}</p>
+                  <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">{metric.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Performance Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+            Execution Performance
+          </h3>
+          <div className="space-y-4">
+            {[
+              { label: 'Success Rate', value: '97.3%', color: 'bg-green-500' },
+              { label: 'Response Time', value: '1.2s', color: 'bg-blue-500' },
+              { label: 'Efficiency Score', value: '94.8%', color: 'bg-purple-500' }
+            ].map((metric, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <span className="text-gray-800 font-medium">{metric.label}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                    <div className={`${metric.color} h-2 rounded-full`} style={{ width: metric.value }}></div>
+                  </div>
+                  <span className="text-gray-900 font-bold text-sm w-12">{metric.value}</span>
+                </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+            Growth Metrics
+          </h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-800 font-medium">Monthly Growth</span>
+              <span className="text-green-600 font-bold">+42.3%</span>
             </div>
-          </motion.div>
-        ))}
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-800 font-medium">Revenue Impact</span>
+              <span className="text-purple-600 font-bold">$127,450</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span className="text-gray-800 font-medium">Time Saved</span>
+              <span className="text-blue-600 font-bold">342.7 hrs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule Performance Table */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <Activity className="h-5 w-5 mr-2 text-orange-600" />
+          Top Performing Rules
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 text-gray-800 font-semibold">Rule Name</th>
+                <th className="text-left py-3 px-4 text-gray-800 font-semibold">Executions</th>
+                <th className="text-left py-3 px-4 text-gray-800 font-semibold">Success Rate</th>
+                <th className="text-left py-3 px-4 text-gray-800 font-semibold">Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: 'AI-Powered Welcome Sequence', executions: '2,847', success: '98.4%', revenue: '$45,230' },
+                { name: 'Revenue Optimization Bot', executions: '8,934', success: '89.2%', revenue: '$67,890' },
+                { name: 'Viral Content Amplifier', executions: '1,289', success: '96.8%', revenue: '$12,340' }
+              ].map((rule, index) => (
+                <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-900 font-medium">{rule.name}</td>
+                  <td className="py-3 px-4 text-gray-800">{rule.executions}</td>
+                  <td className="py-3 px-4 text-green-600 font-semibold">{rule.success}</td>
+                  <td className="py-3 px-4 text-purple-600 font-semibold">{rule.revenue}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </motion.div>
   );
@@ -818,15 +906,219 @@ export default function Automation() {
           </TabsContent>
 
           <TabsContent value="settings" className="mt-8">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16 bg-white border border-gray-200 rounded-2xl shadow-lg" 
-              style={{ backgroundColor: '#ffffff !important' }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-8"
             >
-              <Settings className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Advanced Settings</h3>
-              <p className="text-gray-600 max-w-md mx-auto">Configure your automation preferences, AI models, and enterprise security settings.</p>
+              {/* Settings Header */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                  <Settings className="h-6 w-6 mr-3 text-blue-600" />
+                  Advanced Settings
+                </h2>
+                <p className="text-gray-700 mb-6">Configure your automation preferences, AI models, and enterprise security settings.</p>
+              </div>
+
+              {/* Settings Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* AI Configuration */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Brain className="h-5 w-5 mr-2 text-purple-600" />
+                    AI Configuration
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-gray-800 font-medium">AI Model Selection</Label>
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="GPT-4 Advanced (Recommended)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gpt4">GPT-4 Advanced</SelectItem>
+                          <SelectItem value="gpt35">GPT-3.5 Turbo</SelectItem>
+                          <SelectItem value="claude">Claude 3 Opus</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-gray-800 font-medium">Response Creativity</Label>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Conservative</span>
+                        <div className="w-32 h-2 bg-gray-200 rounded-full">
+                          <div className="w-20 h-2 bg-purple-600 rounded-full"></div>
+                        </div>
+                        <span className="text-sm text-gray-600">Creative</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-gray-800 font-medium">Auto-Learning</Label>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Security Settings */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Shield className="h-5 w-5 mr-2 text-red-600" />
+                    Security & Privacy
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Two-Factor Auth</Label>
+                        <p className="text-sm text-gray-600">Enhanced security for automation</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Data Encryption</Label>
+                        <p className="text-sm text-gray-600">End-to-end message encryption</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Audit Logging</Label>
+                        <p className="text-sm text-gray-600">Track all automation activities</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Performance Settings */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Gauge className="h-5 w-5 mr-2 text-green-600" />
+                    Performance Optimization
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-gray-800 font-medium">Execution Speed</Label>
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Balanced (Recommended)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="fast">High Speed</SelectItem>
+                          <SelectItem value="balanced">Balanced</SelectItem>
+                          <SelectItem value="careful">Careful & Precise</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Smart Caching</Label>
+                        <p className="text-sm text-gray-600">Improve response times</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Batch Processing</Label>
+                        <p className="text-sm text-gray-600">Process multiple requests together</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notification Settings */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Bell className="h-5 w-5 mr-2 text-orange-600" />
+                    Notification Preferences
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Email Alerts</Label>
+                        <p className="text-sm text-gray-600">Critical automation events</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">SMS Notifications</Label>
+                        <p className="text-sm text-gray-600">Urgent system alerts</p>
+                      </div>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-gray-800 font-medium">Weekly Reports</Label>
+                        <p className="text-sm text-gray-600">Performance summaries</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Configuration */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: '#ffffff !important' }}>
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <Command className="h-5 w-5 mr-2 text-indigo-600" />
+                  Advanced Configuration
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label className="text-gray-800 font-medium">API Rate Limits</Label>
+                    <Input 
+                      className="mt-1" 
+                      placeholder="1000 requests/hour"
+                      defaultValue="1000"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-gray-800 font-medium">Webhook Timeout</Label>
+                    <Input 
+                      className="mt-1" 
+                      placeholder="30 seconds"
+                      defaultValue="30"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-gray-800 font-medium">Retry Attempts</Label>
+                    <Input 
+                      className="mt-1" 
+                      placeholder="3 attempts"
+                      defaultValue="3"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-gray-800 font-medium">Max Queue Size</Label>
+                    <Input 
+                      className="mt-1" 
+                      placeholder="1000 items"
+                      defaultValue="1000"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <Label className="text-gray-800 font-medium">Custom API Endpoints</Label>
+                  <Textarea 
+                    className="mt-1" 
+                    placeholder="Enter custom webhook URLs (one per line)"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              {/* Save Settings */}
+              <div className="flex justify-end space-x-4">
+                <Button variant="outline" className="text-gray-700 border-gray-300">
+                  Reset to Default
+                </Button>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                  Save Settings
+                </Button>
+              </div>
             </motion.div>
           </TabsContent>
         </Tabs>

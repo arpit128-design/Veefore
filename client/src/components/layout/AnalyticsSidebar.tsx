@@ -35,21 +35,33 @@ const AnalyticsSidebar: React.FC<AnalyticsSidebarProps> = ({
     {
       label: 'Overview',
       icon: BarChart3,
-      page: 'overview',
-      isActive: isActive('overview')
+      page: '/analytics',
+      isActive: isActive('/analytics')
     },
     {
       label: 'Social Insights',
       icon: TrendingUp,
-      page: 'social-insights',
-      isActive: isActive('social-insights'),
+      page: '/social-insights',
+      isActive: isActive('/social-insights'),
       isHighlighted: true
     },
     {
-      label: 'All Reports',
+      label: 'Performance Analytics',
+      icon: Activity,
+      page: '/performance-analytics',
+      isActive: isActive('/performance-analytics')
+    },
+    {
+      label: 'Advanced Analytics',
+      icon: Zap,
+      page: '/advanced-analytics',
+      isActive: isActive('/advanced-analytics')
+    },
+    {
+      label: 'Content Performance',
       icon: FileText,
-      page: 'reports',
-      isActive: isActive('reports')
+      page: '/content-performance-analytics',
+      isActive: isActive('/content-performance-analytics')
     }
   ];
 

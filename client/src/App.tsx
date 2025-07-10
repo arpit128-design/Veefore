@@ -69,6 +69,10 @@ import Gamification from "@/pages/Gamification";
 import EmotionAnalysis from "@/pages/EmotionAnalysis";
 import EarlyAccessPage from "@/pages/EarlyAccessPage";
 import Analytics from "@/pages/Analytics";
+import SocialInsights from "@/pages/SocialInsights";
+import PerformanceAnalytics from "@/pages/PerformanceAnalytics";
+import AdvancedAnalytics from "@/pages/AdvancedAnalytics";
+import ContentPerformanceAnalytics from "@/pages/ContentPerformanceAnalytics";
 import AnalyticsLayout from "@/components/layout/AnalyticsLayout";
 
 // Landing page related pages
@@ -94,7 +98,11 @@ import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
   const [location] = useLocation();
-  const isAnalyticsRoute = location.startsWith('/analytics');
+  const isAnalyticsRoute = location.startsWith('/analytics') || 
+                          location === '/social-insights' || 
+                          location === '/performance-analytics' || 
+                          location === '/advanced-analytics' ||
+                          location === '/content-performance-analytics';
   
   return (
     <WorkspaceProvider>
@@ -104,6 +112,10 @@ function AuthenticatedApp() {
             <Switch>
               <Route path="/analytics" component={Analytics} />
               <Route path="/analytics/:tab" component={Analytics} />
+              <Route path="/social-insights" component={SocialInsights} />
+              <Route path="/performance-analytics" component={PerformanceAnalytics} />
+              <Route path="/advanced-analytics" component={AdvancedAnalytics} />
+              <Route path="/content-performance-analytics" component={ContentPerformanceAnalytics} />
             </Switch>
           </AnalyticsLayout>
         ) : (

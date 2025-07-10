@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import { useLocation } from 'wouter';
 import { ProfessionalSidebar } from './ProfessionalSidebar';
 import AnalyticsSidebar from './AnalyticsSidebar';
 import { ProfessionalHeader } from './ProfessionalHeader';
-import Analytics from '@/pages/Analytics';
 
 interface AnalyticsLayoutProps {
   children: React.ReactNode;
 }
 
 const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
+  const [location, navigate] = useLocation();
   const [showAnalyticsSidebar, setShowAnalyticsSidebar] = useState(true);
-  const [currentPage, setCurrentPage] = useState('overview');
 
   const toggleToAnalytics = () => {
     setShowAnalyticsSidebar(true);
@@ -18,10 +18,11 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
 
   const backToMain = () => {
     setShowAnalyticsSidebar(false);
+    navigate('/dashboard');
   };
 
   const handlePageChange = (page: string) => {
-    setCurrentPage(page);
+    navigate(page);
   };
 
   return (
@@ -31,18 +32,14 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
         {showAnalyticsSidebar ? (
           <AnalyticsSidebar 
             onBackToMain={backToMain} 
-            currentPage={currentPage}
+            currentPage={location}
             onPageChange={handlePageChange}
           />
         ) : (
           <ProfessionalSidebar onAnalyticsToggle={toggleToAnalytics} />
         )}
         <main className="flex-1">
-          {showAnalyticsSidebar ? (
-            <Analytics currentPage={currentPage} onPageChange={handlePageChange} />
-          ) : (
-            children
-          )}
+          {children}
         </main>
       </div>
     </div>

@@ -33,6 +33,7 @@ const UserSchema = new mongoose.Schema({
   referredBy: String,
   preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
   isOnboarded: { type: Boolean, default: false },
+  onboardingCompletedAt: Date,
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationCode: String,
   emailVerificationExpiry: Date,

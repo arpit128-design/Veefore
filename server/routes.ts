@@ -309,6 +309,37 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Complete onboarding with preferences
+  app.post('/api/user/complete-onboarding', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { preferences } = req.body;
+      
+      console.log(`[ONBOARDING] Completing onboarding for user ${userId} with preferences:`, preferences);
+      
+      // Update user to mark onboarding as complete and save preferences
+      const updateData = {
+        isOnboarded: true,
+        onboardingCompletedAt: new Date(),
+        preferences: preferences || {}
+      };
+      
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      console.log(`[ONBOARDING] Successfully completed onboarding for user ${userId}`);
+      console.log(`[ONBOARDING] User isOnboarded: ${updatedUser.isOnboarded}`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Onboarding completed successfully',
+        user: updatedUser 
+      });
+    } catch (error: any) {
+      console.error('[ONBOARDING] Error completing onboarding:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Debug endpoint to test user creation and examine isOnboarded field
   app.post('/api/debug/create-test-user', async (req, res) => {
     try {

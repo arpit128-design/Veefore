@@ -202,7 +202,17 @@ export default function SignUpWithOnboarding() {
     contentTypes: [] as string[],
     tone: '',
     businessName: '',
-    description: ''
+    description: '',
+    businessType: '',
+    teamSize: '',
+    primaryGoal: '',
+    audience: '',
+    postingFrequency: '',
+    brandVoice: '',
+    location: '',
+    industry: '',
+    website: '',
+    companySize: ''
   });
   
   const { toast } = useToast();
@@ -1147,172 +1157,434 @@ export default function SignUpWithOnboarding() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="max-w-5xl mx-auto"
               >
-                <Card className="border-0 shadow-lg bg-white">
-                  <CardHeader className="text-center pb-6">
-                    <div className="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Sparkles className="w-10 h-10 text-white" />
-                    </div>
-                    <CardTitle className="text-2xl text-gray-900">
-                      Personalize your experience
-                    </CardTitle>
-                    <p className="text-gray-600 mt-2">
-                      Tell us about your content to get better AI suggestions
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Business Name (Optional)
-                      </label>
-                      <Input
-                        placeholder="Your business or brand name"
-                        value={preferences.businessName}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
-                        className="h-12 border-gray-300 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        What niches are you interested in?
-                      </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {niches.map((niche) => {
-                          const Icon = niche.icon;
-                          const isSelected = preferences.selectedNiches.includes(niche.id);
-                          
-                          return (
-                            <button
-                              key={niche.id}
-                              onClick={() => {
-                                setPreferences(prev => ({
-                                  ...prev,
-                                  selectedNiches: isSelected
-                                    ? prev.selectedNiches.filter(id => id !== niche.id)
-                                    : [...prev.selectedNiches, niche.id]
-                                }));
-                              }}
-                              className={`p-3 rounded-lg border-2 transition-all ${
-                                isSelected
-                                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <Icon className="w-5 h-5 mx-auto mb-1" />
-                              <span className="text-xs font-medium">{niche.name}</span>
-                            </button>
-                          );
-                        })}
+                <div className="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex">
+                  {/* Left side with mascot/illustration */}
+                  <div className="w-1/2 flex items-center justify-center p-8">
+                    <div className="w-80 h-80 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center relative">
+                      <div className="w-60 h-60 bg-white rounded-full flex items-center justify-center shadow-2xl">
+                        <Sparkles className="w-20 h-20 text-indigo-600" />
+                      </div>
+                      <div className="absolute -top-4 -right-4 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center">
+                        <Star className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <Heart className="w-6 h-6 text-white" />
                       </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Content Types
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { id: 'posts', name: 'Posts', icon: FileText },
-                          { id: 'stories', name: 'Stories', icon: Camera },
-                          { id: 'reels', name: 'Reels', icon: Video },
-                          { id: 'live', name: 'Live', icon: Users }
-                        ].map((type) => {
-                          const Icon = type.icon;
-                          const isSelected = preferences.contentTypes.includes(type.id);
-                          
-                          return (
-                            <button
-                              key={type.id}
-                              onClick={() => {
-                                setPreferences(prev => ({
-                                  ...prev,
-                                  contentTypes: isSelected
-                                    ? prev.contentTypes.filter(id => id !== type.id)
-                                    : [...prev.contentTypes, type.id]
-                                }));
-                              }}
-                              className={`p-4 rounded-lg border-2 transition-all ${
-                                isSelected
-                                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <Icon className="w-6 h-6 mx-auto mb-2" />
-                              <span className="text-sm font-medium">{type.name}</span>
-                            </button>
-                          );
-                        })}
+                  {/* Right side with form */}
+                  <div className="w-1/2 p-8 flex flex-col justify-center">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 max-h-[90vh] overflow-y-auto">
+                      <div className="text-center mb-8">
+                        <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                          Personalize your experience
+                        </h2>
+                        <p className="text-gray-600">
+                          Tell us about your business to get better AI suggestions
+                        </p>
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Brand Voice
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { id: 'professional', name: 'Professional' },
-                          { id: 'casual', name: 'Casual' },
-                          { id: 'fun', name: 'Fun & Playful' },
-                          { id: 'inspirational', name: 'Inspirational' }
-                        ].map((tone) => (
-                          <button
-                            key={tone.id}
-                            onClick={() => setPreferences(prev => ({ ...prev, tone: tone.id }))}
-                            className={`p-3 rounded-lg border-2 transition-all ${
-                              preferences.tone === tone.id
-                                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
+                      <div className="space-y-6">
+                        {/* Business Information */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Business Name
+                            </label>
+                            <Input
+                              placeholder="Your business or brand name"
+                              value={preferences.businessName}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, businessName: e.target.value }))}
+                              className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Website
+                            </label>
+                            <Input
+                              placeholder="www.yourwebsite.com"
+                              value={preferences.website}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, website: e.target.value }))}
+                              className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Business Type & Industry */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Business Type
+                            </label>
+                            <select
+                              value={preferences.businessType}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, businessType: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select business type</option>
+                              <option value="personal-brand">Personal Brand</option>
+                              <option value="small-business">Small Business</option>
+                              <option value="startup">Startup</option>
+                              <option value="enterprise">Enterprise</option>
+                              <option value="agency">Agency</option>
+                              <option value="nonprofit">Non-profit</option>
+                              <option value="ecommerce">E-commerce</option>
+                              <option value="consultant">Consultant</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Industry
+                            </label>
+                            <select
+                              value={preferences.industry}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, industry: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select industry</option>
+                              <option value="technology">Technology</option>
+                              <option value="healthcare">Healthcare</option>
+                              <option value="finance">Finance</option>
+                              <option value="retail">Retail</option>
+                              <option value="education">Education</option>
+                              <option value="food-beverage">Food & Beverage</option>
+                              <option value="fashion">Fashion</option>
+                              <option value="travel">Travel & Tourism</option>
+                              <option value="fitness">Fitness & Wellness</option>
+                              <option value="real-estate">Real Estate</option>
+                              <option value="automotive">Automotive</option>
+                              <option value="entertainment">Entertainment</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Team Size & Company Size */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Team Size
+                            </label>
+                            <select
+                              value={preferences.teamSize}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, teamSize: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select team size</option>
+                              <option value="just-me">Just me</option>
+                              <option value="2-5">2-5 people</option>
+                              <option value="6-10">6-10 people</option>
+                              <option value="11-25">11-25 people</option>
+                              <option value="26-50">26-50 people</option>
+                              <option value="51-100">51-100 people</option>
+                              <option value="100+">100+ people</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Company Size
+                            </label>
+                            <select
+                              value={preferences.companySize}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, companySize: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select company size</option>
+                              <option value="1-10">1-10 employees</option>
+                              <option value="11-50">11-50 employees</option>
+                              <option value="51-200">51-200 employees</option>
+                              <option value="201-500">201-500 employees</option>
+                              <option value="501-1000">501-1000 employees</option>
+                              <option value="1000+">1000+ employees</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Primary Goal & Target Audience */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Primary Goal
+                            </label>
+                            <select
+                              value={preferences.primaryGoal}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, primaryGoal: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select primary goal</option>
+                              <option value="increase-followers">Increase followers</option>
+                              <option value="drive-sales">Drive sales</option>
+                              <option value="build-brand">Build brand awareness</option>
+                              <option value="generate-leads">Generate leads</option>
+                              <option value="customer-engagement">Customer engagement</option>
+                              <option value="thought-leadership">Thought leadership</option>
+                              <option value="community-building">Community building</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Target Audience
+                            </label>
+                            <select
+                              value={preferences.audience}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, audience: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select target audience</option>
+                              <option value="b2b">B2B professionals</option>
+                              <option value="b2c">B2C consumers</option>
+                              <option value="millennials">Millennials</option>
+                              <option value="gen-z">Gen Z</option>
+                              <option value="business-owners">Business owners</option>
+                              <option value="entrepreneurs">Entrepreneurs</option>
+                              <option value="students">Students</option>
+                              <option value="parents">Parents</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Posting Frequency & Brand Voice */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Posting Frequency
+                            </label>
+                            <select
+                              value={preferences.postingFrequency}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, postingFrequency: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select posting frequency</option>
+                              <option value="daily">Daily</option>
+                              <option value="few-times-week">Few times a week</option>
+                              <option value="weekly">Weekly</option>
+                              <option value="bi-weekly">Bi-weekly</option>
+                              <option value="monthly">Monthly</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Brand Voice
+                            </label>
+                            <select
+                              value={preferences.brandVoice}
+                              onChange={(e) => setPreferences(prev => ({ ...prev, brandVoice: e.target.value }))}
+                              className="h-12 w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                            >
+                              <option value="">Select brand voice</option>
+                              <option value="professional">Professional</option>
+                              <option value="casual">Casual & Friendly</option>
+                              <option value="humorous">Humorous</option>
+                              <option value="inspiring">Inspiring</option>
+                              <option value="educational">Educational</option>
+                              <option value="authoritative">Authoritative</option>
+                              <option value="conversational">Conversational</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Location */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Location
+                          </label>
+                          <Input
+                            placeholder="City, Country"
+                            value={preferences.location}
+                            onChange={(e) => setPreferences(prev => ({ ...prev, location: e.target.value }))}
+                            className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                          />
+                        </div>
+
+                        {/* Business Description */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Business Description
+                          </label>
+                          <textarea
+                            placeholder="Tell us about your business, products, or services..."
+                            value={preferences.description}
+                            onChange={(e) => setPreferences(prev => ({ ...prev, description: e.target.value }))}
+                            rows={4}
+                            className="w-full border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900 p-3"
+                          />
+                        </div>
+
+                        {/* Content Types */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">
+                            Content Types You're Interested In
+                          </label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              { id: 'posts', name: 'Posts', icon: FileText },
+                              { id: 'stories', name: 'Stories', icon: Camera },
+                              { id: 'reels', name: 'Reels', icon: Video },
+                              { id: 'live', name: 'Live', icon: Users }
+                            ].map((type) => {
+                              const Icon = type.icon;
+                              const isSelected = preferences.contentTypes.includes(type.id);
+                              
+                              return (
+                                <button
+                                  key={type.id}
+                                  onClick={() => {
+                                    setPreferences(prev => ({
+                                      ...prev,
+                                      contentTypes: isSelected
+                                        ? prev.contentTypes.filter(id => id !== type.id)
+                                        : [...prev.contentTypes, type.id]
+                                    }));
+                                  }}
+                                  className={`p-4 rounded-lg border-2 transition-all ${
+                                    isSelected
+                                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                  }`}
+                                >
+                                  <Icon className="w-6 h-6 mx-auto mb-2" />
+                                  <span className="text-sm font-medium">{type.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Interest Niches */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">
+                            Industry Niches
+                          </label>
+                          <div className="grid grid-cols-5 gap-2">
+                            {niches.map((niche) => {
+                              const Icon = niche.icon;
+                              const isSelected = preferences.selectedNiches.includes(niche.id);
+                              
+                              return (
+                                <button
+                                  key={niche.id}
+                                  onClick={() => {
+                                    setPreferences(prev => ({
+                                      ...prev,
+                                      selectedNiches: isSelected
+                                        ? prev.selectedNiches.filter(id => id !== niche.id)
+                                        : [...prev.selectedNiches, niche.id]
+                                    }));
+                                  }}
+                                  className={`p-3 rounded-lg border-2 transition-all ${
+                                    isSelected
+                                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                  }`}
+                                >
+                                  <Icon className="w-4 h-4 mx-auto mb-1" />
+                                  <span className="text-xs font-medium">{niche.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex gap-3 pt-6 border-t">
+                          <Button
+                            onClick={prevStep}
+                            variant="outline"
+                            className="flex-1 h-12 border-gray-300 text-gray-700 hover:bg-gray-50"
                           >
-                            <span className="text-sm font-medium">{tone.name}</span>
-                          </button>
-                        ))}
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Back
+                          </Button>
+                          <Button
+                            onClick={handleCompleteOnboarding}
+                            disabled={completeOnboarding.isPending}
+                            className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            {completeOnboarding.isPending ? 'Setting up...' : 'Complete Setup'}
+                            <CheckCircle className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={prevStep}
-                        variant="outline"
-                        className="flex-1 h-12 border-gray-300"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        onClick={handleCompleteOnboarding}
-                        className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? 'Setting up...' : 'Complete Setup'}
-                        <Send className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-
-        {/* Footer */}
-        <div className="px-8 py-4 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center space-x-4">
-              <select className="text-sm border-none bg-transparent">
-                <option>English</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/privacy-policy" className="hover:text-gray-700">Privacy</Link>
-              <Link href="/terms-of-service" className="hover:text-gray-700">Terms</Link>
-              <Link href="/help" className="hover:text-gray-700">Help</Link>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Add the business types for the select dropdown
+const businessTypes = [
+  { id: 'personal-brand', name: 'Personal Brand' },
+  { id: 'small-business', name: 'Small Business' },
+  { id: 'startup', name: 'Startup' },
+  { id: 'enterprise', name: 'Enterprise' },
+  { id: 'agency', name: 'Agency' },
+  { id: 'nonprofit', name: 'Non-profit' },
+  { id: 'ecommerce', name: 'E-commerce' },
+  { id: 'consultant', name: 'Consultant' }
+];
+
+const industries = [
+  { id: 'technology', name: 'Technology' },
+  { id: 'healthcare', name: 'Healthcare' },
+  { id: 'finance', name: 'Finance' },
+  { id: 'retail', name: 'Retail' },
+  { id: 'education', name: 'Education' },
+  { id: 'food-beverage', name: 'Food & Beverage' },
+  { id: 'fashion', name: 'Fashion' },
+  { id: 'travel', name: 'Travel & Tourism' },
+  { id: 'fitness', name: 'Fitness & Wellness' },
+  { id: 'real-estate', name: 'Real Estate' },
+  { id: 'automotive', name: 'Automotive' },
+  { id: 'entertainment', name: 'Entertainment' }
+];
+
+const primaryGoals = [
+  { id: 'increase-followers', name: 'Increase followers' },
+  { id: 'drive-sales', name: 'Drive sales' },
+  { id: 'build-brand', name: 'Build brand awareness' },
+  { id: 'generate-leads', name: 'Generate leads' },
+  { id: 'customer-engagement', name: 'Customer engagement' },
+  { id: 'thought-leadership', name: 'Thought leadership' },
+  { id: 'community-building', name: 'Community building' }
+];
+
+const targetAudiences = [
+  { id: 'b2b', name: 'B2B professionals' },
+  { id: 'b2c', name: 'B2C consumers' },
+  { id: 'millennials', name: 'Millennials' },
+  { id: 'gen-z', name: 'Gen Z' },
+  { id: 'business-owners', name: 'Business owners' },
+  { id: 'entrepreneurs', name: 'Entrepreneurs' },
+  { id: 'students', name: 'Students' },
+  { id: 'parents', name: 'Parents' }
+];
+
+const postingFrequencies = [
+  { id: 'daily', name: 'Daily' },
+  { id: 'few-times-week', name: 'Few times a week' },
+  { id: 'weekly', name: 'Weekly' },
+  { id: 'bi-weekly', name: 'Bi-weekly' },
+  { id: 'monthly', name: 'Monthly' }
+];
+
+const brandVoices = [
+  { id: 'professional', name: 'Professional' },
+  { id: 'casual', name: 'Casual & Friendly' },
+  { id: 'humorous', name: 'Humorous' },
+  { id: 'inspiring', name: 'Inspiring' },
+  { id: 'educational', name: 'Educational' },
+  { id: 'authoritative', name: 'Authoritative' },
+  { id: 'conversational', name: 'Conversational' }
+];

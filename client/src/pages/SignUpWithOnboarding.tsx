@@ -1503,10 +1503,10 @@ export default function SignUpWithOnboarding() {
                           </Button>
                           <Button
                             onClick={handleCompleteOnboarding}
-                            disabled={completeOnboarding.isPending}
+                            disabled={isLoading}
                             className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
                           >
-                            {completeOnboarding.isPending ? 'Setting up...' : 'Complete Setup'}
+                            {isLoading ? 'Setting up...' : 'Complete Setup'}
                             <CheckCircle className="w-4 h-4 ml-2" />
                           </Button>
                         </div>

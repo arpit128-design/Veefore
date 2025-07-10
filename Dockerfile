@@ -1,55 +1,80 @@
-# Production Dockerfile for VeeFore
+# VeeFore Production Dockerfile
+# Multi-stage build for optimized production deployment
+
+# ==========================================
+# Build Stage
+# ==========================================
 FROM node:18-alpine AS builder
 
-# Install Python and build tools for native dependencies
-RUN apk add --no-cache python3 make g++
-
+# Set working directory
 WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
-COPY pnpm-lock.yaml* ./
 
 # Install dependencies
-RUN npm install --frozen-lockfile
+RUN npm ci --only=production --legacy-peer-deps
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build application
+RUN NODE_ENV=production npm run build
 
-# Production stage
+# ==========================================
+# Production Stage
+# ==========================================
 FROM node:18-alpine AS production
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Security hardening
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S veefore -u 1001
 
-# Create app directory
+# Install runtime dependencies
+RUN apk add --no-cache curl dumb-init
+
+# Set working directory
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
 # Copy built application from builder stage
-COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
+COPY --from=builder --chown=veefore:nodejs /app/dist ./dist
+COPY --from=builder --chown=veefore:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=veefore:nodejs /app/package.json ./
 
-# Create uploads directory
-RUN mkdir -p /app/uploads && chown nextjs:nodejs /app/uploads
+# Create necessary directories
+RUN mkdir -p uploads logs && \
+    chown -R veefore:nodejs uploads logs
+
+# Create production environment template
+RUN echo "NODE_ENV=production" > .env.template && \
+    echo "PORT=5000" >> .env.template && \
+    echo "DATABASE_URL=mongodb://localhost:27017/veefore" >> .env.template && \
+    chown veefore:nodejs .env.template
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
 # Switch to non-root user
-USER nextjs
+USER veefore
 
 # Expose port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').request('http://localhost:5000/api/health', res => process.exit(res.statusCode === 200 ? 0 : 1)).end()"
-
-# Start the application
+# Use dumb-init for proper signal handling
 ENTRYPOINT ["dumb-init", "--"]
+
+# Start application
 CMD ["node", "dist/index.js"]
+
+# ==========================================
+# Metadata
+# ==========================================
+LABEL name="veefore" \
+      version="1.0.0" \
+      description="VeeFore - AI-Powered Social Media Management Platform" \
+      maintainer="VeeFore Team" \
+      org.opencontainers.image.source="https://github.com/your-org/veefore"

@@ -99,9 +99,9 @@ const AnalyticsSidebar: React.FC<AnalyticsSidebarProps> = ({
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
+    <div className="w-64 bg-white border-r border-gray-200 veefore-sidebar">
       {/* Modern Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+      <div className="veefore-sidebar-header p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
             Analytics
@@ -118,7 +118,7 @@ const AnalyticsSidebar: React.FC<AnalyticsSidebarProps> = ({
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 p-4 space-y-2">
+      <div className="veefore-sidebar-nav p-4 space-y-2">
         {sidebarItems.map((item) => (
           <Button
             key={item.page}

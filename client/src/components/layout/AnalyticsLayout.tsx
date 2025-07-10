@@ -26,9 +26,9 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="veefore-app-container bg-gray-50">
       <ProfessionalHeader />
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         {showAnalyticsSidebar ? (
           <AnalyticsSidebar 
             onBackToMain={backToMain} 
@@ -38,7 +38,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
         ) : (
           <ProfessionalSidebar onAnalyticsToggle={toggleToAnalytics} />
         )}
-        <main className="flex-1">
+        <main className="veefore-main-content">
           {children}
         </main>
       </div>

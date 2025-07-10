@@ -83,8 +83,8 @@ export default function ProfessionalDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <div className="p-6 space-y-6">
+    <div className="main-dashboard-container min-h-screen bg-gray-50 dark:bg-slate-900" style={{ backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+      <div className="p-6 space-y-6" style={{ backgroundColor: 'transparent' }}>
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>

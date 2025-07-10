@@ -26,7 +26,7 @@
   --ring: 6 182 212; /* cyan-500 */
   --chart-1: 6 182 212; /* cyan-500 */
   --chart-2: 16 185 129; /* emerald-500 */
-  --chart-3: 245 158 11; /* amber-500 */
+  --chart-3: 255 255 255; /* white instead of amber */
   --chart-4: 139 92 246; /* violet-500 */
   --chart-5: 236 72 153; /* pink-500 */
   
@@ -73,7 +73,7 @@
   --ring: 34 211 238; /* cyan-400 */
   --chart-1: 34 211 238; /* cyan-400 */
   --chart-2: 52 211 153; /* emerald-400 */
-  --chart-3: 251 191 36; /* amber-400 */
+  --chart-3: 255 255 255; /* white instead of amber */
   --chart-4: 167 139 250; /* violet-400 */
   --chart-5: 244 114 182; /* pink-400 */
   
@@ -193,15 +193,26 @@ body {
   /* Remove yellow tints and force clean backgrounds */
 }
 
+/* Force clean gray background for main dashboard */
+.min-h-screen {
+  background-color: #f9fafb !important;
+}
+
+.dark .min-h-screen {
+  background-color: #0f172a !important;
+}
+
+/* Eliminate ALL yellow/amber backgrounds */
 .bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400,
 .bg-yellow-500, .bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300,
-.bg-amber-400, .bg-amber-500 {
+.bg-amber-400, .bg-amber-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800,
+.bg-yellow-900, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900 {
   background-color: rgb(255 255 255) !important;
   color: rgb(30 41 59) !important;
 }
 
 /* Force white backgrounds for all dashboard components */
-[class*="bg-yellow"], [class*="bg-amber"] {
+[class*="bg-yellow"], [class*="bg-amber"], div[class*="yellow"], div[class*="amber"] {
   background-color: rgb(255 255 255) !important;
   border-color: rgb(229 231 235) !important;
   color: rgb(30 41 59) !important;
@@ -228,6 +239,40 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
 .dark .card, .dark .professional-card {
   background-color: rgb(30 41 59) !important;
   border-color: rgb(51 65 85) !important;
+}
+
+/* Target specific dashboard containers */
+[class*="dashboard"], [class*="Dashboard"] {
+  background-color: #f9fafb !important;
+}
+
+.dark [class*="dashboard"], .dark [class*="Dashboard"] {
+  background-color: #0f172a !important;
+}
+
+/* FINAL YELLOW ELIMINATION - Most specific rules */
+.main-dashboard-container {
+  background-color: #f9fafb !important;
+  background: #f9fafb !important;
+}
+
+.dark .main-dashboard-container {
+  background-color: #0f172a !important;
+  background: #0f172a !important;
+}
+
+/* Absolute override for any element with yellow background */
+[style*="yellow"], [style*="amber"], [class*="yellow"], [class*="amber"],
+*[style*="rgb(255, 255, 0)"], *[style*="rgb(255, 193, 7)"], 
+*[style*="#ffff00"], *[style*="#ffc107"],
+*[style*="hsl(60"], *[style*="hsl(45"] {
+  background-color: #f9fafb !important;
+  background: #f9fafb !important;
+}
+
+.dark [style*="yellow"], .dark [style*="amber"], .dark [class*="yellow"], .dark [class*="amber"] {
+  background-color: #0f172a !important;
+  background: #0f172a !important;
 }
 
 .professional-input {

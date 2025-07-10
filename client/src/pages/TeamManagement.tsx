@@ -91,20 +91,23 @@ const rolePermissions = {
     icon: Crown, 
     color: "bg-purple-100 text-purple-800 border-purple-200", 
     darkColor: "bg-purple-900 text-purple-100 border-purple-700",
-    description: "Full workspace control and billing",
+    description: "Full workspace control and billing management",
+    level: 10,
     permissions: {
       can: [
         "Manage billing and subscription",
         "Invite and remove team members",
-        "Change member roles (including Admin)",
-        "Delete workspace",
-        "Manage workspace settings",
+        "Change member roles (all levels)",
+        "Delete workspace permanently",
+        "Manage workspace settings and integrations",
         "Create, edit, and publish content",
         "View all analytics and reports",
         "Connect social media accounts",
-        "Use AI suggestions and content generation",
+        "Use all AI suggestions and content generation",
         "Schedule and manage content",
-        "Access team management"
+        "Access team management",
+        "Export all data and reports",
+        "Manage API keys and webhooks"
       ],
       cannot: []
     }
@@ -114,24 +117,58 @@ const rolePermissions = {
     icon: Shield, 
     color: "bg-blue-100 text-blue-800 border-blue-200", 
     darkColor: "bg-blue-900 text-blue-100 border-blue-700",
-    description: "Full access to all features",
+    description: "Full operational access to all features",
+    level: 8,
     permissions: {
       can: [
         "Invite and remove team members",
-        "Change Editor/Viewer roles",
+        "Change roles (Editor, Content Manager, Analyst, Viewer)",
         "Create, edit, and publish content",
         "View all analytics and reports",
         "Connect social media accounts",
         "Use AI suggestions and content generation",
         "Schedule and manage content",
         "Access team management",
-        "Manage workspace settings"
+        "Manage workspace settings",
+        "Export team reports",
+        "Manage content approval workflows"
       ],
       cannot: [
         "Manage billing and subscription",
         "Delete workspace",
         "Change Owner role",
-        "Remove or demote other Admins"
+        "Remove or demote other Admins",
+        "Access sensitive API configurations"
+      ]
+    }
+  },
+  content_manager: { 
+    label: "Content Manager", 
+    icon: Calendar, 
+    color: "bg-indigo-100 text-indigo-800 border-indigo-200", 
+    darkColor: "bg-indigo-900 text-indigo-100 border-indigo-700",
+    description: "Manages content strategy and publishing workflow",
+    level: 6,
+    permissions: {
+      can: [
+        "Create, edit, and publish content",
+        "Manage content calendar and scheduling",
+        "Use AI suggestions and content generation",
+        "View content analytics and performance",
+        "Approve/reject content from Editors",
+        "Connect social media accounts",
+        "Manage content templates",
+        "Set content guidelines and standards",
+        "Schedule bulk content publishing"
+      ],
+      cannot: [
+        "Invite or remove team members",
+        "Change member roles",
+        "Access billing information",
+        "View team analytics",
+        "Manage workspace settings",
+        "Delete workspace",
+        "Access automation settings"
       ]
     }
   },
@@ -140,39 +177,78 @@ const rolePermissions = {
     icon: Edit, 
     color: "bg-emerald-100 text-emerald-800 border-emerald-200", 
     darkColor: "bg-emerald-900 text-emerald-100 border-emerald-700",
-    description: "Can create and manage content",
+    description: "Creates and edits content with approval workflow",
+    level: 5,
     permissions: {
       can: [
-        "Create, edit, and publish content",
+        "Create and edit content (requires approval)",
         "View analytics for their own content",
         "Use AI suggestions and content generation",
-        "Schedule content",
+        "Schedule content for review",
         "Connect personal social media accounts",
-        "Collaborate on content creation"
+        "Collaborate on content creation",
+        "Save content as drafts",
+        "Access content templates"
       ],
       cannot: [
+        "Publish content directly",
         "Invite or remove team members",
         "Change member roles",
         "Access billing information",
         "View other members' analytics",
         "Manage workspace settings",
-        "Delete workspace"
+        "Delete workspace",
+        "Access advanced AI features"
       ]
     }
   },
-  viewer: { 
-    label: "Viewer", 
-    icon: Eye, 
-    color: "bg-slate-100 text-slate-800 border-slate-200", 
-    darkColor: "bg-slate-700 text-slate-100 border-slate-600",
-    description: "Read-only access to content",
+  social_manager: { 
+    label: "Social Manager", 
+    icon: Globe, 
+    color: "bg-cyan-100 text-cyan-800 border-cyan-200", 
+    darkColor: "bg-cyan-900 text-cyan-100 border-cyan-700",
+    description: "Manages social media accounts and engagement",
+    level: 6,
     permissions: {
       can: [
-        "View published content",
-        "View basic analytics",
-        "Comment on content (if enabled)",
-        "Export content reports",
-        "View content calendar"
+        "Connect and manage social media accounts",
+        "Publish content to social platforms",
+        "Respond to comments and messages",
+        "View social media analytics",
+        "Use social listening features",
+        "Manage DM automation rules",
+        "Schedule social posts",
+        "Monitor brand mentions"
+      ],
+      cannot: [
+        "Create original content",
+        "Invite team members",
+        "Change member roles",
+        "Access billing information",
+        "Use AI content generation",
+        "Manage workspace settings",
+        "Delete workspace",
+        "Access advanced analytics"
+      ]
+    }
+  },
+  analyst: { 
+    label: "Analyst", 
+    icon: TrendingUp, 
+    color: "bg-orange-100 text-orange-800 border-orange-200", 
+    darkColor: "bg-orange-900 text-orange-100 border-orange-700",
+    description: "Views and analyzes performance data",
+    level: 4,
+    permissions: {
+      can: [
+        "View all analytics and reports",
+        "Export analytics data",
+        "Create custom reports",
+        "View content performance metrics",
+        "Access ROI and conversion data",
+        "Monitor competitor analysis",
+        "Use advanced filtering and segmentation",
+        "Schedule automated reports"
       ],
       cannot: [
         "Create or edit content",
@@ -181,7 +257,89 @@ const rolePermissions = {
         "Access billing information",
         "Use AI suggestions",
         "Schedule content",
-        "Connect social media accounts"
+        "Connect social media accounts",
+        "Publish content"
+      ]
+    }
+  },
+  contributor: { 
+    label: "Contributor", 
+    icon: UserCheck, 
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200", 
+    darkColor: "bg-yellow-900 text-yellow-100 border-yellow-700",
+    description: "Limited content creation and collaboration",
+    level: 3,
+    permissions: {
+      can: [
+        "Create draft content only",
+        "Collaborate on shared content",
+        "View content calendar",
+        "Comment on content",
+        "Use basic AI suggestions",
+        "Access content templates",
+        "Submit content ideas"
+      ],
+      cannot: [
+        "Publish or schedule content",
+        "View analytics",
+        "Invite team members",
+        "Change any settings",
+        "Access billing information",
+        "Connect social media accounts",
+        "Use advanced AI features"
+      ]
+    }
+  },
+  viewer: { 
+    label: "Viewer", 
+    icon: Eye, 
+    color: "bg-slate-100 text-slate-800 border-slate-200", 
+    darkColor: "bg-slate-700 text-slate-100 border-slate-600",
+    description: "Read-only access to content and basic analytics",
+    level: 1,
+    permissions: {
+      can: [
+        "View published content",
+        "View basic analytics",
+        "Comment on content (if enabled)",
+        "Export content reports",
+        "View content calendar",
+        "Access shared dashboards"
+      ],
+      cannot: [
+        "Create or edit content",
+        "Invite team members",
+        "Change any settings",
+        "Access billing information",
+        "Use AI suggestions",
+        "Schedule content",
+        "Connect social media accounts",
+        "Access detailed analytics"
+      ]
+    }
+  },
+  guest: { 
+    label: "Guest", 
+    icon: Lock, 
+    color: "bg-gray-100 text-gray-800 border-gray-200", 
+    darkColor: "bg-gray-700 text-gray-100 border-gray-600",
+    description: "Temporary access to specific content only",
+    level: 0,
+    permissions: {
+      can: [
+        "View specific shared content",
+        "Comment on shared content (if enabled)",
+        "View basic public metrics"
+      ],
+      cannot: [
+        "Create or edit any content",
+        "View workspace analytics",
+        "Access team information",
+        "Invite team members",
+        "Change any settings",
+        "Use AI features",
+        "Schedule content",
+        "Connect accounts"
       ]
     }
   }
@@ -368,9 +526,23 @@ export default function TeamManagement() {
                           <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
                         <SelectContent style={{ backgroundColor: '#ffffff' }}>
-                          <SelectItem value="viewer">Viewer - Read-only access</SelectItem>
-                          <SelectItem value="editor">Editor - Create and edit content</SelectItem>
-                          <SelectItem value="admin">Admin - Full access to features</SelectItem>
+                          {Object.entries(rolePermissions)
+                            .filter(([roleKey]) => roleKey !== 'owner') // Can't invite as owner
+                            .sort(([,a], [,b]) => b.level - a.level)
+                            .map(([roleKey, role]) => {
+                              const RoleIcon = role.icon;
+                              return (
+                                <SelectItem key={roleKey} value={roleKey}>
+                                  <div className="flex items-center space-x-2">
+                                    <RoleIcon className="h-4 w-4 text-slate-600" />
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{role.label}</span>
+                                      <span className="text-xs text-slate-500">{role.description}</span>
+                                    </div>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
                         </SelectContent>
                       </Select>
                     </div>
@@ -503,10 +675,13 @@ export default function TeamManagement() {
                   </SelectTrigger>
                   <SelectContent style={{ backgroundColor: '#ffffff' }}>
                     <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
+                    {Object.entries(rolePermissions)
+                      .sort(([,a], [,b]) => b.level - a.level)
+                      .map(([roleKey, role]) => (
+                        <SelectItem key={roleKey} value={roleKey}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -781,60 +956,151 @@ export default function TeamManagement() {
 
           {/* Roles & Permissions Tab */}
           <TabsContent value="roles" className="space-y-6">
-            <div className="grid gap-6">
-              {Object.entries(rolePermissions).map(([roleKey, role]) => {
-                const RoleIcon = role.icon;
-                return (
-                  <Card key={roleKey} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }} className="shadow-sm">
-                    <CardHeader>
-                      <div className="flex items-center space-x-3">
-                        <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                          <RoleIcon className="h-6 w-6 text-slate-700" />
+            {/* Role Hierarchy Overview */}
+            <Card style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }} className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-slate-900 flex items-center">
+                  <Shield className="h-5 w-5 mr-2 text-blue-600" />
+                  Role Hierarchy & Access Levels
+                </CardTitle>
+                <CardDescription className="text-slate-600">
+                  Complete overview of all role permissions and access levels in your workspace
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  {Object.entries(rolePermissions)
+                    .sort(([,a], [,b]) => b.level - a.level)
+                    .map(([roleKey, role]) => {
+                      const RoleIcon = role.icon;
+                      return (
+                        <div key={roleKey} className="text-center p-4 rounded-lg border-2 border-slate-200 hover:border-blue-300 transition-colors">
+                          <div className="inline-flex p-3 rounded-full bg-slate-50 border border-slate-200 mb-3">
+                            <RoleIcon className="h-6 w-6 text-slate-700" />
+                          </div>
+                          <h3 className="font-semibold text-slate-900 mb-1">{role.label}</h3>
+                          <div className="text-xs text-slate-500 mb-2">Level {role.level}</div>
+                          <Badge className={role.color} style={{ border: '1px solid' }}>
+                            {role.permissions.can.length} permissions
+                          </Badge>
                         </div>
-                        <div>
-                          <CardTitle className="text-slate-900">{role.label}</CardTitle>
-                          <CardDescription className="text-slate-600">{role.description}</CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Permissions
-                          </h4>
-                          <ul className="space-y-2">
-                            {role.permissions.can.map((permission, index) => (
-                              <li key={index} className="flex items-start space-x-2 text-sm">
-                                <CheckCircle className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-slate-700">{permission}</span>
-                              </li>
+                      );
+                    })}
+                </div>
+                
+                {/* Permission Comparison Matrix */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-200">
+                        <th className="text-left p-3 font-semibold text-slate-900">Key Permissions</th>
+                        {Object.entries(rolePermissions)
+                          .sort(([,a], [,b]) => b.level - a.level)
+                          .map(([roleKey, role]) => (
+                            <th key={roleKey} className="text-center p-3 font-semibold text-slate-900 min-w-[100px]">
+                              {role.label}
+                            </th>
+                          ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        "Manage billing and subscription",
+                        "Invite and remove team members", 
+                        "Create, edit, and publish content",
+                        "View all analytics and reports",
+                        "Use AI suggestions and content generation",
+                        "Connect social media accounts",
+                        "Manage workspace settings"
+                      ].map((permission) => (
+                        <tr key={permission} className="border-b border-slate-100">
+                          <td className="p-3 text-slate-700">{permission}</td>
+                          {Object.entries(rolePermissions)
+                            .sort(([,a], [,b]) => b.level - a.level)
+                            .map(([roleKey, role]) => (
+                              <td key={roleKey} className="text-center p-3">
+                                {role.permissions.can.some(p => p.includes(permission)) ? (
+                                  <CheckCircle className="h-5 w-5 text-emerald-600 mx-auto" />
+                                ) : (
+                                  <XCircle className="h-5 w-5 text-slate-300 mx-auto" />
+                                )}
+                              </td>
                             ))}
-                          </ul>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Detailed Role Cards */}
+            <div className="grid gap-6">
+              {Object.entries(rolePermissions)
+                .sort(([,a], [,b]) => b.level - a.level)
+                .map(([roleKey, role]) => {
+                  const RoleIcon = role.icon;
+                  return (
+                    <Card key={roleKey} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }} className="shadow-sm">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                              <RoleIcon className="h-6 w-6 text-slate-700" />
+                            </div>
+                            <div>
+                              <CardTitle className="text-slate-900 flex items-center gap-2">
+                                {role.label}
+                                <Badge variant="outline" className="text-xs">
+                                  Level {role.level}
+                                </Badge>
+                              </CardTitle>
+                              <CardDescription className="text-slate-600">{role.description}</CardDescription>
+                            </div>
+                          </div>
+                          <Badge className={role.color} style={{ border: '1px solid' }}>
+                            {role.permissions.can.length} permissions
+                          </Badge>
                         </div>
-                        
-                        {role.permissions.cannot.length > 0 && (
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <h4 className="text-sm font-semibold text-red-700 mb-3 flex items-center">
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Restrictions
+                            <h4 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center">
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Permissions ({role.permissions.can.length})
                             </h4>
                             <ul className="space-y-2">
-                              {role.permissions.cannot.map((restriction, index) => (
+                              {role.permissions.can.map((permission, index) => (
                                 <li key={index} className="flex items-start space-x-2 text-sm">
-                                  <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-slate-700">{restriction}</span>
+                                  <CheckCircle className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                  <span className="text-slate-700">{permission}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                          
+                          {role.permissions.cannot.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-red-700 mb-3 flex items-center">
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Restrictions ({role.permissions.cannot.length})
+                              </h4>
+                              <ul className="space-y-2">
+                                {role.permissions.cannot.map((restriction, index) => (
+                                  <li key={index} className="flex items-start space-x-2 text-sm">
+                                    <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-slate-700">{restriction}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
             </div>
           </TabsContent>
 

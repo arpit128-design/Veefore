@@ -179,9 +179,9 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
           />
           <SidebarItem
             icon={MessageSquare}
-            label="Conversations"
+            label="Messages"
             href="/conversations"
-            isActive={location === "/conversations"}
+            isActive={location === "/conversations" || location === "/messages"}
             badge="3"
           />
           <SidebarItem

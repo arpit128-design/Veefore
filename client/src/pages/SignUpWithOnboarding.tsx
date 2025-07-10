@@ -462,12 +462,19 @@ export default function SignUpWithOnboarding() {
         <div className="px-8 py-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
-              <span className="text-xl font-bold text-gray-900">VeeFore</span>
+              <Link href="/" className="flex items-center space-x-2 hover:opacity-80">
+                <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8 object-contain" />
+                <span className="text-xl font-bold text-gray-900">VeeFore</span>
+              </Link>
             </div>
-            <Link href="/signin" className="text-gray-600 hover:text-gray-900 text-sm">
-              Already have an account? Sign in
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">
+                Back to Home
+              </Link>
+              <Link href="/signin" className="text-gray-600 hover:text-gray-900 text-sm">
+                Already have an account? Sign in
+              </Link>
+            </div>
           </div>
         </div>
 

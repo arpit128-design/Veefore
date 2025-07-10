@@ -700,39 +700,57 @@ button[data-state="checked"],
   font-weight: 500 !important;
 }
 
-/* TARGETED YELLOW ELIMINATION FOR SELECT ITEMS */
+/* COMPREHENSIVE DROPDOWN COLOR FIXES */
 
-/* Target Radix UI select items specifically */
-[data-radix-select-item] {
+/* Target ALL Radix UI select items */
+[data-radix-select-item],
+[role="option"],
+.select-item {
   background-color: #ffffff !important;
   color: #1e293b !important;
+  padding: 8px 12px !important;
+  margin: 0 !important;
+  border: none !important;
 }
 
-[data-radix-select-item][data-highlighted] {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
-}
-
-/* Target all select content */
-[data-radix-select-content] {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-/* Target specific "Archived" item */
-[data-radix-select-item][data-value="archived"] {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-/* Hover state for select items */
-[data-radix-select-item]:hover {
+/* HOVER states - clean gray instead of yellow */
+[data-radix-select-item]:hover,
+[data-radix-select-item][data-highlighted],
+[role="option"]:hover,
+[role="option"][data-highlighted],
+.select-item:hover {
   background-color: #f8fafc !important;
   color: #1e293b !important;
+  border: none !important;
 }
 
-/* Force all potential yellow backgrounds to white */
+/* SELECTED states - clean dark gray instead of blue */
+[data-radix-select-item][data-state="checked"],
+[data-radix-select-item][aria-selected="true"],
+[role="option"][aria-selected="true"],
+.select-item[data-selected="true"] {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-weight: 500 !important;
+  border: none !important;
+}
+
+/* Target all select content containers */
+[data-radix-select-content],
+[data-radix-select-viewport],
+.select-content {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Eliminate ALL yellow/amber colors */
+*[style*="yellow"], 
+*[class*="yellow"], 
+*[class*="amber"],
+*[style*="rgb(255, 255, 0)"],
+*[style*="rgb(255, 193, 7)"],
 .bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
 .bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500 {
   background-color: #ffffff !important;
@@ -740,10 +758,29 @@ button[data-state="checked"],
   color: #1e293b !important;
 }
 
-/* Targeted yellow/amber elimination */
-*[style*="yellow"], *[class*="yellow"], *[class*="amber"] {
+/* Eliminate ALL blue selection colors */
+*[style*="rgb(59, 130, 246)"],
+*[style*="rgb(37, 99, 235)"],
+.bg-blue-500, .bg-blue-600, .bg-blue-700 {
+  background-color: #f1f5f9 !important;
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+/* Force clean styling on workspace dropdowns */
+.workspace-container [data-radix-select-item],
+.workspace-container [role="option"],
+[data-route="/workspaces"] [data-radix-select-item],
+[data-route="/workspaces"] [role="option"] {
   background-color: #ffffff !important;
-  background: #ffffff !important;
+  color: #1e293b !important;
+}
+
+.workspace-container [data-radix-select-item]:hover,
+.workspace-container [role="option"]:hover,
+[data-route="/workspaces"] [data-radix-select-item]:hover,
+[data-route="/workspaces"] [role="option"]:hover {
+  background-color: #f8fafc !important;
   color: #1e293b !important;
 }
 

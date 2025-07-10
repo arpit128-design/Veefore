@@ -366,10 +366,6 @@ export default function SignUpWithOnboarding() {
         // Automatically proceed to Step 3 after a brief delay to show Step 2
         setTimeout(() => {
           setCurrentStep(2);
-          toast({
-            title: "Google account verified!",
-            description: "Now choose your plan to continue."
-          });
         }, 1500);
       }
     } catch (error: any) {
@@ -399,10 +395,6 @@ export default function SignUpWithOnboarding() {
 
       if (response.ok) {
         nextStep();
-        toast({
-          title: "Email verified!",
-          description: "Now choose your plan to continue."
-        });
       } else {
         throw new Error('Invalid verification code');
       }
@@ -450,10 +442,6 @@ export default function SignUpWithOnboarding() {
 
       if (response.ok) {
         nextStep();
-        toast({
-          title: "Plan selected!",
-          description: "Now let's connect your social accounts."
-        });
       } else {
         throw new Error('Failed to select plan');
       }
@@ -485,10 +473,6 @@ export default function SignUpWithOnboarding() {
       if (response.ok) {
         setShowPayment(false);
         nextStep();
-        toast({
-          title: "Payment successful!",
-          description: "Your plan has been activated. Let's connect your social accounts."
-        });
       } else {
         throw new Error('Failed to confirm payment');
       }
@@ -525,10 +509,8 @@ export default function SignUpWithOnboarding() {
         localStorage.setItem('onboarding_just_completed', 'true');
         localStorage.setItem('should_show_welcome_popup', 'true');
         queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-        toast({
-          title: "Welcome to VeeFore!",
-          description: "Your account has been set up successfully."
-        });
+        
+        // Navigate to dashboard without toast to prevent interference
         setLocation('/dashboard');
       } else {
         throw new Error('Failed to complete onboarding');

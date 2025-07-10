@@ -599,12 +599,12 @@ export default function TeamManagement() {
                                 <Avatar className="h-12 w-12 border-2 border-slate-200">
                                   <AvatarImage src={member.user.avatar} alt={member.user.displayName} />
                                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
-                                    {member.user.displayName.split(' ').map(n => n[0]).join('')}
+                                    {member.user.displayName ? member.user.displayName.split(' ').map(n => n[0]).join('') : member.user.username.substring(0, 2).toUpperCase()}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
                                   <div className="flex items-center space-x-2">
-                                    <h3 className="font-semibold text-slate-900">{member.user.displayName}</h3>
+                                    <h3 className="font-semibold text-slate-900">{member.user.displayName || member.user.username}</h3>
                                     {member.role === 'owner' && (
                                       <Crown className="h-4 w-4 text-purple-600" />
                                     )}

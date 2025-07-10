@@ -124,8 +124,7 @@ function AuthenticatedApp() {
             <ProfessionalHeader />
             <div className="flex h-[calc(100vh-64px)] overflow-hidden veefore-app-container">
               <ProfessionalSidebar />
-              <main className="flex-1 h-full overflow-hidden veefore-main-content">
-                <div className="h-full overflow-y-auto overflow-x-hidden p-6 space-y-6">
+              <main className="flex-1 h-full overflow-y-auto veefore-main-content">
                 <Switch>
                   <Route path="/dashboard" component={Dashboard} />
                   <Route path="/content-studio" component={ContentStudio} />
@@ -175,7 +174,6 @@ function AuthenticatedApp() {
                   <Route path="/" component={Dashboard} />
                   <Route component={NotFound} />
                 </Switch>
-                </div>
               </main>
             </div>
           </>

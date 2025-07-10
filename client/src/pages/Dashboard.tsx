@@ -192,8 +192,7 @@ export default function Dashboard() {
   console.log('[DASHBOARD DEBUG] Formatted followers:', formatNumber(analytics.newFollowers));
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden">
-      <div className="h-full p-6 space-y-6 bg-gray-50">
+    <div className="h-full w-full bg-gray-50 p-6 space-y-6">
         {/* Welcome Modal */}
         <WelcomePopup
           isOpen={showWelcomeModal}
@@ -472,7 +471,6 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
-      </div>
     </div>
   );
 }

@@ -166,7 +166,6 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">arpit9996363</p>
               <p className="text-xs text-slate-500">Starter Plan</p>
             </div>
             <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600">

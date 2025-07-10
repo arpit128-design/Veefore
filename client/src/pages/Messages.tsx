@@ -565,7 +565,7 @@ export default function Messages() {
   const renderConversationsList = () => (
     <div className="h-full flex flex-col bg-white border-r border-slate-200">
       {/* Professional Header */}
-      <div className="p-6 border-b border-slate-200 bg-white">
+      <div className="flex-shrink-0 p-6 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Direct Messages</h1>
@@ -650,7 +650,7 @@ export default function Messages() {
       </div>
       
       {/* Compact Conversations List */}
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto veefore-scrollbar">
         <div className="p-2 space-y-1">
           <AnimatePresence>
             {filteredConversations?.map((conversation, index) => (
@@ -739,7 +739,7 @@ export default function Messages() {
             </motion.div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 
@@ -759,7 +759,7 @@ export default function Messages() {
     return (
       <div className="flex-1 flex flex-col bg-white">
         {/* Chat Header */}
-        <div className="p-4 border-b border-slate-200 bg-white">
+        <div className="flex-shrink-0 p-4 border-b border-slate-200 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -818,7 +818,7 @@ export default function Messages() {
         </div>
         
         {/* Compact Messages Area */}
-        <ScrollArea className="flex-1 p-3">
+        <div className="flex-1 overflow-y-auto veefore-scrollbar p-3">
           <div className="space-y-2">
             <AnimatePresence>
               {messages?.map((message, index) => (
@@ -861,10 +861,10 @@ export default function Messages() {
             </AnimatePresence>
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
         
         {/* Compact Message Input */}
-        <div className="p-4 border-t border-slate-200 bg-white">
+        <div className="flex-shrink-0 p-4 border-t border-slate-200 bg-white">
           {aiAssistant && (
             <div className="mb-3">
               <Button
@@ -1254,11 +1254,11 @@ export default function Messages() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto">
+    <div className="veefore-app-container bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex flex-col h-full">
         {/* Modern Navigation Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <div className="p-6 pb-0">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col h-full">
+          <div className="flex-shrink-0 p-6 pb-0">
             <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-2 shadow-xl">
               <TabsTrigger 
                 value="conversations" 
@@ -1284,8 +1284,8 @@ export default function Messages() {
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="mt-0">
-            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+          <TabsContent value="conversations" className="flex-1 overflow-hidden mt-0">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1295,8 +1295,8 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-0">
-            <div className="h-[calc(100vh-140px)] flex bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
+          <TabsContent value="messages" className="flex-1 overflow-hidden mt-0">
+            <div className="flex h-full bg-white rounded-xl border border-slate-200 shadow-sm mx-6 mb-6 overflow-hidden">
               <div className="w-96 border-r border-slate-200 flex flex-col h-full overflow-hidden">
                 {renderConversationsList()}
               </div>
@@ -1306,12 +1306,16 @@ export default function Messages() {
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="mt-6">
-            {renderAnalyticsView()}
+          <TabsContent value="analytics" className="flex-1 overflow-hidden mt-6">
+            <div className="veefore-main-content">
+              {renderAnalyticsView()}
+            </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="mt-6">
-            {renderSettingsView()}
+          <TabsContent value="settings" className="flex-1 overflow-hidden mt-6">
+            <div className="veefore-main-content">
+              {renderSettingsView()}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

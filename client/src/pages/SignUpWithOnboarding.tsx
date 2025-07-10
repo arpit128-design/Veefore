@@ -252,6 +252,7 @@ export default function SignUpWithOnboarding() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [preferences, setPreferences] = useState({
     businessName: '',
     industry: '',
@@ -358,8 +359,18 @@ export default function SignUpWithOnboarding() {
           password: '' // Not needed for Google sign up
         });
         
-        // Skip email verification for Google users
-        setCurrentStep(2);
+        // Mark as Google user and go to Step 2 (verification) but automatically skip it
+        setIsGoogleUser(true);
+        setCurrentStep(1);
+        
+        // Automatically proceed to Step 3 after a brief delay to show Step 2
+        setTimeout(() => {
+          setCurrentStep(2);
+          toast({
+            title: "Google account verified!",
+            description: "Now choose your plan to continue."
+          });
+        }, 1500);
       }
     } catch (error: any) {
       console.error('Google sign-up error:', error);
@@ -543,8 +554,8 @@ export default function SignUpWithOnboarding() {
 
   return (
     <div className="min-h-screen bg-green-50 flex">
-      {/* Left Side - Mascot/Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative">
+      {/* Left Side - Mascot/Illustration - Fixed */}
+      <div className="hidden lg:flex lg:w-1/2 bg-green-100 items-center justify-center p-8 relative fixed left-0 top-0 h-screen">
         {/* Back to Home Button - Desktop Only */}
         <div className="absolute top-8 left-8">
           <Link 
@@ -575,8 +586,8 @@ export default function SignUpWithOnboarding() {
         </div>
       </div>
 
-      {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col">
+      {/* Right Side - Form - Scrollable */}
+      <div className="w-full lg:w-1/2 lg:ml-auto bg-white flex flex-col min-h-screen">
         {/* Header - Mobile Only */}
         <div className="lg:hidden px-8 py-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -879,49 +890,77 @@ export default function SignUpWithOnboarding() {
                 <div className="max-w-md mx-auto text-center">
                   <div className="mb-8">
                     <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Mail className="w-8 h-8 text-white" />
+                      {isGoogleUser ? (
+                        <div className="relative">
+                          <Mail className="w-8 h-8 text-white" />
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full flex items-center justify-center">
+                            <Check className="w-2 h-2 text-white" />
+                          </div>
+                        </div>
+                      ) : (
+                        <Mail className="w-8 h-8 text-white" />
+                      )}
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      Verify your email
+                      {isGoogleUser ? 'Verifying your Google account' : 'Verify your email'}
                     </h1>
                     <p className="text-gray-600">
-                      We've sent a 6-digit verification code to<br />
-                      <span className="font-medium">{signupData?.email}</span>
+                      {isGoogleUser ? (
+                        <>
+                          Your Google account{' '}
+                          <span className="font-medium">{signupData?.email}</span>
+                          <br />is being automatically verified...
+                        </>
+                      ) : (
+                        <>
+                          We've sent a 6-digit verification code to<br />
+                          <span className="font-medium">{signupData?.email}</span>
+                        </>
+                      )}
                     </p>
                   </div>
 
-                  {developmentOtp && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                      <p className="text-sm text-yellow-800">
-                        <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
-                      </p>
+                  {isGoogleUser ? (
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                      <span className="ml-3 text-sm text-gray-600">Auto-verifying Google account...</span>
                     </div>
+                  ) : (
+                    <>
+                      {developmentOtp && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                          <p className="text-sm text-yellow-800">
+                            <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="mb-6">
+                        <Input
+                          placeholder="Enter 6-digit code"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                          className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 text-center text-lg font-mono"
+                          maxLength={6}
+                        />
+                      </div>
+
+                      <Button
+                        onClick={handleVerifyEmail}
+                        className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
+                        disabled={isLoading || verificationCode.length !== 6}
+                      >
+                        {isLoading ? 'Verifying...' : 'Verify Email'}
+                      </Button>
+
+                      <p className="text-sm text-gray-500 mt-4">
+                        Didn't receive the code?{' '}
+                        <button className="text-blue-600 hover:underline">
+                          Resend code
+                        </button>
+                      </p>
+                    </>
                   )}
-                  
-                  <div className="mb-6">
-                    <Input
-                      placeholder="Enter 6-digit code"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                      className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 text-center text-lg font-mono"
-                      maxLength={6}
-                    />
-                  </div>
-
-                  <Button
-                    onClick={handleVerifyEmail}
-                    className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
-                    disabled={isLoading || verificationCode.length !== 6}
-                  >
-                    {isLoading ? 'Verifying...' : 'Verify Email'}
-                  </Button>
-
-                  <p className="text-sm text-gray-500 mt-4">
-                    Didn't receive the code?{' '}
-                    <button className="text-blue-600 hover:underline">
-                      Resend code
-                    </button>
-                  </p>
                 </div>
               </motion.div>
             )}

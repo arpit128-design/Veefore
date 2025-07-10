@@ -64,7 +64,7 @@ interface AutomationStats {
   engagementIncrease: string;
 }
 
-export default function Automation() {
+export default function AutomationEnterprise() {
   const { toast } = useToast();
   const { currentWorkspace } = useWorkspaceContext();
   const queryClient = useQueryClient();
@@ -151,19 +151,19 @@ export default function Automation() {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      {/* Header Section - White Background */}
-      <div className="bg-white border border-purple-200 rounded-xl p-6 shadow-sm" style={{ backgroundColor: '#ffffff !important' }}>
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Automation Center</h1>
-            <p className="text-gray-600 mt-1">Enterprise-grade automation with AI intelligence</p>
+            <h1 className="text-2xl font-bold">Automation Center</h1>
+            <p className="text-purple-100 mt-1">Enterprise-grade automation with AI intelligence</p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-              <span className="text-sm font-medium text-green-800">Status: Operational</span>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+              <span className="text-sm font-medium">Status: Operational</span>
               <div className="w-2 h-2 bg-green-400 rounded-full ml-2 inline-block animate-pulse"></div>
             </div>
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+            <Button className="bg-white text-purple-600 hover:bg-purple-50">
               <Plus className="h-4 w-4 mr-2" />
               Create Rule
             </Button>
@@ -173,62 +173,68 @@ export default function Automation() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-blue-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Activity className="h-6 w-6 text-blue-600" />
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Activity className="h-6 w-6 text-blue-600" />
+              </div>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                +12%
+              </Badge>
             </div>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-              +12%
-            </Badge>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">{mockStats.activeRules}</h3>
-          <p className="text-sm text-gray-600">Active Rules</p>
-          <div className="mt-3 text-xs text-gray-500">
-            {mockStats.totalRules} total rules
-          </div>
-        </div>
+            <h3 className="text-2xl font-bold text-gray-900">{mockStats.activeRules}</h3>
+            <p className="text-sm text-gray-600">Active Rules</p>
+            <div className="mt-3 text-xs text-gray-500">
+              {mockStats.totalRules} total rules
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white border border-emerald-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <Zap className="h-6 w-6 text-emerald-600" />
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Zap className="h-6 w-6 text-emerald-600" />
+              </div>
+              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
+                {mockStats.successRate}%
+              </Badge>
             </div>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-              {mockStats.successRate}%
-            </Badge>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">{mockStats.totalExecutions}</h3>
-          <p className="text-sm text-gray-600">Total Executions</p>
-          <div className="mt-3 text-xs text-gray-500">
-            Last 30 days
-          </div>
-        </div>
+            <h3 className="text-2xl font-bold text-gray-900">{mockStats.totalExecutions}</h3>
+            <p className="text-sm text-gray-600">Total Executions</p>
+            <div className="mt-3 text-xs text-gray-500">
+              Last 30 days
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white border border-purple-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Clock className="h-6 w-6 text-purple-600" />
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Clock className="h-6 w-6 text-purple-600" />
+              </div>
+              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                {mockStats.engagementIncrease}
+              </Badge>
             </div>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-              {mockStats.engagementIncrease}
-            </Badge>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">{mockStats.savedTime}</h3>
-          <p className="text-sm text-gray-600">Time Saved</p>
-          <div className="mt-3 text-xs text-gray-500">
-            This month
-          </div>
-        </div>
+            <h3 className="text-2xl font-bold text-gray-900">{mockStats.savedTime}</h3>
+            <p className="text-sm text-gray-600">Time Saved</p>
+            <div className="mt-3 text-xs text-gray-500">
+              This month
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Enterprise Features */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Enterprise Automation Features</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <div className="flex items-start space-x-3 p-4 bg-white border border-blue-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+            <div className="flex items-start space-x-3 p-4 bg-white border border-blue-200 rounded-lg">
               <Shield className="h-5 w-5 text-blue-600 mt-1" />
               <div>
                 <h4 className="font-semibold text-gray-900">Advanced Security</h4>
@@ -239,7 +245,7 @@ export default function Automation() {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-emerald-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+            <div className="flex items-start space-x-3 p-4 bg-white border border-emerald-200 rounded-lg">
               <Target className="h-5 w-5 text-emerald-600 mt-1" />
               <div>
                 <h4 className="font-semibold text-gray-900">Smart Targeting</h4>
@@ -252,7 +258,7 @@ export default function Automation() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-start space-x-3 p-4 bg-white border border-purple-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+            <div className="flex items-start space-x-3 p-4 bg-white border border-purple-200 rounded-lg">
               <BarChart3 className="h-5 w-5 text-purple-600 mt-1" />
               <div>
                 <h4 className="font-semibold text-gray-900">Advanced Analytics</h4>
@@ -263,7 +269,7 @@ export default function Automation() {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-orange-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+            <div className="flex items-start space-x-3 p-4 bg-white border border-orange-200 rounded-lg">
               <Bell className="h-5 w-5 text-orange-600 mt-1" />
               <div>
                 <h4 className="font-semibold text-gray-900">Crisis Management</h4>
@@ -301,62 +307,64 @@ export default function Automation() {
       {/* Rules List */}
       <div className="space-y-4">
         {rules.map((rule: AutomationRule) => (
-          <div key={rule.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className={`p-2 rounded-lg ${
-                  rule.platform === 'instagram' ? 'bg-pink-100' :
-                  rule.platform === 'facebook' ? 'bg-blue-100' :
-                  rule.platform === 'twitter' ? 'bg-sky-100' : 'bg-blue-100'
-                }`}>
-                  {rule.type === 'dm' ? <MessageSquare className="h-5 w-5" /> :
-                   rule.type === 'comment' ? <Heart className="h-5 w-5" /> :
-                   rule.type === 'follow' ? <Users className="h-5 w-5" /> :
-                   <Activity className="h-5 w-5" />}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{rule.name}</h3>
-                  <p className="text-sm text-gray-600">{rule.trigger}</p>
-                  <div className="flex items-center space-x-4 mt-2">
-                    <Badge variant={rule.status === 'active' ? 'default' : 'secondary'}>
-                      {rule.status}
-                    </Badge>
-                    <span className="text-xs text-gray-500">
-                      {rule.totalExecutions} executions • {rule.successRate}% success
-                    </span>
+          <Card key={rule.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className={`p-2 rounded-lg ${
+                    rule.platform === 'instagram' ? 'bg-pink-100' :
+                    rule.platform === 'facebook' ? 'bg-blue-100' :
+                    rule.platform === 'twitter' ? 'bg-sky-100' : 'bg-blue-100'
+                  }`}>
+                    {rule.type === 'dm' ? <MessageSquare className="h-5 w-5" /> :
+                     rule.type === 'comment' ? <Heart className="h-5 w-5" /> :
+                     rule.type === 'follow' ? <Users className="h-5 w-5" /> :
+                     <Activity className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{rule.name}</h3>
+                    <p className="text-sm text-gray-600">{rule.trigger}</p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <Badge variant={rule.status === 'active' ? 'default' : 'secondary'}>
+                        {rule.status}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        {rule.totalExecutions} executions • {rule.successRate}% success
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <div className="text-right mr-4">
-                  <div className="text-sm font-medium text-gray-900">
-                    {rule.dailyLimit}/day limit
+                <div className="flex items-center space-x-2">
+                  <div className="text-right mr-4">
+                    <div className="text-sm font-medium text-gray-900">
+                      {rule.dailyLimit}/day limit
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Last run: {rule.lastRun}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    Last run: {rule.lastRun}
-                  </div>
+                  <Switch 
+                    checked={rule.isActive} 
+                    onCheckedChange={() => {
+                      // Toggle rule mutation would go here
+                    }}
+                  />
+                  <Button variant="outline" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Switch 
-                  checked={rule.isActive} 
-                  onCheckedChange={() => {
-                    // Toggle rule mutation would go here
-                  }}
-                />
-                <Button variant="outline" size="sm">
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       {rules.length === 0 && (
-        <div className="text-center py-12 bg-white border border-gray-200 rounded-xl" style={{ backgroundColor: '#ffffff !important' }}>
+        <div className="text-center py-12">
           <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No automation rules yet</h3>
           <p className="text-gray-600 mb-6">Create your first automation rule to get started with intelligent workflows.</p>
@@ -377,53 +385,61 @@ export default function Automation() {
       className="space-y-6"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Eye className="h-5 w-5 text-blue-600" />
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Eye className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Total Reach</p>
+                <p className="text-lg font-bold text-gray-900">45.2K</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Total Reach</p>
-              <p className="text-lg font-bold text-gray-900">45.2K</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <Heart className="h-5 w-5 text-emerald-600" />
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Heart className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Engagement Rate</p>
+                <p className="text-lg font-bold text-gray-900">12.8%</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Engagement Rate</p>
-              <p className="text-lg font-bold text-gray-900">12.8%</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Share2 className="h-5 w-5 text-purple-600" />
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Share2 className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Responses Sent</p>
+                <p className="text-lg font-bold text-gray-900">1,247</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Responses Sent</p>
-              <p className="text-lg font-bold text-gray-900">1,247</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4" style={{ backgroundColor: '#ffffff !important' }}>
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Growth Rate</p>
+                <p className="text-lg font-bold text-gray-900">+24%</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Growth Rate</p>
-              <p className="text-lg font-bold text-gray-900">+24%</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </motion.div>
   );
@@ -473,7 +489,7 @@ export default function Automation() {
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
-            <div className="text-center py-12 bg-white border border-gray-200 rounded-xl" style={{ backgroundColor: '#ffffff !important' }}>
+            <div className="text-center py-12">
               <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">Settings Panel</h3>
               <p className="text-gray-600">Configure your automation preferences and advanced settings.</p>

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   LayoutDashboard, 
   PenTool, 
@@ -141,31 +142,29 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
 
 export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarProps = {}) {
   const [location] = useLocation();
+  const { user } = useAuth();
   const credits = 0; // Will be dynamically loaded
+
+  // Generate initials from username
+  const getInitials = (username: string) => {
+    if (!username) return "AK";
+    return username.slice(0, 2).toUpperCase();
+  };
 
   return (
     <aside className="bg-white border-r border-slate-200 w-72 h-full flex flex-col overflow-hidden shadow-sm veefore-sidebar">
-      {/* Professional Header with Brand */}
+      {/* User Profile Header */}
       <div className="flex-shrink-0 p-6 border-b border-slate-100 veefore-sidebar-header">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-            <Rocket className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900">VeeFore</h1>
-            <p className="text-xs text-slate-500">AI Social Media Suite</p>
-          </div>
-        </div>
-
         {/* User Profile Section */}
         <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center space-x-3 mb-3">
             <Avatar className="h-10 w-10 ring-2 ring-blue-100">
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-semibold">
-                AK
+                {getInitials(user?.username || "Anonymous")}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 truncate">{user?.username || "Anonymous"}</p>
               <p className="text-xs text-slate-500">Starter Plan</p>
             </div>
             <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600">

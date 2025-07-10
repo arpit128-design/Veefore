@@ -269,66 +269,63 @@ const Analytics: React.FC<AnalyticsProps> = ({
         </Card>
       </div>
 
-      {/* Modern Recommendations */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Zap className="h-5 w-5 text-purple-600 mr-2" />
-            AI-Powered Recommendations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border-l-4 border-cyan-500">
-                <Target className="h-5 w-5 text-cyan-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-gray-900">Optimize Posting Times</h4>
-                  <p className="text-sm text-gray-600">Your audience is most active between 9-11 AM and 7-9 PM.</p>
-                  <Button size="sm" className="mt-2 bg-cyan-600 hover:bg-cyan-700 text-white">
-                    View Best Times
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-l-4 border-purple-500">
-                <Sparkles className="h-5 w-5 text-purple-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-gray-900">Content Performance</h4>
-                  <p className="text-sm text-gray-600">Video content gets 3x more engagement than static posts.</p>
-                  <Button size="sm" className="mt-2 bg-purple-600 hover:bg-purple-700 text-white">
-                    Create Video
-                  </Button>
-                </div>
+      {/* AI-Powered Recommendations - Completely White Background */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6" style={{ backgroundColor: '#ffffff !important' }}>
+        <div className="flex items-center mb-6">
+          <Zap className="h-5 w-5 text-blue-600 mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900">AI-Powered Recommendations</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-4 bg-white border border-cyan-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+              <Target className="h-5 w-5 text-cyan-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-900">Optimize Posting Times</h4>
+                <p className="text-sm text-gray-600">Your audience is most active between 9-11 AM and 7-9 PM.</p>
+                <Button size="sm" className="mt-2 bg-cyan-600 hover:bg-cyan-700 text-white">
+                  View Best Times
+                </Button>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border-l-4 border-emerald-500">
-                <Globe className="h-5 w-5 text-emerald-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-gray-900">Audience Growth</h4>
-                  <p className="text-sm text-gray-600">Use trending hashtags to reach 40% more potential followers.</p>
-                  <Button size="sm" className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white">
-                    Explore Trends
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500">
-                <Activity className="h-5 w-5 text-blue-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-gray-900">Engagement Strategy</h4>
-                  <p className="text-sm text-gray-600">Respond to comments within 2 hours for better reach.</p>
-                  <Button size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700 text-white">
-                    Set Alerts
-                  </Button>
-                </div>
+            <div className="flex items-start space-x-3 p-4 bg-white border border-purple-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+              <Sparkles className="h-5 w-5 text-purple-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-900">Content Performance</h4>
+                <p className="text-sm text-gray-600">Video content gets 3x more engagement than static posts.</p>
+                <Button size="sm" className="mt-2 bg-purple-600 hover:bg-purple-700 text-white">
+                  Create Video
+                </Button>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-4 bg-white border border-emerald-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+              <Globe className="h-5 w-5 text-emerald-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-900">Audience Growth</h4>
+                <p className="text-sm text-gray-600">Use trending hashtags to reach 40% more potential followers.</p>
+                <Button size="sm" className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                  Explore Trends
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 p-4 bg-white border border-blue-200 rounded-lg" style={{ backgroundColor: '#ffffff !important' }}>
+              <Activity className="h-5 w-5 text-blue-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-gray-900">Engagement Strategy</h4>
+                <p className="text-sm text-gray-600">Respond to comments within 2 hours for better reach.</p>
+                <Button size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700 text-white">
+                  Set Alerts
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 

@@ -243,8 +243,17 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
 *[style*="rgb(255, 255, 0)"], *[style*="rgb(255, 193, 7)"], 
 *[style*="#ffff00"], *[style*="#ffc107"],
 *[style*="hsl(60"], *[style*="hsl(45"] {
-  background-color: #f9fafb !important;
-  background: #f9fafb !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* Specific analytics page yellow elimination */
+[data-page="analytics"] *, 
+.analytics-container *,
+*[class*="recommendations"] *,
+*[class*="ai-powered"] * {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
 }
 
 .dark [style*="yellow"], .dark [style*="amber"], .dark [class*="yellow"], .dark [class*="amber"] {

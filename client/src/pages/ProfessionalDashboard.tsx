@@ -61,7 +61,7 @@ const ProfessionalDashboard: React.FC = () => {
     } else if (hour >= 17 && hour < 21) {
       return { greeting: "Good evening", emoji: "🌅" };
     } else {
-      return { greeting: "Ready to create magic", emoji: "✨" };
+      return { greeting: "Own the night", emoji: "🌙" };
     }
   };
 

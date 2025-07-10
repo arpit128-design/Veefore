@@ -76,31 +76,27 @@ const ProfessionalDashboard: React.FC = () => {
   // Quick action cards data
   const quickActions = [
     {
-      title: 'Create from scratch',
-      description: 'Start with a blank canvas',
-      icon: <FileText className="w-12 h-12 text-cyan-600" />,
-      color: 'bg-cyan-50 border-cyan-200',
+      title: 'Create with AI',
+      description: 'Generate content instantly with AI',
+      icon: <Zap className="w-8 h-8" />,
       action: () => {},
     },
     {
-      title: 'Post across networks',
-      description: 'Share to multiple platforms',
-      icon: <Globe className="w-12 h-12 text-blue-600" />,
-      color: 'bg-blue-50 border-blue-200',
+      title: 'Schedule Posts',
+      description: 'Plan your content calendar',
+      icon: <Calendar className="w-8 h-8" />,
       action: () => {},
     },
     {
-      title: 'Post about a trend',
-      description: 'Join trending conversations',
-      icon: <TrendingUp className="w-12 h-12 text-green-600" />,
-      color: 'bg-green-50 border-green-200',
+      title: 'Analyze Trends',
+      description: 'Discover what is trending now',
+      icon: <TrendingUp className="w-8 h-8" />,
       action: () => {},
     },
     {
-      title: 'Start with AI',
-      description: 'Generate content instantly',
-      icon: <Zap className="w-12 h-12 text-orange-600" />,
-      color: 'bg-orange-50 border-orange-200',
+      title: 'Multi-Platform',
+      description: 'Post to all social networks',
+      icon: <Globe className="w-8 h-8" />,
       action: () => {},
     },
   ];
@@ -152,45 +148,46 @@ const ProfessionalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gray-50 min-h-screen p-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm border">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Welcome, Arpit!
+          <h1 className="text-3xl font-bold text-gray-900">
+            Good morning, Arpit! ☀️
           </h1>
-          <p className="text-gray-600 mt-1">
-            For June 30-July 6, 2025
+          <p className="text-gray-500 mt-2 flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            Today is July 10, 2025 • Let's create something amazing
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="secondary" className="px-3 py-1">
-            <Clock className="w-4 h-4 mr-1" />
-            Trial ends in 29 days
-          </Badge>
-          <Button className="bg-slate-800 hover:bg-slate-900 text-white">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-blue-700">Free Trial Active</span>
+          </div>
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg px-6">
             <PlusCircle className="w-4 h-4 mr-2" />
-            Create a post
+            Create Content
           </Button>
         </div>
       </div>
 
       {/* Quick Actions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {quickActions.map((action, index) => (
           <Card 
             key={index} 
-            className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${action.color}`}
+            className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border-0 shadow-sm"
             onClick={action.action}
           >
-            <CardContent className="p-6 text-center">
-              <div className="flex justify-center mb-4">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                 {action.icon}
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-bold text-gray-900 mb-2 text-lg">
                 {action.title}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-500 leading-relaxed">
                 {action.description}
               </p>
             </CardContent>
@@ -203,50 +200,62 @@ const ProfessionalDashboard: React.FC = () => {
         {/* Left Column - Performance & Recommendations */}
         <div className="lg:col-span-2 space-y-6">
           {/* Performance Score */}
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="bg-gradient-to-br from-white to-blue-50 border-0 shadow-lg">
+            <CardHeader className="pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-gray-600" />
-                    Social performance score
+                  <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    Performance Dashboard
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
-                    For June 30-July 6, 2025
+                  <p className="text-sm text-gray-500 mt-2 ml-13">
+                    Your content insights for this week
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700">
-                  Check progress
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                  View Analytics
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <div className="flex items-center gap-8">
                 <div className="relative">
-                  <div className="w-32 h-32 rounded-full border-8 border-gray-200 flex items-center justify-center">
+                  <div className="w-36 h-36 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shadow-xl">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-gray-900">{performanceScore}</div>
-                      <div className="text-sm text-gray-500">/ 1,000</div>
+                      <div className="text-4xl font-bold text-white">{performanceScore}</div>
+                      <div className="text-sm text-blue-100">Score</div>
                     </div>
                   </div>
-                  <div className="absolute top-0 left-0 w-32 h-32 rounded-full border-8 border-transparent border-t-cyan-500" style={{
-                    transform: `rotate(${(performanceScore / 1000) * 360}deg)`
-                  }}></div>
-                </div>
-                <div className="flex-1">
-                  <div className="mb-4">
-                    <h4 className="font-medium text-gray-900 mb-2">Room to grow.</h4>
-                    <p className="text-sm text-gray-600">
-                      You haven't posted in a while. Remember, posting consistently is key to keeping your audience engaged and growing.
-                    </p>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-white" />
                   </div>
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-600">Your selected social network</div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">I</span>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Eye className="w-4 h-4 text-blue-500" />
+                        <span className="text-sm font-medium text-gray-600">Total Reach</span>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">Instagram</span>
+                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.totalReach || 170}</div>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Users className="w-4 h-4 text-green-500" />
+                        <span className="text-sm font-medium text-gray-600">Followers</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.totalFollowers || 13}</div>
+                    </div>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600">Engagement Rate</span>
+                      <span className="text-lg font-bold text-green-600">{dashboardData?.engagementRate || 8.5}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{width: `${dashboardData?.engagementRate || 8.5}%`}}></div>
                     </div>
                   </div>
                 </div>
@@ -255,27 +264,37 @@ const ProfessionalDashboard: React.FC = () => {
           </Card>
 
           {/* AI Recommendations */}
-          <Card>
-            <CardHeader>
+          <Card className="bg-white border-0 shadow-lg">
+            <CardHeader className="pb-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  Your recommendations
+                <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Lightbulb className="w-5 h-5 text-white" />
+                  </div>
+                  AI Growth Insights
                 </CardTitle>
+                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+                  3 insights
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {recommendations.map((rec, index) => (
-                <div key={index} className="flex items-start gap-3 p-4 rounded-lg border-l-4 border-l-blue-500 bg-blue-50">
-                  <div className="p-2 rounded-full bg-white">
-                    {rec.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-2">{rec.title}</h4>
-                    <p className="text-sm text-gray-600 leading-relaxed">{rec.description}</p>
-                    <div className="mt-3">
-                      <Button variant="link" className="p-0 h-auto text-cyan-600 hover:text-cyan-700">
-                        Read more about optimal post length →
+                <div key={index} className="group p-6 rounded-2xl bg-gradient-to-r from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-gray-100 hover:border-blue-200">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-xl bg-white shadow-sm group-hover:scale-110 transition-transform">
+                      {rec.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h4 className="font-bold text-gray-900">{rec.title}</h4>
+                        <Badge variant={rec.priority === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                          {rec.priority} priority
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed mb-4">{rec.description}</p>
+                      <Button variant="ghost" className="p-0 h-auto text-blue-600 hover:text-blue-700 font-medium">
+                        Apply this insight →
                       </Button>
                     </div>
                   </div>
@@ -382,125 +401,171 @@ const ProfessionalDashboard: React.FC = () => {
         {/* Right Column - Tasks & Social Accounts */}
         <div className="space-y-6">
           {/* Get Started Card */}
-          <Card className="bg-gradient-to-br from-cyan-50 to-blue-50">
-            <CardHeader>
+          <Card className="bg-gradient-to-br from-emerald-500 to-green-600 text-white border-0 shadow-xl">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  Get started - earn a reward!
+                <CardTitle className="flex items-center gap-3 text-white text-lg">
+                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-white" />
+                  </div>
+                  Quick Setup Tasks
                 </CardTitle>
-                <Button variant="ghost" size="sm" className="text-gray-400">
-                  ×
-                </Button>
+                <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
+                  1/3 Complete
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white">
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-white" />
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                <div className="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center shadow-lg">
+                  <CheckCircle className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">Add another social account</p>
-                  <p className="text-sm text-gray-600">Connect an additional social account.</p>
+                  <p className="font-semibold text-white">Connect Instagram ✓</p>
+                  <p className="text-sm text-green-100">Account successfully linked</p>
                 </div>
-                <span className="text-xs text-gray-500">1</span>
               </div>
               
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold">
-                  2
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/40">
+                  <span className="text-white font-bold">2</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">Schedule 3 posts</p>
-                  <p className="text-sm text-cyan-600 underline">Create and schedule 3 posts.</p>
+                  <p className="font-semibold text-white">Create your first post</p>
+                  <p className="text-sm text-green-100">Start with AI-powered content</p>
                 </div>
-                <span className="text-xs text-gray-500">2</span>
+                <ArrowRight className="w-5 h-5 text-white/60" />
               </div>
               
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold">
-                  3
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/40">
+                  <span className="text-white font-bold">3</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">Report on your wins with Analytics</p>
-                  <p className="text-sm text-gray-600">See how your posts are performing.</p>
+                  <p className="font-semibold text-white">Schedule content</p>
+                  <p className="text-sm text-green-100">Plan your posting strategy</p>
                 </div>
-                <span className="text-xs text-gray-500">3</span>
               </div>
               
-              <div className="mt-4 p-3 bg-green-100 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-green-600" />
-                  <span className="font-medium text-green-900">Unlock your reward!</span>
+              <div className="mt-6 p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-2">
+                  <Rocket className="w-5 h-5 text-white" />
+                  <span className="font-bold text-white">Almost there!</span>
                 </div>
+                <p className="text-sm text-green-100">Complete setup to unlock premium features</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Most Engaging Post */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Most engaging post</CardTitle>
-              <p className="text-sm text-gray-600">Last 7 days</p>
+          {/* Analytics Preview */}
+          <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0 shadow-xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl flex items-center gap-3 text-white">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                Analytics Preview
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 mb-2">We're working to retrieve your posts and analytics. Check back in a few hours.</p>
-                <Button variant="outline" className="mt-2">
-                  Create a post
-                </Button>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-4 h-4 text-white" />
+                    <span className="text-sm font-medium text-white">Views</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white">2.4K</div>
+                  <div className="text-xs text-orange-100">+12% this week</div>
+                </div>
+                <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="w-4 h-4 text-white" />
+                    <span className="text-sm font-medium text-white">Likes</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white">186</div>
+                  <div className="text-xs text-orange-100">+8% this week</div>
+                </div>
               </div>
+              <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                  <span className="text-sm font-medium text-white">Engagement Rate</span>
+                </div>
+                <div className="text-2xl font-bold text-white">8.5%</div>
+                <div className="w-full bg-white/20 rounded-full h-2 mt-2">
+                  <div className="bg-white h-2 rounded-full" style={{width: '65%'}}></div>
+                </div>
+              </div>
+              <Button variant="ghost" className="w-full bg-white/20 text-white hover:bg-white/30 border-0">
+                <PlayCircle className="w-4 h-4 mr-2" />
+                View Full Analytics
+              </Button>
             </CardContent>
           </Card>
 
           {/* Social Accounts */}
-          <Card>
-            <CardHeader>
+          <Card className="bg-white border-0 shadow-lg">
+            <CardHeader className="pb-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-blue-500" />
-                  Social accounts
+                <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-white" />
+                  </div>
+                  Connected Accounts
                 </CardTitle>
-                <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700">
-                  See all accounts
-                </Button>
+                <Badge className="bg-indigo-100 text-indigo-700">
+                  {socialAccounts.length} connected
+                </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               {accountsLoading ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                  <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="animate-pulse space-y-4">
+                  <div className="h-16 bg-gray-200 rounded-xl"></div>
+                  <div className="h-16 bg-gray-200 rounded-xl"></div>
                 </div>
               ) : socialAccounts.length > 0 ? (
                 <>
                   {socialAccounts.map((account) => (
-                    <div key={account.id} className="flex items-center gap-3 p-3 rounded-lg border">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                        <span className="text-white text-sm font-bold">
-                          {account.platform.charAt(0).toUpperCase()}
-                        </span>
+                    <div key={account.id} className="group p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-indigo-50 hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 border border-gray-100 hover:border-indigo-200">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <span className="text-white text-lg font-bold">
+                              {account.platform.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-900">@{account.username}</p>
+                          <p className="text-sm text-gray-600 flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {account.followers} followers
+                          </p>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700">
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">@{account.username}</p>
-                        <p className="text-sm text-gray-600">
-                          {account.followers} followers
-                        </p>
-                      </div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full">
-                    Connect more accounts
+                  <Button variant="outline" className="w-full border-indigo-200 text-indigo-600 hover:bg-indigo-50 h-12">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Connect Another Account
                   </Button>
                 </>
               ) : (
-                <div className="text-center py-8">
-                  <Globe className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 mb-3">No accounts connected yet</p>
-                  <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
-                    <PlusCircle className="w-4 h-4 mr-1" />
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                    <Globe className="w-10 h-10 text-indigo-600" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">Connect Your First Account</h3>
+                  <p className="text-gray-600 mb-6">Start by connecting your social media accounts to manage all your content in one place.</p>
+                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                    <PlusCircle className="w-4 h-4 mr-2" />
                     Connect Account
                   </Button>
                 </div>

@@ -164,6 +164,30 @@ const ProfessionalScheduler: React.FC = () => {
     });
   };
 
+  const formatWeekRange = (dates: Date[]) => {
+    const start = dates[0];
+    const end = dates[6];
+    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${startStr} - ${endStr}`;
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  const goToPreviousWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() - 7);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + 7);
+    setCurrentDate(newDate);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -208,28 +232,20 @@ const ProfessionalScheduler: React.FC = () => {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => {
-              const newDate = new Date(currentDate);
-              newDate.setDate(currentDate.getDate() - 7);
-              setCurrentDate(newDate);
-            }}>
+            <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" className="font-medium">
+              <Button variant="ghost" size="sm" className="font-medium" onClick={goToToday}>
                 Today
               </Button>
               <span className="text-lg font-semibold">
-                Jul 13 - 19, 2025
+                {formatWeekRange(weekDates)}
               </span>
             </div>
             
-            <Button variant="ghost" size="sm" onClick={() => {
-              const newDate = new Date(currentDate);
-              newDate.setDate(currentDate.getDate() + 7);
-              setCurrentDate(newDate);
-            }}>
+            <Button variant="ghost" size="sm" onClick={goToNextWeek}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

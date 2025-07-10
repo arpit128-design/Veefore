@@ -229,12 +229,12 @@ export default function Suggestions() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 relative overflow-hidden">
+      {/* Subtle Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-100/30 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-100/30 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-100/20 rounded-full blur-2xl"></div>
       </div>
 
       <div className="relative z-10 min-h-screen p-6">
@@ -247,41 +247,40 @@ export default function Suggestions() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-2xl blur-lg opacity-30"></div>
-              <Card className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+              <Card className="relative bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
                 <div className="flex items-center justify-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                     <Brain className="w-8 h-8 text-white" />
                   </div>
                   <div className="text-left">
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 bg-clip-text text-transparent">
                       VeeFore AI Growth Engine
                     </h1>
-                    <p className="text-blue-100 text-lg">Next-generation social media optimization platform</p>
+                    <p className="text-gray-700 text-lg">Next-generation social media optimization platform</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
                       <Zap className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-white font-semibold">AI-Powered Analysis</h3>
-                    <p className="text-blue-100 text-sm">Advanced machine learning insights</p>
+                    <h3 className="text-gray-900 font-semibold">AI-Powered Analysis</h3>
+                    <p className="text-gray-600 text-sm">Advanced machine learning insights</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
                       <TrendingUp className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-white font-semibold">Growth Predictions</h3>
-                    <p className="text-blue-100 text-sm">Accurate growth forecasting</p>
+                    <h3 className="text-gray-900 font-semibold">Growth Predictions</h3>
+                    <p className="text-gray-600 text-sm">Accurate growth forecasting</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-xl mx-auto mb-3 flex items-center justify-center">
                       <Rocket className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-white font-semibold">Viral Optimization</h3>
-                    <p className="text-blue-100 text-sm">Content virality enhancement</p>
+                    <h3 className="text-gray-900 font-semibold">Viral Optimization</h3>
+                    <p className="text-gray-600 text-sm">Content virality enhancement</p>
                   </div>
                 </div>
               </Card>
@@ -293,16 +292,16 @@ export default function Suggestions() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+            className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg"
           >
-            <Badge className="bg-cyan-500/20 text-cyan-100 border-cyan-400/30 text-lg px-6 py-3">
+            <Badge className="bg-cyan-50 text-cyan-700 border-cyan-200 text-lg px-6 py-3 font-medium">
               <Sparkles className="w-5 h-5 mr-2" />
               {user?.credits || 0} Credits Available
             </Badge>
             <Button
               onClick={() => analyzeAccountMutation.mutate()}
               disabled={analyzeAccountMutation.isPending || !currentWorkspace?.id}
-              className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 hover:from-cyan-500 hover:via-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-600 hover:via-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               {analyzeAccountMutation.isPending ? (
                 <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
@@ -321,64 +320,64 @@ export default function Suggestions() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="grid grid-cols-1 md:grid-cols-4 gap-6"
             >
-              <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 group">
+              <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-cyan-100 text-sm font-medium mb-2">Total Followers</p>
-                      <p className="text-3xl font-bold text-white">
+                      <p className="text-gray-600 text-sm font-medium mb-2">Total Followers</p>
+                      <p className="text-3xl font-bold text-gray-900">
                         {socialAccounts.reduce((acc: number, account: any) => acc + (account.followersCount || 0), 0)}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Users className="w-6 h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 group">
+              <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-emerald-100 text-sm font-medium mb-2">Avg Engagement</p>
-                      <p className="text-3xl font-bold text-white">
+                      <p className="text-gray-600 text-sm font-medium mb-2">Avg Engagement</p>
+                      <p className="text-3xl font-bold text-gray-900">
                         {socialAccounts.length > 0 ? 
                           Math.round(socialAccounts.reduce((acc: number, account: any) => acc + (account.avgEngagement || 0), 0) / socialAccounts.length) 
                           : 0}%
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Heart className="w-6 h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 group">
+              <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-100 text-sm font-medium mb-2">Total Posts</p>
-                      <p className="text-3xl font-bold text-white">
+                      <p className="text-gray-600 text-sm font-medium mb-2">Total Posts</p>
+                      <p className="text-3xl font-bold text-gray-900">
                         {socialAccounts.reduce((acc: number, account: any) => acc + (account.mediaCount || 0), 0)}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <BarChart3 className="w-6 h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 group">
+              <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-orange-100 text-sm font-medium mb-2">AI Health Score</p>
-                      <p className="text-3xl font-bold text-white">{analysisData?.accountHealth.score || 0}/100</p>
+                      <p className="text-gray-600 text-sm font-medium mb-2">AI Health Score</p>
+                      <p className="text-3xl font-bold text-gray-900">{analysisData?.accountHealth.score || 0}/100</p>
                     </div>
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Target className="w-6 h-6 text-white" />
                     </div>
                   </div>
@@ -394,38 +393,38 @@ export default function Suggestions() {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-5 bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-2xl shadow-2xl">
+              <TabsList className="grid w-full grid-cols-5 bg-white/90 backdrop-blur-sm border border-gray-200 p-2 rounded-2xl shadow-lg">
                 <TabsTrigger 
                   value="overview" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:shadow-lg data-[state=active]:text-white rounded-xl transition-all text-white/70 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-cyan-50 data-[state=active]:shadow-md data-[state=active]:text-cyan-700 data-[state=active]:border-cyan-200 rounded-xl transition-all text-gray-600 hover:text-gray-900 font-medium"
                 >
                   <Brain className="w-4 h-4" />
                   Overview
                 </TabsTrigger>
                 <TabsTrigger 
                   value="analysis" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:shadow-lg data-[state=active]:text-white rounded-xl transition-all text-white/70 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 rounded-xl transition-all text-gray-600 hover:text-gray-900 font-medium"
                 >
                   <Target className="w-4 h-4" />
                   Analysis
                 </TabsTrigger>
                 <TabsTrigger 
                   value="growth" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:shadow-lg data-[state=active]:text-white rounded-xl transition-all text-white/70 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-emerald-50 data-[state=active]:shadow-md data-[state=active]:text-emerald-700 data-[state=active]:border-emerald-200 rounded-xl transition-all text-gray-600 hover:text-gray-900 font-medium"
                 >
                   <TrendingUp className="w-4 h-4" />
                   Growth
                 </TabsTrigger>
                 <TabsTrigger 
                   value="viral" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:shadow-lg data-[state=active]:text-white rounded-xl transition-all text-white/70 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:shadow-md data-[state=active]:text-orange-700 data-[state=active]:border-orange-200 rounded-xl transition-all text-gray-600 hover:text-gray-900 font-medium"
                 >
                   <Flame className="w-4 h-4" />
                   Viral
                 </TabsTrigger>
                 <TabsTrigger 
                   value="strategy" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:shadow-lg data-[state=active]:text-white rounded-xl transition-all text-white/70 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-purple-50 data-[state=active]:shadow-md data-[state=active]:text-purple-700 data-[state=active]:border-purple-200 rounded-xl transition-all text-gray-600 hover:text-gray-900 font-medium"
                 >
                   <Rocket className="w-4 h-4" />
                   Strategy
@@ -436,42 +435,42 @@ export default function Suggestions() {
               <TabsContent value="overview" className="space-y-8 mt-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* AI Health Score - Center Piece */}
-                  <Card className="lg:col-span-2 bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="lg:col-span-2 bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardContent className="p-8">
                       <div className="text-center mb-8">
                         <div className="w-32 h-32 mx-auto mb-6 relative">
-                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-full animate-pulse"></div>
-                          <div className="absolute inset-2 bg-slate-900 rounded-full flex items-center justify-center">
-                            <div className="text-4xl font-bold text-white">
+                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 rounded-full"></div>
+                          <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center shadow-inner">
+                            <div className="text-4xl font-bold text-gray-900">
                               {analysisData?.accountHealth.score || 87}
                             </div>
                           </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-2">AI Health Score</h3>
-                        <p className="text-cyan-100">Your account's optimization level</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">AI Health Score</h3>
+                        <p className="text-gray-600">Your account's optimization level</p>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-6">
-                        <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                          <div className="text-2xl font-bold text-cyan-400">
+                        <div className="text-center p-4 bg-cyan-50 rounded-xl border border-cyan-200">
+                          <div className="text-2xl font-bold text-cyan-700">
                             +{analysisData?.growthPredictions.nextWeek.followers || 127}
                           </div>
-                          <p className="text-white/70 text-sm">Weekly Growth</p>
+                          <p className="text-gray-600 text-sm">Weekly Growth</p>
                         </div>
-                        <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                          <div className="text-2xl font-bold text-emerald-400">
+                        <div className="text-center p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                          <div className="text-2xl font-bold text-emerald-700">
                             {analysisData?.growthPredictions.confidence || 94}%
                           </div>
-                          <p className="text-white/70 text-sm">AI Confidence</p>
+                          <p className="text-gray-600 text-sm">AI Confidence</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Quick Actions */}
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardContent className="p-6 space-y-4">
-                      <h4 className="text-lg font-semibold text-white mb-4">AI Actions</h4>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">AI Actions</h4>
                       
                       <Button 
                         onClick={() => setActiveTab("analysis")}
@@ -510,33 +509,33 @@ export default function Suggestions() {
 
                 {/* AI Capabilities Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl group hover:shadow-2xl transition-all duration-300">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg group hover:shadow-xl transition-all duration-300">
                     <CardContent className="p-6 text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Brain className="w-8 h-8 text-white" />
                       </div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Neural Analysis</h4>
-                      <p className="text-cyan-100 text-sm">Advanced pattern recognition for content optimization</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Neural Analysis</h4>
+                      <p className="text-gray-600 text-sm">Advanced pattern recognition for content optimization</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl group hover:shadow-2xl transition-all duration-300">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg group hover:shadow-xl transition-all duration-300">
                     <CardContent className="p-6 text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Zap className="w-8 h-8 text-white" />
                       </div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Real-time Optimization</h4>
-                      <p className="text-emerald-100 text-sm">Instant content and strategy adjustments</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Real-time Optimization</h4>
+                      <p className="text-gray-600 text-sm">Instant content and strategy adjustments</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl group hover:shadow-2xl transition-all duration-300">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg group hover:shadow-xl transition-all duration-300">
                     <CardContent className="p-6 text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Sparkles className="w-8 h-8 text-white" />
                       </div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Predictive Intelligence</h4>
-                      <p className="text-purple-100 text-sm">Future trend forecasting and viral prediction</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Predictive Intelligence</h4>
+                      <p className="text-gray-600 text-sm">Future trend forecasting and viral prediction</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -546,9 +545,9 @@ export default function Suggestions() {
               <TabsContent value="analysis" className="space-y-8 mt-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Account Health */}
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                           <Target className="w-6 h-6 text-white" />
                         </div>
@@ -557,10 +556,10 @@ export default function Suggestions() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="text-center">
-                        <div className="text-5xl font-bold text-cyan-400 mb-4">
+                        <div className="text-5xl font-bold text-emerald-600 mb-4">
                           {analysisData?.accountHealth.score || 87}/100
                         </div>
-                        <Progress value={analysisData?.accountHealth.score || 87} className="w-full h-3 bg-white/20" />
+                        <Progress value={analysisData?.accountHealth.score || 87} className="w-full h-3" />
                       </div>
                       
                       <div className="space-y-4">
@@ -569,13 +568,13 @@ export default function Suggestions() {
                           { name: "Posting Consistency", score: 78, impact: "Room for improvement" },
                           { name: "Audience Targeting", score: 89, impact: "Well-optimized reach" }
                         ]).map((factor, index) => (
-                          <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                          <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                             <div className="flex items-center justify-between mb-2">
-                              <p className="font-semibold text-white">{factor.name}</p>
-                              <div className="text-xl font-bold text-cyan-400">{factor.score}</div>
+                              <p className="font-semibold text-gray-900">{factor.name}</p>
+                              <div className="text-xl font-bold text-emerald-600">{factor.score}</div>
                             </div>
-                            <p className="text-sm text-cyan-100">{factor.impact}</p>
-                            <Progress value={factor.score} className="mt-2 h-2 bg-white/20" />
+                            <p className="text-sm text-gray-600">{factor.impact}</p>
+                            <Progress value={factor.score} className="mt-2 h-2" />
                           </div>
                         ))}
                       </div>
@@ -583,9 +582,9 @@ export default function Suggestions() {
                   </Card>
 
                   {/* Growth Predictions */}
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                           <TrendingUp className="w-6 h-6 text-white" />
                         </div>
@@ -594,42 +593,42 @@ export default function Suggestions() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="text-center mb-6">
-                        <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-400/30 text-lg px-4 py-2">
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-lg px-4 py-2">
                           {analysisData?.growthPredictions.confidence || 94}% Confidence
                         </Badge>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-6 bg-white/5 rounded-xl border border-white/10">
-                          <p className="text-cyan-100 mb-2">Next Week</p>
-                          <div className="text-3xl font-bold text-cyan-400">
+                        <div className="text-center p-6 bg-cyan-50 rounded-xl border border-cyan-200">
+                          <p className="text-gray-600 mb-2">Next Week</p>
+                          <div className="text-3xl font-bold text-cyan-700">
                             +{analysisData?.growthPredictions.nextWeek.followers || 127}
                           </div>
-                          <p className="text-xs text-white/60">followers</p>
+                          <p className="text-xs text-gray-500">followers</p>
                         </div>
-                        <div className="text-center p-6 bg-white/5 rounded-xl border border-white/10">
-                          <p className="text-emerald-100 mb-2">Next Month</p>
-                          <div className="text-3xl font-bold text-emerald-400">
+                        <div className="text-center p-6 bg-emerald-50 rounded-xl border border-emerald-200">
+                          <p className="text-gray-600 mb-2">Next Month</p>
+                          <div className="text-3xl font-bold text-emerald-700">
                             +{analysisData?.growthPredictions.nextMonth.followers || 547}
                           </div>
-                          <p className="text-xs text-white/60">followers</p>
+                          <p className="text-xs text-gray-500">followers</p>
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-white">Engagement Growth</h4>
-                        <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <h4 className="font-semibold text-gray-900">Engagement Growth</h4>
+                        <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
                           <div className="flex justify-between items-center">
-                            <span className="text-purple-100">Weekly Increase</span>
-                            <span className="font-bold text-purple-400">
+                            <span className="text-gray-700">Weekly Increase</span>
+                            <span className="font-bold text-purple-600">
                               +{analysisData?.growthPredictions.nextWeek.engagement || 12}%
                             </span>
                           </div>
                         </div>
-                        <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <div className="p-4 bg-orange-50 rounded-xl border border-orange-200">
                           <div className="flex justify-between items-center">
-                            <span className="text-orange-100">Monthly Increase</span>
-                            <span className="font-bold text-orange-400">
+                            <span className="text-gray-700">Monthly Increase</span>
+                            <span className="font-bold text-orange-600">
                               +{analysisData?.growthPredictions.nextMonth.engagement || 34}%
                             </span>
                           </div>
@@ -643,9 +642,9 @@ export default function Suggestions() {
               {/* Growth Tab */}
               <TabsContent value="growth" className="space-y-8 mt-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <Card className="lg:col-span-2 bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="lg:col-span-2 bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
                           <BarChart3 className="w-6 h-6 text-white" />
                         </div>
@@ -659,21 +658,21 @@ export default function Suggestions() {
                         { type: "Stories", performance: 92 },
                         { type: "Reels", performance: 95 }
                       ]).map((content, index) => (
-                        <div key={index} className="p-6 bg-white/5 rounded-xl border border-white/10">
+                        <div key={index} className="p-6 bg-gray-50 rounded-xl border border-gray-200">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="font-semibold text-white text-lg">{content.type}</h4>
-                            <div className="text-2xl font-bold text-emerald-400">{content.performance}%</div>
+                            <h4 className="font-semibold text-gray-900 text-lg">{content.type}</h4>
+                            <div className="text-2xl font-bold text-emerald-600">{content.performance}%</div>
                           </div>
-                          <Progress value={content.performance} className="h-3 bg-white/20" />
-                          <p className="text-emerald-100 text-sm mt-2">Content engagement rate</p>
+                          <Progress value={content.performance} className="h-3" />
+                          <p className="text-gray-600 text-sm mt-2">Content engagement rate</p>
                         </div>
                       ))}
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                           <Clock className="w-6 h-6 text-white" />
                         </div>
@@ -682,10 +681,10 @@ export default function Suggestions() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {(analysisData?.contentStrategy.bestTimes || ["9:00 AM", "2:00 PM", "7:00 PM"]).map((time, index) => (
-                        <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <div key={index} className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-white">{time}</span>
-                            <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-400/30">Peak</Badge>
+                            <span className="font-semibold text-gray-900">{time}</span>
+                            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300">Peak</Badge>
                           </div>
                         </div>
                       ))}
@@ -702,24 +701,24 @@ export default function Suggestions() {
                     { type: "Viral Hashtag", probability: 72, description: "Trending hashtag in your niche", expectedReach: 89000 },
                     { type: "Moment Marketing", probability: 94, description: "Real-time event content opportunity", expectedReach: 156000 }
                   ]).map((opportunity, index) => (
-                    <Card key={index} className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl group hover:shadow-3xl transition-all duration-300">
+                    <Card key={index} className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg group hover:shadow-xl transition-all duration-300">
                       <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-3 text-white">
+                        <CardTitle className="flex items-center gap-3 text-gray-900">
                           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Flame className="w-6 h-6 text-white" />
                           </div>
                           {opportunity.type}
                         </CardTitle>
-                        <Badge className="bg-orange-500/20 text-orange-100 border-orange-400/30 text-lg px-3 py-1">
+                        <Badge className="bg-orange-50 text-orange-700 border-orange-200 text-lg px-3 py-1">
                           {opportunity.probability}% Success Rate
                         </Badge>
                       </CardHeader>
                       <CardContent className="space-y-6">
-                        <p className="text-white/80 leading-relaxed">{opportunity.description}</p>
-                        <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <p className="text-gray-700 leading-relaxed">{opportunity.description}</p>
+                        <div className="p-4 bg-cyan-50 rounded-xl border border-cyan-200">
                           <div className="flex justify-between items-center">
-                            <span className="text-cyan-100">Expected Reach</span>
-                            <span className="font-bold text-cyan-400 text-xl">
+                            <span className="text-gray-700">Expected Reach</span>
+                            <span className="font-bold text-cyan-700 text-xl">
                               {opportunity.expectedReach.toLocaleString()}
                             </span>
                           </div>
@@ -738,9 +737,9 @@ export default function Suggestions() {
               <TabsContent value="strategy" className="space-y-8 mt-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Trending Topics */}
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
                           <Hash className="w-6 h-6 text-white" />
                         </div>
@@ -749,11 +748,11 @@ export default function Suggestions() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {(analysisData?.contentStrategy.trendingTopics || ["AI Technology", "Social Media Marketing", "Content Creation", "Digital Trends"]).map((topic, index) => (
-                        <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <div key={index} className="p-4 bg-purple-50 rounded-xl border border-purple-200">
                           <div className="flex items-center gap-4">
-                            <TrendingUp className="w-5 h-5 text-purple-400" />
-                            <span className="font-semibold text-white flex-1">{topic}</span>
-                            <Badge className="bg-purple-500/20 text-purple-100 border-purple-400/30">Hot</Badge>
+                            <TrendingUp className="w-5 h-5 text-purple-600" />
+                            <span className="font-semibold text-gray-900 flex-1">{topic}</span>
+                            <Badge className="bg-purple-100 text-purple-700 border-purple-300">Hot</Badge>
                           </div>
                         </div>
                       ))}
@@ -761,9 +760,9 @@ export default function Suggestions() {
                   </Card>
 
                   {/* Top Hashtags */}
-                  <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
                     <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-3 text-white text-xl font-bold">
+                      <CardTitle className="flex items-center gap-3 text-gray-900 text-xl font-bold">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
                           <Hash className="w-6 h-6 text-white" />
                         </div>
@@ -773,7 +772,7 @@ export default function Suggestions() {
                     <CardContent>
                       <div className="flex flex-wrap gap-3">
                         {(analysisData?.contentStrategy.topHashtags || ["socialmedia", "contentcreator", "digitalmarketing", "ai", "trending", "viral"]).map((hashtag, index) => (
-                          <Badge key={index} className="bg-blue-500/20 text-blue-100 border-blue-400/30 text-sm px-3 py-2">
+                          <Badge key={index} className="bg-blue-50 text-blue-700 border-blue-200 text-sm px-3 py-2">
                             #{hashtag}
                           </Badge>
                         ))}
@@ -792,11 +791,11 @@ export default function Suggestions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Card className="bg-white/10 backdrop-blur-xl border-2 border-dashed border-white/30 shadow-2xl">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-dashed border-gray-300 shadow-lg">
               <CardContent className="text-center py-16">
-                <Brain className="w-20 h-20 text-cyan-400 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-white mb-4">Connect Your Social Accounts</h3>
-                <p className="text-cyan-100 mb-8 text-lg leading-relaxed">
+                <Brain className="w-20 h-20 text-cyan-600 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Connect Your Social Accounts</h3>
+                <p className="text-gray-600 mb-8 text-lg leading-relaxed">
                   Connect your Instagram, Twitter, or other social media accounts to get AI-powered insights and growth recommendations.
                 </p>
                 <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg">

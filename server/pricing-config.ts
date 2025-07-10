@@ -162,6 +162,7 @@ export const CREDIT_COSTS = {
   'viral-remix': 15,
   
   // Advanced AI Analysis Features
+  'ai_account_analysis': 5, // AI-powered account health analysis and growth suggestions
   'trend-intelligence': 6, // Trend analysis and viral potential scoring
   'viral-predictor': 5, // Content viral potential analysis
   'affiliate-discovery': 4, // Affiliate opportunity discovery engine

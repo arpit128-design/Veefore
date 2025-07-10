@@ -108,6 +108,58 @@ const ProfessionalDashboard: React.FC = () => {
     enabled: true,
   });
 
+  // Fetch user subscription data
+  const { data: userData, isLoading: userLoading } = useQuery({
+    queryKey: ['/api/user'],
+    enabled: true,
+  });
+
+  // Calculate subscription status
+  const getSubscriptionStatus = () => {
+    if (!userData) return { status: 'Free Trial Active', type: 'trial', color: 'blue' };
+    
+    const plan = userData.plan || 'free';
+    const trialExpiresAt = userData.trialExpiresAt;
+    
+    if (plan === 'free' && trialExpiresAt) {
+      const trialDate = new Date(trialExpiresAt);
+      const today = new Date();
+      const daysLeft = Math.ceil((trialDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysLeft > 0) {
+        return { 
+          status: `Free Trial - ${daysLeft} day${daysLeft === 1 ? '' : 's'} left`, 
+          type: 'trial', 
+          color: daysLeft <= 3 ? 'red' : 'blue',
+          expiryDate: trialDate.toLocaleDateString()
+        };
+      } else {
+        return { status: 'Trial Expired', type: 'expired', color: 'red' };
+      }
+    }
+    
+    if (plan !== 'free') {
+      // For paid plans, show plan name and any renewal info
+      const planNames = {
+        starter: 'Starter Plan',
+        pro: 'Pro Plan', 
+        business: 'Business Plan',
+        agency: 'Agency Plan'
+      };
+      
+      return { 
+        status: planNames[plan] || 'Premium Plan', 
+        type: 'paid', 
+        color: 'green',
+        plan: plan
+      };
+    }
+    
+    return { status: 'Free Plan', type: 'free', color: 'gray' };
+  };
+
+  const subscriptionStatus = getSubscriptionStatus();
+
   // Calculate performance score (0-1000)
   const calculatePerformanceScore = () => {
     if (!dashboardData) return 0;
@@ -207,9 +259,23 @@ const ProfessionalDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-blue-700">Free Trial Active</span>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+            subscriptionStatus.color === 'blue' ? 'bg-blue-50' :
+            subscriptionStatus.color === 'green' ? 'bg-green-50' :
+            subscriptionStatus.color === 'red' ? 'bg-red-50' : 'bg-gray-50'
+          }`}>
+            <div className={`w-2 h-2 rounded-full animate-pulse ${
+              subscriptionStatus.color === 'blue' ? 'bg-blue-500' :
+              subscriptionStatus.color === 'green' ? 'bg-green-500' :
+              subscriptionStatus.color === 'red' ? 'bg-red-500' : 'bg-gray-500'
+            }`}></div>
+            <span className={`text-sm font-medium ${
+              subscriptionStatus.color === 'blue' ? 'text-blue-700' :
+              subscriptionStatus.color === 'green' ? 'text-green-700' :
+              subscriptionStatus.color === 'red' ? 'text-red-700' : 'text-gray-700'
+            }`}>
+              {subscriptionStatus.status}
+            </span>
           </div>
           <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg px-6">
             <PlusCircle className="w-4 h-4 mr-2" />

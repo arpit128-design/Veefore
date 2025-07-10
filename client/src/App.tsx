@@ -105,7 +105,7 @@ function AuthenticatedApp() {
           <main className="flex-1 ml-0 md:ml-56 lg:ml-64 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
             <Switch>
               <Route path="/" component={() => <Redirect to="/dashboard" />} />
-              <Route path="/onboarding" component={OnboardingPremium} />
+              {/* Old onboarding route removed - now using integrated signup flow */}
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={AdvancedScheduler} />
@@ -232,6 +232,8 @@ function Router() {
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/early-access" component={EarlyAccessPage} />
+          {/* Legacy onboarding route redirects to integrated signup */}
+          <Route path="/onboarding" component={() => <Redirect to="/signup" />} />
           <Route path="/" component={HootsuiteLanding} />
           <Route component={() => <Redirect to="/" />} />
         </Switch>
@@ -265,21 +267,21 @@ function Router() {
     return <AuthenticatedApp />;
   }
   
-  // Allow onboarding page access for non-onboarded users
-  if (user && !user.isOnboarded && location === '/onboarding') {
-    console.log('[ROUTER] User on onboarding page, allowing access');
+  // Allow signup page access for non-onboarded users
+  if (user && !user.isOnboarded && location === '/signup') {
+    console.log('[ROUTER] User on signup page, allowing access');
     return (
       <Switch>
-        <Route path="/onboarding" component={OnboardingPremium} />
-        <Route component={() => <Redirect to="/onboarding" />} />
+        <Route path="/signup" component={SignUp} />
+        <Route component={() => <Redirect to="/signup" />} />
       </Switch>
     );
   }
   
-  // Redirect non-onboarded users to onboarding
+  // Redirect non-onboarded users to integrated signup flow
   if (user && !user.isOnboarded) {
-    console.log('[ROUTER] User needs onboarding, redirecting to /onboarding');
-    return <Redirect to="/onboarding" />;
+    console.log('[ROUTER] User needs onboarding, redirecting to /signup');
+    return <Redirect to="/signup" />;
   }
   
   console.log('[ROUTER] User is onboarded, showing authenticated app');

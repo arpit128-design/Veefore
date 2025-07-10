@@ -717,7 +717,7 @@ export default function Suggestions() {
                           <div className="space-y-3">
                             <h4 className="font-semibold text-gray-900 text-lg">Account Health Assessment</h4>
                             <p className="text-gray-700 leading-relaxed">
-                              Looking at your Instagram account @arpit9996363 with {socialAccounts.find((acc: any) => acc.username === 'arpit9996363')?.followersCount || 9} followers and {socialAccounts.find((acc: any) => acc.username === 'arpit9996363')?.mediaCount || 18} posts, I can see you're in the early growth phase. Your content consistency shows promise, but there's significant opportunity for optimization.
+                              Looking at your Instagram account @arpit9996363 with {socialAccounts?.find((acc: any) => acc.username === 'arpit9996363')?.followersCount || 9} followers and {socialAccounts?.find((acc: any) => acc.username === 'arpit9996363')?.mediaCount || 18} posts, I can see you're in the early growth phase. Your content consistency shows promise, but there's significant opportunity for optimization.
                             </p>
                           </div>
                         </div>

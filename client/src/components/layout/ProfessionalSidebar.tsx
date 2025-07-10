@@ -122,13 +122,6 @@ export function ProfessionalSidebar() {
             isActive={location === "/scheduler" || location === "/professional-scheduler"}
           />
           <SidebarItem
-            icon={Calendar}
-            label="Advanced Scheduler"
-            href="/advanced-scheduler"
-            isActive={location === "/advanced-scheduler"}
-            badge="Legacy"
-          />
-          <SidebarItem
             icon={Sparkles}
             label="AI Features"
             href="/ai-features"

@@ -83,7 +83,7 @@ export default function ProfessionalDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <div className="p-6 space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
@@ -218,15 +218,15 @@ export default function ProfessionalDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
+              <Button className="w-full justify-start bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
                 <Calendar className="h-4 w-4 mr-2" />
                 Schedule Post
               </Button>
-              <Button className="w-full justify-start border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
+              <Button className="w-full justify-start bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
                 <BarChart3 className="h-4 w-4 mr-2" />
                 View Analytics
               </Button>
-              <Button className="w-full justify-start border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
+              <Button className="w-full justify-start bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700" variant="outline">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Check Messages
               </Button>

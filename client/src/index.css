@@ -1891,6 +1891,34 @@ canvas {
 .team-management-page .text-yellow-800,
 .team-management-page .border-yellow-200,
 .team-management-page .bg-yellow-50,
+.team-management-page .bg-yellow-200,
+.team-management-page .bg-yellow-300,
+.team-management-page .bg-yellow-400,
+.team-management-page .bg-yellow-500,
+.team-management-page .text-yellow-600,
+.team-management-page .text-yellow-700,
+.team-management-page .text-yellow-900,
+.team-management-page .border-yellow-300,
+.team-management-page .border-yellow-400,
+/* Team member badges and role indicators */
+[data-route="/team"] .bg-yellow-100,
+[data-route="/team"] .bg-yellow-200,
+[data-route="/team"] .bg-yellow-300,
+[data-route="/team"] .bg-yellow-400,
+[data-route="/team"] .bg-yellow-500,
+[data-route="/team"] .text-yellow-600,
+[data-route="/team"] .text-yellow-700,
+[data-route="/team"] .text-yellow-800,
+[data-route="/team"] .text-yellow-900,
+[data-route="/team"] .border-yellow-200,
+[data-route="/team"] .border-yellow-300,
+/* Specific team role badges */
+.team-management-container *[class*="yellow"],
+.team-management-container *[style*="yellow"],
+/* Gradient badges with yellow */
+.team-management-container .bg-gradient-to-r[class*="yellow"],
+.team-management-container .from-yellow-400,
+.team-management-container .to-yellow-500,
 .team-management-page .bg-amber-100,
 .team-management-page .text-amber-800,
 .team-management-page .border-amber-200 {
@@ -2256,6 +2284,112 @@ canvas {
   font-weight: 500 !important;
 }
 
+/* ULTIMATE YELLOW COLOR ELIMINATION FOR ENHANCED TEAM MANAGEMENT */
+.team-management-page *[class*="yellow"],
+.team-management-page *[style*="yellow"],
+.team-management-page *[class*="amber"],
+.team-management-page *[style*="amber"],
+/* Specific gradient overrides */
+.team-management-page .from-yellow-400,
+.team-management-page .from-yellow-500,
+.team-management-page .from-yellow-600,
+.team-management-page .to-yellow-400,
+.team-management-page .to-yellow-500,
+.team-management-page .to-yellow-600,
+.team-management-page .from-amber-400,
+.team-management-page .from-amber-500,
+.team-management-page .to-amber-400,
+.team-management-page .to-amber-500,
+/* Role badge specific overrides */
+.team-management-page .bg-gradient-to-r[class*="yellow"],
+.team-management-page .bg-gradient-to-r[class*="amber"],
+/* Enhanced targeting */
+[data-route="/team"] *[class*="yellow"],
+[data-route="/team"] *[style*="yellow"],
+[data-route="/team"] *[class*="amber"],
+[data-route="/team"] *[style*="amber"],
+/* Advanced selectors */
+.team-management-page .bg-yellow-50,
+.team-management-page .bg-yellow-100,
+.team-management-page .bg-yellow-200,
+.team-management-page .bg-yellow-300,
+.team-management-page .bg-yellow-400,
+.team-management-page .bg-yellow-500,
+.team-management-page .bg-yellow-600,
+.team-management-page .bg-yellow-700,
+.team-management-page .bg-yellow-800,
+.team-management-page .bg-yellow-900,
+.team-management-page .bg-amber-50,
+.team-management-page .bg-amber-100,
+.team-management-page .bg-amber-200,
+.team-management-page .bg-amber-300,
+.team-management-page .bg-amber-400,
+.team-management-page .bg-amber-500,
+.team-management-page .bg-amber-600,
+.team-management-page .bg-amber-700,
+.team-management-page .bg-amber-800,
+.team-management-page .bg-amber-900,
+/* Text color overrides */
+.team-management-page .text-yellow-50,
+.team-management-page .text-yellow-100,
+.team-management-page .text-yellow-200,
+.team-management-page .text-yellow-300,
+.team-management-page .text-yellow-400,
+.team-management-page .text-yellow-500,
+.team-management-page .text-yellow-600,
+.team-management-page .text-yellow-700,
+.team-management-page .text-yellow-800,
+.team-management-page .text-yellow-900,
+.team-management-page .text-amber-50,
+.team-management-page .text-amber-100,
+.team-management-page .text-amber-200,
+.team-management-page .text-amber-300,
+.team-management-page .text-amber-400,
+.team-management-page .text-amber-500,
+.team-management-page .text-amber-600,
+.team-management-page .text-amber-700,
+.team-management-page .text-amber-800,
+.team-management-page .text-amber-900,
+/* Border color overrides */
+.team-management-page .border-yellow-50,
+.team-management-page .border-yellow-100,
+.team-management-page .border-yellow-200,
+.team-management-page .border-yellow-300,
+.team-management-page .border-yellow-400,
+.team-management-page .border-yellow-500,
+.team-management-page .border-yellow-600,
+.team-management-page .border-yellow-700,
+.team-management-page .border-yellow-800,
+.team-management-page .border-yellow-900,
+.team-management-page .border-amber-50,
+.team-management-page .border-amber-100,
+.team-management-page .border-amber-200,
+.team-management-page .border-amber-300,
+.team-management-page .border-amber-400,
+.team-management-page .border-amber-500,
+.team-management-page .border-amber-600,
+.team-management-page .border-amber-700,
+.team-management-page .border-amber-800,
+.team-management-page .border-amber-900 {
+  background-color: #ffffff !important;
+  color: #1e293b !important; /* slate-800 */
+  border-color: #cbd5e1 !important; /* slate-300 */
+}
+
+/* Force specific blue alternatives for key elements */
+.team-management-page .bg-gradient-to-r.from-orange-400.to-amber-500,
+.team-management-page .bg-gradient-to-r.from-orange-500.to-amber-500,
+.team-management-page .bg-gradient-to-r.from-orange-600.to-amber-600 {
+  background: linear-gradient(to right, #3b82f6, #6366f1) !important; /* blue-500 to indigo-500 */
+  color: #ffffff !important;
+}
+
+/* Team role badge color corrections */
+.team-management-page .lead .bg-gradient-to-r.from-orange-600.to-red-600 {
+  background: linear-gradient(to right, #059669, #0d9488) !important; /* emerald-600 to teal-600 */
+  color: #ffffff !important;
+}
+
 /* Force light theme backgrounds for all components */
 .team-management-page * {
   background-color: inherit !important;
@@ -2264,6 +2398,46 @@ canvas {
 .team-management-page .bg-white,
 .team-management-page [style*="backgroundColor: '#ffffff'"] {
   background-color: #ffffff !important;
+}
+
+/* Enhanced view mode button styling */
+.team-management-page .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* Productivity bars and progress indicators */
+.team-management-page .bg-gradient-to-r.from-emerald-500.to-blue-500 {
+  background: linear-gradient(to right, #10b981, #3b82f6) !important;
+}
+
+.team-management-page .bg-gradient-to-r.from-blue-500.to-purple-600 {
+  background: linear-gradient(to right, #3b82f6, #9333ea) !important;
+}
+
+/* Tab styling overrides */
+.team-management-page .data-\[state\=active\]\:bg-blue-600 {
+  background-color: #2563eb !important;
+}
+
+.team-management-page .data-\[state\=active\]\:bg-purple-600 {
+  background-color: #9333ea !important;
+}
+
+.team-management-page .data-\[state\=active\]\:bg-emerald-600 {
+  background-color: #059669 !important;
+}
+
+.team-management-page .data-\[state\=active\]\:bg-orange-600 {
+  background-color: #dc2626 !important; /* Use red instead of orange to avoid yellow tints */
+}
+
+.team-management-page .data-\[state\=active\]\:bg-cyan-600 {
+  background-color: #0891b2 !important;
+}
+
+.team-management-page .data-\[state\=active\]\:bg-slate-600 {
+  background-color: #475569 !important;
 }
 
 /* Ensure all cards have proper white backgrounds */

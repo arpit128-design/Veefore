@@ -255,7 +255,7 @@ const ProfessionalDashboard: React.FC = () => {
       action: () => setLocation('/create-post'),
     },
     {
-      title: 'Post',
+      title: 'Schedule Posts',
       description: 'Plan your content calendar',
       icon: <Calendar className="w-8 h-8 text-blue-600" />,
       action: () => {},

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -38,7 +39,10 @@ import {
   Shield,
   Globe,
   Star,
-  Rocket
+  Rocket,
+  Edit,
+  Megaphone,
+  Link as LinkIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -139,7 +143,7 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
 }
 
 export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarProps = {}) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const credits = 0; // Will be dynamically loaded
 
@@ -148,6 +152,48 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
     if (!username) return "AK";
     return username.slice(0, 2).toUpperCase();
   };
+
+  // Scheduler dropdown options
+  const schedulerOptions = [
+    {
+      title: 'Post',
+      description: 'Create and publish content',
+      icon: <Edit className="w-4 h-4 text-gray-600" />,
+      action: () => setLocation('/create-post'),
+    },
+    {
+      title: 'Content with AI',
+      description: 'AI-powered content generation',
+      icon: <Sparkles className="w-4 h-4 text-purple-600" />,
+      action: () => setLocation('/content-studio'),
+    },
+    {
+      title: 'DM automation',
+      description: 'Automated direct messaging',
+      icon: <Bot className="w-4 h-4 text-blue-600" />,
+      action: () => setLocation('/automation'),
+    },
+    {
+      title: 'Ad',
+      description: 'Create advertisement campaigns',
+      icon: <Megaphone className="w-4 h-4 text-orange-600" />,
+      action: () => setLocation('/scheduler'),
+    },
+    {
+      title: 'Automated boost',
+      description: 'Auto-boost high performing content',
+      icon: <TrendingUp className="w-4 h-4 text-green-600" />,
+      badge: 'New',
+      action: () => setLocation('/scheduler'),
+    },
+    {
+      title: 'Hootbio',
+      description: 'Bio link management',
+      icon: <LinkIcon className="w-4 h-4 text-emerald-600" />,
+      badge: 'Upgrade',
+      action: () => setLocation('/scheduler'),
+    },
+  ];
 
   return (
     <aside className="bg-white border-r border-slate-200 w-72 h-full flex flex-col overflow-hidden shadow-sm veefore-sidebar">
@@ -214,12 +260,74 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
             href="/content-studio"
             isActive={location === "/content-studio"}
           />
-          <SidebarItem
-            icon={Calendar}
-            label="Scheduler"
-            href="/scheduler"
-            isActive={location === "/scheduler" || location === "/professional-scheduler"}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <motion.div
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+                    (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+                  )}
+                >
+                  <Calendar className={cn(
+                    "h-4 w-4 mr-3 transition-colors duration-200",
+                    (location === "/scheduler" || location === "/professional-scheduler")
+                      ? "text-blue-600" 
+                      : "text-slate-500 group-hover:text-slate-700"
+                  )} />
+                  <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
+                  <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
+                </Button>
+              </motion.div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="right" align="start">
+              {schedulerOptions.map((option, optionIndex) => (
+                <div key={optionIndex}>
+                  <DropdownMenuItem 
+                    className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      option.action();
+                    }}
+                  >
+                    <div className="mt-1">
+                      {option.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-gray-900 text-sm">
+                          {option.title}
+                        </h4>
+                        {option.badge && (
+                          <Badge 
+                            variant={option.badge === 'New' ? 'default' : 'secondary'} 
+                            className={`text-xs h-5 px-2 ${
+                              option.badge === 'New' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
+                            {option.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {option.description}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                  {optionIndex < schedulerOptions.length - 1 && (
+                    <DropdownMenuSeparator className="my-1 bg-gray-100" />
+                  )}
+                </div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <SidebarItem
             icon={Sparkles}
             label="AI Features"

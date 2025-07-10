@@ -5,13 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { 
   PlusCircle, 
   TrendingUp, 
@@ -24,24 +18,10 @@ import {
   Lightbulb,
   Search,
   Hash,
-  Clock,
   CheckCircle,
   Star,
-  Rocket,
   Globe,
-  Eye,
-  MessageCircle,
-  Heart,
-  ArrowRight,
-  Settings,
-  PlayCircle,
-  Edit,
-  Sparkles,
-  Bot,
-  Megaphone,
-  TrendingDown,
-  Link,
-  ChevronDown
+  Eye
 } from 'lucide-react';
 
 interface DashboardData {
@@ -204,47 +184,7 @@ const ProfessionalDashboard: React.FC = () => {
 
   const performanceScore = calculatePerformanceScore();
 
-  // Post dropdown options
-  const postOptions = [
-    {
-      title: 'Post',
-      description: 'Create and publish content',
-      icon: <Edit className="w-4 h-4 text-gray-600" />,
-      action: () => setLocation('/create-post'),
-    },
-    {
-      title: 'Content with AI',
-      description: 'AI-powered content generation',
-      icon: <Sparkles className="w-4 h-4 text-purple-600" />,
-      action: () => setLocation('/content-studio'),
-    },
-    {
-      title: 'DM automation',
-      description: 'Automated direct messaging',
-      icon: <Bot className="w-4 h-4 text-blue-600" />,
-      action: () => setLocation('/automation'),
-    },
-    {
-      title: 'Ad',
-      description: 'Create advertisement campaigns',
-      icon: <Megaphone className="w-4 h-4 text-orange-600" />,
-      action: () => setLocation('/scheduler'),
-    },
-    {
-      title: 'Automated boost',
-      description: 'Auto-boost high performing content',
-      icon: <TrendingUp className="w-4 h-4 text-green-600" />,
-      badge: 'New',
-      action: () => setLocation('/scheduler'),
-    },
-    {
-      title: 'Hootbio',
-      description: 'Bio link management',
-      icon: <Link className="w-4 h-4 text-emerald-600" />,
-      badge: 'Upgrade',
-      action: () => setLocation('/scheduler'),
-    },
-  ];
+
 
   // Quick action cards data
   const quickActions = [
@@ -258,8 +198,7 @@ const ProfessionalDashboard: React.FC = () => {
       title: 'Schedule Posts',
       description: 'Plan your content calendar',
       icon: <Calendar className="w-8 h-8 text-blue-600" />,
-      action: () => {},
-      isDropdown: true,
+      action: () => setLocation('/scheduler'),
     },
     {
       title: 'Analyze Trends',
@@ -362,82 +301,20 @@ const ProfessionalDashboard: React.FC = () => {
 
       {/* Quick Actions Grid - Pure Hootsuite Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {quickActions.map((action, index) => {
-          if (action.isDropdown) {
-            return (
-              <DropdownMenu key={index}>
-                <DropdownMenuTrigger asChild>
-                  <div className="group cursor-pointer text-center hover:opacity-80 transition-opacity">
-                    <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center relative">
-                      {action.icon}
-                      <ChevronDown className="w-3 h-3 text-gray-500 absolute -bottom-1 -right-1" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 text-base">
-                      {action.title}
-                    </h3>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2">
-                  {postOptions.map((option, optionIndex) => (
-                    <div key={optionIndex}>
-                      <DropdownMenuItem 
-                        className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          option.action();
-                        }}
-                      >
-                        <div className="mt-1">
-                          {option.icon}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-gray-900 text-sm">
-                              {option.title}
-                            </h4>
-                            {option.badge && (
-                              <Badge 
-                                variant={option.badge === 'New' ? 'default' : 'secondary'} 
-                                className={`text-xs h-5 px-2 ${
-                                  option.badge === 'New' 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : 'bg-blue-100 text-blue-700'
-                                }`}
-                              >
-                                {option.badge}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {option.description}
-                          </p>
-                        </div>
-                      </DropdownMenuItem>
-                      {optionIndex < postOptions.length - 1 && (
-                        <DropdownMenuSeparator className="my-1 bg-gray-100" />
-                      )}
-                    </div>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            );
-          }
-
-          return (
-            <div 
-              key={index} 
-              className="group cursor-pointer text-center hover:opacity-80 transition-opacity"
-              onClick={action.action}
-            >
-              <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
-                {action.icon}
-              </div>
-              <h3 className="font-semibold text-gray-900 text-base">
-                {action.title}
-              </h3>
+        {quickActions.map((action, index) => (
+          <div 
+            key={index} 
+            className="group cursor-pointer text-center hover:opacity-80 transition-opacity"
+            onClick={action.action}
+          >
+            <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+              {action.icon}
             </div>
-          );
-        })}
+            <h3 className="font-semibold text-gray-900 text-base">
+              {action.title}
+            </h3>
+          </div>
+        ))}
       </div>
 
       {/* Main Content Grid */}

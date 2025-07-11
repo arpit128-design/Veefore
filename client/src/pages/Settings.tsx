@@ -1769,28 +1769,30 @@ export default function Settings() {
             {/* AI Assistant Tab */}
             {activeTab === "ai" && (
               <div className="space-y-6">
-                <Card className="bg-white border border-gray-200">
-                  <CardHeader className="border-b border-gray-200">
-                    <CardTitle className="flex items-center text-lg">
+                <div className="bg-white border border-gray-200 rounded-lg">
+                  <div className="border-b border-gray-200 p-4">
+                    <h3 className="text-lg font-semibold flex items-center">
                       <Brain className="h-5 w-5 mr-2 text-gray-700" />
                       AI Assistant Settings
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
+                    </h3>
+                  </div>
+                  <div className="p-6">
                     <div className="space-y-6">
                       <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div>
                           <div className="font-medium text-gray-900">AI Assistant</div>
                           <div className="text-sm text-gray-600">Enable AI-powered features and suggestions</div>
                         </div>
-                        <Switch 
+                        <input
+                          type="checkbox"
                           checked={preferences.ai.enabled}
-                          onCheckedChange={(checked) => 
+                          onChange={(e) => 
                             setPreferences(prev => ({
                               ...prev,
-                              ai: { ...prev.ai, enabled: checked }
+                              ai: { ...prev.ai, enabled: e.target.checked }
                             }))
                           }
+                          className="h-4 w-4"
                         />
                       </div>
 
@@ -1799,36 +1801,22 @@ export default function Settings() {
                           <div className="font-medium text-gray-900">Smart Suggestions</div>
                           <div className="text-sm text-gray-600">Get AI-powered content and workflow suggestions</div>
                         </div>
-                        <Switch 
+                        <input
+                          type="checkbox"
                           checked={preferences.ai.suggestions}
-                          onCheckedChange={(checked) => 
+                          onChange={(e) => 
                             setPreferences(prev => ({
                               ...prev,
-                              ai: { ...prev.ai, suggestions: checked }
+                              ai: { ...prev.ai, suggestions: e.target.checked }
                             }))
                           }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Auto-complete</div>
-                          <div className="text-sm text-gray-600">AI-powered text completion while typing</div>
-                        </div>
-                        <Switch 
-                          checked={preferences.ai.autoComplete}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              ai: { ...prev.ai, autoComplete: checked }
-                            }))
-                          }
+                          className="h-4 w-4"
                         />
                       </div>
 
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <Label className="text-sm font-medium text-gray-700">Creativity Level</Label>
+                          <span className="text-sm font-medium text-gray-700">Creativity Level</span>
                           <span className="text-sm font-medium text-gray-900 px-2 py-1 bg-gray-100 rounded">
                             {preferences.ai.creativity}%
                           </span>
@@ -1853,61 +1841,25 @@ export default function Settings() {
                       </div>
 
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">Response Speed</Label>
-                        <Select 
+                        <span className="text-sm font-medium text-gray-700">Response Speed</span>
+                        <select 
                           value={preferences.ai.responseSpeed} 
-                          onValueChange={(value) => 
+                          onChange={(e) => 
                             setPreferences(prev => ({
                               ...prev,
-                              ai: { ...prev.ai, responseSpeed: value }
+                              ai: { ...prev.ai, responseSpeed: e.target.value }
                             }))
                           }
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                         >
-                          <SelectTrigger className="mt-1 border-gray-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="fast">Fast & Simple</SelectItem>
-                            <SelectItem value="balanced">Balanced</SelectItem>
-                            <SelectItem value="detailed">Detailed & Thorough</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Personalized Recommendations</div>
-                          <div className="text-sm text-gray-600">Use your data to improve AI suggestions</div>
-                        </div>
-                        <Switch 
-                          checked={preferences.ai.personalizedRecommendations}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              ai: { ...prev.ai, personalizedRecommendations: checked }
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Beta Features</div>
-                          <div className="text-sm text-gray-600">Access experimental AI features</div>
-                        </div>
-                        <Switch 
-                          checked={preferences.ai.betaFeatures}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              ai: { ...prev.ai, betaFeatures: checked }
-                            }))
-                          }
-                        />
+                          <option value="fast">Fast & Simple</option>
+                          <option value="balanced">Balanced</option>
+                          <option value="detailed">Detailed & Thorough</option>
+                        </select>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -631,7 +631,7 @@ export default function CommentToDMAutomation() {
                                   key={post.id}
                                   onClick={() => setSelectedPost(post)}
                                   className={cn(
-                                    "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
+                                    "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md bg-white",
                                     selectedPost?.id === post.id
                                       ? "border-blue-500 bg-blue-50"
                                       : "border-gray-200 hover:border-gray-300"

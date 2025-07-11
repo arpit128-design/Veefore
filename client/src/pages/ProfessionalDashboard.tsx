@@ -350,17 +350,17 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Grid - Responsive Hootsuite Style */}
+      {/* Quick Actions Grid - Clean Icons Only */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {quickActions.map((action, index) => (
           <div 
             key={index} 
-            className="group cursor-pointer text-center hover:opacity-80 transition-opacity p-4 sm:p-0"
+            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={action.action}
           >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 flex items-center justify-center">
+            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center">
               {React.cloneElement(action.icon, { 
-                className: "w-6 h-6 sm:w-8 sm:h-8 " + action.icon.props.className.split(' ').slice(2).join(' ')
+                className: "w-8 h-8 sm:w-10 sm:h-10 " + action.icon.props.className.split(' ').slice(2).join(' ')
               })}
             </div>
             <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight">

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogOverlay } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -498,7 +498,10 @@ function SidebarContent({
                   </Button>
                 </motion.div>
               </DialogTrigger>
-              <DialogContent className="max-w-sm mx-auto p-0 bg-white shadow-xl border border-gray-200 rounded-xl">
+              <DialogContent className="max-w-sm mx-auto p-0 bg-white shadow-xl border border-gray-200 rounded-xl data-[state=open]:backdrop-blur-sm">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>Scheduler Options</DialogTitle>
+                </DialogHeader>
                 <div className="p-2">
                   {schedulerOptions.map((option, optionIndex) => (
                     <div key={optionIndex}>

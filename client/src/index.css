@@ -700,6 +700,32 @@ button[data-state="checked"],
     border-radius: 3px;
   }
 }
+
+/* Mobile Dialog Backdrop Blur */
+@media (max-width: 1023px) {
+  /* Dialog overlay with blur effect */
+  [data-radix-dialog-overlay] {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  
+  /* Dialog content positioning */
+  [data-radix-dialog-content] {
+    animation: fadeIn 0.2s ease-out !important;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
 [data-route="/workspaces"] .bg-yellow-50,
 [data-route="/workspaces"] .bg-yellow-100,
 [data-route="/workspaces"] .bg-yellow-200,

@@ -37,6 +37,16 @@ const antiYellowStyles = `
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+/* SPECIFICALLY TARGET GREY BOX ISSUE - HIDE DUPLICATE TEXT ELEMENTS */
+.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background-color: rgb(229, 231, 235)"]:not([class]),
+.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background-color: #e5e7eb"]:not([class]),
+.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background: rgb(229, 231, 235)"]:not([class]),
+.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background: #e5e7eb"]:not([class]) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
 `;
 
 // Inject styles BEFORE any rendering occurs

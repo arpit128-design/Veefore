@@ -289,10 +289,6 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
-    // TEST: Static preview to isolate state rendering issue
-    const staticText = 'I\'m so excited you\'d like to see what I\'ve got an offer!';
-    const staticButtonText = 'See products';
-    
     return (
       <div style={{
         backgroundColor: '#ffffff',
@@ -335,7 +331,7 @@ export default function CommentToDMAutomation() {
               borderTopRightRadius: '4px',
               maxWidth: '192px'
             }}>
-              <div style={{ fontSize: '14px' }}>interested</div>
+              <div style={{ fontSize: '14px' }}>{keyword || 'interested'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -351,9 +347,9 @@ export default function CommentToDMAutomation() {
                 fontSize: '14px',
                 wordBreak: 'break-words',
                 overflowWrap: 'anywhere',
-                color: '#6b7280'
+                color: directMessage.text ? '#111827' : '#6b7280'
               }}>
-                {staticText}
+                {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}
               </div>
               <div style={{
                 marginTop: '8px',
@@ -366,9 +362,9 @@ export default function CommentToDMAutomation() {
                   fontSize: '14px',
                   fontWeight: '500',
                   wordBreak: 'break-words',
-                  color: '#9ca3af'
+                  color: directMessage.buttonText ? '#000000' : '#9ca3af'
                 }}>
-                  {staticButtonText}
+                  {directMessage.buttonText || 'See products'}
                 </div>
               </div>
             </div>
@@ -379,7 +375,7 @@ export default function CommentToDMAutomation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex comment-to-dm-automation">
       {/* Main Content */}
       <div className="flex-1 bg-white border-r border-gray-200">
         {/* Header */}

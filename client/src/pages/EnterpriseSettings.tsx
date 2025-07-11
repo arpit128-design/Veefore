@@ -231,11 +231,14 @@ const EnterpriseSettings = () => {
               <button
                 onClick={handleSaveChanges}
                 disabled={!hasChanges}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                style={{ backgroundColor: hasChanges ? '#111827 !important' : '#9ca3af !important' }}
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 save-button"
+                style={{ 
+                  backgroundColor: hasChanges ? '#111827 !important' : '#9ca3af !important',
+                  color: '#ffffff !important'
+                }}
               >
-                <Save className="h-4 w-4" />
-                <span>Save Changes</span>
+                <Save className="h-4 w-4" style={{ color: '#ffffff !important' }} />
+                <span style={{ color: '#ffffff !important' }}>Save Changes</span>
               </button>
               
               {/* Sign Out */}
@@ -298,7 +301,7 @@ const EnterpriseSettings = () => {
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                     style={activeTab === item.id 
-                      ? { backgroundColor: '#111827 !important', color: '#ffffff !important' }
+                      ? { backgroundColor: '#e5e7eb !important', color: '#111827 !important', fontWeight: '600' }
                       : { backgroundColor: 'transparent !important', color: '#374151 !important' }
                     }
                   >
@@ -872,6 +875,21 @@ const EnterpriseSettings = () => {
         
         .border-gray-200 { border-color: #e5e7eb !important; }
         .border-gray-300 { border-color: #d1d5db !important; }
+        
+        /* Save button specific override */
+        .save-button {
+          background-color: #111827 !important;
+          color: #ffffff !important;
+        }
+        
+        .save-button * {
+          color: #ffffff !important;
+        }
+        
+        .save-button:disabled {
+          background-color: #9ca3af !important;
+          color: #ffffff !important;
+        }
       `}</style>
     </div>
   );

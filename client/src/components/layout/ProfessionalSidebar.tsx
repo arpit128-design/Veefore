@@ -465,7 +465,7 @@ function SidebarContent({
   setIsMobileMenuOpen 
 }: SidebarContentProps) {
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden">
+    <div className="h-full overflow-y-auto overflow-x-hidden veefore-sidebar-scroll">
       {/* User Profile Header - Now scrollable */}
       <div className="p-6 border-b border-slate-100 veefore-sidebar-header">
         {/* User Profile Section */}

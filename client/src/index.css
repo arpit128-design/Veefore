@@ -117,36 +117,36 @@ svg.lucide *,
 }
 
 /* Hide sidebar scrollbar by default, show on hover */
-.veefore-sidebar {
+.veefore-sidebar-scroll {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-.veefore-sidebar::-webkit-scrollbar {
+.veefore-sidebar-scroll::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
-.veefore-sidebar:hover {
+.veefore-sidebar-scroll:hover {
   scrollbar-width: thin; /* Firefox */
   -ms-overflow-style: auto; /* IE and Edge */
 }
 
-.veefore-sidebar:hover::-webkit-scrollbar {
+.veefore-sidebar-scroll:hover::-webkit-scrollbar {
   width: 6px;
 }
 
-.veefore-sidebar:hover::-webkit-scrollbar-track {
+.veefore-sidebar-scroll:hover::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 3px;
 }
 
-.veefore-sidebar:hover::-webkit-scrollbar-thumb {
+.veefore-sidebar-scroll:hover::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
 
-.veefore-sidebar:hover::-webkit-scrollbar-thumb:hover {
+.veefore-sidebar-scroll:hover::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 

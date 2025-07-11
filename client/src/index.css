@@ -52,21 +52,21 @@
   background: inherit !important;
 }
 
-/* FORCE WHITE BACKGROUND ON STATE CHANGES */
-[data-state="open"], [data-state="closed"], [data-state="active"], [data-state="inactive"] {
+/* FORCE WHITE BACKGROUND ON STATE CHANGES - EXCEPT SCHEDULER DIALOG */
+[data-state="open"]:not(.scheduler-dialog-content), 
+[data-state="closed"]:not(.scheduler-dialog-content), 
+[data-state="active"]:not(.scheduler-dialog-content), 
+[data-state="inactive"]:not(.scheduler-dialog-content) {
   background-color: #ffffff !important;
   background: #ffffff !important;
 }
 
 /* EXCEPTION: Allow backdrop blur for scheduler dialog */
 .scheduler-dialog-content {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.9) 0%, 
-    rgba(248, 250, 252, 0.85) 50%, 
-    rgba(255, 255, 255, 0.8) 100%) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
@@ -75,13 +75,10 @@
 [data-radix-dialog-content] .scheduler-dialog-content,
 div[role="dialog"].scheduler-dialog-content,
 [data-state="open"].scheduler-dialog-content {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.9) 0%, 
-    rgba(248, 250, 252, 0.85) 50%, 
-    rgba(255, 255, 255, 0.8) 100%) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
@@ -116,12 +113,21 @@ div[role="dialog"].scheduler-dialog-content,
   animation: forceBackdropBlur 0.3s ease-out forwards !important;
 }
 
-/* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES */
+/* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES - EXCEPT SCHEDULER DIALOG */
 /* Target ALL possible tab-related elements */
-[role="tablist"] *, [role="tab"] *, [role="tabpanel"] *,
-.tabs-root *, .tabs-list *, .tabs-trigger *, .tabs-content *,
-[data-radix-tabs-root] *, [data-radix-tabs-list] *, [data-radix-tabs-trigger] *, [data-radix-tabs-content] *,
-[class*="tab"] *, [class*="Tab"] * {
+[role="tablist"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[role="tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[role="tabpanel"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+.tabs-root *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.tabs-list *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.tabs-trigger *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.tabs-content *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+[data-radix-tabs-root] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-tabs-list] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-tabs-trigger] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-tabs-content] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+[class*="tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[class*="Tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
   background-color: #ffffff !important;
   background: #ffffff !important;
   transition: none !important;
@@ -346,10 +352,31 @@ input:focus, textarea:focus, select:focus {
   background-color: #2563eb !important;
 }
 
-/* COMPLETE YELLOW ELIMINATION - ALL INSTANCES */
-.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800, .bg-yellow-900,
-.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
-*[style*="yellow"], *[style*="amber"], *[class*="yellow"], *[class*="amber"] {
+/* COMPLETE YELLOW ELIMINATION - ALL INSTANCES EXCEPT SCHEDULER DIALOG */
+.bg-yellow-50:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-100:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-200:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-300:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-400:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-500:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-600:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-700:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-800:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-yellow-900:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+.bg-amber-50:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-100:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-200:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-300:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-400:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-500:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-600:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-700:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-800:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.bg-amber-900:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+*[style*="yellow"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+*[style*="amber"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+*[class*="yellow"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+*[class*="amber"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
   background-color: #ffffff !important;
   background: #ffffff !important;
   border-color: #e5e7eb !important;

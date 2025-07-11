@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -44,9 +43,7 @@ import {
   Edit,
   Megaphone,
   Link as LinkIcon,
-  X,
-  FileText,
-  Layers
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -198,7 +195,47 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
     return username.slice(0, 2).toUpperCase();
   };
 
-
+  // Scheduler dropdown options
+  const schedulerOptions = [
+    {
+      title: 'Post',
+      description: 'Create and publish content',
+      icon: <Edit className="w-4 h-4 text-gray-600" />,
+      action: () => setLocation('/create-post'),
+    },
+    {
+      title: 'Content with AI',
+      description: 'AI-powered content generation',
+      icon: <Sparkles className="w-4 h-4 text-purple-600" />,
+      action: () => setLocation('/content-studio'),
+    },
+    {
+      title: 'DM automation',
+      description: 'Automated direct messaging',
+      icon: <Bot className="w-4 h-4 text-blue-600" />,
+      action: () => setLocation('/automation'),
+    },
+    {
+      title: 'Ad',
+      description: 'Create advertisement campaigns',
+      icon: <Megaphone className="w-4 h-4 text-orange-600" />,
+      action: () => setLocation('/scheduler'),
+    },
+    {
+      title: 'Automated boost',
+      description: 'Auto-boost high performing content',
+      icon: <TrendingUp className="w-4 h-4 text-green-600" />,
+      badge: 'New',
+      action: () => setLocation('/scheduler'),
+    },
+    {
+      title: 'Hootbio',
+      description: 'Bio link management',
+      icon: <LinkIcon className="w-4 h-4 text-emerald-600" />,
+      badge: 'Upgrade',
+      action: () => setLocation('/scheduler'),
+    },
+  ];
 
   const handleNavClick = () => {
     if (setIsMobileMenuOpen) {
@@ -223,9 +260,9 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
           user={user}
           credits={credits}
           getInitials={getInitials}
+          schedulerOptions={schedulerOptions}
           onAnalyticsToggle={onAnalyticsToggle}
           onNavClick={handleNavClick}
-          isMobile={false}
         />
       </aside>
 
@@ -260,6 +297,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
               user={user}
               credits={credits}
               getInitials={getInitials}
+              schedulerOptions={schedulerOptions}
               onAnalyticsToggle={onAnalyticsToggle}
               onNavClick={handleNavClick}
               isMobile={true}
@@ -277,6 +315,7 @@ interface SidebarContentProps {
   user: any;
   credits: number;
   getInitials: (username: string) => string;
+  schedulerOptions: any[];
   onAnalyticsToggle?: () => void;
   onNavClick: () => void;
   isMobile?: boolean;
@@ -288,6 +327,7 @@ function SidebarContent({
   user, 
   credits, 
   getInitials, 
+  schedulerOptions, 
   onAnalyticsToggle, 
   onNavClick, 
   isMobile = false,
@@ -360,41 +400,70 @@ function SidebarContent({
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
-                  location.startsWith("/scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
-                )}
+              <motion.div
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
               >
-                <Calendar className={cn(
-                  "h-4 w-4 mr-3 transition-colors duration-200",
-                  location.startsWith("/scheduler") 
-                    ? "text-blue-600" 
-                    : "text-slate-500 group-hover:text-slate-700"
-                )} />
-                <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
-                <ChevronDown className="ml-auto h-4 w-4" />
-              </Button>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+                    (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+                  )}
+                >
+                  <Calendar className={cn(
+                    "h-4 w-4 mr-3 transition-colors duration-200",
+                    (location === "/scheduler" || location === "/professional-scheduler")
+                      ? "text-blue-600" 
+                      : "text-slate-500 group-hover:text-slate-700"
+                  )} />
+                  <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
+                  <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
+                </Button>
+              </motion.div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler"; onNavClick(); }}>
-                <Calendar className="mr-2 h-4 w-4" />
-                Calendar View
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/drafts"; onNavClick(); }}>
-                <FileText className="mr-2 h-4 w-4" />
-                Drafts
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/content"; onNavClick(); }}>
-                <Layers className="mr-2 h-4 w-4" />
-                Content Library
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/automation"; onNavClick(); }}>
-                <Zap className="mr-2 h-4 w-4" />
-                DM Automation
-              </DropdownMenuItem>
+            <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="right" align="start">
+              {schedulerOptions.map((option, optionIndex) => (
+                <div key={optionIndex}>
+                  <DropdownMenuItem 
+                    className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      option.action();
+                    }}
+                  >
+                    <div className="mt-1">
+                      {option.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-gray-900 text-sm">
+                          {option.title}
+                        </h4>
+                        {option.badge && (
+                          <Badge 
+                            variant={option.badge === 'New' ? 'default' : 'secondary'} 
+                            className={`text-xs h-5 px-2 ${
+                              option.badge === 'New' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
+                            {option.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {option.description}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                  {optionIndex < schedulerOptions.length - 1 && (
+                    <DropdownMenuSeparator className="my-1 bg-gray-100" />
+                  )}
+                </div>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <SidebarItem

@@ -63,7 +63,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#000000] bg-[#3c445c00]">Analytics Overview</h1>
-            <p className="text-blue-100 mt-1">Real-time insights and performance metrics</p>
+            <p className="mt-1 text-[#000000] bg-[#00000000]">Real-time insights and performance metrics</p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
             <span className="text-sm font-medium">Live Data</span>

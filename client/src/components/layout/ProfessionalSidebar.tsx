@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,7 +44,9 @@ import {
   Edit,
   Megaphone,
   Link as LinkIcon,
-  X
+  X,
+  FileText,
+  Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -355,12 +358,45 @@ function SidebarContent({
             href="/content-studio"
             isActive={location === "/content-studio"}
           />
-          <SidebarItem
-            icon={Calendar}
-            label="Scheduler"
-            href="/scheduler"
-            isActive={location === "/scheduler" || location === "/professional-scheduler"}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+                  location.startsWith("/scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+                )}
+              >
+                <Calendar className={cn(
+                  "h-4 w-4 mr-3 transition-colors duration-200",
+                  location.startsWith("/scheduler") 
+                    ? "text-blue-600" 
+                    : "text-slate-500 group-hover:text-slate-700"
+                )} />
+                <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
+                <ChevronDown className="ml-auto h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler"; onNavClick(); }}>
+                <Calendar className="mr-2 h-4 w-4" />
+                Calendar View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/drafts"; onNavClick(); }}>
+                <FileText className="mr-2 h-4 w-4" />
+                Drafts
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/content"; onNavClick(); }}>
+                <Layers className="mr-2 h-4 w-4" />
+                Content Library
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => { window.location.href = "/scheduler/automation"; onNavClick(); }}>
+                <Zap className="mr-2 h-4 w-4" />
+                DM Automation
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <SidebarItem
             icon={Sparkles}
             label="AI Features"

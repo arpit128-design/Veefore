@@ -112,6 +112,13 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **DM PREVIEW CSS ISOLATION FIX APPLIED** - Converted DM preview to inline styles to isolate from global CSS conflicts that may be causing grey box rendering issues
+  - ✅ **CSS Isolation**: Converted all Tailwind classes to inline styles to prevent CSS conflicts
+  - ✅ **Self-Contained Component**: DM preview now uses only inline styles and direct JavaScript state references
+  - ✅ **Eliminated External Dependencies**: Removed all external CSS class dependencies that might cause styling conflicts
+  - ✅ **Debugging Process**: Attempted multiple approaches including component simplification, conditional rendering fixes, and debug styling
+  - ✅ **Systematic Isolation**: Applied step-by-step debugging to isolate the source of the grey box issue
+  - **Current Status**: Testing isolated inline-style DM preview to determine if CSS conflicts were the root cause
 - July 11, 2025: **DM PREVIEW BUTTON PLACEHOLDER FIX COMPLETE** - Fixed Instagram DM preview to always show "See products" button placeholder text even when field is empty
   - ✅ **Button Preview Enhancement**: DM preview now displays "See products" placeholder button in light grey (text-gray-400) when buttonText field is empty
   - ✅ **Consistent Preview Experience**: Users now see exactly how the automated DM will appear with the button, providing clear visual feedback

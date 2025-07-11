@@ -289,30 +289,82 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
+    // Simple test - completely self-contained
     return (
-      <div className="bg-white rounded-lg border-2 border-blue-500 overflow-hidden max-w-sm shadow-sm">
-        <div className="p-3 border-b border-gray-200 flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">U</span>
+      <div style={{
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: '1px solid #e5e7eb',
+        overflow: 'hidden',
+        maxWidth: '384px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          padding: '12px',
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <span style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>U</span>
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-900">username</div>
-            <div className="text-xs text-gray-500">Active now</div>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>username</div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>Active now</div>
           </div>
         </div>
-        <div className="p-3">
-          <div className="flex justify-end mb-3">
-            <div className="bg-blue-500 text-white px-3 py-2 rounded-2xl rounded-tr-sm max-w-xs">
-              <div className="text-sm">{keyword || 'interested'}</div>
+        <div style={{ padding: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            <div style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              padding: '8px 12px',
+              borderRadius: '16px',
+              borderTopRightRadius: '4px',
+              maxWidth: '192px'
+            }}>
+              <div style={{ fontSize: '14px' }}>{keyword || 'interested'}</div>
             </div>
           </div>
-          <div className="flex justify-start">
-            <div className="bg-gray-200 text-gray-900 px-3 py-2 rounded-2xl rounded-tl-sm w-80">
-              <div className={`text-sm break-words overflow-wrap-anywhere ${directMessage.text ? 'text-gray-900' : 'text-gray-500'}`}>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{
+              backgroundColor: '#e5e7eb',
+              color: '#111827',
+              padding: '8px 12px',
+              borderRadius: '16px',
+              borderTopLeftRadius: '4px',
+              width: '320px'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                wordBreak: 'break-words',
+                overflowWrap: 'anywhere',
+                color: directMessage.text ? '#111827' : '#6b7280'
+              }}>
                 {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}
               </div>
-              <div className="mt-2 p-2 bg-white rounded-lg text-center">
-                <div className={`text-sm font-medium break-words ${directMessage.buttonText ? 'text-black' : 'text-gray-400'}`}>
+              <div style={{
+                marginTop: '8px',
+                padding: '8px',
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  wordBreak: 'break-words',
+                  color: directMessage.buttonText ? '#000000' : '#9ca3af'
+                }}>
                   {directMessage.buttonText || 'See products'}
                 </div>
               </div>
@@ -797,18 +849,12 @@ export default function CommentToDMAutomation() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center bg-red-50">
+        <div className="flex-1 flex flex-col items-center justify-center">
           {currentStep === 2 && (
-            <div className="bg-green-100 p-4 rounded">
-              <p className="text-xs text-green-800 mb-2">DEBUG: DM Preview Container</p>
-              <InstagramDMPreview />
-            </div>
+            <InstagramDMPreview />
           )}
           {currentStep !== 2 && selectedPost && (
-            <div className="bg-yellow-100 p-4 rounded">
-              <p className="text-xs text-yellow-800 mb-2">DEBUG: Post Preview Container</p>
-              <InstagramPostPreview post={selectedPost} />
-            </div>
+            <InstagramPostPreview post={selectedPost} />
           )}
 
           {showAnalytics && (

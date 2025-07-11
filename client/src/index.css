@@ -168,6 +168,37 @@ div.scheduler-dialog-content,
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
+/* OVERRIDE SHADCN/UI DIALOG BACKGROUND FOR SCHEDULER */
+[data-radix-dialog-content].scheduler-dialog-content,
+div[data-radix-dialog-content].scheduler-dialog-content,
+[data-radix-dialog-content][class*="scheduler-dialog-content"] {
+  background: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* NUCLEAR OVERRIDE FOR SCHEDULER DIALOG - TARGETING EXACT SHADCN CLASSES */
+.scheduler-dialog-content.fixed.left-\\[50\\%\\].top-\\[50\\%\\],
+.scheduler-dialog-content[class*="bg-background"],
+.scheduler-dialog-content[class*="fixed"][class*="left-"],
+div.scheduler-dialog-content[data-radix-dialog-content] {
+  background: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* FINAL NUCLEAR OVERRIDE - TARGET TAILWIND BG-BACKGROUND */
+.scheduler-dialog-content.bg-background,
+.bg-background.scheduler-dialog-content,
+[class*="scheduler-dialog-content"].bg-background {
+  background: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
 /* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES - EXCEPT SCHEDULER DIALOG */
 /* Target ALL possible tab-related elements */
 [role="tablist"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 

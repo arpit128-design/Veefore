@@ -500,21 +500,22 @@ function SidebarContent({
                 </motion.div>
               </DialogTrigger>
               <DialogContent 
-                className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl scheduler-dialog-content"
+                className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl scheduler-dialog-content !bg-none"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.85)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)'
+                  background: 'rgba(255, 255, 255, 0.85) !important',
+                  backdropFilter: 'blur(12px) !important',
+                  WebkitBackdropFilter: 'blur(12px) !important',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2) !important',
+                  border: '1px solid rgba(255, 255, 255, 0.3) !important'
                 }}
                 onOpenAutoFocus={(e) => {
-                  // Force backdrop blur on dialog open
+                  // Force backdrop blur on dialog open with highest priority
                   const dialogElement = e.currentTarget;
                   if (dialogElement) {
-                    dialogElement.style.background = 'rgba(255, 255, 255, 0.85)';
-                    dialogElement.style.backdropFilter = 'blur(12px)';
-                    dialogElement.style.WebkitBackdropFilter = 'blur(12px)';
+                    dialogElement.style.setProperty('background', 'rgba(255, 255, 255, 0.85)', 'important');
+                    dialogElement.style.setProperty('backdrop-filter', 'blur(12px)', 'important');
+                    dialogElement.style.setProperty('-webkit-backdrop-filter', 'blur(12px)', 'important');
+                    dialogElement.style.setProperty('background-color', 'rgba(255, 255, 255, 0.85)', 'important');
                   }
                 }}
               >

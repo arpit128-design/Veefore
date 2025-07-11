@@ -112,7 +112,7 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
-- July 11, 2025: **FULLY SCROLLABLE SIDEBAR COMPLETE** - Made entire sidebar scrollable instead of having fixed user profile header
+- July 11, 2025: **FULLY SCROLLABLE SIDEBAR WITH HOVER-ONLY SCROLLBAR COMPLETE** - Made entire sidebar scrollable with comprehensive scrollbar hiding system
   - ✅ **Removed Fixed Header**: Changed user profile header from `flex-shrink-0` to regular scrollable content
   - ✅ **Full Scroll Area**: Entire sidebar container now uses `overflow-y-auto` for complete scrollability
   - ✅ **Unified Scrolling**: User profile, credits section, and navigation menu all scroll together seamlessly

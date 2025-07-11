@@ -276,25 +276,20 @@ interface SidebarSectionProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
-  isAnalytics?: boolean;
 }
 
-function SidebarSection({ title, children, defaultOpen = true, isAnalytics = false }: SidebarSectionProps) {
+function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className="mb-6">
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 group rounded-lg ${
-          isAnalytics 
-            ? "bg-cyan-50 text-cyan-700 hover:bg-cyan-100" 
-            : "text-slate-500 hover:text-slate-700"
-        }`}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-700 transition-colors duration-200 group"
         whileHover={{ x: 2 }}
         transition={{ duration: 0.2 }}
       >
-        <span className={isAnalytics ? "bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent font-bold" : ""}>{title}</span>
+        <span>{title}</span>
         <motion.div
           animate={{ rotate: isOpen ? 90 : 0 }}
           transition={{ duration: 0.2 }}
@@ -624,7 +619,7 @@ function SidebarContent({
         </SidebarSection>
 
         {/* Analytics & Insights */}
-        <SidebarSection title="Analytics" isAnalytics={true}>
+        <SidebarSection title="Analytics">
           {onAnalyticsToggle ? (
             <motion.div
               whileHover={{ x: 4 }}
@@ -644,33 +639,21 @@ function SidebarContent({
             <>
               <SidebarItem
                 icon={BarChart3}
-                label="Overview"
+                label="Analytics"
                 href="/analytics"
                 isActive={location === "/analytics"}
               />
               <SidebarItem
                 icon={TrendingUp}
                 label="Performance"
-                href="/performance-analytics"
-                isActive={location === "/performance-analytics"}
-              />
-              <SidebarItem
-                icon={Activity}
-                label="Social Insights"
-                href="/social-insights"
-                isActive={location === "/social-insights"}
+                href="/content-recommendations"
+                isActive={location === "/content-recommendations"}
               />
               <SidebarItem
                 icon={Target}
-                label="Advanced Analytics"
-                href="/advanced-analytics"
-                isActive={location === "/advanced-analytics"}
-              />
-              <SidebarItem
-                icon={BarChart3}
-                label="Content Performance"
-                href="/content-performance-analytics"
-                isActive={location === "/content-performance-analytics"}
+                label="Competitor Analysis"
+                href="/competitor-analysis"
+                isActive={location === "/competitor-analysis"}
               />
             </>
           )}

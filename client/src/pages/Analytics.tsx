@@ -1402,13 +1402,13 @@ const Analytics: React.FC<AnalyticsProps> = ({
       className="min-h-screen bg-white"
     >
       {/* Modern Header */}
-      <div className="border-b border-gray-200 bg-white analytics-studio-header">
+      <div className="border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
               Analytics Studio
             </h1>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
+            <Badge variant="secondary" className="bg-gradient-to-r from-emerald-100 to-cyan-100 text-emerald-700 border-emerald-200">
               Real-time Insights
             </Badge>
           </div>
@@ -1418,7 +1418,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
-            <Button className="bg-cyan-600 text-white hover:bg-cyan-700">
+            <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 text-white hover:from-cyan-700 hover:to-purple-700">
               <Download className="h-4 w-4 mr-2" />
               Export Report
             </Button>

@@ -818,35 +818,10 @@ const EnterpriseSettings = () => {
         </div>
       </div>
 
-      {/* Colorful Footer with Save Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-t border-emerald-200 p-4 shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-emerald-700">Settings auto-saved</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-blue-700">Security enabled</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-purple-700">AI assistant active</span>
-            </div>
-          </div>
-          <button
-            onClick={handleSaveSettings}
-            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105 shadow-md flex items-center space-x-2"
-          >
-            <span>💾</span>
-            <span>Save All Settings</span>
-          </button>
-        </div>
-      </div>
+
 
       {/* Enhanced global styles to prevent yellow colors */}
-      <style jsx={true} global={true}>{`
+      <style>{`
         /* Force all elements to use specified colors */
         * {
           --yellow-50: #f9fafb !important;

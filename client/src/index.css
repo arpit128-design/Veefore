@@ -4,6 +4,26 @@
 
 /* Clean light theme - yellow colors removed from Tailwind config */
 
+/* QUICK ACTIONS TRANSPARENT BACKGROUND - FORCE TRANSPARENCY */
+.quick-actions-grid svg,
+.quick-actions-grid svg *,
+.quick-actions-grid [data-icon],
+.quick-actions-grid [data-icon] *,
+.quick-actions-grid .lucide,
+.quick-actions-grid .lucide * {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* QUICK ACTIONS CONTAINER - NO BACKGROUND */
+.quick-actions-container,
+.quick-actions-container *,
+.quick-actions-grid,
+.quick-actions-grid * {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */
 /*
 [data-state="open"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]), 

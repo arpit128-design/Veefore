@@ -268,7 +268,7 @@ const ProfessionalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-white min-h-screen p-3 sm:p-4 lg:p-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-gray-50 min-h-screen p-3 sm:p-4 lg:p-6">
       {/* Header Section - Mobile Optimized */}
       <div className="dashboard-greeting-banner bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border">
         {/* Mobile Layout - Compact */}
@@ -350,24 +350,26 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Grid - Clean Icons Only */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {quickActions.map((action, index) => (
-          <div 
-            key={index} 
-            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
-            onClick={action.action}
-          >
-            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center">
-              {React.cloneElement(action.icon, { 
-                className: "w-8 h-8 sm:w-10 sm:h-10 " + action.icon.props.className.split(' ').slice(2).join(' ')
-              })}
+      {/* Quick Actions Grid - Separate Card */}
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {quickActions.map((action, index) => (
+            <div 
+              key={index} 
+              className="cursor-pointer text-center hover:opacity-80 transition-opacity"
+              onClick={action.action}
+            >
+              <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center">
+                {React.cloneElement(action.icon, { 
+                  className: "w-8 h-8 sm:w-10 sm:h-10 " + action.icon.props.className.split(' ').slice(2).join(' ')
+                })}
+              </div>
+              <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight">
+                {action.title}
+              </h3>
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight">
-              {action.title}
-            </h3>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Main Content Grid - Responsive */}

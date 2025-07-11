@@ -200,20 +200,29 @@ export default function CommentToDMAutomation() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        // Try to fetch Instagram account data
-        const socialResponse = await fetch('/api/social-accounts');
-        if (socialResponse.ok) {
-          const accounts = await socialResponse.json();
-          const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
-          
-          if (instagramAccount) {
-            const initials = generateInitials(instagramAccount.username);
-            setUserProfile({
-              username: instagramAccount.username,
-              profilePicture: instagramAccount.profilePicture || null,
-              initials
-            });
-          }
+        // Import the authenticated apiRequest function
+        const { apiRequest } = await import('@/lib/queryClient');
+        
+        // Try to fetch Instagram account data using authenticated API
+        const socialResponse = await apiRequest('GET', '/api/social-accounts');
+        const accounts = await socialResponse.json();
+        const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
+        
+        if (instagramAccount) {
+          const initials = generateInitials(instagramAccount.username);
+          setUserProfile({
+            username: instagramAccount.username,
+            profilePicture: instagramAccount.profilePicture || null,
+            initials
+          });
+          console.log('Updated profile with Instagram account:', {
+            username: instagramAccount.username,
+            hasProfilePicture: !!instagramAccount.profilePicture,
+            profilePictureUrl: instagramAccount.profilePicture,
+            initials
+          });
+        } else {
+          console.log('No Instagram account found in response');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);

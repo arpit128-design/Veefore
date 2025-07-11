@@ -297,7 +297,7 @@ const EnterpriseSettings = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm font-medium rounded-lg transition-colors group ${
                       activeTab === item.id 
-                        ? 'bg-blue-50 text-blue-800' 
+                        ? 'bg-cyan-50 text-cyan-800' 
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                     data-active={activeTab === item.id ? 'true' : 'false'}
@@ -873,32 +873,32 @@ const EnterpriseSettings = () => {
         .border-gray-200 { border-color: #e5e7eb !important; }
         .border-gray-300 { border-color: #d1d5db !important; }
         
-        /* Navigation tab active state - Light Blue */
-        .bg-blue-50 {
-          background-color: #dbeafe !important;
+        /* Navigation tab active state - Cyan color matching main Settings tab */
+        .bg-cyan-50 {
+          background-color: #cffafe !important;
         }
         
-        .text-blue-800 {
-          color: #1e40af !important;
+        .text-cyan-800 {
+          color: #0f766e !important;
         }
         
-        .bg-blue-50 * {
-          color: #1e40af !important;
+        .bg-cyan-50 * {
+          color: #0f766e !important;
         }
         
-        /* Force light blue on active navigation buttons */
+        /* Force light blue on active navigation buttons - matching main Settings tab */
         nav button[data-active="true"] {
-          background-color: #dbeafe !important;
-          color: #1e40af !important;
+          background-color: #cffafe !important;
+          color: #0f766e !important;
           font-weight: 600 !important;
         }
         
         nav button[data-active="true"] * {
-          color: #1e40af !important;
+          color: #0f766e !important;
         }
         
         nav button[data-active="true"] svg {
-          color: #1e40af !important;
+          color: #0f766e !important;
         }
         
         /* Save button specific override */

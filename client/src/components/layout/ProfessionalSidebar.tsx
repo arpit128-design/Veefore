@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -398,74 +399,162 @@ function SidebarContent({
             href="/content-studio"
             isActive={location === "/content-studio"}
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <motion.div
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
-                    (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
-                  )}
+          {/* Desktop Dropdown - Hidden on mobile */}
+          <div className="hidden lg:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <Calendar className={cn(
-                    "h-4 w-4 mr-3 transition-colors duration-200",
-                    (location === "/scheduler" || location === "/professional-scheduler")
-                      ? "text-blue-600" 
-                      : "text-slate-500 group-hover:text-slate-700"
-                  )} />
-                  <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
-                  <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
-                </Button>
-              </motion.div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="right" align="start">
-              {schedulerOptions.map((option, optionIndex) => (
-                <div key={optionIndex}>
-                  <DropdownMenuItem 
-                    className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      option.action();
-                    }}
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+                      (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+                    )}
                   >
-                    <div className="mt-1">
-                      {option.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-900 text-sm">
-                          {option.title}
-                        </h4>
-                        {option.badge && (
-                          <Badge 
-                            variant={option.badge === 'New' ? 'default' : 'secondary'} 
-                            className={`text-xs h-5 px-2 ${
-                              option.badge === 'New' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {option.badge}
-                          </Badge>
-                        )}
+                    <Calendar className={cn(
+                      "h-4 w-4 mr-3 transition-colors duration-200",
+                      (location === "/scheduler" || location === "/professional-scheduler")
+                        ? "text-blue-600" 
+                        : "text-slate-500 group-hover:text-slate-700"
+                    )} />
+                    <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
+                    <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
+                  </Button>
+                </motion.div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="right" align="start">
+                {schedulerOptions.map((option, optionIndex) => (
+                  <div key={optionIndex}>
+                    <DropdownMenuItem 
+                      className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        option.action();
+                      }}
+                    >
+                      <div className="mt-1">
+                        {option.icon}
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {option.description}
-                      </p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-gray-900 text-sm">
+                            {option.title}
+                          </h4>
+                          {option.badge && (
+                            <Badge 
+                              variant={option.badge === 'New' ? 'default' : 'secondary'} 
+                              className={`text-xs h-5 px-2 ${
+                                option.badge === 'New' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}
+                            >
+                              {option.badge}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {option.description}
+                        </p>
+                      </div>
+                    </DropdownMenuItem>
+                    {optionIndex < schedulerOptions.length - 1 && (
+                      <DropdownMenuSeparator className="my-1 bg-gray-100" />
+                    )}
+                  </div>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Mobile Dialog - Shown on mobile */}
+          <div className="lg:hidden">
+            <Dialog>
+              <DialogTrigger asChild>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
+                      (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
+                    )}
+                  >
+                    <Calendar className={cn(
+                      "h-4 w-4 mr-3 transition-colors duration-200",
+                      (location === "/scheduler" || location === "/professional-scheduler")
+                        ? "text-blue-600" 
+                        : "text-slate-500 group-hover:text-slate-700"
+                    )} />
+                    <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
+                    <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
+                  </Button>
+                </motion.div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Scheduler Options
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-2 py-4">
+                  {schedulerOptions.map((option, optionIndex) => (
+                    <div key={optionIndex}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start p-4 h-auto text-left"
+                        onClick={() => {
+                          option.action();
+                          if (setIsMobileMenuOpen) {
+                            setIsMobileMenuOpen(false);
+                          }
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="mt-1">
+                            {option.icon}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-gray-900 text-sm">
+                                {option.title}
+                              </h4>
+                              {option.badge && (
+                                <Badge 
+                                  variant={option.badge === 'New' ? 'default' : 'secondary'} 
+                                  className={`text-xs h-5 px-2 ${
+                                    option.badge === 'New' 
+                                      ? 'bg-green-100 text-green-700' 
+                                      : 'bg-blue-100 text-blue-700'
+                                  }`}
+                                >
+                                  {option.badge}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {option.description}
+                            </p>
+                          </div>
+                        </div>
+                      </Button>
+                      {optionIndex < schedulerOptions.length - 1 && (
+                        <Separator className="my-1" />
+                      )}
                     </div>
-                  </DropdownMenuItem>
-                  {optionIndex < schedulerOptions.length - 1 && (
-                    <DropdownMenuSeparator className="my-1 bg-gray-100" />
-                  )}
+                  ))}
                 </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DialogContent>
+            </Dialog>
+          </div>
           <SidebarItem
             icon={Sparkles}
             label="AI Features"

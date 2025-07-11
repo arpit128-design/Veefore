@@ -12,7 +12,7 @@ const mockAgeData = [
 const mockGenderData = [
   { gender: 'Female', percentage: 58, count: 3134, color: '#ff6b9d' },
   { gender: 'Male', percentage: 40, count: 2160, color: '#4ecdc4' },
-  { gender: 'Other', percentage: 2, count: 108, color: '#ffe66d' }
+  { gender: 'Other', percentage: 2, count: 108, color: '#8b5cf6' }
 ];
 
 const mockLocationData = [

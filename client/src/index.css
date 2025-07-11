@@ -1922,11 +1922,17 @@ input[type="time"].glassmorphism::-webkit-calendar-picker-indicator {
   padding: 4px;
 }
 
-/* Additional space theme colors */
+/* Additional space theme colors - Professional light theme equivalents */
 :root {
+  --space-navy: 220 13% 18%; /* #2D3748 - Professional dark blue */
+  --space-black: 220 13% 9%; /* #1A1A1A - Professional black */
+  --deep-purple: 256 71% 58%; /* #7C3AED */
+  --cosmic-blue: 255 255 255; /* #FFFFFF - Pure white background */
+  --electric-cyan: 194 100% 50%; /* #00D4FF - Bright cyan */
+  --neon-pink: 330 81% 60%; /* #EC4899 */
   --nebula-purple: 256 71% 58%; /* #7C3AED */
-  --solar-gold: 221 39% 11%; /* Change from yellow to dark blue */
-  --space-gray: 220 13% 26%; /* #374151 */
+  --solar-gold: 217 91% 60%; /* Changed to blue-500 equivalent */
+  --space-gray: 220 13% 91%; /* #F7FAFC - Light gray background */
   --asteroid-silver: 220 9% 65%; /* #9CA3AF */
 }
 

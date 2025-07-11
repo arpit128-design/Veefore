@@ -253,7 +253,7 @@ export function VideoGenerator() {
             </div>
             
             <div className="glassmorphism p-4 rounded-lg space-y-3">
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+              <div className="aspect-video bg-slate-100 rounded-lg flex items-center justify-center">
                 <div className="text-center text-asteroid-silver">
                   <Video className="w-16 h-16 mx-auto mb-2" />
                   <p>Video Preview</p>

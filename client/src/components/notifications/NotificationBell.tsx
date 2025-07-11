@@ -81,7 +81,7 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-80 max-h-96 overflow-y-auto bg-slate-900 border-slate-700"
+        className="w-80 max-h-96 overflow-y-auto bg-white border-slate-200"
       >
         <div className="p-4 border-b border-slate-700">
           <h3 className="text-sm font-medium text-white flex items-center justify-between">

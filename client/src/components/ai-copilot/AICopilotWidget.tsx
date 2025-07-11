@@ -279,7 +279,7 @@ export function AICopilotWidget() {
   return (
     <motion.div
       className={cn(
-        "fixed bottom-20 right-6 z-40 md:bottom-6 md:z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl flex flex-col",
+        "fixed bottom-20 right-6 z-40 md:bottom-6 md:z-50 bg-white/95 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col",
         isMinimized ? "h-16" : "h-[500px] max-h-[calc(100vh-8rem)]",
         "w-96 max-w-[calc(100vw-3rem)]"
       )}

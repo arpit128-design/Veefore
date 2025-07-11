@@ -139,7 +139,7 @@ export function WaitlistModal({ isOpen, onClose, initialReferralCode = '' }: Wai
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-slate-900 rounded-2xl border border-slate-700 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl border border-slate-200 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -148,13 +148,13 @@ export function WaitlistModal({ isOpen, onClose, initialReferralCode = '' }: Wai
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Rocket className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-white">Join VeeFore Waitlist</h2>
+              <h2 className="text-xl font-bold text-slate-900">Join VeeFore Waitlist</h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-600 hover:text-slate-900"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -192,7 +192,7 @@ export function WaitlistModal({ isOpen, onClose, initialReferralCode = '' }: Wai
                     {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </div>
-                <div className="bg-slate-900 rounded-lg p-3 font-mono text-center text-white">
+                <div className="bg-slate-100 rounded-lg p-3 font-mono text-center text-slate-900">
                   {result.user.referralCode}
                 </div>
               </div>

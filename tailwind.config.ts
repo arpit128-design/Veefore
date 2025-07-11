@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  // Dark mode completely removed
+  // NO DARK MODE - Light theme only to prevent yellow color conversion
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {

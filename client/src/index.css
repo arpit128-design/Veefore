@@ -2,82 +2,196 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Authentic Hootsuite Design System */
+/* VeeFore Professional Light Theme - TRUE LIGHT THEME */
 :root {
-  /* Hootsuite Light Theme - Clean Professional Colors */
-  --background: 249 250 251; /* gray-50 - Clean light background */
-  --foreground: 17 24 39; /* slate-900 - Dark text */
-  --card: 255 255 255; /* white - Clean white cards */
-  --card-foreground: 17 24 39; /* slate-900 */
-  --popover: 255 255 255; /* white */
-  --popover-foreground: 17 24 39; /* slate-900 */
-  --primary: 6 182 212; /* cyan-500 - Hootsuite brand */
-  --primary-foreground: 255 255 255; /* white */
-  --secondary: 249 250 251; /* gray-50 - Clean secondary */
-  --secondary-foreground: 30 41 59; /* slate-800 */
-  --muted: 243 244 246; /* gray-100 - Clean muted */
-  --muted-foreground: 75 85 99; /* gray-600 */
-  --accent: 243 244 246; /* gray-100 */
-  --accent-foreground: 30 41 59; /* slate-800 */
-  --destructive: 239 68 68; /* red-500 */
-  --destructive-foreground: 255 255 255; /* white */
-  --border: 229 231 235; /* gray-200 - Clean borders */
-  --input: 255 255 255; /* white - Clean inputs */
-  --ring: 6 182 212; /* cyan-500 */
-  --chart-1: 6 182 212; /* cyan-500 */
+  /* Core Light Theme Colors - NO CONVERSION FROM DARK */
+  --background: 255 255 255; /* Pure white background */
+  --foreground: 15 23 42; /* slate-900 - Pure dark text */
+  --card: 255 255 255; /* Pure white cards */
+  --card-foreground: 15 23 42; /* slate-900 - Pure dark text */
+  --popover: 255 255 255; /* Pure white popover */
+  --popover-foreground: 15 23 42; /* slate-900 - Pure dark text */
+  --primary: 37 99 235; /* blue-600 - Professional primary */
+  --primary-foreground: 255 255 255; /* Pure white on primary */
+  --secondary: 248 250 252; /* slate-50 - Light secondary */
+  --secondary-foreground: 15 23 42; /* slate-900 - Pure dark text */
+  --muted: 241 245 249; /* slate-100 - Light muted */
+  --muted-foreground: 100 116 139; /* slate-500 - Medium text */
+  --accent: 241 245 249; /* slate-100 - Light accent */
+  --accent-foreground: 15 23 42; /* slate-900 - Pure dark text */
+  --destructive: 239 68 68; /* red-500 - Error red */
+  --destructive-foreground: 255 255 255; /* Pure white on error */
+  --border: 226 232 240; /* slate-200 - Light border */
+  --input: 255 255 255; /* Pure white inputs */
+  --ring: 37 99 235; /* blue-600 - Focus ring */
+  
+  /* Chart Colors - NO YELLOW/AMBER */
+  --chart-1: 37 99 235; /* blue-600 */
   --chart-2: 16 185 129; /* emerald-500 */
-  --chart-3: 16 185 129; /* emerald-500 instead of amber */
-  --chart-4: 139 92 246; /* violet-500 */
-  --chart-5: 236 72 153; /* pink-500 */
+  --chart-3: 139 92 246; /* violet-500 */
+  --chart-4: 236 72 153; /* pink-500 */
+  --chart-5: 245 101 101; /* red-400 */
   
-  /* Clean text hierarchy */
-  --text-primary: 17 24 39; /* slate-900 - Clean primary text */
-  --text-secondary: 30 41 59; /* slate-800 - Clean secondary text */
-  --text-tertiary: 75 85 99; /* gray-600 - Clean muted text */
-  --text-quaternary: 107 114 128; /* gray-500 - Clean light text */
+  /* Professional Text Hierarchy */
+  --text-primary: 15 23 42; /* slate-900 - Darkest text */
+  --text-secondary: 30 41 59; /* slate-800 - Secondary text */
+  --text-tertiary: 71 85 105; /* slate-600 - Muted text */
+  --text-quaternary: 100 116 139; /* slate-500 - Light text */
   
-  /* VeeFore Modern Brand Accents - No Yellow/Amber */
-  --brand-primary: 6 182 212; /* cyan-500 - Primary brand */
-  --brand-secondary: 139 92 246; /* violet-500 - Secondary */
-  --brand-accent: 16 185 129; /* emerald-500 - Success Green */
-  --brand-highlight: 236 72 153; /* pink-500 - Highlight */
+  /* Sidebar Colors - Light Theme */
+  --sidebar-background: 255 255 255; /* Pure white sidebar */
+  --sidebar-foreground: 15 23 42; /* slate-900 */
+  --sidebar-primary: 37 99 235; /* blue-600 */
+  --sidebar-primary-foreground: 255 255 255; /* Pure white */
+  --sidebar-accent: 241 245 249; /* slate-100 */
+  --sidebar-accent-foreground: 15 23 42; /* slate-900 */
+  --sidebar-border: 226 232 240; /* slate-200 */
+  --sidebar-ring: 37 99 235; /* blue-600 */
   
-  /* Professional shadows */
+  /* Professional Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Radius */
+  --radius: 0.5rem;
 }
 
 /* Dark mode completely removed - Light theme only */
 
 /* GLOBAL YELLOW COLOR ELIMINATION - CRITICAL FIX */
 * {
-  /* Prevent any yellow/amber colors from appearing */
-  --yellow-50: 249 250 251 !important;
-  --yellow-100: 243 244 246 !important;
-  --yellow-200: 229 231 235 !important;
-  --yellow-300: 209 213 219 !important;
-  --yellow-400: 156 163 175 !important;
-  --yellow-500: 107 114 128 !important;
-  --amber-50: 249 250 251 !important;
-  --amber-100: 243 244 246 !important;
-  --amber-200: 229 231 235 !important;
-  --amber-300: 209 213 219 !important;
-  --amber-400: 156 163 175 !important;
-  --amber-500: 107 114 128 !important;
+  /* Prevent any yellow/amber colors from appearing - Convert to proper light theme colors */
+  --yellow-50: 255 255 255 !important; /* Pure white */
+  --yellow-100: 248 250 252 !important; /* slate-50 */
+  --yellow-200: 241 245 249 !important; /* slate-100 */
+  --yellow-300: 226 232 240 !important; /* slate-200 */
+  --yellow-400: 148 163 184 !important; /* slate-400 */
+  --yellow-500: 100 116 139 !important; /* slate-500 */
+  --amber-50: 255 255 255 !important; /* Pure white */
+  --amber-100: 248 250 252 !important; /* slate-50 */
+  --amber-200: 241 245 249 !important; /* slate-100 */
+  --amber-300: 226 232 240 !important; /* slate-200 */
+  --amber-400: 148 163 184 !important; /* slate-400 */
+  --amber-500: 100 116 139 !important; /* slate-500 */
 }
 
-/* Body and HTML - prevent yellow browser bars */
+/* Body and HTML - True Light Theme */
 html {
   background-color: #ffffff !important;
+  color: #0f172a !important;
   color-scheme: light only;
 }
 
 body {
   background-color: #ffffff !important;
-  color: #111827 !important;
+  color: #0f172a !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Global Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Force light theme on all elements */
+*,
+*::before,
+*::after {
+  border-color: hsl(var(--border));
+}
+
+/* CRITICAL: Prevent dark-to-light conversion that creates yellow colors */
+/* This is the root cause fix for yellow contamination */
+*[class*="dark:"] {
+  /* Override any dark mode classes that might be applied */
+  background-color: unset !important;
+  color: unset !important;
+  border-color: unset !important;
+}
+
+/* Force proper button colors */
+button {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+button[class*="bg-blue"] {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+button[class*="bg-blue"]:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* Input elements */
+input, textarea, select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1px #2563eb !important;
+}
+
+/* Dropdown and select elements */
+[role="combobox"],
+[role="listbox"],
+[role="option"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Modal and popover backgrounds */
+[role="dialog"],
+[role="alertdialog"],
+[data-state="open"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Switch and toggle components */
+[role="switch"] {
+  background-color: #e2e8f0 !important;
+}
+
+[role="switch"][data-state="checked"] {
+  background-color: #2563eb !important;
+}
+
+/* Slider components */
+[role="slider"] {
+  background-color: #e2e8f0 !important;
+}
+
+[role="slider"] [data-radix-slider-range] {
+  background-color: #2563eb !important;
+}
+
+/* Progress bars */
+[role="progressbar"] {
+  background-color: #e2e8f0 !important;
+}
+
+[role="progressbar"] > div {
+  background-color: #2563eb !important;
 }
 
 /* COMPLETE YELLOW ELIMINATION - ALL INSTANCES */
@@ -309,9 +423,25 @@ body {
   @apply bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors border border-gray-200;
 }
 
-/* Force clean gray background for main dashboard */
+/* Force clean white background for main dashboard */
 .min-h-screen {
-  background-color: #f9fafb !important;
+  background-color: #ffffff !important;
+}
+
+/* Main application container */
+#root {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  min-height: 100vh;
+}
+
+/* Dashboard container */
+.dashboard-container,
+.main-dashboard-container,
+[class*="dashboard"],
+[class*="Dashboard"] {
+  background-color: #f8fafc !important; /* slate-50 - Very light gray */
+  color: #0f172a !important;
 }
 
 /* COMPLETE YELLOW/AMBER ELIMINATION - GLOBAL OVERRIDE */
@@ -360,19 +490,28 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
 
 /* Clean card backgrounds */
 .card, .professional-card, [data-testid*="card"] {
-  background-color: rgb(255 255 255) !important;
-  border-color: rgb(229 231 235) !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important; /* slate-200 */
+  color: #0f172a !important;
 }
 
-/* Target specific dashboard containers */
-[class*="dashboard"], [class*="Dashboard"] {
-  background-color: #f9fafb !important;
+/* Button fixes - prevent yellow conversion */
+.btn, 
+button:not([class*="bg-"]) {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
 }
 
-/* FINAL YELLOW ELIMINATION - Most specific rules */
-.main-dashboard-container {
-  background-color: #f9fafb !important;
-  background: #f9fafb !important;
+button[class*="bg-blue"] {
+  background-color: #2563eb !important; /* blue-600 */
+  color: #ffffff !important;
+}
+
+button[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
 }
 
 /* Absolute override for any element with yellow background */

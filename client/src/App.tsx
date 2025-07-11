@@ -102,15 +102,8 @@ import SolutionAgencies from "@/pages/SolutionAgencies";
 import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // Redirect authenticated users from root to dashboard
-  useEffect(() => {
-    if (location === '/') {
-      setLocation('/dashboard');
-    }
-  }, [location, setLocation]);
   
   const isAnalyticsRoute = location.startsWith('/analytics') || 
                           location === '/social-insights' || 

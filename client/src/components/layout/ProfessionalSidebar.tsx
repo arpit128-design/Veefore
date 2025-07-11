@@ -288,7 +288,7 @@ function SidebarSection({ title, children, defaultOpen = true, isAnalytics = fal
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 group rounded-lg ${
           isAnalytics 
-            ? "bg-gradient-to-r from-cyan-50 to-purple-50 text-cyan-700 hover:from-cyan-100 hover:to-purple-100" 
+            ? "bg-cyan-50 text-cyan-700 hover:bg-cyan-100" 
             : "text-slate-500 hover:text-slate-700"
         }`}
         whileHover={{ x: 2 }}

@@ -30,7 +30,7 @@ import TeamManagement from "@/pages/TeamManagement";
 import Integrations from "@/pages/Integrations";
 import Referrals from "@/pages/Referrals";
 import Settings from "@/pages/Settings";
-import EnterpriseSettings from "@/pages/EnterpriseSettings";
+import EnterpriseSettings from "@/pages/EnterpriseSettingsNew";
 import Pricing from "@/pages/Pricing";
 import Subscription from "@/pages/Subscription";
 import SubscriptionNew from "@/pages/SubscriptionNew";

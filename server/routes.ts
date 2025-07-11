@@ -8270,24 +8270,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'Email is required' });
       }
 
-      // EARLY ACCESS VALIDATION - Check if user has early access
-      const waitlistUser = await storage.getWaitlistUserByEmail(email);
-      if (!waitlistUser) {
-        return res.status(403).json({ 
-          message: 'Early access required. Please join our waitlist first.',
-          requiresWaitlist: true
-        });
-      }
-
-      if (waitlistUser.status !== 'early_access') {
-        return res.status(403).json({ 
-          message: 'Early access not yet granted. You are currently on the waitlist.',
-          waitlistStatus: waitlistUser.status,
-          requiresApproval: true
-        });
-      }
-
-      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification email`);
+      // EARLY ACCESS DISABLED - Allow open signup
+      console.log(`[OPEN SIGNUP] User ${email} signup allowed, proceeding with verification email`);
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -8341,24 +8325,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'Email is required' });
       }
 
-      // EARLY ACCESS VALIDATION - Check if user has early access
-      const waitlistUser = await storage.getWaitlistUserByEmail(email);
-      if (!waitlistUser) {
-        return res.status(403).json({ 
-          message: 'Early access required. Please join our waitlist first.',
-          requiresWaitlist: true
-        });
-      }
-
-      if (waitlistUser.status !== 'early_access') {
-        return res.status(403).json({ 
-          message: 'Early access not yet granted. You are currently on the waitlist.',
-          waitlistStatus: waitlistUser.status,
-          requiresApproval: true
-        });
-      }
-
-      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification email`);
+      // EARLY ACCESS DISABLED - Allow open signup
+      console.log(`[OPEN SIGNUP] User ${email} signup allowed, proceeding with verification email`);
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -8415,24 +8383,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'Email and verification code are required' });
       }
 
-      // EARLY ACCESS VALIDATION - Check if user has early access
-      const waitlistUser = await storage.getWaitlistUserByEmail(email);
-      if (!waitlistUser) {
-        return res.status(403).json({ 
-          message: 'Early access required. Please join our waitlist first.',
-          requiresWaitlist: true
-        });
-      }
-
-      if (waitlistUser.status !== 'early_access') {
-        return res.status(403).json({ 
-          message: 'Early access not yet granted. You are currently on the waitlist.',
-          waitlistStatus: waitlistUser.status,
-          requiresApproval: true
-        });
-      }
-
-      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification`);
+      // EARLY ACCESS DISABLED - Allow open signup
+      console.log(`[OPEN SIGNUP] User ${email} signup allowed, proceeding with verification`);
 
       // Find user by email
       const user = await storage.getUserByEmail(email);
@@ -12276,8 +12228,8 @@ Create a detailed growth strategy in JSON format:
       const stats = await storage.getWaitlistStats();
       
       res.json({
-        isEarlyAccessMode: true, // Always true for now - can be made configurable
-        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!',
+        isEarlyAccessMode: false, // Early access disabled - open signup allowed
+        message: 'VeeFore is now available for open signup! Create your account to get started.',
         totalWaitlist: stats.totalUsers,
         earlyAccessCount: stats.earlyAccessCount
       });
@@ -12285,8 +12237,8 @@ Create a detailed growth strategy in JSON format:
       console.error('[EARLY ACCESS] Get config error:', error);
       res.status(500).json({ 
         error: 'Failed to get early access config',
-        isEarlyAccessMode: true, // Default to early access mode on error
-        message: 'VeeFore is currently in early access. Join our waitlist to be notified when access becomes available!'
+        isEarlyAccessMode: false, // Default to open signup on error
+        message: 'VeeFore is now available for open signup! Create your account to get started.'
       });
     }
   });

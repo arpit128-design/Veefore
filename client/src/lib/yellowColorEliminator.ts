@@ -181,10 +181,10 @@ export function startYellowColorElimination(): void {
   // Run immediately
   eliminateAllYellowColors();
   
-  // Run every 1 second for continuous monitoring
+  // Run every 500ms for ultra-aggressive monitoring (reduced from 1 second)
   eliminatorInterval = setInterval(() => {
     eliminateAllYellowColors();
-  }, 1000);
+  }, 500);
   
   // Set up mutation observer for real-time monitoring
   observer = new MutationObserver((mutations) => {
@@ -210,12 +210,12 @@ export function startYellowColorElimination(): void {
     });
   });
   
-  // Start observing
+  // Start observing with enhanced options
   observer.observe(document.body, {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['style', 'class']
+    attributeFilter: ['style', 'class', 'data-state', 'aria-selected', 'role']
   });
   
   // Run on DOM content loaded
@@ -225,6 +225,20 @@ export function startYellowColorElimination(): void {
   
   // Run on window load
   window.addEventListener('load', eliminateAllYellowColors);
+  
+  // Enhanced tab change detection
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target && (target.matches('[role="tab"]') || target.closest('[role="tab"]'))) {
+      // Immediate yellow elimination on tab clicks
+      setTimeout(() => eliminateAllYellowColors(), 0);
+      setTimeout(() => eliminateAllYellowColors(), 50);
+      setTimeout(() => eliminateAllYellowColors(), 100);
+    }
+  });
+  
+  // Enhanced state change detection
+  document.addEventListener('DOMNodeInserted', eliminateAllYellowColors);
   
   // Run on route changes
   window.addEventListener('popstate', eliminateAllYellowColors);

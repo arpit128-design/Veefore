@@ -2,6 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ULTIMATE ANTI-YELLOW FLICKER SYSTEM */
+/* Prevents yellow colors that cause rendering flickers during tab changes */
+
+/* IMMEDIATE TRANSITION SUPPRESSION */
+*, *::before, *::after {
+  transition: background-color 0ms !important;
+  transition: background 0ms !important;
+  transition: color 0ms !important;
+  transition: border-color 0ms !important;
+}
+
+/* FORCE OVERRIDE ALL YELLOW VARIANTS WITH IMMEDIATE EFFECT */
+*[style*="yellow"], *[style*="#ff"], *[style*="rgb(255,255"], *[style*="rgb(255, 255"],
+*[style*="hsl(60"], *[style*="gold"], *[style*="amber"], *[style*="orange"],
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500,
+.bg-orange-50, .bg-orange-100, .bg-orange-200, .bg-orange-300, .bg-orange-400, .bg-orange-500,
+[class*="yellow"], [class*="amber"], [class*="orange"], [class*="warning"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+  transition: none !important;
+}
+
+/* TAB CHANGE ANTI-FLICKER SYSTEM */
+[role="tab"], [role="tabpanel"], .tab, .tab-content, 
+[data-state*="active"], [data-state*="inactive"],
+[aria-selected="true"], [aria-selected="false"] {
+  transition: none !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* RADIX UI COMPONENT FIXES */
+[data-radix-tabs-trigger], [data-radix-tabs-content],
+[data-radix-select-trigger], [data-radix-select-content],
+[data-radix-dropdown-menu-trigger], [data-radix-dropdown-menu-content] {
+  transition: none !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* PREVENT YELLOW IN COMPUTED STYLES */
+*::before, *::after {
+  background-color: inherit !important;
+  background: inherit !important;
+}
+
+/* FORCE WHITE BACKGROUND ON STATE CHANGES */
+[data-state="open"], [data-state="closed"], [data-state="active"], [data-state="inactive"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES */
+/* Target ALL possible tab-related elements */
+[role="tablist"] *, [role="tab"] *, [role="tabpanel"] *,
+.tabs-root *, .tabs-list *, .tabs-trigger *, .tabs-content *,
+[data-radix-tabs-root] *, [data-radix-tabs-list] *, [data-radix-tabs-trigger] *, [data-radix-tabs-content] *,
+[class*="tab"] *, [class*="Tab"] * {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  transition: none !important;
+}
+
+/* AGGRESSIVE YELLOW PATTERN ELIMINATION */
+*[style*="rgb(255, 255, 0)"], *[style*="rgba(255, 255, 0"], *[style*="#ffff00"],
+*[style*="rgb(255, 247"], *[style*="rgba(255, 247"], *[style*="#fff7"],
+*[style*="rgb(255, 215"], *[style*="rgba(255, 215"], *[style*="#ffd7"],
+*[style*="rgb(255, 193"], *[style*="rgba(255, 193"], *[style*="#ffc1"],
+*[style*="hsl(60,"], *[style*="hsla(60,"], *[style*="hsl(45,"], *[style*="hsla(45,"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+  transition: none !important;
+}
+
+/* PREVENT YELLOW DURING THEME SWITCHES */
+html[data-theme="light"] *, html[data-theme="dark"] *,
+body[data-theme="light"] *, body[data-theme="dark"] *,
+[data-theme="light"] *, [data-theme="dark"] * {
+  transition: none !important;
+}
+
+/* OVERRIDE COMPUTED YELLOW STYLES */
+*[computed-style*="yellow"], *[computed-style*="rgb(255,255,0)"], *[computed-style*="rgb(255, 255, 0)"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  transition: none !important;
+}
+
 /* VeeFore Professional Light Theme - TRUE LIGHT THEME */
 :root {
   /* Core Light Theme Colors - NO CONVERSION FROM DARK */

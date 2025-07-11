@@ -263,6 +263,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
           schedulerOptions={schedulerOptions}
           onAnalyticsToggle={onAnalyticsToggle}
           onNavClick={handleNavClick}
+          isMobile={false}
         />
       </aside>
 

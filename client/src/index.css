@@ -759,12 +759,32 @@ button[class*="create-content-button"] {
   border: none !important;
 }
 
+/* CREATE CONTENT BUTTON TEXT - FORCE WHITE TEXT */
+.create-content-button *,
+button.create-content-button *,
+.create-content-button span,
+button.create-content-button span,
+[class*="create-content-button"] *,
+button[class*="create-content-button"] * {
+  color: white !important;
+}
+
 .create-content-button:hover,
 button.create-content-button:hover,
 [class*="create-content-button"]:hover,
 button[class*="create-content-button"]:hover {
   background-color: #3b64d9 !important;
   background: #3b64d9 !important;
+  color: white !important;
+}
+
+/* CREATE CONTENT BUTTON HOVER TEXT - FORCE WHITE TEXT */
+.create-content-button:hover *,
+button.create-content-button:hover *,
+.create-content-button:hover span,
+button.create-content-button:hover span,
+[class*="create-content-button"]:hover *,
+button[class*="create-content-button"]:hover * {
   color: white !important;
 }
 

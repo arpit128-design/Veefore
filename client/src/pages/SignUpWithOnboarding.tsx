@@ -290,11 +290,16 @@ export default function SignUpWithOnboarding() {
     if (user && user.isOnboarded) {
       setLocation('/dashboard');
     }
-    // If user is authenticated but not onboarded, skip to step 2 (email verification is done)
+    // If user is authenticated but not onboarded, start from step 2 (email verification is done)
     if (user && !user.isOnboarded && currentStep === 0) {
-      setCurrentStep(2); // Skip to plan selection
+      setCurrentStep(2); // Skip to plan selection since auth is already done
     }
   }, [user, setLocation, currentStep]);
+
+  // Handle back to home navigation
+  const handleBackToHome = () => {
+    setLocation('/');
+  };
 
   // Step progression logic
   const nextStep = () => {
@@ -632,6 +637,13 @@ export default function SignUpWithOnboarding() {
               </Button>
             )}
           </div>
+          {user && !user.isOnboarded && currentStep === 2 && (
+            <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <span className="font-medium">Welcome back!</span> Since you're already signed in, we've skipped the signup and email verification steps.
+              </p>
+            </div>
+          )}
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"

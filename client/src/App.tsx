@@ -256,20 +256,34 @@ function Router() {
 
   // If user is authenticated, check if they need onboarding
   if (isAuthenticated) {
-    // If user hasn't completed onboarding and not already on signup page, redirect to signup
-    if (!user.isOnboarded && location !== "/signup") {
+    // If user hasn't completed onboarding
+    if (!user.isOnboarded) {
+      // Allow access to home page (landing page) if they want to go back
+      if (location === "/" || location === "/landing" || location === "/hootsuite-landing") {
+        return (
+          <div className="min-h-screen bg-background text-foreground">
+            <Switch>
+              <Route path="/" component={HootsuiteLanding} />
+              <Route path="/landing" component={HootsuiteLanding} />
+              <Route path="/hootsuite-landing" component={HootsuiteLanding} />
+              <Route component={() => <Redirect to="/" />} />
+            </Switch>
+          </div>
+        );
+      }
+      // If they're on signup page, show signup
+      if (location === "/signup") {
+        return (
+          <div className="min-h-screen bg-background text-foreground">
+            <Switch>
+              <Route path="/signup" component={SignUpWithOnboarding} />
+              <Route component={() => <Redirect to="/signup" />} />
+            </Switch>
+          </div>
+        );
+      }
+      // For any other route, redirect to signup
       return <Redirect to="/signup" />;
-    }
-    // If user hasn't completed onboarding and is on signup page, show signup
-    if (!user.isOnboarded && location === "/signup") {
-      return (
-        <div className="min-h-screen bg-background text-foreground">
-          <Switch>
-            <Route path="/signup" component={SignUpWithOnboarding} />
-            <Route component={() => <Redirect to="/signup" />} />
-          </Switch>
-        </div>
-      );
     }
     return <AuthenticatedApp />;
   }

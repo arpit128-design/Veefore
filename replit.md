@@ -112,6 +112,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **AUTHENTICATION RACE CONDITION RESOLVED** - Fixed signin/signup page flicker issue on page refresh by improving useAuth hook loading state management
+  - ✅ **Root Cause Fixed**: Loading state was ending before user data was completely fetched from database
+  - ✅ **Enhanced useAuth Hook**: Modified to wait for complete user data fetch before setting loading to false
+  - ✅ **Eliminated Race Condition**: Removed brief window where user appeared unauthenticated during page refresh
+  - ✅ **Improved User Experience**: No more flicker between signin/signup and authenticated app on page refresh
+  - ✅ **Maintained Functionality**: All authentication flows (existing users, new users, errors) handle loading state properly
+  - **Technical Implementation**: Updated useAuth.ts to set loading state only after user data is retrieved or creation is complete
+  - **Result**: Smooth, seamless authentication experience without any visual flicker or unwanted redirects
 - July 11, 2025: **COMPLETE COMMENT TO DM AUTOMATION LAYOUT OPTIMIZATION** - Fixed layout proportions and added dynamic initials functionality
   - ✅ **Layout Proportion Fix**: Changed main content from w-2/3 to w-1/2 and preview panel from w-1/3 to w-1/2 to prevent overlap
   - ✅ **Fixed Message Container Width**: Set DM preview message bubble to fixed width of 280px to prevent shrinking with short text

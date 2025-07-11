@@ -207,11 +207,21 @@ const ProfessionalDashboard: React.FC = () => {
         rightBtn.classList.remove('hidden');
         leftBtn.classList.add('opacity-75');
         rightBtn.classList.add('opacity-75');
+        // Change back to flex layout for scrolling
+        const grid = document.getElementById('quick-actions-grid');
+        if (grid) {
+          grid.className = 'flex space-x-8 min-w-max';
+        }
       } else {
         leftBtn.classList.add('hidden');
         rightBtn.classList.add('hidden');
         leftBtn.classList.remove('opacity-75');
         rightBtn.classList.remove('opacity-75');
+        // Use justify-between when not scrollable
+        const grid = document.getElementById('quick-actions-grid');
+        if (grid) {
+          grid.className = 'flex justify-between w-full';
+        }
       }
     }
   };
@@ -426,7 +436,7 @@ const ProfessionalDashboard: React.FC = () => {
         </button>
 
         <div id="quick-actions-scroll" className="overflow-x-auto px-3 sm:px-4 lg:px-6" style={{ background: 'transparent' }}>
-          <div id="quick-actions-grid" className="flex space-x-8 min-w-max" style={{ background: 'transparent' }}>
+          <div id="quick-actions-grid" className="flex justify-between w-full" style={{ background: 'transparent' }}>
             <div 
               id="create-ai-action"
               className="cursor-pointer text-center hover:opacity-80 transition-opacity flex-shrink-0 w-24 sm:w-28"

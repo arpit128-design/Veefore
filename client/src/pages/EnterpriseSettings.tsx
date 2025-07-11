@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 
 const EnterpriseSettings = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
   const [searchQuery, setSearchQuery] = useState("");
@@ -189,26 +189,18 @@ const EnterpriseSettings = () => {
     }, 1000);
   };
 
-  // Fetch user data
+  // Set user data from auth context (which already has the correct data)
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/user', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
-
+    console.log('Setting user data from auth context:', user);
     if (user) {
-      fetchUserData();
+      setUserData(user);
+      
+      // Update profile with real user data
+      setProfile(prev => ({
+        ...prev,
+        displayName: user.displayName || user.username || '',
+        email: user.email || ''
+      }));
     }
   }, [user]);
 

@@ -102,6 +102,184 @@ import {
 import { Link as RouterLink } from "wouter";
 
 export default function Settings() {
+  // Add CSS to completely eliminate yellow colors and ensure black text
+  const settingsStyles = `
+    /* Force all text to be black and override any yellow backgrounds */
+    .settings-page *, 
+    .settings-page h1, 
+    .settings-page h2, 
+    .settings-page h3, 
+    .settings-page h4, 
+    .settings-page h5, 
+    .settings-page h6,
+    .settings-page p,
+    .settings-page span,
+    .settings-page label,
+    .settings-page div {
+      color: #000000 !important;
+    }
+    
+    /* Override all switch/toggle backgrounds and states */
+    .settings-page [role="switch"],
+    .settings-page button[role="switch"],
+    .settings-page .toggle-switch {
+      background-color: #e5e7eb !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .settings-page [role="switch"][data-state="checked"],
+    .settings-page button[role="switch"][data-state="checked"],
+    .settings-page .toggle-switch[data-state="checked"] {
+      background-color: #111827 !important;
+      border-color: #111827 !important;
+    }
+    
+    .settings-page [role="switch"] span,
+    .settings-page button[role="switch"] span {
+      background-color: #ffffff !important;
+    }
+    
+    /* Override all slider backgrounds and handles */
+    .settings-page [role="slider"],
+    .settings-page .slider-track {
+      background-color: #e5e7eb !important;
+    }
+    
+    .settings-page [role="slider"] [data-orientation="horizontal"],
+    .settings-page .slider-range {
+      background-color: #111827 !important;
+    }
+    
+    .settings-page [role="slider"] [data-orientation="horizontal"] > span,
+    .settings-page .slider-thumb {
+      background-color: #111827 !important;
+      border-color: #111827 !important;
+    }
+    
+    /* Override all button backgrounds */
+    .settings-page button:not(.save-button) {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .settings-page button:not(.save-button):hover {
+      background-color: #f3f4f6 !important;
+      color: #000000 !important;
+    }
+    
+    /* Override input field backgrounds */
+    .settings-page input[type="text"],
+    .settings-page input[type="email"],
+    .settings-page input[type="password"],
+    .settings-page input[type="number"],
+    .settings-page input {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .settings-page input:focus {
+      border-color: #6b7280 !important;
+      box-shadow: 0 0 0 1px #6b7280 !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+    }
+    
+    /* Override textarea backgrounds */
+    .settings-page textarea {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .settings-page textarea:focus {
+      border-color: #6b7280 !important;
+      box-shadow: 0 0 0 1px #6b7280 !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+    }
+    
+    /* Override select backgrounds */
+    .settings-page select,
+    .settings-page [role="combobox"] {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    /* Override progress bar backgrounds */
+    .settings-page [role="progressbar"],
+    .settings-page .progress-bar {
+      background-color: #e5e7eb !important;
+    }
+    
+    .settings-page [role="progressbar"] > div,
+    .settings-page .progress-bar-fill {
+      background-color: #111827 !important;
+    }
+    
+    /* Override badge backgrounds */
+    .settings-page .badge,
+    .settings-page [class*="badge"] {
+      background-color: #f3f4f6 !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    /* Override any remaining yellow/amber elements */
+    .settings-page *[style*="yellow"],
+    .settings-page *[style*="amber"],
+    .settings-page *[class*="yellow"],
+    .settings-page *[class*="amber"],
+    .settings-page *[class*="bg-yellow"],
+    .settings-page *[class*="bg-amber"] {
+      background-color: #e5e7eb !important;
+      color: #000000 !important;
+    }
+    
+    /* Target specific Radix UI components */
+    .settings-page [data-radix-collection-item],
+    .settings-page [data-state],
+    .settings-page [data-orientation] {
+      color: #000000 !important;
+    }
+    
+    /* Save button specific styling */
+    .settings-page .save-button {
+      background-color: #111827 !important;
+      color: #ffffff !important;
+      border-color: #111827 !important;
+    }
+    
+    .settings-page .save-button:hover {
+      background-color: #1f2937 !important;
+      color: #ffffff !important;
+    }
+    
+    /* Eliminate any focus rings with yellow */
+    .settings-page *:focus {
+      outline: 2px solid #6b7280 !important;
+      outline-offset: 2px !important;
+    }
+    
+    /* Force all card backgrounds to white */
+    .settings-page .card,
+    .settings-page [class*="card"] {
+      background-color: #ffffff !important;
+      border-color: #e5e7eb !important;
+    }
+  `;
+  
+  // Inject styles
+  if (typeof document !== 'undefined') {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = settingsStyles;
+    if (!document.head.querySelector('[data-settings-styles]')) {
+      styleElement.setAttribute('data-settings-styles', 'true');
+      document.head.appendChild(styleElement);
+    }
+  }
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("account");
@@ -250,28 +428,28 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="settings-page min-h-screen bg-gray-50" style={{ backgroundColor: '#f9fafb' }}>
       {/* Professional Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-200" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-900 rounded-lg">
+                <div className="p-2 bg-gray-900 rounded-lg" style={{ backgroundColor: '#111827' }}>
                   <SettingsIcon className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-                  <p className="text-gray-600 text-sm">Manage your account and application preferences</p>
+                  <h1 className="text-2xl font-semibold text-black" style={{ color: '#000000 !important' }}>Settings</h1>
+                  <p className="text-gray-700 text-sm" style={{ color: '#000000 !important' }}>Manage your account and application preferences</p>
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm" className="text-gray-600 border-gray-300">
+              <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-100" style={{ color: '#374151', borderColor: '#d1d5db', backgroundColor: '#ffffff' }}>
                 <Search className="h-4 w-4 mr-2" />
                 Search Settings
               </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 border-red-300 hover:bg-red-50">
+              <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 border-red-300 hover:bg-red-50" style={{ color: '#dc2626', borderColor: '#fca5a5', backgroundColor: '#ffffff' }}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
@@ -284,103 +462,193 @@ export default function Settings() {
         <div className="flex gap-6">
           {/* Sidebar Navigation */}
           <div className="w-64 shrink-0">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
               <nav className="space-y-1">
                 <button
                   onClick={() => setActiveTab("account")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "account" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "account" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "account") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "account") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <User className="h-4 w-4 mr-3" />
                   Account & Profile
                 </button>
                 <button
                   onClick={() => setActiveTab("security")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "security" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "security" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "security") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "security") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Shield className="h-4 w-4 mr-3" />
                   Security & Privacy
                 </button>
                 <button
                   onClick={() => setActiveTab("notifications")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "notifications" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "notifications" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "notifications") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "notifications") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Bell className="h-4 w-4 mr-3" />
                   Notifications
                 </button>
                 <button
                   onClick={() => setActiveTab("workspace")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "workspace" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "workspace" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "workspace") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "workspace") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Building className="h-4 w-4 mr-3" />
                   Workspace
                 </button>
                 <button
                   onClick={() => setActiveTab("ai")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "ai" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "ai" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "ai") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "ai") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Brain className="h-4 w-4 mr-3" />
                   AI Assistant
                 </button>
                 <button
                   onClick={() => setActiveTab("billing")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "billing" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "billing" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "billing") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "billing") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <CreditCard className="h-4 w-4 mr-3" />
                   Billing & Usage
                 </button>
                 <button
                   onClick={() => setActiveTab("integrations")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "integrations" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "integrations" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "integrations") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "integrations") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Link className="h-4 w-4 mr-3" />
                   Integrations
                 </button>
                 <button
                   onClick={() => setActiveTab("accessibility")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "accessibility" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "accessibility" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "accessibility") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "accessibility") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Accessibility className="h-4 w-4 mr-3" />
                   Accessibility
                 </button>
                 <button
                   onClick={() => setActiveTab("developer")}
-                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "developer" 
-                      ? "bg-gray-900 text-white" 
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
+                  style={activeTab === "developer" 
+                    ? { backgroundColor: '#111827', color: '#ffffff' }
+                    : { color: '#000000', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== "developer") {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== "developer") {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   <Code className="h-4 w-4 mr-3" />
                   Developer Tools
@@ -472,13 +740,14 @@ export default function Settings() {
                   <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="display-name" className="text-sm font-medium text-gray-700">Display Name</Label>
+                        <Label htmlFor="display-name" className="text-sm font-medium text-black" style={{ color: '#000000' }}>Display Name</Label>
                         <Input
                           id="display-name"
                           value={profileData.displayName}
                           onChange={(e) => setProfileData(prev => ({ ...prev, displayName: e.target.value }))}
                           disabled={!isEditing}
                           className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
+                          style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#d1d5db' }}
                         />
                       </div>
                       <div>
@@ -1840,12 +2109,12 @@ export default function Settings() {
             )}
 
             {/* Save Button */}
-            <div className="flex items-center justify-between p-6 bg-white border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between p-6 bg-white border border-gray-200 rounded-lg" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
               <div>
-                <h3 className="font-medium text-gray-900">Save Settings</h3>
-                <p className="text-sm text-gray-600">Changes are automatically saved as you make them</p>
+                <h3 className="font-medium text-black" style={{ color: '#000000' }}>Save Settings</h3>
+                <p className="text-sm text-gray-700" style={{ color: '#374151' }}>Changes are automatically saved as you make them</p>
               </div>
-              <Button onClick={handleSaveProfile} className="bg-gray-900 hover:bg-gray-800">
+              <Button onClick={handleSaveProfile} className="save-button bg-gray-900 hover:bg-gray-800" style={{ backgroundColor: '#111827', color: '#ffffff', borderColor: '#111827' }}>
                 <Save className="h-4 w-4 mr-2" />
                 Save All Changes
               </Button>

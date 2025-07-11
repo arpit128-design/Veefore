@@ -336,8 +336,8 @@ export default function CommentToDMAutomation() {
             
             {/* Button inside the message bubble - wider and closer to text */}
             <div className="mt-2 text-center">
-              <button className={`bg-white border border-gray-300 px-12 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors w-full max-w-xs ${!directMessage.buttonText ? 'text-gray-500' : 'text-gray-900'}`}>
-                {directMessage.buttonText || "see products"}
+              <button className={`bg-white border border-gray-300 px-12 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors w-full max-w-xs ${!directMessage.buttonText ? 'text-gray-400' : 'text-gray-900'}`}>
+                {directMessage.buttonText || "See products"}
               </button>
             </div>
           </div>

@@ -47,7 +47,10 @@ import {
   Filter,
   Search,
   MoreHorizontal,
-  X
+  X,
+  Linkedin,
+  Twitter,
+  Facebook
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -63,7 +66,7 @@ interface Post {
   likes: number;
   comments: number;
   shares: number;
-  platform: 'instagram' | 'facebook' | 'twitter';
+  platform: 'instagram' | 'facebook' | 'twitter' | 'linkedin';
   isScheduled: boolean;
   status: 'published' | 'scheduled' | 'draft';
 }
@@ -104,6 +107,7 @@ const STEP_TITLES = [
 ];
 
 const MOCK_POSTS: Post[] = [
+  // Instagram posts
   {
     id: "1",
     caption: "What are your thoughts on our latest project? We would love to hear your feedback and ideas! Share your insights with us! Comment below with your thoughts! #vfvfv",
@@ -142,13 +146,100 @@ const MOCK_POSTS: Post[] = [
     platform: 'instagram',
     isScheduled: true,
     status: 'scheduled'
+  },
+  // LinkedIn posts
+  {
+    id: "4",
+    caption: "Excited to share our latest industry insights on social media automation trends for 2025",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'image',
+    timestamp: "2025-07-11T09:00:00Z",
+    likes: 89,
+    comments: 23,
+    shares: 15,
+    platform: 'linkedin',
+    isScheduled: false,
+    status: 'published'
+  },
+  {
+    id: "5",
+    caption: "How AI is transforming content creation: A comprehensive guide for businesses",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'video',
+    timestamp: "2025-07-10T15:00:00Z",
+    likes: 156,
+    comments: 45,
+    shares: 32,
+    platform: 'linkedin',
+    isScheduled: true,
+    status: 'scheduled'
+  },
+  // Twitter posts
+  {
+    id: "6",
+    caption: "Just launched our new automation feature! 🚀 What do you think? #innovation #automation",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'image',
+    timestamp: "2025-07-11T11:00:00Z",
+    likes: 234,
+    comments: 67,
+    shares: 89,
+    platform: 'twitter',
+    isScheduled: false,
+    status: 'published'
+  },
+  {
+    id: "7",
+    caption: "The future of social media management is here. Are you ready? 💫",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'video',
+    timestamp: "2025-07-09T16:00:00Z",
+    likes: 178,
+    comments: 34,
+    shares: 56,
+    platform: 'twitter',
+    isScheduled: true,
+    status: 'scheduled'
+  },
+  // Facebook posts
+  {
+    id: "8",
+    caption: "Join our community of creators and discover new ways to grow your audience",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'image',
+    timestamp: "2025-07-11T08:00:00Z",
+    likes: 145,
+    comments: 29,
+    shares: 18,
+    platform: 'facebook',
+    isScheduled: false,
+    status: 'published'
+  },
+  {
+    id: "9",
+    caption: "Behind the scenes: How we built our AI-powered social media platform",
+    mediaUrl: "/api/placeholder/400/400",
+    mediaType: 'carousel',
+    timestamp: "2025-07-10T12:00:00Z",
+    likes: 198,
+    comments: 52,
+    shares: 23,
+    platform: 'facebook',
+    isScheduled: true,
+    status: 'scheduled'
   }
 ];
 
 const MOCK_SOCIAL_ACCOUNTS = [
   { id: "1", username: "rahulc1020", platform: "instagram", avatar: "/api/placeholder/32/32" },
   { id: "2", username: "arpit9996363", platform: "instagram", avatar: "/api/placeholder/32/32" },
-  { id: "3", username: "veefore_official", platform: "instagram", avatar: "/api/placeholder/32/32" }
+  { id: "3", username: "veefore_official", platform: "instagram", avatar: "/api/placeholder/32/32" },
+  { id: "4", username: "VeeFore Solutions", platform: "linkedin", avatar: "/api/placeholder/32/32" },
+  { id: "5", username: "VeeFore Business", platform: "linkedin", avatar: "/api/placeholder/32/32" },
+  { id: "6", username: "@veefore_ai", platform: "twitter", avatar: "/api/placeholder/32/32" },
+  { id: "7", username: "@veefore_official", platform: "twitter", avatar: "/api/placeholder/32/32" },
+  { id: "8", username: "VeeFore", platform: "facebook", avatar: "/api/placeholder/32/32" },
+  { id: "9", username: "VeeFore Page", platform: "facebook", avatar: "/api/placeholder/32/32" }
 ];
 
 export default function CommentToDMAutomation() {
@@ -177,11 +268,16 @@ export default function CommentToDMAutomation() {
 
   const progress = ((currentStep + 1) / STEP_TITLES.length) * 100;
 
-  const filteredPosts = MOCK_POSTS.filter(post => {
-    const matchesSearch = post.caption.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || post.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const selectedAccountData = MOCK_SOCIAL_ACCOUNTS.find(account => account.id === selectedSocialAccount);
+  
+  const filteredPosts = selectedSocialAccount && selectedAccountData 
+    ? MOCK_POSTS.filter(post => {
+        const matchesSearch = post.caption.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = filterStatus === 'all' || post.status === filterStatus;
+        const matchesPlatform = post.platform === selectedAccountData.platform;
+        return matchesSearch && matchesStatus && matchesPlatform;
+      })
+    : [];
 
   const addCommentReply = () => {
     const newReply: CommentReply = {
@@ -237,7 +333,7 @@ export default function CommentToDMAutomation() {
           <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-semibold">R</span>
           </div>
-          <span className="font-semibold text-gray-900">{selectedSocialAccount || 'rahulc1020'}</span>
+          <span className="font-semibold text-gray-900">{selectedAccountData?.username || 'Select account'}</span>
         </div>
         <button className="p-1">
           <MoreHorizontal className="w-4 h-4 text-gray-600" />
@@ -290,7 +386,7 @@ export default function CommentToDMAutomation() {
               </div>
               <div className="flex-1">
                 <div className="text-sm">
-                  <span className="font-semibold text-gray-900">{selectedSocialAccount || 'rahulc1020'}</span>
+                  <span className="font-semibold text-gray-900">{selectedAccountData?.username || 'Select account'}</span>
                   <span className="text-gray-700 ml-1">{commentReplies[0]?.text || 'Done and sent! 😊'}</span>
                 </div>
                 <div className="text-xs text-gray-500">Reply</div>
@@ -475,9 +571,12 @@ export default function CommentToDMAutomation() {
                           </SelectTrigger>
                           <SelectContent>
                             {MOCK_SOCIAL_ACCOUNTS.map(account => (
-                              <SelectItem key={account.id} value={account.username}>
+                              <SelectItem key={account.id} value={account.id}>
                                 <div className="flex items-center space-x-2">
-                                  <Instagram className="w-4 h-4 text-purple-600" />
+                                  {account.platform === 'instagram' && <Instagram className="w-4 h-4 text-purple-600" />}
+                                  {account.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
+                                  {account.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-500" />}
+                                  {account.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-700" />}
                                   <span>{account.username}</span>
                                 </div>
                               </SelectItem>
@@ -511,52 +610,68 @@ export default function CommentToDMAutomation() {
                             </Select>
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-4">
-                            {filteredPosts.map(post => (
-                              <div
-                                key={post.id}
-                                onClick={() => setSelectedPost(post)}
-                                className={cn(
-                                  "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
-                                  selectedPost?.id === post.id
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-gray-200 hover:border-gray-300"
-                                )}
-                              >
-                                <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                                  {post.mediaType === 'video' ? (
-                                    <Video className="w-12 h-12 text-gray-400" />
-                                  ) : post.mediaType === 'carousel' ? (
-                                    <div className="flex space-x-1">
-                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                    </div>
-                                  ) : (
-                                    <ImageIcon className="w-12 h-12 text-gray-400" />
+                          {!selectedSocialAccount ? (
+                            <div className="text-center py-8">
+                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <MessageCircle className="w-8 h-8 text-gray-400" />
+                              </div>
+                              <p className="text-gray-500 text-sm">Select a social account to see posts</p>
+                            </div>
+                          ) : filteredPosts.length === 0 ? (
+                            <div className="text-center py-8">
+                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Globe className="w-8 h-8 text-gray-400" />
+                              </div>
+                              <p className="text-gray-500 text-sm">No posts available for this account</p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-4">
+                              {filteredPosts.map(post => (
+                                <div
+                                  key={post.id}
+                                  onClick={() => setSelectedPost(post)}
+                                  className={cn(
+                                    "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
+                                    selectedPost?.id === post.id
+                                      ? "border-blue-500 bg-blue-50"
+                                      : "border-gray-200 hover:border-gray-300"
                                   )}
-                                </div>
-                                <div className="space-y-2">
-                                  <p className="text-sm text-gray-700 line-clamp-2">{post.caption}</p>
-                                  <div className="flex items-center justify-between">
-                                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="text-xs">
-                                      {post.status}
-                                    </Badge>
-                                    <div className="flex items-center space-x-2 text-xs text-gray-500">
-                                      <span className="flex items-center">
-                                        <Heart className="w-3 h-3 mr-1" />
-                                        {post.likes}
-                                      </span>
-                                      <span className="flex items-center">
-                                        <MessageCircle className="w-3 h-3 mr-1" />
-                                        {post.comments}
-                                      </span>
+                                >
+                                  <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
+                                    {post.mediaType === 'video' ? (
+                                      <Video className="w-12 h-12 text-gray-400" />
+                                    ) : post.mediaType === 'carousel' ? (
+                                      <div className="flex space-x-1">
+                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                      </div>
+                                    ) : (
+                                      <ImageIcon className="w-12 h-12 text-gray-400" />
+                                    )}
+                                  </div>
+                                  <div className="space-y-2">
+                                    <p className="text-sm text-gray-700 line-clamp-2">{post.caption}</p>
+                                    <div className="flex items-center justify-between">
+                                      <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="text-xs">
+                                        {post.status}
+                                      </Badge>
+                                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                                        <span className="flex items-center">
+                                          <Heart className="w-3 h-3 mr-1" />
+                                          {post.likes}
+                                        </span>
+                                        <span className="flex items-center">
+                                          <MessageCircle className="w-3 h-3 mr-1" />
+                                          {post.comments}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 

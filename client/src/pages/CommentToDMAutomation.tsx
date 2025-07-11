@@ -289,90 +289,182 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
-    console.log('DM Preview render:', { 
-      dmText: directMessage.text, 
-      dmButton: directMessage.buttonText, 
-      keyword: keyword 
-    });
+    const currentTime = new Date().toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    }).toUpperCase();
     
     return (
       <div style={{
         backgroundColor: '#ffffff',
-        borderRadius: '8px',
+        borderRadius: '12px',
         border: '1px solid #e5e7eb',
         overflow: 'hidden',
-        maxWidth: '384px',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+        maxWidth: '400px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       }}>
+        {/* Header */}
         <div style={{
-          padding: '12px',
+          padding: '16px',
           borderBottom: '1px solid #e5e7eb',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '12px',
+          backgroundColor: '#fafafa'
         }}>
           <div style={{
-            width: '32px',
-            height: '32px',
-            background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+            width: '24px',
+            height: '24px',
             borderRadius: '50%',
+            backgroundColor: '#e91e63',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>U</span>
+            <span style={{
+              fontSize: '12px',
+              fontWeight: 'bold',
+              color: 'white'
+            }}>📷</span>
           </div>
-          <div>
-            <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>username</div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>Active now</div>
-          </div>
+          <span style={{
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#262626'
+          }}>
+            Instagram direct message
+          </span>
         </div>
-        <div style={{ padding: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-            <div style={{
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              padding: '8px 12px',
-              borderRadius: '16px',
-              borderTopRightRadius: '4px',
-              maxWidth: '192px'
+
+        {/* Message Area */}
+        <div style={{
+          padding: '20px',
+          backgroundColor: '#ffffff',
+          minHeight: '280px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Timestamp */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '20px'
+          }}>
+            <span style={{
+              fontSize: '12px',
+              color: '#8e8e8e',
+              fontWeight: '500'
             }}>
-              <div style={{ fontSize: '14px' }}>{keyword || 'interested'}</div>
-            </div>
+              {currentTime}
+            </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+
+          {/* Message Bubble */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            marginBottom: 'auto'
+          }}>
+            {/* Sender Avatar */}
             <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
               backgroundColor: '#e5e7eb',
-              color: '#111827',
-              padding: '8px 12px',
-              borderRadius: '16px',
-              borderTopLeftRadius: '4px',
-              width: '320px'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#6b7280'
+              }}>
+                R
+              </span>
+            </div>
+
+            {/* Message Content */}
+            <div style={{
+              backgroundColor: '#f1f1f1',
+              borderRadius: '18px',
+              padding: '12px 16px',
+              maxWidth: '280px',
+              position: 'relative'
             }}>
               <div style={{
                 fontSize: '14px',
-                wordBreak: 'break-words',
-                overflowWrap: 'anywhere',
-                color: directMessage.text ? '#111827' : '#6b7280'
+                lineHeight: '1.4',
+                color: directMessage.text ? '#262626' : '#8e8e8e',
+                marginBottom: '8px'
               }}>
-                {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}
+                {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got on offer!'}
               </div>
+              
+              {/* Button */}
               <div style={{
-                marginTop: '8px',
-                padding: '8px',
                 backgroundColor: '#ffffff',
+                border: '1px solid #dbdbdb',
                 borderRadius: '8px',
-                textAlign: 'center'
+                padding: '10px 16px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}>
-                <div style={{
+                <span style={{
                   fontSize: '14px',
-                  fontWeight: '500',
-                  wordBreak: 'break-words',
-                  color: directMessage.buttonText ? '#000000' : '#9ca3af'
+                  fontWeight: '600',
+                  color: directMessage.buttonText ? '#262626' : '#8e8e8e'
                 }}>
                   {directMessage.buttonText || 'See products'}
-                </div>
+                </span>
               </div>
+            </div>
+          </div>
+
+          {/* Input Area */}
+          <div style={{
+            marginTop: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '8px 0'
+          }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#0095f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <span style={{
+                fontSize: '16px',
+                color: 'white'
+              }}>📷</span>
+            </div>
+            <div style={{
+              flex: 1,
+              fontSize: '14px',
+              color: '#8e8e8e',
+              fontWeight: '400'
+            }}>
+              Message...
+            </div>
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center'
+            }}>
+              <span style={{ fontSize: '16px', color: '#8e8e8e' }}>🎙️</span>
+              <span style={{ fontSize: '16px', color: '#8e8e8e' }}>📷</span>
+              <span style={{ fontSize: '16px', color: '#8e8e8e' }}>📎</span>
+              <span style={{ fontSize: '16px', color: '#8e8e8e' }}>➕</span>
             </div>
           </div>
         </div>

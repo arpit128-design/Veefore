@@ -52,6 +52,50 @@
 
 /* Dark mode completely removed - Light theme only */
 
+/* GLOBAL YELLOW COLOR ELIMINATION - CRITICAL FIX */
+* {
+  /* Prevent any yellow/amber colors from appearing */
+  --yellow-50: 249 250 251 !important;
+  --yellow-100: 243 244 246 !important;
+  --yellow-200: 229 231 235 !important;
+  --yellow-300: 209 213 219 !important;
+  --yellow-400: 156 163 175 !important;
+  --yellow-500: 107 114 128 !important;
+  --amber-50: 249 250 251 !important;
+  --amber-100: 243 244 246 !important;
+  --amber-200: 229 231 235 !important;
+  --amber-300: 209 213 219 !important;
+  --amber-400: 156 163 175 !important;
+  --amber-500: 107 114 128 !important;
+}
+
+/* Body and HTML - prevent yellow browser bars */
+html {
+  background-color: #ffffff !important;
+  color-scheme: light only;
+}
+
+body {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* COMPLETE YELLOW ELIMINATION - ALL INSTANCES */
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800, .bg-yellow-900,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
+*[style*="yellow"], *[style*="amber"], *[class*="yellow"], *[class*="amber"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* Text color fixes */
+.text-yellow-50, .text-yellow-100, .text-yellow-200, .text-yellow-300, .text-yellow-400, .text-yellow-500, .text-yellow-600, .text-yellow-700, .text-yellow-800, .text-yellow-900,
+.text-amber-50, .text-amber-100, .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500, .text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900 {
+  color: #111827 !important;
+}
+
 /* AI Growth Assistant - Complete Yellow Elimination */
 .ai-growth-assistant,
 .ai-growth-assistant *,
@@ -252,31 +296,22 @@ body {
   }
 }
 
-/* Professional component styles with dark mode support */
+/* Professional component styles - Light theme only */
 .professional-card {
   @apply bg-white text-slate-900 border border-gray-200 rounded-lg shadow-sm;
 }
 
 .professional-button-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors dark:bg-blue-600 dark:text-white;
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors;
 }
 
 .professional-button-secondary {
   @apply bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 rounded-md font-medium transition-colors border border-gray-200;
 }
 
-/* CRITICAL FIX: Override any yellow/amber backgrounds with clean white */
-* {
-  /* Remove yellow tints and force clean backgrounds */
-}
-
 /* Force clean gray background for main dashboard */
 .min-h-screen {
   background-color: #f9fafb !important;
-}
-
-.dark .min-h-screen {
-  background-color: #0f172a !important;
 }
 
 /* COMPLETE YELLOW/AMBER ELIMINATION - GLOBAL OVERRIDE */
@@ -329,29 +364,15 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
   border-color: rgb(229 231 235) !important;
 }
 
-.dark .card, .dark .professional-card {
-  background-color: rgb(30 41 59) !important;
-  border-color: rgb(51 65 85) !important;
-}
-
 /* Target specific dashboard containers */
 [class*="dashboard"], [class*="Dashboard"] {
   background-color: #f9fafb !important;
-}
-
-.dark [class*="dashboard"], .dark [class*="Dashboard"] {
-  background-color: #0f172a !important;
 }
 
 /* FINAL YELLOW ELIMINATION - Most specific rules */
 .main-dashboard-container {
   background-color: #f9fafb !important;
   background: #f9fafb !important;
-}
-
-.dark .main-dashboard-container {
-  background-color: #0f172a !important;
-  background: #0f172a !important;
 }
 
 /* Absolute override for any element with yellow background */
@@ -701,7 +722,7 @@ button[data-state="checked"],
   }
 }
 
-/* Mobile Dialog Backdrop Blur */
+/* Mobile Dialog Backdrop Blur - ENHANCED */
 @media (max-width: 1023px) {
   /* Dialog overlay with blur effect */
   [data-radix-dialog-overlay] {
@@ -713,6 +734,8 @@ button[data-state="checked"],
   /* Dialog content positioning */
   [data-radix-dialog-content] {
     animation: fadeIn 0.2s ease-out !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
   }
   
   @keyframes fadeIn {
@@ -724,6 +747,33 @@ button[data-state="checked"],
       opacity: 1;
       transform: scale(1);
     }
+  }
+}
+
+/* MOBILE BROWSER YELLOW BAR FIX */
+@media (max-width: 768px) {
+  /* Force white background on mobile */
+  body {
+    background-color: #ffffff !important;
+  }
+  
+  /* Safe area handling */
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Prevent yellow in mobile browser chrome */
+  #root {
+    background-color: #ffffff !important;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  html {
+    height: -webkit-fill-available;
   }
 }
 [data-route="/workspaces"] .bg-yellow-50,

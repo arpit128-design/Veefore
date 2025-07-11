@@ -501,6 +501,13 @@ function SidebarContent({
               </DialogTrigger>
               <DialogContent 
                 className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl scheduler-dialog-content"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)'
+                }}
               >
                 <DialogHeader className="sr-only">
                   <DialogTitle>Scheduler Options</DialogTitle>

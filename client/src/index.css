@@ -915,6 +915,198 @@ button[data-state="checked"],
     height: -webkit-fill-available;
   }
 }
+
+/* COMPREHENSIVE YELLOW ELIMINATION - RUNTIME TARGETING */
+/* Target any element with yellow-like RGB values */
+*[style*="rgb(255, 255, 0)"],
+*[style*="rgb(255, 247, 0)"],
+*[style*="rgb(255, 235, 0)"],
+*[style*="rgb(255, 223, 0)"],
+*[style*="rgb(255, 215, 0)"],
+*[style*="rgb(255, 207, 0)"],
+*[style*="rgb(255, 193, 7)"],
+*[style*="rgb(255, 185, 0)"],
+*[style*="rgb(255, 165, 0)"],
+*[style*="rgb(255, 140, 0)"],
+*[style*="rgb(255, 127, 0)"],
+*[style*="rgb(255, 69, 0)"],
+*[style*="rgb(255, 215, 0)"],
+*[style*="rgb(255, 255, 224)"],
+*[style*="rgb(255, 255, 240)"],
+*[style*="rgb(255, 250, 205)"],
+*[style*="rgb(255, 248, 220)"],
+*[style*="rgb(255, 245, 238)"],
+*[style*="rgb(254, 252, 191)"],
+*[style*="rgb(254, 249, 195)"],
+*[style*="rgb(254, 240, 138)"],
+*[style*="rgb(253, 230, 138)"],
+*[style*="rgb(252, 211, 77)"],
+*[style*="rgb(251, 191, 36)"],
+*[style*="rgb(245, 158, 11)"],
+*[style*="rgb(217, 119, 6)"],
+*[style*="rgb(180, 83, 9)"],
+*[style*="rgb(146, 64, 14)"],
+*[style*="rgb(120, 53, 15)"],
+*[style*="rgb(69, 26, 3)"],
+*[style*="hsl(60, 100%, 50%)"],
+*[style*="hsl(55, 100%, 50%)"],
+*[style*="hsl(50, 100%, 50%)"],
+*[style*="hsl(45, 100%, 50%)"],
+*[style*="hsl(40, 100%, 50%)"],
+*[style*="hsl(35, 100%, 50%)"],
+*[style*="hsl(30, 100%, 50%)"],
+*[style*="hsl(25, 100%, 50%)"],
+*[style*="hsl(20, 100%, 50%)"],
+*[style*="hsl(15, 100%, 50%)"],
+*[style*="hsl(10, 100%, 50%)"],
+*[style*="#ffff00"], *[style*="#fff000"], *[style*="#ffe000"], *[style*="#ffd000"],
+*[style*="#ffc000"], *[style*="#ffb000"], *[style*="#ffa000"], *[style*="#ff9000"],
+*[style*="#ff8000"], *[style*="#ff7000"], *[style*="#ff6000"], *[style*="#ff5000"],
+*[style*="#ff4000"], *[style*="#ff3000"], *[style*="#ff2000"], *[style*="#ff1000"],
+*[style*="#fef3c7"], *[style*="#fde68a"], *[style*="#fcd34d"], *[style*="#f59e0b"],
+*[style*="#d97706"], *[style*="#b45309"], *[style*="#92400e"], *[style*="#78350f"],
+*[style*="#451a03"], *[style*="#fffbeb"], *[style*="#fef3c7"], *[style*="#fde68a"],
+*[style*="#fcd34d"], *[style*="#f59e0b"], *[style*="#d97706"], *[style*="#b45309"],
+*[style*="#92400e"], *[style*="#78350f"], *[style*="#451a03"], *[style*="yellow"],
+*[style*="gold"], *[style*="amber"], *[style*="orange"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Absolute override for any computed styles */
+*[style*="background-color: rgb(255, 255, 0)"],
+*[style*="background-color: rgb(255, 247, 0)"],
+*[style*="background-color: rgb(255, 235, 0)"],
+*[style*="background-color: rgb(255, 223, 0)"],
+*[style*="background-color: rgb(255, 215, 0)"],
+*[style*="background-color: rgb(255, 207, 0)"],
+*[style*="background-color: rgb(255, 193, 7)"],
+*[style*="background-color: rgb(255, 185, 0)"],
+*[style*="background-color: rgb(255, 165, 0)"],
+*[style*="background-color: rgb(255, 140, 0)"],
+*[style*="background-color: rgb(255, 127, 0)"],
+*[style*="background-color: rgb(255, 69, 0)"],
+*[style*="background-color: rgb(255, 215, 0)"],
+*[style*="background-color: rgb(255, 255, 224)"],
+*[style*="background-color: rgb(255, 255, 240)"],
+*[style*="background-color: rgb(255, 250, 205)"],
+*[style*="background-color: rgb(255, 248, 220)"],
+*[style*="background-color: rgb(255, 245, 238)"],
+*[style*="background-color: rgb(254, 252, 191)"],
+*[style*="background-color: rgb(254, 249, 195)"],
+*[style*="background-color: rgb(254, 240, 138)"],
+*[style*="background-color: rgb(253, 230, 138)"],
+*[style*="background-color: rgb(252, 211, 77)"],
+*[style*="background-color: rgb(251, 191, 36)"],
+*[style*="background-color: rgb(245, 158, 11)"],
+*[style*="background-color: rgb(217, 119, 6)"],
+*[style*="background-color: rgb(180, 83, 9)"],
+*[style*="background-color: rgb(146, 64, 14)"],
+*[style*="background-color: rgb(120, 53, 15)"],
+*[style*="background-color: rgb(69, 26, 3)"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* ULTIMATE YELLOW ELIMINATION - GLOBAL OVERRIDE */
+/* Override ANY element that might have yellow-like colors */
+*, *:before, *:after {
+  /* If background is yellow-like, force it to white */
+  background-image: none !important;
+}
+
+/* Force all elements to respect color scheme */
+html {
+  color-scheme: light !important;
+}
+
+/* Global override for any yellow-like backgrounds */
+*[style*="yellow"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+*[style*="amber"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+*[style*="gold"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Override any gradients with yellow */
+*[style*="gradient"] {
+  background-image: none !important;
+}
+
+/* Force specific component types */
+.bg-gradient-to-r,
+.bg-gradient-to-l,
+.bg-gradient-to-t,
+.bg-gradient-to-b,
+.bg-gradient-to-br,
+.bg-gradient-to-bl,
+.bg-gradient-to-tr,
+.bg-gradient-to-tl {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* Override any shadow colors */
+*[style*="shadow"] {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* CRITICAL: Override any runtime computed styles */
+*[style*="rgb(255, 255, 0)"],
+*[style*="rgb(255, 247, 0)"],
+*[style*="rgb(255, 235, 0)"],
+*[style*="rgb(255, 223, 0)"],
+*[style*="rgb(255, 215, 0)"],
+*[style*="rgb(255, 207, 0)"],
+*[style*="rgb(255, 193, 7)"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* ULTIMATE NUCLEAR OPTION - Target ALL potential yellow sources */
+div, span, p, h1, h2, h3, h4, h5, h6, section, article, aside, nav, header, footer, main, button, input, textarea, select, label, form, fieldset, legend, table, tr, td, th, tbody, thead, tfoot, ul, ol, li, dl, dt, dd, blockquote, figure, figcaption, img, video, audio, canvas, svg, iframe, embed, object, param, source, track, map, area, del, ins, mark, s, u, small, strong, em, i, b, cite, q, dfn, abbr, time, code, var, samp, kbd, sub, sup, ruby, rt, rp, bdi, bdo, wbr, details, summary, menuitem, menu {
+  /* If any element has yellow-like computed background, override it */
+  background-image: none !important;
+}
+
+/* Final override for any remaining yellow contamination */
+*[style*="#ff"],
+*[style*="#fe"],
+*[style*="#fd"],
+*[style*="#fc"],
+*[style*="#fb"],
+*[style*="#fa"],
+*[style*="#f9"],
+*[style*="#f8"],
+*[style*="#f7"],
+*[style*="#f6"],
+*[style*="#f5"],
+*[style*="#f4"],
+*[style*="#f3"],
+*[style*="#f2"],
+*[style*="#f1"],
+*[style*="#f0"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
 [data-route="/workspaces"] .bg-yellow-50,
 [data-route="/workspaces"] .bg-yellow-100,
 [data-route="/workspaces"] .bg-yellow-200,

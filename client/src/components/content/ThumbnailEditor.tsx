@@ -67,7 +67,7 @@ export function ThumbnailEditor() {
     <Card className="content-card holographic">
       <CardHeader>
         <CardTitle className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
             <FileImage className="h-6 w-6 text-white" />
           </div>
           <div>

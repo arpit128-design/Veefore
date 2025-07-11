@@ -90,10 +90,10 @@ export function FeatureAccessGuard({
           </AlertDescription>
         </Alert>
         
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-blue-500/20 bg-blue-500/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-yellow-500" />
+              <Crown className="h-5 w-5 text-blue-500" />
               {featureName} - Premium Feature
             </CardTitle>
             <CardDescription>

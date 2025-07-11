@@ -267,20 +267,26 @@ const ProfessionalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 bg-gray-50 min-h-screen p-6">
-      {/* Header Section */}
-      <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm border">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-gray-50 min-h-screen p-3 sm:p-4 lg:p-6">
+      {/* Header Section - Responsive */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 sm:p-6 rounded-xl shadow-sm border space-y-4 sm:space-y-0">
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
             {greeting}, Arpit! {emoji}
           </h1>
-          <p className="text-gray-500 mt-2 flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Today is {date} • {time} • Let's create something amazing
+          <p className="text-gray-500 mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm sm:text-base">
+            <span className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Today is {date}
+            </span>
+            <span className="hidden sm:inline">•</span>
+            <span>{time}</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="text-xs sm:text-sm">Let's create something amazing</span>
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+          <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm ${
             subscriptionStatus.color === 'blue' ? 'bg-blue-50' :
             subscriptionStatus.color === 'green' ? 'bg-green-50' :
             subscriptionStatus.color === 'red' ? 'bg-red-50' : 'bg-gray-50'
@@ -290,7 +296,7 @@ const ProfessionalDashboard: React.FC = () => {
               subscriptionStatus.color === 'green' ? 'bg-green-500' :
               subscriptionStatus.color === 'red' ? 'bg-red-500' : 'bg-gray-500'
             }`}></div>
-            <span className={`text-sm font-medium ${
+            <span className={`font-medium ${
               subscriptionStatus.color === 'blue' ? 'text-blue-700' :
               subscriptionStatus.color === 'green' ? 'text-green-700' :
               subscriptionStatus.color === 'red' ? 'text-red-700' : 'text-gray-700'
@@ -298,89 +304,91 @@ const ProfessionalDashboard: React.FC = () => {
               {subscriptionStatus.status}
             </span>
           </div>
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg px-6">
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg px-4 sm:px-6 w-full sm:w-auto">
             <PlusCircle className="w-4 h-4 mr-2" />
-            Create Content
+            <span className="text-sm sm:text-base">Create Content</span>
           </Button>
         </div>
       </div>
 
-      {/* Quick Actions Grid - Pure Hootsuite Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Quick Actions Grid - Responsive Hootsuite Style */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {quickActions.map((action, index) => (
           <div 
             key={index} 
-            className="group cursor-pointer text-center hover:opacity-80 transition-opacity"
+            className="group cursor-pointer text-center hover:opacity-80 transition-opacity p-4 sm:p-0"
             onClick={action.action}
           >
-            <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
-              {action.icon}
+            <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 flex items-center justify-center">
+              {React.cloneElement(action.icon, { 
+                className: "w-6 h-6 sm:w-8 sm:h-8 " + action.icon.props.className.split(' ').slice(2).join(' ')
+              })}
             </div>
-            <h3 className="font-semibold text-gray-900 text-base">
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight">
               {action.title}
             </h3>
           </div>
         ))}
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Content Grid - Responsive */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - Performance & Recommendations */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Performance Score */}
+        <div className="xl:col-span-2 space-y-4 sm:space-y-6">
+          {/* Performance Score - Responsive */}
           <Card className="bg-gradient-to-br from-white to-blue-50 border-0 shadow-lg">
-            <CardHeader className="pb-6">
-              <div className="flex items-center justify-between">
+            <CardHeader className="pb-4 sm:pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                 <div>
-                  <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
-                      <BarChart3 className="w-5 h-5 text-white" />
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-3 text-gray-900">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                     Performance Dashboard
                   </CardTitle>
-                  <p className="text-sm text-gray-500 mt-2 ml-13">
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 ml-11 sm:ml-13">
                     Your content insights for this week
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto">
                   View Analytics
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-8">
-                <div className="relative">
-                  <div className="w-36 h-36 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shadow-xl">
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8">
+                <div className="relative mx-auto lg:mx-0">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shadow-xl">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-white">{performanceScore}</div>
-                      <div className="text-sm text-blue-100">Score</div>
+                      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{performanceScore}</div>
+                      <div className="text-xs sm:text-sm text-blue-100">Score</div>
                     </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-white" />
+                  <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-xl shadow-sm">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Eye className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-600">Total Reach</span>
+                <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="bg-white p-3 sm:p-4 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                        <span className="text-xs sm:text-sm font-medium text-gray-600">Total Reach</span>
                       </div>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.totalReach || 170}</div>
+                      <div className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData?.totalReach || 170}</div>
                     </div>
-                    <div className="bg-white p-4 rounded-xl shadow-sm">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Users className="w-4 h-4 text-green-500" />
-                        <span className="text-sm font-medium text-gray-600">Followers</span>
+                    <div className="bg-white p-3 sm:p-4 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                        <Users className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                        <span className="text-xs sm:text-sm font-medium text-gray-600">Followers</span>
                       </div>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.totalFollowers || 13}</div>
+                      <div className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData?.totalFollowers || 13}</div>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-xl shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-600">Engagement Rate</span>
-                      <span className="text-lg font-bold text-green-600">{dashboardData?.engagementRate || 8.5}%</span>
+                  <div className="bg-white p-3 sm:p-4 rounded-xl shadow-sm">
+                    <div className="flex items-center justify-between mb-1 sm:mb-2">
+                      <span className="text-xs sm:text-sm font-medium text-gray-600">Engagement Rate</span>
+                      <span className="text-base sm:text-lg font-bold text-green-600">{dashboardData?.engagementRate || 8.5}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{width: `${dashboardData?.engagementRate || 8.5}%`}}></div>
@@ -391,37 +399,37 @@ const ProfessionalDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* AI Recommendations */}
+          {/* AI Recommendations - Responsive */}
           <Card className="bg-white border-0 shadow-lg">
-            <CardHeader className="pb-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Lightbulb className="w-5 h-5 text-white" />
+            <CardHeader className="pb-4 sm:pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-3 text-gray-900">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   AI Growth Insights
                 </CardTitle>
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 w-fit">
                   3 insights
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               {recommendations.map((rec, index) => (
-                <div key={index} className="group p-6 rounded-2xl bg-gradient-to-r from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-gray-100 hover:border-blue-200">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-xl bg-white shadow-sm group-hover:scale-110 transition-transform">
+                <div key={index} className="group p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-gray-100 hover:border-blue-200">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="p-2 sm:p-3 rounded-xl bg-white shadow-sm group-hover:scale-110 transition-transform flex-shrink-0">
                       {rec.icon}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <h4 className="font-bold text-gray-900">{rec.title}</h4>
-                        <Badge variant={rec.priority === 'high' ? 'destructive' : 'outline'} className="text-xs border-gray-300">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <h4 className="font-bold text-gray-900 text-sm sm:text-base">{rec.title}</h4>
+                        <Badge variant={rec.priority === 'high' ? 'destructive' : 'outline'} className="text-xs border-gray-300 w-fit">
                           {rec.priority} priority
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed mb-4">{rec.description}</p>
-                      <Button variant="ghost" className="p-0 h-auto text-blue-600 hover:text-blue-700 font-medium">
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-3 sm:mb-4">{rec.description}</p>
+                      <Button variant="ghost" className="p-0 h-auto text-blue-600 hover:text-blue-700 font-medium text-xs sm:text-sm">
                         Apply this insight →
                       </Button>
                     </div>
@@ -526,148 +534,148 @@ const ProfessionalDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Right Column - Tasks & Social Accounts */}
-        <div className="space-y-6">
-          {/* Get Started Card */}
+        {/* Right Column - Tasks & Social Accounts - Responsive */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* Get Started Card - Responsive */}
           <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border border-gray-200 shadow-lg">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-3 text-gray-900 text-lg">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-blue-600" />
+            <CardHeader className="pb-3 sm:pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                <CardTitle className="flex items-center gap-3 text-gray-900 text-base sm:text-lg">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
                   Quick Setup Tasks
                 </CardTitle>
-                <div className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                <div className="text-xs sm:text-sm bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full font-medium w-fit">
                   1/3 Complete
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Connect Instagram ✓</p>
-                  <p className="text-sm text-gray-600">Account successfully linked</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300">
-                  <span className="text-gray-700 font-bold">2</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Create your first post</p>
-                  <p className="text-sm text-gray-600">Start with AI-powered content</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-400" />
-              </div>
-              
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300">
-                  <span className="text-gray-700 font-bold">3</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Schedule content</p>
-                  <p className="text-sm text-gray-600">Plan your posting strategy</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base">Connect Instagram ✓</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Account successfully linked</p>
                 </div>
               </div>
               
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <div className="flex items-center gap-3 mb-2">
-                  <Rocket className="w-5 h-5 text-blue-600" />
-                  <span className="font-bold text-blue-900">Almost there!</span>
+              <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300 flex-shrink-0">
+                  <span className="text-gray-700 font-bold text-sm sm:text-base">2</span>
                 </div>
-                <p className="text-sm text-blue-700">Complete setup to unlock premium features</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base">Create your first post</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Start with AI-powered content</p>
+                </div>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+              </div>
+              
+              <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-gray-200 shadow-sm">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-300 flex-shrink-0">
+                  <span className="text-gray-700 font-bold text-sm sm:text-base">3</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base">Schedule content</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Plan your posting strategy</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  <span className="font-bold text-blue-900 text-sm sm:text-base">Almost there!</span>
+                </div>
+                <p className="text-xs sm:text-sm text-blue-700">Complete setup to unlock premium features</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Analytics Preview */}
+          {/* Analytics Preview - Responsive */}
           <Card className="bg-gradient-to-br from-white to-slate-50 border border-gray-200 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-slate-100 to-gray-200 flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-slate-600" />
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-xl flex items-center gap-3 text-gray-900">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-r from-slate-100 to-gray-200 flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
                 </div>
                 Analytics Preview
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Eye className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-medium text-gray-600">Views</span>
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                    <span className="text-xs sm:text-sm font-medium text-gray-600">Views</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">2.4K</div>
+                  <div className="text-lg sm:text-2xl font-bold text-gray-900">2.4K</div>
                   <div className="text-xs text-green-600 font-medium">+12% this week</div>
                 </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-4 h-4 text-pink-500" />
-                    <span className="text-sm font-medium text-gray-600">Likes</span>
+                <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                    <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-pink-500" />
+                    <span className="text-xs sm:text-sm font-medium text-gray-600">Likes</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">186</div>
+                  <div className="text-lg sm:text-2xl font-bold text-gray-900">186</div>
                   <div className="text-xs text-green-600 font-medium">+8% this week</div>
                 </div>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 mb-2">
-                  <MessageCircle className="w-4 h-4 text-purple-500" />
-                  <span className="text-sm font-medium text-gray-600">Engagement Rate</span>
+              <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Engagement Rate</span>
                 </div>
-                <div className="text-2xl font-bold text-gray-900">8.5%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">8.5%</div>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{width: '65%'}}></div>
                 </div>
               </div>
-              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-white">
+              <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 bg-white text-sm">
                 <PlayCircle className="w-4 h-4 mr-2" />
                 View Full Analytics
               </Button>
             </CardContent>
           </Card>
 
-          {/* Social Accounts */}
+          {/* Social Accounts - Responsive */}
           <Card className="bg-white border-0 shadow-lg">
-            <CardHeader className="pb-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-white" />
+            <CardHeader className="pb-4 sm:pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                <CardTitle className="text-base sm:text-xl flex items-center gap-3 text-gray-900">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   Connected Accounts
                 </CardTitle>
-                <Badge className="bg-indigo-100 text-indigo-700">
+                <Badge className="bg-indigo-100 text-indigo-700 w-fit">
                   {socialAccounts.length} connected
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               {accountsLoading ? (
-                <div className="animate-pulse space-y-4">
-                  <div className="h-16 bg-gray-200 rounded-xl"></div>
-                  <div className="h-16 bg-gray-200 rounded-xl"></div>
+                <div className="animate-pulse space-y-3 sm:space-y-4">
+                  <div className="h-14 sm:h-16 bg-gray-200 rounded-xl"></div>
+                  <div className="h-14 sm:h-16 bg-gray-200 rounded-xl"></div>
                 </div>
               ) : socialAccounts.length > 0 ? (
                 <>
                   {socialAccounts.map((account) => (
-                    <div key={account.id} className="group p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-indigo-50 hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 border border-gray-100 hover:border-indigo-200">
-                      <div className="flex items-center gap-4">
-                        <div className="relative">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
-                            <span className="text-white text-lg font-bold">
+                    <div key={account.id} className="group p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-indigo-50 hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 border border-gray-100 hover:border-indigo-200">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="relative flex-shrink-0">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <span className="text-white text-base sm:text-lg font-bold">
                               {account.platform.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                          <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white"></div>
                         </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-gray-900">@{account.username}</p>
-                          <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-900 text-sm sm:text-base">@{account.username}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 flex items-center gap-1">
                             <Users className="w-3 h-3" />
                             {account.followers} followers
                           </p>
@@ -680,19 +688,19 @@ const ProfessionalDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 h-12 bg-white">
+                  <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 h-10 sm:h-12 bg-white text-sm">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Connect Another Account
                   </Button>
                 </>
               ) : (
-                <div className="text-center py-12">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-                    <Globe className="w-10 h-10 text-indigo-600" />
+                <div className="text-center py-8 sm:py-12">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                    <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-600" />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-2">Connect Your First Account</h3>
-                  <p className="text-gray-600 mb-6">Start by connecting your social media accounts to manage all your content in one place.</p>
-                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">Connect Your First Account</h3>
+                  <p className="text-gray-600 mb-4 sm:mb-6 text-xs sm:text-sm">Start by connecting your social media accounts to manage all your content in one place.</p>
+                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-sm">
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Connect Account
                   </Button>
@@ -701,18 +709,18 @@ const ProfessionalDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Kickstart Card */}
+          {/* Kickstart Card - Responsive */}
           <Card className="bg-gradient-to-br from-slate-100 to-blue-50">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Rocket className="w-8 h-8 text-orange-600" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Kickstart your social content</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Kickstart your social content</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
                   Get 30 days of social media posts in minutes
                 </p>
-                <Button className="bg-slate-800 hover:bg-slate-900 text-white">
+                <Button className="bg-slate-800 hover:bg-slate-900 text-white text-sm">
                   Create posts
                 </Button>
               </div>

@@ -112,6 +112,15 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **CRITICAL EMAIL VERIFICATION SECURITY FIX** - Fixed authentication bypass vulnerability where users could skip email verification
+  - ✅ **Security Vulnerability Eliminated**: Users signing up with email and password must now complete email verification before accessing any app features
+  - ✅ **Enhanced Authentication Logic**: Updated SignUpWithOnboarding to check `isEmailVerified` status before allowing step progression
+  - ✅ **Step Progression Security**: Added security checks to prevent users from bypassing email verification step using nextStep() function
+  - ✅ **User Experience Maintained**: Authenticated users with verified emails can still skip verification steps for smooth experience
+  - ✅ **Clear User Feedback**: Added appropriate messaging to guide users through secure verification process
+  - ✅ **Prevention of Unauthorized Access**: Users who are authenticated but not email verified are directed to complete verification
+  - **Technical Implementation**: Added `isEmailVerified` checks in useEffect and nextStep functions with proper error handling
+  - **Security Result**: Email verification is now mandatory and cannot be bypassed - users must complete verification before proceeding to onboarding
 - July 11, 2025: **CRITICAL SIGNUP BUG FIXED** - Resolved signup failure with JSON parsing error and improper app redirection
   - ✅ **Fixed API Route Mismatch**: Updated frontend to call correct `/api/auth/send-verification-email` endpoint instead of `/api/auth/send-verification`
   - ✅ **Added Route Compatibility**: Added backup endpoint for old route to handle both request paths

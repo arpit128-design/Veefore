@@ -290,9 +290,15 @@ export default function SignUpWithOnboarding() {
     if (user && user.isOnboarded) {
       setLocation('/dashboard');
     }
-    // If user is authenticated but not onboarded, start from step 2 (email verification is done)
+    // If user is authenticated but not onboarded, check email verification status
     if (user && !user.isOnboarded && currentStep === 0) {
-      setCurrentStep(2); // Skip to plan selection since auth is already done
+      // Only skip to plan selection if email is verified
+      if (user.isEmailVerified) {
+        setCurrentStep(2); // Skip to plan selection since auth and email verification are done
+      } else {
+        // User is authenticated but email not verified - they must complete email verification
+        setCurrentStep(1); // Go to email verification step
+      }
     }
   }, [user, setLocation, currentStep]);
 
@@ -303,6 +309,16 @@ export default function SignUpWithOnboarding() {
 
   // Step progression logic
   const nextStep = () => {
+    // Security check: If on email verification step (step 1), ensure email is verified before proceeding
+    if (currentStep === 1 && user && !user.isEmailVerified) {
+      toast({
+        title: "Email verification required",
+        description: "Please verify your email address before proceeding",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -637,10 +653,17 @@ export default function SignUpWithOnboarding() {
               </Button>
             )}
           </div>
-          {user && !user.isOnboarded && currentStep === 2 && (
+          {user && !user.isOnboarded && currentStep === 2 && user.isEmailVerified && (
             <div className="mb-3 p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-700">
-                <span className="font-medium">Welcome back!</span> Since you're already signed in, we've skipped the signup and email verification steps.
+                <span className="font-medium">Welcome back!</span> Since you're already signed in and verified, we've skipped the signup and email verification steps.
+              </p>
+            </div>
+          )}
+          {user && !user.isOnboarded && currentStep === 1 && !user.isEmailVerified && (
+            <div className="mb-3 p-3 bg-orange-50 rounded-lg">
+              <p className="text-sm text-orange-700">
+                <span className="font-medium">Email verification required!</span> Please verify your email address to continue with the secure signup process.
               </p>
             </div>
           )}

@@ -28,19 +28,27 @@
   transition: background-color 0ms !important;
 }
 
-/* TAB CHANGE ANTI-FLICKER SYSTEM */
-[role="tab"], [role="tabpanel"], .tab, .tab-content, 
-[data-state*="active"], [data-state*="inactive"],
-[aria-selected="true"], [aria-selected="false"] {
+/* TAB CHANGE ANTI-FLICKER SYSTEM - EXCLUDE SCHEDULER DIALOG */
+[role="tab"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[role="tabpanel"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.tab:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+.tab-content:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-state*="active"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *):not([data-radix-dialog-content]), 
+[data-state*="inactive"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *):not([data-radix-dialog-content]),
+[aria-selected="true"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[aria-selected="false"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
   transition: none !important;
   background-color: #ffffff !important;
   background: #ffffff !important;
 }
 
-/* RADIX UI COMPONENT FIXES */
-[data-radix-tabs-trigger], [data-radix-tabs-content],
-[data-radix-select-trigger], [data-radix-select-content],
-[data-radix-dropdown-menu-trigger], [data-radix-dropdown-menu-content] {
+/* RADIX UI COMPONENT FIXES - EXCLUDE SCHEDULER DIALOG */
+[data-radix-tabs-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-tabs-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+[data-radix-select-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-select-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
+[data-radix-dropdown-menu-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
+[data-radix-dropdown-menu-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
   transition: none !important;
   background-color: #ffffff !important;
   background: #ffffff !important;
@@ -129,6 +137,27 @@ div.scheduler-dialog-content,
 
 .scheduler-dialog-content[data-state="open"] {
   animation: forceBackdropBlur 0.3s ease-out forwards !important;
+}
+
+/* HIGHEST PRIORITY SCHEDULER DIALOG OVERRIDE - FORCE BACKDROP BLUR */
+.scheduler-dialog-content,
+.scheduler-dialog-content[data-state="open"],
+.scheduler-dialog-content[data-state="closed"],
+div.scheduler-dialog-content,
+[data-radix-dialog-content].scheduler-dialog-content,
+[role="dialog"].scheduler-dialog-content {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* FORCE BACKDROP BLUR ON SCHEDULER DIALOG USING ATTRIBUTE SELECTOR */
+[class*="scheduler-dialog-content"] {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
 }
 
 /* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES - EXCEPT SCHEDULER DIALOG */

@@ -173,6 +173,18 @@ const EnterpriseSettings = () => {
       reducedMotion: false,
       keyboardNavigation: true,
       focusIndicators: true
+    },
+    billing: {
+      autoRenewal: true,
+      usageAlerts: true,
+      alertThreshold: 80
+    },
+    developer: {
+      debugMode: false,
+      apiKey: '',
+      webhookUrl: '',
+      betaFeatures: false,
+      advancedMetrics: false
     }
   });
 

@@ -936,40 +936,136 @@ button[data-state="checked"],
   border-color: #e2e8f0 !important;
 }
 
-/* TARGETED YELLOW ELIMINATION - SURGICAL PRECISION */
-/* Only target specific yellow color patterns without affecting legitimate UI */
+/* COMPREHENSIVE YELLOW ELIMINATION - PERMANENT SOLUTION */
+/* This section completely eliminates ALL yellow colors from the application */
 
-/* Target only pure yellow and yellow-like colors */
-*[style*="background-color: yellow"],
-*[style*="background: yellow"],
-*[style*="color: yellow"],
-*[style*="background-color: gold"],
-*[style*="background: gold"],
-*[style*="color: gold"],
-*[style*="background-color: amber"],
-*[style*="background: amber"],
-*[style*="color: amber"] {
+/* Force light theme for HTML */
+html {
+  color-scheme: light !important;
+}
+
+/* NUCLEAR YELLOW ELIMINATION - TARGET ALL YELLOW VARIANTS */
+/* Background colors */
+*[style*="background-color: yellow"], *[style*="background: yellow"],
+*[style*="background-color: gold"], *[style*="background: gold"],
+*[style*="background-color: amber"], *[style*="background: amber"],
+*[style*="background-color: orange"], *[style*="background: orange"],
+*[style*="background-color: #ffff00"], *[style*="background: #ffff00"],
+*[style*="background-color: #ffd700"], *[style*="background: #ffd700"],
+*[style*="background-color: #ff0"], *[style*="background: #ff0"],
+*[style*="background-color: #ffc107"], *[style*="background: #ffc107"],
+*[style*="background-color: #ffeb3b"], *[style*="background: #ffeb3b"],
+*[style*="background-color: #fff3cd"], *[style*="background: #fff3cd"],
+*[style*="background-color: #ffeaa7"], *[style*="background: #ffeaa7"],
+*[style*="background-color: #fdcb6e"], *[style*="background: #fdcb6e"],
+*[style*="background-color: #f39c12"], *[style*="background: #f39c12"],
+*[style*="background-color: #e67e22"], *[style*="background: #e67e22"],
+*[style*="background-color: #d35400"], *[style*="background: #d35400"],
+*[style*="background-color: rgb(255, 255, 0)"], *[style*="background: rgb(255, 255, 0)"],
+*[style*="background-color: rgb(255, 215, 0)"], *[style*="background: rgb(255, 215, 0)"],
+*[style*="background-color: rgb(255, 193, 7)"], *[style*="background: rgb(255, 193, 7)"],
+*[style*="background-color: rgb(255, 235, 59)"], *[style*="background: rgb(255, 235, 59)"],
+*[style*="background-color: rgb(255, 243, 205)"], *[style*="background: rgb(255, 243, 205)"],
+*[style*="background-color: rgb(255, 234, 167)"], *[style*="background: rgb(255, 234, 167)"],
+*[style*="background-color: rgb(253, 203, 110)"], *[style*="background: rgb(253, 203, 110)"],
+*[style*="background-color: rgb(243, 156, 18)"], *[style*="background: rgb(243, 156, 18)"],
+*[style*="background-color: rgb(230, 126, 34)"], *[style*="background: rgb(230, 126, 34)"],
+*[style*="background-color: rgb(211, 84, 0)"], *[style*="background: rgb(211, 84, 0)"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Text colors */
+*[style*="color: yellow"], *[style*="color: gold"], *[style*="color: amber"], *[style*="color: orange"],
+*[style*="color: #ffff00"], *[style*="color: #ffd700"], *[style*="color: #ff0"],
+*[style*="color: #ffc107"], *[style*="color: #ffeb3b"], *[style*="color: #fff3cd"],
+*[style*="color: #ffeaa7"], *[style*="color: #fdcb6e"], *[style*="color: #f39c12"],
+*[style*="color: #e67e22"], *[style*="color: #d35400"],
+*[style*="color: rgb(255, 255, 0)"], *[style*="color: rgb(255, 215, 0)"],
+*[style*="color: rgb(255, 193, 7)"], *[style*="color: rgb(255, 235, 59)"],
+*[style*="color: rgb(255, 243, 205)"], *[style*="color: rgb(255, 234, 167)"],
+*[style*="color: rgb(253, 203, 110)"], *[style*="color: rgb(243, 156, 18)"],
+*[style*="color: rgb(230, 126, 34)"], *[style*="color: rgb(211, 84, 0)"] {
+  color: #1e293b !important;
+}
+
+/* Border colors */
+*[style*="border-color: yellow"], *[style*="border-color: gold"], *[style*="border-color: amber"], *[style*="border-color: orange"],
+*[style*="border-color: #ffff00"], *[style*="border-color: #ffd700"], *[style*="border-color: #ff0"],
+*[style*="border-color: #ffc107"], *[style*="border-color: #ffeb3b"], *[style*="border-color: #fff3cd"],
+*[style*="border-color: #ffeaa7"], *[style*="border-color: #fdcb6e"], *[style*="border-color: #f39c12"],
+*[style*="border-color: #e67e22"], *[style*="border-color: #d35400"],
+*[style*="border-color: rgb(255, 255, 0)"], *[style*="border-color: rgb(255, 215, 0)"],
+*[style*="border-color: rgb(255, 193, 7)"], *[style*="border-color: rgb(255, 235, 59)"],
+*[style*="border-color: rgb(255, 243, 205)"], *[style*="border-color: rgb(255, 234, 167)"],
+*[style*="border-color: rgb(253, 203, 110)"], *[style*="border-color: rgb(243, 156, 18)"],
+*[style*="border-color: rgb(230, 126, 34)"], *[style*="border-color: rgb(211, 84, 0)"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* GLOBAL CLASS-BASED YELLOW ELIMINATION */
+/* Target all Tailwind yellow classes */
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800, .bg-yellow-900,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
+.bg-orange-50, .bg-orange-100, .bg-orange-200, .bg-orange-300, .bg-orange-400, .bg-orange-500, .bg-orange-600, .bg-orange-700, .bg-orange-800, .bg-orange-900,
+.text-yellow-50, .text-yellow-100, .text-yellow-200, .text-yellow-300, .text-yellow-400, .text-yellow-500, .text-yellow-600, .text-yellow-700, .text-yellow-800, .text-yellow-900,
+.text-amber-50, .text-amber-100, .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500, .text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900,
+.text-orange-50, .text-orange-100, .text-orange-200, .text-orange-300, .text-orange-400, .text-orange-500, .text-orange-600, .text-orange-700, .text-orange-800, .text-orange-900,
+.border-yellow-50, .border-yellow-100, .border-yellow-200, .border-yellow-300, .border-yellow-400, .border-yellow-500, .border-yellow-600, .border-yellow-700, .border-yellow-800, .border-yellow-900,
+.border-amber-50, .border-amber-100, .border-amber-200, .border-amber-300, .border-amber-400, .border-amber-500, .border-amber-600, .border-amber-700, .border-amber-800, .border-amber-900,
+.border-orange-50, .border-orange-100, .border-orange-200, .border-orange-300, .border-orange-400, .border-orange-500, .border-orange-600, .border-orange-700, .border-orange-800, .border-orange-900 {
   background-color: #ffffff !important;
   background: #ffffff !important;
   color: #1e293b !important;
   border-color: #e2e8f0 !important;
 }
 
-/* Target specific problematic yellow hex codes only */
+/* SPECIFIC COMPONENT TARGETING */
+/* Alert/Error messages */
+.alert-warning, .alert-danger, .alert-yellow, .bg-warning, .bg-danger, .bg-yellow,
+[class*="warning"], [class*="yellow"], [class*="amber"], [class*="orange"],
+.error-message, .warning-message, .alert-message {
+  background-color: #ef4444 !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+}
+
+/* 404 Page styling */
+.error-page, .not-found, .page-error, [class*="404"], [class*="error"] {
+  background-color: #ef4444 !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+}
+
+/* Override any computed yellow styles */
+*[style*="rgb(255, 255, 0)"] { background-color: #ffffff !important; background: #ffffff !important; }
+*[style*="rgb(255, 215, 0)"] { background-color: #ffffff !important; background: #ffffff !important; }
+*[style*="rgb(255, 193, 7)"] { background-color: #ffffff !important; background: #ffffff !important; }
+*[style*="#ffff00"] { background-color: #ffffff !important; background: #ffffff !important; }
+*[style*="#ffd700"] { background-color: #ffffff !important; background: #ffffff !important; }
+*[style*="#ff0"] { background-color: #ffffff !important; background: #ffffff !important; }
+
+/* MINIMAL YELLOW TARGETING - ONLY PURE YELLOW COLORS */
+/* Target only the exact yellow colors that are problematic */
+*[style*="background-color: yellow"],
+*[style*="background: yellow"],
+*[style*="color: yellow"],
 *[style*="background-color: #ffff00"],
 *[style*="background: #ffff00"],
 *[style*="color: #ffff00"],
-*[style*="background-color: #ffd700"],
-*[style*="background: #ffd700"],
-*[style*="color: #ffd700"] {
+*[style*="background-color: gold"],
+*[style*="background: gold"],
+*[style*="color: gold"],
+*[style*="background-color: rgb(255, 255, 0)"],
+*[style*="background: rgb(255, 255, 0)"],
+*[style*="color: rgb(255, 255, 0)"] {
   background-color: #ffffff !important;
   background: #ffffff !important;
   color: #1e293b !important;
-}
-
-/* Force light theme for HTML */
-html {
-  color-scheme: light !important;
+  border-color: #e2e8f0 !important;
 }
 [data-route="/workspaces"] .bg-yellow-50,
 [data-route="/workspaces"] .bg-yellow-100,

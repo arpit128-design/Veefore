@@ -22,7 +22,7 @@ import {
   Shield, 
   Palette, 
   Brain, 
-  Zap, 
+  Cog, 
   Save, 
   Edit,
   Camera,
@@ -48,7 +48,7 @@ import {
   Share2,
   Heart,
   Target,
-  Rocket,
+  Building,
   Sparkles,
   Cpu,
   Activity,
@@ -66,17 +66,48 @@ import {
   Info,
   X,
   Check,
-  Plus
+  Plus,
+  Zap,
+  Rocket,
+  Users,
+  CreditCard,
+  Eye,
+  EyeOff,
+  Wifi,
+  WifiOff,
+  Link,
+  Unlink,
+  Search,
+  Filter,
+  Copy,
+  ExternalLink,
+  Languages,
+  Accessibility,
+  MousePointer,
+  Keyboard,
+  Headphones,
+  Mic,
+  Video,
+  Image,
+  FileVideo,
+  Folder,
+  Cloud,
+  Server,
+  Terminal,
+  Code,
+  GitBranch,
+  Package,
+  Layers
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link as RouterLink } from "wouter";
 
 export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("account");
   const [isEditing, setIsEditing] = useState(false);
 
-  // Profile data state
+  // Enhanced profile state
   const [profileData, setProfileData] = useState({
     displayName: user?.displayName || '',
     username: user?.username || '',
@@ -85,48 +116,119 @@ export default function Settings() {
     location: '',
     website: '',
     phone: '',
-    birthDate: '',
-    timezone: 'UTC'
+    jobTitle: '',
+    company: '',
+    department: '',
+    timezone: 'UTC',
+    dateFormat: 'MM/DD/YYYY',
+    timeFormat: '12h',
+    language: 'en',
+    profileVisibility: 'public'
   });
 
-  // Preferences state
+  // Enhanced preferences state
   const [preferences, setPreferences] = useState({
-    theme: 'light',
-    language: 'en',
+    general: {
+      theme: 'light',
+      language: 'en',
+      timezone: 'UTC',
+      dateFormat: 'MM/DD/YYYY',
+      numberFormat: 'US',
+      currency: 'USD'
+    },
     notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      marketing: false
+      email: {
+        marketing: false,
+        security: true,
+        updates: true,
+        digest: true,
+        mentions: true,
+        comments: true
+      },
+      push: {
+        enabled: true,
+        marketing: false,
+        security: true,
+        updates: false,
+        sound: true,
+        vibration: true
+      },
+      sms: {
+        enabled: false,
+        security: true,
+        emergency: true
+      },
+      desktop: {
+        enabled: true,
+        position: 'top-right',
+        duration: 5000
+      }
     },
     privacy: {
-      profileVisible: true,
-      activityVisible: false,
-      dataCollection: true
+      profileVisibility: 'public',
+      activityStatus: true,
+      onlineStatus: false,
+      dataCollection: true,
+      analytics: true,
+      thirdPartyIntegrations: false,
+      searchEngineIndexing: true
     },
     security: {
       twoFactor: false,
       sessionTimeout: 30,
-      loginAlerts: true
+      loginAlerts: true,
+      deviceTracking: true,
+      ipWhitelist: false,
+      apiAccess: false,
+      downloadSessions: true
     },
     workspace: {
+      defaultView: 'grid',
+      itemsPerPage: 20,
       autoSave: true,
       autoSync: true,
-      defaultView: 'grid',
-      itemsPerPage: 20
+      collaborativeEditing: true,
+      versionHistory: true,
+      backup: true,
+      cloudSync: true
     },
     ai: {
+      enabled: true,
       suggestions: true,
       autoComplete: true,
       creativity: 70,
-      responseSpeed: 'balanced'
+      responseSpeed: 'balanced',
+      personalizedRecommendations: true,
+      dataTraining: false,
+      betaFeatures: false
+    },
+    accessibility: {
+      screenReader: false,
+      highContrast: false,
+      largeText: false,
+      reducedMotion: false,
+      keyboardNavigation: true,
+      focusIndicators: true
+    },
+    integrations: {
+      googleWorkspace: false,
+      microsoftOffice: false,
+      slack: false,
+      zapier: false,
+      webhooks: false
+    },
+    billing: {
+      autoRenew: true,
+      invoiceEmail: true,
+      usageAlerts: true,
+      budgetLimit: 0
     }
   });
 
   const handleSaveProfile = () => {
     toast({
-      title: "Profile Updated",
-      description: "Your profile has been updated successfully.",
+      title: "Settings Updated",
+      description: "Your settings have been saved successfully.",
     });
     setIsEditing(false);
   };
@@ -148,707 +250,389 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Modern Header */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Professional Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="relative">
-                <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg">
-                  <SettingsIcon className="h-8 w-8 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gray-900 rounded-lg">
+                  <SettingsIcon className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Settings</h1>
-                <p className="text-slate-600 mt-1">Customize your VeeFore experience</p>
+                <div>
+                  <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+                  <p className="text-gray-600 text-sm">Manage your account and application preferences</p>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button
-                variant="outline"
-                onClick={() => window.location.reload()}
-                className="border-slate-300 hover:bg-slate-50 text-slate-700"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
+              <Button variant="outline" size="sm" className="text-gray-600 border-gray-300">
+                <Search className="h-4 w-4 mr-2" />
+                Search Settings
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="border-red-300 text-red-600 hover:bg-red-50"
-              >
+              <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 border-red-300 hover:bg-red-50">
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                Sign Out
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          {/* Tab Navigation */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-3">
-            <TabsList className="grid grid-cols-6 w-full bg-slate-100 rounded-xl p-2 h-auto">
-              <TabsTrigger 
-                value="profile" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <User className="h-5 w-5" />
-                <span className="text-sm font-medium">Profile</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="security" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">Security</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="notifications" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <Bell className="h-5 w-5" />
-                <span className="text-sm font-medium">Notifications</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="appearance" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <Palette className="h-5 w-5" />
-                <span className="text-sm font-medium">Appearance</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="ai" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <Brain className="h-5 w-5" />
-                <span className="text-sm font-medium">AI Assistant</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="advanced" 
-                className="flex flex-col items-center space-y-2 py-4 px-6 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200"
-              >
-                <Zap className="h-5 w-5" />
-                <span className="text-sm font-medium">Advanced</span>
-              </TabsTrigger>
-            </TabsList>
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="flex gap-6">
+          {/* Sidebar Navigation */}
+          <div className="w-64 shrink-0">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <nav className="space-y-1">
+                <button
+                  onClick={() => setActiveTab("account")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "account" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <User className="h-4 w-4 mr-3" />
+                  Account & Profile
+                </button>
+                <button
+                  onClick={() => setActiveTab("security")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "security" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Shield className="h-4 w-4 mr-3" />
+                  Security & Privacy
+                </button>
+                <button
+                  onClick={() => setActiveTab("notifications")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "notifications" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Bell className="h-4 w-4 mr-3" />
+                  Notifications
+                </button>
+                <button
+                  onClick={() => setActiveTab("workspace")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "workspace" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Building className="h-4 w-4 mr-3" />
+                  Workspace
+                </button>
+                <button
+                  onClick={() => setActiveTab("ai")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "ai" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Brain className="h-4 w-4 mr-3" />
+                  AI Assistant
+                </button>
+                <button
+                  onClick={() => setActiveTab("billing")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "billing" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <CreditCard className="h-4 w-4 mr-3" />
+                  Billing & Usage
+                </button>
+                <button
+                  onClick={() => setActiveTab("integrations")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "integrations" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Link className="h-4 w-4 mr-3" />
+                  Integrations
+                </button>
+                <button
+                  onClick={() => setActiveTab("accessibility")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "accessibility" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Accessibility className="h-4 w-4 mr-3" />
+                  Accessibility
+                </button>
+                <button
+                  onClick={() => setActiveTab("developer")}
+                  className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors ${
+                    activeTab === "developer" 
+                      ? "bg-gray-900 text-white" 
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <Code className="h-4 w-4 mr-3" />
+                  Developer Tools
+                </button>
+              </nav>
+
+              {/* Quick Stats */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Account Status</div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Plan</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      {user?.plan?.toUpperCase() || 'FREE'}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Credits</span>
+                    <span className="text-sm font-medium text-gray-900">{user?.credits || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Storage</span>
+                    <span className="text-sm font-medium text-gray-900">2.4 GB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-8">
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-              {/* Main Profile Section */}
-              <div className="xl:col-span-3 space-y-8">
-                {/* Profile Header Card */}
-                <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 h-32 relative">
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <div className="flex items-end space-x-6">
-                        <div className="relative">
-                          <Avatar className="h-24 w-24 border-4 border-white shadow-xl">
-                            <AvatarImage src={user?.avatar || ""} alt={user?.username || ""} />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
-                              {user?.username?.charAt(0).toUpperCase() || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <Button
-                            size="sm"
-                            className="absolute -bottom-2 -right-2 rounded-full h-8 w-8 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg"
-                          >
-                            <Camera className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex-1 pb-2">
-                          <h2 className="text-2xl font-bold text-white mb-1">
-                            {user?.displayName || user?.username}
-                          </h2>
-                          <p className="text-blue-100">@{user?.username}</p>
-                          <div className="flex items-center space-x-3 mt-3">
-                            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                              <Crown className="h-3 w-3 mr-1" />
-                              {user?.plan?.toUpperCase() || 'FREE'}
-                            </Badge>
-                            <Badge className="bg-green-500/20 text-green-100 border-green-400/30 backdrop-blur-sm">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Verified
-                            </Badge>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => setIsEditing(!isEditing)}
-                          className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          {isEditing ? 'Cancel' : 'Edit Profile'}
+          {/* Main Content */}
+          <div className="flex-1 space-y-6">
+            {/* Account & Profile Tab */}
+            {activeTab === "account" && (
+              <div className="space-y-6">
+                {/* Profile Header */}
+                <Card className="bg-white border border-gray-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-6">
+                      <div className="relative">
+                        <Avatar className="h-20 w-20 border-2 border-gray-200">
+                          <AvatarImage src={user?.avatar || ""} alt={user?.username || ""} />
+                          <AvatarFallback className="bg-gray-900 text-white text-xl font-semibold">
+                            {user?.username?.charAt(0).toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Button size="sm" className="absolute -bottom-1 -right-1 h-8 w-8 p-0 bg-gray-900 hover:bg-gray-800">
+                          <Camera className="h-4 w-4" />
                         </Button>
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">{user?.displayName || user?.username}</h3>
+                            <p className="text-gray-600">@{user?.username}</p>
+                            <p className="text-gray-500 text-sm mt-1">{profileData.jobTitle || "No title set"} • {profileData.company || "No company"}</p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="border-gray-300"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            {isEditing ? 'Cancel' : 'Edit Profile'}
+                          </Button>
+                        </div>
+                        <div className="flex items-center space-x-4 mt-4">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Verified
+                          </Badge>
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                            <Crown className="h-3 w-3 mr-1" />
+                            {user?.plan?.toUpperCase() || 'FREE'}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </CardContent>
                 </Card>
 
-                {/* Profile Information */}
-                <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                  <CardHeader className="pb-6">
-                    <CardTitle className="flex items-center space-x-3 text-xl">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <User className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <span>Personal Information</span>
+                {/* Personal Information */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <User className="h-5 w-5 mr-2 text-gray-700" />
+                      Personal Information
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-8">
+                  <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-3">
-                        <Label htmlFor="display-name" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <User className="h-4 w-4" />
-                          <span>Display Name</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="display-name" className="text-sm font-medium text-gray-700">Display Name</Label>
                         <Input
                           id="display-name"
                           value={profileData.displayName}
                           onChange={(e) => setProfileData(prev => ({ ...prev, displayName: e.target.value }))}
                           disabled={!isEditing}
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
-                          placeholder="Enter your display name"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
-                      <div className="space-y-3">
-                        <Label htmlFor="username" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <Target className="h-4 w-4" />
-                          <span>Username</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="username" className="text-sm font-medium text-gray-700">Username</Label>
                         <Input
                           id="username"
                           value={profileData.username}
                           onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
                           disabled={!isEditing}
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
-                          placeholder="Choose a unique username"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
-                      <div className="space-y-3">
-                        <Label htmlFor="email" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <Mail className="h-4 w-4" />
-                          <span>Email Address</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
                         <Input
                           id="email"
                           type="email"
                           value={profileData.email}
                           onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
                           disabled={!isEditing}
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
-                          placeholder="your@email.com"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
-                      <div className="space-y-3">
-                        <Label htmlFor="phone" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <Phone className="h-4 w-4" />
-                          <span>Phone Number</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number</Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={profileData.phone}
                           onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                           disabled={!isEditing}
-                          placeholder="+1 (555) 123-4567"
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
-                      <div className="space-y-3">
-                        <Label htmlFor="location" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <MapPin className="h-4 w-4" />
-                          <span>Location</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="job-title" className="text-sm font-medium text-gray-700">Job Title</Label>
+                        <Input
+                          id="job-title"
+                          value={profileData.jobTitle}
+                          onChange={(e) => setProfileData(prev => ({ ...prev, jobTitle: e.target.value }))}
+                          disabled={!isEditing}
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company</Label>
+                        <Input
+                          id="company"
+                          value={profileData.company}
+                          onChange={(e) => setProfileData(prev => ({ ...prev, company: e.target.value }))}
+                          disabled={!isEditing}
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location</Label>
                         <Input
                           id="location"
                           value={profileData.location}
                           onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
                           disabled={!isEditing}
-                          placeholder="New York, NY"
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
-                      <div className="space-y-3">
-                        <Label htmlFor="website" className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-                          <Globe className="h-4 w-4" />
-                          <span>Website</span>
-                        </Label>
+                      <div>
+                        <Label htmlFor="website" className="text-sm font-medium text-gray-700">Website</Label>
                         <Input
                           id="website"
                           type="url"
                           value={profileData.website}
                           onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
                           disabled={!isEditing}
-                          placeholder="https://yourwebsite.com"
-                          className="h-12 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                          className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         />
                       </div>
                     </div>
-
-                    <div className="space-y-3">
-                      <Label htmlFor="bio" className="text-sm font-semibold text-slate-700">Bio</Label>
+                    <div className="mt-6">
+                      <Label htmlFor="bio" className="text-sm font-medium text-gray-700">Bio</Label>
                       <Textarea
                         id="bio"
                         value={profileData.bio}
                         onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
                         disabled={!isEditing}
+                        rows={3}
+                        className="mt-1 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
                         placeholder="Tell us about yourself..."
-                        rows={4}
-                        className="bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl resize-none"
                       />
-                      <p className="text-xs text-slate-500 flex justify-between">
-                        <span>Share a brief description about yourself</span>
-                        <span>{profileData.bio.length}/500</span>
-                      </p>
                     </div>
 
                     {isEditing && (
-                      <div className="flex items-center space-x-4 pt-6 border-t border-slate-200">
-                        <Button 
-                          onClick={handleSaveProfile}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl"
-                        >
+                      <div className="flex items-center space-x-4 mt-6 pt-6 border-t border-gray-200">
+                        <Button onClick={handleSaveProfile} className="bg-gray-900 hover:bg-gray-800">
                           <Save className="h-4 w-4 mr-2" />
                           Save Changes
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setIsEditing(false)}
-                          className="border-slate-300 text-slate-700 hover:bg-slate-50 px-8 py-3 rounded-xl"
-                        >
-                          <X className="h-4 w-4 mr-2" />
+                        <Button variant="outline" onClick={() => setIsEditing(false)}>
                           Cancel
                         </Button>
                       </div>
                     )}
                   </CardContent>
                 </Card>
-              </div>
 
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Account Overview */}
-                <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center space-x-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <BarChart3 className="h-5 w-5 text-green-600" />
-                      </div>
-                      <span>Account Stats</span>
+                {/* Regional Settings */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Globe className="h-5 w-5 mr-2 text-gray-700" />
+                      Regional & Language Settings
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-xl">
-                        <div className="text-2xl font-bold text-blue-600">{user?.credits || 0}</div>
-                        <div className="text-sm text-slate-600">Credits</div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Timezone</Label>
+                        <Select value={preferences.general.timezone} onValueChange={(value) => 
+                          setPreferences(prev => ({ ...prev, general: { ...prev.general, timezone: value } }))
+                        }>
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UTC">UTC</SelectItem>
+                            <SelectItem value="America/New_York">Eastern Time</SelectItem>
+                            <SelectItem value="America/Chicago">Central Time</SelectItem>
+                            <SelectItem value="America/Denver">Mountain Time</SelectItem>
+                            <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                            <SelectItem value="Europe/London">London</SelectItem>
+                            <SelectItem value="Europe/Paris">Paris</SelectItem>
+                            <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="text-center p-4 bg-purple-50 rounded-xl">
-                        <div className="text-2xl font-bold text-purple-600">{user?.plan || 'Free'}</div>
-                        <div className="text-sm text-slate-600">Plan</div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Date Format</Label>
+                        <Select value={preferences.general.dateFormat} onValueChange={(value) => 
+                          setPreferences(prev => ({ ...prev, general: { ...prev.general, dateFormat: value } }))
+                        }>
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                            <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                            <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-slate-600">Member Since</span>
-                        <span className="text-sm font-medium text-slate-900">
-                          {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-slate-600">Last Active</span>
-                        <span className="text-sm font-medium text-slate-900">Today</span>
-                      </div>
-                    </div>
-                    
-                    <Link href="/billing">
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl py-3">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Upgrade Plan
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center space-x-3">
-                      <div className="p-2 bg-orange-100 rounded-lg">
-                        <Rocket className="h-5 w-5 text-orange-600" />
-                      </div>
-                      <span>Quick Actions</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50">
-                      <Download className="h-4 w-4 mr-3" />
-                      Export Data
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50">
-                      <Share2 className="h-4 w-4 mr-3" />
-                      Share Profile
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50">
-                      <RefreshCw className="h-4 w-4 mr-3" />
-                      Sync Data
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Security Tab */}
-          <TabsContent value="security" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="flex items-center space-x-3 text-xl">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <Shield className="h-5 w-5 text-red-600" />
-                    </div>
-                    <span>Security Settings</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                      <div className="space-y-1">
-                        <Label className="text-sm font-semibold text-slate-900">Two-Factor Authentication</Label>
-                        <p className="text-sm text-slate-600">Add an extra layer of security to your account</p>
-                      </div>
-                      <Switch 
-                        checked={preferences.security.twoFactor}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({
-                            ...prev,
-                            security: { ...prev.security, twoFactor: checked }
-                          }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                      <div className="space-y-1">
-                        <Label className="text-sm font-semibold text-slate-900">Login Alerts</Label>
-                        <p className="text-sm text-slate-600">Get notified of new login attempts</p>
-                      </div>
-                      <Switch 
-                        checked={preferences.security.loginAlerts}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({
-                            ...prev,
-                            security: { ...prev.security, loginAlerts: checked }
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-slate-900">Session Timeout</Label>
-                      <Select 
-                        value={preferences.security.sessionTimeout.toString()} 
-                        onValueChange={(value) => 
-                          setPreferences(prev => ({
-                            ...prev,
-                            security: { ...prev.security, sessionTimeout: parseInt(value) }
-                          }))
-                        }
-                      >
-                        <SelectTrigger className="h-12 bg-slate-50 border-slate-200 rounded-xl">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="15">15 minutes</SelectItem>
-                          <SelectItem value="30">30 minutes</SelectItem>
-                          <SelectItem value="60">1 hour</SelectItem>
-                          <SelectItem value="240">4 hours</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Key className="h-4 w-4 mr-3" />
-                      Change Password
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Smartphone className="h-4 w-4 mr-3" />
-                      Manage Devices
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Archive className="h-4 w-4 mr-3" />
-                      Security Log
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="flex items-center space-x-3 text-xl">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <BarChart3 className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <span>Account Usage</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-blue-600 rounded-xl">
-                        <Crown className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-blue-900">Current Plan</h4>
-                        <p className="text-blue-700">{user?.plan || 'Free'} Plan</p>
-                      </div>
-                      <Badge className="bg-blue-100 text-blue-800 px-3 py-1">Active</Badge>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700">Storage Used</span>
-                        <span className="text-sm text-slate-600">2.4 GB / 10 GB</span>
-                      </div>
-                      <Progress value={24} className="h-3 bg-slate-100" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700">Credits Used</span>
-                        <span className="text-sm text-slate-600">45 / 300</span>
-                      </div>
-                      <Progress value={15} className="h-3 bg-slate-100" />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <Link href="/billing">
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl h-12">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Manage Billing
-                      </Button>
-                    </Link>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <FileText className="h-4 w-4 mr-3" />
-                      Billing History
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-8">
-            <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-              <CardHeader className="pb-6">
-                <CardTitle className="flex items-center space-x-3 text-xl">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Bell className="h-5 w-5 text-green-600" />
-                  </div>
-                  <span>Notification Preferences</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">Communication Channels</h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900 flex items-center space-x-2">
-                            <Mail className="h-4 w-4" />
-                            <span>Email Notifications</span>
-                          </Label>
-                          <p className="text-sm text-slate-600">Receive updates via email</p>
-                        </div>
-                        <Switch 
-                          checked={preferences.notifications.email}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              notifications: { ...prev.notifications, email: checked }
-                            }))
-                          }
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900 flex items-center space-x-2">
-                            <Smartphone className="h-4 w-4" />
-                            <span>Push Notifications</span>
-                          </Label>
-                          <p className="text-sm text-slate-600">Browser and mobile notifications</p>
-                        </div>
-                        <Switch 
-                          checked={preferences.notifications.push}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              notifications: { ...prev.notifications, push: checked }
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900 flex items-center space-x-2">
-                            <Phone className="h-4 w-4" />
-                            <span>SMS Notifications</span>
-                          </Label>
-                          <p className="text-sm text-slate-600">Important alerts via text</p>
-                        </div>
-                        <Switch 
-                          checked={preferences.notifications.sms}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              notifications: { ...prev.notifications, sms: checked }
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900 flex items-center space-x-2">
-                            <TrendingUp className="h-4 w-4" />
-                            <span>Marketing Updates</span>
-                          </Label>
-                          <p className="text-sm text-slate-600">Product news and promotions</p>
-                        </div>
-                        <Switch 
-                          checked={preferences.notifications.marketing}
-                          onCheckedChange={(checked) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              notifications: { ...prev.notifications, marketing: checked }
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">Notification Types</h4>
-                    <div className="space-y-4">
-                      <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                          <span className="font-medium text-green-900">Account Activity</span>
-                        </div>
-                        <p className="text-sm text-green-700">Login alerts, security changes, and account updates</p>
-                      </div>
-
-                      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <AlertTriangle className="h-5 w-5 text-blue-600" />
-                          <span className="font-medium text-blue-900">System Updates</span>
-                        </div>
-                        <p className="text-sm text-blue-700">Maintenance windows and feature releases</p>
-                      </div>
-
-                      <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <Sparkles className="h-5 w-5 text-purple-600" />
-                          <span className="font-medium text-purple-900">AI Insights</span>
-                        </div>
-                        <p className="text-sm text-purple-700">AI-generated recommendations and insights</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                        <Timer className="h-4 w-4 mr-3" />
-                        Notification Schedule
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                        <Volume2 className="h-4 w-4 mr-3" />
-                        Sound Settings
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Appearance Tab */}
-          <TabsContent value="appearance" className="space-y-8">
-            <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-              <CardHeader className="pb-6">
-                <CardTitle className="flex items-center space-x-3 text-xl">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <Palette className="h-5 w-5 text-indigo-600" />
-                  </div>
-                  <span>Appearance & Theme</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">Theme Settings</h4>
-                    <div className="space-y-4">
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-900">Theme Mode</Label>
-                        <div className="grid grid-cols-3 gap-3">
-                          <Button
-                            variant={preferences.theme === 'light' ? 'default' : 'outline'}
-                            onClick={() => setPreferences(prev => ({ ...prev, theme: 'light' }))}
-                            className="flex flex-col items-center space-y-2 h-20 rounded-xl"
-                          >
-                            <Sun className="h-5 w-5" />
-                            <span className="text-sm">Light</span>
-                          </Button>
-                          <Button
-                            variant={preferences.theme === 'dark' ? 'default' : 'outline'}
-                            onClick={() => setPreferences(prev => ({ ...prev, theme: 'dark' }))}
-                            className="flex flex-col items-center space-y-2 h-20 rounded-xl"
-                          >
-                            <Moon className="h-5 w-5" />
-                            <span className="text-sm">Dark</span>
-                          </Button>
-                          <Button
-                            variant={preferences.theme === 'auto' ? 'default' : 'outline'}
-                            onClick={() => setPreferences(prev => ({ ...prev, theme: 'auto' }))}
-                            className="flex flex-col items-center space-y-2 h-20 rounded-xl"
-                          >
-                            <Monitor className="h-5 w-5" />
-                            <span className="text-sm">Auto</span>
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-900">Language</Label>
-                        <Select 
-                          value={preferences.language} 
-                          onValueChange={(value) => setPreferences(prev => ({ ...prev, language: value }))}
-                        >
-                          <SelectTrigger className="h-12 bg-slate-50 border-slate-200 rounded-xl">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Language</Label>
+                        <Select value={preferences.general.language} onValueChange={(value) => 
+                          setPreferences(prev => ({ ...prev, general: { ...prev.general, language: value } }))
+                        }>
+                          <SelectTrigger className="mt-1 border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -862,13 +646,407 @@ export default function Settings() {
                         </Select>
                       </div>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">Workspace Settings</h4>
+            {/* Security & Privacy Tab */}
+            {activeTab === "security" && (
+              <div className="space-y-6">
+                {/* Security Settings */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Shield className="h-5 w-5 mr-2 text-gray-700" />
+                      Security Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Two-Factor Authentication</div>
+                          <div className="text-sm text-gray-600">Add an extra layer of security to your account</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.security.twoFactor}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              security: { ...prev.security, twoFactor: checked }
+                            }))
+                          }
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Login Alerts</div>
+                          <div className="text-sm text-gray-600">Get notified of new login attempts</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.security.loginAlerts}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              security: { ...prev.security, loginAlerts: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Device Tracking</div>
+                          <div className="text-sm text-gray-600">Monitor devices that access your account</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.security.deviceTracking}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              security: { ...prev.security, deviceTracking: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Session Timeout</Label>
+                        <Select 
+                          value={preferences.security.sessionTimeout.toString()} 
+                          onValueChange={(value) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              security: { ...prev.security, sessionTimeout: parseInt(value) }
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="15">15 minutes</SelectItem>
+                            <SelectItem value="30">30 minutes</SelectItem>
+                            <SelectItem value="60">1 hour</SelectItem>
+                            <SelectItem value="240">4 hours</SelectItem>
+                            <SelectItem value="720">12 hours</SelectItem>
+                            <SelectItem value="1440">24 hours</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Button variant="outline" className="border-gray-300">
+                          <Key className="h-4 w-4 mr-2" />
+                          Change Password
+                        </Button>
+                        <Button variant="outline" className="border-gray-300">
+                          <Smartphone className="h-4 w-4 mr-2" />
+                          Manage Devices
+                        </Button>
+                        <Button variant="outline" className="border-gray-300">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Data
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Privacy Settings */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Eye className="h-5 w-5 mr-2 text-gray-700" />
+                      Privacy Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Profile Visibility</Label>
+                        <Select 
+                          value={preferences.privacy.profileVisibility} 
+                          onValueChange={(value) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              privacy: { ...prev.privacy, profileVisibility: value }
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="public">Public</SelectItem>
+                            <SelectItem value="private">Private</SelectItem>
+                            <SelectItem value="team">Team Only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Activity Status</div>
+                          <div className="text-sm text-gray-600">Show when you're active on the platform</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.privacy.activityStatus}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              privacy: { ...prev.privacy, activityStatus: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Data Collection</div>
+                          <div className="text-sm text-gray-600">Allow usage analytics to improve the service</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.privacy.dataCollection}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              privacy: { ...prev.privacy, dataCollection: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Third-party Integrations</div>
+                          <div className="text-sm text-gray-600">Allow third-party apps to access your data</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.privacy.thirdPartyIntegrations}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              privacy: { ...prev.privacy, thirdPartyIntegrations: checked }
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Notifications Tab */}
+            {activeTab === "notifications" && (
+              <div className="space-y-6">
+                {/* Email Notifications */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Mail className="h-5 w-5 mr-2 text-gray-700" />
+                      Email Notifications
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
                     <div className="space-y-4">
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-900">Default View</Label>
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Security Alerts</div>
+                          <div className="text-sm text-gray-600">Login attempts, password changes, and security updates</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.email.security}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                email: { ...prev.notifications.email, security: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Product Updates</div>
+                          <div className="text-sm text-gray-600">New features, improvements, and announcements</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.email.updates}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                email: { ...prev.notifications.email, updates: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Weekly Digest</div>
+                          <div className="text-sm text-gray-600">Summary of your activity and insights</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.email.digest}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                email: { ...prev.notifications.email, digest: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Marketing Communications</div>
+                          <div className="text-sm text-gray-600">Tips, best practices, and promotional offers</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.email.marketing}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                email: { ...prev.notifications.email, marketing: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Push Notifications */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Smartphone className="h-5 w-5 mr-2 text-gray-700" />
+                      Push Notifications
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Enable Push Notifications</div>
+                          <div className="text-sm text-gray-600">Receive notifications on your devices</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.push.enabled}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                push: { ...prev.notifications.push, enabled: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Security Alerts</div>
+                          <div className="text-sm text-gray-600">Important security notifications</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.push.security}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                push: { ...prev.notifications.push, security: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Sound</div>
+                          <div className="text-sm text-gray-600">Play sound for notifications</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.notifications.push.sound}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                push: { ...prev.notifications.push, sound: checked }
+                              }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Notification Position</Label>
+                        <Select 
+                          value={preferences.notifications.desktop.position} 
+                          onValueChange={(value) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              notifications: { 
+                                ...prev.notifications, 
+                                desktop: { ...prev.notifications.desktop, position: value }
+                              }
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="top-right">Top Right</SelectItem>
+                            <SelectItem value="top-left">Top Left</SelectItem>
+                            <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                            <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Workspace Tab */}
+            {activeTab === "workspace" && (
+              <div className="space-y-6">
+                {/* Workspace Preferences */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Building className="h-5 w-5 mr-2 text-gray-700" />
+                      Workspace Preferences
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Default View</Label>
                         <Select 
                           value={preferences.workspace.defaultView} 
                           onValueChange={(value) => 
@@ -878,22 +1056,47 @@ export default function Settings() {
                             }))
                           }
                         >
-                          <SelectTrigger className="h-12 bg-slate-50 border-slate-200 rounded-xl">
+                          <SelectTrigger className="mt-1 border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="grid">Grid View</SelectItem>
                             <SelectItem value="list">List View</SelectItem>
                             <SelectItem value="kanban">Kanban Board</SelectItem>
-                            <SelectItem value="timeline">Timeline</SelectItem>
+                            <SelectItem value="timeline">Timeline View</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900">Auto-save</Label>
-                          <p className="text-sm text-slate-600">Automatically save changes</p>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Items Per Page</Label>
+                        <Select 
+                          value={preferences.workspace.itemsPerPage.toString()} 
+                          onValueChange={(value) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              workspace: { ...prev.workspace, itemsPerPage: parseInt(value) }
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10">10 items</SelectItem>
+                            <SelectItem value="20">20 items</SelectItem>
+                            <SelectItem value="50">50 items</SelectItem>
+                            <SelectItem value="100">100 items</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 space-y-4">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Auto-save</div>
+                          <div className="text-sm text-gray-600">Automatically save changes as you work</div>
                         </div>
                         <Switch 
                           checked={preferences.workspace.autoSave}
@@ -906,48 +1109,143 @@ export default function Settings() {
                         />
                       </div>
 
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900">Auto-sync</Label>
-                          <p className="text-sm text-slate-600">Sync across devices</p>
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Cloud Sync</div>
+                          <div className="text-sm text-gray-600">Sync your work across all devices</div>
                         </div>
                         <Switch 
-                          checked={preferences.workspace.autoSync}
+                          checked={preferences.workspace.cloudSync}
                           onCheckedChange={(checked) => 
                             setPreferences(prev => ({
                               ...prev,
-                              workspace: { ...prev.workspace, autoSync: checked }
+                              workspace: { ...prev.workspace, cloudSync: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Collaborative Editing</div>
+                          <div className="text-sm text-gray-600">Allow real-time collaboration on shared content</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.workspace.collaborativeEditing}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              workspace: { ...prev.workspace, collaborativeEditing: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Version History</div>
+                          <div className="text-sm text-gray-600">Keep track of changes and enable rollback</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.workspace.versionHistory}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              workspace: { ...prev.workspace, versionHistory: checked }
                             }))
                           }
                         />
                       </div>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </CardContent>
+                </Card>
 
-          {/* AI Tab */}
-          <TabsContent value="ai" className="space-y-8">
-            <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-              <CardHeader className="pb-6">
-                <CardTitle className="flex items-center space-x-3 text-xl">
-                  <div className="p-2 bg-pink-100 rounded-lg">
-                    <Brain className="h-5 w-5 text-pink-600" />
-                  </div>
-                  <span>AI Assistant Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">AI Behavior</h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900">AI Suggestions</Label>
-                          <p className="text-sm text-slate-600">Get AI-powered content suggestions</p>
+                {/* Theme Settings */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Palette className="h-5 w-5 mr-2 text-gray-700" />
+                      Appearance & Theme
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700 mb-3 block">Theme</Label>
+                        <div className="grid grid-cols-3 gap-4">
+                          <button
+                            onClick={() => setPreferences(prev => ({ ...prev, general: { ...prev.general, theme: 'light' } }))}
+                            className={`p-4 border rounded-lg flex flex-col items-center space-y-2 transition-colors ${
+                              preferences.general.theme === 'light' 
+                                ? 'border-gray-900 bg-gray-50' 
+                                : 'border-gray-300 hover:border-gray-400'
+                            }`}
+                          >
+                            <Sun className="h-6 w-6 text-gray-600" />
+                            <span className="text-sm font-medium">Light</span>
+                          </button>
+                          <button
+                            onClick={() => setPreferences(prev => ({ ...prev, general: { ...prev.general, theme: 'dark' } }))}
+                            className={`p-4 border rounded-lg flex flex-col items-center space-y-2 transition-colors ${
+                              preferences.general.theme === 'dark' 
+                                ? 'border-gray-900 bg-gray-50' 
+                                : 'border-gray-300 hover:border-gray-400'
+                            }`}
+                          >
+                            <Moon className="h-6 w-6 text-gray-600" />
+                            <span className="text-sm font-medium">Dark</span>
+                          </button>
+                          <button
+                            onClick={() => setPreferences(prev => ({ ...prev, general: { ...prev.general, theme: 'auto' } }))}
+                            className={`p-4 border rounded-lg flex flex-col items-center space-y-2 transition-colors ${
+                              preferences.general.theme === 'auto' 
+                                ? 'border-gray-900 bg-gray-50' 
+                                : 'border-gray-300 hover:border-gray-400'
+                            }`}
+                          >
+                            <Monitor className="h-6 w-6 text-gray-600" />
+                            <span className="text-sm font-medium">Auto</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* AI Assistant Tab */}
+            {activeTab === "ai" && (
+              <div className="space-y-6">
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Brain className="h-5 w-5 mr-2 text-gray-700" />
+                      AI Assistant Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">AI Assistant</div>
+                          <div className="text-sm text-gray-600">Enable AI-powered features and suggestions</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.ai.enabled}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              ai: { ...prev.ai, enabled: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Smart Suggestions</div>
+                          <div className="text-sm text-gray-600">Get AI-powered content and workflow suggestions</div>
                         </div>
                         <Switch 
                           checked={preferences.ai.suggestions}
@@ -959,11 +1257,11 @@ export default function Settings() {
                           }
                         />
                       </div>
-                      
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-semibold text-slate-900">Auto-complete</Label>
-                          <p className="text-sm text-slate-600">AI-powered text completion</p>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Auto-complete</div>
+                          <div className="text-sm text-gray-600">AI-powered text completion while typing</div>
                         </div>
                         <Switch 
                           checked={preferences.ai.autoComplete}
@@ -977,36 +1275,9 @@ export default function Settings() {
                       </div>
 
                       <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-900">Response Speed</Label>
-                        <Select 
-                          value={preferences.ai.responseSpeed} 
-                          onValueChange={(value) => 
-                            setPreferences(prev => ({
-                              ...prev,
-                              ai: { ...prev.ai, responseSpeed: value }
-                            }))
-                          }
-                        >
-                          <SelectTrigger className="h-12 bg-slate-50 border-slate-200 rounded-xl">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="fast">Fast & Simple</SelectItem>
-                            <SelectItem value="balanced">Balanced</SelectItem>
-                            <SelectItem value="detailed">Detailed & Thorough</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">Creativity Settings</h4>
-                    <div className="space-y-6">
-                      <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <Label className="text-sm font-semibold text-slate-900">Creativity Level</Label>
-                          <span className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-lg">
+                          <Label className="text-sm font-medium text-gray-700">Creativity Level</Label>
+                          <span className="text-sm font-medium text-gray-900 px-2 py-1 bg-gray-100 rounded">
                             {preferences.ai.creativity}%
                           </span>
                         </div>
@@ -1022,234 +1293,565 @@ export default function Settings() {
                           step={1}
                           className="w-full"
                         />
-                        <div className="flex justify-between text-xs text-slate-500">
+                        <div className="flex justify-between text-xs text-gray-500">
                           <span>Conservative</span>
                           <span>Balanced</span>
                           <span>Creative</span>
                         </div>
                       </div>
 
-                      <div className="p-6 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-200">
-                        <div className="flex items-start space-x-4">
-                          <div className="p-2 bg-pink-600 rounded-lg">
-                            <Sparkles className="h-5 w-5 text-white" />
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Response Speed</Label>
+                        <Select 
+                          value={preferences.ai.responseSpeed} 
+                          onValueChange={(value) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              ai: { ...prev.ai, responseSpeed: value }
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="mt-1 border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fast">Fast & Simple</SelectItem>
+                            <SelectItem value="balanced">Balanced</SelectItem>
+                            <SelectItem value="detailed">Detailed & Thorough</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Personalized Recommendations</div>
+                          <div className="text-sm text-gray-600">Use your data to improve AI suggestions</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.ai.personalizedRecommendations}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              ai: { ...prev.ai, personalizedRecommendations: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Beta Features</div>
+                          <div className="text-sm text-gray-600">Access experimental AI features</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.ai.betaFeatures}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              ai: { ...prev.ai, betaFeatures: checked }
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Billing & Usage Tab */}
+            {activeTab === "billing" && (
+              <div className="space-y-6">
+                {/* Current Plan */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Crown className="h-5 w-5 mr-2 text-gray-700" />
+                      Current Plan
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{user?.plan?.toUpperCase() || 'FREE'} Plan</h3>
+                        <p className="text-gray-600">Your current subscription plan</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-gray-900">$0<span className="text-lg text-gray-600">/month</span></div>
+                        <RouterLink href="/billing">
+                          <Button className="mt-2 bg-gray-900 hover:bg-gray-800">
+                            <Crown className="h-4 w-4 mr-2" />
+                            Upgrade Plan
+                          </Button>
+                        </RouterLink>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Usage Statistics */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <BarChart3 className="h-5 w-5 mr-2 text-gray-700" />
+                      Usage Statistics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">Credits Used</span>
+                          <span className="text-sm text-gray-600">{user?.credits || 0} / 300</span>
+                        </div>
+                        <Progress value={((user?.credits || 0) / 300) * 100} className="h-2" />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">Storage Used</span>
+                          <span className="text-sm text-gray-600">2.4 GB / 10 GB</span>
+                        </div>
+                        <Progress value={24} className="h-2" />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">API Calls</span>
+                          <span className="text-sm text-gray-600">1,245 / 10,000</span>
+                        </div>
+                        <Progress value={12.45} className="h-2" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Billing Settings */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <CreditCard className="h-5 w-5 mr-2 text-gray-700" />
+                      Billing Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Auto-renewal</div>
+                          <div className="text-sm text-gray-600">Automatically renew your subscription</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.billing.autoRenew}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              billing: { ...prev.billing, autoRenew: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Invoice Emails</div>
+                          <div className="text-sm text-gray-600">Receive invoices and receipts via email</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.billing.invoiceEmail}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              billing: { ...prev.billing, invoiceEmail: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Usage Alerts</div>
+                          <div className="text-sm text-gray-600">Get notified when approaching limits</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.billing.usageAlerts}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              billing: { ...prev.billing, usageAlerts: checked }
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Button variant="outline" className="border-gray-300">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Invoices
+                        </Button>
+                        <Button variant="outline" className="border-gray-300">
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Payment Methods
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Integrations Tab */}
+            {activeTab === "integrations" && (
+              <div className="space-y-6">
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Link className="h-5 w-5 mr-2 text-gray-700" />
+                      Connected Services
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Globe className="h-5 w-5 text-blue-600" />
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-pink-900 mb-2">AI Pro Features</h4>
-                            <p className="text-sm text-pink-700 mb-3">
-                              Unlock advanced AI capabilities with our Pro plan
-                            </p>
-                            <div className="space-y-2">
-                              <div className="flex items-center space-x-2 text-sm text-pink-800">
-                                <Check className="h-4 w-4" />
-                                <span>Advanced AI models</span>
-                              </div>
-                              <div className="flex items-center space-x-2 text-sm text-pink-800">
-                                <Check className="h-4 w-4" />
-                                <span>Custom AI training</span>
-                              </div>
-                              <div className="flex items-center space-x-2 text-sm text-pink-800">
-                                <Check className="h-4 w-4" />
-                                <span>Priority processing</span>
-                              </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Google Workspace</div>
+                            <div className="text-sm text-gray-600">Gmail, Drive, Calendar integration</div>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" className="border-gray-300">
+                          Connect
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <Building className="h-5 w-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Slack</div>
+                            <div className="text-sm text-gray-600">Team communication and notifications</div>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" className="border-gray-300">
+                          Connect
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <Zap className="h-5 w-5 text-orange-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Zapier</div>
+                            <div className="text-sm text-gray-600">Automate workflows with 5000+ apps</div>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" className="border-gray-300">
+                          Connect
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Webhooks */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Wifi className="h-5 w-5 mr-2 text-gray-700" />
+                      Webhooks
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">Webhook Endpoints</h3>
+                        <p className="text-sm text-gray-600">Configure webhooks to receive real-time updates</p>
+                      </div>
+                      <Button variant="outline" className="border-gray-300">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Webhook
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Accessibility Tab */}
+            {activeTab === "accessibility" && (
+              <div className="space-y-6">
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Accessibility className="h-5 w-5 mr-2 text-gray-700" />
+                      Accessibility Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Screen Reader Support</div>
+                          <div className="text-sm text-gray-600">Optimize interface for screen readers</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.accessibility.screenReader}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              accessibility: { ...prev.accessibility, screenReader: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">High Contrast Mode</div>
+                          <div className="text-sm text-gray-600">Increase color contrast for better visibility</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.accessibility.highContrast}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              accessibility: { ...prev.accessibility, highContrast: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Large Text</div>
+                          <div className="text-sm text-gray-600">Increase font size throughout the interface</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.accessibility.largeText}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              accessibility: { ...prev.accessibility, largeText: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Reduced Motion</div>
+                          <div className="text-sm text-gray-600">Minimize animations and transitions</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.accessibility.reducedMotion}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              accessibility: { ...prev.accessibility, reducedMotion: checked }
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">Keyboard Navigation</div>
+                          <div className="text-sm text-gray-600">Enhanced keyboard shortcuts and navigation</div>
+                        </div>
+                        <Switch 
+                          checked={preferences.accessibility.keyboardNavigation}
+                          onCheckedChange={(checked) => 
+                            setPreferences(prev => ({
+                              ...prev,
+                              accessibility: { ...prev.accessibility, keyboardNavigation: checked }
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Developer Tools Tab */}
+            {activeTab === "developer" && (
+              <div className="space-y-6">
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Code className="h-5 w-5 mr-2 text-gray-700" />
+                      API & Developer Tools
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-medium text-gray-900">API Access</h3>
+                          <p className="text-sm text-gray-600">Generate and manage API keys for development</p>
+                        </div>
+                        <Button variant="outline" className="border-gray-300">
+                          <Key className="h-4 w-4 mr-2" />
+                          Manage API Keys
+                        </Button>
+                      </div>
+
+                      <Separator />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Button variant="outline" className="border-gray-300 justify-start h-auto p-4">
+                          <div className="flex items-center space-x-3">
+                            <FileText className="h-5 w-5 text-gray-600" />
+                            <div className="text-left">
+                              <div className="font-medium">API Documentation</div>
+                              <div className="text-sm text-gray-600">View API reference and examples</div>
                             </div>
-                            <Link href="/billing">
-                              <Button size="sm" className="mt-4 bg-pink-600 hover:bg-pink-700 text-white rounded-lg">
-                                <Crown className="h-4 w-4 mr-2" />
-                                Upgrade Now
-                              </Button>
-                            </Link>
+                          </div>
+                        </Button>
+
+                        <Button variant="outline" className="border-gray-300 justify-start h-auto p-4">
+                          <div className="flex items-center space-x-3">
+                            <Terminal className="h-5 w-5 text-gray-600" />
+                            <div className="text-left">
+                              <div className="font-medium">Webhook Logs</div>
+                              <div className="text-sm text-gray-600">Monitor webhook events and responses</div>
+                            </div>
+                          </div>
+                        </Button>
+
+                        <Button variant="outline" className="border-gray-300 justify-start h-auto p-4">
+                          <div className="flex items-center space-x-3">
+                            <Activity className="h-5 w-5 text-gray-600" />
+                            <div className="text-left">
+                              <div className="font-medium">System Status</div>
+                              <div className="text-sm text-gray-600">Check API uptime and performance</div>
+                            </div>
+                          </div>
+                        </Button>
+
+                        <Button variant="outline" className="border-gray-300 justify-start h-auto p-4">
+                          <div className="flex items-center space-x-3">
+                            <Download className="h-5 w-5 text-gray-600" />
+                            <div className="text-left">
+                              <div className="font-medium">Export Data</div>
+                              <div className="text-sm text-gray-600">Download your data in various formats</div>
+                            </div>
+                          </div>
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* System Information */}
+                <Card className="bg-white border border-gray-200">
+                  <CardHeader className="border-b border-gray-200">
+                    <CardTitle className="flex items-center text-lg">
+                      <Info className="h-5 w-5 mr-2 text-gray-700" />
+                      System Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3">Application</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Version</span>
+                            <span className="font-mono">v2.1.4</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Build</span>
+                            <span className="font-mono">2024.7.11</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Environment</span>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">Production</Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3">Performance</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Uptime</span>
+                            <span>99.9%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Response Time</span>
+                            <span>142ms</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Last Updated</span>
+                            <span>2 min ago</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">CPU Usage</span>
+                            <span>23%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Memory</span>
+                            <span>1.2 GB</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Storage</span>
+                            <span>2.4 GB</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          {/* Advanced Tab */}
-          <TabsContent value="advanced" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="flex items-center space-x-3 text-xl">
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <Database className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <span>System Management</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="p-6 bg-slate-50 rounded-xl">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-semibold text-slate-900">Cache Status</span>
-                      <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Optimized
-                      </Badge>
-                    </div>
-                    <div className="space-y-3 text-sm text-slate-600">
-                      <div className="flex justify-between">
-                        <span>Browser Cache</span>
-                        <span className="font-medium">24.5 MB</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>App Data</span>
-                        <span className="font-medium">156 MB</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Media Cache</span>
-                        <span className="font-medium">892 MB</span>
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Button variant="outline" className="border-gray-300">
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Clear Cache
+                        </Button>
+                        <Button variant="outline" className="border-gray-300">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Export Settings
+                        </Button>
+                        <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Reset Settings
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <RefreshCw className="h-4 w-4 mr-3" />
-                      Clear Cache
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Download className="h-4 w-4 mr-3" />
-                      Export Settings
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Upload className="h-4 w-4 mr-3" />
-                      Import Settings
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="flex items-center space-x-3 text-xl">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Zap className="h-5 w-5 text-orange-600" />
-                    </div>
-                    <span>Developer Tools</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="p-4 bg-orange-50 rounded-xl border border-orange-200">
-                    <div className="flex items-start space-x-3">
-                      <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-orange-900">Advanced Settings</h4>
-                        <p className="text-sm text-orange-700 mt-1">
-                          These settings are for advanced users only. Proceed with caution.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <FileText className="h-4 w-4 mr-3" />
-                      API Documentation
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Key className="h-4 w-4 mr-3" />
-                      Manage API Keys
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <Activity className="h-4 w-4 mr-3" />
-                      System Diagnostics
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 h-12">
-                      <HardDrive className="h-4 w-4 mr-3" />
-                      Storage Analytics
-                    </Button>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start text-orange-600 border-orange-200 hover:bg-orange-50 rounded-xl h-12">
-                      <RefreshCw className="h-4 w-4 mr-3" />
-                      Reset All Settings
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 rounded-xl h-12">
-                      <Trash2 className="h-4 w-4 mr-3" />
-                      Factory Reset
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Save Button */}
+            <div className="flex items-center justify-between p-6 bg-white border border-gray-200 rounded-lg">
+              <div>
+                <h3 className="font-medium text-gray-900">Save Settings</h3>
+                <p className="text-sm text-gray-600">Changes are automatically saved as you make them</p>
+              </div>
+              <Button onClick={handleSaveProfile} className="bg-gray-900 hover:bg-gray-800">
+                <Save className="h-4 w-4 mr-2" />
+                Save All Changes
+              </Button>
             </div>
-
-            {/* System Information */}
-            <Card className="bg-white shadow-sm border border-slate-200 rounded-2xl">
-              <CardHeader className="pb-6">
-                <CardTitle className="flex items-center space-x-3 text-xl">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Info className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <span>System Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-slate-900">Application</h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Version</span>
-                        <span className="font-mono font-medium">v2.1.4</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Build</span>
-                        <span className="font-mono font-medium">2024.7.11</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Environment</span>
-                        <Badge className="bg-green-100 text-green-800">Production</Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-slate-900">Performance</h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Uptime</span>
-                        <span className="font-medium">99.9%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Response Time</span>
-                        <span className="font-medium">142ms</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Last Updated</span>
-                        <span className="font-medium">2 minutes ago</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-slate-900">Resources</h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">CPU Usage</span>
-                        <span className="font-medium">23%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Memory</span>
-                        <span className="font-medium">1.2 GB</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Network</span>
-                        <Badge className="bg-green-100 text-green-800">Online</Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -170,9 +170,63 @@ export default function CommentToDMAutomation() {
   });
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  // Generate initials from Instagram username (defaults to "R" for rahulc1020)
-  const getInitials = (): string => {
-    return 'R';
+  const [userProfile, setUserProfile] = useState<{
+    username: string;
+    profilePicture: string | null;
+    initials: string;
+  }>({
+    username: 'rahulc1020',
+    profilePicture: null,
+    initials: 'R'
+  });
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('/api/user');
+        if (response.ok) {
+          const userData = await response.json();
+          
+          // Get Instagram account data
+          const socialResponse = await fetch('/api/social-accounts');
+          if (socialResponse.ok) {
+            const accounts = await socialResponse.json();
+            const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
+            
+            if (instagramAccount) {
+              const initials = generateInitials(instagramAccount.username);
+              setUserProfile({
+                username: instagramAccount.username,
+                profilePicture: instagramAccount.profilePicture || null,
+                initials
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // Keep default values on error
+      }
+    };
+    
+    fetchUserProfile();
+  }, []);
+
+  // Generate initials from username
+  const generateInitials = (username: string): string => {
+    if (!username) return 'U';
+    
+    const cleanUsername = username.replace('@', '');
+    const firstLetter = cleanUsername.charAt(0).toUpperCase();
+    
+    // Try to find a second significant character
+    const restOfName = cleanUsername.slice(1);
+    const secondLetter = restOfName.split('').find(char => 
+      char.match(/[A-Z0-9]/) || (char >= '0' && char <= '9')
+    );
+    
+    return secondLetter ? firstLetter + secondLetter.toUpperCase() : firstLetter;
   };
 
   const filteredPosts = selectedPlatform === 'all' 
@@ -300,8 +354,6 @@ export default function CommentToDMAutomation() {
       minute: '2-digit' 
     }).toUpperCase();
     
-    const userInitials = getInitials();
-    
     return (
       <div style={{
         backgroundColor: '#ffffff',
@@ -383,15 +435,28 @@ export default function CommentToDMAutomation() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              overflow: 'hidden'
             }}>
-              <span style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#6b7280'
-              }}>
-                {userInitials}
-              </span>
+              {userProfile.profilePicture ? (
+                <img 
+                  src={userProfile.profilePicture} 
+                  alt={`${userProfile.username} profile`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <span style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#6b7280'
+                }}>
+                  {userProfile.initials}
+                </span>
+              )}
             </div>
 
             {/* Message Content */}

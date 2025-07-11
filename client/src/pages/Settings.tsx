@@ -1144,7 +1144,7 @@ export default function Settings() {
                           Customize Colors
                         </Button>
                         <Button variant="outline" className="w-full justify-start">
-                          <Layout className="h-4 w-4 mr-2" />
+                          <Grid className="h-4 w-4 mr-2" />
                           Layout Settings
                         </Button>
                       </div>

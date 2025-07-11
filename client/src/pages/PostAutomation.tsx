@@ -531,6 +531,90 @@ const PostAutomation: React.FC = () => {
               rows={3}
             />
           </div>
+          
+          {newRule.type === 'comment_to_dm' && (
+            <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center space-x-2">
+                <MessageCircle className="w-5 h-5 text-blue-600" />
+                <h4 className="font-semibold text-blue-900">Comment to DM Flow</h4>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="reply-first-main"
+                    checked={newRule.conditions?.commentToDmFlow?.replyToCommentFirst || false}
+                    onCheckedChange={(checked) => setNewRule({
+                      ...newRule,
+                      conditions: {
+                        ...newRule.conditions,
+                        commentToDmFlow: {
+                          ...newRule.conditions?.commentToDmFlow,
+                          replyToCommentFirst: checked
+                        }
+                      }
+                    })}
+                  />
+                  <Label htmlFor="reply-first-main" className="text-sm font-medium text-blue-900">
+                    Reply to comment first, then send DM
+                  </Label>
+                </div>
+                
+                {newRule.conditions?.commentToDmFlow?.replyToCommentFirst && (
+                  <>
+                    <div>
+                      <Label htmlFor="public-reply-main">Public Comment Reply</Label>
+                      <Textarea
+                        id="public-reply-main"
+                        placeholder="Enter your public comment reply..."
+                        value={newRule.conditions?.commentToDmFlow?.publicReplyContent || ''}
+                        onChange={(e) => setNewRule({
+                          ...newRule,
+                          conditions: {
+                            ...newRule.conditions,
+                            commentToDmFlow: {
+                              ...newRule.conditions?.commentToDmFlow,
+                              publicReplyContent: e.target.value
+                            }
+                          }
+                        })}
+                        rows={2}
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-blue-600 mt-1">
+                        This will be posted as a public comment reply before sending the DM
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="dm-delay-main">DM Delay (minutes)</Label>
+                      <Input
+                        id="dm-delay-main"
+                        type="number"
+                        min="0"
+                        max="60"
+                        value={newRule.conditions?.commentToDmFlow?.dmFollowUpDelay || 2}
+                        onChange={(e) => setNewRule({
+                          ...newRule,
+                          conditions: {
+                            ...newRule.conditions,
+                            commentToDmFlow: {
+                              ...newRule.conditions?.commentToDmFlow,
+                              dmFollowUpDelay: parseInt(e.target.value)
+                            }
+                          }
+                        })}
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-blue-600 mt-1">
+                        Wait time before sending DM after comment reply
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -621,90 +705,6 @@ const PostAutomation: React.FC = () => {
                   />
                 </div>
               </div>
-              
-              {newRule.type === 'comment_to_dm' && (
-                <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center space-x-2">
-                    <MessageCircle className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-900">Comment to DM Flow</h4>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="reply-first"
-                        checked={newRule.conditions?.commentToDmFlow?.replyToCommentFirst || false}
-                        onCheckedChange={(checked) => setNewRule({
-                          ...newRule,
-                          conditions: {
-                            ...newRule.conditions,
-                            commentToDmFlow: {
-                              ...newRule.conditions?.commentToDmFlow,
-                              replyToCommentFirst: checked
-                            }
-                          }
-                        })}
-                      />
-                      <Label htmlFor="reply-first" className="text-sm font-medium text-blue-900">
-                        Reply to comment first, then send DM
-                      </Label>
-                    </div>
-                    
-                    {newRule.conditions?.commentToDmFlow?.replyToCommentFirst && (
-                      <>
-                        <div>
-                          <Label htmlFor="public-reply">Public Comment Reply</Label>
-                          <Textarea
-                            id="public-reply"
-                            placeholder="Enter your public comment reply..."
-                            value={newRule.conditions?.commentToDmFlow?.publicReplyContent || ''}
-                            onChange={(e) => setNewRule({
-                              ...newRule,
-                              conditions: {
-                                ...newRule.conditions,
-                                commentToDmFlow: {
-                                  ...newRule.conditions?.commentToDmFlow,
-                                  publicReplyContent: e.target.value
-                                }
-                              }
-                            })}
-                            rows={2}
-                            className="text-sm"
-                          />
-                          <p className="text-xs text-blue-600 mt-1">
-                            This will be posted as a public comment reply before sending the DM
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="dm-delay">DM Delay (minutes)</Label>
-                          <Input
-                            id="dm-delay"
-                            type="number"
-                            min="0"
-                            max="60"
-                            value={newRule.conditions?.commentToDmFlow?.dmFollowUpDelay || 2}
-                            onChange={(e) => setNewRule({
-                              ...newRule,
-                              conditions: {
-                                ...newRule.conditions,
-                                commentToDmFlow: {
-                                  ...newRule.conditions?.commentToDmFlow,
-                                  dmFollowUpDelay: parseInt(e.target.value)
-                                }
-                              }
-                            })}
-                            className="text-sm"
-                          />
-                          <p className="text-xs text-blue-600 mt-1">
-                            Wait time before sending DM after comment reply
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
             </TabsContent>
             
             <TabsContent value="ai" className="space-y-4">

@@ -542,7 +542,7 @@ export default function CommentToDMAutomation() {
           </div>
 
           {/* Step Content */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}

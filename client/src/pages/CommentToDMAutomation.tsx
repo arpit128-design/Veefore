@@ -393,14 +393,15 @@ export default function CommentToDMAutomation() {
               backgroundColor: '#f1f1f1',
               borderRadius: '18px',
               padding: '12px 16px',
-              maxWidth: '260px',
+              width: '280px',
               position: 'relative'
             }}>
               <div style={{
                 fontSize: '14px',
                 lineHeight: '1.4',
                 color: directMessage.text ? '#262626' : '#8e8e8e',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                minHeight: '20px'
               }}>
                 {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got on offer!'}
               </div>
@@ -409,12 +410,12 @@ export default function CommentToDMAutomation() {
               <div style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '8px',
-                padding: '8px 12px',
+                padding: '10px 16px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                maxWidth: '120px',
-                margin: '0 auto'
+                width: '100%',
+                boxSizing: 'border-box'
               }}>
                 <span style={{
                   fontSize: '14px',

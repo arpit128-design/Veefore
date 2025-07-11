@@ -645,6 +645,95 @@ nav[class*="bg-amber"] {
   color: rgb(30 41 59) !important;
 }
 
+/* CRITICAL: Dashboard greeting banner - FORCE WHITE BACKGROUND */
+.space-y-4 > div:first-child,
+.space-y-6 > div:first-child,
+.space-y-8 > div:first-child,
+div[class*="space-y"] > div:first-child {
+  background-color: rgb(255 255 255) !important;
+  background: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+/* Dashboard header section specific targeting */
+.bg-gray-50 .bg-white,
+.bg-gray-50 > div:first-child,
+[class*="bg-gray-50"] > div:first-child {
+  background-color: rgb(255 255 255) !important;
+  background: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+/* NUCLEAR OPTION: Force all dashboard containers to white background */
+.min-h-screen .bg-white,
+.min-h-screen > div:first-child,
+[class*="min-h-screen"] > div:first-child,
+[class*="min-h-screen"] .bg-white {
+  background-color: rgb(255 255 255) !important;
+  background: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+/* Specific targeting for VeeFore dashboard greeting banner */
+div[class*="space-y"] > div[class*="flex-col"]:first-child,
+div[class*="space-y"] > div[class*="sm:flex-row"]:first-child,
+div[class*="space-y"] > div[class*="items-center"]:first-child {
+  background-color: rgb(255 255 255) !important;
+  background: rgb(255 255 255) !important;
+  border-color: rgb(229 231 235) !important;
+}
+
+/* ULTIMATE YELLOW BANNER ELIMINATION - Target all possible yellow backgrounds */
+* {
+  --yellow-50: rgb(255, 255, 255) !important;
+  --yellow-100: rgb(255, 255, 255) !important;
+  --yellow-200: rgb(255, 255, 255) !important;
+  --yellow-300: rgb(255, 255, 255) !important;
+  --yellow-400: rgb(255, 255, 255) !important;
+  --yellow-500: rgb(255, 255, 255) !important;
+  --amber-50: rgb(255, 255, 255) !important;
+  --amber-100: rgb(255, 255, 255) !important;
+  --amber-200: rgb(255, 255, 255) !important;
+  --amber-300: rgb(255, 255, 255) !important;
+  --amber-400: rgb(255, 255, 255) !important;
+  --amber-500: rgb(255, 255, 255) !important;
+  --warning: rgb(255, 255, 255) !important;
+  --warning-background: rgb(255, 255, 255) !important;
+}
+
+/* Force any computed yellow backgrounds to white */
+*[style*="background-color: rgb(255, 255, 0)"],
+*[style*="background-color: rgb(255, 215, 0)"],
+*[style*="background-color: rgb(255, 247, 205)"],
+*[style*="background-color: rgb(254, 240, 138)"],
+*[style*="background: rgb(255, 255, 0)"],
+*[style*="background: rgb(255, 215, 0)"],
+*[style*="background: rgb(255, 247, 205)"],
+*[style*="background: rgb(254, 240, 138)"] {
+  background-color: rgb(255, 255, 255) !important;
+  background: rgb(255, 255, 255) !important;
+  border-color: rgb(229, 231, 235) !important;
+}
+
+/* SPECIFIC DASHBOARD GREETING BANNER FIX */
+.dashboard-greeting-banner,
+.dashboard-greeting-banner *,
+div[class*="dashboard-greeting-banner"] {
+  background-color: rgb(255, 255, 255) !important;
+  background: rgb(255, 255, 255) !important;
+  border-color: rgb(229, 231, 235) !important;
+}
+
+/* Additional safeguards for all main dashboard containers */
+.bg-gray-50 > div,
+.min-h-screen > div,
+[class*="bg-gray-50"] > div,
+[class*="min-h-screen"] > div {
+  background-color: rgb(255, 255, 255) !important;
+  background: rgb(255, 255, 255) !important;
+  border-color: rgb(229, 231, 235) !important;
+}
+
 /* Force specific button styling to white */
 button[class*="bg-yellow"], button[class*="bg-amber"], 
 .btn-yellow, .btn-amber {

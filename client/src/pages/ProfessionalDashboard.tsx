@@ -270,7 +270,7 @@ const ProfessionalDashboard: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-gray-50 min-h-screen p-3 sm:p-4 lg:p-6">
       {/* Header Section - Responsive */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 sm:p-6 rounded-xl shadow-sm border space-y-4 sm:space-y-0">
+      <div className="dashboard-greeting-banner flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 sm:p-6 rounded-xl shadow-sm border space-y-4 sm:space-y-0">
         <div className="flex-1">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
             {greeting}, Arpit! {emoji}

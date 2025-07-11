@@ -1,61 +1,27 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
-  Instagram, 
-  Send, 
-  Clock, 
-  Target, 
-  TrendingUp,
-  Users,
-  Heart,
-  Eye,
-  Play,
-  Image as ImageIcon,
-  Video,
-  Calendar,
-  Settings,
+  X, 
+  Check, 
+  ArrowLeft, 
+  ArrowRight, 
+  Zap, 
+  Plus, 
+  Trash2, 
+  Eye, 
   BarChart3,
-  Zap,
-  CheckCircle,
-  XCircle,
-  Plus,
-  Trash2,
-  Edit,
-  Copy,
-  ExternalLink,
-  ArrowRight,
-  ArrowLeft,
-  Sparkles,
-  Bot,
-  ChevronRight,
-  Globe,
-  Share2,
-  MessageSquare,
-  Filter,
-  Search,
-  MoreHorizontal,
-  X,
+  Instagram,
   Linkedin,
   Twitter,
-  Facebook
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+  Facebook,
+  ImageIcon,
+  PlayCircle,
+  Grid3x3
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface Post {
   id: string;
@@ -100,203 +66,114 @@ interface DMAutomation {
 }
 
 const STEP_TITLES = [
-  "Select a post",
+  "Select post",
   "Comment replies", 
   "Direct message",
-  "Review and save"
+  "Review & save"
 ];
 
 const MOCK_POSTS: Post[] = [
-  // Instagram posts
   {
-    id: "1",
-    caption: "What are your thoughts on our latest project? We would love to hear your feedback and ideas! Share your insights with us! Comment below with your thoughts! #vfvfv",
-    mediaUrl: "/api/placeholder/400/400",
+    id: '1',
+    caption: 'Check out our new product launch! What do you think?',
+    mediaUrl: '/api/placeholder/400/400',
     mediaType: 'image',
-    timestamp: "2025-07-11T10:00:00Z",
-    likes: 124,
-    comments: 18,
-    shares: 5,
+    timestamp: '2024-01-15T10:00:00Z',
+    likes: 245,
+    comments: 32,
+    shares: 18,
     platform: 'instagram',
     isScheduled: false,
     status: 'published'
   },
   {
-    id: "2", 
-    caption: "Behind the scenes of our creative process! 🎨✨",
-    mediaUrl: "/api/placeholder/400/400",
+    id: '2',
+    caption: 'Behind the scenes of our latest project. Swipe to see more!',
+    mediaUrl: '/api/placeholder/400/400',
     mediaType: 'carousel',
-    timestamp: "2025-07-10T14:30:00Z",
-    likes: 89,
-    comments: 12,
-    shares: 3,
-    platform: 'instagram',
-    isScheduled: false,
-    status: 'published'
-  },
-  {
-    id: "3",
-    caption: "New video content coming soon! Stay tuned for updates 📺",
-    mediaUrl: "/api/placeholder/400/400", 
-    mediaType: 'video',
-    timestamp: "2025-07-09T09:15:00Z",
-    likes: 203,
-    comments: 34,
+    timestamp: '2024-01-14T14:30:00Z',
+    likes: 189,
+    comments: 24,
     shares: 12,
     platform: 'instagram',
-    isScheduled: true,
-    status: 'scheduled'
-  },
-  // LinkedIn posts
-  {
-    id: "4",
-    caption: "Excited to share our latest industry insights on social media automation trends for 2025",
-    mediaUrl: "/api/placeholder/400/400",
-    mediaType: 'image',
-    timestamp: "2025-07-11T09:00:00Z",
-    likes: 89,
-    comments: 23,
-    shares: 15,
-    platform: 'linkedin',
     isScheduled: false,
     status: 'published'
   },
   {
-    id: "5",
-    caption: "How AI is transforming content creation: A comprehensive guide for businesses",
-    mediaUrl: "/api/placeholder/400/400",
+    id: '3',
+    caption: 'Exciting news coming soon! Stay tuned...',
+    mediaUrl: '/api/placeholder/400/400',
     mediaType: 'video',
-    timestamp: "2025-07-10T15:00:00Z",
-    likes: 156,
+    timestamp: '2024-01-13T09:15:00Z',
+    likes: 312,
     comments: 45,
-    shares: 32,
+    shares: 27,
+    platform: 'instagram',
+    isScheduled: false,
+    status: 'published'
+  },
+  {
+    id: '4',
+    caption: 'Professional insights on industry trends and best practices',
+    mediaUrl: '/api/placeholder/400/400',
+    mediaType: 'image',
+    timestamp: '2024-01-12T16:45:00Z',
+    likes: 156,
+    comments: 18,
+    shares: 22,
     platform: 'linkedin',
-    isScheduled: true,
-    status: 'scheduled'
+    isScheduled: false,
+    status: 'published'
   },
-  // Twitter posts
   {
-    id: "6",
-    caption: "Just launched our new automation feature! 🚀 What do you think? #innovation #automation",
-    mediaUrl: "/api/placeholder/400/400",
+    id: '5',
+    caption: 'Quick thoughts on the latest market developments',
+    mediaUrl: '/api/placeholder/400/400',
     mediaType: 'image',
-    timestamp: "2025-07-11T11:00:00Z",
+    timestamp: '2024-01-11T11:20:00Z',
+    likes: 89,
+    comments: 12,
+    shares: 15,
+    platform: 'twitter',
+    isScheduled: false,
+    status: 'published'
+  },
+  {
+    id: '6',
+    caption: 'Community update: Thank you for your continued support!',
+    mediaUrl: '/api/placeholder/400/400',
+    mediaType: 'image',
+    timestamp: '2024-01-10T13:00:00Z',
     likes: 234,
-    comments: 67,
-    shares: 89,
-    platform: 'twitter',
-    isScheduled: false,
-    status: 'published'
-  },
-  {
-    id: "7",
-    caption: "The future of social media management is here. Are you ready? 💫",
-    mediaUrl: "/api/placeholder/400/400",
-    mediaType: 'video',
-    timestamp: "2025-07-09T16:00:00Z",
-    likes: 178,
-    comments: 34,
-    shares: 56,
-    platform: 'twitter',
-    isScheduled: true,
-    status: 'scheduled'
-  },
-  // Facebook posts
-  {
-    id: "8",
-    caption: "Join our community of creators and discover new ways to grow your audience",
-    mediaUrl: "/api/placeholder/400/400",
-    mediaType: 'image',
-    timestamp: "2025-07-11T08:00:00Z",
-    likes: 145,
-    comments: 29,
-    shares: 18,
+    comments: 28,
+    shares: 19,
     platform: 'facebook',
     isScheduled: false,
     status: 'published'
-  },
-  {
-    id: "9",
-    caption: "Behind the scenes: How we built our AI-powered social media platform",
-    mediaUrl: "/api/placeholder/400/400",
-    mediaType: 'carousel',
-    timestamp: "2025-07-10T12:00:00Z",
-    likes: 198,
-    comments: 52,
-    shares: 23,
-    platform: 'facebook',
-    isScheduled: true,
-    status: 'scheduled'
   }
-];
-
-const MOCK_SOCIAL_ACCOUNTS = [
-  { id: "1", username: "rahulc1020", platform: "instagram", avatar: "/api/placeholder/32/32" },
-  { id: "2", username: "arpit9996363", platform: "instagram", avatar: "/api/placeholder/32/32" },
-  { id: "3", username: "veefore_official", platform: "instagram", avatar: "/api/placeholder/32/32" },
-  { id: "4", username: "VeeFore Solutions", platform: "linkedin", avatar: "/api/placeholder/32/32" },
-  { id: "5", username: "VeeFore Business", platform: "linkedin", avatar: "/api/placeholder/32/32" },
-  { id: "6", username: "@veefore_ai", platform: "twitter", avatar: "/api/placeholder/32/32" },
-  { id: "7", username: "@veefore_official", platform: "twitter", avatar: "/api/placeholder/32/32" },
-  { id: "8", username: "VeeFore", platform: "facebook", avatar: "/api/placeholder/32/32" },
-  { id: "9", username: "VeeFore Page", platform: "facebook", avatar: "/api/placeholder/32/32" }
 ];
 
 export default function CommentToDMAutomation() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [selectedSocialAccount, setSelectedSocialAccount] = useState("");
-  const [keyword, setKeyword] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'instagram' | 'linkedin' | 'twitter' | 'facebook'>('all');
+  const [keyword, setKeyword] = useState('');
   const [commentReplies, setCommentReplies] = useState<CommentReply[]>([
-    { id: "1", text: "Done and sent! 😊", emoji: "😊" },
-    { id: "2", text: "There you go! 🎉", emoji: "🎉" },
-    { id: "3", text: "You've got it! 👍", emoji: "👍" }
+    { id: '1', text: '', emoji: '' }
   ]);
-  const [commentDelay, setCommentDelay] = useState(15);
+  const [commentDelay, setCommentDelay] = useState(5);
   const [commentDelayUnit, setCommentDelayUnit] = useState<'minutes' | 'hours'>('minutes');
   const [directMessage, setDirectMessage] = useState({
-    text: "",
-    buttonText: "",
-    websiteUrl: ""
+    text: '',
+    buttonText: '',
+    websiteUrl: ''
   });
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'scheduled'>('all');
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  const { toast } = useToast();
-
-  const progress = ((currentStep + 1) / STEP_TITLES.length) * 100;
-
-  const selectedAccountData = MOCK_SOCIAL_ACCOUNTS.find(account => account.id === selectedSocialAccount);
-  
-  const filteredPosts = selectedSocialAccount && selectedAccountData 
-    ? MOCK_POSTS.filter(post => {
-        const matchesSearch = post.caption.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus === 'all' || post.status === filterStatus;
-        const matchesPlatform = post.platform === selectedAccountData.platform;
-        return matchesSearch && matchesStatus && matchesPlatform;
-      })
-    : [];
-
-  const addCommentReply = () => {
-    const newReply: CommentReply = {
-      id: Date.now().toString(),
-      text: "",
-      emoji: "😊"
-    };
-    setCommentReplies([...commentReplies, newReply]);
-  };
-
-  const removeCommentReply = (id: string) => {
-    setCommentReplies(commentReplies.filter(reply => reply.id !== id));
-  };
-
-  const updateCommentReply = (id: string, text: string) => {
-    setCommentReplies(commentReplies.map(reply => 
-      reply.id === id ? { ...reply, text } : reply
-    ));
-  };
+  const filteredPosts = selectedPlatform === 'all' 
+    ? MOCK_POSTS 
+    : MOCK_POSTS.filter(post => post.platform === selectedPlatform);
 
   const getStepStatus = (stepIndex: number) => {
     if (stepIndex < currentStep) return "completed";
@@ -307,167 +184,137 @@ export default function CommentToDMAutomation() {
   const canProceedToNextStep = () => {
     switch (currentStep) {
       case 0:
-        return selectedPost && selectedSocialAccount && keyword;
+        return selectedPost !== null;
       case 1:
-        return commentReplies.length > 0 && commentReplies.every(reply => reply.text.trim());
+        return commentReplies.some(reply => reply.text.trim() !== '');
       case 2:
-        return directMessage.text && directMessage.buttonText && directMessage.websiteUrl;
-      default:
+        return directMessage.text.trim() !== '' && directMessage.buttonText.trim() !== '';
+      case 3:
         return true;
+      default:
+        return false;
     }
   };
 
+  const addCommentReply = () => {
+    const newReply: CommentReply = {
+      id: Date.now().toString(),
+      text: '',
+      emoji: ''
+    };
+    setCommentReplies([...commentReplies, newReply]);
+  };
+
+  const removeCommentReply = (index: number) => {
+    if (commentReplies.length > 1) {
+      setCommentReplies(commentReplies.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateCommentReply = (index: number, field: 'text' | 'emoji', value: string) => {
+    const updatedReplies = [...commentReplies];
+    updatedReplies[index][field] = value;
+    setCommentReplies(updatedReplies);
+  };
+
   const handleSaveAutomation = () => {
-    // Save automation logic here
-    toast({
-      title: "Automation Saved",
-      description: "Your Comment to DM automation has been successfully created and activated.",
-    });
+    const automation: DMAutomation = {
+      postId: selectedPost?.id || '',
+      socialAccountId: selectedPost?.platform || '',
+      keyword,
+      commentReplies,
+      commentDelay,
+      commentDelayUnit,
+      directMessage,
+      isActive: true,
+      analytics: {
+        totalComments: 0,
+        dmsSent: 0,
+        openRate: 0,
+        totalClicks: 0
+      }
+    };
+
+    console.log('Saving automation:', automation);
+    // Here you would typically save to your backend
+    alert('Automation saved successfully!');
   };
 
   const InstagramPostPreview = ({ post }: { post: Post }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-sm">
-      {/* Post Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-100">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-semibold">R</span>
-          </div>
-          <span className="font-semibold text-gray-900">{selectedAccountData?.username || 'Select account'}</span>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden max-w-sm">
+      <div className="p-3 flex items-center space-x-2">
+        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+          <span className="text-white text-sm font-bold">U</span>
         </div>
-        <button className="p-1">
-          <MoreHorizontal className="w-4 h-4 text-gray-600" />
-        </button>
+        <div>
+          <div className="text-sm font-semibold text-gray-900">username</div>
+          <div className="text-xs text-gray-500">2h</div>
+        </div>
       </div>
-      
-      {/* Post Image */}
-      <div className="aspect-square bg-gray-200 flex items-center justify-center">
-        <ImageIcon className="w-12 h-12 text-gray-400" />
+      <div className="aspect-square bg-gray-100">
+        <img 
+          src={post.mediaUrl} 
+          alt={post.caption}
+          className="w-full h-full object-cover"
+        />
       </div>
-      
-      {/* Post Actions */}
-      <div className="p-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Heart className="w-6 h-6 text-gray-700" />
-            <MessageCircle className="w-6 h-6 text-gray-700" />
-            <Send className="w-6 h-6 text-gray-700" />
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-4">
+            <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+            <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+            <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
           </div>
-          <div className="w-6 h-6 border-2 border-gray-700 rounded-sm"></div>
+          <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
         </div>
-        
-        <div className="text-sm text-gray-900">
-          <span className="font-semibold">{selectedSocialAccount || 'rahulc1020'}</span>
+        <div className="text-sm text-gray-900 mb-2">
+          <span className="font-semibold">username</span> {post.caption}
         </div>
-        
-        <div className="text-sm text-gray-700">
-          {post.caption}
+        <div className="text-xs text-gray-500 mb-2">
+          View all {post.comments} comments
         </div>
-        
-        {/* Mock Comments */}
-        <div className="space-y-1 mt-3">
-          <div className="flex items-start space-x-2">
-            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-xs text-gray-600">U</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-sm">
-                <span className="font-semibold text-gray-900">username</span>
-                <span className="text-gray-700 ml-1">{keyword || 'dfd'}</span>
-              </div>
-              <div className="text-xs text-gray-500">Reply</div>
-            </div>
+        {keyword && (
+          <div className="text-xs text-gray-500 mb-2">
+            <span className="font-semibold">user123</span> {keyword}
           </div>
-          
-          {commentReplies.length > 0 && (
-            <div className="flex items-start space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <span className="text-xs text-white">R</span>
-              </div>
-              <div className="flex-1">
-                <div className="text-sm">
-                  <span className="font-semibold text-gray-900">{selectedAccountData?.username || 'Select account'}</span>
-                  <span className="text-gray-700 ml-1">{commentReplies[0]?.text || 'Done and sent! 😊'}</span>
-                </div>
-                <div className="text-xs text-gray-500">Reply</div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
+        {commentReplies.length > 0 && commentReplies[0].text && (
+          <div className="text-xs text-gray-500 mb-2">
+            <span className="font-semibold">username</span> {commentReplies[0].text} {commentReplies[0].emoji}
+          </div>
+        )}
+        <div className="text-xs text-gray-500">2 hours ago</div>
       </div>
     </div>
   );
 
   const InstagramDMPreview = () => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-sm">
-      {/* DM Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-100">
-        <div className="flex items-center space-x-2">
-          <Instagram className="w-5 h-5 text-purple-600" />
-          <span className="font-semibold text-gray-900">Instagram direct message</span>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden max-w-sm">
+      <div className="p-3 border-b border-gray-200 flex items-center space-x-2">
+        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+          <span className="text-white text-sm font-bold">U</span>
         </div>
-        <button className="p-1">
-          <MoreHorizontal className="w-4 h-4 text-gray-600" />
-        </button>
+        <div>
+          <div className="text-sm font-semibold text-gray-900">username</div>
+          <div className="text-xs text-gray-500">Active now</div>
+        </div>
       </div>
-      
-      {/* DM Content */}
-      <div className="p-4 space-y-4 relative">
-        <div className="text-xs text-gray-500 text-center">
-          JUL 11, 04:09 PM
-        </div>
-        
-        {/* Message Container with User Initial */}
-        <div className="relative">
-          {/* User Initial - Positioned to the left */}
-          <div className="absolute left-0 top-0 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-lg font-medium text-gray-700">R</span>
-          </div>
-          
-          {/* Message Bubble */}
-          <div className="ml-16 bg-gray-100 rounded-2xl p-4 text-sm leading-relaxed break-words max-w-sm">
-            <div className={`break-words overflow-wrap-anywhere ${!directMessage.text ? 'text-gray-500' : 'text-gray-800'}`}>
-              {directMessage.text || "I'm so excited you'd like to see what I've got an offer!"}
-            </div>
-            
-            {/* Button inside the message bubble - wider and closer to text */}
-            <div className="mt-2 text-center">
-              <button className={`bg-white border border-gray-300 px-12 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors w-full max-w-xs ${!directMessage.buttonText ? 'text-gray-400' : 'text-gray-900'}`}>
-                {directMessage.buttonText || "See products"}
-              </button>
-            </div>
+      <div className="p-3 space-y-3">
+        <div className="flex justify-end">
+          <div className="bg-blue-500 text-white px-3 py-2 rounded-2xl rounded-tr-sm max-w-xs">
+            <div className="text-sm">{keyword || 'interested'}</div>
           </div>
         </div>
-        
-        {/* Bottom Input Area */}
-        <div className="flex items-center space-x-3 bg-gray-50 rounded-full p-3 mt-6">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-          </div>
-          <span className="text-sm text-gray-500 flex-1">Message...</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            </div>
-            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </div>
+        <div className="flex justify-start">
+          <div className="bg-gray-200 text-gray-900 px-3 py-2 rounded-2xl rounded-tl-sm max-w-xs">
+            <div className="text-sm">{directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}</div>
+            {directMessage.buttonText && (
+              <div className="mt-2 p-2 bg-white rounded-lg border border-gray-300 text-center">
+                <div className="text-sm font-medium text-gray-400">
+                  {directMessage.buttonText}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -475,541 +322,502 @@ export default function CommentToDMAutomation() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Left Panel - Configuration - Full width except preview */}
-        <div className="flex-1 bg-white border-r border-gray-200 flex flex-col">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">DM automation</h1>
-                  <p className="text-sm text-gray-500">Create automated comment to DM flows</p>
-                </div>
+      <div className="flex-1 bg-white border-r border-gray-200">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-white" />
               </div>
-              <button 
-                onClick={() => window.history.back()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">DM automation</h1>
+                <p className="text-sm text-gray-500">Create automated comment to DM flows</p>
+              </div>
             </div>
-            
-            {/* Progress Steps */}
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                {STEP_TITLES.map((title, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200",
-                      getStepStatus(index) === "completed" 
-                        ? "bg-green-100 text-green-700 border-2 border-green-300" 
-                        : getStepStatus(index) === "current"
-                        ? "bg-blue-100 text-blue-700 border-2 border-blue-300"
-                        : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-                    )}>
-                      {getStepStatus(index) === "completed" ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : (
-                        <span>{index + 1}</span>
-                      )}
-                    </div>
-                    {index < STEP_TITLES.length - 1 && (
-                      <div className={cn(
-                        "w-16 h-1 mx-2 rounded-full transition-all duration-200",
-                        index < currentStep ? "bg-green-300" : "bg-gray-200"
-                      )} />
+            <button 
+              onClick={() => window.history.back()}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+          
+          {/* Progress Steps */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              {STEP_TITLES.map((title, index) => (
+                <div key={index} className="flex items-center">
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200",
+                    getStepStatus(index) === "completed" 
+                      ? "bg-green-100 text-green-700 border-2 border-green-300" 
+                      : getStepStatus(index) === "current"
+                      ? "bg-blue-100 text-blue-700 border-2 border-blue-300"
+                      : "bg-gray-100 text-gray-400 border-2 border-gray-200"
+                  )}>
+                    {getStepStatus(index) === "completed" ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      index + 1
                     )}
                   </div>
-                ))}
-              </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
-                {STEP_TITLES.map((title, index) => (
-                  <span key={index} className={cn(
-                    "transition-colors duration-200",
-                    index === currentStep ? "text-blue-600 font-medium" : ""
-                  )}>
-                    {title}
-                  </span>
-                ))}
-              </div>
+                  {index < STEP_TITLES.length - 1 && (
+                    <div className="w-16 h-0.5 bg-gray-200 mx-2" />
+                  )}
+                </div>
+              ))}
             </div>
-          </div>
-
-          {/* Step Content */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {/* Step 1: Select a post */}
-                {currentStep === 0 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Create a DM automation</h2>
-                      <p className="text-sm text-gray-600">
-                        Invite people to use a specific keyword in the comments of an Instagram Post or Reel, 
-                        and automatically reply to their comment and send them a direct message.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="social-account">Social account</Label>
-                        <Select value={selectedSocialAccount} onValueChange={setSelectedSocialAccount}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select social account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {MOCK_SOCIAL_ACCOUNTS.map(account => (
-                              <SelectItem key={account.id} value={account.id}>
-                                <div className="flex items-center space-x-2">
-                                  {account.platform === 'instagram' && <Instagram className="w-4 h-4 text-purple-600" />}
-                                  {account.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
-                                  {account.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-500" />}
-                                  {account.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-700" />}
-                                  <span>{account.username}</span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label>Select a scheduled post or reel</Label>
-                        <div className="mt-2 space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="relative flex-1">
-                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input
-                                placeholder="Search posts..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                              />
-                            </div>
-                            <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
-                              <SelectTrigger className="w-36">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All posts</SelectItem>
-                                <SelectItem value="published">Published</SelectItem>
-                                <SelectItem value="scheduled">Scheduled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          
-                          {!selectedSocialAccount ? (
-                            <div className="text-center py-8">
-                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <MessageCircle className="w-8 h-8 text-gray-400" />
-                              </div>
-                              <p className="text-gray-500 text-sm">Select a social account to see posts</p>
-                            </div>
-                          ) : filteredPosts.length === 0 ? (
-                            <div className="text-center py-8">
-                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Globe className="w-8 h-8 text-gray-400" />
-                              </div>
-                              <p className="text-gray-500 text-sm">No posts available for this account</p>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-3 gap-4">
-                              {filteredPosts.map(post => (
-                                <div
-                                  key={post.id}
-                                  onClick={() => setSelectedPost(post)}
-                                  className={cn(
-                                    "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md bg-white",
-                                    selectedPost?.id === post.id
-                                      ? "border-blue-500 bg-blue-50"
-                                      : "border-gray-200 hover:border-gray-300"
-                                  )}
-                                >
-                                  <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                                    {post.mediaType === 'video' ? (
-                                      <Video className="w-12 h-12 text-gray-400" />
-                                    ) : post.mediaType === 'carousel' ? (
-                                      <div className="flex space-x-1">
-                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                                      </div>
-                                    ) : (
-                                      <ImageIcon className="w-12 h-12 text-gray-400" />
-                                    )}
-                                  </div>
-                                  <div className="space-y-2">
-                                    <p className="text-sm text-gray-700 line-clamp-2">{post.caption}</p>
-                                    <div className="flex items-center justify-between">
-                                      <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="text-xs">
-                                        {post.status}
-                                      </Badge>
-                                      <div className="flex items-center space-x-2 text-xs text-gray-500">
-                                        <span className="flex items-center">
-                                          <Heart className="w-3 h-3 mr-1" />
-                                          {post.likes}
-                                        </span>
-                                        <span className="flex items-center">
-                                          <MessageCircle className="w-3 h-3 mr-1" />
-                                          {post.comments}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="keyword">Keyword</Label>
-                        <Input
-                          id="keyword"
-                          placeholder="Your keyword"
-                          value={keyword}
-                          onChange={(e) => setKeyword(e.target.value)}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          When a user includes this keyword in a comment it will trigger a reply to their comment and a DM.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: Comment replies */}
-                {currentStep === 1 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Write comment replies</h2>
-                      <p className="text-sm text-gray-600">
-                        Write a few different possible responses, and we'll cycle through them so your responses seem more genuine and varied.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Comment replies</Label>
-                        <div className="space-y-3 mt-2">
-                          {commentReplies.map((reply, index) => (
-                            <div key={reply.id} className="flex items-center space-x-2">
-                              <Input
-                                placeholder="Enter comment reply..."
-                                value={reply.text}
-                                onChange={(e) => updateCommentReply(reply.id, e.target.value)}
-                                className="flex-1"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeCommentReply(reply.id)}
-                                className="p-2 hover:bg-red-50 hover:text-red-600"
-                              >
-                                <XCircle className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={addCommentReply}
-                            className="w-full"
-                          >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add another reply
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Delay before comment</Label>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.
-                        </p>
-                        <div className="flex items-center space-x-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max="60"
-                            value={commentDelay}
-                            onChange={(e) => setCommentDelay(parseInt(e.target.value))}
-                            className="w-20"
-                          />
-                          <Select value={commentDelayUnit} onValueChange={(value: any) => setCommentDelayUnit(value)}>
-                            <SelectTrigger className="w-28">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="minutes">Minutes</SelectItem>
-                              <SelectItem value="hours">Hours</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Direct message */}
-                {currentStep === 2 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Write a direct message</h2>
-                      <p className="text-sm text-gray-600">
-                        Write the DM you want sent when users include your keyword when they comment on your post.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Direct message</Label>
-                        <p className="text-sm text-gray-600 mb-2">
-                          We'll send this DM to the user who included your keyword in their comment.
-                        </p>
-                        <Textarea
-                          placeholder="Enter your DM text here"
-                          value={directMessage.text}
-                          onChange={(e) => setDirectMessage({...directMessage, text: e.target.value})}
-                          rows={3}
-                        />
-                      </div>
-
-                      <div>
-                        <Label>Button text</Label>
-                        <Input
-                          placeholder="Choose a short and clear button text"
-                          value={directMessage.buttonText}
-                          onChange={(e) => setDirectMessage({...directMessage, buttonText: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <Label>Website URL</Label>
-                        <Input
-                          placeholder="Enter the destination URL for your button"
-                          value={directMessage.websiteUrl}
-                          onChange={(e) => setDirectMessage({...directMessage, websiteUrl: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 4: Review and save */}
-                {currentStep === 3 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Review and save this DM automation</h2>
-                      <p className="text-sm text-gray-600">
-                        Review your automation settings and activate when ready.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Social account</Label>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Instagram className="w-4 h-4 text-purple-600" />
-                          <span className="text-sm text-gray-700">{selectedSocialAccount}</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Select a scheduled post or reel</Label>
-                        {selectedPost && (
-                          <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                                {selectedPost.mediaType === 'video' ? (
-                                  <Video className="w-6 h-6 text-gray-400" />
-                                ) : (
-                                  <ImageIcon className="w-6 h-6 text-gray-400" />
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm text-gray-700 line-clamp-1">{selectedPost.caption}</p>
-                                <Badge variant="secondary" className="mt-1">
-                                  {selectedPost.status}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        <Label>Keyword</Label>
-                        <p className="text-sm text-gray-600 mt-1">
-                          When a user includes this keyword in a comment it will trigger a reply to their comment and a DM.
-                        </p>
-                        <div className="mt-2 p-2 bg-blue-50 rounded-lg">
-                          <span className="text-sm font-medium text-blue-700">✏️ {keyword}</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Comment replies</Label>
-                        <p className="text-sm text-gray-600 mt-1">
-                          We'll cycle through these comments so your responses seem more genuine and varied.
-                        </p>
-                        <div className="mt-2 space-y-2">
-                          {commentReplies.map((reply, index) => (
-                            <div key={reply.id} className="p-2 bg-gray-50 rounded-lg">
-                              <span className="text-sm text-gray-700">{reply.text}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Delay before comment</Label>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.
-                        </p>
-                        <div className="mt-2 p-2 bg-gray-50 rounded-lg">
-                          <span className="text-sm text-gray-700">{commentDelay} {commentDelayUnit}</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Direct message</Label>
-                        <p className="text-sm text-gray-600 mt-1">
-                          We'll send this DM to the user who included your keyword in their comment.
-                        </p>
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-700">{directMessage.text}</p>
-                          {directMessage.buttonText && (
-                            <div className="mt-2 flex items-center space-x-2">
-                              <Button size="sm" className="pointer-events-none">
-                                {directMessage.buttonText}
-                              </Button>
-                              <span className="text-xs text-gray-500">→ {directMessage.websiteUrl}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Navigation Footer */}
-          <div className="p-6 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                {currentStep > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentStep(currentStep - 1)}
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                {currentStep < STEP_TITLES.length - 1 ? (
-                  <Button
-                    onClick={() => setCurrentStep(currentStep + 1)}
-                    disabled={!canProceedToNextStep()}
-                  >
-                    Continue
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline">
-                      Save for later
-                    </Button>
-                    <Button
-                      onClick={handleSaveAutomation}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      Activate
-                    </Button>
-                  </div>
-                )}
-              </div>
+            <div className="flex justify-between text-sm text-gray-600">
+              {STEP_TITLES.map((title, index) => (
+                <span key={index} className="flex-1 text-center">
+                  {title}
+                </span>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Right Panel - Preview */}
-        <div className="w-96 bg-gray-50 p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Step 1: Post Selection */}
+          {currentStep === 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Select a post to automate</h2>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1 bg-white rounded-lg border border-gray-200 p-1">
+                    <button
+                      onClick={() => setSelectedPlatform('all')}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        selectedPlatform === 'all' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlatform('instagram')}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
+                        selectedPlatform === 'instagram' 
+                          ? 'bg-purple-100 text-purple-700' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Instagram className="w-4 h-4" />
+                      <span>Instagram</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlatform('linkedin')}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
+                        selectedPlatform === 'linkedin' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      <span>LinkedIn</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlatform('twitter')}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
+                        selectedPlatform === 'twitter' 
+                          ? 'bg-sky-100 text-sky-700' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Twitter className="w-4 h-4" />
+                      <span>Twitter</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlatform('facebook')}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
+                        selectedPlatform === 'facebook' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Facebook className="w-4 h-4" />
+                      <span>Facebook</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                {filteredPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    onClick={() => setSelectedPost(post)}
+                    className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                      selectedPost?.id === post.id 
+                        ? 'border-blue-500 bg-blue-50 shadow-lg' 
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center">
+                      <img 
+                        src={post.mediaUrl} 
+                        alt={post.caption}
+                        className="w-full h-full object-cover rounded-t-lg"
+                      />
+                    </div>
+                    <div className="p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          {post.platform === 'instagram' && <Instagram className="w-4 h-4 text-purple-600" />}
+                          {post.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
+                          {post.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-600" />}
+                          {post.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-800" />}
+                          <span className="text-xs text-gray-500 capitalize">{post.platform}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {post.mediaType === 'image' && <ImageIcon className="w-4 h-4 text-gray-400" />}
+                          {post.mediaType === 'video' && <PlayCircle className="w-4 h-4 text-gray-400" />}
+                          {post.mediaType === 'carousel' && <Grid3x3 className="w-4 h-4 text-gray-400" />}
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-2">{post.caption}</p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{post.likes} likes</span>
+                        <span>{post.comments} comments</span>
+                      </div>
+                    </div>
+                    {selectedPost?.id === post.id && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 2: Comment Replies */}
+          {currentStep === 1 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Set up comment replies</h2>
+                <p className="text-sm text-gray-600 mb-4">Configure how the system responds to comments before sending DMs</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Trigger keyword or phrase
+                    </label>
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      placeholder=""
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Comment replies ({commentReplies.length})
+                    </label>
+                    <div className="space-y-2">
+                      {commentReplies.map((reply, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <input
+                            type="text"
+                            value={reply.text}
+                            onChange={(e) => updateCommentReply(index, 'text', e.target.value)}
+                            placeholder=""
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <input
+                            type="text"
+                            value={reply.emoji}
+                            onChange={(e) => updateCommentReply(index, 'emoji', e.target.value)}
+                            placeholder="😊"
+                            className="w-16 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeCommentReply(index)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        onClick={addCommentReply}
+                        className="flex items-center space-x-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add reply</span>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Reply delay
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        value={commentDelay}
+                        onChange={(e) => setCommentDelay(Number(e.target.value))}
+                        className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <select
+                        value={commentDelayUnit}
+                        onChange={(e) => setCommentDelayUnit(e.target.value as 'minutes' | 'hours')}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="minutes">minutes</option>
+                        <option value="hours">hours</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 3: Direct Message */}
+          {currentStep === 2 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Configure direct message</h2>
+                <p className="text-sm text-gray-600 mb-4">Set up the automated direct message that will be sent to users</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Direct message text
+                    </label>
+                    <textarea
+                      value={directMessage.text}
+                      onChange={(e) => setDirectMessage({...directMessage, text: e.target.value})}
+                      placeholder="I'm so excited you'd like to see what I've got an offer!"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Button text
+                      </label>
+                      <input
+                        type="text"
+                        value={directMessage.buttonText}
+                        onChange={(e) => setDirectMessage({...directMessage, buttonText: e.target.value})}
+                        placeholder="See products"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Website URL
+                      </label>
+                      <input
+                        type="url"
+                        value={directMessage.websiteUrl}
+                        onChange={(e) => setDirectMessage({...directMessage, websiteUrl: e.target.value})}
+                        placeholder=""
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 4: Review and Save */}
+          {currentStep === 3 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Review and activate</h2>
+                <p className="text-sm text-gray-600 mb-4">Review your automation settings and activate the flow</p>
+                
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-900 mb-2">Selected Post</h3>
+                    {selectedPost && (
+                      <div className="flex items-center space-x-3">
+                        <img 
+                          src={selectedPost.mediaUrl} 
+                          alt={selectedPost.caption}
+                          className="w-12 h-12 object-cover rounded-lg"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{selectedPost.caption}</p>
+                          <p className="text-xs text-gray-500 capitalize">{selectedPost.platform}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-900 mb-2">Comment Automation</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Trigger keyword:</span>
+                        <span className="text-sm font-medium text-gray-900">{keyword || 'Any comment'}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Comment replies:</span>
+                        <span className="text-sm font-medium text-gray-900">{commentReplies.length} replies</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Reply delay:</span>
+                        <span className="text-sm font-medium text-gray-900">{commentDelay} {commentDelayUnit}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-900 mb-2">Direct Message</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-sm text-gray-600">Message:</span>
+                        <p className="text-sm font-medium text-gray-900 mt-1">{directMessage.text}</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Button text:</span>
+                        <span className="text-sm font-medium text-gray-900">{directMessage.buttonText}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Website URL:</span>
+                        <span className="text-sm font-medium text-gray-900">{directMessage.websiteUrl}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-200">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Instagram className="w-5 h-5 text-purple-600" />
-              <span className="font-semibold text-gray-900">
-                {currentStep === 2 ? 'Instagram direct message' : 'Instagram post and keyword'}
-              </span>
+              {currentStep > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              )}
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsPreviewMode(!isPreviewMode)}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {isPreviewMode ? 'Edit' : 'Preview'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAnalytics(!showAnalytics)}
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Analytics
-              </Button>
+              {currentStep < STEP_TITLES.length - 1 ? (
+                <Button
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  disabled={!canProceedToNextStep()}
+                >
+                  Continue
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline">
+                    Save for later
+                  </Button>
+                  <Button
+                    onClick={handleSaveAutomation}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Activate
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
+        </div>
+      </div>
+      
+      {/* Right Panel - Preview */}
+      <div className="w-96 bg-gray-50 p-6 flex flex-col">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <Instagram className="w-5 h-5 text-purple-600" />
+            <span className="font-semibold text-gray-900">
+              {currentStep === 2 ? 'Instagram direct message' : 'Instagram post and keyword'}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPreviewMode(!isPreviewMode)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              {isPreviewMode ? 'Edit' : 'Preview'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </Button>
+          </div>
+        </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-            {currentStep === 2 ? (
-              // Step 3: Direct message - Show only DM preview
+        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
+          {currentStep === 2 ? (
+            // Step 3: Direct message - Show only DM preview
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <InstagramDMPreview />
+            </motion.div>
+          ) : (
+            // All other steps - Show post preview
+            selectedPost && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <InstagramDMPreview />
-              </motion.div>
-            ) : (
-              // All other steps - Show post preview
-              selectedPost && (
                 <InstagramPostPreview post={selectedPost} />
-              )
-            )}
-            
-            {currentStep >= 2 && currentStep !== 2 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <InstagramDMPreview />
               </motion.div>
-            )}
-          </div>
+            )
+          )}
 
-          {/* Analytics Panel */}
           {showAnalytics && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

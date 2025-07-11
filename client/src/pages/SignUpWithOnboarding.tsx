@@ -293,9 +293,9 @@ export default function SignUpWithOnboarding() {
       return;
     }
     // If user is authenticated but not onboarded, check email verification status
-    // Skip verification step if user is already verified
-    if (user && !user.isOnboarded && user.isEmailVerified) {
-      if (currentStep === 0 && !userNavigatedManually) {
+    // Only auto-skip verification step if user hasn't manually navigated
+    if (user && !user.isOnboarded && user.isEmailVerified && !userNavigatedManually) {
+      if (currentStep === 0) {
         setCurrentStep(2); // Skip to plan selection since auth and email verification are done
       } else if (currentStep === 1) {
         // User is on verification step but already verified - skip to plan selection
@@ -937,6 +937,28 @@ export default function SignUpWithOnboarding() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="max-w-md mx-auto text-center">
+                  {/* Show special message for already verified users */}
+                  {user && user.isEmailVerified && (
+                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center justify-center mb-2">
+                        <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      <p className="text-sm text-green-800">
+                        <span className="font-medium">Email already verified!</span>
+                        <br />
+                        Your email address <span className="font-medium">{user.email}</span> has been verified. You can continue to the next step.
+                      </p>
+                      <Button
+                        onClick={() => setCurrentStep(2)}
+                        className="mt-3 bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 h-auto"
+                      >
+                        Continue to Plan Selection
+                      </Button>
+                    </div>
+                  )}
+                  
                   <div className="mb-8">
                     <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       {isGoogleUser ? (
@@ -951,10 +973,16 @@ export default function SignUpWithOnboarding() {
                       )}
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      {isGoogleUser ? 'Verifying your Google account' : 'Verify your email'}
+                      {user && user.isEmailVerified ? 'Email Verified' : isGoogleUser ? 'Verifying your Google account' : 'Verify your email'}
                     </h1>
                     <p className="text-gray-600">
-                      {isGoogleUser ? (
+                      {user && user.isEmailVerified ? (
+                        <>
+                          Your email address has been successfully verified.
+                          <br />
+                          You can now proceed to select your plan.
+                        </>
+                      ) : isGoogleUser ? (
                         <>
                           Your Google account{' '}
                           <span className="font-medium">{signupData?.email}</span>
@@ -969,45 +997,50 @@ export default function SignUpWithOnboarding() {
                     </p>
                   </div>
 
-                  {isGoogleUser ? (
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                      <span className="ml-3 text-sm text-gray-600">Auto-verifying Google account...</span>
-                    </div>
-                  ) : (
+                  {/* Only show verification form if user needs to verify */}
+                  {!(user && user.isEmailVerified) && (
                     <>
-                      {developmentOtp && (
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                          <p className="text-sm text-yellow-800">
-                            <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
-                          </p>
+                      {isGoogleUser ? (
+                        <div className="flex items-center justify-center mb-6">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                          <span className="ml-3 text-sm text-gray-600">Auto-verifying Google account...</span>
                         </div>
+                      ) : (
+                        <>
+                          {developmentOtp && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                              <p className="text-sm text-yellow-800">
+                                <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
+                              </p>
+                            </div>
+                          )}
+                          
+                          <div className="mb-6">
+                            <Input
+                              placeholder="Enter 6-digit code"
+                              value={verificationCode}
+                              onChange={(e) => setVerificationCode(e.target.value)}
+                              className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 text-center text-lg font-mono"
+                              maxLength={6}
+                            />
+                          </div>
+
+                          <Button
+                            onClick={handleVerifyEmail}
+                            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
+                            disabled={isLoading || verificationCode.length !== 6}
+                          >
+                            {isLoading ? 'Verifying...' : 'Verify Email'}
+                          </Button>
+
+                          <p className="text-sm text-gray-500 mt-4">
+                            Didn't receive the code?{' '}
+                            <button className="text-blue-600 hover:underline">
+                              Resend code
+                            </button>
+                          </p>
+                        </>
                       )}
-                      
-                      <div className="mb-6">
-                        <Input
-                          placeholder="Enter 6-digit code"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          className="w-full h-12 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 text-center text-lg font-mono"
-                          maxLength={6}
-                        />
-                      </div>
-
-                      <Button
-                        onClick={handleVerifyEmail}
-                        className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
-                        disabled={isLoading || verificationCode.length !== 6}
-                      >
-                        {isLoading ? 'Verifying...' : 'Verify Email'}
-                      </Button>
-
-                      <p className="text-sm text-gray-500 mt-4">
-                        Didn't receive the code?{' '}
-                        <button className="text-blue-600 hover:underline">
-                          Resend code
-                        </button>
-                      </p>
                     </>
                   )}
                 </div>

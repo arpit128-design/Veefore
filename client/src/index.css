@@ -1168,14 +1168,22 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a {
   color: rgb(15 23 42) !important;
 }
 
-/* ALL GRADIENT TEXT FIXES */
-.bg-gradient-to-r,
-[class*="bg-gradient"],
-[class*="text-transparent"] {
+/* ALL GRADIENT TEXT FIXES - EXCEPT ANALYTICS STUDIO HEADER */
+.bg-gradient-to-r:not(.analytics-studio-header *),
+[class*="bg-gradient"]:not(.analytics-studio-header *),
+[class*="text-transparent"]:not(.analytics-studio-header *) {
   background: none !important;
   color: rgb(15 23 42) !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
+}
+
+/* Allow Analytics Studio header gradient to work */
+.analytics-studio-header h1.bg-gradient-to-r {
+  background: linear-gradient(to right, rgb(8 145 178), rgb(147 51 234)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
 }
 
 /* COMPREHENSIVE INPUT TEXT VISIBILITY - CATCH ALL CASES */

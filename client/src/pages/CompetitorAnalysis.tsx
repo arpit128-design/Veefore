@@ -173,7 +173,7 @@ export default function CompetitorAnalysis() {
 
   const getEngagementColor = (engagement: number) => {
     if (engagement >= 5) return 'text-green-400';
-    if (engagement >= 3) return 'text-yellow-400';
+    if (engagement >= 3) return 'text-emerald-400';
     if (engagement >= 1) return 'text-orange-400';
     return 'text-red-400';
   };
@@ -437,7 +437,7 @@ export default function CompetitorAnalysis() {
                       </p>
                     </div>
                     <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-3 border border-blue-500/30">
-                      <h4 className="text-yellow-400 font-medium text-sm">Growth Gap</h4>
+                      <h4 className="text-emerald-400 font-medium text-sm">Growth Gap</h4>
                       <p className="text-asteroid-silver text-xs mt-1">
                         Competitors post 40% more frequently. Consider increasing posting frequency
                       </p>
@@ -514,7 +514,7 @@ export default function CompetitorAnalysis() {
                         </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-asteroid-silver">Fri 7-9 PM</span>
-                          <span className="text-yellow-400">Medium</span>
+                          <span className="text-emerald-400">Medium</span>
                         </div>
                       </div>
                     </div>

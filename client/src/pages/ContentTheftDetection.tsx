@@ -458,7 +458,7 @@ export default function ContentTheftDetection() {
                                 </div>
                                 <div>
                                   <span className="text-gray-400">Success Rate: </span>
-                                  <span className="text-yellow-400">{option.successRate}%</span>
+                                  <span className="text-emerald-400">{option.successRate}%</span>
                                 </div>
                               </div>
                             </div>

@@ -73,7 +73,7 @@ const demoSteps = [
     title: 'Mission Control Center',
     subtitle: 'What Are Your Primary Goals?',
     description: 'Define your objectives so our AI can optimize content strategy for maximum impact',
-    color: '#f59e0b',
+    color: '#10b981',
     icon: Zap,
     particles: 85,
     elements: ['pattern', 'sphere', 'cube']
@@ -119,7 +119,7 @@ const personalities = [
 const businessGoals = [
   { id: 'brand-awareness', name: 'Brand Awareness', description: 'Increase visibility and recognition', icon: Star, color: '#3b82f6' },
   { id: 'lead-generation', name: 'Lead Generation', description: 'Generate qualified prospects', icon: Users, color: '#10b981' },
-  { id: 'sales-growth', name: 'Sales Growth', description: 'Drive revenue and conversions', icon: Zap, color: '#f59e0b' },
+  { id: 'sales-growth', name: 'Sales Growth', description: 'Drive revenue and conversions', icon: Zap, color: '#10b981' },
   { id: 'engagement', name: 'Engagement', description: 'Build community and loyalty', icon: Heart, color: '#ec4899' },
   { id: 'thought-leadership', name: 'Thought Leadership', description: 'Establish industry authority', icon: Brain, color: '#8b5cf6' },
   { id: 'customer-support', name: 'Customer Support', description: 'Enhance customer experience', icon: Shield, color: '#6b7280' }
@@ -143,7 +143,7 @@ const categories = [
   { id: 'gaming', name: 'Gaming', icon: Gamepad2, color: '#dc2626' },
   { id: 'food', name: 'Food & Dining', icon: Utensils, color: '#dc2626' },
   { id: 'fitness', name: 'Health & Fitness', icon: Heart, color: '#10b981' },
-  { id: 'education', name: 'Education', icon: GraduationCap, color: '#f59e0b' },
+  { id: 'education', name: 'Education', icon: GraduationCap, color: '#10b981' },
   { id: 'automotive', name: 'Automotive', icon: Car, color: '#6b7280' },
   { id: 'real-estate', name: 'Real Estate', icon: Home, color: '#8b5cf6' },
   { id: 'ecommerce', name: 'E-commerce', icon: ShoppingCart, color: '#059669' }

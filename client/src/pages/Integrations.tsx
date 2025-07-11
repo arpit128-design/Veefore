@@ -678,9 +678,9 @@ export default function Integrations() {
                               {platform === 'youtube' && (
                                 <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                                   <div className="flex items-start space-x-3">
-                                    <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
+                                    <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5" />
                                     <div>
-                                      <h4 className="text-amber-500 font-medium">OAuth App Verification Required</h4>
+                                      <h4 className="text-orange-500 font-medium">OAuth App Verification Required</h4>
                                       <p className="text-xs text-asteroid-gray mt-1">
                                         YouTube OAuth is blocked due to Google app verification requirements. Manual connection allows you to use YouTube features during development.
                                       </p>

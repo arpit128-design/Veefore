@@ -111,8 +111,8 @@ const featureData = {
       'Progress tracking',
       'Community challenges'
     ],
-    color: 'text-yellow-500',
-    bgColor: 'bg-yellow-500/10',
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
     borderColor: 'border-blue-500/20'
   },
   'a/b-testing': {
@@ -415,7 +415,7 @@ export default function FeaturePreview() {
           </Card>
 
           <Card className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 text-center">
-            <Star className="w-8 h-8 text-yellow-400 mx-auto mb-4" />
+            <Star className="w-8 h-8 text-emerald-400 mx-auto mb-4" />
             <h3 className="font-semibold mb-2">Exclusive Updates</h3>
             <p className="text-white/70 text-sm">
               Get behind-the-scenes development updates and sneak peeks

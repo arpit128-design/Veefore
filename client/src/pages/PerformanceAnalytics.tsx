@@ -187,7 +187,7 @@ export default function PerformanceAnalytics() {
       case 'leading':
         return <Badge className="bg-green-100 text-green-800 border-green-200">Leading</Badge>;
       case 'competitive':
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Competitive</Badge>;
+        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">Competitive</Badge>;
       default:
         return <Badge className="bg-red-100 text-red-800 border-red-200">Below Average</Badge>;
     }
@@ -349,7 +349,7 @@ export default function PerformanceAnalytics() {
           <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <Zap className="h-5 w-5 mr-2 text-yellow-600" />
+                <Zap className="h-5 w-5 mr-2 text-emerald-600" />
                 Performance Insights
               </CardTitle>
             </CardHeader>
@@ -366,12 +366,12 @@ export default function PerformanceAnalytics() {
                   </p>
                 </div>
                 
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                   <div className="flex items-center mb-2">
-                    <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
-                    <span className="font-semibold text-yellow-800">Optimization Opportunity</span>
+                    <AlertCircle className="h-5 w-5 text-orange-600 mr-2" />
+                    <span className="font-semibold text-orange-800">Optimization Opportunity</span>
                   </div>
-                  <p className="text-sm text-yellow-700">
+                  <p className="text-sm text-orange-700">
                     Story engagement is 18% below potential. 
                     Experiment with interactive elements and polls.
                   </p>
@@ -475,7 +475,7 @@ export default function PerformanceAnalytics() {
                     description: 'Shift more content to 6-9 PM window for maximum visibility.',
                     priority: 'Medium',
                     impact: '+18% reach',
-                    color: 'border-yellow-200 bg-yellow-50'
+                    color: 'border-orange-200 bg-orange-50'
                   },
                   {
                     title: 'Improve Story Strategy',

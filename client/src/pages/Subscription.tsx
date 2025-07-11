@@ -623,7 +623,7 @@ export default function Subscription() {
                           plan.id === 'free' ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
                           plan.id === 'starter' ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
                           plan.id === 'pro' ? 'bg-gradient-to-r from-purple-400 to-purple-600' :
-                          'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                          'bg-gradient-to-r from-emerald-400 to-emerald-600'
                         }`} />
                         
                         <CardHeader className="text-center p-8">
@@ -631,12 +631,12 @@ export default function Subscription() {
                             plan.id === 'free' ? 'bg-gradient-to-br from-gray-100 to-gray-200' :
                             plan.id === 'starter' ? 'bg-gradient-to-br from-blue-100 to-blue-200' :
                             plan.id === 'pro' ? 'bg-gradient-to-br from-purple-100 to-purple-200' :
-                            'bg-gradient-to-br from-yellow-100 to-yellow-200'
+                            'bg-gradient-to-br from-emerald-100 to-emerald-200'
                           }`}>
                             {plan.id === 'free' ? <Shield className={`w-10 h-10 text-gray-600`} /> :
                              plan.id === 'starter' ? <Star className={`w-10 h-10 text-blue-600`} /> :
                              plan.id === 'pro' ? <Zap className={`w-10 h-10 text-purple-600`} /> :
-                             <Crown className={`w-10 h-10 text-yellow-600`} />}
+                             <Crown className={`w-10 h-10 text-emerald-600`} />}
                           </div>
                           <CardTitle className="text-gray-900 text-2xl font-bold mb-2">{plan.name}</CardTitle>
                           <p className="text-gray-600 text-sm mb-6">{plan.description}</p>

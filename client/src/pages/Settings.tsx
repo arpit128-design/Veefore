@@ -365,7 +365,7 @@ export default function Settings() {
     .settings-page *[style*="amber"],
     .settings-page *[class*="yellow"],
     .settings-page *[class*="amber"],
-    .settings-page *[class*="bg-yellow"],
+    .settings-page *[class*="bg-emerald"],
     .settings-page *[class*="bg-amber"] {
       background-color: #e5e7eb !important;
       color: #000000 !important;
@@ -375,8 +375,8 @@ export default function Settings() {
     .settings-page *[style*="rgb(255, 255, 0)"],
     .settings-page *[style*="rgb(255, 247, 0)"],
     .settings-page *[style*="#ffff00"],
-    .settings-page *[style*="#fbbf24"],
-    .settings-page *[style*="#f59e0b"],
+    .settings-page *[style*="#10b981"],
+    .settings-page *[style*="#059669"],
     .settings-page *[style*="hsl(45"],
     .settings-page *[style*="hsl(50"],
     .settings-page *[style*="hsl(55"],

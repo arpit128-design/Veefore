@@ -310,7 +310,7 @@ export default function ContentRepurpose() {
                     {/* Quality Score */}
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4 text-yellow-400" />
+                        <Lightbulb className="w-4 h-4 text-emerald-400" />
                         Quality Score
                       </h3>
                       <div className="flex items-center gap-3">

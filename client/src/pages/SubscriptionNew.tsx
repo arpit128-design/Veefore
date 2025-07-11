@@ -248,7 +248,7 @@ export default function SubscriptionNew() {
     free: { icon: Zap, gradient: 'from-gray-400 to-gray-600', yearlyDiscount: 0 },
     starter: { icon: Star, gradient: 'from-blue-400 to-blue-600', yearlyDiscount: 10 },
     pro: { icon: Crown, gradient: 'from-purple-400 to-purple-600', yearlyDiscount: 15 },
-    business: { icon: Shield, gradient: 'from-amber-400 to-amber-600', yearlyDiscount: 20 }
+    business: { icon: Shield, gradient: 'from-emerald-400 to-emerald-600', yearlyDiscount: 20 }
   };
 
   const getPrice = (plan: any) => {
@@ -464,7 +464,7 @@ export default function SubscriptionNew() {
             {planData?.creditPackages?.map((pack: any) => (
               <Card key={pack.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 group">
                 <CardHeader className="text-center pb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                     <Plus className="w-6 h-6 text-white" />
                   </div>
                   <CardTitle className="text-white text-xl">{pack.name}</CardTitle>
@@ -490,7 +490,7 @@ export default function SubscriptionNew() {
                         variant: 'default',
                       });
                     }}
-                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-medium"
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium"
                   >
                     Purchase Credits
                     <Plus className="w-4 h-4 ml-2" />

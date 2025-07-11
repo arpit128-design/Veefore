@@ -467,8 +467,8 @@ function SmartLegalAssistant() {
                       )}
 
                       {/* Disclaimer */}
-                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                        <p className="text-yellow-400 text-xs">
+                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4">
+                        <p className="text-orange-400 text-xs">
                           {guidanceResult.disclaimer}
                         </p>
                       </div>
@@ -712,14 +712,14 @@ function SmartLegalAssistant() {
                       {/* Warning Flags */}
                       {contractResult.warningFlags && contractResult.warningFlags.length > 0 && (
                         <div className="space-y-3">
-                          <h4 className="text-lg font-semibold text-yellow-400 flex items-center gap-2">
+                          <h4 className="text-lg font-semibold text-orange-400 flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4" />
                             Review Required
                           </h4>
                           <ul className="space-y-2">
                             {contractResult.warningFlags.map((flag, index) => (
                               <li key={index} className="text-asteroid-silver text-sm flex items-start gap-2">
-                                <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                                <AlertTriangle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
                                 {flag}
                               </li>
                             ))}
@@ -728,8 +728,8 @@ function SmartLegalAssistant() {
                       )}
 
                       {/* Disclaimer */}
-                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                        <p className="text-yellow-400 text-xs">
+                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4">
+                        <p className="text-orange-400 text-xs">
                           {contractResult.disclaimer}
                         </p>
                       </div>

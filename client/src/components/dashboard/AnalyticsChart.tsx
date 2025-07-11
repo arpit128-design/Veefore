@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, Users, Eye, Heart } from 'lucide-react';
 import { useInstantAnalytics } from '@/hooks/useInstantData';
 
-const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#10b981', '#ef4444'];
 
 interface AnalyticsChartProps {
   data?: any;

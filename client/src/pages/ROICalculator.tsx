@@ -183,7 +183,7 @@ export default function ROICalculator() {
 
   const getROIColor = (roi: number) => {
     if (roi >= 200) return 'text-green-400';
-    if (roi >= 100) return 'text-yellow-400';
+    if (roi >= 100) return 'text-emerald-400';
     if (roi >= 50) return 'text-orange-400';
     return 'text-red-400';
   };
@@ -580,10 +580,10 @@ export default function ROICalculator() {
                           </div>
                           <div className="text-2xl font-bold text-white">{roiResult.roi}%</div>
                         </div>
-                        <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-4 border border-yellow-500/20">
+                        <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-lg p-4 border border-emerald-500/20">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-yellow-400 font-medium">Industry Average</span>
-                            <span className="text-xs bg-yellow-500/20 px-2 py-1 rounded">{roiInput.industry}</span>
+                            <span className="text-emerald-400 font-medium">Industry Average</span>
+                            <span className="text-xs bg-emerald-500/20 px-2 py-1 rounded">{roiInput.industry}</span>
                           </div>
                           <div className="text-2xl font-bold text-white">{roiResult.benchmarks.industry}%</div>
                         </div>

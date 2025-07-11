@@ -269,7 +269,7 @@ const VeeForeHomeDashboard: React.FC = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
+                  <Lightbulb className="w-5 h-5 text-emerald-500" />
                   AI Growth Recommendations
                 </CardTitle>
                 <Button variant="ghost" size="sm">

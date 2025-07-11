@@ -202,7 +202,7 @@ export default function Gamification() {
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return 'from-yellow-400 to-orange-500';
+      case 'legendary': return 'from-emerald-400 to-blue-500';
       case 'epic': return 'from-purple-400 to-pink-500';
       case 'rare': return 'from-blue-400 to-cyan-500';
       default: return 'from-gray-400 to-gray-500';
@@ -251,7 +251,7 @@ export default function Gamification() {
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8 space-y-6">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-yellow-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-emerald-500 bg-clip-text text-transparent">
             Creator Gamification
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -265,7 +265,7 @@ export default function Gamification() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center">
-                  <Crown className="h-8 w-8 text-yellow-400" />
+                  <Crown className="h-8 w-8 text-emerald-400" />
                   <span className="text-2xl font-bold ml-2">{userStats.level}</span>
                 </div>
                 <p className="text-sm text-gray-400">Level</p>
@@ -315,7 +315,7 @@ export default function Gamification() {
               <Target className="h-4 w-4 mr-2" />
               Challenges
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-yellow-600">
+            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-emerald-600">
               <TrendingUp className="h-4 w-4 mr-2" />
               Leaderboard
             </TabsTrigger>
@@ -544,7 +544,7 @@ export default function Gamification() {
             <Card className="bg-gray-900/50 border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-yellow-400" />
+                  <TrendingUp className="h-5 w-5 text-emerald-400" />
                   Global Leaderboard
                 </CardTitle>
                 <CardDescription>
@@ -566,7 +566,7 @@ export default function Gamification() {
                         <div className="flex items-center gap-2">
                           {index < 3 ? (
                             <Trophy className={`h-5 w-5 ${
-                              index === 0 ? 'text-yellow-400' : 
+                              index === 0 ? 'text-emerald-400' : 
                               index === 1 ? 'text-gray-300' : 'text-orange-400'
                             }`} />
                           ) : (
@@ -602,13 +602,13 @@ export default function Gamification() {
 
                 <Card className="bg-gray-800/50 border-gray-600">
                   <CardContent className="p-4">
-                    <h4 className="font-medium text-yellow-400 mb-2">Season Rankings</h4>
+                    <h4 className="font-medium text-emerald-400 mb-2">Season Rankings</h4>
                     <p className="text-sm text-gray-300 mb-3">
                       Current season ends in 18 days. Top 10 creators get special rewards!
                     </p>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Your season rank:</span>
-                      <span className="text-yellow-400 font-medium">#3</span>
+                      <span className="text-emerald-400 font-medium">#3</span>
                     </div>
                   </CardContent>
                 </Card>

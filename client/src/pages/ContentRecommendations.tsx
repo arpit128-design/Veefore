@@ -552,7 +552,7 @@ const ContentRecommendations = () => {
                   displayItems.push({
                     label: 'Tone',
                     value: prefs.tone,
-                    className: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                    className: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   });
                 }
                 

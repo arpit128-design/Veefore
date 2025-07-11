@@ -1039,9 +1039,9 @@ export default function SignUpWithOnboarding() {
                       ) : (
                         <>
                           {developmentOtp && (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                              <p className="text-sm text-yellow-800">
-                                <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-yellow-100 px-1 rounded">{developmentOtp}</code>
+                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+                              <p className="text-sm text-orange-800">
+                                <strong>Development Mode:</strong> Your verification code is: <code className="font-mono bg-orange-100 px-1 rounded">{developmentOtp}</code>
                               </p>
                             </div>
                           )}

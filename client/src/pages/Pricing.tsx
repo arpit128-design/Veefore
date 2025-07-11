@@ -627,7 +627,7 @@ export default function Pricing() {
                               ((userSubscription as any)?.plan || 'free').toLowerCase() === plan.id.toLowerCase()
                                 ? 'bg-slate-600 hover:bg-slate-600 cursor-not-allowed text-slate-300'
                                 : isPopular
-                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25 text-white'
+                                ? 'bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-400 hover:to-blue-400 shadow-lg hover:shadow-emerald-500/25 text-white'
                                 : plan.id === 'creator'
                                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 shadow-lg hover:shadow-blue-500/25 text-white'
                                   : plan.id === 'pro'

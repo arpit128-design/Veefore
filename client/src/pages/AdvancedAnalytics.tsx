@@ -53,8 +53,8 @@ export default function AdvancedAnalytics() {
       trend: 'up',
       description: 'Likelihood of content going viral',
       icon: Zap,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100'
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-100'
     },
     {
       title: 'Conversion Velocity',
@@ -229,7 +229,7 @@ export default function AdvancedAnalytics() {
 
   const getInsightIcon = (type: string) => {
     switch (type) {
-      case 'Opportunity': return <Lightbulb className="h-5 w-5 text-yellow-600" />;
+      case 'Opportunity': return <Lightbulb className="h-5 w-5 text-emerald-600" />;
       case 'Warning': return <AlertTriangle className="h-5 w-5 text-red-600" />;
       case 'Trend': return <TrendingUp className="h-5 w-5 text-blue-600" />;
       case 'Optimization': return <Settings className="h-5 w-5 text-green-600" />;
@@ -239,7 +239,7 @@ export default function AdvancedAnalytics() {
 
   const getInsightColor = (type: string) => {
     switch (type) {
-      case 'Opportunity': return 'bg-yellow-50 border-yellow-200';
+      case 'Opportunity': return 'bg-emerald-50 border-emerald-200';
       case 'Warning': return 'bg-red-50 border-red-200';
       case 'Trend': return 'bg-blue-50 border-blue-200';
       case 'Optimization': return 'bg-green-50 border-green-200';

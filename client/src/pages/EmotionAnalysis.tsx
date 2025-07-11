@@ -517,7 +517,7 @@ export default function EmotionAnalysis() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="bg-gray-800/50 border-gray-600">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-yellow-400">78%</div>
+                      <div className="text-2xl font-bold text-emerald-400">78%</div>
                       <p className="text-sm text-gray-400">Avg. Joy Intensity</p>
                     </CardContent>
                   </Card>
@@ -714,7 +714,7 @@ export default function EmotionAnalysis() {
                   <Card className="bg-gray-800/50 border-gray-600">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <Lightbulb className="h-5 w-5 text-yellow-400" />
+                        <Lightbulb className="h-5 w-5 text-emerald-400" />
                         Recommendations
                       </CardTitle>
                     </CardHeader>
@@ -722,7 +722,7 @@ export default function EmotionAnalysis() {
                       <ul className="space-y-2 text-sm">
                         {mockEmotionAnalysis.contentOptimization.recommendations.map((rec, index) => (
                           <li key={index} className="flex items-start gap-2">
-                            <Sparkles className="h-3 w-3 text-yellow-400 mt-1 flex-shrink-0" />
+                            <Sparkles className="h-3 w-3 text-emerald-400 mt-1 flex-shrink-0" />
                             <span className="text-gray-300">{rec}</span>
                           </li>
                         ))}

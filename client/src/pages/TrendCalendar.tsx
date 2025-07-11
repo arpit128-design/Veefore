@@ -103,7 +103,7 @@ export default function TrendCalendar() {
 
   const getViralPotentialColor = (score: number) => {
     if (score >= 90) return 'text-green-400';
-    if (score >= 75) return 'text-yellow-400';
+    if (score >= 75) return 'text-emerald-400';
     if (score >= 60) return 'text-orange-400';
     return 'text-red-400';
   };

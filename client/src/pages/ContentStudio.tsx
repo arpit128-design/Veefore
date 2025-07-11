@@ -120,7 +120,7 @@ function getActiveTabClasses(color: string) {
     green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
     orange: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
     rose: "bg-rose-600 hover:bg-rose-700 border-rose-600 text-white scale-105 shadow-lg",
-    amber: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg"
+    emerald: "bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white scale-105 shadow-lg"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
 }
@@ -135,7 +135,7 @@ function getToolButtonClasses(color: string, isSelected: boolean) {
     green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
     purple: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg",
     orange: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
-    amber: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg"
+    emerald: "bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white scale-105 shadow-lg"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
 }
@@ -148,7 +148,7 @@ function getBadgeClasses(color: string) {
     green: "bg-green-100 text-green-700 border-green-200",
     purple: "bg-purple-100 text-purple-700 border-purple-200",
     orange: "bg-blue-100 text-blue-700 border-blue-200",
-    amber: "bg-purple-100 text-purple-700 border-purple-200"
+    emerald: "bg-emerald-100 text-emerald-700 border-emerald-200"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-100 text-slate-700 border-slate-200";
 }
@@ -161,7 +161,7 @@ function getIconBgClasses(color: string) {
     green: "bg-green-600",
     purple: "bg-purple-600",
     orange: "bg-blue-600",
-    amber: "bg-purple-600"
+    emerald: "bg-emerald-600"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600";
 }

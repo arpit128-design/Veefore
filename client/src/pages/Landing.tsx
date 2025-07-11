@@ -1355,7 +1355,7 @@ function TestimonialsSection() {
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center space-x-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                      <Star key={i} className="w-4 h-4 text-emerald-400 fill-current" />
                     ))}
                   </div>
                   <p className="text-gray-300 leading-relaxed">"{testimonial.content}"</p>
@@ -1396,7 +1396,7 @@ function IntegrationSection() {
     { name: "Facebook", icon: <Facebook className="w-8 h-8" />, color: "text-blue-500" },
     { name: "TikTok", icon: <Video className="w-8 h-8" />, color: "text-black" },
     { name: "Pinterest", icon: <Camera className="w-8 h-8" />, color: "text-red-600" },
-    { name: "Snapchat", icon: <Zap className="w-8 h-8" />, color: "text-yellow-400" }
+    { name: "Snapchat", icon: <Zap className="w-8 h-8" />, color: "text-emerald-400" }
   ];
 
   return (

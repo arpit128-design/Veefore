@@ -164,9 +164,9 @@ export default function CommentToDMAutomation() {
   const [commentDelay, setCommentDelay] = useState(15);
   const [commentDelayUnit, setCommentDelayUnit] = useState<'minutes' | 'hours'>('minutes');
   const [directMessage, setDirectMessage] = useState({
-    text: "This is the product link",
-    buttonText: "Click here",
-    websiteUrl: "https://veefore.com"
+    text: "",
+    buttonText: "",
+    websiteUrl: ""
   });
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");

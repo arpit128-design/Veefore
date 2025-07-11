@@ -12338,6 +12338,48 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // Temporary endpoint to cleanup Firebase user account
+  app.post('/api/cleanup-firebase-user', async (req: any, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+      
+      console.log(`[CLEANUP] Looking for Firebase user with email: ${email}`);
+      
+      // Get user by email
+      const userRecord = await admin.auth().getUserByEmail(email);
+      console.log(`[CLEANUP] Found Firebase user: ${userRecord.uid}`);
+      
+      // Delete the user
+      await admin.auth().deleteUser(userRecord.uid);
+      console.log(`[CLEANUP] Successfully deleted Firebase user: ${userRecord.uid}`);
+      
+      res.json({ 
+        success: true, 
+        message: `Firebase user ${email} deleted successfully. You can now sign up with this email.`,
+        deletedUid: userRecord.uid
+      });
+      
+    } catch (error: any) {
+      console.error('[CLEANUP] Error:', error);
+      
+      if (error.code === 'auth/user-not-found') {
+        res.json({ 
+          success: true, 
+          message: `No Firebase user found with email ${req.body.email}. Email is already clean - you can sign up normally.`
+        });
+      } else {
+        res.status(500).json({ 
+          error: error.message,
+          code: error.code 
+        });
+      }
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

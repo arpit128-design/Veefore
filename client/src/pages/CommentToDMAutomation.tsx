@@ -377,7 +377,7 @@ export default function CommentToDMAutomation() {
   return (
     <div className="min-h-screen bg-gray-50 flex comment-to-dm-automation">
       {/* Main Content */}
-      <div className="flex-1 bg-white border-r border-gray-200">
+      <div className="w-2/3 bg-white border-r border-gray-200">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -822,6 +822,79 @@ export default function CommentToDMAutomation() {
             <span className="font-semibold text-gray-900">
               {currentStep === 2 ? 'Instagram direct message' : 'Instagram post and keyword'}
             </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPreviewMode(!isPreviewMode)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              {isPreviewMode ? 'Edit' : 'Preview'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center">
+          {currentStep === 2 && (
+            <div key="dm-preview">
+              <InstagramDMPreview />
+            </div>
+          )}
+          {currentStep !== 2 && selectedPost && (
+            <div key="post-preview">
+              <InstagramPostPreview post={selectedPost} />
+            </div>
+          )}
+
+          {showAnalytics && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="mt-6 p-4 bg-white rounded-lg border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">Automation Analytics</h3>
+                <Badge variant="secondary">Live Preview</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">-</div>
+                  <div className="text-sm text-gray-600">Total comments</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">-</div>
+                  <div className="text-sm text-gray-600">DMs sent</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">-</div>
+                  <div className="text-sm text-gray-600">Open rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">-</div>
+                  <div className="text-sm text-gray-600">Total clicks</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Right Panel - Preview */}
+      <div className="w-1/3 bg-gray-50 p-8 overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <Instagram className="w-5 h-5 text-pink-600" />
+            <span className="font-medium text-gray-900">Instagram Preview</span>
           </div>
           <div className="flex items-center space-x-2">
             <Button

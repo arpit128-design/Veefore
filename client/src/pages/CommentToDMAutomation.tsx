@@ -156,6 +156,7 @@ const MOCK_POSTS: Post[] = [
 export default function CommentToDMAutomation() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedSocialAccount, setSelectedSocialAccount] = useState<any>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'instagram' | 'linkedin' | 'twitter' | 'facebook'>('all');
   const [keyword, setKeyword] = useState('');
   const [commentReplies, setCommentReplies] = useState<CommentReply[]>([
@@ -179,6 +180,9 @@ export default function CommentToDMAutomation() {
     profilePicture: null,
     initials: 'R'
   });
+  
+  const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
+  const [loadingSocialAccounts, setLoadingSocialAccounts] = useState(false);
 
   // Generate initials from username
   const generateInitials = (username: string): string => {
@@ -242,18 +246,22 @@ export default function CommentToDMAutomation() {
     }
   };
 
-  // Fetch user profile data
+  // Fetch social accounts and user profile data
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchSocialAccounts = async () => {
       try {
+        setLoadingSocialAccounts(true);
         // Import the authenticated apiRequest function
         const { apiRequest } = await import('@/lib/queryClient');
         
-        // Try to fetch Instagram account data using authenticated API
+        // Fetch all social accounts
         const socialResponse = await apiRequest('GET', '/api/social-accounts');
         const accounts = await socialResponse.json();
-        const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
         
+        setSocialAccounts(accounts);
+        
+        // Set user profile from first Instagram account (for DM preview)
+        const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
         if (instagramAccount) {
           const initials = generateInitials(instagramAccount.username);
           
@@ -283,22 +291,24 @@ export default function CommentToDMAutomation() {
           console.log('No Instagram account found in response');
         }
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('Error fetching social accounts:', error);
         // Keep default values on error - show 'R' for rahulc1020
         setUserProfile({
           username: 'rahulc1020',
           profilePicture: null,
           initials: 'R'
         });
+      } finally {
+        setLoadingSocialAccounts(false);
       }
     };
     
-    fetchUserProfile();
+    fetchSocialAccounts();
   }, []);
 
-  const filteredPosts = selectedPlatform === 'all' 
-    ? MOCK_POSTS 
-    : MOCK_POSTS.filter(post => post.platform === selectedPlatform);
+  const filteredPosts = selectedSocialAccount
+    ? MOCK_POSTS.filter(post => post.platform === selectedSocialAccount.platform)
+    : [];
 
   const getStepStatus = (stepIndex: number) => {
     if (stepIndex < currentStep) return "completed";
@@ -309,7 +319,7 @@ export default function CommentToDMAutomation() {
   const canProceedToNextStep = () => {
     switch (currentStep) {
       case 0:
-        return selectedPost !== null;
+        return selectedSocialAccount !== null && selectedPost !== null;
       case 1:
         return commentReplies.some(reply => reply.text.trim() !== '');
       case 2:
@@ -681,117 +691,130 @@ export default function CommentToDMAutomation() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Select a post to automate</h2>
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-1 bg-white rounded-lg border border-gray-200 p-1">
-                    <button
-                      onClick={() => setSelectedPlatform('all')}
-                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                        selectedPlatform === 'all' 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setSelectedPlatform('instagram')}
-                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                        selectedPlatform === 'instagram' 
-                          ? 'bg-purple-100 text-purple-700' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      <Instagram className="w-4 h-4" />
-                      <span>Instagram</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedPlatform('linkedin')}
-                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                        selectedPlatform === 'linkedin' 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      <Linkedin className="w-4 h-4" />
-                      <span>LinkedIn</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedPlatform('twitter')}
-                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                        selectedPlatform === 'twitter' 
-                          ? 'bg-sky-100 text-sky-700' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      <Twitter className="w-4 h-4" />
-                      <span>Twitter</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedPlatform('facebook')}
-                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                        selectedPlatform === 'facebook' 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      <Facebook className="w-4 h-4" />
-                      <span>Facebook</span>
-                    </button>
+              {/* First: Select Social Account */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-900">Select a social account</h2>
+                
+                {loadingSocialAccounts ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {socialAccounts.map((account) => (
+                      <div
+                        key={account.id}
+                        onClick={() => setSelectedSocialAccount(account)}
+                        className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-md p-4 ${
+                          selectedSocialAccount?.id === account.id 
+                            ? 'border-blue-500 bg-blue-50 shadow-lg' 
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          {/* Profile Picture or Avatar */}
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                            {account.profilePictureUrl ? (
+                              <img 
+                                src={account.profilePictureUrl} 
+                                alt={account.username}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className={`w-full h-full flex items-center justify-center text-white font-semibold ${
+                                account.platform === 'instagram' ? 'bg-pink-500' :
+                                account.platform === 'linkedin' ? 'bg-blue-600' :
+                                account.platform === 'twitter' ? 'bg-sky-500' :
+                                'bg-blue-800'
+                              }`}>
+                                {generateInitials(account.username)}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Account Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              {account.platform === 'instagram' && <Instagram className="w-4 h-4 text-pink-600" />}
+                              {account.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
+                              {account.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-600" />}
+                              {account.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-800" />}
+                              <span className="text-sm text-gray-500 capitalize">{account.platform}</span>
+                            </div>
+                            <p className="text-sm font-medium text-gray-900 truncate">@{account.username}</p>
+                            <p className="text-xs text-gray-500">{account.followersCount || 0} followers</p>
+                          </div>
+                        </div>
+                        
+                        {selectedSocialAccount?.id === account.id && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
-                {filteredPosts.map((post) => (
-                  <div
-                    key={post.id}
-                    onClick={() => setSelectedPost(post)}
-                    className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
-                      selectedPost?.id === post.id 
-                        ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center">
-                      <img 
-                        src={post.mediaUrl} 
-                        alt={post.caption}
-                        className="w-full h-full object-cover rounded-t-lg"
-                      />
-                    </div>
-                    <div className="p-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          {post.platform === 'instagram' && <Instagram className="w-4 h-4 text-purple-600" />}
-                          {post.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
-                          {post.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-600" />}
-                          {post.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-800" />}
-                          <span className="text-xs text-gray-500 capitalize">{post.platform}</span>
+              {/* Second: Select Post (only after account is selected) */}
+              {selectedSocialAccount && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Select a post from @{selectedSocialAccount.username}
+                  </h2>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    {filteredPosts.map((post) => (
+                      <div
+                        key={post.id}
+                        onClick={() => setSelectedPost(post)}
+                        className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                          selectedPost?.id === post.id 
+                            ? 'border-blue-500 bg-blue-50 shadow-lg' 
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center">
+                          <img 
+                            src={post.mediaUrl} 
+                            alt={post.caption}
+                            className="w-full h-full object-cover rounded-t-lg"
+                          />
                         </div>
-                        <div className="flex items-center space-x-1">
-                          {post.mediaType === 'image' && <ImageIcon className="w-4 h-4 text-gray-400" />}
-                          {post.mediaType === 'video' && <PlayCircle className="w-4 h-4 text-gray-400" />}
-                          {post.mediaType === 'carousel' && <Grid3x3 className="w-4 h-4 text-gray-400" />}
+                        <div className="p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              {post.platform === 'instagram' && <Instagram className="w-4 h-4 text-purple-600" />}
+                              {post.platform === 'linkedin' && <Linkedin className="w-4 h-4 text-blue-600" />}
+                              {post.platform === 'twitter' && <Twitter className="w-4 h-4 text-sky-600" />}
+                              {post.platform === 'facebook' && <Facebook className="w-4 h-4 text-blue-800" />}
+                              <span className="text-xs text-gray-500 capitalize">{post.platform}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              {post.mediaType === 'image' && <ImageIcon className="w-4 h-4 text-gray-400" />}
+                              {post.mediaType === 'video' && <PlayCircle className="w-4 h-4 text-gray-400" />}
+                              {post.mediaType === 'carousel' && <Grid3x3 className="w-4 h-4 text-gray-400" />}
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 line-clamp-2">{post.caption}</p>
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span>{post.likes} likes</span>
+                            <span>{post.comments} comments</span>
+                          </div>
                         </div>
+                        {selectedPost?.id === post.id && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{post.caption}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>{post.likes} likes</span>
-                        <span>{post.comments} comments</span>
-                      </div>
-                    </div>
-                    {selectedPost?.id === post.id && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-white" />
-                      </div>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </motion.div>
           )}
 

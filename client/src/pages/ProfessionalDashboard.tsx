@@ -350,8 +350,8 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Grid - Transparent Background */}
-      <div className="bg-gray-50 p-4 sm:p-6 rounded-xl">
+      {/* Quick Actions Grid - No Background */}
+      <div className="px-4 sm:px-6 py-2 sm:py-4">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {quickActions.map((action, index) => (
             <div 

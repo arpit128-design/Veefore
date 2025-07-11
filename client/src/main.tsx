@@ -3,7 +3,7 @@ import App from "./App";
 import "./index.css";
 import { startYellowColorElimination } from "./lib/yellowColorEliminator";
 
-// PRECISE YELLOW ELIMINATION - PRESERVE OTHER COLORS
+// PRECISE YELLOW ELIMINATION - PRESERVE OTHER COLORS + HIDE DEBUG ELEMENTS
 const antiYellowStyles = `
 /* TARGETED YELLOW BLOCKING - PRESERVE BLUE, GREEN, PURPLE */
 *[style*="background-color: yellow"], *[style*="background: yellow"],
@@ -25,6 +25,33 @@ const antiYellowStyles = `
   background: #ffffff !important;
   transition: none !important;
 }
+
+/* HIDE POTENTIAL DEBUG ELEMENTS AND GREY BOXES */
+[data-testid*="debug"], [class*="debug"], [id*="debug"],
+[data-testid*="inspector"], [class*="inspector"], [id*="inspector"],
+[data-testid*="devtools"], [class*="devtools"], [id*="devtools"],
+.__react-inspector, .__react-devtools, .__react-debug,
+[data-react-devtools], [data-react-inspector],
+div[style*="position: fixed"][style*="z-index: 999"],
+div[style*="position: absolute"][style*="z-index: 999"],
+/* TARGET GREY BOXES SPECIFICALLY */
+div[style*="background-color: rgb(229, 231, 235)"],
+div[style*="background-color: #e5e7eb"],
+div[style*="background: rgb(229, 231, 235)"],
+div[style*="background: #e5e7eb"],
+div[style*="background-color: rgba(229, 231, 235"],
+div[style*="background: rgba(229, 231, 235"],
+/* Hide any floating div that appears during typing */
+div[style*="position: absolute"]:not(.InstagramDMPreview):not([class*="dropdown"]):not([class*="tooltip"]):not([class*="popover"]),
+div[style*="position: fixed"]:not([class*="modal"]):not([class*="dialog"]):not([class*="notification"]),
+/* Hide temporary state display elements */
+div:empty + div:only-child,
+div:not([class]):not([id]):not([data-testid]) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 `;
 
 // Inject styles BEFORE any rendering occurs
@@ -33,6 +60,6 @@ styleElement.textContent = antiYellowStyles;
 document.head.insertBefore(styleElement, document.head.firstChild);
 
 // Start yellow color elimination system immediately
-startYellowColorElimination();
+// startYellowColorElimination(); // Temporarily disabled for debugging
 
 createRoot(document.getElementById("root")!).render(<App />);

@@ -180,39 +180,6 @@ export default function CommentToDMAutomation() {
     initials: 'R'
   });
 
-  // Fetch user profile data
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await fetch('/api/user');
-        if (response.ok) {
-          const userData = await response.json();
-          
-          // Get Instagram account data
-          const socialResponse = await fetch('/api/social-accounts');
-          if (socialResponse.ok) {
-            const accounts = await socialResponse.json();
-            const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
-            
-            if (instagramAccount) {
-              const initials = generateInitials(instagramAccount.username);
-              setUserProfile({
-                username: instagramAccount.username,
-                profilePicture: instagramAccount.profilePicture || null,
-                initials
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        // Keep default values on error
-      }
-    };
-    
-    fetchUserProfile();
-  }, []);
-
   // Generate initials from username
   const generateInitials = (username: string): string => {
     if (!username) return 'U';
@@ -228,6 +195,39 @@ export default function CommentToDMAutomation() {
     
     return secondLetter ? firstLetter + secondLetter.toUpperCase() : firstLetter;
   };
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        // Try to fetch Instagram account data
+        const socialResponse = await fetch('/api/social-accounts');
+        if (socialResponse.ok) {
+          const accounts = await socialResponse.json();
+          const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram');
+          
+          if (instagramAccount) {
+            const initials = generateInitials(instagramAccount.username);
+            setUserProfile({
+              username: instagramAccount.username,
+              profilePicture: instagramAccount.profilePicture || null,
+              initials
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // Keep default values on error - show 'R' for rahulc1020
+        setUserProfile({
+          username: 'rahulc1020',
+          profilePicture: null,
+          initials: 'R'
+        });
+      }
+    };
+    
+    fetchUserProfile();
+  }, []);
 
   const filteredPosts = selectedPlatform === 'all' 
     ? MOCK_POSTS 
@@ -431,12 +431,13 @@ export default function CommentToDMAutomation() {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#e5e7eb',
+              backgroundColor: '#e91e63',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              border: '2px solid #ffffff'
             }}>
               {userProfile.profilePicture ? (
                 <img 
@@ -452,9 +453,9 @@ export default function CommentToDMAutomation() {
                 <span style={{
                   fontSize: '16px',
                   fontWeight: '600',
-                  color: '#6b7280'
+                  color: '#ffffff'
                 }}>
-                  {userProfile.initials}
+                  {userProfile.initials || 'R'}
                 </span>
               )}
             </div>

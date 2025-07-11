@@ -295,6 +295,14 @@ function Router() {
       // For any other route, redirect to signup
       return <Redirect to="/signup" />;
     }
+    
+    // User is authenticated and onboarded
+    // If they're on signin/signup/auth pages, redirect to dashboard
+    if (location === "/signin" || location === "/signup" || location === "/auth") {
+      console.log('[APP.TSX] Authenticated user on signin/signup/auth page, redirecting to dashboard');
+      return <Redirect to="/" />;
+    }
+    
     return <AuthenticatedApp />;
   }
 

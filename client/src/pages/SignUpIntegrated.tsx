@@ -416,7 +416,7 @@ export default function SignUpIntegrated() {
         },
         body: JSON.stringify({
           email: signupData?.email,
-          code: verificationCode.trim()
+          otp: verificationCode.trim()
         }),
       });
 

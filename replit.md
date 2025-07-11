@@ -112,6 +112,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **CRITICAL OTP VERIFICATION PARAMETER FIX** - Fixed frontend-backend parameter mismatch preventing OTP verification
+  - ✅ **Parameter Mismatch Fixed**: Frontend was sending `code` parameter while backend expected `otp`
+  - ✅ **SignUpWithOnboarding.tsx Updated**: Changed verification request from `code: verificationCode` to `otp: verificationCode`
+  - ✅ **SignUpIntegrated.tsx Updated**: Changed verification request from `code: verificationCode.trim()` to `otp: verificationCode.trim()`
+  - ✅ **Backend Validation Working**: OTP verification now properly validates with correct parameter name
+  - ✅ **Test Validated**: Both email `aasthachoudhary1804@gmail.com` and `aasthachoudhary733@gmail.com` now verify successfully
+  - **Technical Fix**: Updated both signup components to use consistent parameter naming with backend API
+  - **Result**: Users can now properly verify their email addresses with the 6-digit OTP codes
 - July 11, 2025: **AUTHENTICATION FLOW ISSUE RESOLVED** - Fixed problem where early access users caused new signups to skip verification steps
   - ✅ **Root Cause Identified**: Early access users left in MongoDB database were treated as existing verified users
   - ✅ **Database Cleanup**: Created cleanup-specific-user.cjs script to remove problematic user entries

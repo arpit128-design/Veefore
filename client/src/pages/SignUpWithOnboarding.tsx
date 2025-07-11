@@ -427,7 +427,7 @@ export default function SignUpWithOnboarding() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: signupData?.email,
-          code: verificationCode
+          otp: verificationCode
         })
       });
 

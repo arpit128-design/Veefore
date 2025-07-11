@@ -286,7 +286,11 @@ function SidebarSection({ title, children, defaultOpen = true, isAnalytics = fal
     <div className="mb-6">
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-700 transition-colors duration-200 group"
+        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 group rounded-lg ${
+          isAnalytics 
+            ? "bg-gradient-to-r from-cyan-50 to-purple-50 text-cyan-700 hover:from-cyan-100 hover:to-purple-100" 
+            : "text-slate-500 hover:text-slate-700"
+        }`}
         whileHover={{ x: 2 }}
         transition={{ duration: 0.2 }}
       >

@@ -282,8 +282,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Get current user
   app.get('/api/user', requireAuth, async (req: any, res: Response) => {
     try {
-      console.log(`[API] /api/user - User ${req.user.id} isOnboarded: ${req.user.isOnboarded} (type: ${typeof req.user.isOnboarded})`);
-      res.json(req.user);
+      // Fetch fresh user data from database to ensure all fields are included
+      const freshUser = await storage.getUser(req.user.id);
+      console.log(`[API] /api/user - User ${req.user.id} isOnboarded: ${freshUser.isOnboarded} (type: ${typeof freshUser.isOnboarded})`);
+      console.log(`[API] /api/user - User ${req.user.id} isEmailVerified: ${freshUser.isEmailVerified} (type: ${typeof freshUser.isEmailVerified})`);
+      res.json(freshUser);
     } catch (error: any) {
       console.error('Error fetching user:', error);
       res.status(500).json({ error: error.message });

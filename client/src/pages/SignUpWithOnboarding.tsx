@@ -293,11 +293,16 @@ export default function SignUpWithOnboarding() {
       return;
     }
     // If user is authenticated but not onboarded, check email verification status
-    // Only auto-redirect if user is on initial step (0) and has verified email AND user hasn't navigated manually
-    if (user && !user.isOnboarded && currentStep === 0 && user.isEmailVerified && !userNavigatedManually) {
-      setCurrentStep(2); // Skip to plan selection since auth and email verification are done
+    // Skip verification step if user is already verified
+    if (user && !user.isOnboarded && user.isEmailVerified) {
+      if (currentStep === 0 && !userNavigatedManually) {
+        setCurrentStep(2); // Skip to plan selection since auth and email verification are done
+      } else if (currentStep === 1) {
+        // User is on verification step but already verified - skip to plan selection
+        setCurrentStep(2);
+      }
     }
-  }, [user, setLocation, userNavigatedManually]); // Add userNavigatedManually to dependencies
+  }, [user, currentStep, setLocation, userNavigatedManually]); // Add currentStep to dependencies
 
   // Handle back to home navigation
   const handleBackToHome = () => {

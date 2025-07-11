@@ -42,7 +42,8 @@ import {
   Rocket,
   Edit,
   Megaphone,
-  Link as LinkIcon
+  Link as LinkIcon,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -272,6 +273,20 @@ function SidebarContent({
 }: SidebarContentProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
+      {/* Mobile Close Button */}
+      {isMobile && (
+        <div className="flex justify-end p-4 border-b border-slate-200">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMobileMenuOpen?.(false)}
+            className="text-slate-600 hover:bg-slate-100"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+      
       {/* User Profile Header */}
       <div className="flex-shrink-0 p-6 border-b border-slate-100 veefore-sidebar-header">
         {/* User Profile Section */}

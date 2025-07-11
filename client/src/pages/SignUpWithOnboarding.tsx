@@ -436,10 +436,39 @@ export default function SignUpWithOnboarding() {
         })
       });
 
+      const result = await response.json();
+
       if (response.ok) {
+        // Store auth token if provided
+        if (result.token) {
+          localStorage.setItem('veefore_auth_token', result.token);
+        }
+        
+        // Refresh user data to get updated verification status
+        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        
+        toast({
+          title: "Email verified successfully!",
+          description: "You can now proceed to the next step."
+        });
+        
         nextStep();
       } else {
-        throw new Error('Invalid verification code');
+        // Handle the "Email already verified" case
+        if (result.message === "Email already verified") {
+          toast({
+            title: "Email already verified",
+            description: "Your email has been verified. You can proceed to the next step.",
+            variant: "default"
+          });
+          
+          // Refresh user data to get updated verification status
+          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          
+          nextStep();
+        } else {
+          throw new Error(result.message || 'Invalid verification code');
+        }
       }
     } catch (error: any) {
       toast({

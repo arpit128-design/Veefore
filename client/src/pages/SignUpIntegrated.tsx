@@ -422,20 +422,31 @@ export default function SignUpIntegrated() {
 
       const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to verify email');
-      }
+      if (response.ok) {
+        // Store auth token
+        if (result.token) {
+          localStorage.setItem('veefore_auth_token', result.token);
+        }
 
-      // Store auth token
-      if (result.token) {
-        localStorage.setItem('veefore_auth_token', result.token);
+        setCurrentStep(2); // Move to plan selection
+        toast({
+          title: "Email verified successfully!",
+          description: "Please choose your subscription plan."
+        });
+      } else {
+        // Handle the "Email already verified" case
+        if (result.message === "Email already verified") {
+          toast({
+            title: "Email already verified",
+            description: "Your email has been verified. You can proceed to plan selection.",
+            variant: "default"
+          });
+          
+          setCurrentStep(2); // Move to plan selection
+        } else {
+          throw new Error(result.message || 'Failed to verify email');
+        }
       }
-
-      setCurrentStep(2); // Move to plan selection
-      toast({
-        title: "Email verified successfully!",
-        description: "Please choose your subscription plan."
-      });
     } catch (error: any) {
       console.error('Verification error:', error);
       toast({

@@ -262,16 +262,43 @@ button[class*="bg-blue"]:hover {
   background-color: #1d4ed8 !important;
 }
 
-/* Input elements */
-input, textarea, select {
+/* Input elements - COMPREHENSIVE TEXT VISIBILITY FIX */
+input, 
+textarea, 
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+.form-input,
+.input,
+[role="textbox"] {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border-color: #e2e8f0 !important;
+  opacity: 1 !important;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus, 
+textarea:focus, 
+select:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+.form-input:focus,
+.input:focus,
+[role="textbox"]:focus {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 1px #2563eb !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
 }
 
 /* Dropdown and select elements */
@@ -810,14 +837,38 @@ input[placeholder*="search"],
   background-color: rgb(37 99 235) !important;
 }
 
-/* Textarea and all input types */
+/* Textarea and all input types - ENHANCED TEXT VISIBILITY */
 textarea,
 input[type="text"],
 input[type="search"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"] {
   background-color: white !important;
+  color: rgb(15 23 42) !important;
   border-color: rgb(203 213 225) !important;
+  opacity: 1 !important;
+}
+
+/* PLACEHOLDER TEXT VISIBILITY */
+input::placeholder,
+textarea::placeholder,
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder {
+  color: rgb(107 114 128) !important;
+  opacity: 1 !important;
+}
+
+/* VALUE TEXT VISIBILITY */
+input:not(:placeholder-shown),
+textarea:not(:placeholder-shown) {
+  color: rgb(15 23 42) !important;
 }
 
 /* Force white for any remaining yellow elements */
@@ -972,6 +1023,35 @@ option,
 .dropdown-item[data-state="checked"] {
   background-color: rgb(239 246 255) !important; /* Light blue for selected items */
   color: rgb(15 23 42) !important;
+}
+
+/* COMPREHENSIVE INPUT TEXT VISIBILITY - CATCH ALL CASES */
+* input,
+* textarea,
+* select,
+form input,
+form textarea,
+form select,
+div input,
+div textarea,
+.form-field input,
+.form-field textarea,
+.input-field input,
+.input-field textarea {
+  color: rgb(15 23 42) !important;
+  background-color: rgb(255 255 255) !important;
+  opacity: 1 !important;
+}
+
+/* SPECIFIC TARGETING FOR COMMON INPUT PATTERNS */
+.w-full[type="text"],
+.w-full[type="email"],
+.w-full[type="password"],
+.flex-1[type="text"],
+.flex-1[type="email"],
+.flex-1[type="password"] {
+  color: rgb(15 23 42) !important;
+  background-color: rgb(255 255 255) !important;
 }
 
 /* Scrollbar fixes - remove any yellow tints */

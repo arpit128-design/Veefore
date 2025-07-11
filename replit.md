@@ -122,6 +122,7 @@ VeeFore is a comprehensive social media management platform that leverages AI to
   - ✅ **Fixed Message Box Sizing**: Added minimum width constraints (200px for message, 120px for button) to prevent shrinking with short text
   - ✅ **Long Text Wrapping**: Added proper text wrapping (break-words, overflow-wrap-anywhere) to prevent text overflow in DM preview
   - ✅ **Fixed Width Container**: Set message box to fixed width (320px) to match placeholder text size and prevent shrinking
+  - ✅ **Dynamic DM Text Color**: DM placeholder text shows in grey (text-gray-500) until users type their own message (text-gray-900)
   - **Technical Implementation**: Updated InstagramDMPreview component to show fallback placeholder text for button using logical OR operator
   - **User Experience**: Users now get immediate visual feedback showing how their automated DM will appear to recipients
 - July 11, 2025: **DEDICATED COMMENT TO DM AUTOMATION PAGE COMPLETE** - Created comprehensive standalone Comment to DM automation page with sophisticated 4-step flow based on user reference images

@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import veeforeLogo from '@/assets/veefore-logo.png';
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -2051,7 +2052,11 @@ export default function Settings() {
                       <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <Zap className="h-5 w-5 text-orange-600" />
+                            <img 
+                              src={veeforeLogo} 
+                              alt="VeeFore Logo" 
+                              className="h-5 w-5 object-contain"
+                            />
                           </div>
                           <div>
                             <div className="font-medium text-gray-900">Zapier</div>

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
+import veeforeLogo from '@/assets/veefore-logo.png';
 
 const solutions = [
   {
@@ -103,9 +104,11 @@ export default function Solutions() {
           <div className="flex items-center justify-between">
             <Link href="/">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-white" />
-                </div>
+                <img 
+                  src={veeforeLogo} 
+                  alt="VeeFore Logo" 
+                  className="w-8 h-8 object-contain"
+                />
                 <span className="text-xl font-bold">VeeFore</span>
               </div>
             </Link>

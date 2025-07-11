@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspaceContext } from '@/hooks/useWorkspace';
 import { apiRequest } from '@/lib/queryClient';
+import veeforeLogo from '@/assets/veefore-logo.png';
 // VeeFore logo will be text-based
 import { 
   Eye, 
@@ -551,9 +552,13 @@ export default function SignUpWithOnboarding() {
         
         <div className="text-center">
           <div className="w-80 h-80 bg-red-500 rounded-full flex items-center justify-center mb-8 mx-auto relative">
-            {/* VeeFore Rocket Mascot */}
+            {/* VeeFore Logo Mascot */}
             <div className="text-white text-8xl">
-              <Rocket className="w-32 h-32" />
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-32 h-32 object-contain"
+              />
             </div>
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
               <div className="w-24 h-3 bg-red-400 rounded-full opacity-50"></div>
@@ -576,7 +581,11 @@ export default function SignUpWithOnboarding() {
             <div className="flex items-center space-x-2">
               <Link href="/" className="flex items-center space-x-2 hover:opacity-80">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Rocket className="w-5 h-5 text-white" />
+                  <img 
+                    src={veeforeLogo} 
+                    alt="VeeFore Logo" 
+                    className="w-5 h-5 object-contain"
+                  />
                 </div>
                 <span className="text-xl font-bold text-gray-900">VeeFore</span>
               </Link>

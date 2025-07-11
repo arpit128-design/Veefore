@@ -29,6 +29,7 @@ import {
   PlayCircle,
   Settings
 } from 'lucide-react';
+import veeforeLogo from '@/assets/veefore-logo.png';
 
 interface DashboardData {
   totalPosts: number;
@@ -714,7 +715,11 @@ const ProfessionalDashboard: React.FC = () => {
             <CardContent className="p-4 sm:p-6">
               <div className="text-center">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
+                  <img 
+                    src={veeforeLogo} 
+                    alt="VeeFore Logo" 
+                    className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+                  />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Kickstart your social content</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">

@@ -6,6 +6,7 @@ import { Zap, Star, Rocket, Crown, ArrowRight, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import veeforeLogo from '@/assets/veefore-logo.png';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -256,7 +257,11 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
             transition={{ delay: 0.5 }}
             className="text-center bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-6 border border-electric-cyan/20"
           >
-            <Rocket className="w-12 h-12 text-electric-cyan mx-auto mb-4" />
+            <img 
+              src={veeforeLogo} 
+              alt="VeeFore Logo" 
+              className="w-12 h-12 object-contain mx-auto mb-4"
+            />
             <h4 className="text-lg font-semibold text-white mb-2">
               Unlock Your Social Media Potential
             </h4>

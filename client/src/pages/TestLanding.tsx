@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Rocket } from 'lucide-react';
 import { useLocation } from 'wouter';
+import veeforeLogo from '@/assets/veefore-logo.png';
 
 export default function TestLanding() {
   const [, setLocation] = useLocation();
@@ -16,7 +17,11 @@ export default function TestLanding() {
           className="flex items-center justify-center mb-8"
         >
           <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
-            <Rocket className="w-8 h-8 text-white" />
+            <img 
+              src={veeforeLogo} 
+              alt="VeeFore Logo" 
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <span className="text-4xl font-bold text-white">VeeFore</span>
         </motion.div>

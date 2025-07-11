@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import veeforeLogo from '@/assets/veefore-logo.png';
 
 // Main tab structure
 const mainTabs = [

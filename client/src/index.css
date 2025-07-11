@@ -957,7 +957,7 @@ main[class*="flex-1"][class*="overflow"] {
 /* Ensure content inside main areas keeps original backgrounds */
 main.flex-1 > *,
 .veefore-main-content > * {
-  background-color: unset !important;
+  background-color: white !important;
 }
 
 /* Reset specific background classes to their original values */
@@ -994,6 +994,34 @@ main.flex-1 .bg-red-50,
 main.flex-1 .bg-purple-50,
 .veefore-main-content .bg-purple-50 {
   background-color: #faf5ff !important;
+}
+
+/* Ensure all cards and containers have white backgrounds */
+main.flex-1 .card,
+main.flex-1 [class*="card"],
+main.flex-1 .rounded,
+main.flex-1 [class*="rounded"],
+main.flex-1 .border,
+main.flex-1 [class*="border"],
+main.flex-1 .shadow,
+main.flex-1 [class*="shadow"],
+main.flex-1 .p-4,
+main.flex-1 .p-6,
+main.flex-1 .p-8,
+main.flex-1 [class*="p-"],
+.veefore-main-content .card,
+.veefore-main-content [class*="card"],
+.veefore-main-content .rounded,
+.veefore-main-content [class*="rounded"],
+.veefore-main-content .border,
+.veefore-main-content [class*="border"],
+.veefore-main-content .shadow,
+.veefore-main-content [class*="shadow"],
+.veefore-main-content .p-4,
+.veefore-main-content .p-6,
+.veefore-main-content .p-8,
+.veefore-main-content [class*="p-"] {
+  background-color: white !important;
 }
 
 /* NUCLEAR YELLOW ELIMINATION - TARGET ALL YELLOW VARIANTS */

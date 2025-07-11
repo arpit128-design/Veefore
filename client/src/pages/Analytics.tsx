@@ -59,7 +59,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
       className="space-y-6"
     >
       {/* Header Section with Gradient */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
+      <div className="from-blue-600 to-purple-600 rounded-xl p-6 bg-[#f3f8fe] text-[#000000]">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#000000] bg-[#3c445c00]">Analytics Overview</h1>

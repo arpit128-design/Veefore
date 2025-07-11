@@ -500,80 +500,57 @@ function SidebarContent({
                 </motion.div>
               </DialogTrigger>
               <DialogContent 
-                className="max-w-sm mx-auto p-0 shadow-xl border-0 rounded-xl scheduler-dialog-content"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.85)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  position: 'relative',
-                  zIndex: 60
-                }}
+                className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl scheduler-dialog-content"
               >
-                {/* Custom backdrop blur overlay */}
-                <div 
-                  className="absolute inset-0 rounded-xl -z-10"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    borderRadius: '12px'
-                  }}
-                />
-                
-                {/* Actual dialog content */}
-                <div className="relative z-10 bg-transparent">
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Scheduler Options</DialogTitle>
-                  </DialogHeader>
-                  <div className="p-2">
-                    {schedulerOptions.map((option, optionIndex) => (
-                      <div key={optionIndex}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start p-4 h-auto text-left rounded-lg hover:bg-gray-50 transition-colors"
-                          onClick={() => {
-                            option.action();
-                            if (setIsMobileMenuOpen) {
-                              setIsMobileMenuOpen(false);
-                            }
-                          }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="mt-1">
-                              {option.icon}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-gray-900 text-sm">
-                                  {option.title}
-                                </h4>
-                                {option.badge && (
-                                  <Badge 
-                                    variant={option.badge === 'New' ? 'default' : 'secondary'} 
-                                    className={`text-xs h-5 px-2 ${
-                                      option.badge === 'New' 
-                                        ? 'bg-green-100 text-green-700' 
-                                        : 'bg-blue-100 text-blue-700'
-                                    }`}
-                                  >
-                                    {option.badge}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {option.description}
-                              </p>
-                            </div>
+                <DialogHeader className="sr-only">
+                  <DialogTitle>Scheduler Options</DialogTitle>
+                </DialogHeader>
+                <div className="p-2">
+                  {schedulerOptions.map((option, optionIndex) => (
+                    <div key={optionIndex}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start p-4 h-auto text-left rounded-lg hover:bg-gray-50 transition-colors"
+                        onClick={() => {
+                          option.action();
+                          if (setIsMobileMenuOpen) {
+                            setIsMobileMenuOpen(false);
+                          }
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="mt-1">
+                            {option.icon}
                           </div>
-                        </Button>
-                        {optionIndex < schedulerOptions.length - 1 && (
-                          <Separator className="my-1 bg-gray-100" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-gray-900 text-sm">
+                                {option.title}
+                              </h4>
+                              {option.badge && (
+                                <Badge 
+                                  variant={option.badge === 'New' ? 'default' : 'secondary'} 
+                                  className={`text-xs h-5 px-2 ${
+                                    option.badge === 'New' 
+                                      ? 'bg-green-100 text-green-700' 
+                                      : 'bg-blue-100 text-blue-700'
+                                  }`}
+                                >
+                                  {option.badge}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {option.description}
+                            </p>
+                          </div>
+                        </div>
+                      </Button>
+                      {optionIndex < schedulerOptions.length - 1 && (
+                        <Separator className="my-1 bg-gray-100" />
+                      )}
+                    </div>
+                  ))}
                 </div>
               </DialogContent>
             </Dialog>

@@ -14,6 +14,7 @@ import { AICopilotWidget } from "@/components/ai-copilot/AICopilotWidget";
 // Pages - Using Pure Light Theme Components
 import Dashboard from "@/pages/Dashboard";
 import PureLightDashboard from "@/pages/PureLightDashboard";
+import ModernPureDashboard from "@/pages/ModernPureDashboard";
 import VeeForeHomeDashboard from "@/pages/VeeForeHomeDashboard";
 import ContentStudio from "@/pages/ContentStudio";
 import AdvancedScheduler from "@/pages/AdvancedScheduler";
@@ -129,7 +130,7 @@ function AuthenticatedApp() {
         ) : (
           <PureLightLayout>
             <Switch>
-              <Route path="/dashboard" component={PureLightDashboard} />
+              <Route path="/dashboard" component={ModernPureDashboard} />
               <Route path="/create-post" component={CreatePost} />
               <Route path="/content-studio" component={ContentStudio} />
               <Route path="/scheduler" component={ProfessionalScheduler} />
@@ -179,7 +180,7 @@ function AuthenticatedApp() {
               <Route path="/admin/early-access" component={AdminEarlyAccess} />
               <Route path="/feature-preview" component={FeaturePreview} />
               <Route path="/onboarding" component={OnboardingPremium} />
-              <Route path="/" component={PureLightDashboard} />
+              <Route path="/" component={ModernPureDashboard} />
               <Route component={NotFound} />
             </Switch>
           </PureLightLayout>

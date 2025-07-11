@@ -289,6 +289,12 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
+    console.log('DM Preview render:', { 
+      dmText: directMessage.text, 
+      dmButton: directMessage.buttonText, 
+      keyword: keyword 
+    });
+    
     return (
       <div style={{
         backgroundColor: '#ffffff',

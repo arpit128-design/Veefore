@@ -428,11 +428,12 @@ export default function SignUpIntegrated() {
           localStorage.setItem('veefore_auth_token', result.token);
         }
 
-        setCurrentStep(2); // Move to plan selection
         toast({
           title: "Email verified successfully!",
           description: "Please choose your subscription plan."
         });
+        
+        setCurrentStep(2); // Move to plan selection
       } else {
         // Handle the "Email already verified" case
         if (result.message === "Email already verified") {

@@ -445,14 +445,15 @@ export default function SignUpWithOnboarding() {
         }
         
         // Refresh user data to get updated verification status
-        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
         
         toast({
           title: "Email verified successfully!",
           description: "You can now proceed to the next step."
         });
         
-        nextStep();
+        // Force move to next step since we know verification is complete
+        setCurrentStep(2);
       } else {
         // Handle the "Email already verified" case
         if (result.message === "Email already verified") {
@@ -463,9 +464,10 @@ export default function SignUpWithOnboarding() {
           });
           
           // Refresh user data to get updated verification status
-          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
           
-          nextStep();
+          // Force move to next step since we know verification is complete
+          setCurrentStep(2);
         } else {
           throw new Error(result.message || 'Invalid verification code');
         }

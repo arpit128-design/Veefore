@@ -125,17 +125,19 @@ VeeFore is a comprehensive social media management platform that leverages AI to
   - **Technical Fix**: Modified `/api/user` endpoint to fetch fresh user data from database instead of cached req.user object
   - **User Experience**: Users can now navigate back and forth through onboarding steps while maintaining proper verification logic
   - **Result**: Complete frontend-backend synchronization with proper navigation control for verified users
-- July 11, 2025: **CRITICAL EMAIL VERIFICATION HANDLER FIX** - Fixed frontend not handling "Email already verified" responses properly
+- July 11, 2025: **CRITICAL EMAIL VERIFICATION SECURITY CHECK FIX** - Fixed frontend security check blocking verified users from proceeding
   - ✅ **Parameter Mismatch Fixed**: Frontend was sending `code` parameter while backend expected `otp`
   - ✅ **SignUpWithOnboarding.tsx Updated**: Changed verification request from `code: verificationCode` to `otp: verificationCode`
   - ✅ **SignUpIntegrated.tsx Updated**: Changed verification request from `code: verificationCode.trim()` to `otp: verificationCode.trim()`
   - ✅ **Backend Validation Working**: OTP verification now properly validates with correct parameter name
   - ✅ **"Email Already Verified" Response Handling**: Frontend now properly handles 400 responses with "Email already verified" message
   - ✅ **Enhanced Error Handling**: Added proper JSON response parsing and specific handling for already verified users
-  - ✅ **User Experience Fix**: Users no longer see "Invalid verification code" when email is already verified
+  - ✅ **Security Check Bypass**: Fixed issue where `nextStep()` security check was blocking progression even for verified users
+  - ✅ **Direct Step Progression**: Users now advance directly to plan selection (step 2) after successful verification
+  - ✅ **User Data Refresh**: Added proper user data invalidation to ensure fresh verification status
   - ✅ **Both Signup Components Fixed**: Updated both SignUpWithOnboarding.tsx and SignUpIntegrated.tsx with proper response handling
-  - **Technical Fix**: Updated both signup components to use consistent parameter naming with backend API and handle already verified responses
-  - **Result**: Users can now properly verify their email addresses with the 6-digit OTP codes without false error messages
+  - **Technical Fix**: Bypassed stale user data issue by directly setting step progression instead of relying on security check with potentially cached data
+  - **Result**: Users can now properly verify their email addresses and advance to plan selection without being blocked by security checks
 - July 11, 2025: **AUTHENTICATION FLOW ISSUE RESOLVED** - Fixed problem where early access users caused new signups to skip verification steps
   - ✅ **Root Cause Identified**: Early access users left in MongoDB database were treated as existing verified users
   - ✅ **Database Cleanup**: Created cleanup-specific-user.cjs script to remove problematic user entries

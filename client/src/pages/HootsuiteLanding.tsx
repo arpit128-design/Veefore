@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { useLocation } from 'wouter';
-// VeeFore logo will be text-based
+import veeforeLogo from '@/assets/veefore-logo.png';
 import { 
   ArrowRight, 
   Calendar, 
@@ -75,9 +75,11 @@ function VeeForeNavigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
               <span className="text-xl font-bold text-gray-900">VeeFore</span>
             </div>
           </div>

@@ -465,9 +465,9 @@ function SidebarContent({
   setIsMobileMenuOpen 
 }: SidebarContentProps) {
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {/* User Profile Header */}
-      <div className="flex-shrink-0 p-6 border-b border-slate-100 veefore-sidebar-header">
+    <div className="h-full overflow-y-auto overflow-x-hidden">
+      {/* User Profile Header - Now scrollable */}
+      <div className="p-6 border-b border-slate-100 veefore-sidebar-header">
         {/* User Profile Section */}
         <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
           <div className="flex items-center space-x-3 mb-3">
@@ -509,8 +509,8 @@ function SidebarContent({
         </div>
       </div>
       
-      {/* Independent Scrollable Navigation Area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6 veefore-sidebar-nav">
+      {/* Navigation Area - Now part of the scrollable content */}
+      <div className="px-6 pb-6 veefore-sidebar-nav">
         {/* Main Navigation */}
         <div className="space-y-1 mb-6">
           <SidebarItem

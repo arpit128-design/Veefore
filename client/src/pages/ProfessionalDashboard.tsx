@@ -269,46 +269,84 @@ const ProfessionalDashboard: React.FC = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-gray-50 min-h-screen p-3 sm:p-4 lg:p-6">
-      {/* Header Section - Responsive */}
-      <div className="dashboard-greeting-banner flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 sm:p-6 rounded-xl shadow-sm border space-y-4 sm:space-y-0">
-        <div className="flex-1">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-            {greeting}, Arpit! {emoji}
-          </h1>
-          <p className="text-gray-500 mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm sm:text-base">
-            <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Today is {date}
-            </span>
-            <span className="hidden sm:inline">•</span>
-            <span>{time}</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="text-xs sm:text-sm">Let's create something amazing</span>
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-          <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm ${
-            subscriptionStatus.color === 'blue' ? 'bg-blue-50' :
-            subscriptionStatus.color === 'green' ? 'bg-green-50' :
-            subscriptionStatus.color === 'red' ? 'bg-red-50' : 'bg-gray-50'
-          }`}>
-            <div className={`w-2 h-2 rounded-full animate-pulse ${
-              subscriptionStatus.color === 'blue' ? 'bg-blue-500' :
-              subscriptionStatus.color === 'green' ? 'bg-green-500' :
-              subscriptionStatus.color === 'red' ? 'bg-red-500' : 'bg-gray-500'
-            }`}></div>
-            <span className={`font-medium ${
-              subscriptionStatus.color === 'blue' ? 'text-blue-700' :
-              subscriptionStatus.color === 'green' ? 'text-green-700' :
-              subscriptionStatus.color === 'red' ? 'text-red-700' : 'text-gray-700'
+      {/* Header Section - Mobile Optimized */}
+      <div className="dashboard-greeting-banner bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border">
+        {/* Mobile Layout - Compact */}
+        <div className="block sm:hidden">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-lg font-bold text-gray-900 truncate">
+              {greeting}, Arpit! {emoji}
+            </h1>
+            <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
+              subscriptionStatus.color === 'blue' ? 'bg-blue-50' :
+              subscriptionStatus.color === 'green' ? 'bg-green-50' :
+              subscriptionStatus.color === 'red' ? 'bg-red-50' : 'bg-gray-50'
             }`}>
-              {subscriptionStatus.status}
-            </span>
+              <div className={`w-1.5 h-1.5 rounded-full ${
+                subscriptionStatus.color === 'blue' ? 'bg-blue-500' :
+                subscriptionStatus.color === 'green' ? 'bg-green-500' :
+                subscriptionStatus.color === 'red' ? 'bg-red-500' : 'bg-gray-500'
+              }`}></div>
+              <span className={`font-medium ${
+                subscriptionStatus.color === 'blue' ? 'text-blue-700' :
+                subscriptionStatus.color === 'green' ? 'text-green-700' :
+                subscriptionStatus.color === 'red' ? 'text-red-700' : 'text-gray-700'
+              }`}>
+                {subscriptionStatus.status}
+              </span>
+            </div>
           </div>
-          <Button className="text-white shadow-lg px-4 sm:px-6 w-full sm:w-auto create-content-button" style={{ backgroundColor: '#4a78f5 !important' }}>
+          <p className="text-gray-500 text-xs mb-3 flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {date.split(',')[0]} • {time.split(':')[0]}:{time.split(':')[1]} • Let's create something amazing
+          </p>
+          <Button className="text-white shadow-lg w-full create-content-button" style={{ backgroundColor: '#4a78f5 !important' }}>
             <PlusCircle className="w-4 h-4 mr-2" />
-            <span className="text-sm sm:text-base">Create Content</span>
+            <span className="text-sm">Create Content</span>
           </Button>
+        </div>
+
+        {/* Desktop Layout - Full */}
+        <div className="hidden sm:flex sm:items-center sm:justify-between space-y-0">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+              {greeting}, Arpit! {emoji}
+            </h1>
+            <p className="text-gray-500 mt-2 flex flex-row items-center gap-2 text-sm sm:text-base">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Today is {date}
+              </span>
+              <span>•</span>
+              <span>{time}</span>
+              <span>•</span>
+              <span className="text-xs sm:text-sm">Let's create something amazing</span>
+            </p>
+          </div>
+          <div className="flex flex-row items-center gap-4">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
+              subscriptionStatus.color === 'blue' ? 'bg-blue-50' :
+              subscriptionStatus.color === 'green' ? 'bg-green-50' :
+              subscriptionStatus.color === 'red' ? 'bg-red-50' : 'bg-gray-50'
+            }`}>
+              <div className={`w-2 h-2 rounded-full animate-pulse ${
+                subscriptionStatus.color === 'blue' ? 'bg-blue-500' :
+                subscriptionStatus.color === 'green' ? 'bg-green-500' :
+                subscriptionStatus.color === 'red' ? 'bg-red-500' : 'bg-gray-500'
+              }`}></div>
+              <span className={`font-medium ${
+                subscriptionStatus.color === 'blue' ? 'text-blue-700' :
+                subscriptionStatus.color === 'green' ? 'text-green-700' :
+                subscriptionStatus.color === 'red' ? 'text-red-700' : 'text-gray-700'
+              }`}>
+                {subscriptionStatus.status}
+              </span>
+            </div>
+            <Button className="text-white shadow-lg px-6 create-content-button" style={{ backgroundColor: '#4a78f5 !important' }}>
+              <PlusCircle className="w-4 h-4 mr-2" />
+              <span className="text-base">Create Content</span>
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -246,32 +246,33 @@ const EnterpriseSettings = () => {
                 />
               </div>
               
-              {/* Save Button - Enhanced with gradient */}
+              {/* Save Button - Light colors with animation */}
               <button
                 onClick={handleSaveChanges}
                 disabled={!hasChanges}
-                className="save-button px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                className="save-button px-6 py-2.5 bg-gradient-to-r from-emerald-300 to-teal-300 text-white rounded-lg text-sm font-medium hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105 animate-pulse"
                 style={{ 
-                  background: hasChanges ? 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)' : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                  background: hasChanges ? 'linear-gradient(135deg, #6ee7b7 0%, #5eead4 100%)' : 'linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)',
                   color: '#ffffff !important',
-                  border: 'none'
+                  border: 'none',
+                  animation: hasChanges ? 'gentle-pulse 2s infinite' : 'none'
                 }}
               >
-                <Save className="h-4 w-4" style={{ color: '#ffffff !important' }} />
+                <Save className="h-4 w-4 animate-bounce" style={{ color: '#ffffff !important' }} />
                 <span style={{ color: '#ffffff !important' }}>Save Changes</span>
               </button>
               
-              {/* Sign Out - Enhanced with gradient */}
+              {/* Sign Out - Light colors with animation */}
               <button
                 onClick={handleLogout}
-                className="sign-out-button px-6 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:from-red-600 hover:to-pink-600 flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                className="sign-out-button px-6 py-2.5 bg-gradient-to-r from-red-300 to-pink-300 text-white rounded-lg text-sm font-medium hover:from-red-400 hover:to-pink-400 flex items-center space-x-2 transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105 hover:rotate-1"
                 style={{ 
-                  background: 'linear-gradient(135deg, #ef4444 0%, #ec4899 100%)',
+                  background: 'linear-gradient(135deg, #fca5a5 0%, #f9a8d4 100%)',
                   color: '#ffffff !important',
                   border: 'none'
                 }}
               >
-                <LogOut className="h-4 w-4" style={{ color: '#ffffff !important' }} />
+                <LogOut className="h-4 w-4 hover:animate-spin" style={{ color: '#ffffff !important' }} />
                 <span style={{ color: '#ffffff !important' }}>Sign Out</span>
               </button>
             </div>
@@ -922,19 +923,20 @@ const EnterpriseSettings = () => {
           color: #0f766e !important;
         }
         
-        /* Enhanced button styling */
+        /* Enhanced button styling with lighter colors and animations */
         .save-button {
-          background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
+          background: linear-gradient(135deg, #6ee7b7 0%, #5eead4 100%) !important;
           color: #ffffff !important;
           border: none !important;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-          transition: all 0.2s ease-in-out !important;
+          transition: all 0.3s ease-in-out !important;
+          animation: gentle-pulse 2s infinite !important;
         }
         
         .save-button:hover {
-          background: linear-gradient(135deg, #059669 0%, #0f766e 100%) !important;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-          transform: scale(1.05) !important;
+          background: linear-gradient(135deg, #34d399 0%, #2dd4bf 100%) !important;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+          transform: scale(1.05) translateY(-2px) !important;
         }
         
         .save-button * {
@@ -942,30 +944,50 @@ const EnterpriseSettings = () => {
         }
         
         .save-button:disabled {
-          background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+          background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%) !important;
           color: #ffffff !important;
           opacity: 0.5 !important;
           cursor: not-allowed !important;
           transform: none !important;
+          animation: none !important;
         }
         
-        /* Sign out button styling */
+        /* Sign out button styling with lighter colors */
         .sign-out-button {
-          background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%) !important;
+          background: linear-gradient(135deg, #fca5a5 0%, #f9a8d4 100%) !important;
           color: #ffffff !important;
           border: none !important;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-          transition: all 0.2s ease-in-out !important;
+          transition: all 0.3s ease-in-out !important;
         }
         
         .sign-out-button:hover {
-          background: linear-gradient(135deg, #dc2626 0%, #db2777 100%) !important;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-          transform: scale(1.05) !important;
+          background: linear-gradient(135deg, #f87171 0%, #f472b6 100%) !important;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+          transform: scale(1.05) translateY(-2px) rotate(1deg) !important;
         }
         
         .sign-out-button * {
           color: #ffffff !important;
+        }
+        
+        /* Custom animation keyframes */
+        @keyframes gentle-pulse {
+          0%, 100% {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          }
+          50% {
+            box-shadow: 0 8px 12px -2px rgba(16, 185, 129, 0.3), 0 4px 8px -2px rgba(16, 185, 129, 0.2);
+          }
+        }
+        
+        @keyframes button-float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-3px);
+          }
         }
         
         /* Enhanced colorful styling for all form elements */

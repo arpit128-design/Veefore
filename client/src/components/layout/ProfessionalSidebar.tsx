@@ -644,21 +644,33 @@ function SidebarContent({
             <>
               <SidebarItem
                 icon={BarChart3}
-                label="Analytics"
+                label="Overview"
                 href="/analytics"
                 isActive={location === "/analytics"}
               />
               <SidebarItem
                 icon={TrendingUp}
                 label="Performance"
-                href="/content-recommendations"
-                isActive={location === "/content-recommendations"}
+                href="/performance-analytics"
+                isActive={location === "/performance-analytics"}
+              />
+              <SidebarItem
+                icon={Activity}
+                label="Social Insights"
+                href="/social-insights"
+                isActive={location === "/social-insights"}
               />
               <SidebarItem
                 icon={Target}
-                label="Competitor Analysis"
-                href="/competitor-analysis"
-                isActive={location === "/competitor-analysis"}
+                label="Advanced Analytics"
+                href="/advanced-analytics"
+                isActive={location === "/advanced-analytics"}
+              />
+              <SidebarItem
+                icon={BarChart3}
+                label="Content Performance"
+                href="/content-performance-analytics"
+                isActive={location === "/content-performance-analytics"}
               />
             </>
           )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -214,7 +214,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
         />
       )}
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Only shown on large screens (lg:1024px+) */}
       <aside className="hidden lg:flex bg-white border-r border-slate-200 w-72 h-full flex-col overflow-hidden shadow-sm veefore-sidebar">
         <SidebarContent 
           location={location}

@@ -236,6 +236,22 @@ body {
   background: #94a3b8;
 }
 
+/* Mobile Sidebar Fix - Force desktop sidebar to be hidden on mobile/tablet */
+@media (max-width: 1023px) {
+  .veefore-sidebar {
+    display: none !important;
+  }
+  
+  aside.veefore-sidebar {
+    display: none !important;
+  }
+  
+  /* Ensure desktop sidebar is completely hidden on mobile */
+  aside.hidden.lg\:flex {
+    display: none !important;
+  }
+}
+
 /* Professional component styles with dark mode support */
 .professional-card {
   @apply bg-white text-slate-900 border border-gray-200 rounded-lg shadow-sm;

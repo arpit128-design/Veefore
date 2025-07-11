@@ -27,7 +27,9 @@ import {
   Heart,
   MessageCircle,
   PlayCircle,
-  Settings
+  Settings,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import veeforeLogo from '@/assets/veefore-logo.png';
 
@@ -350,8 +352,38 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Horizontal Scroll - Transparent Icons */}
-      <div id="quick-actions-section" className="py-2 sm:py-4" style={{ background: 'transparent' }}>
+      {/* Quick Actions Horizontal Scroll with Arrow Buttons */}
+      <div id="quick-actions-section" className="py-2 sm:py-4 relative" style={{ background: 'transparent' }}>
+        {/* Left Arrow Button */}
+        <button
+          id="scroll-left-btn"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-75 hover:opacity-100"
+          onClick={() => {
+            const container = document.getElementById('quick-actions-scroll');
+            if (container) {
+              container.scrollLeft -= 200;
+            }
+          }}
+          style={{ background: 'rgba(255, 255, 255, 0.8)' }}
+        >
+          <ChevronLeft className="w-4 h-4 text-gray-700" />
+        </button>
+
+        {/* Right Arrow Button */}
+        <button
+          id="scroll-right-btn"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-75 hover:opacity-100"
+          onClick={() => {
+            const container = document.getElementById('quick-actions-scroll');
+            if (container) {
+              container.scrollLeft += 200;
+            }
+          }}
+          style={{ background: 'rgba(255, 255, 255, 0.8)' }}
+        >
+          <ChevronRight className="w-4 h-4 text-gray-700" />
+        </button>
+
         <div id="quick-actions-scroll" className="overflow-x-auto px-4 sm:px-6" style={{ background: 'transparent' }}>
           <div id="quick-actions-grid" className="flex space-x-8 min-w-max" style={{ background: 'transparent' }}>
             <div 

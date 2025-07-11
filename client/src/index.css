@@ -80,6 +80,22 @@ svg.lucide *,
   display: none; /* WebKit */
 }
 
+/* SCROLL ARROW BUTTONS */
+#scroll-left-btn,
+#scroll-right-btn {
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#scroll-left-btn:hover,
+#scroll-right-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  opacity: 1 !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */
 /*
 [data-state="open"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]), 

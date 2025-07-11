@@ -329,8 +329,10 @@ export default function CommentToDMAutomation() {
           </div>
           
           {/* Message Bubble */}
-          <div className="ml-16 bg-gray-100 rounded-2xl p-4 text-sm text-gray-800 leading-relaxed">
-            {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
+          <div className="ml-16 bg-gray-100 rounded-2xl p-4 text-sm text-gray-800 leading-relaxed break-words max-w-sm">
+            <div className="break-words overflow-wrap-anywhere">
+              {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
+            </div>
             
             {/* Button inside the message bubble - wider and closer to text */}
             {(directMessage.buttonText || directMessage.websiteUrl) && (

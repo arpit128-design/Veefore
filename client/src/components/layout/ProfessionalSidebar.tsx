@@ -55,6 +55,45 @@ interface SidebarItemProps {
   isActive?: boolean;
 }
 
+interface MobileNavItemProps {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  isActive?: boolean;
+  badge?: string;
+  onClick?: () => void;
+}
+
+// Mobile Navigation Item Component
+function MobileNavItem({ icon: Icon, label, href, isActive, badge, onClick }: MobileNavItemProps) {
+  return (
+    <Link href={href} onClick={onClick}>
+      <div className={cn(
+        "flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 cursor-pointer",
+        isActive 
+          ? "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 text-blue-700" 
+          : "hover:bg-gray-50 text-gray-700"
+      )}>
+        <Icon className={cn(
+          "w-5 h-5",
+          isActive ? "text-blue-600" : "text-gray-500"
+        )} />
+        <span className="flex-1 font-medium">{label}</span>
+        {badge && (
+          <span className={cn(
+            "px-2 py-1 text-xs font-medium rounded-full",
+            isActive 
+              ? "bg-blue-100 text-blue-700" 
+              : "bg-gray-100 text-gray-600"
+          )}>
+            {badge}
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
 interface ProfessionalSidebarProps {
   onAnalyticsToggle?: () => void;
   isMobileMenuOpen?: boolean;
@@ -227,22 +266,142 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
         />
       </aside>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - Modern Design */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden",
+        "fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <SidebarContent 
-          location={location}
-          user={user}
-          credits={credits}
-          getInitials={getInitials}
-          schedulerOptions={schedulerOptions}
-          onAnalyticsToggle={onAnalyticsToggle}
-          onNavClick={handleNavClick}
-          isMobile={true}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
+        <div className="flex flex-col h-full">
+          {/* Mobile Header with Close Button */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-white" />
+              </div>
+              <h1 className="text-lg font-bold text-gray-900">VeeFore</h1>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen?.(false)}
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Mobile User Profile Card */}
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex items-center space-x-3">
+              <Avatar className="w-12 h-12 ring-2 ring-blue-500 ring-offset-2">
+                <AvatarImage src={user?.avatar} alt={user?.username} />
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                  {getInitials(user?.username || "User")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">{user?.username || "User"}</h3>
+                <p className="text-sm text-gray-500">Free Plan</p>
+              </div>
+            </div>
+            
+            {/* Mobile Credits Display */}
+            <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">Credits</span>
+                </div>
+                <span className="text-lg font-bold text-blue-600">{credits}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <div>
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Actions</h4>
+                <div className="space-y-2">
+                  <MobileNavItem
+                    icon={LayoutDashboard}
+                    label="Dashboard"
+                    href="/dashboard"
+                    isActive={location === "/dashboard"}
+                    onClick={handleNavClick}
+                  />
+                  <MobileNavItem
+                    icon={Plus}
+                    label="Create Post"
+                    href="/create-post"
+                    isActive={location === "/create-post"}
+                    onClick={handleNavClick}
+                  />
+                  <MobileNavItem
+                    icon={Calendar}
+                    label="Scheduler"
+                    href="/scheduler"
+                    isActive={location === "/scheduler"}
+                    onClick={handleNavClick}
+                  />
+                </div>
+              </div>
+
+              {/* AI Tools */}
+              <div>
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">AI Tools</h4>
+                <div className="space-y-2">
+                  <MobileNavItem
+                    icon={Sparkles}
+                    label="Content Studio"
+                    href="/content-studio"
+                    isActive={location === "/content-studio"}
+                    onClick={handleNavClick}
+                    badge="AI"
+                  />
+                  <MobileNavItem
+                    icon={Bot}
+                    label="Automation"
+                    href="/automation"
+                    isActive={location === "/automation"}
+                    onClick={handleNavClick}
+                  />
+                  <MobileNavItem
+                    icon={TrendingUp}
+                    label="Analytics"
+                    href="/analytics"
+                    isActive={location === "/analytics"}
+                    onClick={handleNavClick}
+                  />
+                </div>
+              </div>
+
+              {/* Account */}
+              <div>
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Account</h4>
+                <div className="space-y-2">
+                  <MobileNavItem
+                    icon={Settings}
+                    label="Settings"
+                    href="/settings"
+                    isActive={location === "/settings"}
+                    onClick={handleNavClick}
+                  />
+                  <MobileNavItem
+                    icon={CreditCard}
+                    label="Billing"
+                    href="/billing"
+                    isActive={location === "/billing"}
+                    onClick={handleNavClick}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </aside>
     </>
   );

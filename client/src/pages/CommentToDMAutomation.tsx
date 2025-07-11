@@ -332,10 +332,10 @@ export default function CommentToDMAutomation() {
           <div className="ml-16 bg-gray-100 rounded-2xl p-4 text-sm text-gray-800 leading-relaxed">
             {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
             
-            {/* Button inside the message bubble */}
+            {/* Button inside the message bubble - wider and closer to text */}
             {(directMessage.buttonText || directMessage.websiteUrl) && (
-              <div className="mt-4 text-center">
-                <button className="bg-white border border-gray-300 text-gray-900 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+              <div className="mt-2 text-center">
+                <button className="bg-white border border-gray-300 text-gray-900 px-12 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors w-full max-w-xs">
                   {directMessage.buttonText || "Click here"}
                 </button>
               </div>

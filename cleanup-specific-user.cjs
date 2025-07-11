@@ -16,7 +16,7 @@ async function cleanupSpecificUser() {
     const db = client.db('veeforedb');
     const usersCollection = db.collection('users');
     
-    const email = 'aasthachoudhary0111@gmail.com';
+    const email = 'aasthachoudhary1804@gmail.com';
     
     // Find the user first
     const user = await usersCollection.findOne({ email });

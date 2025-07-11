@@ -832,7 +832,10 @@ export default function Settings() {
                   Workspace
                 </button>
                 <button
-                  onClick={() => setActiveTab("ai")}
+                  onClick={() => {
+                    console.log('AI Assistant tab clicked');
+                    setActiveTab("ai");
+                  }}
                   className={`w-full flex items-center px-3 py-2 text-left text-sm font-medium rounded-md transition-colors`}
                   style={activeTab === "ai" 
                     ? { backgroundColor: '#111827', color: '#ffffff' }
@@ -1769,6 +1772,7 @@ export default function Settings() {
             {/* AI Assistant Tab */}
             {activeTab === "ai" && (
               <div className="space-y-6">
+                {console.log('AI Assistant tab content rendered')}
                 <Card className="bg-white border border-gray-200">
                   <CardHeader className="border-b border-gray-200">
                     <CardTitle className="flex items-center text-lg">

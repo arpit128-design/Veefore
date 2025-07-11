@@ -80,7 +80,7 @@ svg.lucide *,
   display: none; /* WebKit */
 }
 
-/* SCROLL ARROW BUTTONS */
+/* SCROLL ARROW BUTTONS - CONDITIONAL VISIBILITY */
 #scroll-left-btn,
 #scroll-right-btn {
   transition: all 0.2s ease;
@@ -94,6 +94,18 @@ svg.lucide *,
   transform: translateY(-50%) scale(1.1);
   opacity: 1 !important;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Show buttons only when scrollable */
+#scroll-left-btn.opacity-75,
+#scroll-right-btn.opacity-75 {
+  opacity: 0.75;
+}
+
+/* Hide buttons when not scrollable */
+#scroll-left-btn.hidden,
+#scroll-right-btn.hidden {
+  display: none !important;
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */

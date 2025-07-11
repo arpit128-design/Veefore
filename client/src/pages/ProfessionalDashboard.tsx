@@ -193,6 +193,47 @@ const ProfessionalDashboard: React.FC = () => {
 
   const performanceScore = calculatePerformanceScore();
 
+  // Check if Quick Actions section is scrollable and show/hide arrow buttons
+  const checkScrollableAndUpdateArrows = () => {
+    const container = document.getElementById('quick-actions-scroll');
+    const leftBtn = document.getElementById('scroll-left-btn');
+    const rightBtn = document.getElementById('scroll-right-btn');
+    
+    if (container && leftBtn && rightBtn) {
+      const isScrollable = container.scrollWidth > container.clientWidth;
+      
+      if (isScrollable) {
+        leftBtn.classList.remove('hidden');
+        rightBtn.classList.remove('hidden');
+        leftBtn.classList.add('opacity-75');
+        rightBtn.classList.add('opacity-75');
+      } else {
+        leftBtn.classList.add('hidden');
+        rightBtn.classList.add('hidden');
+        leftBtn.classList.remove('opacity-75');
+        rightBtn.classList.remove('opacity-75');
+      }
+    }
+  };
+
+  // Check scrollable state on component mount and window resize
+  useEffect(() => {
+    checkScrollableAndUpdateArrows();
+    
+    const handleResize = () => {
+      checkScrollableAndUpdateArrows();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Check again after a short delay to ensure DOM is fully rendered
+    setTimeout(checkScrollableAndUpdateArrows, 100);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
 
 
   // Quick action cards data
@@ -352,12 +393,12 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Horizontal Scroll with Arrow Buttons */}
+      {/* Quick Actions Horizontal Scroll with Conditional Arrow Buttons */}
       <div id="quick-actions-section" className="py-2 sm:py-4 relative" style={{ background: 'transparent' }}>
-        {/* Left Arrow Button */}
+        {/* Left Arrow Button - Only visible when scrollable */}
         <button
           id="scroll-left-btn"
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-75 hover:opacity-100"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-0 hover:opacity-100 hidden"
           onClick={() => {
             const container = document.getElementById('quick-actions-scroll');
             if (container) {
@@ -369,10 +410,10 @@ const ProfessionalDashboard: React.FC = () => {
           <ChevronLeft className="w-4 h-4 text-gray-700" />
         </button>
 
-        {/* Right Arrow Button */}
+        {/* Right Arrow Button - Only visible when scrollable */}
         <button
           id="scroll-right-btn"
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-75 hover:opacity-100"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full p-2 shadow-lg transition-all duration-200 opacity-0 hover:opacity-100 hidden"
           onClick={() => {
             const container = document.getElementById('quick-actions-scroll');
             if (container) {

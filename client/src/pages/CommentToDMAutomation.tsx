@@ -302,7 +302,7 @@ export default function CommentToDMAutomation() {
         borderRadius: '12px',
         border: '1px solid #e5e7eb',
         overflow: 'hidden',
-        maxWidth: '400px',
+        width: '380px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       }}>
@@ -370,8 +370,8 @@ export default function CommentToDMAutomation() {
           }}>
             {/* Sender Avatar */}
             <div style={{
-              width: '28px',
-              height: '28px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
               backgroundColor: '#e5e7eb',
               display: 'flex',
@@ -380,7 +380,7 @@ export default function CommentToDMAutomation() {
               flexShrink: 0
             }}>
               <span style={{
-                fontSize: '14px',
+                fontSize: '16px',
                 fontWeight: '600',
                 color: '#6b7280'
               }}>
@@ -393,7 +393,7 @@ export default function CommentToDMAutomation() {
               backgroundColor: '#f1f1f1',
               borderRadius: '18px',
               padding: '12px 16px',
-              maxWidth: '280px',
+              maxWidth: '260px',
               position: 'relative'
             }}>
               <div style={{
@@ -408,12 +408,13 @@ export default function CommentToDMAutomation() {
               {/* Button */}
               <div style={{
                 backgroundColor: '#ffffff',
-                border: '1px solid #dbdbdb',
                 borderRadius: '8px',
-                padding: '10px 16px',
+                padding: '8px 12px',
                 textAlign: 'center',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                maxWidth: '120px',
+                margin: '0 auto'
               }}>
                 <span style={{
                   fontSize: '14px',

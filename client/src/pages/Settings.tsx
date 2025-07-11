@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
+import { SettingsSlider } from "@/components/ui/settings-slider";
 import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
@@ -215,29 +215,77 @@ export default function Settings() {
     }
     
     /* Targeted slider fix */
-    .settings-page [role="slider"] {
-      position: relative !important;
+    /* Complete slider override with all possible selectors */
+    .settings-page [role="slider"],
+    .settings-page [data-radix-slider-root],
+    .settings-page .radix-slider-root {
       background: #e5e7eb !important;
       background-color: #e5e7eb !important;
       background-image: none !important;
     }
     
-    .settings-page [role="slider"]::before {
-      content: '' !important;
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 70% !important;
-      height: 100% !important;
+    /* Target the track - this is the background rail */
+    .settings-page [role="slider"] > span,
+    .settings-page [data-radix-slider-track],
+    .settings-page .radix-slider-track {
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    /* Target the range - this is the filled portion */
+    .settings-page [role="slider"] > span > span,
+    .settings-page [data-radix-slider-range],
+    .settings-page .radix-slider-range {
       background: #111827 !important;
       background-color: #111827 !important;
       background-image: none !important;
-      z-index: 1 !important;
     }
     
-    .settings-page [role="slider"] > * {
-      z-index: 2 !important;
-      position: relative !important;
+    /* Target the thumb - this is the handle */
+    .settings-page [role="slider"] button,
+    .settings-page [data-radix-slider-thumb],
+    .settings-page .radix-slider-thumb {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      border-color: #111827 !important;
+    }
+    
+    /* Nuclear option - override any inline styles */
+    .settings-page [role="slider"] * {
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    .settings-page [role="slider"] > span:first-child,
+    .settings-page [role="slider"] > span:first-child * {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
+    }
+    
+    /* Ultra-specific targeting for the yellow part */
+    .settings-page [role="slider"] > span:nth-child(2),
+    .settings-page [role="slider"] > span:last-child {
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    /* Target any element with transform style (usually the filled part) */
+    .settings-page [role="slider"] [style*="transform"],
+    .settings-page [role="slider"] [style*="width"] {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
+    }
+    
+    /* Target any element with background that's not gray */
+    .settings-page [role="slider"] [style*="background"] {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
     }
     
     /* Override all button backgrounds */
@@ -393,14 +441,47 @@ export default function Settings() {
     }
   `;
   
-  // Inject styles
+  // Inject styles with maximum priority
   if (typeof document !== 'undefined') {
     const styleElement = document.createElement('style');
     styleElement.textContent = settingsStyles;
-    if (!document.head.querySelector('[data-settings-styles]')) {
-      styleElement.setAttribute('data-settings-styles', 'true');
-      document.head.appendChild(styleElement);
+    styleElement.setAttribute('data-settings-styles', 'true');
+    
+    // Remove existing styles first
+    const existingStyles = document.head.querySelector('[data-settings-styles]');
+    if (existingStyles) {
+      existingStyles.remove();
     }
+    
+    // Add new styles at the end of head for maximum priority
+    document.head.appendChild(styleElement);
+    
+    // Also add immediate inline styles for sliders
+    const immediateSliderStyles = document.createElement('style');
+    immediateSliderStyles.textContent = `
+      [role="slider"] { 
+        background: #e5e7eb !important; 
+        background-color: #e5e7eb !important; 
+        background-image: none !important; 
+      }
+      [role="slider"] > span { 
+        background: #e5e7eb !important; 
+        background-color: #e5e7eb !important; 
+        background-image: none !important; 
+      }
+      [role="slider"] > span:first-child,
+      [role="slider"] > span:first-child * { 
+        background: #111827 !important; 
+        background-color: #111827 !important; 
+        background-image: none !important; 
+      }
+      [role="slider"] button { 
+        background: #111827 !important; 
+        background-color: #111827 !important; 
+        border-color: #111827 !important; 
+      }
+    `;
+    document.head.appendChild(immediateSliderStyles);
   }
   
   const { user } = useAuth();
@@ -408,47 +489,83 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState("account");
   const [isEditing, setIsEditing] = useState(false);
   
-  // Force override slider colors after render
+  // Force override slider colors with aggressive targeting
   useEffect(() => {
     const forceSliderColors = () => {
-      // Apply styles to all sliders
-      const sliders = document.querySelectorAll('.settings-page [role="slider"]');
-      sliders.forEach(slider => {
-        if (slider instanceof HTMLElement) {
-          // Force gray background
-          slider.style.setProperty('background', '#e5e7eb', 'important');
-          slider.style.setProperty('background-color', '#e5e7eb', 'important');
-          slider.style.setProperty('background-image', 'none', 'important');
-          
-          // Target all child elements
-          const allChildren = slider.querySelectorAll('*');
-          allChildren.forEach((child, index) => {
-            if (child instanceof HTMLElement) {
-              if (index === 0) {
-                // First child should be dark (progress part)
-                child.style.setProperty('background', '#111827', 'important');
-                child.style.setProperty('background-color', '#111827', 'important');
-              } else {
-                // Other children should be gray
-                child.style.setProperty('background', '#e5e7eb', 'important');
-                child.style.setProperty('background-color', '#e5e7eb', 'important');
+      // Target all possible slider elements
+      const sliderSelectors = [
+        '.settings-page [role="slider"]',
+        '.settings-page [data-radix-slider-root]',
+        '.settings-page .slider',
+        '.settings-page [class*="slider"]'
+      ];
+      
+      sliderSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          if (element instanceof HTMLElement) {
+            // Apply to the main element
+            element.style.setProperty('background', '#e5e7eb', 'important');
+            element.style.setProperty('background-color', '#e5e7eb', 'important');
+            element.style.setProperty('background-image', 'none', 'important');
+            
+            // Apply to all descendants
+            const descendants = element.querySelectorAll('*');
+            descendants.forEach((desc, index) => {
+              if (desc instanceof HTMLElement) {
+                // Check if this is the filled portion (usually has a style attribute with percentage)
+                const hasPercentage = desc.style.cssText.includes('%') || desc.getAttribute('style')?.includes('%');
+                if (hasPercentage || index === 0) {
+                  desc.style.setProperty('background', '#111827', 'important');
+                  desc.style.setProperty('background-color', '#111827', 'important');
+                } else {
+                  desc.style.setProperty('background', '#e5e7eb', 'important');
+                  desc.style.setProperty('background-color', '#e5e7eb', 'important');
+                }
+                desc.style.setProperty('background-image', 'none', 'important');
               }
-              child.style.setProperty('background-image', 'none', 'important');
-            }
-          });
+            });
+          }
+        });
+      });
+      
+      // Also target any elements with yellow backgrounds specifically
+      const yellowElements = document.querySelectorAll('.settings-page *');
+      yellowElements.forEach(el => {
+        if (el instanceof HTMLElement) {
+          const computedStyle = window.getComputedStyle(el);
+          const bgColor = computedStyle.backgroundColor;
+          // Check if background is yellow-ish
+          if (bgColor.includes('255, 255') || bgColor.includes('yellow') || bgColor.includes('rgb(255, 247')) {
+            el.style.setProperty('background-color', '#e5e7eb', 'important');
+            el.style.setProperty('background', '#e5e7eb', 'important');
+          }
         }
       });
     };
 
-    // Apply multiple times to ensure override
+    // Apply immediately and repeatedly
     forceSliderColors();
+    setTimeout(forceSliderColors, 10);
     setTimeout(forceSliderColors, 50);
-    setTimeout(forceSliderColors, 200);
+    setTimeout(forceSliderColors, 100);
+    setTimeout(forceSliderColors, 300);
     setTimeout(forceSliderColors, 500);
+    setTimeout(forceSliderColors, 1000);
     
-    // Also run when switching tabs
-    const interval = setInterval(forceSliderColors, 1000);
-    return () => clearInterval(interval);
+    // Set up observer for dynamic content
+    const observer = new MutationObserver(() => {
+      forceSliderColors();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+    
+    return () => observer.disconnect();
   }, [activeTab]);
 
   // Enhanced profile state
@@ -1716,7 +1833,7 @@ export default function Settings() {
                             {preferences.ai.creativity}%
                           </span>
                         </div>
-                        <Slider
+                        <SettingsSlider
                           value={[preferences.ai.creativity]}
                           onValueChange={(value) => 
                             setPreferences(prev => ({

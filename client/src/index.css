@@ -28,7 +28,7 @@
   --ring: 37 99 235;
   --chart-1: 220 38 127;
   --chart-2: 16 185 129;
-  --chart-3: 245 158 11;
+  --chart-3: 37 99 235;
   --chart-4: 139 92 246;
   --chart-5: 236 72 153;
   --radius: 0.5rem;
@@ -51,16 +51,53 @@
   --electric-cyan: 6 182 212;
   --neon-pink: 236 72 153;
   --nebula-purple: 139 92 246;
-  --solar-gold: 245 158 11;
+  --solar-blue: 37 99 235;
   --space-gray: 71 85 105;
   --asteroid-silver: 148 163 184;
 }
 
-/* PURE LIGHT THEME BASE STYLES */
-/* Clean implementation without dark-to-light conversion */
+/* NUCLEAR YELLOW ELIMINATION SYSTEM */
+/* Complete prevention of ALL yellow colors */
 
 * {
   border-color: hsl(var(--border));
+}
+
+/* COMPREHENSIVE YELLOW COLOR ELIMINATION */
+/* Override ALL possible yellow color sources */
+
+*[style*="rgb(255, 255, 0)"],
+*[style*="rgb(255,255,0)"],
+*[style*="#ffff00"],
+*[style*="#FFFF00"],
+*[style*="yellow"],
+*[style*="gold"],
+*[style*="hsl(60"],
+*[class*="yellow"],
+*[class*="amber"],
+*[class*="bg-yellow"],
+*[class*="text-yellow"],
+*[class*="border-yellow"],
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800, .bg-yellow-900,
+.text-yellow-50, .text-yellow-100, .text-yellow-200, .text-yellow-300, .text-yellow-400, .text-yellow-500, .text-yellow-600, .text-yellow-700, .text-yellow-800, .text-yellow-900,
+.border-yellow-50, .border-yellow-100, .border-yellow-200, .border-yellow-300, .border-yellow-400, .border-yellow-500, .border-yellow-600, .border-yellow-700, .border-yellow-800, .border-yellow-900,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
+.text-amber-50, .text-amber-100, .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500, .text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900,
+.border-amber-50, .border-amber-100, .border-amber-200, .border-amber-300, .border-amber-400, .border-amber-500, .border-amber-600, .border-amber-700, .border-amber-800, .border-amber-900 {
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(15, 23, 42) !important;
+  border-color: rgb(226, 232, 240) !important;
+}
+
+/* Override any computed yellow colors */
+[style*="background-color: rgb(255, 255, 0)"],
+[style*="background-color: rgb(255,255,0)"],
+[style*="background-color:#ffff00"],
+[style*="background-color: #ffff00"],
+[style*="background-color: yellow"],
+[style*="background-color: gold"] {
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(15, 23, 42) !important;
 }
 
 body {

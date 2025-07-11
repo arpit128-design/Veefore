@@ -290,7 +290,11 @@ export default function SignUpWithOnboarding() {
     if (user && user.isOnboarded) {
       setLocation('/dashboard');
     }
-  }, [user, setLocation]);
+    // If user is authenticated but not onboarded, skip to step 2 (email verification is done)
+    if (user && !user.isOnboarded && currentStep === 0) {
+      setCurrentStep(2); // Skip to plan selection
+    }
+  }, [user, setLocation, currentStep]);
 
   // Step progression logic
   const nextStep = () => {

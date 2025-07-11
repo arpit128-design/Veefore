@@ -256,9 +256,20 @@ function Router() {
 
   // If user is authenticated, check if they need onboarding
   if (isAuthenticated) {
-    // If user hasn't completed onboarding, redirect to signup/onboarding
-    if (!user.isOnboarded) {
+    // If user hasn't completed onboarding and not already on signup page, redirect to signup
+    if (!user.isOnboarded && location !== "/signup") {
       return <Redirect to="/signup" />;
+    }
+    // If user hasn't completed onboarding and is on signup page, show signup
+    if (!user.isOnboarded && location === "/signup") {
+      return (
+        <div className="min-h-screen bg-background text-foreground">
+          <Switch>
+            <Route path="/signup" component={SignUpWithOnboarding} />
+            <Route component={() => <Redirect to="/signup" />} />
+          </Switch>
+        </div>
+      );
     }
     return <AuthenticatedApp />;
   }

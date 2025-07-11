@@ -170,6 +170,10 @@ export default function CommentToDMAutomation() {
   });
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  // Generate initials from Instagram username (defaults to "R" for rahulc1020)
+  const getInitials = (): string => {
+    return 'R';
+  };
 
   const filteredPosts = selectedPlatform === 'all' 
     ? MOCK_POSTS 
@@ -296,6 +300,8 @@ export default function CommentToDMAutomation() {
       minute: '2-digit' 
     }).toUpperCase();
     
+    const userInitials = getInitials();
+    
     return (
       <div style={{
         backgroundColor: '#ffffff',
@@ -384,7 +390,7 @@ export default function CommentToDMAutomation() {
                 fontWeight: '600',
                 color: '#6b7280'
               }}>
-                R
+                {userInitials}
               </span>
             </div>
 
@@ -477,7 +483,7 @@ export default function CommentToDMAutomation() {
   return (
     <div className="min-h-screen bg-gray-50 flex comment-to-dm-automation">
       {/* Main Content */}
-      <div className="w-2/3 bg-white border-r border-gray-200">
+      <div className="w-1/2 bg-white border-r border-gray-200">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -917,7 +923,7 @@ export default function CommentToDMAutomation() {
 
 
       {/* Right Panel - Preview */}
-      <div className="w-1/3 bg-gray-50 p-8 overflow-y-auto">
+      <div className="w-1/2 bg-gray-50 p-8 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Instagram className="w-5 h-5 text-pink-600" />

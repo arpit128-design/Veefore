@@ -308,8 +308,8 @@ export default function CommentToDMAutomation() {
         <div className="flex justify-start">
           <div className="bg-gray-200 text-gray-900 px-3 py-2 rounded-2xl rounded-tl-sm max-w-xs">
             <div className="text-sm">{directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}</div>
-            <div className="mt-2 p-2 bg-white rounded-lg border border-gray-300 text-center">
-              <div className="text-sm font-medium text-gray-400">
+            <div className="mt-2 p-2 bg-white rounded-lg text-center">
+              <div className={`text-sm font-medium ${directMessage.buttonText ? 'text-black' : 'text-gray-400'}`}>
                 {directMessage.buttonText || 'See products'}
               </div>
             </div>

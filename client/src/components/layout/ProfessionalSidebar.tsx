@@ -147,12 +147,20 @@ function MobileSchedulerPopup({ schedulerOptions, setIsMobileMenuOpen, location 
 
       {/* Custom Popup Overlay */}
       {isOpen && (
-        <div 
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={handleClose}
         >
           {/* Backdrop with blur */}
-          <div 
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="absolute inset-0"
             style={{
               background: 'rgba(0, 0, 0, 0.4)',
@@ -162,7 +170,16 @@ function MobileSchedulerPopup({ schedulerOptions, setIsMobileMenuOpen, location 
           />
           
           {/* Popup Content */}
-          <div 
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ 
+              duration: 0.3,
+              type: "spring",
+              stiffness: 300,
+              damping: 30
+            }}
             className="relative max-w-sm w-full rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             style={{
@@ -182,8 +199,21 @@ function MobileSchedulerPopup({ schedulerOptions, setIsMobileMenuOpen, location 
             {/* Content */}
             <div className="p-2">
               {schedulerOptions.map((option, optionIndex) => (
-                <div key={optionIndex}>
-                  <button
+                <motion.div 
+                  key={optionIndex}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.3,
+                    delay: optionIndex * 0.1,
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25
+                  }}
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleOptionClick(option)}
                     className="w-full p-4 text-left rounded-lg hover:bg-white/50 transition-colors"
                   >
@@ -211,15 +241,15 @@ function MobileSchedulerPopup({ schedulerOptions, setIsMobileMenuOpen, location 
                         </p>
                       </div>
                     </div>
-                  </button>
+                  </motion.button>
                   {optionIndex < schedulerOptions.length - 1 && (
                     <hr className="my-1 border-gray-200" />
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

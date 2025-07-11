@@ -201,39 +201,75 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
       title: 'Post',
       description: 'Create and publish content',
       icon: <Edit className="w-4 h-4 text-gray-600" />,
-      action: () => setLocation('/create-post'),
+      action: () => {
+        try {
+          setLocation('/create-post');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
     {
       title: 'Content with AI',
       description: 'AI-powered content generation',
       icon: <Sparkles className="w-4 h-4 text-purple-600" />,
-      action: () => setLocation('/content-studio'),
+      action: () => {
+        try {
+          setLocation('/content-studio');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
     {
       title: 'DM automation',
       description: 'Automated direct messaging',
       icon: <Bot className="w-4 h-4 text-blue-600" />,
-      action: () => setLocation('/automation'),
+      action: () => {
+        try {
+          setLocation('/automation');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
     {
       title: 'Ad',
       description: 'Create advertisement campaigns',
       icon: <Megaphone className="w-4 h-4 text-orange-600" />,
-      action: () => setLocation('/scheduler'),
+      action: () => {
+        try {
+          setLocation('/scheduler');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
     {
       title: 'Automated boost',
       description: 'Auto-boost high performing content',
       icon: <TrendingUp className="w-4 h-4 text-green-600" />,
       badge: 'New',
-      action: () => setLocation('/scheduler'),
+      action: () => {
+        try {
+          setLocation('/scheduler');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
     {
       title: 'Hootbio',
       description: 'Bio link management',
       icon: <LinkIcon className="w-4 h-4 text-emerald-600" />,
       badge: 'Upgrade',
-      action: () => setLocation('/scheduler'),
+      action: () => {
+        try {
+          setLocation('/scheduler');
+        } catch (error) {
+          console.error('Navigation error:', error);
+        }
+      },
     },
   ];
 
@@ -424,14 +460,19 @@ function SidebarContent({
                 </Button>
               </motion.div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className={cn("bg-white shadow-xl border border-gray-200 rounded-xl p-2", isMobile ? "w-80 max-w-[calc(100vw-2rem)]" : "w-72")} side={isMobile ? "bottom" : "right"} align={isMobile ? "end" : "start"} sideOffset={isMobile ? 4 : 8}>
+            <DropdownMenuContent className="w-72 max-w-[calc(100vw-2rem)] bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="bottom" align="start" sideOffset={4}>
               {schedulerOptions.map((option, optionIndex) => (
                 <div key={optionIndex}>
                   <DropdownMenuItem 
                     className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={(e) => {
                       e.preventDefault();
-                      option.action();
+                      e.stopPropagation();
+                      try {
+                        option.action();
+                      } catch (error) {
+                        console.error('Dropdown action error:', error);
+                      }
                     }}
                   >
                     <div className="mt-1">

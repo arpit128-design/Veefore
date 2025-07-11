@@ -316,34 +316,35 @@ export default function CommentToDMAutomation() {
       </div>
       
       {/* DM Content */}
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 relative">
         <div className="text-xs text-gray-500 text-center">
           JUL 11, 04:09 PM
         </div>
         
-        {/* Message Bubble */}
-        <div className="bg-gray-100 rounded-2xl p-4 text-sm text-gray-700 leading-relaxed">
-          {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
-        </div>
-        
-        {/* Button */}
-        {(directMessage.buttonText || directMessage.websiteUrl) && (
-          <div className="text-center">
-            <button className="bg-white border border-gray-300 text-gray-900 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
-              {directMessage.buttonText || "Click here"}
-            </button>
+        {/* Message Container with User Initial */}
+        <div className="relative">
+          {/* User Initial - Positioned to the left */}
+          <div className="absolute left-0 top-0 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+            <span className="text-lg font-medium text-gray-700">R</span>
           </div>
-        )}
-        
-        {/* User Initial */}
-        <div className="flex justify-end">
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">R</span>
+          
+          {/* Message Bubble */}
+          <div className="ml-16 bg-gray-100 rounded-2xl p-4 text-sm text-gray-800 leading-relaxed">
+            {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
+            
+            {/* Button inside the message bubble */}
+            {(directMessage.buttonText || directMessage.websiteUrl) && (
+              <div className="mt-4 text-center">
+                <button className="bg-white border border-gray-300 text-gray-900 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                  {directMessage.buttonText || "Click here"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
         
         {/* Bottom Input Area */}
-        <div className="flex items-center space-x-3 bg-gray-50 rounded-full p-3 mt-4">
+        <div className="flex items-center space-x-3 bg-gray-50 rounded-full p-3 mt-6">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>

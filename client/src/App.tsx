@@ -221,7 +221,6 @@ function Router() {
 
   // Public routes that don't require authentication
   const publicRoutes = [
-    '/',
     '/landing',
     '/hootsuite-landing',
     '/features',

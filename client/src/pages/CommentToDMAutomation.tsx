@@ -289,7 +289,10 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
-    // Simple test - completely self-contained
+    // TEST: Static preview to isolate state rendering issue
+    const staticText = 'I\'m so excited you\'d like to see what I\'ve got an offer!';
+    const staticButtonText = 'See products';
+    
     return (
       <div style={{
         backgroundColor: '#ffffff',
@@ -332,7 +335,7 @@ export default function CommentToDMAutomation() {
               borderTopRightRadius: '4px',
               maxWidth: '192px'
             }}>
-              <div style={{ fontSize: '14px' }}>{keyword || 'interested'}</div>
+              <div style={{ fontSize: '14px' }}>interested</div>
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -348,9 +351,9 @@ export default function CommentToDMAutomation() {
                 fontSize: '14px',
                 wordBreak: 'break-words',
                 overflowWrap: 'anywhere',
-                color: directMessage.text ? '#111827' : '#6b7280'
+                color: '#6b7280'
               }}>
-                {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}
+                {staticText}
               </div>
               <div style={{
                 marginTop: '8px',
@@ -363,9 +366,9 @@ export default function CommentToDMAutomation() {
                   fontSize: '14px',
                   fontWeight: '500',
                   wordBreak: 'break-words',
-                  color: directMessage.buttonText ? '#000000' : '#9ca3af'
+                  color: '#9ca3af'
                 }}>
-                  {directMessage.buttonText || 'See products'}
+                  {staticButtonText}
                 </div>
               </div>
             </div>
@@ -652,12 +655,7 @@ export default function CommentToDMAutomation() {
 
           {/* Step 3: Direct Message */}
           {currentStep === 2 && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
+            <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">Configure direct message</h2>
                 <p className="text-sm text-gray-600 mb-4">Set up the automated direct message that will be sent to users</p>
@@ -704,7 +702,7 @@ export default function CommentToDMAutomation() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Step 4: Review and Save */}
@@ -851,10 +849,14 @@ export default function CommentToDMAutomation() {
 
         <div className="flex-1 flex flex-col items-center justify-center">
           {currentStep === 2 && (
-            <InstagramDMPreview />
+            <div key="dm-preview">
+              <InstagramDMPreview />
+            </div>
           )}
           {currentStep !== 2 && selectedPost && (
-            <InstagramPostPreview post={selectedPost} />
+            <div key="post-preview">
+              <InstagramPostPreview post={selectedPost} />
+            </div>
           )}
 
           {showAnalytics && (

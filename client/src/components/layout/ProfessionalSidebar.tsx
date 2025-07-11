@@ -498,19 +498,13 @@ function SidebarContent({
                   </Button>
                 </motion.div>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
-                    Scheduler Options
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-2 py-4">
+              <DialogContent className="max-w-sm mx-auto p-0 bg-white shadow-xl border border-gray-200 rounded-xl">
+                <div className="p-2">
                   {schedulerOptions.map((option, optionIndex) => (
                     <div key={optionIndex}>
                       <Button
                         variant="ghost"
-                        className="w-full justify-start p-4 h-auto text-left"
+                        className="w-full justify-start p-4 h-auto text-left rounded-lg hover:bg-gray-50 transition-colors"
                         onClick={() => {
                           option.action();
                           if (setIsMobileMenuOpen) {
@@ -547,7 +541,7 @@ function SidebarContent({
                         </div>
                       </Button>
                       {optionIndex < schedulerOptions.length - 1 && (
-                        <Separator className="my-1" />
+                        <Separator className="my-1 bg-gray-100" />
                       )}
                     </div>
                   ))}

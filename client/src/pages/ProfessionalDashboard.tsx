@@ -425,7 +425,7 @@ const ProfessionalDashboard: React.FC = () => {
           <ChevronRight className="w-4 h-4 text-gray-700" />
         </button>
 
-        <div id="quick-actions-scroll" className="overflow-x-auto px-4 sm:px-6" style={{ background: 'transparent' }}>
+        <div id="quick-actions-scroll" className="overflow-x-auto px-3 sm:px-4 lg:px-6" style={{ background: 'transparent' }}>
           <div id="quick-actions-grid" className="flex space-x-8 min-w-max" style={{ background: 'transparent' }}>
             <div 
               id="create-ai-action"

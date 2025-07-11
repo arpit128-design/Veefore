@@ -100,12 +100,20 @@ svg.lucide *,
 #scroll-left-btn.opacity-75,
 #scroll-right-btn.opacity-75 {
   opacity: 0.75;
+  visibility: visible;
 }
 
 /* Hide buttons when not scrollable */
 #scroll-left-btn.hidden,
 #scroll-right-btn.hidden {
   display: none !important;
+  visibility: hidden;
+}
+
+/* Smooth transition for button appearance */
+#scroll-left-btn,
+#scroll-right-btn {
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */

@@ -16,6 +16,7 @@ import {
   Lightbulb,
   Zap,
   MessageSquare,
+  MessageCircle,
   Settings,
   Users,
   Briefcase,
@@ -616,6 +617,13 @@ function SidebarContent({
             href="/post-automation"
             isActive={location === "/post-automation"}
             badge="New"
+          />
+          <SidebarItem
+            icon={MessageCircle}
+            label="Comment to DM"
+            href="/comment-to-dm-automation"
+            isActive={location === "/comment-to-dm-automation"}
+            badge="Pro"
           />
           <SidebarItem
             icon={MessageSquare}

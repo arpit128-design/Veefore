@@ -446,7 +446,7 @@ export default function CommentToDMAutomation() {
           </div>
 
           {/* Step Content */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -511,7 +511,7 @@ export default function CommentToDMAutomation() {
                             </Select>
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-4 max-h-80 overflow-y-auto">
+                          <div className="grid grid-cols-3 gap-4">
                             {filteredPosts.map(post => (
                               <div
                                 key={post.id}

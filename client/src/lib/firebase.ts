@@ -120,18 +120,22 @@ export async function logout() {
     // Clear demo mode from localStorage
     localStorage.removeItem('veefore_demo_mode');
     
+    // Clear authentication token
+    localStorage.removeItem('veefore_auth_token');
+    
     // If Firebase auth is available, sign out
     if (auth) {
       await signOut(auth);
     }
     
-    // Force reload to reset application state
-    window.location.reload();
+    // Redirect to landing page instead of reloading
+    window.location.href = '/';
   } catch (error) {
     console.error('Logout error:', error);
     // Even if Firebase logout fails, clear local state
     localStorage.removeItem('veefore_demo_mode');
-    window.location.reload();
+    localStorage.removeItem('veefore_auth_token');
+    window.location.href = '/';
   }
 }
 

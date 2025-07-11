@@ -511,33 +511,33 @@ export default function CommentToDMAutomation() {
                             </Select>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
+                          <div className="grid grid-cols-3 gap-4 max-h-80 overflow-y-auto">
                             {filteredPosts.map(post => (
                               <div
                                 key={post.id}
                                 onClick={() => setSelectedPost(post)}
                                 className={cn(
-                                  "p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
+                                  "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
                                   selectedPost?.id === post.id
                                     ? "border-blue-500 bg-blue-50"
                                     : "border-gray-200 hover:border-gray-300"
                                 )}
                               >
-                                <div className="aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center">
+                                <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
                                   {post.mediaType === 'video' ? (
-                                    <Video className="w-8 h-8 text-gray-400" />
+                                    <Video className="w-12 h-12 text-gray-400" />
                                   ) : post.mediaType === 'carousel' ? (
                                     <div className="flex space-x-1">
-                                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
                                     </div>
                                   ) : (
-                                    <ImageIcon className="w-8 h-8 text-gray-400" />
+                                    <ImageIcon className="w-12 h-12 text-gray-400" />
                                   )}
                                 </div>
-                                <div className="space-y-1">
-                                  <p className="text-xs text-gray-700 line-clamp-2">{post.caption}</p>
+                                <div className="space-y-2">
+                                  <p className="text-sm text-gray-700 line-clamp-2">{post.caption}</p>
                                   <div className="flex items-center justify-between">
                                     <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="text-xs">
                                       {post.status}

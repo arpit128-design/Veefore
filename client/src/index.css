@@ -738,12 +738,29 @@ div[class*="dashboard-greeting-banner"] {
   border-color: rgb(229, 231, 235) !important;
 }
 
-/* Force specific button styling to white */
-button[class*="bg-yellow"], button[class*="bg-amber"], 
-.btn-yellow, .btn-amber {
+/* Force specific button styling to white - BUT EXCLUDE CREATE CONTENT BUTTON */
+button[class*="bg-yellow"]:not(.create-content-button), 
+button[class*="bg-amber"]:not(.create-content-button), 
+.btn-yellow:not(.create-content-button), 
+.btn-amber:not(.create-content-button) {
   background-color: rgb(255 255 255) !important;
   color: rgb(30 41 59) !important;
   border-color: rgb(229 231 235) !important;
+}
+
+/* CREATE CONTENT BUTTON SPECIFIC OVERRIDE - FORCE BLUE COLOR */
+.create-content-button,
+button.create-content-button {
+  background-color: #4a78f5 !important;
+  background: #4a78f5 !important;
+  color: white !important;
+}
+
+.create-content-button:hover,
+button.create-content-button:hover {
+  background-color: #3b64d9 !important;
+  background: #3b64d9 !important;
+  color: white !important;
 }
 
 button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {

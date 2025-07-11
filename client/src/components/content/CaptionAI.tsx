@@ -144,7 +144,7 @@ export function CaptionAI() {
           </div>
           <div className="text-right">
             <div className="font-medium text-asteroid-silver">Estimated Time</div>
-            <div className="text-sm text-solar-gold">10-20 seconds</div>
+            <div className="text-sm text-blue-500">10-20 seconds</div>
           </div>
         </div>
 

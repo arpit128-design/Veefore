@@ -436,7 +436,7 @@ export default function CompetitorAnalysis() {
                         Your engagement rate (5.2%) is higher than 60% of competitors in your niche
                       </p>
                     </div>
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-3 border border-yellow-500/30">
+                    <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-3 border border-blue-500/30">
                       <h4 className="text-yellow-400 font-medium text-sm">Growth Gap</h4>
                       <p className="text-asteroid-silver text-xs mt-1">
                         Competitors post 40% more frequently. Consider increasing posting frequency

@@ -188,10 +188,10 @@ export function OptimalTimes() {
             </p>
           </div>
           
-          <div className="p-4 rounded-lg bg-solar-gold/10 border border-solar-gold/30">
+          <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
             <div className="flex items-center space-x-2 mb-2">
-              <Zap className="h-5 w-5 text-solar-gold" />
-              <span className="font-medium text-solar-gold">Quick Tip</span>
+              <Zap className="h-5 w-5 text-blue-500" />
+              <span className="font-medium text-blue-500">Quick Tip</span>
             </div>
             <p className="text-sm text-asteroid-silver">
               Cross-posting within 15-minute windows increases total reach by 23%

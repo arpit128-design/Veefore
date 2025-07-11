@@ -714,7 +714,7 @@ const ProfessionalDashboard: React.FC = () => {
           <Card className="bg-gradient-to-br from-slate-100 to-blue-50">
             <CardContent className="p-4 sm:p-6">
               <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                   <img 
                     src={veeforeLogo} 
                     alt="VeeFore Logo" 

@@ -17,7 +17,7 @@ const contentTools = [
     name: 'Reel Builder',
     description: 'Short-form content',
     icon: Smartphone,
-    gradient: 'from-solar-gold to-red-500',
+    gradient: 'from-blue-500 to-purple-500',
     route: '/content-studio?tool=reel'
   },
   {

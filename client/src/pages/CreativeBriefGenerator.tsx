@@ -158,7 +158,7 @@ export default function CreativeBriefGenerator() {
               <Sparkles className="w-3 h-3 mr-1" />
               Credits: {userCredits || 0}
             </Badge>
-            <Badge className="bg-solar-gold/20 text-solar-gold border-solar-gold/30">3 credits per generation</Badge>
+            <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/30">3 credits per generation</Badge>
           </div>
         </div>
 

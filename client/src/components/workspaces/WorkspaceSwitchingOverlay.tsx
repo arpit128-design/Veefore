@@ -86,7 +86,7 @@ export function WorkspaceSwitchingOverlay({
               >
                 <div className="absolute inset-0 border-4 border-electric-cyan/30 rounded-full"></div>
                 <div className="absolute inset-2 border-2 border-nebula-purple/50 rounded-full"></div>
-                <div className="absolute inset-4 border border-solar-gold/40 rounded-full"></div>
+                <div className="absolute inset-4 border border-blue-500/40 rounded-full"></div>
               </motion.div>
               
               {/* Center workspace icon */}

@@ -33,10 +33,10 @@ export function Header() {
             
             {/* Credit Display */}
             <div className="flex items-center space-x-2 glassmorphism px-2 lg:px-3 py-1.5 lg:py-2 rounded-lg border border-electric-cyan/20 hover:border-electric-cyan/40 transition-all duration-300">
-              <div className="w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-gradient-to-r from-solar-gold to-electric-cyan animate-pulse-glow flex items-center justify-center">
+              <div className="w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-gradient-to-r from-blue-500 to-electric-cyan animate-pulse-glow flex items-center justify-center">
                 <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-white"></div>
               </div>
-              <span className="text-solar-gold font-mono text-lg font-bold">{credits.toLocaleString()}</span>
+              <span className="text-blue-500 font-mono text-lg font-bold">{credits.toLocaleString()}</span>
               <span className="text-xs text-electric-cyan font-medium">Credits</span>
             </div>
             

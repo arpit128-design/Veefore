@@ -54,7 +54,7 @@ export default function PublishingProgressTracker({
   const getStatusColor = () => {
     switch (status) {
       case 'preparing':
-        return 'border-solar-gold/50 bg-solar-gold/10';
+        return 'border-blue-500/50 bg-blue-500/10';
       case 'uploading':
         return 'border-electric-cyan/50 bg-electric-cyan/10';
       case 'processing':

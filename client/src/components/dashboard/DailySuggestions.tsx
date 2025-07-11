@@ -53,7 +53,7 @@ export function DailySuggestions() {
   const getColorForType = (type: string) => {
     switch (type) {
       case 'growth': return 'text-electric-cyan';
-      case 'hashtag': return 'text-solar-gold';
+      case 'hashtag': return 'text-blue-500';
       case 'trending': return 'text-purple-500';
       case 'engagement': return 'text-nebula-purple';
       default: return 'text-electric-cyan';
@@ -63,7 +63,7 @@ export function DailySuggestions() {
   const getBorderForType = (type: string) => {
     switch (type) {
       case 'growth': return 'border-electric-cyan/30';
-      case 'hashtag': return 'border-solar-gold/30';
+      case 'hashtag': return 'border-blue-500/30';
       case 'trending': return 'border-purple-500/30';
       case 'engagement': return 'border-nebula-purple/30';
       default: return 'border-electric-cyan/30';

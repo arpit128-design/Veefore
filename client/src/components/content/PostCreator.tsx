@@ -140,7 +140,7 @@ export function PostCreator() {
           </div>
           <div className="text-right">
             <div className="font-medium text-asteroid-silver">Estimated Time</div>
-            <div className="text-sm text-solar-gold">30-60 seconds</div>
+            <div className="text-sm text-blue-500">30-60 seconds</div>
           </div>
         </div>
 

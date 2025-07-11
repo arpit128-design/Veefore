@@ -65,7 +65,7 @@ export function ReelBuilder() {
     <Card className="content-card holographic">
       <CardHeader>
         <CardTitle className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-solar-gold to-red-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
             <Smartphone className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -116,21 +116,21 @@ export function ReelBuilder() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 rounded-lg bg-cosmic-blue border border-solar-gold/30">
+        <div className="flex items-center justify-between p-4 rounded-lg bg-cosmic-blue border border-blue-500/30">
           <div>
-            <div className="font-medium text-solar-gold">Generation Cost</div>
+            <div className="font-medium text-blue-500">Generation Cost</div>
             <div className="text-sm text-asteroid-silver">15 credits per reel</div>
           </div>
           <div className="text-right">
             <div className="font-medium text-asteroid-silver">Estimated Time</div>
-            <div className="text-sm text-solar-gold">1-2 minutes</div>
+            <div className="text-sm text-blue-500">1-2 minutes</div>
           </div>
         </div>
 
         <Button
           onClick={handleGenerate}
           disabled={generateMutation.isPending || !prompt.trim()}
-          className="w-full bg-gradient-to-r from-solar-gold to-red-500 hover:opacity-90 transition-opacity"
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition-opacity"
         >
           {generateMutation.isPending ? (
             <>

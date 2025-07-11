@@ -1333,7 +1333,7 @@ function TestimonialsSection() {
     <section id="testimonials" className="py-24 bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30">
             <Star className="w-3 h-3 mr-1" />
             Testimonials
           </Badge>

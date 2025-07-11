@@ -140,7 +140,7 @@ export function ThumbnailEditor() {
           </div>
           <div className="text-right">
             <div className="font-medium text-asteroid-silver">Estimated Time</div>
-            <div className="text-sm text-solar-gold">1 minute</div>
+            <div className="text-sm text-blue-500">1 minute</div>
           </div>
         </div>
 

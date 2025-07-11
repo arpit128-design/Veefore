@@ -108,7 +108,7 @@ export function ContentPerformance() {
       case 'youtube_short':
         return 'from-electric-cyan/20 to-nebula-purple/20';
       case 'reel':
-        return 'from-solar-gold/20 to-red-500/20';
+        return 'from-blue-500/20 to-purple-500/20';
       case 'post':
         return 'from-nebula-purple/20 to-pink-500/20';
       default:

@@ -243,7 +243,7 @@ export default function FeatureUnifiedManagement() {
               <MessageSquare className="w-10 h-10" />
             </motion.div>
             
-            <Badge className="mb-6 bg-orange-500/20 text-orange-300 border-orange-500/30 text-lg px-4 py-2">
+            <Badge className="mb-6 bg-blue-500/20 text-blue-300 border-blue-500/30 text-lg px-4 py-2">
               <Users className="w-4 h-4 mr-2" />
               Unified Social Media Management
             </Badge>

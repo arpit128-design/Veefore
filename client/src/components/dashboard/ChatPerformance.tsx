@@ -78,7 +78,7 @@ export function ChatPerformance() {
             <div className="text-xs text-asteroid-silver">Avg Satisfaction</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-solar-gold">{totalActiveChats}</div>
+            <div className="text-2xl font-bold text-blue-500">{totalActiveChats}</div>
             <div className="text-xs text-asteroid-silver">Active Chats</div>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function ChatPerformance() {
                   <div className="text-asteroid-silver">Satisfaction</div>
                 </div>
                 <div>
-                  <div className="text-solar-gold font-semibold">{metric.activeChats}</div>
+                  <div className="text-blue-500 font-semibold">{metric.activeChats}</div>
                   <div className="text-asteroid-silver">Active</div>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export function ChatPerformance() {
           <button className="px-3 py-1.5 bg-electric-cyan/20 text-electric-cyan rounded-md text-sm hover:bg-electric-cyan/30 transition-colors">
             View All Chats
           </button>
-          <button className="px-3 py-1.5 bg-solar-gold/20 text-solar-gold rounded-md text-sm hover:bg-solar-gold/30 transition-colors">
+          <button className="px-3 py-1.5 bg-blue-500/20 text-blue-500 rounded-md text-sm hover:bg-blue-500/30 transition-colors">
             Response Templates
           </button>
           <button className="px-3 py-1.5 bg-white/10 text-white rounded-md text-sm hover:bg-white/20 transition-colors">

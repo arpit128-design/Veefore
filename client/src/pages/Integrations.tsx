@@ -512,7 +512,7 @@ export default function Integrations() {
                                   Live
                                 </Badge>
                               ) : liveDataStatus[platform] === 'stale' ? (
-                                <Badge variant="outline" className="text-xs border-amber-400 text-amber-400">
+                                <Badge variant="outline" className="text-xs border-blue-400 text-blue-400">
                                   <Clock className="w-3 h-3 mr-1" />
                                   Stale
                                 </Badge>
@@ -676,7 +676,7 @@ export default function Integrations() {
                             </DialogHeader>
                             <div className="space-y-4">
                               {platform === 'youtube' && (
-                                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                                   <div className="flex items-start space-x-3">
                                     <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
                                     <div>

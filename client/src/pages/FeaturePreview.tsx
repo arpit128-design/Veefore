@@ -113,7 +113,7 @@ const featureData = {
     ],
     color: 'text-yellow-500',
     bgColor: 'bg-yellow-500/10',
-    borderColor: 'border-yellow-500/20'
+    borderColor: 'border-blue-500/20'
   },
   'a/b-testing': {
     title: 'A/B Testing',
@@ -272,7 +272,7 @@ export default function FeaturePreview() {
               </div>
 
               {/* Lock Badge */}
-              <Badge variant="outline" className="mb-4 border-orange-500/50 text-orange-400">
+              <Badge variant="outline" className="mb-4 border-blue-500/50 text-blue-400">
                 <Lock className="w-3 h-3 mr-1" />
                 Coming Soon
               </Badge>

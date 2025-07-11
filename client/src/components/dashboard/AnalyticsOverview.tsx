@@ -458,14 +458,14 @@ export function AnalyticsOverview({ data, isLoading }: AnalyticsOverviewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-asteroid-silver">Total Content</p>
-                <p className="text-2xl font-bold text-solar-gold">
+                <p className="text-2xl font-bold text-blue-500">
                   {loading ? '—' : formatNumber(combinedMetrics.totalContent)}
                 </p>
                 <p className="text-xs text-asteroid-silver">
                   {displayData?.platformData?.instagram?.posts || 0} posts + {displayData?.platformData?.youtube?.videos || 0} videos
                 </p>
               </div>
-              <Calendar className="h-8 w-8 text-solar-gold/50" />
+              <Calendar className="h-8 w-8 text-blue-500/50" />
             </div>
           </CardContent>
         </Card>

@@ -426,7 +426,7 @@ export function TrendAnalyzer() {
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-solar-gold mb-2">⚡ Quick Win</h4>
+              <h4 className="font-medium text-blue-500 mb-2">⚡ Quick Win</h4>
               <p className="text-asteroid-silver">
                 Use trending audio within 24 hours of viral detection for maximum reach potential.
               </p>

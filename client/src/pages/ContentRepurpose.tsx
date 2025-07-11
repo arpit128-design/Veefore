@@ -346,7 +346,7 @@ export default function ContentRepurpose() {
                         <h3 className="text-lg font-semibold text-white">Alternative Versions</h3>
                         <div className="space-y-3">
                           {result.repurposed.alternativeVersions.map((version: string, index: number) => (
-                            <div key={index} className="bg-cosmic-dark/30 border border-solar-gold/30 rounded-lg p-4">
+                            <div key={index} className="bg-cosmic-dark/30 border border-blue-500/30 rounded-lg p-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="secondary" className="text-xs">
                                   Version {index + 1}
@@ -373,7 +373,7 @@ export default function ContentRepurpose() {
                     <div className="mt-6 pt-4 border-t border-electric-cyan/20">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-nebula-gray">Credits Used:</span>
-                        <Badge variant="outline" className="border-solar-gold text-solar-gold">
+                        <Badge variant="outline" className="border-blue-500 text-blue-500">
                           {result.creditsUsed} credits
                         </Badge>
                       </div>

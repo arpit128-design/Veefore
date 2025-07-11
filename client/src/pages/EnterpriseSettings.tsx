@@ -44,6 +44,7 @@ const EnterpriseSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [searchQuery, setSearchQuery] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   // Save settings handler
   const handleSaveSettings = async () => {
@@ -188,6 +189,64 @@ const EnterpriseSettings = () => {
     }, 1000);
   };
 
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  // Helper function to get user initials
+  const getUserInitials = (name, username) => {
+    if (name && name.trim()) {
+      const names = name.trim().split(' ');
+      if (names.length >= 2) {
+        return names[0][0] + names[1][0];
+      }
+      return names[0][0];
+    }
+    if (username) {
+      return username[0].toUpperCase();
+    }
+    return 'U';
+  };
+
+  // Helper function to get subscription plan
+  const getSubscriptionPlan = (userData) => {
+    if (!userData) return 'Free Plan';
+    
+    // Check if user has active subscription
+    if (userData.subscription && userData.subscription.plan) {
+      const plan = userData.subscription.plan.toLowerCase();
+      if (plan === 'starter') return 'Starter Plan';
+      if (plan === 'pro') return 'Pro Plan';
+      if (plan === 'business') return 'Business Plan';
+    }
+    
+    // Check if user has trial
+    if (userData.trialExpiresAt && new Date(userData.trialExpiresAt) > new Date()) {
+      return 'Free Trial';
+    }
+    
+    return 'Free Plan';
+  };
+
   // Mark changes when preferences update
   useEffect(() => {
     setHasChanges(true);
@@ -222,9 +281,7 @@ const EnterpriseSettings = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-900 rounded-lg">
-                  <SettingsIcon className="h-5 w-5 text-white" />
-                </div>
+                <SettingsIcon className="h-6 w-6 text-gray-700" />
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Settings</h1>
                   <p className="text-sm text-gray-600">Manage your account and preferences</p>
@@ -289,14 +346,20 @@ const EnterpriseSettings = () => {
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
                   <div className="relative">
-                    <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center">
-                      <User className="h-6 w-6 text-white" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold text-lg">
+                        {getUserInitials(userData?.displayName || userData?.username, userData?.username)}
+                      </span>
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{profile.displayName || 'User'}</h3>
-                    <p className="text-sm text-gray-600">Free Plan</p>
+                    <h3 className="font-semibold text-gray-900">
+                      {userData?.displayName || userData?.username || 'User'}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {getSubscriptionPlan(userData)}
+                    </p>
                   </div>
                 </div>
                 

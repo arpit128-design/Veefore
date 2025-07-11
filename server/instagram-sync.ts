@@ -36,7 +36,7 @@ export class InstagramSyncService {
   private async fetchInstagramProfile(accessToken: string): Promise<any> {
     try {
       const response = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,followers_count,follows_count,media_count&access_token=${accessToken}`
+        `https://graph.instagram.com/me?fields=id,username,followers_count,follows_count,media_count,profile_picture_url&access_token=${accessToken}`
       );
       
       if (!response.ok) {
@@ -50,7 +50,8 @@ export class InstagramSyncService {
         followers: data.followers_count,
         following: data.follows_count,
         mediaCount: data.media_count,
-        accountId: data.id
+        accountId: data.id,
+        profilePictureUrl: data.profile_picture_url
       };
     } catch (error) {
       console.error('[INSTAGRAM SYNC] Error fetching profile:', error);

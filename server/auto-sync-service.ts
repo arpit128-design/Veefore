@@ -63,8 +63,8 @@ class AutoSyncService {
     try {
       console.log(`[AUTO SYNC] Syncing Instagram account: @${account.username}`);
 
-      // Fetch fresh data from Instagram API
-      const apiUrl = `https://graph.instagram.com/me?fields=account_type,followers_count,media_count&access_token=${account.accessToken}`;
+      // Fetch fresh data from Instagram API including profile picture
+      const apiUrl = `https://graph.instagram.com/me?fields=account_type,followers_count,media_count,profile_picture_url&access_token=${account.accessToken}`;
       
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -72,13 +72,15 @@ class AutoSyncService {
       if (response.ok && data.followers_count !== undefined) {
         console.log(`[AUTO SYNC] Live data for @${account.username}:`, {
           followers: data.followers_count,
-          mediaCount: data.media_count
+          mediaCount: data.media_count,
+          profilePictureUrl: data.profile_picture_url
         });
 
-        // Update database with fresh data
+        // Update database with fresh data including profile picture
         await this.storage.updateSocialAccount(account.id, {
           followersCount: data.followers_count,
           mediaCount: data.media_count,
+          profilePictureUrl: data.profile_picture_url,
           lastSyncAt: new Date(),
           updatedAt: new Date()
         });

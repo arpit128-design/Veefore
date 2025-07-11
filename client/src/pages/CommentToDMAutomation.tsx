@@ -210,16 +210,28 @@ export default function CommentToDMAutomation() {
         
         if (instagramAccount) {
           const initials = generateInitials(instagramAccount.username);
+          
+          // Check multiple possible profile picture field names
+          const profilePictureUrl = instagramAccount.profilePicture || 
+                                   instagramAccount.profilePictureUrl || 
+                                   instagramAccount.profile_picture_url ||
+                                   instagramAccount.avatar ||
+                                   instagramAccount.pictureUrl ||
+                                   null;
+          
           setUserProfile({
             username: instagramAccount.username,
-            profilePicture: instagramAccount.profilePicture || null,
+            profilePicture: profilePictureUrl,
             initials
           });
+          
+          console.log('Full Instagram account data:', instagramAccount);
           console.log('Updated profile with Instagram account:', {
             username: instagramAccount.username,
-            hasProfilePicture: !!instagramAccount.profilePicture,
-            profilePictureUrl: instagramAccount.profilePicture,
-            initials
+            hasProfilePicture: !!profilePictureUrl,
+            profilePictureUrl: profilePictureUrl,
+            initials,
+            allFields: Object.keys(instagramAccount)
           });
         } else {
           console.log('No Instagram account found in response');

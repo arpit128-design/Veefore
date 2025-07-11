@@ -56,6 +56,8 @@ interface SidebarItemProps {
 
 interface ProfessionalSidebarProps {
   onAnalyticsToggle?: () => void;
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (open: boolean) => void;
 }
 
 function SidebarItem({ icon: Icon, label, href, badge, isActive }: SidebarItemProps) {
@@ -142,7 +144,7 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
   );
 }
 
-export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarProps = {}) {
+export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIsMobileMenuOpen }: ProfessionalSidebarProps = {}) {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const credits = 0; // Will be dynamically loaded
@@ -195,8 +197,81 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
     },
   ];
 
+  const handleNavClick = () => {
+    if (setIsMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <aside className="bg-white border-r border-slate-200 w-72 h-full flex flex-col overflow-hidden shadow-sm veefore-sidebar">
+    <>
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen?.(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex bg-white border-r border-slate-200 w-72 h-full flex-col overflow-hidden shadow-sm veefore-sidebar">
+        <SidebarContent 
+          location={location}
+          user={user}
+          credits={credits}
+          getInitials={getInitials}
+          schedulerOptions={schedulerOptions}
+          onAnalyticsToggle={onAnalyticsToggle}
+          onNavClick={handleNavClick}
+        />
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-slate-200 shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <SidebarContent 
+          location={location}
+          user={user}
+          credits={credits}
+          getInitials={getInitials}
+          schedulerOptions={schedulerOptions}
+          onAnalyticsToggle={onAnalyticsToggle}
+          onNavClick={handleNavClick}
+          isMobile={true}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+      </aside>
+    </>
+  );
+}
+
+interface SidebarContentProps {
+  location: string;
+  user: any;
+  credits: number;
+  getInitials: (username: string) => string;
+  schedulerOptions: any[];
+  onAnalyticsToggle?: () => void;
+  onNavClick: () => void;
+  isMobile?: boolean;
+  setIsMobileMenuOpen?: (open: boolean) => void;
+}
+
+function SidebarContent({ 
+  location, 
+  user, 
+  credits, 
+  getInitials, 
+  schedulerOptions, 
+  onAnalyticsToggle, 
+  onNavClick, 
+  isMobile = false,
+  setIsMobileMenuOpen 
+}: SidebarContentProps) {
+  return (
+    <div className="h-full flex flex-col overflow-hidden">
       {/* User Profile Header */}
       <div className="flex-shrink-0 p-6 border-b border-slate-100 veefore-sidebar-header">
         {/* User Profile Section */}
@@ -466,6 +541,6 @@ export function ProfessionalSidebar({ onAnalyticsToggle }: ProfessionalSidebarPr
           </div>
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

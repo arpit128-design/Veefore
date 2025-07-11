@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -100,12 +100,18 @@ import SolutionEnterprises from "@/pages/SolutionEnterprises";
 
 function AuthenticatedApp() {
   const [location] = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const isAnalyticsRoute = location.startsWith('/analytics') || 
                           location === '/social-insights' || 
                           location === '/performance-analytics' || 
                           location === '/advanced-analytics' ||
                           location === '/content-performance-analytics';
   
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <WorkspaceProvider>
       <div className="min-h-screen bg-background text-foreground">
@@ -122,9 +128,12 @@ function AuthenticatedApp() {
           </AnalyticsLayout>
         ) : (
           <>
-            <ProfessionalHeader />
+            <ProfessionalHeader onMobileMenuToggle={handleMobileMenuToggle} />
             <div className="flex h-[calc(100vh-64px)] overflow-hidden">
-              <ProfessionalSidebar />
+              <ProfessionalSidebar 
+                isMobileMenuOpen={isMobileMenuOpen} 
+                setIsMobileMenuOpen={setIsMobileMenuOpen}
+              />
               <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
                 <Switch>
                   <Route path="/dashboard" component={ProfessionalDashboard} />

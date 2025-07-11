@@ -42,7 +42,18 @@ const antiYellowStyles = `
 .comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background-color: rgb(229, 231, 235)"]:not([class]),
 .comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background-color: #e5e7eb"]:not([class]),
 .comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background: rgb(229, 231, 235)"]:not([class]),
-.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background: #e5e7eb"]:not([class]) {
+.comment-to-dm-automation *:not(.InstagramDMPreview) div[style*="background: #e5e7eb"]:not([class]),
+/* Target any grey background div that might be duplicating text */
+.comment-to-dm-automation div[style*="background-color: rgb(229, 231, 235)"][style*="border-radius"],
+.comment-to-dm-automation div[style*="background-color: #e5e7eb"][style*="border-radius"],
+.comment-to-dm-automation div[style*="background: rgb(229, 231, 235)"][style*="border-radius"],
+.comment-to-dm-automation div[style*="background: #e5e7eb"][style*="border-radius"],
+/* Target any div with grey background that contains only text */
+.comment-to-dm-automation div[style*="background-color: rgb(229, 231, 235)"]:not([class]):not([id]):empty,
+.comment-to-dm-automation div[style*="background-color: #e5e7eb"]:not([class]):not([id]):empty,
+/* Target divs that might be appearing as state displays */
+.comment-to-dm-automation div[style*="position: absolute"][style*="background"],
+.comment-to-dm-automation div[style*="position: fixed"][style*="background"] {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
@@ -56,5 +67,62 @@ document.head.insertBefore(styleElement, document.head.firstChild);
 
 // Start yellow color elimination system immediately
 startYellowColorElimination();
+
+// Grey box eliminator specifically for DM automation page
+const greyBoxEliminator = () => {
+  const removeGreyBoxes = () => {
+    const commentAutomationContainer = document.querySelector('.comment-to-dm-automation');
+    if (commentAutomationContainer) {
+      // Find all potential grey boxes
+      const greyElements = commentAutomationContainer.querySelectorAll('*');
+      
+      greyElements.forEach(element => {
+        const style = window.getComputedStyle(element);
+        const backgroundColor = style.backgroundColor;
+        
+        // Check if it's a grey box (rgb(229, 231, 235) or similar)
+        if (backgroundColor.includes('rgb(229, 231, 235)') || 
+            backgroundColor.includes('#e5e7eb') ||
+            backgroundColor.includes('229, 231, 235')) {
+          
+          // Skip if it's part of the legitimate DM preview
+          if (element.closest('.InstagramDMPreview')) return;
+          
+          // Skip if it has important classes or roles
+          if (element.classList.length > 0 || element.getAttribute('role')) return;
+          
+          // Check if this element might be duplicating text
+          const text = element.textContent?.trim();
+          if (text && text.length > 0 && text.length < 50) {
+            // Check if there's a text input nearby with the same value
+            const inputs = document.querySelectorAll('input[type="text"], textarea');
+            const hasDuplicateInput = Array.from(inputs).some(input => 
+              (input as HTMLInputElement).value === text
+            );
+            
+            if (hasDuplicateInput) {
+              console.log('Grey box eliminator: Hiding duplicate text element:', text);
+              (element as HTMLElement).style.display = 'none';
+              (element as HTMLElement).style.opacity = '0';
+              (element as HTMLElement).style.visibility = 'hidden';
+            }
+          }
+        }
+      });
+    }
+  };
+
+  // Run immediately and then every 100ms when on the DM automation page
+  if (window.location.pathname.includes('comment-to-dm-automation')) {
+    removeGreyBoxes();
+    setInterval(removeGreyBoxes, 100);
+    
+    // Also run on input events
+    document.addEventListener('input', removeGreyBoxes);
+  }
+};
+
+// Start grey box elimination
+setTimeout(greyBoxEliminator, 500);
 
 createRoot(document.getElementById("root")!).render(<App />);

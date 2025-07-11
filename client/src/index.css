@@ -298,7 +298,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 [role="switch"][data-state="checked"] {
-  background-color: #2563eb !important;
+  background-color: #bbf7d0 !important; /* Light green background for checked state */
 }
 
 /* Slider components */
@@ -835,33 +835,41 @@ input[type="password"] {
   border-color: rgb(203 213 225) !important;
 }
 
-/* CRITICAL FIX: Switch/Toggle yellow elimination */
+/* CRITICAL FIX: Switch/Toggle with green color scheme */
 [data-state="checked"] {
-  background-color: rgb(37 99 235) !important;
+  background-color: rgb(187 247 208) !important; /* Light green background */
 }
 
 button[data-state="checked"],
 .switch-thumb[data-state="checked"],
 .toggle-thumb[data-state="checked"] {
-  background-color: rgb(37 99 235) !important;
+  background-color: rgb(187 247 208) !important; /* Light green background */
 }
 
-/* Force blue background on any checked switches */
+/* Force green background on any checked switches */
 [role="switch"][data-state="checked"],
 [role="switch"][aria-checked="true"] {
-  background-color: rgb(37 99 235) !important;
+  background-color: rgb(187 247 208) !important; /* Light green background */
 }
 
 /* COMPREHENSIVE TOGGLE CIRCLE FIX - TARGET ALL POSSIBLE TOGGLE ELEMENTS */
 [data-radix-switch-thumb],
-[data-radix-switch-thumb][data-state="checked"],
-[data-radix-switch-thumb][data-state="unchecked"],
 button[role="switch"] > span,
 button[role="switch"] > div,
 .switch-thumb,
 .toggle-thumb {
-  background-color: rgb(37 99 235) !important;
-  border-color: rgb(37 99 235) !important;
+  background-color: rgb(255 255 255) !important; /* White circle by default */
+  border-color: rgb(226 232 240) !important;
+}
+
+/* CHECKED STATE - DARK GREEN CIRCLE */
+[data-radix-switch-thumb][data-state="checked"],
+button[role="switch"][data-state="checked"] > span,
+button[role="switch"][data-state="checked"] > div,
+.switch-thumb[data-state="checked"],
+.toggle-thumb[data-state="checked"] {
+  background-color: rgb(34 197 94) !important; /* Dark green circle when checked */
+  border-color: rgb(34 197 94) !important;
 }
 
 /* FORCE GRAY BACKGROUND FOR UNCHECKED TOGGLES */
@@ -872,37 +880,53 @@ button[role="switch"] > div,
 
 /* RADIX UI SWITCH THUMB SPECIFIC TARGETING */
 [data-radix-switch-thumb][data-state="unchecked"] {
-  background-color: rgb(255 255 255) !important;
+  background-color: rgb(255 255 255) !important; /* White circle when unchecked */
 }
 
-/* TOGGLE CIRCLE UNIVERSAL OVERRIDE - CATCH ALL YELLOW TOGGLES */
-*[role="switch"] *,
+[data-radix-switch-thumb][data-state="checked"] {
+  background-color: rgb(34 197 94) !important; /* Dark green circle when checked */
+}
+
+/* TOGGLE CIRCLE UNIVERSAL OVERRIDE - CONDITIONAL GREEN COLOR SCHEME */
+*[role="switch"][data-state="checked"] *,
 *[data-state="checked"] *,
+button[type="button"][role="switch"][data-state="checked"] *,
+.switch-root[data-state="checked"] *,
+.toggle-root[data-state="checked"] * {
+  background-color: rgb(34 197 94) !important; /* Dark green circle when checked */
+  border-color: rgb(34 197 94) !important;
+}
+
+/* UNCHECKED STATE - WHITE CIRCLE */
+*[role="switch"][data-state="unchecked"] *,
 *[data-state="unchecked"] *,
-button[type="button"][role="switch"] *,
-.switch-root *,
-.toggle-root * {
-  background-color: rgb(37 99 235) !important;
-  border-color: rgb(37 99 235) !important;
+button[type="button"][role="switch"][data-state="unchecked"] *,
+.switch-root[data-state="unchecked"] *,
+.toggle-root[data-state="unchecked"] * {
+  background-color: rgb(255 255 255) !important; /* White circle when unchecked */
+  border-color: rgb(226 232 240) !important;
 }
 
-/* SPECIFIC TARGETING FOR TOGGLE CIRCLES THAT MIGHT BE YELLOW */
+/* SPECIFIC TARGETING FOR TOGGLE CIRCLES - CONDITIONAL GREEN THEME */
 span[data-state="checked"],
-span[data-state="unchecked"],
-div[data-state="checked"],
-div[data-state="unchecked"] {
-  background-color: rgb(37 99 235) !important;
+div[data-state="checked"] {
+  background-color: rgb(34 197 94) !important; /* Dark green circle when checked */
 }
 
-/* YELLOW TOGGLE ELIMINATION - ALL POSSIBLE SELECTORS */
+span[data-state="unchecked"],
+div[data-state="unchecked"] {
+  background-color: rgb(255 255 255) !important; /* White circle when unchecked */
+}
+
+/* YELLOW TOGGLE ELIMINATION - FORCE GREEN COLORS */
 *[style*="yellow"],
 *[style*="rgb(255, 255, 0)"],
 *[style*="rgb(255, 247"],
 *[style*="#ffff00"],
 *[style*="#fbbf24"],
 *[style*="#f59e0b"] {
-  background-color: rgb(37 99 235) !important;
-  color: rgb(37 99 235) !important;
+  background-color: rgb(34 197 94) !important; /* Dark green circle */
+  color: rgb(34 197 94) !important;
 }
 
 /* Scrollbar fixes - remove any yellow tints */

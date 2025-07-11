@@ -38,8 +38,9 @@ svg.lucide *,
   background-color: transparent !important;
 }
 
-/* QUICK ACTIONS TRANSPARENCY - ID-BASED TARGETING */
+/* QUICK ACTIONS TRANSPARENCY - ID-BASED TARGETING WITH HORIZONTAL SCROLL */
 #quick-actions-section,
+#quick-actions-scroll,
 #quick-actions-grid,
 #create-ai-action,
 #schedule-action,
@@ -58,6 +59,7 @@ svg.lucide *,
 #analyze-text,
 #multiplatform-text,
 #quick-actions-section *,
+#quick-actions-scroll *,
 #quick-actions-grid *,
 #create-ai-action *,
 #schedule-action *,
@@ -66,6 +68,16 @@ svg.lucide *,
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
+}
+
+/* HORIZONTAL SCROLL STYLING */
+#quick-actions-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+#quick-actions-scroll::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */

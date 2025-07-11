@@ -618,7 +618,7 @@ export default function CommentToDMAutomation() {
                       onChange={(e) => setDirectMessage({...directMessage, text: e.target.value})}
                       placeholder="I'm so excited you'd like to see what I've got an offer!"
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
                     />
                   </div>
                   
@@ -632,7 +632,7 @@ export default function CommentToDMAutomation() {
                         value={directMessage.buttonText}
                         onChange={(e) => setDirectMessage({...directMessage, buttonText: e.target.value})}
                         placeholder="See products"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-400"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
                       />
                     </div>
                     <div>

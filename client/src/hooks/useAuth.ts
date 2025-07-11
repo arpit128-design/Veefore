@@ -87,6 +87,15 @@ export function useAuth() {
               const userData = await response.json();
               console.log('[AUTH] User found in database:', userData.username);
               console.log('[AUTH] User onboarding status:', userData.isOnboarded);
+              console.log('[AUTH] Complete user data received from backend:', {
+                id: userData.id,
+                email: userData.email,
+                username: userData.username,
+                isOnboarded: userData.isOnboarded,
+                isOnboardedType: typeof userData.isOnboarded,
+                isEmailVerified: userData.isEmailVerified,
+                firebaseUid: userData.firebaseUid
+              });
               setUser(userData);
               // Set loading to false only after user data is loaded
               setLoading(false);

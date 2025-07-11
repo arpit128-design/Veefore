@@ -256,6 +256,16 @@ function Router() {
 
   // If user is authenticated, check if they need onboarding
   if (isAuthenticated) {
+    // Debug log to track the user's onboarding status
+    console.log('[APP.TSX] User authentication check:', {
+      isAuthenticated,
+      userEmail: user?.email,
+      isOnboarded: user?.isOnboarded,
+      isOnboardedType: typeof user?.isOnboarded,
+      userId: user?.id,
+      location
+    });
+    
     // If user hasn't completed onboarding
     if (!user.isOnboarded) {
       // Allow access to home page (landing page) if they want to go back

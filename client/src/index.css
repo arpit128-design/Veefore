@@ -748,18 +748,38 @@ button[class*="bg-amber"]:not(.create-content-button),
   border-color: rgb(229 231 235) !important;
 }
 
-/* CREATE CONTENT BUTTON SPECIFIC OVERRIDE - FORCE BLUE COLOR */
+/* CREATE CONTENT BUTTON SPECIFIC OVERRIDE - NUCLEAR LEVEL FORCE BLUE COLOR */
 .create-content-button,
-button.create-content-button {
+button.create-content-button,
+[class*="create-content-button"],
+button[class*="create-content-button"] {
   background-color: #4a78f5 !important;
   background: #4a78f5 !important;
   color: white !important;
+  border: none !important;
 }
 
 .create-content-button:hover,
-button.create-content-button:hover {
+button.create-content-button:hover,
+[class*="create-content-button"]:hover,
+button[class*="create-content-button"]:hover {
   background-color: #3b64d9 !important;
   background: #3b64d9 !important;
+  color: white !important;
+}
+
+/* NUCLEAR OVERRIDE - Target all possible button variations */
+button.create-content-button[style],
+button[class*="create-content-button"][style] {
+  background-color: #4a78f5 !important;
+  background: #4a78f5 !important;
+}
+
+/* Override any computed styles */
+button.create-content-button,
+button[class*="create-content-button"] {
+  background-color: #4a78f5 !important;
+  background: #4a78f5 !important;
   color: white !important;
 }
 
@@ -774,9 +794,9 @@ button[class*="bg-yellow"]:hover, button[class*="bg-amber"]:hover {
   color: #0f172a !important;
 }
 
-/* Button fixes - prevent yellow conversion */
-.btn, 
-button:not([class*="bg-"]) {
+/* Button fixes - prevent yellow conversion BUT EXCLUDE CREATE CONTENT BUTTON */
+.btn:not(.create-content-button), 
+button:not([class*="bg-"]):not(.create-content-button) {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;

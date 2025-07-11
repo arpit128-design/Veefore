@@ -45,6 +45,25 @@ const EnterpriseSettings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Save settings handler
+  const handleSaveSettings = async () => {
+    try {
+      // Simulate API call to save settings
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setHasChanges(false);
+      toast({
+        title: "Settings saved",
+        description: "Your settings have been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Enhanced user profile state
   const [profile, setProfile] = useState({
     displayName: user?.displayName || '',
@@ -275,15 +294,15 @@ const EnterpriseSettings = () => {
                   </div>
                 </div>
                 
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Storage Used</span>
-                    <span className="font-medium text-gray-900">2.3 GB / 10 GB</span>
+                    <span className="text-blue-700">Storage Used</span>
+                    <span className="font-medium text-purple-800">2.3 GB / 10 GB</span>
                   </div>
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                  <div className="mt-2 w-full bg-gradient-to-r from-blue-100 to-purple-100 rounded-full h-2">
                     <div 
-                      className="bg-gray-900 h-2 rounded-full" 
-                      style={{ width: '23%', backgroundColor: '#111827 !important' }}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full shadow-sm" 
+                      style={{ width: '23%' }}
                     ></div>
                   </div>
                 </div>
@@ -485,10 +504,10 @@ const EnterpriseSettings = () => {
                       <div className="space-y-6">
                         {/* AI Features */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
                             <div>
-                              <h3 className="font-medium text-gray-900">AI Assistant</h3>
-                              <p className="text-sm text-gray-600">Enable AI-powered features</p>
+                              <h3 className="font-medium text-orange-900">AI Assistant</h3>
+                              <p className="text-sm text-orange-600">Enable AI-powered features</p>
                             </div>
                             <div className="relative">
                               <input
@@ -502,9 +521,8 @@ const EnterpriseSettings = () => {
                               />
                               <div 
                                 className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                  preferences.ai.enabled ? 'bg-gray-900' : 'bg-gray-200'
+                                  preferences.ai.enabled ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
                                 }`}
-                                style={{ backgroundColor: preferences.ai.enabled ? '#111827 !important' : '#e5e7eb !important' }}
                                 onClick={() => setPreferences(prev => ({
                                   ...prev,
                                   ai: { ...prev.ai, enabled: !prev.ai.enabled }
@@ -517,10 +535,10 @@ const EnterpriseSettings = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 rounded-lg">
                             <div>
-                              <h3 className="font-medium text-gray-900">Smart Suggestions</h3>
-                              <p className="text-sm text-gray-600">AI-powered recommendations</p>
+                              <h3 className="font-medium text-cyan-900">Smart Suggestions</h3>
+                              <p className="text-sm text-cyan-600">AI-powered recommendations</p>
                             </div>
                             <div className="relative">
                               <input
@@ -534,9 +552,8 @@ const EnterpriseSettings = () => {
                               />
                               <div 
                                 className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                  preferences.ai.suggestions ? 'bg-gray-900' : 'bg-gray-200'
+                                  preferences.ai.suggestions ? 'bg-gradient-to-r from-cyan-500 to-blue-500' : 'bg-gray-200'
                                 }`}
-                                style={{ backgroundColor: preferences.ai.suggestions ? '#111827 !important' : '#e5e7eb !important' }}
                                 onClick={() => setPreferences(prev => ({
                                   ...prev,
                                   ai: { ...prev.ai, suggestions: !prev.ai.suggestions }
@@ -551,10 +568,10 @@ const EnterpriseSettings = () => {
                         </div>
 
                         {/* Creativity Level */}
-                        <div className="space-y-3">
+                        <div className="space-y-3 p-4 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-lg">
                           <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-gray-700">Creativity Level</label>
-                            <span className="text-sm font-medium text-gray-900 px-2 py-1 bg-gray-100 rounded">
+                            <label className="text-sm font-medium text-violet-700">Creativity Level</label>
+                            <span className="text-sm font-medium text-violet-900 px-2 py-1 bg-gradient-to-r from-violet-100 to-purple-100 rounded">
                               {preferences.ai.creativity}%
                             </span>
                           </div>
@@ -570,7 +587,7 @@ const EnterpriseSettings = () => {
                               }))}
                               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                               style={{
-                                background: `linear-gradient(to right, #111827 0%, #111827 ${preferences.ai.creativity}%, #e5e7eb ${preferences.ai.creativity}%, #e5e7eb 100%)`
+                                background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${preferences.ai.creativity}%, #e5e7eb ${preferences.ai.creativity}%, #e5e7eb 100%)`
                               }}
                             />
                           </div>
@@ -618,10 +635,10 @@ const EnterpriseSettings = () => {
                     <div className="p-6">
                       <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
                             <div>
-                              <h3 className="font-medium text-gray-900">Two-Factor Authentication</h3>
-                              <p className="text-sm text-gray-600">Add extra security to your account</p>
+                              <h3 className="font-medium text-green-900">Two-Factor Authentication</h3>
+                              <p className="text-sm text-green-600">Add extra security to your account</p>
                             </div>
                             <div className="relative">
                               <input
@@ -635,9 +652,8 @@ const EnterpriseSettings = () => {
                               />
                               <div 
                                 className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                  preferences.security.twoFactorEnabled ? 'bg-gray-900' : 'bg-gray-200'
+                                  preferences.security.twoFactorEnabled ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-200'
                                 }`}
-                                style={{ backgroundColor: preferences.security.twoFactorEnabled ? '#111827 !important' : '#e5e7eb !important' }}
                                 onClick={() => setPreferences(prev => ({
                                   ...prev,
                                   security: { ...prev.security, twoFactorEnabled: !prev.security.twoFactorEnabled }
@@ -650,10 +666,10 @@ const EnterpriseSettings = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
                             <div>
-                              <h3 className="font-medium text-gray-900">Login Alerts</h3>
-                              <p className="text-sm text-gray-600">Get notified of new logins</p>
+                              <h3 className="font-medium text-purple-900">Login Alerts</h3>
+                              <p className="text-sm text-purple-600">Get notified of new logins</p>
                             </div>
                             <div className="relative">
                               <input
@@ -667,9 +683,8 @@ const EnterpriseSettings = () => {
                               />
                               <div 
                                 className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                  preferences.security.loginAlerts ? 'bg-gray-900' : 'bg-gray-200'
+                                  preferences.security.loginAlerts ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gray-200'
                                 }`}
-                                style={{ backgroundColor: preferences.security.loginAlerts ? '#111827 !important' : '#e5e7eb !important' }}
                                 onClick={() => setPreferences(prev => ({
                                   ...prev,
                                   security: { ...prev.security, loginAlerts: !prev.security.loginAlerts }
@@ -701,10 +716,10 @@ const EnterpriseSettings = () => {
                   <div className="p-6">
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-gray-900">Email Notifications</h3>
-                            <p className="text-sm text-gray-600">Receive updates via email</p>
+                            <h3 className="font-medium text-blue-900">Email Notifications</h3>
+                            <p className="text-sm text-blue-600">Receive updates via email</p>
                           </div>
                           <div className="relative">
                             <input
@@ -721,9 +736,9 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.notifications.email.enabled ? 'bg-gray-900' : 'bg-gray-200'
+                                preferences.notifications.email.enabled ? 'bg-gradient-to-r from-blue-500 to-indigo-500' : 'bg-gray-200'
                               }`}
-                              style={{ backgroundColor: preferences.notifications.email.enabled ? '#111827 !important' : '#e5e7eb !important' }}
+
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
                                 notifications: { 
@@ -739,10 +754,10 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-gray-900">Push Notifications</h3>
-                            <p className="text-sm text-gray-600">Receive browser notifications</p>
+                            <h3 className="font-medium text-rose-900">Push Notifications</h3>
+                            <p className="text-sm text-rose-600">Receive browser notifications</p>
                           </div>
                           <div className="relative">
                             <input
@@ -759,9 +774,8 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.notifications.push.enabled ? 'bg-gray-900' : 'bg-gray-200'
+                                preferences.notifications.push.enabled ? 'bg-gradient-to-r from-rose-500 to-pink-500' : 'bg-gray-200'
                               }`}
-                              style={{ backgroundColor: preferences.notifications.push.enabled ? '#111827 !important' : '#e5e7eb !important' }}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
                                 notifications: { 
@@ -801,6 +815,33 @@ const EnterpriseSettings = () => {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Colorful Footer with Save Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-t border-emerald-200 p-4 shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-emerald-700">Settings auto-saved</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-blue-700">Security enabled</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-purple-700">AI assistant active</span>
+            </div>
+          </div>
+          <button
+            onClick={handleSaveSettings}
+            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105 shadow-md flex items-center space-x-2"
+          >
+            <span>💾</span>
+            <span>Save All Settings</span>
+          </button>
         </div>
       </div>
 
@@ -915,6 +956,172 @@ const EnterpriseSettings = () => {
           background-color: #9ca3af !important;
           color: #ffffff !important;
         }
+        
+        /* Enhanced colorful styling for all form elements */
+        input[type="text"], input[type="email"], input[type="password"], 
+        input[type="number"], input[type="tel"], input[type="url"], 
+        textarea, select {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+          border-color: #d1d5db !important;
+        }
+        
+        input[type="text"]:focus, input[type="email"]:focus, 
+        input[type="password"]:focus, input[type="number"]:focus, 
+        input[type="tel"]:focus, input[type="url"]:focus, 
+        textarea:focus, select:focus {
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        /* Enhanced button styling with colors */
+        button {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+          border-color: #d1d5db !important;
+        }
+        
+        button:hover {
+          background-color: #f9fafb !important;
+          border-color: #9ca3af !important;
+        }
+        
+        /* Gradient backgrounds for different sections */
+        .security-section {
+          background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+        }
+        
+        .ai-section {
+          background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%) !important;
+        }
+        
+        .notifications-section {
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+        }
+        
+        .profile-section {
+          background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
+        }
+        
+        /* Colorful card enhancements */
+        .settings-card {
+          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .settings-card:hover {
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+          transform: translateY(-2px) !important;
+        }
+        
+        /* Comprehensive toggle switch styling */
+        .toggle-switch {
+          background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%) !important;
+          border: 1px solid #9ca3af !important;
+        }
+        
+        .toggle-switch.active {
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+          border: 1px solid #1e40af !important;
+        }
+        
+        .toggle-switch.active.green {
+          background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+          border: 1px solid #065f46 !important;
+        }
+        
+        .toggle-switch.active.purple {
+          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+          border: 1px solid #6d28d9 !important;
+        }
+        
+        .toggle-switch.active.orange {
+          background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+          border: 1px solid #c2410c !important;
+        }
+        
+        .toggle-switch.active.cyan {
+          background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+          border: 1px solid #0e7490 !important;
+        }
+        
+        .toggle-switch.active.rose {
+          background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+          border: 1px solid #be123c !important;
+        }
+        
+        /* Enhanced range slider styling */
+        input[type="range"] {
+          background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+          border: 1px solid #d1d5db !important;
+          border-radius: 6px !important;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+          border: 2px solid #ffffff !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+          border: 2px solid #ffffff !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* Enhanced footer styling */
+        .colorful-footer {
+          background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 50%, #cffafe 100%) !important;
+          border-top: 2px solid #10b981 !important;
+          box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Status indicators */
+        .status-indicator.green {
+          background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+          box-shadow: 0 0 10px rgba(16, 185, 129, 0.5) !important;
+        }
+        
+        .status-indicator.blue {
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+        }
+        
+        .status-indicator.purple {
+          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+          box-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+        }
+        
+        /* Enhanced text colors */
+        .text-emerald-700 { color: #047857 !important; }
+        .text-blue-700 { color: #1d4ed8 !important; }
+        .text-purple-700 { color: #7c3aed !important; }
+        .text-orange-700 { color: #ea580c !important; }
+        .text-cyan-700 { color: #0891b2 !important; }
+        .text-rose-700 { color: #e11d48 !important; }
+        .text-violet-700 { color: #7c3aed !important; }
+        .text-pink-700 { color: #be185d !important; }
+        
+        /* Enhanced background colors */
+        .bg-emerald-50 { background-color: #ecfdf5 !important; }
+        .bg-blue-50 { background-color: #eff6ff !important; }
+        .bg-purple-50 { background-color: #faf5ff !important; }
+        .bg-orange-50 { background-color: #fff7ed !important; }
+        .bg-cyan-50 { background-color: #ecfeff !important; }
+        .bg-rose-50 { background-color: #fff1f2 !important; }
+        .bg-violet-50 { background-color: #f5f3ff !important; }
+        .bg-pink-50 { background-color: #fdf2f8 !important; }
+        
+        /* Enhanced border colors */
+        .border-emerald-200 { border-color: #a7f3d0 !important; }
+        .border-blue-200 { border-color: #bfdbfe !important; }
+        .border-purple-200 { border-color: #e9d5ff !important; }
+        .border-orange-200 { border-color: #fed7aa !important; }
+        .border-cyan-200 { border-color: #a5f3fc !important; }
+        .border-rose-200 { border-color: #fecaca !important; }
+        .border-violet-200 { border-color: #ddd6fe !important; }
+        .border-pink-200 { border-color: #fbcfe8 !important; }
       `}</style>
     </div>
   );

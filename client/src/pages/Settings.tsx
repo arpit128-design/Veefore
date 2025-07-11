@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -182,8 +182,62 @@ export default function Settings() {
       background-image: none !important;
     }
     
+    /* Complete slider override with aggressive targeting */
+    .settings-page [role="slider"],
+    .settings-page [role="slider"] > span,
+    .settings-page [role="slider"] > span > span,
+    .settings-page [role="slider"] span,
+    .settings-page [role="slider"] div {
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    .settings-page [role="slider"] > span:first-child,
+    .settings-page [role="slider"] > span:first-child > span,
+    .settings-page [role="slider"] > span:first-child div {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
+    }
+    
+    /* Force override any inline styles */
+    .settings-page [role="slider"] * {
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    .settings-page [role="slider"] > span:first-child * {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
+    }
+    
+    /* Targeted slider fix */
     .settings-page [role="slider"] {
-      background: linear-gradient(to right, #111827 0%, #111827 70%, #e5e7eb 70%, #e5e7eb 100%) !important;
+      position: relative !important;
+      background: #e5e7eb !important;
+      background-color: #e5e7eb !important;
+      background-image: none !important;
+    }
+    
+    .settings-page [role="slider"]::before {
+      content: '' !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 70% !important;
+      height: 100% !important;
+      background: #111827 !important;
+      background-color: #111827 !important;
+      background-image: none !important;
+      z-index: 1 !important;
+    }
+    
+    .settings-page [role="slider"] > * {
+      z-index: 2 !important;
+      position: relative !important;
     }
     
     /* Override all button backgrounds */
@@ -348,10 +402,54 @@ export default function Settings() {
       document.head.appendChild(styleElement);
     }
   }
+  
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("account");
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Force override slider colors after render
+  useEffect(() => {
+    const forceSliderColors = () => {
+      // Apply styles to all sliders
+      const sliders = document.querySelectorAll('.settings-page [role="slider"]');
+      sliders.forEach(slider => {
+        if (slider instanceof HTMLElement) {
+          // Force gray background
+          slider.style.setProperty('background', '#e5e7eb', 'important');
+          slider.style.setProperty('background-color', '#e5e7eb', 'important');
+          slider.style.setProperty('background-image', 'none', 'important');
+          
+          // Target all child elements
+          const allChildren = slider.querySelectorAll('*');
+          allChildren.forEach((child, index) => {
+            if (child instanceof HTMLElement) {
+              if (index === 0) {
+                // First child should be dark (progress part)
+                child.style.setProperty('background', '#111827', 'important');
+                child.style.setProperty('background-color', '#111827', 'important');
+              } else {
+                // Other children should be gray
+                child.style.setProperty('background', '#e5e7eb', 'important');
+                child.style.setProperty('background-color', '#e5e7eb', 'important');
+              }
+              child.style.setProperty('background-image', 'none', 'important');
+            }
+          });
+        }
+      });
+    };
+
+    // Apply multiple times to ensure override
+    forceSliderColors();
+    setTimeout(forceSliderColors, 50);
+    setTimeout(forceSliderColors, 200);
+    setTimeout(forceSliderColors, 500);
+    
+    // Also run when switching tabs
+    const interval = setInterval(forceSliderColors, 1000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
   // Enhanced profile state
   const [profileData, setProfileData] = useState({
@@ -2186,16 +2284,22 @@ export default function Settings() {
                 onClick={handleSaveProfile} 
                 className="save-button px-6 py-3 text-base font-medium rounded-lg transition-colors" 
                 style={{ 
-                  backgroundColor: '#1f2937', 
-                  color: '#ffffff', 
-                  borderColor: '#1f2937',
-                  border: '1px solid #1f2937'
+                  backgroundColor: '#1f2937 !important', 
+                  color: '#ffffff !important', 
+                  borderColor: '#1f2937 !important',
+                  border: '1px solid #1f2937 !important',
+                  fontWeight: '500 !important',
+                  padding: '12px 24px !important',
+                  borderRadius: '8px !important',
+                  boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05) !important'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#111827';
+                  e.currentTarget.style.borderColor = '#111827';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = '#1f2937';
+                  e.currentTarget.style.borderColor = '#1f2937';
                 }}
               >
                 <Save className="h-4 w-4 mr-2" />

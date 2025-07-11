@@ -316,33 +316,62 @@ export default function CommentToDMAutomation() {
       </div>
       
       {/* DM Content */}
-      <div className="p-3 space-y-3">
+      <div className="p-4 space-y-4">
         <div className="text-xs text-gray-500 text-center">
-          JUL 11, 03:56 PM
+          JUL 11, 04:09 PM
         </div>
         
-        <div className="bg-gray-100 rounded-lg p-3 text-sm text-gray-700">
-          {directMessage.text || "This is the product link"}
+        {/* Message Bubble */}
+        <div className="bg-gray-100 rounded-2xl p-4 text-sm text-gray-700 leading-relaxed">
+          {directMessage.text || "This is the product link frfrfffrffrgtgtgtgtr 5ytt htgt5tg t5g 6 tgtgt4gtg4 vy65y5 6666 ftbghbtgrbhtgtgtgtrgtg"}
         </div>
         
+        {/* Button */}
         {(directMessage.buttonText || directMessage.websiteUrl) && (
-          <div className="bg-blue-50 rounded-lg p-3 text-center">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <div className="text-center">
+            <button className="bg-white border border-gray-300 text-gray-900 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
               {directMessage.buttonText || "Click here"}
             </button>
           </div>
         )}
         
-        <div className="flex items-center space-x-2 pt-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <MessageCircle className="w-4 h-4 text-white" />
+        {/* User Initial */}
+        <div className="flex justify-end">
+          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+            <span className="text-sm font-medium text-gray-700">R</span>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-full px-3 py-2">
-            <span className="text-sm text-gray-500">Message...</span>
+        </div>
+        
+        {/* Bottom Input Area */}
+        <div className="flex items-center space-x-3 bg-gray-50 rounded-full p-3 mt-4">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
           </div>
-          <button className="p-2">
-            <Send className="w-4 h-4 text-gray-600" />
-          </button>
+          <span className="text-sm text-gray-500 flex-1">Message...</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>

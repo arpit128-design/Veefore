@@ -26,6 +26,7 @@ import AIFeatures from "@/pages/AIFeatures";
 import Automation from "@/pages/Automation";
 import PostAutomation from "@/pages/PostAutomation";
 import CommentToDMAutomation from "@/pages/CommentToDMAutomation";
+import DMAutomationList from "@/pages/DMAutomationList";
 import Messages from "@/pages/Messages";
 import Workspaces from "@/pages/Workspaces";
 import TeamManagement from "@/pages/TeamManagement";
@@ -151,6 +152,7 @@ function AuthenticatedApp() {
                   <Route path="/automation" component={Automation} />
                   <Route path="/post-automation" component={PostAutomation} />
                   <Route path="/comment-to-dm-automation" component={CommentToDMAutomation} />
+          <Route path="/dm-automation-list" component={DMAutomationList} />
                   <Route path="/conversations" component={Messages} />
                   <Route path="/messages" component={Messages} />
                   <Route path="/workspaces" component={Workspaces} />

@@ -120,6 +120,7 @@ VeeFore is a comprehensive social media management platform that leverages AI to
   - ✅ **Empty Form Fields**: All input fields start completely empty as requested, with placeholders only showing when fields are empty
   - ✅ **Button Styling Enhancement**: Removed black border from button preview and implemented dynamic text color (black for user input, grey for placeholder)
   - ✅ **Fixed Message Box Sizing**: Added minimum width constraints (200px for message, 120px for button) to prevent shrinking with short text
+  - ✅ **Long Text Wrapping**: Added proper text wrapping (break-words, overflow-wrap-anywhere) to prevent text overflow in DM preview
   - **Technical Implementation**: Updated InstagramDMPreview component to show fallback placeholder text for button using logical OR operator
   - **User Experience**: Users now get immediate visual feedback showing how their automated DM will appear to recipients
 - July 11, 2025: **DEDICATED COMMENT TO DM AUTOMATION PAGE COMPLETE** - Created comprehensive standalone Comment to DM automation page with sophisticated 4-step flow based on user reference images

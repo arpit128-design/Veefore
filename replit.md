@@ -112,6 +112,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **DM PREVIEW BUTTON PLACEHOLDER FIX COMPLETE** - Fixed Instagram DM preview to always show "See products" button placeholder text even when field is empty
+  - ✅ **Button Preview Enhancement**: DM preview now displays "See products" placeholder button in light grey (text-gray-400) when buttonText field is empty
+  - ✅ **Consistent Preview Experience**: Users now see exactly how the automated DM will appear with the button, providing clear visual feedback
+  - ✅ **Fixed JSX Syntax Errors**: Resolved critical duplicate return statement causing build failures in CommentToDMAutomation.tsx
+  - ✅ **Proper Placeholder Styling**: Implemented correct placeholder text colors - DM text in dark grey (placeholder-gray-500), button in light grey (placeholder-gray-400)
+  - ✅ **Empty Form Fields**: All input fields start completely empty as requested, with placeholders only showing when fields are empty
+  - **Technical Implementation**: Updated InstagramDMPreview component to show fallback placeholder text for button using logical OR operator
+  - **User Experience**: Users now get immediate visual feedback showing how their automated DM will appear to recipients
 - July 11, 2025: **DEDICATED COMMENT TO DM AUTOMATION PAGE COMPLETE** - Created comprehensive standalone Comment to DM automation page with sophisticated 4-step flow based on user reference images
   - ✅ **4-Step Workflow Implementation**: Select post → Comment replies → Direct message → Review and save with professional progress tracking
   - ✅ **Dedicated Route**: Added `/comment-to-dm-automation` route with full sidebar navigation integration

@@ -805,7 +805,7 @@ const EnterpriseSettings = () => {
       </div>
 
       {/* Enhanced global styles to prevent yellow colors */}
-      <style jsx global>{`
+      <style jsx={true} global={true}>{`
         /* Force all elements to use specified colors */
         * {
           --yellow-50: #f9fafb !important;

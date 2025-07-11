@@ -144,8 +144,8 @@ function AuthenticatedApp() {
                   <Route path="/team" component={TeamManagement} />
                   <Route path="/integrations" component={Integrations} />
                   <Route path="/referrals" component={Referrals} />
-                  <Route path="/settings" component={Settings} />
-                  <Route path="/enterprise-settings" component={EnterpriseSettings} />
+                  <Route path="/settings" component={EnterpriseSettings} />
+                  <Route path="/legacy-settings" component={Settings} />
                   <Route path="/pricing" component={Pricing} />
                   <Route path="/subscription" component={Subscription} />
                   <Route path="/subscription-new" component={SubscriptionNew} />

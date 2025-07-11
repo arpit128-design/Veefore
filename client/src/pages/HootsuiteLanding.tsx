@@ -1708,9 +1708,11 @@ function VeeForeFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <img 
+                src={veeforeLogo} 
+                alt="VeeFore Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
               <span className="text-xl font-bold">VeeFore</span>
             </div>
             <p className="text-gray-400 mb-4">

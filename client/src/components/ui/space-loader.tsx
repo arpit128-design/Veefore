@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import veeforeLogo from '@/assets/veefore-logo.png';
 import { useMemo } from 'react';
 
 interface SpaceLoaderProps {
@@ -93,16 +94,20 @@ export function SpaceLoader({
                   <div className="absolute bottom-6 right-6 w-1 h-1 bg-cyan-400 rounded-full animate-float-1" />
                 </div>
                 
-                {/* Center "VF" letters with glow */}
+                {/* Center VeeFore Logo with glow */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
-                    <span className="text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text font-bold text-2xl tracking-wider animate-text-glow">
-                      VF
-                    </span>
-                    {/* Text shadow glow */}
-                    <span className="absolute inset-0 text-blue-400/20 font-bold text-2xl tracking-wider blur-sm">
-                      VF
-                    </span>
+                    <img 
+                      src={veeforeLogo} 
+                      alt="VeeFore Logo" 
+                      className="w-16 h-16 object-contain filter drop-shadow-lg animate-text-glow"
+                    />
+                    {/* Logo shadow glow */}
+                    <img 
+                      src={veeforeLogo} 
+                      alt="VeeFore Logo" 
+                      className="absolute inset-0 w-16 h-16 object-contain filter blur-sm opacity-30"
+                    />
                   </div>
                 </div>
                 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useDeviceWaitlistStatus } from '@/hooks/useDeviceWaitlistStatus';
 import { useLocation } from 'wouter';
+import veeforeLogo from '@/assets/veefore-logo.png';
 import { 
   ArrowRight, 
   Calendar, 
@@ -101,9 +102,11 @@ function OptimizedNavigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Rocket className="w-5 h-5 text-white" />
-            </div>
+            <img 
+              src={veeforeLogo} 
+              alt="VeeFore Logo" 
+              className="w-8 h-8 object-contain"
+            />
             <span className="text-xl font-bold text-white">VeeFore</span>
           </div>
           

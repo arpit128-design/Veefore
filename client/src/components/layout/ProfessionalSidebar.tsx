@@ -611,6 +611,13 @@ function SidebarContent({
             isActive={location === "/automation"}
           />
           <SidebarItem
+            icon={Target}
+            label="Post Automation"
+            href="/post-automation"
+            isActive={location === "/post-automation"}
+            badge="New"
+          />
+          <SidebarItem
             icon={MessageSquare}
             label="Messages"
             href="/conversations"

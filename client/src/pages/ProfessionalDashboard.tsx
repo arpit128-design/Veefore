@@ -305,7 +305,7 @@ const ProfessionalDashboard: React.FC = () => {
               {subscriptionStatus.status}
             </span>
           </div>
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg px-4 sm:px-6 w-full sm:w-auto">
+          <Button className="text-[#1a4f69] bg-[#dbeafe] hover:bg-[#bfdbfe] shadow-lg px-4 sm:px-6 w-full sm:w-auto">
             <PlusCircle className="w-4 h-4 mr-2" />
             <span className="text-sm sm:text-base">Create Content</span>
           </Button>

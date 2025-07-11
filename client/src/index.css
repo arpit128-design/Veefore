@@ -1054,6 +1054,179 @@ div textarea,
   background-color: rgb(255 255 255) !important;
 }
 
+/* ENHANCED INPUT FIELD TEXT VISIBILITY - ADDITIONAL COMPREHENSIVE RULES */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="week"],
+input[type="month"],
+input[type="color"],
+textarea,
+select {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+/* FORCE VISIBILITY FOR AUTOFILLED INPUTS */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  box-shadow: 0 0 0 30px #ffffff inset !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* FOCUSED INPUT STATES */
+input:focus,
+textarea:focus,
+select:focus {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* DISABLED INPUT STATES */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: #6b7280 !important;
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+  opacity: 0.7 !important;
+}
+
+/* READONLY INPUT STATES */
+input:read-only,
+textarea:read-only {
+  color: #374151 !important;
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+}
+
+/* PLACEHOLDER TEXT VISIBILITY */
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* SELECTED TEXT VISIBILITY */
+input::selection,
+textarea::selection {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* SPECIFIC COMPONENT OVERRIDES */
+.input,
+.form-input,
+.form-control,
+[role="textbox"],
+[role="combobox"],
+[contenteditable="true"] {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  opacity: 1 !important;
+}
+
+/* SEARCH INPUT SPECIFIC RULES */
+input[type="search"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: none !important;
+}
+
+/* MULTI-SELECT AND DROPDOWN VISIBILITY */
+select multiple,
+select[multiple] {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+option {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+option:checked {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* TEXTAREA SPECIFIC RULES */
+textarea {
+  resize: vertical !important;
+  min-height: 80px !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+}
+
+/* FORCE VISIBILITY IN SPECIFIC CONTEXTS */
+.dark input,
+.dark textarea,
+.dark select {
+  color: #f8fafc !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* OVERRIDE ANY COMPONENT LIBRARY STYLES */
+.shadcn-input,
+.ui-input,
+.ant-input,
+.mui-input,
+.chakra-input {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* FORCE VISIBILITY FOR HIDDEN TEXT */
+input[style*="color: transparent"],
+textarea[style*="color: transparent"],
+input[style*="color: rgba(0,0,0,0)"],
+textarea[style*="color: rgba(0,0,0,0)"] {
+  color: #0f172a !important;
+}
+
+/* ENSURE PROPER CONTRAST FOR LIGHT BACKGROUNDS */
+input[style*="background-color: #ffffff"],
+input[style*="background-color: white"],
+textarea[style*="background-color: #ffffff"],
+textarea[style*="background-color: white"] {
+  color: #0f172a !important;
+}
+
 /* Scrollbar fixes - remove any yellow tints */
 ::-webkit-scrollbar {
   width: 8px;

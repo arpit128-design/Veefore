@@ -196,6 +196,52 @@ export default function CommentToDMAutomation() {
     return secondLetter ? firstLetter + secondLetter.toUpperCase() : firstLetter;
   };
 
+  // Get platform-specific data for DM previews
+  const getPlatformData = (platform: string) => {
+    switch (platform) {
+      case 'instagram':
+        return {
+          name: 'Instagram',
+          color: '#e91e63',
+          icon: '📷',
+          accentColor: '#e91e63',
+          bgColor: '#fafafa'
+        };
+      case 'linkedin':
+        return {
+          name: 'LinkedIn',
+          color: '#0077b5',
+          icon: '💼',
+          accentColor: '#0077b5',
+          bgColor: '#f3f6f8'
+        };
+      case 'twitter':
+        return {
+          name: 'Twitter',
+          color: '#1da1f2',
+          icon: '🐦',
+          accentColor: '#1da1f2',
+          bgColor: '#f7f9fa'
+        };
+      case 'facebook':
+        return {
+          name: 'Facebook',
+          color: '#1877f2',
+          icon: '👥',
+          accentColor: '#1877f2',
+          bgColor: '#f0f2f5'
+        };
+      default:
+        return {
+          name: 'Instagram',
+          color: '#e91e63',
+          icon: '📷',
+          accentColor: '#e91e63',
+          bgColor: '#fafafa'
+        };
+    }
+  };
+
   // Fetch user profile data
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -367,7 +413,8 @@ export default function CommentToDMAutomation() {
     </div>
   );
 
-  const InstagramDMPreview = () => {
+  const PlatformDMPreview = ({ platform }: { platform: string }) => {
+    const platformData = getPlatformData(platform);
     const currentTime = new Date().toLocaleString('en-US', { 
       month: 'short', 
       day: 'numeric', 
@@ -392,13 +439,13 @@ export default function CommentToDMAutomation() {
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          backgroundColor: '#fafafa'
+          backgroundColor: platformData.bgColor
         }}>
           <div style={{
             width: '24px',
             height: '24px',
             borderRadius: '50%',
-            backgroundColor: '#e91e63',
+            backgroundColor: platformData.color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
@@ -407,14 +454,14 @@ export default function CommentToDMAutomation() {
               fontSize: '12px',
               fontWeight: 'bold',
               color: 'white'
-            }}>📷</span>
+            }}>{platformData.icon}</span>
           </div>
           <span style={{
             fontSize: '16px',
             fontWeight: '600',
             color: '#262626'
           }}>
-            Instagram direct message
+            {platformData.name} direct message
           </span>
         </div>
 
@@ -452,7 +499,7 @@ export default function CommentToDMAutomation() {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#e91e63',
+              backgroundColor: platformData.accentColor,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1013,8 +1060,17 @@ export default function CommentToDMAutomation() {
       <div className="w-1/2 bg-gray-50 p-8 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
-            <Instagram className="w-5 h-5 text-pink-600" />
-            <span className="font-medium text-gray-900">Instagram Preview</span>
+            {selectedPost?.platform === 'instagram' && <Instagram className="w-5 h-5 text-pink-600" />}
+            {selectedPost?.platform === 'linkedin' && <Linkedin className="w-5 h-5 text-blue-600" />}
+            {selectedPost?.platform === 'twitter' && <Twitter className="w-5 h-5 text-sky-600" />}
+            {selectedPost?.platform === 'facebook' && <Facebook className="w-5 h-5 text-blue-800" />}
+            <span className="font-medium text-gray-900">
+              {selectedPost?.platform === 'instagram' && 'Instagram Preview'}
+              {selectedPost?.platform === 'linkedin' && 'LinkedIn Preview'}
+              {selectedPost?.platform === 'twitter' && 'Twitter Preview'}
+              {selectedPost?.platform === 'facebook' && 'Facebook Preview'}
+              {!selectedPost && 'Platform Preview'}
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -1037,9 +1093,9 @@ export default function CommentToDMAutomation() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center">
-          {currentStep === 2 && (
+          {currentStep === 2 && selectedPost && (
             <div key="dm-preview">
-              <InstagramDMPreview />
+              <PlatformDMPreview platform={selectedPost.platform} />
             </div>
           )}
           {currentStep !== 2 && selectedPost && (

@@ -297,13 +297,10 @@ const EnterpriseSettings = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm font-medium rounded-lg transition-colors group ${
                       activeTab === item.id 
-                        ? 'bg-gray-900 text-white' 
+                        ? 'bg-blue-50 text-blue-800' 
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
-                    style={activeTab === item.id 
-                      ? { backgroundColor: '#dbeafe !important', color: '#1e40af !important', fontWeight: '600' }
-                      : { backgroundColor: 'transparent !important', color: '#374151 !important' }
-                    }
+                    data-active={activeTab === item.id ? 'true' : 'false'}
                   >
                     <div className="flex items-center space-x-3">
                       <item.icon className="h-4 w-4" />
@@ -877,13 +874,30 @@ const EnterpriseSettings = () => {
         .border-gray-300 { border-color: #d1d5db !important; }
         
         /* Navigation tab active state - Light Blue */
-        .w-full.flex.items-center.justify-between[data-active="true"] {
+        .bg-blue-50 {
+          background-color: #dbeafe !important;
+        }
+        
+        .text-blue-800 {
+          color: #1e40af !important;
+        }
+        
+        .bg-blue-50 * {
+          color: #1e40af !important;
+        }
+        
+        /* Force light blue on active navigation buttons */
+        nav button[data-active="true"] {
           background-color: #dbeafe !important;
           color: #1e40af !important;
           font-weight: 600 !important;
         }
         
-        .w-full.flex.items-center.justify-between[data-active="true"] * {
+        nav button[data-active="true"] * {
+          color: #1e40af !important;
+        }
+        
+        nav button[data-active="true"] svg {
           color: #1e40af !important;
         }
         

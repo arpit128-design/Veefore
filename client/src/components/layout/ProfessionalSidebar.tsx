@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -195,83 +195,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
     return username.slice(0, 2).toUpperCase();
   };
 
-  // Scheduler dropdown options
-  const schedulerOptions = [
-    {
-      title: 'Post',
-      description: 'Create and publish content',
-      icon: <Edit className="w-4 h-4 text-gray-600" />,
-      action: () => {
-        try {
-          setLocation('/create-post');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-    {
-      title: 'Content with AI',
-      description: 'AI-powered content generation',
-      icon: <Sparkles className="w-4 h-4 text-purple-600" />,
-      action: () => {
-        try {
-          setLocation('/content-studio');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-    {
-      title: 'DM automation',
-      description: 'Automated direct messaging',
-      icon: <Bot className="w-4 h-4 text-blue-600" />,
-      action: () => {
-        try {
-          setLocation('/automation');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-    {
-      title: 'Ad',
-      description: 'Create advertisement campaigns',
-      icon: <Megaphone className="w-4 h-4 text-orange-600" />,
-      action: () => {
-        try {
-          setLocation('/scheduler');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-    {
-      title: 'Automated boost',
-      description: 'Auto-boost high performing content',
-      icon: <TrendingUp className="w-4 h-4 text-green-600" />,
-      badge: 'New',
-      action: () => {
-        try {
-          setLocation('/scheduler');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-    {
-      title: 'Hootbio',
-      description: 'Bio link management',
-      icon: <LinkIcon className="w-4 h-4 text-emerald-600" />,
-      badge: 'Upgrade',
-      action: () => {
-        try {
-          setLocation('/scheduler');
-        } catch (error) {
-          console.error('Navigation error:', error);
-        }
-      },
-    },
-  ];
+
 
   const handleNavClick = () => {
     if (setIsMobileMenuOpen) {
@@ -296,7 +220,6 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
           user={user}
           credits={credits}
           getInitials={getInitials}
-          schedulerOptions={schedulerOptions}
           onAnalyticsToggle={onAnalyticsToggle}
           onNavClick={handleNavClick}
           isMobile={false}
@@ -334,7 +257,6 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
               user={user}
               credits={credits}
               getInitials={getInitials}
-              schedulerOptions={schedulerOptions}
               onAnalyticsToggle={onAnalyticsToggle}
               onNavClick={handleNavClick}
               isMobile={true}
@@ -352,7 +274,6 @@ interface SidebarContentProps {
   user: any;
   credits: number;
   getInitials: (username: string) => string;
-  schedulerOptions: any[];
   onAnalyticsToggle?: () => void;
   onNavClick: () => void;
   isMobile?: boolean;
@@ -364,7 +285,6 @@ function SidebarContent({
   user, 
   credits, 
   getInitials, 
-  schedulerOptions, 
   onAnalyticsToggle, 
   onNavClick, 
   isMobile = false,
@@ -435,79 +355,12 @@ function SidebarContent({
             href="/content-studio"
             isActive={location === "/content-studio"}
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <motion.div
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-11 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all duration-200 group",
-                    (location === "/scheduler" || location === "/professional-scheduler") && "bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200 shadow-sm"
-                  )}
-                >
-                  <Calendar className={cn(
-                    "h-4 w-4 mr-3 transition-colors duration-200",
-                    (location === "/scheduler" || location === "/professional-scheduler")
-                      ? "text-blue-600" 
-                      : "text-slate-500 group-hover:text-slate-700"
-                  )} />
-                  <span className="text-sm font-medium flex-1 text-left">Scheduler</span>
-                  <ChevronDown className="w-3 h-3 text-gray-500 ml-auto" />
-                </Button>
-              </motion.div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72 max-w-[calc(100vw-2rem)] bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="bottom" align="start" sideOffset={4}>
-              {schedulerOptions.map((option, optionIndex) => (
-                <div key={optionIndex}>
-                  <DropdownMenuItem 
-                    className="flex items-start gap-3 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      try {
-                        option.action();
-                      } catch (error) {
-                        console.error('Dropdown action error:', error);
-                      }
-                    }}
-                  >
-                    <div className="mt-1">
-                      {option.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-900 text-sm">
-                          {option.title}
-                        </h4>
-                        {option.badge && (
-                          <Badge 
-                            variant={option.badge === 'New' ? 'default' : 'secondary'} 
-                            className={`text-xs h-5 px-2 ${
-                              option.badge === 'New' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {option.badge}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {option.description}
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                  {optionIndex < schedulerOptions.length - 1 && (
-                    <DropdownMenuSeparator className="my-1 bg-gray-100" />
-                  )}
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SidebarItem
+            icon={Calendar}
+            label="Scheduler"
+            href="/scheduler"
+            isActive={location === "/scheduler" || location === "/professional-scheduler"}
+          />
           <SidebarItem
             icon={Sparkles}
             label="AI Features"

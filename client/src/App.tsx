@@ -207,6 +207,7 @@ function Router() {
   const { user, loading } = useAuth();
   const [location] = useLocation();
 
+  // Show loading spinner while authentication is being determined
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -253,7 +254,7 @@ function Router() {
 
   const isPublicRoute = publicRoutes.includes(location);
 
-  // If user is authenticated, render the authenticated app
+  // If user is authenticated, always render the authenticated app
   if (isAuthenticated) {
     return <AuthenticatedApp />;
   }

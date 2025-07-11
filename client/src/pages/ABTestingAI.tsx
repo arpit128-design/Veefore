@@ -172,7 +172,7 @@ export default function ABTestingAI() {
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'low': return 'text-green-400 bg-green-400/10 border-green-400/30';
-      case 'medium': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30';
+      case 'medium': return 'text-blue-400 bg-blue-400/10 border-blue-400/30';
       case 'high': return 'text-red-400 bg-red-400/10 border-red-400/30';
       default: return 'text-gray-400 bg-gray-400/10 border-gray-400/30';
     }
@@ -740,9 +740,9 @@ export default function ABTestingAI() {
                     </CardContent>
                   </Card>
                   
-                  <Card className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
+                  <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-yellow-400 text-sm">Worst Case</CardTitle>
+                      <CardTitle className="text-red-400 text-sm">Worst Case</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-asteroid-silver text-sm">{generatedStrategy.expectedOutcomes.worstCase}</p>

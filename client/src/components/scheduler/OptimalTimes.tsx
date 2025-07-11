@@ -91,13 +91,13 @@ export function OptimalTimes() {
 
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 80) return "text-green-400";
-    if (confidence >= 60) return "text-yellow-400";
+    if (confidence >= 60) return "text-blue-400";
     return "text-red-400";
   };
 
   const getConfidenceBgColor = (confidence: number) => {
     if (confidence >= 80) return "bg-green-400";
-    if (confidence >= 60) return "bg-yellow-400";
+    if (confidence >= 60) return "bg-blue-400";
     return "bg-red-400";
   };
 

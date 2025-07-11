@@ -47,7 +47,7 @@ export function FloatingSparkles() {
             ease: "easeInOut"
           }}
         >
-          <Sparkles className="w-4 h-4 text-yellow-400" />
+          <Sparkles className="w-4 h-4 text-blue-400" />
         </motion.div>
       ))}
     </div>

@@ -265,8 +265,8 @@ const rolePermissions = {
   contributor: { 
     label: "Contributor", 
     icon: UserCheck, 
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200", 
-    darkColor: "bg-yellow-900 text-yellow-100 border-yellow-700",
+    color: "bg-blue-100 text-blue-800 border-blue-200", 
+    darkColor: "bg-blue-900 text-blue-100 border-blue-700",
     description: "Limited content creation and collaboration",
     level: 3,
     permissions: {

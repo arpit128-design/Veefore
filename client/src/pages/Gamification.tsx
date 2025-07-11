@@ -213,7 +213,7 @@ export default function Gamification() {
     switch (difficulty) {
       case 'expert': return 'text-red-400 bg-red-900/50';
       case 'hard': return 'text-orange-400 bg-orange-900/50';
-      case 'medium': return 'text-yellow-400 bg-yellow-900/50';
+      case 'medium': return 'text-blue-400 bg-blue-900/50';
       default: return 'text-green-400 bg-green-900/50';
     }
   };

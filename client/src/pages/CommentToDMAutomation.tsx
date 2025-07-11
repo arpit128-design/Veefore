@@ -289,11 +289,8 @@ export default function CommentToDMAutomation() {
   );
 
   const InstagramDMPreview = () => {
-    const dmText = directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!';
-    const btnText = directMessage.buttonText || 'See products';
-    
     return (
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden max-w-sm shadow-sm">
+      <div className="bg-white rounded-lg border-2 border-blue-500 overflow-hidden max-w-sm shadow-sm">
         <div className="p-3 border-b border-gray-200 flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">U</span>
@@ -312,11 +309,11 @@ export default function CommentToDMAutomation() {
           <div className="flex justify-start">
             <div className="bg-gray-200 text-gray-900 px-3 py-2 rounded-2xl rounded-tl-sm w-80">
               <div className={`text-sm break-words overflow-wrap-anywhere ${directMessage.text ? 'text-gray-900' : 'text-gray-500'}`}>
-                {dmText}
+                {directMessage.text || 'I\'m so excited you\'d like to see what I\'ve got an offer!'}
               </div>
               <div className="mt-2 p-2 bg-white rounded-lg text-center">
                 <div className={`text-sm font-medium break-words ${directMessage.buttonText ? 'text-black' : 'text-gray-400'}`}>
-                  {btnText}
+                  {directMessage.buttonText || 'See products'}
                 </div>
               </div>
             </div>
@@ -800,19 +797,18 @@ export default function CommentToDMAutomation() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-          {currentStep === 2 ? (
-            // Step 3: Direct message - Show only DM preview
-            <div className="w-full flex justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center bg-red-50">
+          {currentStep === 2 && (
+            <div className="bg-green-100 p-4 rounded">
+              <p className="text-xs text-green-800 mb-2">DEBUG: DM Preview Container</p>
               <InstagramDMPreview />
             </div>
-          ) : (
-            // All other steps - Show post preview
-            selectedPost && (
-              <div className="w-full flex justify-center">
-                <InstagramPostPreview post={selectedPost} />
-              </div>
-            )
+          )}
+          {currentStep !== 2 && selectedPost && (
+            <div className="bg-yellow-100 p-4 rounded">
+              <p className="text-xs text-yellow-800 mb-2">DEBUG: Post Preview Container</p>
+              <InstagramPostPreview post={selectedPost} />
+            </div>
           )}
 
           {showAnalytics && (

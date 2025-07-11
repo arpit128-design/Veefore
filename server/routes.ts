@@ -12350,11 +12350,11 @@ Create a detailed growth strategy in JSON format:
       console.log(`[CLEANUP] Looking for Firebase user with email: ${email}`);
       
       // Get user by email
-      const userRecord = await admin.auth().getUserByEmail(email);
+      const userRecord = await firebaseAdmin.auth().getUserByEmail(email);
       console.log(`[CLEANUP] Found Firebase user: ${userRecord.uid}`);
       
       // Delete the user
-      await admin.auth().deleteUser(userRecord.uid);
+      await firebaseAdmin.auth().deleteUser(userRecord.uid);
       console.log(`[CLEANUP] Successfully deleted Firebase user: ${userRecord.uid}`);
       
       res.json({ 

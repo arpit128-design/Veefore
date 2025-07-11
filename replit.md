@@ -114,7 +114,8 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 - July 11, 2025: **ADVANCED POST-SPECIFIC AUTOMATION SYSTEM COMPLETE** - Created revolutionary post-specific automation interface with modern professional design
   - ✅ **Post-Specific Automation Rules**: Users now create separate automation rules for each individual post on every platform
-  - ✅ **Advanced Rule Creation**: Comprehensive automation rule builder with 4 automation types (DM, Comment, Story Reply, Mention Reply)
+  - ✅ **Advanced Rule Creation**: Comprehensive automation rule builder with 4 automation types (Comment to DM, Comment, Story Reply, Mention Reply)
+  - ✅ **Comment to DM Automation**: Revolutionary feature where system sends DMs automatically when users comment on posts - perfect for lead generation and customer support
   - ✅ **Intelligent Triggers**: Support for keyword, hashtag, mention, emoji, and universal triggers (all comments/DMs)
   - ✅ **AI-Powered Responses**: Multiple response types including text, AI-generated, template, and media responses
   - ✅ **Advanced Configuration**: Time restrictions, user filters, rate limiting, and AI personality settings

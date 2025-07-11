@@ -70,7 +70,7 @@ interface AutomationRule {
   id: string;
   postId: string;
   platform: string;
-  type: 'dm' | 'comment' | 'story_reply' | 'mention_reply';
+  type: 'comment_to_dm' | 'comment' | 'story_reply' | 'mention_reply';
   triggerType: 'keyword' | 'hashtag' | 'mention' | 'emoji' | 'all_comments' | 'all_dms';
   triggerValue?: string;
   responseType: 'text' | 'ai_generated' | 'template' | 'media';
@@ -120,7 +120,7 @@ const PostAutomation: React.FC = () => {
   const [showCreateRule, setShowCreateRule] = useState(false);
   const [selectedRule, setSelectedRule] = useState<AutomationRule | null>(null);
   const [newRule, setNewRule] = useState<Partial<AutomationRule>>({
-    type: 'dm',
+    type: 'comment_to_dm',
     triggerType: 'keyword',
     responseType: 'text',
     isActive: true,
@@ -158,7 +158,7 @@ const PostAutomation: React.FC = () => {
           id: 'rule1',
           postId: '1',
           platform: 'instagram',
-          type: 'dm',
+          type: 'comment_to_dm',
           triggerType: 'keyword',
           triggerValue: 'price',
           responseType: 'ai_generated',
@@ -248,7 +248,7 @@ const PostAutomation: React.FC = () => {
     selectedPost.automationRules = [...(selectedPost.automationRules || []), rule];
     setShowCreateRule(false);
     setNewRule({
-      type: 'dm',
+      type: 'comment_to_dm',
       triggerType: 'keyword',
       responseType: 'text',
       isActive: true,
@@ -343,22 +343,23 @@ const PostAutomation: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              rule.type === 'dm' ? 'bg-blue-100 text-blue-600' :
+              rule.type === 'comment_to_dm' ? 'bg-blue-100 text-blue-600' :
               rule.type === 'comment' ? 'bg-green-100 text-green-600' :
               rule.type === 'story_reply' ? 'bg-purple-100 text-purple-600' :
               'bg-orange-100 text-orange-600'
             }`}>
-              {rule.type === 'dm' ? <MessageCircle className="w-4 h-4" /> :
+              {rule.type === 'comment_to_dm' ? <MessageCircle className="w-4 h-4" /> :
                rule.type === 'comment' ? <Reply className="w-4 h-4" /> :
                rule.type === 'story_reply' ? <Eye className="w-4 h-4" /> :
                <AtSign className="w-4 h-4" />}
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 capitalize">
-                {rule.type.replace('_', ' ')} Automation
+                {rule.type === 'comment_to_dm' ? 'Comment to DM' : rule.type.replace('_', ' ')} Automation
               </h4>
               <p className="text-sm text-gray-500">
-                Trigger: {rule.triggerType} "{rule.triggerValue}"
+                {rule.type === 'comment_to_dm' ? 'Send DM when user comments' : `Trigger: ${rule.triggerType}`} 
+                {rule.triggerValue && ` "${rule.triggerValue}"`}
               </p>
             </div>
           </div>
@@ -439,13 +440,30 @@ const PostAutomation: React.FC = () => {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dm">Direct Message</SelectItem>
+                  <SelectItem value="comment_to_dm">Comment to DM</SelectItem>
                   <SelectItem value="comment">Comment Reply</SelectItem>
                   <SelectItem value="story_reply">Story Reply</SelectItem>
                   <SelectItem value="mention_reply">Mention Reply</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            
+            {newRule.type === 'comment_to_dm' && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900">Comment to DM Automation</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                      When users comment on your post, the system will automatically send them a direct message with your response. 
+                      This is perfect for lead generation, customer support, or providing additional information privately.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div>
               <Label htmlFor="trigger-type">Trigger Type</Label>

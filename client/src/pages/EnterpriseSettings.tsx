@@ -301,7 +301,7 @@ const EnterpriseSettings = () => {
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                     style={activeTab === item.id 
-                      ? { backgroundColor: '#e5e7eb !important', color: '#111827 !important', fontWeight: '600' }
+                      ? { backgroundColor: '#dbeafe !important', color: '#1e40af !important', fontWeight: '600' }
                       : { backgroundColor: 'transparent !important', color: '#374151 !important' }
                     }
                   >
@@ -875,6 +875,17 @@ const EnterpriseSettings = () => {
         
         .border-gray-200 { border-color: #e5e7eb !important; }
         .border-gray-300 { border-color: #d1d5db !important; }
+        
+        /* Navigation tab active state - Light Blue */
+        .w-full.flex.items-center.justify-between[data-active="true"] {
+          background-color: #dbeafe !important;
+          color: #1e40af !important;
+          font-weight: 600 !important;
+        }
+        
+        .w-full.flex.items-center.justify-between[data-active="true"] * {
+          color: #1e40af !important;
+        }
         
         /* Save button specific override */
         .save-button {

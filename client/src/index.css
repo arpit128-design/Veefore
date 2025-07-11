@@ -643,6 +643,63 @@ button[data-state="checked"],
 }
 
 /* WORKSPACE ROUTE SPECIFIC OVERRIDES */
+
+/* Mobile-Optimized Sidebar Styling */
+@media (max-width: 1023px) {
+  .veefore-sidebar {
+    width: 320px !important;
+  }
+  
+  .veefore-sidebar .veefore-sidebar-header {
+    padding: 1rem !important;
+  }
+  
+  .veefore-sidebar .veefore-sidebar-nav {
+    padding: 1rem !important;
+  }
+  
+  /* Make sidebar items more touch-friendly on mobile */
+  .veefore-sidebar .veefore-sidebar-nav button,
+  .veefore-sidebar .veefore-sidebar-nav a {
+    min-height: 44px !important;
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Collapsible sections should have better touch targets */
+  .veefore-sidebar .veefore-sidebar-nav [data-collapsible="true"] {
+    min-height: 48px !important;
+  }
+  
+  /* Better spacing for mobile */
+  .veefore-sidebar .veefore-sidebar-nav > div {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Enhanced mobile header */
+  .veefore-sidebar .veefore-sidebar-header .bg-gradient-to-r {
+    padding: 1rem !important;
+  }
+  
+  /* Better mobile scrolling */
+  .veefore-sidebar .veefore-sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+  
+  .veefore-sidebar .veefore-sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .veefore-sidebar .veefore-sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .veefore-sidebar .veefore-sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: rgb(203 213 225);
+    border-radius: 3px;
+  }
+}
 [data-route="/workspaces"] .bg-yellow-50,
 [data-route="/workspaces"] .bg-yellow-100,
 [data-route="/workspaces"] .bg-yellow-200,

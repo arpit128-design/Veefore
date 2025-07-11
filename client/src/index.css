@@ -767,6 +767,18 @@ button.create-content-button span,
 [class*="create-content-button"] *,
 button[class*="create-content-button"] * {
   color: white !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* SPECIFIC TARGETING FOR BUTTON CONTENT */
+.create-content-button svg,
+button.create-content-button svg,
+.create-content-button svg path,
+button.create-content-button svg path {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
 }
 
 .create-content-button:hover,
@@ -786,6 +798,18 @@ button.create-content-button:hover span,
 [class*="create-content-button"]:hover *,
 button[class*="create-content-button"]:hover * {
   color: white !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* HOVER STATE FOR SVG ICONS */
+.create-content-button:hover svg,
+button.create-content-button:hover svg,
+.create-content-button:hover svg path,
+button.create-content-button:hover svg path {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
 }
 
 /* NUCLEAR OVERRIDE - Target all possible button variations */

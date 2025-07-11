@@ -688,7 +688,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
                 <span className="font-medium">10:00 AM</span>
                 <Badge className="bg-emerald-600 text-white">Peak</Badge>
               </div>
-              <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <span className="font-medium">2:00 PM</span>
                 <Badge variant="secondary">Good</Badge>
               </div>

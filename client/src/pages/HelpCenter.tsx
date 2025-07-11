@@ -286,7 +286,7 @@ export default function HelpCenter() {
                             <span>{article.views} views</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Star className="h-4 w-4 text-yellow-400" />
+                            <Star className="h-4 w-4 text-blue-400" />
                             <span>{article.rating}</span>
                           </div>
                         </div>

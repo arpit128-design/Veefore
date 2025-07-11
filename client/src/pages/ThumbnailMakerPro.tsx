@@ -273,7 +273,7 @@ const ThumbnailMakerPro: React.FC = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="h-8 w-8 text-yellow-400" />
+            <Sparkles className="h-8 w-8 text-blue-400" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
               VeeFore AI Thumbnail Maker Pro
             </h1>

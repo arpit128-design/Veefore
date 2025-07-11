@@ -511,7 +511,7 @@ export default function PerformanceAnalytics() {
                       <h4 className="font-semibold text-gray-900">{action.title}</h4>
                       <Badge variant="outline" className={`text-xs ${
                         action.priority === 'High' ? 'border-red-300 text-red-700' :
-                        action.priority === 'Medium' ? 'border-yellow-300 text-yellow-700' :
+                        action.priority === 'Medium' ? 'border-blue-300 text-blue-700' :
                         'border-green-300 text-green-700'
                       }`}>
                         {action.priority}

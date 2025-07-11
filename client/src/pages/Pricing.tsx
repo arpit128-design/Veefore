@@ -484,7 +484,7 @@ export default function Pricing() {
                         <Card className={`
                           h-full relative overflow-hidden border-2 backdrop-blur-md transition-all duration-500 hover:scale-105 group-hover:shadow-2xl
                           ${isPopular 
-                            ? 'border-amber-500/60 bg-gradient-to-br from-amber-900/30 via-orange-900/20 to-red-900/30 hover:border-amber-400/80 ring-4 ring-amber-400/20' 
+                            ? 'border-blue-500/60 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-red-900/30 hover:border-blue-400/80 ring-4 ring-blue-400/20' 
                             : plan.id === 'free'
                               ? 'border-slate-500/40 bg-gradient-to-br from-slate-800/40 via-slate-700/30 to-slate-800/40 hover:border-slate-400/60'
                               : plan.id === 'creator'
@@ -506,7 +506,7 @@ export default function Pricing() {
                             animate={{ scale: 1, rotate: 0 }}
                             transition={{ delay: 0.5, type: "spring", bounce: 0.5 }}
                           >
-                            <div className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 text-black px-6 py-2 text-sm font-bold rounded-full shadow-lg border-2 border-amber-300">
+                            <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-red-400 text-black px-6 py-2 text-sm font-bold rounded-full shadow-lg border-2 border-blue-300">
                               <span className="flex items-center gap-2">
                                 <Crown className="w-4 h-4" />
                                 Most Popular
@@ -567,7 +567,7 @@ export default function Pricing() {
                           >
                             <div className="relative">
                               <div className={`text-3xl font-bold mb-1 ${
-                                isPopular ? 'text-amber-400' : 'text-white'
+                                isPopular ? 'text-blue-400' : 'text-white'
                               }`}>
                                 {plan.price === 0 ? 'Free' : `₹${plan.price}`}
                               </div>

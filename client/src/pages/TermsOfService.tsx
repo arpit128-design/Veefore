@@ -208,7 +208,7 @@ export function TermsOfService() {
               href="#user-accounts"
               className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
             >
-              <Users className="w-6 h-6 text-orange-400 mb-2 group-hover:scale-110 transition-transform" />
+              <Users className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
               <span className="text-sm text-white/70 group-hover:text-white text-center">User Accounts</span>
             </a>
             
@@ -232,7 +232,7 @@ export function TermsOfService() {
               href="#intellectual-property"
               className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
             >
-              <Lock className="w-6 h-6 text-yellow-400 mb-2 group-hover:scale-110 transition-transform" />
+              <Lock className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
               <span className="text-sm text-white/70 group-hover:text-white text-center">IP Rights</span>
             </a>
             
@@ -320,10 +320,10 @@ export function TermsOfService() {
                   </ul>
                 </div>
                 
-                <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-6">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle className="w-5 h-5 text-orange-400" />
-                    <h3 className="font-semibold text-orange-400">Acceptance Methods</h3>
+                    <AlertTriangle className="w-5 h-5 text-blue-400" />
+                    <h3 className="font-semibold text-blue-400">Acceptance Methods</h3>
                   </div>
                   <ul className="space-y-2 text-sm text-white/80">
                     <li>• Creating an account on our platform</li>
@@ -383,7 +383,7 @@ export function TermsOfService() {
             className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
           >
             <div className="flex items-center gap-3 mb-6">
-              <Users className="w-8 h-8 text-orange-400" />
+              <Users className="w-8 h-8 text-blue-400" />
               <h2 className="text-3xl font-bold">4. User Accounts and Registration</h2>
             </div>
             
@@ -396,7 +396,7 @@ export function TermsOfService() {
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {userRights.map((right, index) => (
                   <div key={index} className="bg-white/5 rounded-lg p-6 border border-white/10">
-                    <h3 className="font-semibold mb-3 text-orange-400">{right.title}</h3>
+                    <h3 className="font-semibold mb-3 text-blue-400">{right.title}</h3>
                     <p className="text-sm text-white/70 mb-3">{right.description}</p>
                     <ul className="space-y-1 text-xs text-white/60">
                       {right.details.map((detail, detailIndex) => (

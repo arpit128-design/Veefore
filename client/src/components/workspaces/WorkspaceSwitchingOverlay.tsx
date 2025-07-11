@@ -153,7 +153,7 @@ export function WorkspaceSwitchingOverlay({
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-4"
                 >
-                  <h2 className="text-3xl font-orbitron font-bold neon-text text-solar-gold">
+                  <h2 className="text-3xl font-orbitron font-bold neon-text text-blue-500">
                     Welcome to {targetWorkspace?.name}
                   </h2>
                   <p className="text-asteroid-silver">

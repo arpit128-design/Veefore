@@ -199,7 +199,7 @@ export default function Subscribe() {
                     {plan.price}
                     <span className="text-lg text-asteroid-silver">{plan.period}</span>
                   </div>
-                  <div className="text-sm text-solar-gold">{plan.credits}</div>
+                  <div className="text-sm text-blue-400">{plan.credits}</div>
                 </div>
               </CardHeader>
               
@@ -295,7 +295,7 @@ export default function Subscribe() {
 
         {/* FAQ Section */}
         <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-orbitron font-bold neon-text text-solar-gold mb-8 text-center">
+          <h2 className="text-3xl font-orbitron font-bold neon-text text-blue-400 mb-8 text-center">
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">

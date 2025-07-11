@@ -156,7 +156,7 @@ export default function AdminUserManagement() {
     const statusColors = {
       active: 'bg-green-500',
       inactive: 'bg-gray-500',
-      waitlisted: 'bg-yellow-500',
+      waitlisted: 'bg-blue-500',
       early_access: 'bg-blue-500',
       launched: 'bg-purple-500'
     };

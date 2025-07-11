@@ -205,7 +205,7 @@ export default function Reviews() {
                   </div>
                   <div className="flex items-center space-x-1 mb-4">
                     {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-4 w-4 text-blue-400 fill-current" />
                     ))}
                   </div>
                 </CardHeader>
@@ -235,7 +235,7 @@ export default function Reviews() {
               <div>
                 <div className="flex items-center space-x-1 mb-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-6 w-6 text-blue-400 fill-current" />
                   ))}
                 </div>
                 <div className="text-gray-400">out of 5 stars</div>
@@ -255,11 +255,11 @@ export default function Reviews() {
                 <div key={index} className="flex items-center space-x-4 max-w-md mx-auto">
                   <div className="flex items-center space-x-1 w-16">
                     <span className="text-sm text-gray-400">{rating.stars}</span>
-                    <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                    <Star className="h-3 w-3 text-blue-400 fill-current" />
                   </div>
                   <div className="flex-1 bg-gray-700 rounded-full h-2">
                     <div 
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-1000"
+                      className="bg-blue-400 h-2 rounded-full transition-all duration-1000"
                       style={{ width: `${rating.percentage}%` }}
                     />
                   </div>

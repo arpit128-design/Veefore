@@ -769,7 +769,7 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-blue-50 border border-red-200 rounded-lg">
                           <div>
                             <h3 className="font-medium text-red-900">Trend Analysis</h3>
                             <p className="text-sm text-red-600">Real-time trend monitoring</p>
@@ -786,7 +786,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.ai.trendAnalysis ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-gray-200'
+                                preferences.ai.trendAnalysis ? 'bg-gradient-to-r from-red-500 to-blue-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
@@ -961,10 +961,10 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-red-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-orange-900">Biometric Authentication</h3>
-                            <p className="text-sm text-orange-600">Fingerprint & face recognition</p>
+                            <h3 className="font-medium text-blue-900">Biometric Authentication</h3>
+                            <p className="text-sm text-blue-600">Fingerprint & face recognition</p>
                           </div>
                           <div className="relative">
                             <input
@@ -978,7 +978,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.security.biometricAuth ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                                preferences.security.biometricAuth ? 'bg-gradient-to-r from-blue-500 to-red-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
@@ -1260,10 +1260,10 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-red-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-orange-900">Updates</h3>
-                            <p className="text-sm text-orange-600">Feature updates and releases</p>
+                            <h3 className="font-medium text-blue-900">Updates</h3>
+                            <p className="text-sm text-blue-600">Feature updates and releases</p>
                           </div>
                           <div className="relative">
                             <input
@@ -1277,7 +1277,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.notifications.push.updates ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                                preferences.notifications.push.updates ? 'bg-gradient-to-r from-blue-500 to-red-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
@@ -1658,10 +1658,10 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-red-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-orange-900">Animations</h3>
-                            <p className="text-sm text-orange-600">Enable smooth animations</p>
+                            <h3 className="font-medium text-blue-900">Animations</h3>
+                            <p className="text-sm text-blue-600">Enable smooth animations</p>
                           </div>
                           <div className="relative">
                             <input
@@ -1675,7 +1675,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.workspace.animations ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                                preferences.workspace.animations ? 'bg-gradient-to-r from-blue-500 to-red-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
@@ -1740,10 +1740,10 @@ const EnterpriseSettings = () => {
                       </div>
                       
                       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-red-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-orange-900">Auto-renewal</h3>
-                            <p className="text-sm text-orange-600">Automatically renew subscription</p>
+                            <h3 className="font-medium text-blue-900">Auto-renewal</h3>
+                            <p className="text-sm text-blue-600">Automatically renew subscription</p>
                           </div>
                           <div className="relative">
                             <input
@@ -1757,7 +1757,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.billing.autoRenewal ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                                preferences.billing.autoRenewal ? 'bg-gradient-to-r from-blue-500 to-red-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,
@@ -1804,10 +1804,10 @@ const EnterpriseSettings = () => {
                       </div>
                       
                       {/* Alert Threshold */}
-                      <div className="mt-6 space-y-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
+                      <div className="mt-6 space-y-3 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium text-amber-700">Alert Threshold</label>
-                          <span className="text-sm font-medium text-amber-900 px-2 py-1 bg-gradient-to-r from-amber-100 to-orange-100 rounded">
+                          <label className="text-sm font-medium text-blue-700">Alert Threshold</label>
+                          <span className="text-sm font-medium text-blue-900 px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded">
                             {preferences.billing.alertThreshold}% remaining
                           </span>
                         </div>
@@ -1823,7 +1823,7 @@ const EnterpriseSettings = () => {
                             }))}
                             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                             style={{
-                              background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(preferences.billing.alertThreshold - 10) / 40 * 100}%, #e5e7eb ${(preferences.billing.alertThreshold - 10) / 40 * 100}%, #e5e7eb 100%)`
+                              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(preferences.billing.alertThreshold - 10) / 40 * 100}%, #e5e7eb ${(preferences.billing.alertThreshold - 10) / 40 * 100}%, #e5e7eb 100%)`
                             }}
                           />
                         </div>
@@ -2098,10 +2098,10 @@ const EnterpriseSettings = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-red-50 border border-blue-200 rounded-lg">
                           <div>
-                            <h3 className="font-medium text-orange-900">Keyboard Navigation</h3>
-                            <p className="text-sm text-orange-600">Enhanced keyboard shortcuts</p>
+                            <h3 className="font-medium text-blue-900">Keyboard Navigation</h3>
+                            <p className="text-sm text-blue-600">Enhanced keyboard shortcuts</p>
                           </div>
                           <div className="relative">
                             <input
@@ -2115,7 +2115,7 @@ const EnterpriseSettings = () => {
                             />
                             <div 
                               className={`w-11 h-6 rounded-full cursor-pointer transition-colors ${
-                                preferences.accessibility.keyboardNavigation ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gray-200'
+                                preferences.accessibility.keyboardNavigation ? 'bg-gradient-to-r from-blue-500 to-red-500' : 'bg-gray-200'
                               }`}
                               onClick={() => setPreferences(prev => ({
                                 ...prev,

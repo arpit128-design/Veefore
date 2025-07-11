@@ -220,7 +220,7 @@ export function PrivacyPolicy() {
               href="#cookies-tracking"
               className="flex flex-col items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 group"
             >
-              <Eye className="w-6 h-6 text-yellow-400 mb-2 group-hover:scale-110 transition-transform" />
+              <Eye className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
               <span className="text-sm text-white/70 group-hover:text-white text-center">Cookies</span>
             </a>
             
@@ -346,8 +346,8 @@ export function PrivacyPolicy() {
             ))}
           </div>
 
-          <div className="mt-8 bg-yellow-500/10 border border-yellow-300/20 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-yellow-300 mb-3">Automatic Data Collection</h3>
+          <div className="mt-8 bg-blue-500/10 border border-blue-300/20 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-300 mb-3">Automatic Data Collection</h3>
             <p className="text-white/70">
               We automatically collect certain information when you access our Service, including 
               device information, usage patterns, and technical data necessary for service functionality 

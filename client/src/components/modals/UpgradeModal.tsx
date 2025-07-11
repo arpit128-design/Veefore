@@ -131,7 +131,7 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
           {/* Quick Credit Packages */}
           <div>
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-solar-gold" />
+              <Zap className="w-5 h-5 text-blue-500" />
               Quick Credit Boost
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -187,7 +187,7 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
           {/* Subscription Plans */}
           <div>
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <Crown className="w-5 h-5 text-solar-gold" />
+              <Crown className="w-5 h-5 text-blue-500" />
               Monthly Plans with More Value
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,7 +227,7 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
                       <ul className="space-y-2">
                         {plan.features.map((feature, i) => (
                           <li key={i} className="flex items-center gap-2 text-sm text-asteroid-silver">
-                            <Star className="w-4 h-4 text-solar-gold flex-shrink-0" />
+                            <Star className="w-4 h-4 text-blue-500 flex-shrink-0" />
                             {feature}
                           </li>
                         ))}
@@ -255,7 +255,7 @@ export function UpgradeModal({ isOpen, onClose, featureType, creditsRequired, cu
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-center bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-6 border border-electric-cyan/20"
+            className="text-center bg-gradient-to-r from-electric-cyan/10 to-blue-500/10 rounded-lg p-6 border border-electric-cyan/20"
           >
             <img 
               src={veeforeLogo} 

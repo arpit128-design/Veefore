@@ -687,7 +687,7 @@ export default function ROICalculator() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-6 border border-electric-cyan/20 text-center"
+                  className="bg-gradient-to-r from-electric-cyan/10 to-blue-500/10 rounded-lg p-6 border border-electric-cyan/20 text-center"
                 >
                   <BarChart3 className="w-12 h-12 text-electric-cyan mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">

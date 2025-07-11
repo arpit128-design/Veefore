@@ -502,7 +502,7 @@ export default function ThumbnailAIMakerPro() {
                 </div>
 
                 {currentStage >= 2 && (
-                  <div className="text-xs text-amber-400 bg-amber-900/20 px-3 py-2 rounded-lg">
+                  <div className="text-xs text-blue-400 bg-blue-900/20 px-3 py-2 rounded-lg">
                     ⏱️ AI processing takes 2-3 minutes for high-quality results. Please wait...
                   </div>
                 )}

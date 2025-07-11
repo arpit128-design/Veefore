@@ -48,7 +48,7 @@ export function WorkspaceSwitcher() {
               )}
             </div>
             {workspace.isDefault && (
-              <div className="text-xs text-solar-gold">Default</div>
+              <div className="text-xs text-blue-500">Default</div>
             )}
           </DropdownMenuItem>
         ))}

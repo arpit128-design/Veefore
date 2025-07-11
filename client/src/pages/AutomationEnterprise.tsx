@@ -269,12 +269,12 @@ export default function AutomationEnterprise() {
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-orange-200 rounded-lg">
-              <Bell className="h-5 w-5 text-orange-600 mt-1" />
+            <div className="flex items-start space-x-3 p-4 bg-white border border-blue-200 rounded-lg">
+              <Bell className="h-5 w-5 text-blue-600 mt-1" />
               <div>
                 <h4 className="font-semibold text-gray-900">Crisis Management</h4>
                 <p className="text-sm text-gray-600">Automated crisis detection and response protocols.</p>
-                <Button size="sm" className="mt-2 bg-orange-600 hover:bg-orange-700 text-white">
+                <Button size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700 text-white">
                   Setup Alerts
                 </Button>
               </div>
@@ -430,8 +430,8 @@ export default function AutomationEnterprise() {
         <Card className="border-0 shadow-sm">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-orange-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Growth Rate</p>

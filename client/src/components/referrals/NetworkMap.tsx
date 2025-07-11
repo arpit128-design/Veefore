@@ -109,7 +109,7 @@ export function NetworkMap() {
           {/* Network Stats */}
           <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
             <div className="text-center">
-              <div className="text-lg font-bold text-solar-gold">
+              <div className="text-lg font-bold text-blue-500">
                 {referralData?.stats?.totalReferrals || 0}
               </div>
               <div className="text-asteroid-silver">Active Satellites</div>

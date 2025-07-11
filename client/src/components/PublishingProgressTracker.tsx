@@ -35,7 +35,7 @@ export default function PublishingProgressTracker({
   const getStatusIcon = () => {
     switch (status) {
       case 'preparing':
-        return <Clock className="h-5 w-5 text-solar-gold animate-pulse" />;
+        return <Clock className="h-5 w-5 text-blue-500 animate-pulse" />;
       case 'uploading':
         return <Upload className="h-5 w-5 text-electric-cyan animate-bounce" />;
       case 'processing':

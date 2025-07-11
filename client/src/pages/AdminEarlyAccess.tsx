@@ -181,7 +181,7 @@ export default function AdminEarlyAccess() {
   };
 
   const getReferralBadge = (referralCount: number) => {
-    if (referralCount >= 10) return { icon: '🎯', label: 'Top Referrer', color: 'bg-yellow-500' };
+    if (referralCount >= 10) return { icon: '🎯', label: 'Top Referrer', color: 'bg-blue-500' };
     if (referralCount >= 5) return { icon: '💎', label: 'Super Referrer', color: 'bg-purple-500' };
     if (referralCount >= 3) return { icon: '🚀', label: 'Active Referrer', color: 'bg-blue-500' };
     if (referralCount >= 1) return { icon: '⭐', label: 'Referrer', color: 'bg-green-500' };
@@ -288,7 +288,7 @@ export default function AdminEarlyAccess() {
                     <p className="text-sm font-medium text-gray-300">Pending Approvals</p>
                     <p className="text-2xl font-bold">{stats.pendingApprovals}</p>
                   </div>
-                  <Clock className="w-8 h-8 text-yellow-400" />
+                  <Clock className="w-8 h-8 text-blue-400" />
                 </div>
               </CardContent>
             </Card>
@@ -420,7 +420,7 @@ export default function AdminEarlyAccess() {
                             className={
                               user.status === 'early_access' ? 'bg-green-500' :
                               user.status === 'approved' ? 'bg-blue-500' :
-                              'bg-yellow-500'
+                              'bg-blue-500'
                             }
                           >
                             {user.status}

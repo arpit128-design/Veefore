@@ -67,7 +67,7 @@ export default function SimplePlanUpgradeModal({
       currency: 'INR',
       interval: 'month',
       icon: Crown,
-      color: 'from-pink-600 to-orange-500',
+      color: 'from-pink-600 to-purple-500',
       features: [
         'Unlimited workspaces',
         '10000 AI credits/month',

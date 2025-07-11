@@ -313,7 +313,7 @@ export default function SolutionSmallBusinesses() {
                     </div>
                     <div className="flex space-x-1 mb-2">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                        <Star key={i} className="h-4 w-4 text-blue-400 fill-current" />
                       ))}
                     </div>
                     <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">

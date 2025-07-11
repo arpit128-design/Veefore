@@ -220,7 +220,7 @@ function SmartLegalAssistant() {
       {/* Cosmic Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-1 h-1 bg-electric-cyan/30 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-solar-gold/20 rounded-full"></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-blue-500/20 rounded-full"></div>
         <div className="absolute bottom-20 left-1/4 w-1 h-1 bg-nebula-purple/30 rounded-full animate-pulse"></div>
       </div>
 
@@ -456,7 +456,7 @@ function SmartLegalAssistant() {
                           <ul className="space-y-2">
                             {guidanceResult.nextSteps.map((step, index) => (
                               <li key={index} className="text-asteroid-silver text-sm flex items-start gap-2">
-                                <div className="w-4 h-4 bg-solar-gold/20 text-solar-gold rounded text-xs flex items-center justify-center mt-0.5 flex-shrink-0">
+                                <div className="w-4 h-4 bg-blue-500/20 text-blue-500 rounded text-xs flex items-center justify-center mt-0.5 flex-shrink-0">
                                   {index + 1}
                                 </div>
                                 {step}

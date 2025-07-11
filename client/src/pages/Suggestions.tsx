@@ -222,7 +222,7 @@ export default function Suggestions() {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'high': return 'bg-red-500/20 text-red-600 border-red-500/30';
-      case 'medium': return 'bg-orange-500/20 text-orange-600 border-orange-500/30';
+      case 'medium': return 'bg-blue-500/20 text-blue-600 border-blue-500/30';
       case 'low': return 'bg-green-500/20 text-green-600 border-green-500/30';
       default: return 'bg-blue-500/20 text-blue-600 border-blue-500/30';
     }

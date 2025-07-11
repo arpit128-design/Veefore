@@ -177,8 +177,8 @@ export default function ContentPerformanceAnalytics() {
       engagement: 15.3,
       reach: 567000,
       icon: Zap,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100'
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100'
     }
   ];
 
@@ -221,7 +221,7 @@ export default function ContentPerformanceAnalytics() {
   const getPerformanceColor = (performance: string) => {
     switch (performance) {
       case 'high': return 'bg-green-500';
-      case 'medium': return 'bg-yellow-500';
+      case 'medium': return 'bg-purple-500';
       case 'low': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
@@ -349,7 +349,7 @@ export default function ContentPerformanceAnalytics() {
                         <div className="text-center">
                           <Badge className={`${
                             content.score >= 90 ? 'bg-green-100 text-green-800' :
-                            content.score >= 80 ? 'bg-yellow-100 text-yellow-800' :
+                            content.score >= 80 ? 'bg-purple-100 text-purple-800' :
                             'bg-red-100 text-red-800'
                           }`}>
                             {content.score}/100
@@ -483,7 +483,7 @@ export default function ContentPerformanceAnalytics() {
           <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <Zap className="h-5 w-5 mr-2 text-yellow-600" />
+                <Zap className="h-5 w-5 mr-2 text-purple-600" />
                 Top Performing Hashtags
               </CardTitle>
             </CardHeader>
@@ -539,13 +539,13 @@ export default function ContentPerformanceAnalytics() {
                     15.3% avg engagement
                   </Badge>
                 </div>
-                <div className="p-4 bg-white rounded-lg border border-yellow-200">
+                <div className="p-4 bg-white rounded-lg border border-purple-200">
                   <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                    <Clock className="h-4 w-4 mr-2 text-purple-600" />
                     Optimal Posting Time
                   </h4>
                   <p className="text-sm text-gray-700 mb-2">6-8 PM weekdays show highest engagement rates</p>
-                  <Badge className="bg-yellow-100 text-yellow-800 text-xs">
+                  <Badge className="bg-purple-100 text-purple-800 text-xs">
                     +23% engagement boost
                   </Badge>
                 </div>

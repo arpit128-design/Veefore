@@ -441,7 +441,7 @@ export function BulkScheduler({ isOpen, onClose, workspaceId }: BulkSchedulerPro
             <Button
               onClick={handleSubmit}
               disabled={bulkCreateMutation.isPending || bulkContent.length === 0}
-              className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90"
             >
               <Play className="w-4 h-4 mr-2" />
               {bulkCreateMutation.isPending ? "Scheduling..." : `Schedule ${bulkContent.length} Items`}

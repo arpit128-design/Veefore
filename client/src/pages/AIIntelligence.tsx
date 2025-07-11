@@ -103,7 +103,7 @@ const aiEngines: AIEngineCard[] = [
     description: 'Multi-platform brand monitoring with sentiment analysis and competitor insights',
     icon: <Search className="w-6 h-6" />,
     credits: 4,
-    color: 'from-orange-500 to-red-500',
+    color: 'from-blue-500 to-red-500',
     features: ['Brand monitoring', 'Sentiment analysis', 'Competitor tracking', 'Trend identification'],
     endpoint: '/api/ai/social-listening',
     inputFields: [
@@ -307,7 +307,7 @@ export default function AIIntelligence() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">Est. Revenue</div>
               </div>
               <div className="text-center p-4 bg-white dark:bg-slate-800 rounded">
-                <div className="text-2xl font-bold text-orange-600">${result.recommendedBudget}</div>
+                <div className="text-2xl font-bold text-blue-600">${result.recommendedBudget}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Recommended Budget</div>
               </div>
               <div className="text-center p-4 bg-white dark:bg-slate-800 rounded">
@@ -363,7 +363,7 @@ export default function AIIntelligence() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">Similarity Score</div>
               </div>
               <div className="text-center p-4 bg-white dark:bg-slate-800 rounded">
-                <div className={`text-2xl font-bold ${result.riskLevel === 'High' ? 'text-red-600' : result.riskLevel === 'Medium' ? 'text-orange-600' : 'text-green-600'}`}>
+                <div className={`text-2xl font-bold ${result.riskLevel === 'High' ? 'text-red-600' : result.riskLevel === 'Medium' ? 'text-blue-600' : 'text-green-600'}`}>
                   {result.riskLevel}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Risk Level</div>

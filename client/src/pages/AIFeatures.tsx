@@ -333,10 +333,10 @@ export default function AIFeatures() {
         </Card>
 
         {/* AI Hashtag Generation */}
-        <Card className="border-orange-200 dark:border-orange-800">
+        <Card className="border-blue-200 dark:border-blue-800">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Hash className="w-5 h-5 text-orange-500" />
+              <Hash className="w-5 h-5 text-blue-500" />
               <CardTitle>AI Hashtag Generator</CardTitle>
               <Badge variant="outline">1 Credit</Badge>
             </div>
@@ -365,7 +365,7 @@ export default function AIFeatures() {
             <Button
               onClick={() => hashtagMutation.mutate(hashtagForm)}
               disabled={hashtagMutation.isPending || !hashtagForm.content}
-              className="w-full bg-orange-600 hover:bg-orange-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               {hashtagMutation.isPending ? "Generating..." : "Generate Hashtags"}
             </Button>

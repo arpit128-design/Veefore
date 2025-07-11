@@ -116,7 +116,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
   const getContentTypeColor = (type: string) => {
     switch (type) {
       case 'video': return 'bg-electric-cyan';
-      case 'reel': return 'bg-solar-gold';
+      case 'reel': return 'bg-blue-500';
       case 'post': return 'bg-nebula-purple';
       case 'youtube_short': return 'bg-red-500';
       default: return 'bg-green-400';
@@ -188,7 +188,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
             <Button
               size="sm"
               onClick={() => onScheduleContent?.()}
-              className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Schedule Content
@@ -248,7 +248,7 @@ export function Calendar({ onScheduleContent }: CalendarProps) {
             <span>Video</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded bg-solar-gold"></div>
+            <div className="w-3 h-3 rounded bg-blue-500"></div>
             <span>Reel</span>
           </div>
           <div className="flex items-center space-x-2">

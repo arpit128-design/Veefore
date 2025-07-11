@@ -118,9 +118,9 @@ function getActiveTabClasses(color: string) {
     blue: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
     purple: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg",
     green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
-    orange: "bg-orange-600 hover:bg-orange-700 border-orange-600 text-white scale-105 shadow-lg",
+    orange: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
     rose: "bg-rose-600 hover:bg-rose-700 border-rose-600 text-white scale-105 shadow-lg",
-    amber: "bg-amber-600 hover:bg-amber-700 border-amber-600 text-white scale-105 shadow-lg"
+    amber: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
 }
@@ -134,8 +134,8 @@ function getToolButtonClasses(color: string, isSelected: boolean) {
     blue: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
     green: "bg-green-600 hover:bg-green-700 border-green-600 text-white scale-105 shadow-lg",
     purple: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg",
-    orange: "bg-orange-600 hover:bg-orange-700 border-orange-600 text-white scale-105 shadow-lg",
-    amber: "bg-amber-600 hover:bg-amber-700 border-amber-600 text-white scale-105 shadow-lg"
+    orange: "bg-blue-600 hover:bg-blue-700 border-blue-600 text-white scale-105 shadow-lg",
+    amber: "bg-purple-600 hover:bg-purple-700 border-purple-600 text-white scale-105 shadow-lg"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600 hover:bg-slate-700 border-slate-600 text-white scale-105 shadow-lg";
 }
@@ -147,8 +147,8 @@ function getBadgeClasses(color: string) {
     blue: "bg-blue-100 text-blue-700 border-blue-200",
     green: "bg-green-100 text-green-700 border-green-200",
     purple: "bg-purple-100 text-purple-700 border-purple-200",
-    orange: "bg-orange-100 text-orange-700 border-orange-200",
-    amber: "bg-amber-100 text-amber-700 border-amber-200"
+    orange: "bg-blue-100 text-blue-700 border-blue-200",
+    amber: "bg-purple-100 text-purple-700 border-purple-200"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-100 text-slate-700 border-slate-200";
 }
@@ -160,8 +160,8 @@ function getIconBgClasses(color: string) {
     blue: "bg-blue-600",
     green: "bg-green-600",
     purple: "bg-purple-600",
-    orange: "bg-orange-600",
-    amber: "bg-amber-600"
+    orange: "bg-blue-600",
+    amber: "bg-purple-600"
   };
   return colorMap[color as keyof typeof colorMap] || "bg-slate-600";
 }
@@ -230,8 +230,8 @@ function ProfessionalStudioHeader() {
           <div className="text-2xl font-bold text-emerald-600">{realTimeStats.success}</div>
           <div className="text-sm text-slate-600">Success Rate</div>
         </div>
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-orange-600">{realTimeStats.models}</div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-blue-600">{realTimeStats.models}</div>
           <div className="text-sm text-slate-600">AI Models</div>
         </div>
       </div>
@@ -254,7 +254,7 @@ function ProfessionalStudioHeader() {
           <Globe className="h-3 w-3 mr-1" />
           Global CDN
         </Badge>
-        <Badge className="bg-orange-100 text-orange-700 border-orange-200 px-3 py-1">
+        <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
           <Bot className="h-3 w-3 mr-1" />
           GPT-4 Turbo
         </Badge>
@@ -579,7 +579,7 @@ function ProfessionalAICreator() {
                   </div>
                   <div>
                     <span className="font-semibold text-slate-700">Queue Position:</span>
-                    <div className="text-orange-600 font-medium">#3</div>
+                    <div className="text-blue-600 font-medium">#3</div>
                   </div>
                 </div>
                 

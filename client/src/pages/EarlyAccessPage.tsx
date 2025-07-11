@@ -126,7 +126,7 @@ export default function EarlyAccessPage() {
                     <p className="text-sm font-medium text-gray-300">Total Referrals</p>
                     <p className="text-2xl font-bold">{stats.totalReferrals}</p>
                   </div>
-                  <Star className="w-8 h-8 text-yellow-400" />
+                  <Star className="w-8 h-8 text-blue-400" />
                 </div>
               </CardContent>
             </Card>

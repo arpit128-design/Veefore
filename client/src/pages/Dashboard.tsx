@@ -199,7 +199,7 @@ export default function Dashboard() {
             Mission Control
           </h2>
           <p className="text-asteroid-silver text-xs sm:text-sm md:text-base">
-            Welcome back, <span className="text-solar-gold font-medium">{user?.displayName || user?.username}</span>
+            Welcome back, <span className="text-blue-600 font-medium">{user?.displayName || user?.username}</span>
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -407,7 +407,7 @@ export default function Dashboard() {
                     <div className="text-gray-300 font-medium">{slot.time}</div>
                     <div className={`text-xs ${
                       slot.activity === "Peak" ? "text-green-400" :
-                      slot.activity === "High" ? "text-yellow-400" :
+                      slot.activity === "High" ? "text-blue-400" :
                       slot.activity === "Medium" ? "text-blue-400" : "text-gray-500"
                     }`}>{slot.activity}</div>
                   </div>

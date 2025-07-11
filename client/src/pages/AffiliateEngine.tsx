@@ -128,7 +128,7 @@ export default function AffiliateEngine() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'paid': return 'bg-green-500';
-      case 'pending': return 'bg-yellow-500';
+      case 'pending': return 'bg-blue-500';
       case 'active': return 'bg-blue-500';
       default: return 'bg-gray-500';
     }
@@ -136,7 +136,7 @@ export default function AffiliateEngine() {
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4.5) return 'text-green-400';
-    if (rating >= 4.0) return 'text-yellow-400';
+    if (rating >= 4.0) return 'text-blue-400';
     if (rating >= 3.5) return 'text-orange-400';
     return 'text-red-400';
   };

@@ -92,7 +92,7 @@ export default function SocialInsights() {
     { metric: 'Age 18-24', percentage: 28, color: 'bg-purple-500' },
     { metric: 'Age 25-34', percentage: 42, color: 'bg-blue-500' },
     { metric: 'Age 35-44', percentage: 22, color: 'bg-green-500' },
-    { metric: 'Age 45+', percentage: 8, color: 'bg-orange-500' }
+    { metric: 'Age 45+', percentage: 8, color: 'bg-blue-500' }
   ];
 
   const topPosts = [
@@ -311,7 +311,7 @@ export default function SocialInsights() {
           <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <Zap className="h-5 w-5 mr-2 text-yellow-600" />
+                <Zap className="h-5 w-5 mr-2 text-blue-600" />
                 Top Performing Posts
               </CardTitle>
             </CardHeader>
@@ -359,7 +359,7 @@ export default function SocialInsights() {
           <Card className="bg-white border border-gray-200">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <Clock className="h-5 w-5 mr-2 text-orange-600" />
+                <Clock className="h-5 w-5 mr-2 text-blue-600" />
                 Optimal Posting Times
               </CardTitle>
             </CardHeader>
@@ -385,9 +385,9 @@ export default function SocialInsights() {
                       <span className="text-purple-800 font-semibold">10:00 AM - 12:00 PM</span>
                       <p className="text-sm text-purple-600">Best visibility</p>
                     </div>
-                    <div className="bg-orange-100 rounded-lg p-3">
-                      <span className="text-orange-800 font-semibold">7:00 PM - 9:00 PM</span>
-                      <p className="text-sm text-orange-600">Evening peak</p>
+                    <div className="bg-blue-100 rounded-lg p-3">
+                      <span className="text-blue-800 font-semibold">7:00 PM - 9:00 PM</span>
+                      <p className="text-sm text-blue-600">Evening peak</p>
                     </div>
                   </div>
                 </div>

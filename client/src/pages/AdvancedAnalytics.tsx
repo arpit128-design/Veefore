@@ -466,7 +466,7 @@ export default function AdvancedAnalytics() {
                       <div className="flex space-x-2">
                         <Badge variant="outline" className={`text-xs ${
                           insight.impact === 'High' ? 'border-red-300 text-red-700' :
-                          insight.impact === 'Medium' ? 'border-yellow-300 text-yellow-700' :
+                          insight.impact === 'Medium' ? 'border-blue-300 text-blue-700' :
                           'border-green-300 text-green-700'
                         }`}>
                           {insight.impact} Impact

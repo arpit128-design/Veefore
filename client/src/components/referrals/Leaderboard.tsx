@@ -25,7 +25,7 @@ export function Leaderboard() {
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
-      case 1: return <Crown className="h-4 w-4 text-solar-gold" />;
+      case 1: return <Crown className="h-4 w-4 text-blue-500" />;
       case 2: return <Medal className="h-4 w-4 text-asteroid-silver" />;
       case 3: return <Award className="h-4 w-4 text-purple-500" />;
       default: return <Trophy className="h-4 w-4 text-space-gray" />;
@@ -34,7 +34,7 @@ export function Leaderboard() {
 
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
-      case 1: return "bg-gradient-to-r from-solar-gold to-cyan-500 text-space-navy";
+      case 1: return "bg-gradient-to-r from-blue-500 to-cyan-500 text-space-navy";
       case 2: return "bg-gradient-to-r from-asteroid-silver to-gray-400 text-space-navy";
       case 3: return "bg-gradient-to-r from-purple-500 to-pink-500 text-white";
       default: return "bg-space-gray text-white";
@@ -43,7 +43,7 @@ export function Leaderboard() {
 
   const getBadgeColor = (badge: string) => {
     switch (badge) {
-      case "Nova Influencer": return "text-solar-gold";
+      case "Nova Influencer": return "text-blue-500";
       case "Cosmic Ambassador": return "text-electric-cyan";
       case "Stellar Navigator": return "text-nebula-purple";
       case "Meteor Ambassador": return "text-green-400";
@@ -124,7 +124,7 @@ export function Leaderboard() {
               </div>
               
               <div className="text-right">
-                <div className="font-bold text-solar-gold">{leaderUser.referralCount}</div>
+                <div className="font-bold text-blue-500">{leaderUser.referralCount}</div>
                 <div className="text-xs text-asteroid-silver">referrals</div>
               </div>
               

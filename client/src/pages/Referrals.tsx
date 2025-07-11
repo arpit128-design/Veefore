@@ -125,25 +125,25 @@ export default function Referrals() {
             <Card className="bg-cosmic-blue border-electric-cyan/30">
               <CardContent className="p-4">
                 <h4 className="font-semibold mb-3 flex items-center">
-                  <Gift className="h-4 w-4 mr-2 text-solar-gold" />
+                  <Gift className="h-4 w-4 mr-2 text-blue-500" />
                   Rewards Structure
                 </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Free signup:</span>
-                    <Badge variant="outline" className="text-solar-gold border-solar-gold/50">
+                    <Badge variant="outline" className="text-blue-500 border-blue-500/50">
                       100 credits
                     </Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Pro subscription:</span>
-                    <Badge variant="outline" className="text-solar-gold border-solar-gold/50">
+                    <Badge variant="outline" className="text-blue-500 border-blue-500/50">
                       500 credits + 10%/month
                     </Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Agency subscription:</span>
-                    <Badge variant="outline" className="text-solar-gold border-solar-gold/50">
+                    <Badge variant="outline" className="text-blue-500 border-blue-500/50">
                       1000 credits + 15%/month
                     </Badge>
                   </div>
@@ -170,11 +170,11 @@ export default function Referrals() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-cosmic-blue border border-solar-gold/50 text-center">
-                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-r from-solar-gold to-orange-500 flex items-center justify-center">
+              <div className="p-4 rounded-lg bg-cosmic-blue border border-blue-500/50 text-center">
+                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                   <i className="fas fa-rocket text-xl text-white"></i>
                 </div>
-                <div className="font-medium text-sm text-solar-gold">First Launch</div>
+                <div className="font-medium text-sm text-blue-500">First Launch</div>
                 <div className="text-xs text-asteroid-silver mt-1">Gained your first referral</div>
                 <div className="text-xs text-green-400 mt-2">✓ Unlocked</div>
               </div>

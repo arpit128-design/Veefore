@@ -88,9 +88,9 @@ const PLAN_FEATURES = {
     currency: "₹",
     interval: "month",
     icon: Rocket,
-    color: "text-orange-400",
-    bgColor: "bg-orange-500/10", 
-    borderColor: "border-orange-500/20",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10", 
+    borderColor: "border-blue-500/20",
     limits: {
       workspaces: 10,
       credits: 500,
@@ -308,13 +308,13 @@ export default function PlanUpgradeModal({
 
         <DialogHeader className="text-center pb-6 relative z-10">
           <div 
-            className="mx-auto mb-4 p-3 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm"
+            className="mx-auto mb-4 p-3 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 backdrop-blur-sm"
             style={{
               transform: `scale(${1 + Math.sin(animationPhase * 0.03) * 0.1}) rotateY(${Math.sin(animationPhase * 0.02) * 15}deg)`,
               transition: 'transform 0.05s ease-out'
             }}
           >
-            <Shield className="w-8 h-8 text-orange-400" />
+            <Shield className="w-8 h-8 text-blue-400" />
           </div>
           <DialogTitle 
             className="text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"

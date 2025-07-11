@@ -467,7 +467,7 @@ export default function ABTesting() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center bg-gradient-to-r from-electric-cyan/10 to-solar-gold/10 rounded-lg p-8 border border-electric-cyan/20"
+              className="text-center bg-gradient-to-r from-electric-cyan/10 to-blue-500/10 rounded-lg p-8 border border-electric-cyan/20"
             >
               <BarChart3 className="w-16 h-16 text-electric-cyan mx-auto mb-4" />
               <h3 className="text-2xl font-semibold text-white mb-2">

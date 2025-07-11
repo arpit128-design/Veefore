@@ -462,7 +462,7 @@ export default function AdvancedScheduler() {
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-electric-cyan to-solar-gold hover:opacity-90 text-black font-medium">
+              <Button className="bg-gradient-to-r from-electric-cyan to-blue-500 hover:opacity-90 text-black font-medium">
                 <Plus className="w-4 h-4 mr-2" />
                 Schedule Content
               </Button>
@@ -925,7 +925,7 @@ export default function AdvancedScheduler() {
                   </p>
                   <Button 
                     onClick={() => setIsCreateOpen(true)}
-                    className="bg-gradient-to-r from-electric-cyan to-solar-gold hover:opacity-90 text-black font-medium"
+                    className="bg-gradient-to-r from-electric-cyan to-blue-500 hover:opacity-90 text-black font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Schedule Content

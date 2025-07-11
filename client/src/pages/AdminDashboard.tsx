@@ -154,7 +154,7 @@ export default function AdminDashboard() {
           <Card className="bg-black/20 backdrop-blur-md border-purple-500/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
-              <Shield className="h-4 w-4 text-yellow-400" />
+              <Shield className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">₹{stats?.totalRevenue || 0}</div>

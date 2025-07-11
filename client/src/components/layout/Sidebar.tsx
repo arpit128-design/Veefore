@@ -52,9 +52,9 @@ const mainTabs = [
     id: "publish",
     label: "Publish",
     icon: Calendar,
-    color: "text-solar-gold",
+    color: "text-blue-500",
     features: [
-      { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-solar-gold" },
+      { href: "/scheduler", icon: Calendar, label: "Scheduler", color: "text-blue-500" },
       { href: "/content-recommendations", icon: PlayCircle, label: "Content Feed", color: "text-purple-400" }
     ]
   },
@@ -76,7 +76,7 @@ const mainTabs = [
     color: "text-cyan-400",
     features: [
       { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400", locked: true },
-      { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
+      { href: "/referrals", icon: Share2, label: "Referrals", color: "text-blue-500" },
       { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-cyan-400" }
     ]
   }

@@ -99,8 +99,8 @@ const VeeForeHomeDashboard: React.FC = () => {
     {
       title: 'Optimize Content',
       description: 'Improve with AI insights',
-      icon: <Target className="w-8 h-8 text-orange-600" />,
-      color: 'bg-orange-50 border-orange-200',
+      icon: <Target className="w-8 h-8 text-blue-600" />,
+      color: 'bg-blue-50 border-blue-200',
       action: () => {},
     },
   ];

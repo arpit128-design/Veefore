@@ -161,7 +161,7 @@ export default function WatchDemo() {
                     <span>50K+ views</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 text-yellow-400" />
+                    <Star className="h-4 w-4 text-blue-400" />
                     <span>4.9/5 rating</span>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export default function WatchDemo() {
                     </div>
                     <div className="flex items-center space-x-1 mb-4">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                        <Star key={i} className="h-4 w-4 text-blue-400 fill-current" />
                       ))}
                     </div>
                   </CardHeader>

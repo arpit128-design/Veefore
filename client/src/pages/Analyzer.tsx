@@ -216,11 +216,11 @@ export default function Analyzer() {
         <Card className="content-card holographic">
           <CardContent className="p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-solar-gold to-orange-500 flex items-center justify-center">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                 <Users className="h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-solar-gold">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-500">{analytics?.totalReach ? formatNumber(analytics.totalReach) : '—'}</div>
                 <div className="text-xs sm:text-sm text-asteroid-silver">Total Reach</div>
               </div>
             </div>

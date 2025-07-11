@@ -994,8 +994,8 @@ export default function Messages() {
               value: analytics?.averageResponseTime || '0m', 
               change: '-15%',
               color: 'orange',
-              bg: 'bg-orange-100',
-              text: 'text-orange-600'
+              bg: 'bg-blue-100',
+              text: 'text-blue-600'
             }
           ].map((metric, index) => (
             <motion.div

@@ -183,7 +183,7 @@ export default function CompetitorAnalysis() {
       {/* Cosmic Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-2 h-2 bg-electric-cyan rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-solar-gold rounded-full animate-ping"></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-blue-500 rounded-full animate-ping"></div>
         <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-nebula-purple rounded-full animate-pulse"></div>
       </div>
 
@@ -518,8 +518,8 @@ export default function CompetitorAnalysis() {
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gradient-to-r from-solar-gold/10 to-yellow-500/10 rounded-lg p-3 border border-solar-gold/20">
-                      <h4 className="text-solar-gold font-medium text-sm">Peak Performance</h4>
+                    <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-3 border border-blue-500/20">
+                      <h4 className="text-blue-500 font-medium text-sm">Peak Performance</h4>
                       <p className="text-asteroid-silver text-xs mt-1">
                         Your competitors see 45% higher engagement during evening posts
                       </p>

@@ -405,8 +405,8 @@ export default function SocialListening() {
                       <p className="text-2xl font-bold text-electric-cyan">{listeningResult.summary?.totalMentions?.toLocaleString() || '0'}</p>
                       <p className="text-sm text-asteroid-silver">Total Mentions</p>
                     </div>
-                    <div className="text-center p-3 bg-solar-gold/10 rounded border border-solar-gold/20">
-                      <p className="text-2xl font-bold text-solar-gold">{listeningResult.summary?.sentimentDistribution?.positive || 0}%</p>
+                    <div className="text-center p-3 bg-blue-500/10 rounded border border-blue-500/20">
+                      <p className="text-2xl font-bold text-blue-500">{listeningResult.summary?.sentimentDistribution?.positive || 0}%</p>
                       <p className="text-sm text-asteroid-silver">Positive Sentiment</p>
                     </div>
                   </div>
@@ -476,11 +476,11 @@ export default function SocialListening() {
                   
                   {listeningResult.recommendations?.contentSuggestions && (
                     <div>
-                      <h4 className="font-medium text-solar-gold mb-3">Content Suggestions</h4>
+                      <h4 className="font-medium text-blue-500 mb-3">Content Suggestions</h4>
                       <ul className="space-y-2">
                         {listeningResult.recommendations.contentSuggestions.slice(0, 3).map((suggestion: string, index: number) => (
                           <li key={index} className="text-sm text-asteroid-silver flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-solar-gold mt-2 flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
                             {suggestion}
                           </li>
                         ))}

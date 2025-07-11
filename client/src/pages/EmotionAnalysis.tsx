@@ -235,11 +235,11 @@ export default function EmotionAnalysis() {
 
   const getEmotionColor = (emotion: string) => {
     const colors: { [key: string]: string } = {
-      joy: 'text-yellow-400',
+      joy: 'text-blue-400',
       anger: 'text-red-400',
       sadness: 'text-blue-400',
       fear: 'text-purple-400',
-      surprise: 'text-orange-400',
+      surprise: 'text-purple-400',
       disgust: 'text-green-400',
       trust: 'text-cyan-400',
       anticipation: 'text-pink-400'
@@ -453,7 +453,7 @@ export default function EmotionAnalysis() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-gray-400">Arousal:</span>
-                          <Badge className="bg-orange-900/50 text-orange-300">
+                          <Badge className="bg-blue-900/50 text-blue-300">
                             {emotionResult.psychologicalInsights.arousalLevel}
                           </Badge>
                         </div>

@@ -549,7 +549,7 @@ export function ScheduleDialog({ isOpen, onClose, selectedDate }: ScheduleDialog
             <Button
               type="submit"
               disabled={createContentMutation.isPending || socialAccounts.length === 0}
-              className="bg-gradient-to-r from-solar-gold to-orange-500 hover:opacity-90"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90"
             >
               {createContentMutation.isPending ? "Scheduling..." : "Schedule Content"}
             </Button>

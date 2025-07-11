@@ -277,7 +277,7 @@ export function AutomationRules() {
                   </div>
                   <div>
                     <span className="text-asteroid-silver">Next run:</span>
-                    <span className="text-solar-gold ml-2">
+                    <span className="text-blue-500 ml-2">
                       {formatNextRun(rule)}
                     </span>
                   </div>

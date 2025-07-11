@@ -343,7 +343,7 @@ export default function Scheduler() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-orange-500" />
+              <Clock className="w-5 h-5 text-blue-500" />
               <div>
                 <p className="text-sm text-gray-600">Today</p>
                 <p className="text-xl font-bold">
@@ -473,13 +473,13 @@ export default function Scheduler() {
 
       {/* Connection Warning */}
       {getConnectedPlatforms().length === 0 && (
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-blue-200 bg-blue-50">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-orange-500" />
+              <AlertCircle className="w-5 h-5 text-blue-500" />
               <div>
-                <h3 className="font-medium text-orange-800">No Social Accounts Connected</h3>
-                <p className="text-sm text-orange-700 mt-1">
+                <h3 className="font-medium text-blue-800">No Social Accounts Connected</h3>
+                <p className="text-sm text-blue-700 mt-1">
                   Connect your social media accounts to start scheduling content. 
                   <a href="/integrations" className="underline ml-1">Go to Integrations</a>
                 </p>

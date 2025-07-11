@@ -86,7 +86,7 @@ export function SpaceBackground() {
     y: Math.random() * 100,
     size: Math.random() * 300 + 150,
     delay: Math.random() * 10,
-    color: ['cyan', 'slate', 'yellow', 'blue'][Math.floor(Math.random() * 4)],
+    color: ['cyan', 'slate', 'purple', 'blue'][Math.floor(Math.random() * 4)],
   }));
 
   // Generate shooting stars
@@ -102,7 +102,7 @@ export function SpaceBackground() {
       
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-slate-900/20 via-cyan-900/20 to-yellow-900/20"
+        className="absolute inset-0 bg-gradient-to-r from-slate-900/20 via-cyan-900/20 to-purple-900/20"
         animate={{
           backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
         }}

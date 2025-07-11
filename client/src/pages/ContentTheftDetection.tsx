@@ -295,7 +295,7 @@ export default function ContentTheftDetection() {
                                         {theft.status.replace('_', ' ')}
                                       </Badge>
                                       <span className="text-sm text-gray-400">{theft.platform}</span>
-                                      <span className="text-sm text-yellow-400">{theft.similarity}% similar</span>
+                                      <span className="text-sm text-blue-400">{theft.similarity}% similar</span>
                                     </div>
                                     <p className="text-sm text-gray-300">{theft.excerpt}</p>
                                     <p className="text-xs text-blue-400">{theft.recommendedAction}</p>
@@ -319,7 +319,7 @@ export default function ContentTheftDetection() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                             <Card className="bg-gray-800/50 border-gray-600">
                               <CardContent className="p-4">
-                                <h5 className="font-medium text-yellow-400 mb-2">Immediate Actions</h5>
+                                <h5 className="font-medium text-blue-400 mb-2">Immediate Actions</h5>
                                 <ul className="space-y-1 text-sm">
                                   {theftResult.recommendations.immediateActions?.map((action: string, index: number) => (
                                     <li key={index} className="text-gray-300">• {action}</li>

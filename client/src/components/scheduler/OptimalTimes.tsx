@@ -137,7 +137,7 @@ export function OptimalTimes() {
                 
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-asteroid-silver">Expected reach:</span>
-                  <span className="text-solar-gold font-mono text-sm">
+                  <span className="text-blue-500 font-mono text-sm">
                     {platform.expectedReach}
                   </span>
                 </div>
@@ -214,7 +214,7 @@ export function OptimalTimes() {
                   <div className="text-xs bg-electric-cyan/20 text-electric-cyan px-2 py-1 rounded">
                     6:30 PM
                   </div>
-                  <div className="text-xs bg-solar-gold/20 text-solar-gold px-2 py-1 rounded">
+                  <div className="text-xs bg-blue-500/20 text-blue-500 px-2 py-1 rounded">
                     12:15 PM
                   </div>
                   {index < 5 && ( // Weekdays only

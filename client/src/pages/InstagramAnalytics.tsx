@@ -283,7 +283,7 @@ export default function InstagramAnalytics() {
                 {hasData ? `${(calculateEngagementRate() > 3 ? '+' : '')}${calculateEngagementRate().toFixed(1)}%` : 'Loading...'}
               </div>
               <div className="text-sm text-asteroid-silver mb-2">vs Industry Average (1-3%)</div>
-              <div className={`text-xs px-2 py-1 rounded ${calculateEngagementRate() > 3 ? 'text-green-400 bg-green-500/20' : 'text-yellow-400 bg-yellow-500/20'}`}>
+              <div className={`text-xs px-2 py-1 rounded ${calculateEngagementRate() > 3 ? 'text-green-400 bg-green-500/20' : 'text-blue-400 bg-blue-500/20'}`}>
                 {calculateEngagementRate() > 3 ? 'Above Average' : 'Industry Standard'}
               </div>
             </div>

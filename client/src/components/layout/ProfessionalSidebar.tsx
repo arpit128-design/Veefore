@@ -499,7 +499,7 @@ function SidebarContent({
                   </Button>
                 </motion.div>
               </DialogTrigger>
-              <DialogContent className="max-w-sm mx-auto p-0 bg-white shadow-xl border border-gray-200 rounded-xl data-[state=open]:backdrop-blur-sm">
+              <DialogContent className="max-w-sm mx-auto p-0 bg-white/90 backdrop-blur-md shadow-xl border border-gray-200 rounded-xl data-[state=open]:backdrop-blur-sm">
                 <DialogHeader className="sr-only">
                   <DialogTitle>Scheduler Options</DialogTitle>
                 </DialogHeader>

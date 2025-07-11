@@ -8,32 +8,20 @@ let isRunning = false;
 let eliminatorInterval: NodeJS.Timeout | null = null;
 let observer: MutationObserver | null = null;
 
-// Comprehensive list of ALL yellow-like color patterns
+// Precise yellow patterns - only target pure yellow colors
 const YELLOW_PATTERNS = [
-  // Color names
-  /yellow/gi,
-  /gold/gi,
-  /amber/gi,
-  /orange/gi,
-  /warning/gi,
+  // Color names - only pure yellow
+  /^yellow$/gi,
+  /^gold$/gi,
   
-  // Hex patterns - all yellow variants
-  /#ffff00/gi, /#fff000/gi, /#ffe000/gi, /#ffd000/gi, /#ffc000/gi, /#ffb000/gi,
-  /#ffa000/gi, /#ff9000/gi, /#ff8000/gi, /#ff7000/gi, /#ff6000/gi, /#ff5000/gi,
-  /#ff4000/gi, /#ff3000/gi, /#ff2000/gi, /#ff1000/gi, /#ff0/gi, /#ffd700/gi,
-  /#ffc107/gi, /#ffeb3b/gi, /#fff3cd/gi, /#ffeaa7/gi, /#fdcb6e/gi, /#f39c12/gi,
-  /#e67e22/gi, /#d35400/gi, /#fffbeb/gi, /#fef3c7/gi, /#fde68a/gi, /#fcd34d/gi,
-  /#f59e0b/gi, /#d97706/gi, /#b45309/gi, /#92400e/gi, /#78350f/gi, /#451a03/gi,
+  // Hex patterns - only pure yellow
+  /#ffff00/gi, /#ff0$/gi, /#ffd700/gi,
   
-  // RGB patterns - all yellow variants
+  // RGB patterns - only pure yellow
   /rgb\(\s*255,\s*255,\s*0\s*\)/gi, /rgb\(\s*255,\s*215,\s*0\s*\)/gi,
-  /rgb\(\s*255,\s*193,\s*7\s*\)/gi, /rgb\(\s*255,\s*235,\s*59\s*\)/gi,
-  /rgb\(\s*255,\s*243,\s*205\s*\)/gi, /rgb\(\s*255,\s*234,\s*167\s*\)/gi,
-  /rgb\(\s*253,\s*203,\s*110\s*\)/gi, /rgb\(\s*243,\s*156,\s*18\s*\)/gi,
-  /rgb\(\s*230,\s*126,\s*34\s*\)/gi, /rgb\(\s*211,\s*84,\s*0\s*\)/gi,
   
-  // HSL patterns - yellow hues
-  /hsl\(\s*[4-7][0-9],\s*[5-9][0-9]%,\s*[3-9][0-9]%\s*\)/gi,
+  // HSL patterns - only yellow hues (60 degrees)
+  /hsl\(\s*60,\s*[5-9][0-9]%,\s*[3-9][0-9]%\s*\)/gi,
 ];
 
 /**
@@ -51,22 +39,23 @@ function isYellowColor(color: string): boolean {
     }
   }
   
-  // Check RGB values directly for yellow-like colors
+  // Check RGB values directly for pure yellow colors only
   const rgbMatch = cleanColor.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/);
   if (rgbMatch) {
     const [, r, g, b] = rgbMatch.map(Number);
-    // Detect yellow-like colors (high red and green, low blue)
-    if (r > 200 && g > 150 && b < 150) {
+    // Only detect pure yellow colors (not orange, amber, etc.)
+    if ((r === 255 && g === 255 && b === 0) || // Pure yellow
+        (r === 255 && g === 215 && b === 0)) { // Gold
       return true;
     }
   }
   
-  // Check HSL values for yellow hues
+  // Check HSL values for pure yellow hues only
   const hslMatch = cleanColor.match(/hsl\(\s*(\d+),\s*(\d+)%,\s*(\d+)%\s*\)/);
   if (hslMatch) {
     const [, h, s, l] = hslMatch.map(Number);
-    // Yellow hue range: 45-75 degrees
-    if (h >= 45 && h <= 75 && s > 30 && l > 20) {
+    // Only detect pure yellow hue (60 degrees) with high saturation
+    if (h === 60 && s >= 50 && l >= 30) {
       return true;
     }
   }

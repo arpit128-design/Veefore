@@ -5,26 +5,27 @@
 /* ULTIMATE ANTI-YELLOW FLICKER SYSTEM */
 /* Prevents yellow colors that cause rendering flickers during tab changes */
 
-/* IMMEDIATE TRANSITION SUPPRESSION */
-*, *::before, *::after {
+/* TARGETED TRANSITION SUPPRESSION - PRESERVE ANIMATIONS */
+*[style*="yellow"], *[style*="rgb(255,255,0)"], *[style*="#ffff00"],
+*[style*="gold"], *[style*="amber"],
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500 {
   transition: background-color 0ms !important;
   transition: background 0ms !important;
-  transition: color 0ms !important;
-  transition: border-color 0ms !important;
 }
 
-/* FORCE OVERRIDE ALL YELLOW VARIANTS WITH IMMEDIATE EFFECT */
-*[style*="yellow"], *[style*="#ff"], *[style*="rgb(255,255"], *[style*="rgb(255, 255"],
-*[style*="hsl(60"], *[style*="gold"], *[style*="amber"], *[style*="orange"],
+/* PRECISE YELLOW TARGETING - PRESERVE OTHER COLORS */
+*[style*="background-color: yellow"], *[style*="background: yellow"],
+*[style*="background-color: #ffff00"], *[style*="background: #ffff00"],
+*[style*="background-color: rgb(255, 255, 0)"], *[style*="background: rgb(255, 255, 0)"],
+*[style*="background-color: gold"], *[style*="background: gold"],
 .bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
-.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500,
-.bg-orange-50, .bg-orange-100, .bg-orange-200, .bg-orange-300, .bg-orange-400, .bg-orange-500,
-[class*="yellow"], [class*="amber"], [class*="orange"], [class*="warning"] {
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500 {
   background-color: #ffffff !important;
   background: #ffffff !important;
   color: #1e293b !important;
   border-color: #e2e8f0 !important;
-  transition: none !important;
+  transition: background-color 0ms !important;
 }
 
 /* TAB CHANGE ANTI-FLICKER SYSTEM */

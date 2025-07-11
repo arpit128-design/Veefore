@@ -1859,7 +1859,7 @@ input[type="time"].glassmorphism::-webkit-calendar-picker-indicator {
 /* Additional space theme colors */
 :root {
   --nebula-purple: 256 71% 58%; /* #7C3AED */
-  --solar-gold: 45 96% 49%; /* #F59E0B */
+  --solar-gold: 221 39% 11%; /* Change from yellow to dark blue */
   --space-gray: 220 13% 26%; /* #374151 */
   --asteroid-silver: 220 9% 65%; /* #9CA3AF */
 }

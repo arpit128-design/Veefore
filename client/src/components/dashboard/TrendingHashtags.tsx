@@ -53,8 +53,8 @@ export function TrendingHashtags() {
 
   const getPopularityColor = (popularity: number) => {
     if (popularity >= 80) return 'bg-red-500';
-    if (popularity >= 60) return 'bg-orange-500';
-    if (popularity >= 40) return 'bg-yellow-500';
+    if (popularity >= 60) return 'bg-purple-500';
+    if (popularity >= 40) return 'bg-blue-500';
     return 'bg-green-500';
   };
 
@@ -75,8 +75,8 @@ export function TrendingHashtags() {
 
   const getGrowthColor = (growth: number) => {
     if (growth >= 90) return 'text-green-400';
-    if (growth >= 70) return 'text-yellow-400';
-    if (growth >= 50) return 'text-orange-400';
+    if (growth >= 70) return 'text-blue-400';
+    if (growth >= 50) return 'text-purple-400';
     return 'text-red-400';
   };
 

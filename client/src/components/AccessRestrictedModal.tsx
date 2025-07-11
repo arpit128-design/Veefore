@@ -34,7 +34,7 @@ export function AccessRestrictedModal({
             className="w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <Card className="bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-500/30 shadow-2xl">
+            <Card className="bg-gradient-to-br from-red-900/20 to-purple-900/20 border-red-500/30 shadow-2xl">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-lg text-white">

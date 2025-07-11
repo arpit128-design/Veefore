@@ -349,7 +349,7 @@ export function ProfessionalSidebar({ onAnalyticsToggle, isMobileMenuOpen, setIs
     {
       title: 'Ad',
       description: 'Create advertisement campaigns',
-      icon: <Megaphone className="w-4 h-4 text-orange-600" />,
+      icon: <Megaphone className="w-4 h-4 text-purple-600" />,
       action: () => setLocation('/scheduler'),
     },
     {

@@ -101,7 +101,7 @@ export default function Calendar({ onScheduleContent }: CalendarProps) {
           {/* Mobile-responsive Schedule Content button */}
           <Button
             onClick={handleScheduleContent}
-            className="bg-gradient-to-r from-solar-gold to-orange-500 hover:from-orange-500 hover:to-solar-gold transition-all duration-300 w-full sm:w-auto"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 transition-all duration-300 w-full sm:w-auto"
             size="sm"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -179,7 +179,7 @@ export default function Calendar({ onScheduleContent }: CalendarProps) {
                     : 'text-asteroid-silver/30 cursor-not-allowed'
                   }
                   ${isToday 
-                    ? 'bg-gradient-to-r from-solar-gold/20 to-orange-500/20 border-solar-gold text-solar-gold font-bold' 
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500 text-blue-500 font-bold' 
                     : ''
                   }
                   ${isSelected 
@@ -220,7 +220,7 @@ export default function Calendar({ onScheduleContent }: CalendarProps) {
             </Button>
             <Button
               onClick={handleScheduleContent}
-              className="bg-gradient-to-r from-solar-gold to-orange-500 hover:from-orange-500 hover:to-solar-gold transition-all duration-300 flex-1 text-sm"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 transition-all duration-300 flex-1 text-sm"
             >
               <Plus className="w-4 h-4 mr-2" />
               Schedule
@@ -232,7 +232,7 @@ export default function Calendar({ onScheduleContent }: CalendarProps) {
         <div className="mt-4 pt-4 border-t border-white/10">
           <div className="flex flex-wrap gap-4 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-gradient-to-r from-solar-gold/20 to-orange-500/20 border border-solar-gold"></div>
+              <div className="w-3 h-3 rounded bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500"></div>
               <span className="text-asteroid-silver">Today</span>
             </div>
             <div className="flex items-center gap-2">

@@ -245,7 +245,7 @@ export function TrendAnalyzer() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy': return 'bg-green-400/20 text-green-400';
-      case 'Medium': return 'bg-yellow-400/20 text-yellow-400';
+      case 'Medium': return 'bg-blue-400/20 text-blue-400';
       case 'Hard': return 'bg-red-400/20 text-red-400';
       default: return 'bg-gray-400/20 text-gray-400';
     }
@@ -253,7 +253,7 @@ export function TrendAnalyzer() {
 
   const getPopularityColor = (popularity: number) => {
     if (popularity >= 90) return 'text-green-400';
-    if (popularity >= 70) return 'text-yellow-400';
+    if (popularity >= 70) return 'text-blue-400';
     return 'text-red-400';
   };
 

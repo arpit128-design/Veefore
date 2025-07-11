@@ -31,7 +31,7 @@ export function ReferralStats() {
       value: referralData?.stats?.activePaid || 0,
       change: "+8 this month",
       icon: CreditCard,
-      gradient: "from-solar-gold to-orange-500",
+      gradient: "from-solar-gold to-purple-500",
       color: "text-solar-gold"
     },
     {

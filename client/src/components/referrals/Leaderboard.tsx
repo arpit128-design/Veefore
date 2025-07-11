@@ -27,16 +27,16 @@ export function Leaderboard() {
     switch (rank) {
       case 1: return <Crown className="h-4 w-4 text-solar-gold" />;
       case 2: return <Medal className="h-4 w-4 text-asteroid-silver" />;
-      case 3: return <Award className="h-4 w-4 text-orange-500" />;
+      case 3: return <Award className="h-4 w-4 text-purple-500" />;
       default: return <Trophy className="h-4 w-4 text-space-gray" />;
     }
   };
 
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
-      case 1: return "bg-gradient-to-r from-solar-gold to-yellow-500 text-space-navy";
+      case 1: return "bg-gradient-to-r from-solar-gold to-cyan-500 text-space-navy";
       case 2: return "bg-gradient-to-r from-asteroid-silver to-gray-400 text-space-navy";
-      case 3: return "bg-gradient-to-r from-orange-500 to-red-500 text-white";
+      case 3: return "bg-gradient-to-r from-purple-500 to-pink-500 text-white";
       default: return "bg-space-gray text-white";
     }
   };

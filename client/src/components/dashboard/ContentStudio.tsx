@@ -41,7 +41,7 @@ const contentTools = [
     name: 'Thumbnail Editor',
     description: 'Eye-catching covers',
     icon: FileImage,
-    gradient: 'from-yellow-400 to-orange-500',
+    gradient: 'from-blue-400 to-purple-500',
     route: '/content-studio?tool=thumbnail'
   }
 ];

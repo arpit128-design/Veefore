@@ -133,9 +133,9 @@ export function ThumbnailEditor() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 rounded-lg bg-cosmic-blue border border-yellow-400/30">
+        <div className="flex items-center justify-between p-4 rounded-lg bg-cosmic-blue border border-blue-400/30">
           <div>
-            <div className="font-medium text-yellow-400">Generation Cost</div>
+            <div className="font-medium text-blue-400">Generation Cost</div>
             <div className="text-sm text-asteroid-silver">8 credits per thumbnail</div>
           </div>
           <div className="text-right">
@@ -147,7 +147,7 @@ export function ThumbnailEditor() {
         <Button
           onClick={handleGenerate}
           disabled={generateMutation.isPending || !prompt.trim()}
-          className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90 transition-opacity"
+          className="w-full bg-gradient-to-r from-blue-400 to-purple-500 hover:opacity-90 transition-opacity"
         >
           {generateMutation.isPending ? (
             <>

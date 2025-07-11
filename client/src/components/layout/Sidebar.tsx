@@ -27,8 +27,8 @@ const mainTabs = [
     features: [
       { href: "/trend-calendar", icon: Calendar, label: "Trend Calendar", color: "text-purple-500" },
       { href: "/persona-suggestions", icon: Users, label: "Persona Builder", color: "text-purple-400" },
-      { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-amber-400" },
-      { href: "/competitor-analysis", icon: Users, label: "Competitor Analysis", color: "text-orange-400", locked: true },
+      { href: "/creative-brief", icon: FileText, label: "Creative Brief", color: "text-purple-400" },
+      { href: "/competitor-analysis", icon: Users, label: "Competitor Analysis", color: "text-purple-400", locked: true },
       { href: "/social-listening", icon: Globe, label: "Social Listening", color: "text-cyan-400", locked: true }
     ]
   },
@@ -45,7 +45,7 @@ const mainTabs = [
       { href: "/legal-assistant", icon: FileText, label: "Legal Assistant", color: "text-indigo-400", locked: true },
       { href: "/content-theft-detection", icon: Shield, label: "Content Theft Detection", color: "text-red-500", locked: true },
       { href: "/emotion-analysis", icon: Heart, label: "Emotion Analysis", color: "text-pink-500", locked: true },
-      { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-yellow-500", locked: true }
+      { href: "/gamification", icon: Trophy, label: "Gamification", color: "text-purple-500", locked: true }
     ]
   },
   {
@@ -73,18 +73,18 @@ const mainTabs = [
     id: "monetize",
     label: "Monetize",
     icon: DollarSign,
-    color: "text-yellow-400",
+    color: "text-cyan-400",
     features: [
       { href: "/affiliate-engine", icon: Share2, label: "Affiliate Engine", color: "text-emerald-400", locked: true },
       { href: "/referrals", icon: Share2, label: "Referrals", color: "text-solar-gold" },
-      { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-yellow-400" }
+      { href: "/subscription", icon: CreditCard, label: "Subscription", color: "text-cyan-400" }
     ]
   }
 ];
 
 // Bottom navigation items (workspace management & remaining features)
 const bottomNavItems = [
-  { href: "/automation", icon: Bot, label: "Automation", color: "text-orange-400" },
+  { href: "/automation", icon: Bot, label: "Automation", color: "text-purple-400" },
   { href: "/conversations", icon: MessageCircle, label: "Conversations", color: "text-blue-500" },
   { href: "/integrations", icon: LinkIcon, label: "Integrations", color: "text-pink-500" },
   { href: "/workspaces", icon: Globe, label: "Workspaces", color: "text-nebula-purple" },

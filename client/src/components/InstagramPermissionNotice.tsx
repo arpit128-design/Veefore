@@ -12,12 +12,12 @@ interface InstagramPermissionNoticeProps {
 export function InstagramPermissionNotice({ onDismiss, showDetailed = false }: InstagramPermissionNoticeProps) {
   return (
     <div className="space-y-4">
-      <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-        <AlertTriangle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-800 dark:text-amber-200">
+      <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
+        <AlertTriangle className="h-4 w-4 text-blue-600" />
+        <AlertTitle className="text-blue-800 dark:text-blue-200">
           Video Publishing Requires Additional Permissions
         </AlertTitle>
-        <AlertDescription className="text-amber-700 dark:text-amber-300">
+        <AlertDescription className="text-blue-700 dark:text-blue-300">
           Your Instagram app needs advanced permissions for video publishing. Image posts work perfectly with current permissions.
         </AlertDescription>
       </Alert>

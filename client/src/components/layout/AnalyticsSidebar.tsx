@@ -128,12 +128,12 @@ const AnalyticsSidebar: React.FC<AnalyticsSidebarProps> = ({
               item.isActive
                 ? 'bg-gradient-to-r from-cyan-50 to-purple-50 text-cyan-700 border-l-4 border-cyan-500 font-semibold'
                 : item.isHighlighted
-                ? 'bg-gradient-to-r from-orange-50 to-pink-50 text-orange-700 hover:bg-orange-100'
+                ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 hover:bg-purple-100'
                 : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <item.icon className={`mr-3 h-4 w-4 ${
-              item.isActive ? 'text-cyan-600' : item.isHighlighted ? 'text-orange-600' : 'text-gray-500'
+              item.isActive ? 'text-cyan-600' : item.isHighlighted ? 'text-purple-600' : 'text-gray-500'
             }`} />
             {item.label}
           </Button>

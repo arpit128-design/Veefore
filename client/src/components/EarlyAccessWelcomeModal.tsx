@@ -76,14 +76,14 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim, userEmail
                 className="mx-auto mb-4"
               >
                 <div className="relative">
-                  <Crown className="w-16 h-16 text-yellow-400 mx-auto" />
+                  <Crown className="w-16 h-16 text-blue-400 mx-auto" />
                   <motion.div
                     animate={{ 
                       scale: [1, 1.2, 1],
                       opacity: [0.5, 1, 0.5]
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute inset-0 w-16 h-16 text-yellow-400/50 mx-auto"
+                    className="absolute inset-0 w-16 h-16 text-blue-400/50 mx-auto"
                   >
                     <Sparkles className="w-16 h-16" />
                   </motion.div>
@@ -95,7 +95,7 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim, userEmail
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <Badge className="mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 text-sm font-semibold">
+                <Badge className="mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 text-sm font-semibold">
                   🎉 EARLY ACCESS APPROVED
                 </Badge>
                 <DialogTitle className="text-3xl font-bold text-white mb-2">
@@ -117,7 +117,7 @@ export function EarlyAccessWelcomeModal({ open, onOpenChange, onClaim, userEmail
               {/* Early Access Benefits */}
               <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/20">
                 <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-400" />
+                  <Star className="w-5 h-5 text-blue-400" />
                   Your Early Access Benefits
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -73,7 +73,7 @@ export function WaitlistStatusNotification({
                       <CheckCircle className="w-8 h-8 text-white" />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                       <Clock className="w-8 h-8 text-white" />
                     </div>
                   )}
@@ -107,7 +107,7 @@ export function WaitlistStatusNotification({
                   className={`w-full py-3 font-semibold relative overflow-hidden ${
                     hasEarlyAccess 
                       ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600' 
-                      : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600'
+                      : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
                   }`}
                 >
                   <motion.div

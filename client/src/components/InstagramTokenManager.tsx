@@ -129,7 +129,7 @@ export default function InstagramTokenManager() {
     }
     
     if (account.daysUntilExpiry <= 14) {
-      return <Clock className="h-4 w-4 text-yellow-500" />;
+      return <Clock className="h-4 w-4 text-blue-500" />;
     }
     
     return <CheckCircle className="h-4 w-4 text-green-500" />;
@@ -238,14 +238,14 @@ export default function InstagramTokenManager() {
         </div>
         
         {tokenStatus.accountsNeedingRefresh > 0 && (
-          <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              <p className="font-medium text-yellow-800 dark:text-yellow-200">
+              <AlertTriangle className="h-5 w-5 text-blue-600" />
+              <p className="font-medium text-blue-800 dark:text-blue-200">
                 Token Refresh Required
               </p>
             </div>
-            <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
               {tokenStatus.accountsNeedingRefresh} account(s) need token refresh to maintain API access.
               Tokens are automatically refreshed daily, but you can refresh manually if needed.
             </p>

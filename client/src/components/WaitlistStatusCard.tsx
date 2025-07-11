@@ -116,7 +116,7 @@ export function WaitlistStatusCard({ isOpen, onClose }: WaitlistStatusCardProps)
                       </>
                     ) : (
                       <>
-                        <Clock className="w-5 h-5 text-orange-500" />
+                        <Clock className="w-5 h-5 text-purple-500" />
                         On Waitlist
                       </>
                     )}
@@ -144,7 +144,7 @@ export function WaitlistStatusCard({ isOpen, onClose }: WaitlistStatusCardProps)
                 <div className={`p-3 rounded-lg ${
                   deviceStatus.hasEarlyAccess 
                     ? 'bg-green-900/20 text-green-200 border border-green-800/30' 
-                    : 'bg-orange-900/20 text-orange-200 border border-orange-800/30'
+                    : 'bg-purple-900/20 text-purple-200 border border-purple-800/30'
                 }`}>
                   <p className="text-sm font-medium">
                     {deviceStatus.hasEarlyAccess 

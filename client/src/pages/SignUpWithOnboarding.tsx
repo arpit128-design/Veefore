@@ -254,6 +254,7 @@ export default function SignUpWithOnboarding() {
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [userNavigatedManually, setUserNavigatedManually] = useState(false);
   const [preferences, setPreferences] = useState({
     businessName: '',
     industry: '',
@@ -289,18 +290,14 @@ export default function SignUpWithOnboarding() {
   useEffect(() => {
     if (user && user.isOnboarded) {
       setLocation('/dashboard');
+      return;
     }
     // If user is authenticated but not onboarded, check email verification status
-    if (user && !user.isOnboarded && currentStep === 0) {
-      // Only skip to plan selection if email is verified
-      if (user.isEmailVerified) {
-        setCurrentStep(2); // Skip to plan selection since auth and email verification are done
-      } else {
-        // User is authenticated but email not verified - they must complete email verification
-        setCurrentStep(1); // Go to email verification step
-      }
+    // Only auto-redirect if user is on initial step (0) and has verified email AND user hasn't navigated manually
+    if (user && !user.isOnboarded && currentStep === 0 && user.isEmailVerified && !userNavigatedManually) {
+      setCurrentStep(2); // Skip to plan selection since auth and email verification are done
     }
-  }, [user, setLocation, currentStep]);
+  }, [user, setLocation, userNavigatedManually]); // Add userNavigatedManually to dependencies
 
   // Handle back to home navigation
   const handleBackToHome = () => {
@@ -326,6 +323,7 @@ export default function SignUpWithOnboarding() {
 
   const prevStep = () => {
     if (currentStep > 0) {
+      setUserNavigatedManually(true); // Mark that user navigated manually
       setCurrentStep(currentStep - 1);
     }
   };

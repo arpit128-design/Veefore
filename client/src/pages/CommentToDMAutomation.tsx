@@ -322,13 +322,13 @@ export default function CommentToDMAutomation() {
         </div>
         
         <div className="bg-gray-100 rounded-lg p-3 text-sm text-gray-700">
-          {directMessage.text}
+          {directMessage.text || "This is the product link"}
         </div>
         
-        {directMessage.buttonText && directMessage.websiteUrl && (
+        {(directMessage.buttonText || directMessage.websiteUrl) && (
           <div className="bg-blue-50 rounded-lg p-3 text-center">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-              {directMessage.buttonText}
+              {directMessage.buttonText || "Click here"}
             </button>
           </div>
         )}
@@ -813,7 +813,7 @@ export default function CommentToDMAutomation() {
             <div className="flex items-center space-x-2">
               <Instagram className="w-5 h-5 text-purple-600" />
               <span className="font-semibold text-gray-900">
-                {currentStep <= 2 ? 'Instagram post and keyword' : 'Instagram post and keyword'}
+                {currentStep === 2 ? 'Instagram direct message' : 'Instagram post and keyword'}
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -837,11 +837,23 @@ export default function CommentToDMAutomation() {
           </div>
 
           <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-            {selectedPost && (
-              <InstagramPostPreview post={selectedPost} />
+            {currentStep === 2 ? (
+              // Step 3: Direct message - Show only DM preview
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <InstagramDMPreview />
+              </motion.div>
+            ) : (
+              // All other steps - Show post preview
+              selectedPost && (
+                <InstagramPostPreview post={selectedPost} />
+              )
             )}
             
-            {currentStep >= 2 && (
+            {currentStep >= 2 && currentStep !== 2 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

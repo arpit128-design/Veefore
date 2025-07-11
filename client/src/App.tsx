@@ -134,7 +134,7 @@ function AuthenticatedApp() {
                 isMobileMenuOpen={isMobileMenuOpen} 
                 setIsMobileMenuOpen={setIsMobileMenuOpen}
               />
-              <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 space-y-4 sm:space-y-6" style={{ backgroundColor: '#F5F5F5' }}>
+              <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 space-y-4 sm:space-y-6" style={{ backgroundColor: '#F9FAFB' }}>
                 <Switch>
                   <Route path="/dashboard" component={ProfessionalDashboard} />
                   <Route path="/create-post" component={CreatePost} />

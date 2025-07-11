@@ -944,14 +944,14 @@ html {
   color-scheme: light !important;
 }
 
-/* MAIN CONTENT AREA BACKGROUND - #F5F5F5 */
+/* MAIN CONTENT AREA BACKGROUND - #F9FAFB */
 /* Apply background ONLY to main content container, not affecting inner content */
 
 /* Target only the main content wrapper elements */
 main.flex-1,
 .veefore-main-content,
 main[class*="flex-1"][class*="overflow"] {
-  background-color: #F5F5F5 !important;
+  background-color: #F9FAFB !important;
 }
 
 /* Ensure content inside main areas keeps original backgrounds */

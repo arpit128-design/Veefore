@@ -38,7 +38,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({ children }) => {
         ) : (
           <ProfessionalSidebar onAnalyticsToggle={toggleToAnalytics} />
         )}
-        <main className="veefore-main-content" style={{ backgroundColor: '#F5F5F5' }}>
+        <main className="veefore-main-content" style={{ backgroundColor: '#F9FAFB' }}>
           {children}
         </main>
       </div>

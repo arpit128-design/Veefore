@@ -351,53 +351,57 @@ const ProfessionalDashboard: React.FC = () => {
       </div>
 
       {/* Quick Actions Grid - Transparent Icons */}
-      <div className="px-4 sm:px-6 py-2 sm:py-4" style={{ background: 'transparent' }}>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div id="quick-actions-section" className="px-4 sm:px-6 py-2 sm:py-4" style={{ background: 'transparent' }}>
+        <div id="quick-actions-grid" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div 
+            id="create-ai-action"
             className="cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate('/create-post')}
             style={{ background: 'transparent' }}
           >
-            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
-              <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" style={{ background: 'transparent' }} />
+            <div id="create-ai-icon" className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Zap id="zap-icon" className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" style={{ background: 'transparent' }} />
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+            <h3 id="create-ai-text" className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
               Create with AI
             </h3>
           </div>
           <div 
+            id="schedule-action"
             className="cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate('/content-studio')}
             style={{ background: 'transparent' }}
           >
-            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
-              <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" style={{ background: 'transparent' }} />
+            <div id="schedule-icon" className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Calendar id="calendar-icon" className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" style={{ background: 'transparent' }} />
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+            <h3 id="schedule-text" className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
               Schedule Posts
             </h3>
           </div>
           <div 
+            id="analyze-action"
             className="cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate('/analytics')}
             style={{ background: 'transparent' }}
           >
-            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
-              <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" style={{ background: 'transparent' }} />
+            <div id="analyze-icon" className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <TrendingUp id="trending-icon" className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" style={{ background: 'transparent' }} />
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+            <h3 id="analyze-text" className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
               Analyze Trends
             </h3>
           </div>
           <div 
+            id="multiplatform-action"
             className="cursor-pointer text-center hover:opacity-80 transition-opacity"
             onClick={() => navigate('/professional-dashboard')}
             style={{ background: 'transparent' }}
           >
-            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
-              <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" style={{ background: 'transparent' }} />
+            <div id="multiplatform-icon" className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Globe id="globe-icon" className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" style={{ background: 'transparent' }} />
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+            <h3 id="multiplatform-text" className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
               Multi-Platform
             </h3>
           </div>

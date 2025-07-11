@@ -4,24 +4,68 @@
 
 /* Clean light theme - yellow colors removed from Tailwind config */
 
-/* QUICK ACTIONS TRANSPARENT BACKGROUND - FORCE TRANSPARENCY */
-.quick-actions-grid svg,
-.quick-actions-grid svg *,
-.quick-actions-grid [data-icon],
-.quick-actions-grid [data-icon] *,
-.quick-actions-grid .lucide,
-.quick-actions-grid .lucide * {
+/* NUCLEAR TRANSPARENCY - FORCE ALL QUICK ACTIONS TO BE TRANSPARENT */
+[style*="background: transparent"] *,
+[style*="background: transparent"] svg,
+[style*="background: transparent"] svg *,
+[style*="background: transparent"] path,
+[style*="background: transparent"] circle,
+[style*="background: transparent"] rect,
+[style*="background: transparent"] polygon,
+[style*="background: transparent"] .lucide,
+[style*="background: transparent"] .lucide *,
+[style*="background: transparent"] h3,
+[style*="background: transparent"] div {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background-attachment: initial !important;
+  background-clip: initial !important;
+  background-origin: initial !important;
+  background-position: initial !important;
+  background-repeat: initial !important;
+  background-size: initial !important;
+}
+
+/* SPECIFIC LUCIDE ICON TRANSPARENCY */
+.lucide,
+.lucide *,
+svg.lucide,
+svg.lucide *,
+[data-lucide],
+[data-lucide] * {
   background: transparent !important;
   background-color: transparent !important;
 }
 
-/* QUICK ACTIONS CONTAINER - NO BACKGROUND */
-.quick-actions-container,
-.quick-actions-container *,
-.quick-actions-grid,
-.quick-actions-grid * {
+/* QUICK ACTIONS TRANSPARENCY - ID-BASED TARGETING */
+#quick-actions-section,
+#quick-actions-grid,
+#create-ai-action,
+#schedule-action,
+#analyze-action,
+#multiplatform-action,
+#create-ai-icon,
+#schedule-icon,
+#analyze-icon,
+#multiplatform-icon,
+#zap-icon,
+#calendar-icon,
+#trending-icon,
+#globe-icon,
+#create-ai-text,
+#schedule-text,
+#analyze-text,
+#multiplatform-text,
+#quick-actions-section *,
+#quick-actions-grid *,
+#create-ai-action *,
+#schedule-action *,
+#analyze-action *,
+#multiplatform-action * {
   background: transparent !important;
   background-color: transparent !important;
+  background-image: none !important;
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */

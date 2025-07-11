@@ -945,54 +945,55 @@ html {
 }
 
 /* MAIN CONTENT AREA BACKGROUND - #F5F5F5 */
-/* Apply the specified background color to main content areas across all pages */
-main, [data-main-content], .main-content, 
-.dashboard-container, .content-container, .page-container,
-.authenticated-app > div, .authenticated-app > main,
-.app-layout > div:last-child, .app-layout > main,
-[class*="main"], [class*="content"]:not(.sidebar):not(.header):not(.nav),
-.grid-container, .flex-container > div:last-child,
-.workspace-page, .analytics-page, .settings-page, .scheduler-page,
-.messages-page, .automation-page, .suggestions-page, .studio-page,
-.dashboard-page, .profile-page, .billing-page, .team-page {
+/* Apply background ONLY to main content container, not affecting inner content */
+
+/* Target only the main content wrapper elements */
+main.flex-1,
+.veefore-main-content,
+main[class*="flex-1"][class*="overflow"] {
   background-color: #F5F5F5 !important;
 }
 
-/* Specific component targeting for main content areas */
-.veefore-main-content, .veefore-app-container > div:last-child,
-.authenticated-layout > div:not(.sidebar), 
-.app-container > div:not(.sidebar):not(.header),
-.layout-container > div:not(.sidebar):not(.nav),
-.flex > div:not(.sidebar):not(.navigation),
-body > div > div > div:not(.sidebar):not(.nav):not(.header) {
-  background-color: #F5F5F5 !important;
+/* Ensure content inside main areas keeps original backgrounds */
+main.flex-1 > *,
+.veefore-main-content > * {
+  background-color: unset !important;
 }
 
-/* Page-specific main content areas */
-[data-page] > div, [data-route] > div,
-.page-wrapper, .content-wrapper, .main-wrapper,
-.dashboard-content, .analytics-content, .settings-content,
-.automation-content, .scheduler-content, .messages-content,
-.suggestions-content, .studio-content, .billing-content {
-  background-color: #F5F5F5 !important;
+/* Reset specific background classes to their original values */
+main.flex-1 .bg-white,
+.veefore-main-content .bg-white {
+  background-color: white !important;
 }
 
-/* Force #F5F5F5 background on all main content containers */
-.veefore-main-content, .veefore-app-container main,
-.authenticated-app main, .app-layout main, .layout main,
-main[class*="flex-1"], main[class*="overflow"], 
-div[class*="main"], div[class*="content"]:not(.sidebar):not(.header) {
-  background-color: #F5F5F5 !important;
+main.flex-1 .bg-gray-50,
+.veefore-main-content .bg-gray-50 {
+  background-color: #f9fafb !important;
 }
 
-/* Comprehensive page background enforcement */
-body > div#root > div > div:not(.sidebar):not(.header),
-body > div#root > div > main,
-[data-authenticated="true"] main,
-[data-layout="app"] main,
-.app-container main,
-.layout-container main {
-  background-color: #F5F5F5 !important;
+main.flex-1 .bg-slate-50,
+.veefore-main-content .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+main.flex-1 .bg-blue-50,
+.veefore-main-content .bg-blue-50 {
+  background-color: #eff6ff !important;
+}
+
+main.flex-1 .bg-green-50,
+.veefore-main-content .bg-green-50 {
+  background-color: #f0fdf4 !important;
+}
+
+main.flex-1 .bg-red-50,
+.veefore-main-content .bg-red-50 {
+  background-color: #fef2f2 !important;
+}
+
+main.flex-1 .bg-purple-50,
+.veefore-main-content .bg-purple-50 {
+  background-color: #faf5ff !important;
 }
 
 /* NUCLEAR YELLOW ELIMINATION - TARGET ALL YELLOW VARIANTS */

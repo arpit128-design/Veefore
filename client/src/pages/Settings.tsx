@@ -490,11 +490,84 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState("account");
   const [isEditing, setIsEditing] = useState(false);
   
-  // DISABLED: Aggressive JavaScript color manipulation that was interfering with legitimate colors
-  // Now using CSS-only approach for precise yellow targeting without affecting other colors
-  // useEffect(() => {
-  //   // JavaScript color manipulation disabled - using CSS only
-  // }, [activeTab]);
+  // Force override slider colors with aggressive targeting
+  useEffect(() => {
+    const forceSliderColors = () => {
+      // Target all possible slider elements
+      const sliderSelectors = [
+        '.settings-page [role="slider"]',
+        '.settings-page [data-radix-slider-root]',
+        '.settings-page .slider',
+        '.settings-page [class*="slider"]'
+      ];
+      
+      sliderSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          if (element instanceof HTMLElement) {
+            // Apply to the main element
+            element.style.setProperty('background', '#e5e7eb', 'important');
+            element.style.setProperty('background-color', '#e5e7eb', 'important');
+            element.style.setProperty('background-image', 'none', 'important');
+            
+            // Apply to all descendants
+            const descendants = element.querySelectorAll('*');
+            descendants.forEach((desc, index) => {
+              if (desc instanceof HTMLElement) {
+                // Check if this is the filled portion (usually has a style attribute with percentage)
+                const hasPercentage = desc.style.cssText.includes('%') || desc.getAttribute('style')?.includes('%');
+                if (hasPercentage || index === 0) {
+                  desc.style.setProperty('background', '#111827', 'important');
+                  desc.style.setProperty('background-color', '#111827', 'important');
+                } else {
+                  desc.style.setProperty('background', '#e5e7eb', 'important');
+                  desc.style.setProperty('background-color', '#e5e7eb', 'important');
+                }
+                desc.style.setProperty('background-image', 'none', 'important');
+              }
+            });
+          }
+        });
+      });
+      
+      // Also target any elements with yellow backgrounds specifically
+      const yellowElements = document.querySelectorAll('.settings-page *');
+      yellowElements.forEach(el => {
+        if (el instanceof HTMLElement) {
+          const computedStyle = window.getComputedStyle(el);
+          const bgColor = computedStyle.backgroundColor;
+          // Check if background is yellow-ish
+          if (bgColor.includes('255, 255') || bgColor.includes('yellow') || bgColor.includes('rgb(255, 247')) {
+            el.style.setProperty('background-color', '#e5e7eb', 'important');
+            el.style.setProperty('background', '#e5e7eb', 'important');
+          }
+        }
+      });
+    };
+
+    // Apply immediately and repeatedly
+    forceSliderColors();
+    setTimeout(forceSliderColors, 10);
+    setTimeout(forceSliderColors, 50);
+    setTimeout(forceSliderColors, 100);
+    setTimeout(forceSliderColors, 300);
+    setTimeout(forceSliderColors, 500);
+    setTimeout(forceSliderColors, 1000);
+    
+    // Set up observer for dynamic content
+    const observer = new MutationObserver(() => {
+      forceSliderColors();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+    
+    return () => observer.disconnect();
+  }, [activeTab]);
 
   // Enhanced profile state
   const [profileData, setProfileData] = useState({

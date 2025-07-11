@@ -350,25 +350,57 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions Grid - No Background */}
-      <div className="px-4 sm:px-6 py-2 sm:py-4 quick-actions-container">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 quick-actions-grid">
-          {quickActions.map((action, index) => (
-            <div 
-              key={index} 
-              className="cursor-pointer text-center hover:opacity-80 transition-opacity"
-              onClick={action.action}
-            >
-              <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center">
-                {React.cloneElement(action.icon, { 
-                  className: "w-8 h-8 sm:w-10 sm:h-10 " + action.icon.props.className.split(' ').slice(2).join(' ')
-                })}
-              </div>
-              <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight">
-                {action.title}
-              </h3>
+      {/* Quick Actions Grid - Transparent Icons */}
+      <div className="px-4 sm:px-6 py-2 sm:py-4" style={{ background: 'transparent' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div 
+            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/create-post')}
+            style={{ background: 'transparent' }}
+          >
+            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" style={{ background: 'transparent' }} />
             </div>
-          ))}
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+              Create with AI
+            </h3>
+          </div>
+          <div 
+            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/content-studio')}
+            style={{ background: 'transparent' }}
+          >
+            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" style={{ background: 'transparent' }} />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+              Schedule Posts
+            </h3>
+          </div>
+          <div 
+            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/analytics')}
+            style={{ background: 'transparent' }}
+          >
+            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" style={{ background: 'transparent' }} />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+              Analyze Trends
+            </h3>
+          </div>
+          <div 
+            className="cursor-pointer text-center hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/professional-dashboard')}
+            style={{ background: 'transparent' }}
+          >
+            <div className="mx-auto mb-2 sm:mb-3 flex items-center justify-center" style={{ background: 'transparent' }}>
+              <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" style={{ background: 'transparent' }} />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight" style={{ background: 'transparent' }}>
+              Multi-Platform
+            </h3>
+          </div>
         </div>
       </div>
 

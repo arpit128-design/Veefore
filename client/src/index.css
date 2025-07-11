@@ -53,10 +53,10 @@
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - EXCEPT SCHEDULER DIALOG */
-[data-state="open"]:not(.scheduler-dialog-content), 
-[data-state="closed"]:not(.scheduler-dialog-content), 
-[data-state="active"]:not(.scheduler-dialog-content), 
-[data-state="inactive"]:not(.scheduler-dialog-content) {
+[data-state="open"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]), 
+[data-state="closed"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]), 
+[data-state="active"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]), 
+[data-state="inactive"]:not(.scheduler-dialog-content):not([data-radix-dialog-content]) {
   background-color: #ffffff !important;
   background: #ffffff !important;
 }
@@ -93,6 +93,24 @@ div[role="dialog"].scheduler-dialog-content,
 .scheduler-dialog-content * {
   backdrop-filter: inherit !important;
   -webkit-backdrop-filter: inherit !important;
+}
+
+/* NUCLEAR SCHEDULER DIALOG OVERRIDE - ALL POSSIBLE SELECTORS */
+[data-radix-dialog-content]:has(.scheduler-dialog-content),
+[data-radix-dialog-content].scheduler-dialog-content,
+[data-radix-dialog-content] .scheduler-dialog-content,
+div[role="dialog"]:has(.scheduler-dialog-content),
+div[role="dialog"].scheduler-dialog-content,
+[data-state="open"]:has(.scheduler-dialog-content),
+[data-state="open"].scheduler-dialog-content,
+.scheduler-dialog-content,
+div.scheduler-dialog-content,
+[class*="scheduler-dialog-content"] {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 /* FORCE BACKDROP BLUR ON DIALOG MOUNT */

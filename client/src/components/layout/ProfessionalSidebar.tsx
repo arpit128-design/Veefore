@@ -508,6 +508,15 @@ function SidebarContent({
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2)',
                   border: '1px solid rgba(255, 255, 255, 0.3)'
                 }}
+                onOpenAutoFocus={(e) => {
+                  // Force backdrop blur on dialog open
+                  const dialogElement = e.currentTarget;
+                  if (dialogElement) {
+                    dialogElement.style.background = 'rgba(255, 255, 255, 0.85)';
+                    dialogElement.style.backdropFilter = 'blur(12px)';
+                    dialogElement.style.WebkitBackdropFilter = 'blur(12px)';
+                  }
+                }}
               >
                 <DialogHeader className="sr-only">
                   <DialogTitle>Scheduler Options</DialogTitle>

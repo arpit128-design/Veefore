@@ -777,8 +777,11 @@ button.create-content-button svg,
 .create-content-button svg path,
 button.create-content-button svg path {
   color: white !important;
-  fill: white !important;
+  fill: none !important;
   stroke: white !important;
+  stroke-width: 2 !important;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .create-content-button:hover,
@@ -808,8 +811,11 @@ button.create-content-button:hover svg,
 .create-content-button:hover svg path,
 button.create-content-button:hover svg path {
   color: white !important;
-  fill: white !important;
+  fill: none !important;
   stroke: white !important;
+  stroke-width: 2 !important;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* NUCLEAR OVERRIDE - Target all possible button variations */

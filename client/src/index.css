@@ -2,68 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ULTIMATE ANTI-YELLOW FLICKER SYSTEM */
-/* Prevents yellow colors that cause rendering flickers during tab changes */
+/* MOBILE-OPTIMIZED ANTI-YELLOW SYSTEM */
+/* Simplified CSS rules to prevent mobile crashes */
 
-/* TARGETED TRANSITION SUPPRESSION - PRESERVE ANIMATIONS */
-*[style*="yellow"], *[style*="rgb(255,255,0)"], *[style*="#ffff00"],
-*[style*="gold"], *[style*="amber"],
-.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
-.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500 {
-  transition: background-color 0ms !important;
-  transition: background 0ms !important;
-}
-
-/* PRECISE YELLOW TARGETING - PRESERVE OTHER COLORS - TEMPORARILY DISABLED */
-/*
-*[style*="background-color: yellow"], *[style*="background: yellow"],
-*[style*="background-color: #ffff00"], *[style*="background: #ffff00"],
-*[style*="background-color: rgb(255, 255, 0)"], *[style*="background: rgb(255, 255, 0)"],
-*[style*="background-color: gold"], *[style*="background: gold"],
+/* Basic yellow class prevention */
 .bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
 .bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500 {
   background-color: #ffffff !important;
-  background: #ffffff !important;
   color: #1e293b !important;
-  border-color: #e2e8f0 !important;
-  transition: background-color 0ms !important;
-}
-*/
-
-/* TAB CHANGE ANTI-FLICKER SYSTEM - TEMPORARILY DISABLED */
-/*
-[role="tab"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[role="tabpanel"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-.tab:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-.tab-content:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-state*="active"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *):not([data-radix-dialog-content]), 
-[data-state*="inactive"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *):not([data-radix-dialog-content]),
-[aria-selected="true"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[aria-selected="false"]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
-  transition: none !important;
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-}
-*/
-
-/* RADIX UI COMPONENT FIXES - TEMPORARILY DISABLED */
-/*
-[data-radix-tabs-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-tabs-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
-[data-radix-select-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-select-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
-[data-radix-dropdown-menu-trigger]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-dropdown-menu-content]:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
-  transition: none !important;
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-}
-*/
-
-/* PREVENT YELLOW IN COMPUTED STYLES */
-*::before, *::after {
-  background-color: inherit !important;
-  background: inherit !important;
 }
 
 /* FORCE WHITE BACKGROUND ON STATE CHANGES - TEMPORARILY DISABLED */
@@ -199,51 +145,9 @@ div.scheduler-dialog-content[data-radix-dialog-content] {
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
-/* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES - EXCEPT SCHEDULER DIALOG */
-/* Target ALL possible tab-related elements */
-[role="tablist"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[role="tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[role="tabpanel"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
-.tabs-root *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-.tabs-list *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-.tabs-trigger *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-.tabs-content *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
-[data-radix-tabs-root] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-tabs-list] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-tabs-trigger] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[data-radix-tabs-content] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *),
-[class*="tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *), 
-[class*="Tab"] *:not(.scheduler-dialog-content):not(.scheduler-dialog-content *) {
+/* SIMPLE TAB STYLING */
+[role="tab"], [role="tabpanel"] {
   background-color: #ffffff !important;
-  background: #ffffff !important;
-  transition: none !important;
-}
-
-/* AGGRESSIVE YELLOW PATTERN ELIMINATION */
-*[style*="rgb(255, 255, 0)"], *[style*="rgba(255, 255, 0"], *[style*="#ffff00"],
-*[style*="rgb(255, 247"], *[style*="rgba(255, 247"], *[style*="#fff7"],
-*[style*="rgb(255, 215"], *[style*="rgba(255, 215"], *[style*="#ffd7"],
-*[style*="rgb(255, 193"], *[style*="rgba(255, 193"], *[style*="#ffc1"],
-*[style*="hsl(60,"], *[style*="hsla(60,"], *[style*="hsl(45,"], *[style*="hsla(45,"] {
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-  color: #1e293b !important;
-  border-color: #e2e8f0 !important;
-  transition: none !important;
-}
-
-/* PREVENT YELLOW DURING THEME SWITCHES */
-html[data-theme="light"] *, html[data-theme="dark"] *,
-body[data-theme="light"] *, body[data-theme="dark"] *,
-[data-theme="light"] *, [data-theme="dark"] * {
-  transition: none !important;
-}
-
-/* OVERRIDE COMPUTED YELLOW STYLES */
-*[computed-style*="yellow"], *[computed-style*="rgb(255,255,0)"], *[computed-style*="rgb(255, 255, 0)"] {
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-  transition: none !important;
 }
 
 /* VeeFore Professional Light Theme - TRUE LIGHT THEME */

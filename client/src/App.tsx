@@ -38,7 +38,7 @@ import Pricing from "@/pages/Pricing";
 import Subscription from "@/pages/Subscription";
 import SubscriptionNew from "@/pages/SubscriptionNew";
 import SignIn from "@/pages/SignIn";
-import SignUp from "@/pages/SignUp";
+import SignUpWithOnboarding from "@/pages/SignUpWithOnboarding";
 import OnboardingPremium from "@/pages/OnboardingPremium";
 
 import HootsuiteLanding from "@/pages/HootsuiteLanding";
@@ -254,8 +254,12 @@ function Router() {
 
   const isPublicRoute = publicRoutes.includes(location);
 
-  // If user is authenticated, always render the authenticated app
+  // If user is authenticated, check if they need onboarding
   if (isAuthenticated) {
+    // If user hasn't completed onboarding, redirect to signup/onboarding
+    if (!user.isOnboarded) {
+      return <Redirect to="/signup" />;
+    }
     return <AuthenticatedApp />;
   }
 
@@ -290,7 +294,7 @@ function Router() {
         <Route path="/solution/agencies" component={SolutionAgencies} />
         <Route path="/solution/enterprises" component={SolutionEnterprises} />
         <Route path="/signin" component={SignIn} />
-        <Route path="/signup" component={SignUp} />
+        <Route path="/signup" component={SignUpWithOnboarding} />
         <Route path="/auth" component={SignIn} />
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/terms" component={TermsOfService} />

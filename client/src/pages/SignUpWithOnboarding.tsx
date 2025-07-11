@@ -315,10 +315,10 @@ export default function SignUpWithOnboarding() {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       
       // Send verification email
-      const response = await fetch('/api/auth/send-verification', {
+      const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email })
+        body: JSON.stringify({ email: data.email, firstName: data.fullName })
       });
 
       if (response.ok) {
@@ -332,7 +332,21 @@ export default function SignUpWithOnboarding() {
           description: "Please check your email and enter the verification code."
         });
       } else {
-        throw new Error('Failed to send verification email');
+        // Handle different error responses
+        let errorMessage = 'Failed to send verification email';
+        try {
+          const errorResponse = await response.json();
+          if (errorResponse.message) {
+            errorMessage = errorResponse.message;
+          }
+        } catch (parseError) {
+          // If can't parse JSON, check if it's HTML
+          const textResponse = await response.text();
+          if (textResponse.includes('<!DOCTYPE')) {
+            errorMessage = 'Server error - please try again later';
+          }
+        }
+        throw new Error(errorMessage);
       }
     } catch (error: any) {
       console.error('Sign up error:', error);

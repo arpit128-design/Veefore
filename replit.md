@@ -112,6 +112,15 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 11, 2025: **CRITICAL SIGNUP BUG FIXED** - Resolved signup failure with JSON parsing error and improper app redirection
+  - ✅ **Fixed API Route Mismatch**: Updated frontend to call correct `/api/auth/send-verification-email` endpoint instead of `/api/auth/send-verification`
+  - ✅ **Added Route Compatibility**: Added backup endpoint for old route to handle both request paths
+  - ✅ **Enhanced Error Handling**: Added proper JSON parsing error handling to prevent "Unexpected token '<', '<!DOCTYPE'..." errors
+  - ✅ **Fixed Onboarding Flow**: Updated App.tsx router to check `isOnboarded` status and redirect incomplete users back to signup
+  - ✅ **Improved User Experience**: Users now stay in onboarding flow until completion instead of being redirected to main app
+  - ✅ **Better Error Messages**: Added specific error messages for different failure scenarios (HTML responses, JSON parsing, API errors)
+  - **Technical Fix**: Changed signup route from SignUp to SignUpWithOnboarding component for proper multi-step flow
+  - **Result**: Signup process now works correctly with proper error handling and completion flow
 - July 11, 2025: **AUTHENTICATION RACE CONDITION RESOLVED** - Fixed signin/signup page flicker issue on page refresh by improving useAuth hook loading state management
   - ✅ **Root Cause Fixed**: Loading state was ending before user data was completely fetched from database
   - ✅ **Enhanced useAuth Hook**: Modified to wait for complete user data fetch before setting loading to false

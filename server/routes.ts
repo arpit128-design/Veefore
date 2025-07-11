@@ -8261,6 +8261,77 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
   // ===== EMAIL VERIFICATION ROUTES =====
   
+  // Backup endpoint for old route compatibility
+  app.post('/api/auth/send-verification', async (req: any, res: Response) => {
+    try {
+      const { email, firstName } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      // EARLY ACCESS VALIDATION - Check if user has early access
+      const waitlistUser = await storage.getWaitlistUserByEmail(email);
+      if (!waitlistUser) {
+        return res.status(403).json({ 
+          message: 'Early access required. Please join our waitlist first.',
+          requiresWaitlist: true
+        });
+      }
+
+      if (waitlistUser.status !== 'early_access') {
+        return res.status(403).json({ 
+          message: 'Early access not yet granted. You are currently on the waitlist.',
+          waitlistStatus: waitlistUser.status,
+          requiresApproval: true
+        });
+      }
+
+      console.log(`[EARLY ACCESS] User ${email} has early access, proceeding with verification email`);
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser && existingUser.isEmailVerified) {
+        return res.status(400).json({ message: 'User already exists and is verified' });
+      }
+
+      // Generate OTP and expiry
+      const otp = emailService.generateOTP();
+      const otpExpiry = emailService.generateExpiry();
+
+      // Store or update verification data
+      if (existingUser) {
+        await storage.updateUserEmailVerification(existingUser.id, otp, otpExpiry);
+      } else {
+        // Create temporary user record with verification data
+        await storage.createUnverifiedUser({
+          email,
+          firstName: firstName || '',
+          emailVerificationCode: otp,
+          emailVerificationExpiry: otpExpiry,
+          isEmailVerified: false
+        });
+      }
+
+      // Send verification email
+      await emailService.sendVerificationEmail(email, otp, firstName);
+
+      console.log(`[EMAIL VERIFICATION] Sent verification email to ${email} with OTP: ${otp}`);
+
+      res.json({ 
+        message: 'Verification email sent successfully',
+        developmentOtp: process.env.NODE_ENV === 'development' ? otp : undefined
+      });
+
+    } catch (error: any) {
+      console.error('[EMAIL VERIFICATION] Error:', error);
+      res.status(500).json({ 
+        message: 'Failed to send verification email',
+        error: error.message 
+      });
+    }
+  });
+  
   // Send verification email for manual signup
   app.post('/api/auth/send-verification-email', async (req: any, res: Response) => {
     try {

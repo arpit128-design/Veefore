@@ -423,7 +423,7 @@ function SidebarContent({
                 </Button>
               </motion.div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72 bg-white shadow-xl border border-gray-200 rounded-xl p-2" side="right" align="start">
+            <DropdownMenuContent className={cn("bg-white shadow-xl border border-gray-200 rounded-xl p-2", isMobile ? "w-80 max-w-[calc(100vw-2rem)]" : "w-72")} side={isMobile ? "bottom" : "right"} align={isMobile ? "end" : "start"} sideOffset={isMobile ? 4 : 8}>
               {schedulerOptions.map((option, optionIndex) => (
                 <div key={optionIndex}>
                   <DropdownMenuItem 

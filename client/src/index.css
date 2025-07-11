@@ -699,6 +699,22 @@ button[data-state="checked"],
     background-color: rgb(203 213 225);
     border-radius: 3px;
   }
+  
+  /* Mobile dropdown positioning fixes */
+  .veefore-sidebar [data-radix-popper-content-wrapper] {
+    max-width: calc(100vw - 2rem) !important;
+  }
+  
+  .veefore-sidebar [data-radix-dropdown-menu-content] {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Ensure dropdown doesn't go off-screen */
+  .veefore-sidebar [data-side="bottom"] {
+    transform: translateX(-50%) !important;
+  }
 }
 [data-route="/workspaces"] .bg-yellow-50,
 [data-route="/workspaces"] .bg-yellow-100,

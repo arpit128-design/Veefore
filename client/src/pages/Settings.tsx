@@ -141,19 +141,49 @@ export default function Settings() {
     
     /* Override all slider backgrounds and handles */
     .settings-page [role="slider"],
-    .settings-page .slider-track {
+    .settings-page .slider-track,
+    .settings-page [data-radix-slider-track],
+    .settings-page [class*="slider"] {
       background-color: #e5e7eb !important;
     }
     
     .settings-page [role="slider"] [data-orientation="horizontal"],
-    .settings-page .slider-range {
+    .settings-page .slider-range,
+    .settings-page [data-radix-slider-range],
+    .settings-page [class*="slider-range"] {
       background-color: #111827 !important;
     }
     
     .settings-page [role="slider"] [data-orientation="horizontal"] > span,
-    .settings-page .slider-thumb {
+    .settings-page .slider-thumb,
+    .settings-page [data-radix-slider-thumb],
+    .settings-page [class*="slider-thumb"] {
       background-color: #111827 !important;
       border-color: #111827 !important;
+    }
+    
+    /* Target specific slider color sections */
+    .settings-page [role="slider"] > span:last-child,
+    .settings-page [data-radix-slider-track] > span:last-child {
+      background-color: #e5e7eb !important;
+    }
+    
+    /* Force all slider components to use gray colors */
+    .settings-page [role="slider"] * {
+      background-color: #e5e7eb !important;
+    }
+    
+    .settings-page [role="slider"] [style*="background"] {
+      background-color: #e5e7eb !important;
+    }
+    
+    /* Ultimate slider yellow elimination - target any yellow values */
+    .settings-page * {
+      background-image: none !important;
+    }
+    
+    .settings-page [role="slider"] {
+      background: linear-gradient(to right, #111827 0%, #111827 70%, #e5e7eb 70%, #e5e7eb 100%) !important;
     }
     
     /* Override all button backgrounds */
@@ -238,6 +268,31 @@ export default function Settings() {
       color: #000000 !important;
     }
     
+    /* Specific targeting for gradient colors and RGB values that might be yellow */
+    .settings-page *[style*="rgb(255, 255, 0)"],
+    .settings-page *[style*="rgb(255, 247, 0)"],
+    .settings-page *[style*="#ffff00"],
+    .settings-page *[style*="#fbbf24"],
+    .settings-page *[style*="#f59e0b"],
+    .settings-page *[style*="hsl(45"],
+    .settings-page *[style*="hsl(50"],
+    .settings-page *[style*="hsl(55"],
+    .settings-page *[style*="hsl(60"] {
+      background-color: #e5e7eb !important;
+      color: #000000 !important;
+    }
+    
+    /* Target all possible slider color variations */
+    .settings-page [role="slider"] > span[style*="background"],
+    .settings-page [role="slider"] span[style*="background"],
+    .settings-page [role="slider"] div[style*="background"] {
+      background-color: #e5e7eb !important;
+    }
+    
+    .settings-page [role="slider"] > span:first-child {
+      background-color: #111827 !important;
+    }
+    
     /* Target specific Radix UI components */
     .settings-page [data-radix-collection-item],
     .settings-page [data-state],
@@ -247,14 +302,27 @@ export default function Settings() {
     
     /* Save button specific styling */
     .settings-page .save-button {
-      background-color: #111827 !important;
+      background-color: #1f2937 !important;
       color: #ffffff !important;
-      border-color: #111827 !important;
+      border-color: #1f2937 !important;
+      border: 1px solid #1f2937 !important;
+      font-weight: 500 !important;
+      padding: 12px 24px !important;
+      border-radius: 8px !important;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
     }
     
     .settings-page .save-button:hover {
-      background-color: #1f2937 !important;
+      background-color: #111827 !important;
       color: #ffffff !important;
+      border-color: #111827 !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+    }
+    
+    .settings-page .save-button:active {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      border-color: #0f172a !important;
     }
     
     /* Eliminate any focus rings with yellow */
@@ -2112,9 +2180,24 @@ export default function Settings() {
             <div className="flex items-center justify-between p-6 bg-white border border-gray-200 rounded-lg" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
               <div>
                 <h3 className="font-medium text-black" style={{ color: '#000000' }}>Save Settings</h3>
-                <p className="text-sm text-gray-700" style={{ color: '#374151' }}>Changes are automatically saved as you make them</p>
+                <p className="text-sm text-black" style={{ color: '#000000' }}>Changes are automatically saved as you make them</p>
               </div>
-              <Button onClick={handleSaveProfile} className="save-button bg-gray-900 hover:bg-gray-800" style={{ backgroundColor: '#111827', color: '#ffffff', borderColor: '#111827' }}>
+              <Button 
+                onClick={handleSaveProfile} 
+                className="save-button px-6 py-3 text-base font-medium rounded-lg transition-colors" 
+                style={{ 
+                  backgroundColor: '#1f2937', 
+                  color: '#ffffff', 
+                  borderColor: '#1f2937',
+                  border: '1px solid #1f2937'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#111827';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1f2937';
+                }}
+              >
                 <Save className="h-4 w-4 mr-2" />
                 Save All Changes
               </Button>

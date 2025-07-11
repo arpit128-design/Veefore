@@ -58,6 +58,14 @@
   background: #ffffff !important;
 }
 
+/* EXCEPTION: Allow backdrop blur for scheduler dialog */
+.scheduler-dialog-content {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
 /* COMPREHENSIVE TAB-SPECIFIC ANTI-YELLOW RULES */
 /* Target ALL possible tab-related elements */
 [role="tablist"] *, [role="tab"] *, [role="tabpanel"] *,

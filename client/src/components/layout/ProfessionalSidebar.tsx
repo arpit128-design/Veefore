@@ -500,12 +500,7 @@ function SidebarContent({
                 </motion.div>
               </DialogTrigger>
               <DialogContent 
-                className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl"
-                style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)'
-                }}
+                className="max-w-sm mx-auto p-0 shadow-xl border border-gray-200 rounded-xl scheduler-dialog-content"
               >
                 <DialogHeader className="sr-only">
                   <DialogTitle>Scheduler Options</DialogTitle>

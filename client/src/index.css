@@ -954,49 +954,33 @@ main[class*="flex-1"][class*="overflow"] {
   background-color: #F5F5F5 !important;
 }
 
-/* Ensure content inside main areas keeps original backgrounds */
+/* Ensure content inside main areas inherits the #F5F5F5 background */
 main.flex-1 > *,
 .veefore-main-content > * {
-  background-color: white !important;
+  background-color: #F5F5F5 !important;
 }
 
-/* Reset specific background classes to their original values */
+/* Override all background classes to use #F5F5F5 */
 main.flex-1 .bg-white,
-.veefore-main-content .bg-white {
-  background-color: white !important;
-}
-
 main.flex-1 .bg-gray-50,
-.veefore-main-content .bg-gray-50 {
-  background-color: #f9fafb !important;
-}
-
 main.flex-1 .bg-slate-50,
-.veefore-main-content .bg-slate-50 {
-  background-color: #f8fafc !important;
-}
-
 main.flex-1 .bg-blue-50,
-.veefore-main-content .bg-blue-50 {
-  background-color: #eff6ff !important;
-}
-
 main.flex-1 .bg-green-50,
-.veefore-main-content .bg-green-50 {
-  background-color: #f0fdf4 !important;
-}
-
 main.flex-1 .bg-red-50,
-.veefore-main-content .bg-red-50 {
-  background-color: #fef2f2 !important;
-}
-
 main.flex-1 .bg-purple-50,
-.veefore-main-content .bg-purple-50 {
-  background-color: #faf5ff !important;
+main.flex-1 [class*="bg-"],
+.veefore-main-content .bg-white,
+.veefore-main-content .bg-gray-50,
+.veefore-main-content .bg-slate-50,
+.veefore-main-content .bg-blue-50,
+.veefore-main-content .bg-green-50,
+.veefore-main-content .bg-red-50,
+.veefore-main-content .bg-purple-50,
+.veefore-main-content [class*="bg-"] {
+  background-color: #F5F5F5 !important;
 }
 
-/* Ensure all cards and containers have white backgrounds */
+/* Ensure all cards and containers have #F5F5F5 backgrounds */
 main.flex-1 .card,
 main.flex-1 [class*="card"],
 main.flex-1 .rounded,
@@ -1021,7 +1005,7 @@ main.flex-1 [class*="p-"],
 .veefore-main-content .p-6,
 .veefore-main-content .p-8,
 .veefore-main-content [class*="p-"] {
-  background-color: white !important;
+  background-color: #F5F5F5 !important;
 }
 
 /* NUCLEAR YELLOW ELIMINATION - TARGET ALL YELLOW VARIANTS */

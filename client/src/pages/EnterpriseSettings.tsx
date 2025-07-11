@@ -246,28 +246,33 @@ const EnterpriseSettings = () => {
                 />
               </div>
               
-              {/* Save Button */}
+              {/* Save Button - Enhanced with gradient */}
               <button
                 onClick={handleSaveChanges}
                 disabled={!hasChanges}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 save-button"
+                className="save-button px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                 style={{ 
-                  backgroundColor: hasChanges ? '#111827 !important' : '#9ca3af !important',
-                  color: '#ffffff !important'
+                  background: hasChanges ? 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)' : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                  color: '#ffffff !important',
+                  border: 'none'
                 }}
               >
                 <Save className="h-4 w-4" style={{ color: '#ffffff !important' }} />
                 <span style={{ color: '#ffffff !important' }}>Save Changes</span>
               </button>
               
-              {/* Sign Out */}
+              {/* Sign Out - Enhanced with gradient */}
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center space-x-2"
-                style={{ backgroundColor: '#ffffff !important', color: '#374151 !important' }}
+                className="sign-out-button px-6 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:from-red-600 hover:to-pink-600 flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                style={{ 
+                  background: 'linear-gradient(135deg, #ef4444 0%, #ec4899 100%)',
+                  color: '#ffffff !important',
+                  border: 'none'
+                }}
               >
-                <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
+                <LogOut className="h-4 w-4" style={{ color: '#ffffff !important' }} />
+                <span style={{ color: '#ffffff !important' }}>Sign Out</span>
               </button>
             </div>
           </div>
@@ -917,10 +922,19 @@ const EnterpriseSettings = () => {
           color: #0f766e !important;
         }
         
-        /* Save button specific override */
+        /* Enhanced button styling */
         .save-button {
-          background-color: #111827 !important;
+          background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
           color: #ffffff !important;
+          border: none !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          transition: all 0.2s ease-in-out !important;
+        }
+        
+        .save-button:hover {
+          background: linear-gradient(135deg, #059669 0%, #0f766e 100%) !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+          transform: scale(1.05) !important;
         }
         
         .save-button * {
@@ -928,7 +942,29 @@ const EnterpriseSettings = () => {
         }
         
         .save-button:disabled {
-          background-color: #9ca3af !important;
+          background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+          color: #ffffff !important;
+          opacity: 0.5 !important;
+          cursor: not-allowed !important;
+          transform: none !important;
+        }
+        
+        /* Sign out button styling */
+        .sign-out-button {
+          background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%) !important;
+          color: #ffffff !important;
+          border: none !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          transition: all 0.2s ease-in-out !important;
+        }
+        
+        .sign-out-button:hover {
+          background: linear-gradient(135deg, #dc2626 0%, #db2777 100%) !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+          transform: scale(1.05) !important;
+        }
+        
+        .sign-out-button * {
           color: #ffffff !important;
         }
         

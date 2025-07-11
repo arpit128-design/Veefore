@@ -382,8 +382,8 @@ export default function CommentToDMAutomation() {
     <div className="flex h-screen bg-gray-50">
       {/* Main Content */}
       <div className="flex-1 flex">
-        {/* Left Panel - Configuration */}
-        <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
+        {/* Left Panel - Configuration - Full width except preview */}
+        <div className="flex-1 bg-white border-r border-gray-200 flex flex-col">
           {/* Header */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -838,7 +838,7 @@ export default function CommentToDMAutomation() {
         </div>
 
         {/* Right Panel - Preview */}
-        <div className="w-1/2 bg-gray-50 p-6 flex flex-col">
+        <div className="w-96 bg-gray-50 p-6 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-2">
               <Instagram className="w-5 h-5 text-purple-600" />

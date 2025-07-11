@@ -263,7 +263,7 @@ export function getEngagementQuality(rate: number, platform: string): {
   } else if (rate >= benchmark.average) {
     return {
       quality: 'average',
-      color: 'text-yellow-400',
+      color: 'text-emerald-400',
       description: 'Average engagement'
     };
   } else {

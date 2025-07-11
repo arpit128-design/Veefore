@@ -385,7 +385,7 @@ export default function AdvancedAnalytics() {
                         style={{ width: `${platform.positive}%` }}
                       ></div>
                       <div 
-                        className="bg-yellow-500" 
+                        className="bg-emerald-500" 
                         style={{ width: `${platform.neutral}%` }}
                       ></div>
                       <div 

@@ -852,6 +852,59 @@ button[data-state="checked"],
   background-color: rgb(37 99 235) !important;
 }
 
+/* COMPREHENSIVE TOGGLE CIRCLE FIX - TARGET ALL POSSIBLE TOGGLE ELEMENTS */
+[data-radix-switch-thumb],
+[data-radix-switch-thumb][data-state="checked"],
+[data-radix-switch-thumb][data-state="unchecked"],
+button[role="switch"] > span,
+button[role="switch"] > div,
+.switch-thumb,
+.toggle-thumb {
+  background-color: rgb(37 99 235) !important;
+  border-color: rgb(37 99 235) !important;
+}
+
+/* FORCE GRAY BACKGROUND FOR UNCHECKED TOGGLES */
+[role="switch"][data-state="unchecked"],
+[role="switch"][aria-checked="false"] {
+  background-color: rgb(226 232 240) !important;
+}
+
+/* RADIX UI SWITCH THUMB SPECIFIC TARGETING */
+[data-radix-switch-thumb][data-state="unchecked"] {
+  background-color: rgb(255 255 255) !important;
+}
+
+/* TOGGLE CIRCLE UNIVERSAL OVERRIDE - CATCH ALL YELLOW TOGGLES */
+*[role="switch"] *,
+*[data-state="checked"] *,
+*[data-state="unchecked"] *,
+button[type="button"][role="switch"] *,
+.switch-root *,
+.toggle-root * {
+  background-color: rgb(37 99 235) !important;
+  border-color: rgb(37 99 235) !important;
+}
+
+/* SPECIFIC TARGETING FOR TOGGLE CIRCLES THAT MIGHT BE YELLOW */
+span[data-state="checked"],
+span[data-state="unchecked"],
+div[data-state="checked"],
+div[data-state="unchecked"] {
+  background-color: rgb(37 99 235) !important;
+}
+
+/* YELLOW TOGGLE ELIMINATION - ALL POSSIBLE SELECTORS */
+*[style*="yellow"],
+*[style*="rgb(255, 255, 0)"],
+*[style*="rgb(255, 247"],
+*[style*="#ffff00"],
+*[style*="#fbbf24"],
+*[style*="#f59e0b"] {
+  background-color: rgb(37 99 235) !important;
+  color: rgb(37 99 235) !important;
+}
+
 /* Scrollbar fixes - remove any yellow tints */
 ::-webkit-scrollbar {
   width: 8px;

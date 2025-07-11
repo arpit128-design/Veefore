@@ -268,7 +268,7 @@ const ProfessionalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-gray-50 min-h-screen p-3 sm:p-4 lg:p-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 bg-white min-h-screen p-3 sm:p-4 lg:p-6">
       {/* Header Section - Mobile Optimized */}
       <div className="dashboard-greeting-banner bg-white p-3 sm:p-4 lg:p-6 rounded-xl shadow-sm border">
         {/* Mobile Layout - Compact */}

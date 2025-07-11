@@ -1186,6 +1186,14 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a {
   color: transparent !important;
 }
 
+/* Allow Analytics sidebar section gradient to work */
+.bg-gradient-to-r.from-cyan-600.to-purple-600 {
+  background: linear-gradient(to right, rgb(8 145 178), rgb(147 51 234)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
 /* COMPREHENSIVE INPUT TEXT VISIBILITY - CATCH ALL CASES */
 * input,
 * textarea,

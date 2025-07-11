@@ -276,9 +276,10 @@ interface SidebarSectionProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  isAnalytics?: boolean;
 }
 
-function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionProps) {
+function SidebarSection({ title, children, defaultOpen = true, isAnalytics = false }: SidebarSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
@@ -289,7 +290,7 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
         whileHover={{ x: 2 }}
         transition={{ duration: 0.2 }}
       >
-        <span>{title}</span>
+        <span className={isAnalytics ? "bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent font-bold" : ""}>{title}</span>
         <motion.div
           animate={{ rotate: isOpen ? 90 : 0 }}
           transition={{ duration: 0.2 }}
@@ -619,7 +620,7 @@ function SidebarContent({
         </SidebarSection>
 
         {/* Analytics & Insights */}
-        <SidebarSection title="Analytics">
+        <SidebarSection title="Analytics" isAnalytics={true}>
           {onAnalyticsToggle ? (
             <motion.div
               whileHover={{ x: 4 }}

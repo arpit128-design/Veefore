@@ -173,6 +173,30 @@ const EnterpriseSettings = () => {
       reducedMotion: false,
       keyboardNavigation: true,
       focusIndicators: true
+    },
+    billing: {
+      autoRenewal: true,
+      paymentMethod: 'credit_card',
+      invoiceEmails: true,
+      usageAlerts: true,
+      spendingLimit: 1000,
+      currency: 'USD',
+      billingAddress: {
+        street: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: 'US'
+      }
+    },
+    developer: {
+      apiKey: '',
+      webhookUrl: '',
+      debugMode: false,
+      betaFeatures: false,
+      advancedMetrics: false,
+      apiRateLimit: 1000,
+      logLevel: 'info'
     }
   });
 

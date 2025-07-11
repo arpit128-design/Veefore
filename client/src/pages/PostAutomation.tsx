@@ -93,6 +93,11 @@ interface AutomationRule {
       maxPerDay: number;
       cooldownMinutes: number;
     };
+    commentToDmFlow?: {
+      replyToCommentFirst: boolean;
+      publicReplyContent?: string;
+      dmFollowUpDelay?: number; // delay in minutes before sending DM
+    };
   };
   aiSettings?: {
     personality: string;
@@ -361,6 +366,11 @@ const PostAutomation: React.FC = () => {
                 {rule.type === 'comment_to_dm' ? 'Send DM when user comments' : `Trigger: ${rule.triggerType}`} 
                 {rule.triggerValue && ` "${rule.triggerValue}"`}
               </p>
+              {rule.type === 'comment_to_dm' && rule.conditions?.commentToDmFlow?.replyToCommentFirst && (
+                <p className="text-xs text-blue-600 mt-1">
+                  ✓ Reply to comment first, then send DM
+                </p>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -458,6 +468,7 @@ const PostAutomation: React.FC = () => {
                     <h4 className="font-semibold text-blue-900">Comment to DM Automation</h4>
                     <p className="text-sm text-blue-700 mt-1">
                       When users comment on your post, the system will automatically send them a direct message with your response. 
+                      You can optionally reply to their comment first publicly, then send a follow-up DM.
                       This is perfect for lead generation, customer support, or providing additional information privately.
                     </p>
                   </div>
@@ -610,6 +621,90 @@ const PostAutomation: React.FC = () => {
                   />
                 </div>
               </div>
+              
+              {newRule.type === 'comment_to_dm' && (
+                <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-2">
+                    <MessageCircle className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-900">Comment to DM Flow</h4>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="reply-first"
+                        checked={newRule.conditions?.commentToDmFlow?.replyToCommentFirst || false}
+                        onCheckedChange={(checked) => setNewRule({
+                          ...newRule,
+                          conditions: {
+                            ...newRule.conditions,
+                            commentToDmFlow: {
+                              ...newRule.conditions?.commentToDmFlow,
+                              replyToCommentFirst: checked
+                            }
+                          }
+                        })}
+                      />
+                      <Label htmlFor="reply-first" className="text-sm font-medium text-blue-900">
+                        Reply to comment first, then send DM
+                      </Label>
+                    </div>
+                    
+                    {newRule.conditions?.commentToDmFlow?.replyToCommentFirst && (
+                      <>
+                        <div>
+                          <Label htmlFor="public-reply">Public Comment Reply</Label>
+                          <Textarea
+                            id="public-reply"
+                            placeholder="Enter your public comment reply..."
+                            value={newRule.conditions?.commentToDmFlow?.publicReplyContent || ''}
+                            onChange={(e) => setNewRule({
+                              ...newRule,
+                              conditions: {
+                                ...newRule.conditions,
+                                commentToDmFlow: {
+                                  ...newRule.conditions?.commentToDmFlow,
+                                  publicReplyContent: e.target.value
+                                }
+                              }
+                            })}
+                            rows={2}
+                            className="text-sm"
+                          />
+                          <p className="text-xs text-blue-600 mt-1">
+                            This will be posted as a public comment reply before sending the DM
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="dm-delay">DM Delay (minutes)</Label>
+                          <Input
+                            id="dm-delay"
+                            type="number"
+                            min="0"
+                            max="60"
+                            value={newRule.conditions?.commentToDmFlow?.dmFollowUpDelay || 2}
+                            onChange={(e) => setNewRule({
+                              ...newRule,
+                              conditions: {
+                                ...newRule.conditions,
+                                commentToDmFlow: {
+                                  ...newRule.conditions?.commentToDmFlow,
+                                  dmFollowUpDelay: parseInt(e.target.value)
+                                }
+                              }
+                            })}
+                            className="text-sm"
+                          />
+                          <p className="text-xs text-blue-600 mt-1">
+                            Wait time before sending DM after comment reply
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="ai" className="space-y-4">
